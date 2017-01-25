@@ -152,6 +152,7 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
                 .space(TEST_SPACE_NAME)
                 .build())
             .as(StepVerifier::create)
+            .expectNext(1)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -203,6 +204,7 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
                 .space(TEST_SPACE_NAME)
                 .build())
             .as(StepVerifier::create)
+            .expectNext(1)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -220,6 +222,7 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
                 .space(TEST_SPACE_NAME)
                 .build())
             .as(StepVerifier::create)
+            .expectNext(1)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -238,6 +241,7 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
                 .space(TEST_SPACE_NAME)
                 .build())
             .as(StepVerifier::create)
+            .expectNext(1)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -256,6 +260,7 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
                 .space(TEST_SPACE_NAME)
                 .build())
             .as(StepVerifier::create)
+            .expectNext(1)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -511,6 +516,7 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
                 .port(9999)
                 .build())
             .as(StepVerifier::create)
+            .expectNext(9999)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }

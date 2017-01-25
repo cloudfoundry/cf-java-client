@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.operations.domains;
 
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
@@ -28,5 +29,11 @@ abstract class _CreateSharedDomainRequest {
      * The domain name
      */
     abstract String getDomain();
+
+    /**
+     * The router group name
+     */
+    @Nullable
+    abstract String getRouterGroup();
 
 }

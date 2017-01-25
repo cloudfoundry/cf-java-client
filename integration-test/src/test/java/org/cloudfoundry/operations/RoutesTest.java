@@ -29,10 +29,10 @@ import org.cloudfoundry.operations.routes.ListRoutesRequest;
 import org.cloudfoundry.operations.routes.MapRouteRequest;
 import org.cloudfoundry.operations.routes.Route;
 import org.cloudfoundry.operations.routes.UnmapRouteRequest;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -48,8 +48,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.IfCloudFoundryVersion.CloudFoundryVersion.PCF_1_8;
 import static org.cloudfoundry.operations.routes.Level.ORGANIZATION;
 import static org.cloudfoundry.operations.routes.Level.SPACE;
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public final class RoutesTest extends AbstractIntegrationTest {
+
+    private static final String DEFAULT_ROUTER_GROUP = "default-tcp";
 
     @Autowired
     private CloudFoundryOperations cloudFoundryOperations;
@@ -136,6 +139,35 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
+    public void createRouteTcpAssignedPort() throws TimeoutException, InterruptedException {
+        String domainName = this.nameFactory.getDomainName();
+        Integer port = 61002;
+
+        requestCreateSharedDomain(this.cloudFoundryOperations, domainName, DEFAULT_ROUTER_GROUP)
+            .then(requestCreateRoute(this.cloudFoundryOperations, this.spaceName, domainName, port))
+            .thenMany(requestListRoutes(this.cloudFoundryOperations))
+            .filter(response -> domainName.equals(response.getDomain()))
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void createRouteTcpRandomPort() throws TimeoutException, InterruptedException {
+        String domainName = this.nameFactory.getDomainName();
+
+        requestCreateSharedDomain(this.cloudFoundryOperations, domainName, DEFAULT_ROUTER_GROUP)
+            .then(requestCreateRoute(this.cloudFoundryOperations, this.spaceName, domainName, true))
+            .thenMany(requestListRoutes(this.cloudFoundryOperations))
+            .filter(response -> domainName.equals(response.getDomain()))
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
     public void createRouteWithNonExistentDomain() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
@@ -150,24 +182,6 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .build())
             .as(StepVerifier::create)
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Domain %s does not exist", domainName))
-            .verify(Duration.ofMinutes(5));
-    }
-
-    @Ignore("TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/588")
-    @Test
-    public void createTcpRoute() throws TimeoutException, InterruptedException {
-        String domainName = this.nameFactory.getDomainName();
-        String path = this.nameFactory.getPath();
-
-        createDomainAndRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, 5000)
-            .then(this.cloudFoundryOperations.routes()
-                .check(CheckRouteRequest.builder()
-                    .domain(domainName)
-                    .path(path)
-                    .build()))
-            .as(StepVerifier::create)
-            .expectNext(true)
-            .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
 
@@ -234,10 +248,23 @@ public final class RoutesTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    @Ignore("TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/588")
     @Test
     public void deleteTcpRoute() throws TimeoutException, InterruptedException {
-        //
+        String domainName = this.nameFactory.getDomainName();
+
+        requestCreateSharedDomain(this.cloudFoundryOperations, domainName, DEFAULT_ROUTER_GROUP)
+            .then(requestCreateRoute(this.cloudFoundryOperations, this.spaceName, domainName, true))
+            .then(port -> this.cloudFoundryOperations.routes()
+                .delete(DeleteRouteRequest.builder()
+                    .domain(domainName)
+                    .port(port)
+                    .build()))
+            .thenMany(requestListRoutes(this.cloudFoundryOperations))
+            .filter(response -> domainName.equals(response.getDomain()))
+            .as(StepVerifier::create)
+            .expectNextCount(0)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -295,10 +322,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     .host(hostName)
                     .path(path)
                     .build()))
-            .thenMany(this.cloudFoundryOperations.routes()
-                .list(ListRoutesRequest.builder()
-                    .level(SPACE)
-                    .build()))
+            .thenMany(requestListRoutes(this.cloudFoundryOperations))
             .filter(filterRoutes(domainName, hostName, path, applicationName))
             .as(StepVerifier::create)
             .expectNextCount(1)
@@ -325,10 +349,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     .host(hostName)
                     .path(path)
                     .build()))
-            .thenMany(this.cloudFoundryOperations.routes()
-                .list(ListRoutesRequest.builder()
-                    .level(SPACE)
-                    .build()))
+            .thenMany(requestListRoutes(this.cloudFoundryOperations))
             .filter(filterRoutes(domainName, hostName, path, applicationName))
             .as(StepVerifier::create)
             .expectNextCount(1)
@@ -355,10 +376,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     .host(hostName)
                     .path(path)
                     .build()))
-            .thenMany(this.cloudFoundryOperations.routes()
-                .list(ListRoutesRequest.builder()
-                    .level(SPACE)
-                    .build()))
+            .thenMany(requestListRoutes(this.cloudFoundryOperations))
             .filter(filterRoutes(domainName, hostName, path, applicationName))
             .as(StepVerifier::create)
             .expectNextCount(1)
@@ -366,10 +384,29 @@ public final class RoutesTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    @Ignore("TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/588")
     @Test
-    public void mapTcpRoute() throws TimeoutException, InterruptedException {
-        //
+    public void mapTcpRoute() throws TimeoutException, InterruptedException, IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+        String domainName = this.nameFactory.getDomainName();
+
+        Mono
+            .when(
+                createSharedDomainAndTcpRoute(this.cloudFoundryOperations, domainName, this.spaceName),
+                requestCreateApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, true)
+            )
+            .then(this.cloudFoundryOperations.routes()
+                .map(MapRouteRequest.builder()
+                    .applicationName(applicationName)
+                    .domain(domainName)
+                    .build()))
+            .thenMany(requestListRoutes(this.cloudFoundryOperations))
+            .filter(response -> domainName.equals(response.getDomain()))
+            .single()
+            .map(route -> route.getApplications().size())
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -398,10 +435,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     .host(hostName)
                     .path(path)
                     .build()))
-            .thenMany(this.cloudFoundryOperations.routes()
-                .list(ListRoutesRequest.builder()
-                    .level(SPACE)
-                    .build()))
+            .thenMany(requestListRoutes(this.cloudFoundryOperations))
             .filter(filterRoutes(domainName, hostName, path, applicationName))
             .as(StepVerifier::create)
             .expectComplete()
@@ -434,35 +468,58 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     .host(hostName)
                     .path(path)
                     .build()))
-            .thenMany(this.cloudFoundryOperations.routes()
-                .list(ListRoutesRequest.builder()
-                    .level(SPACE)
-                    .build()))
+            .thenMany(requestListRoutes(this.cloudFoundryOperations))
             .filter(filterRoutes(domainName, hostName, path, applicationName))
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
 
-    @Ignore("TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/588")
     @Test
-    public void unmapTcpRoute() throws TimeoutException, InterruptedException {
-        //
+    public void unmapTcpRoute() throws TimeoutException, InterruptedException, IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+        String domainName = this.nameFactory.getDomainName();
+
+        Mono
+            .when(
+                createSharedDomainAndTcpRoute(this.cloudFoundryOperations, domainName, this.spaceName),
+                requestCreateApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, true)
+            )
+            .then(function((port, ignore) -> this.cloudFoundryOperations.routes()
+                .map(MapRouteRequest.builder()
+                    .applicationName(applicationName)
+                    .domain(domainName)
+                    .port(port)
+                    .build())))
+            .then(port -> this.cloudFoundryOperations.routes()
+                .unmap(UnmapRouteRequest.builder()
+                    .applicationName(applicationName)
+                    .domain(domainName)
+                    .port(port)
+                    .build()))
+            .thenMany(requestListRoutes(this.cloudFoundryOperations))
+            .filter(response -> domainName.equals(response.getDomain()))
+            .single()
+            .map(route -> route.getApplications().size())
+            .as(StepVerifier::create)
+            .expectNextCount(0)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
-    private static Mono<Void> createDomainAndRoute(CloudFoundryOperations cloudFoundryOperations, String organizationName, String spaceName, String domainName, String hostName, String path) {
+    private static Mono<Integer> createDomainAndRoute(CloudFoundryOperations cloudFoundryOperations, String organizationName, String spaceName, String domainName, String hostName, String path) {
         return requestCreateDomain(cloudFoundryOperations, organizationName, domainName)
             .then(requestCreateRoute(cloudFoundryOperations, spaceName, domainName, hostName, path));
     }
 
-    private static Mono<Void> createDomainAndRoute(CloudFoundryOperations cloudFoundryOperations, String organizationName, String spaceName, String domainName, Integer port) {
-        return requestCreateDomain(cloudFoundryOperations, organizationName, domainName)
-            .then(requestCreateRoute(cloudFoundryOperations, spaceName, domainName, port));
+    private static Mono<Integer> createSharedDomainAndRoute(CloudFoundryOperations cloudFoundryOperations, String spaceName, String domainName, String hostName, String path) {
+        return requestCreateSharedDomain(cloudFoundryOperations, domainName, null)
+            .then(requestCreateRoute(cloudFoundryOperations, spaceName, domainName, hostName, path));
     }
 
-    private static Mono<Void> createSharedDomainAndRoute(CloudFoundryOperations cloudFoundryOperations, String spaceName, String domainName, String hostName, String path) {
-        return requestCreateSharedDomain(cloudFoundryOperations, domainName)
-            .then(requestCreateRoute(cloudFoundryOperations, spaceName, domainName, hostName, path));
+    private static Mono<Integer> createSharedDomainAndTcpRoute(CloudFoundryOperations cloudFoundryOperations, String domainName, String spaceName) {
+        return requestCreateSharedDomain(cloudFoundryOperations, domainName, DEFAULT_ROUTER_GROUP)
+            .then(requestCreateRoute(cloudFoundryOperations, spaceName, domainName, true));
     }
 
     private static Predicate<Route> filterRoutes(String domainName, String host, String path, String applicationName) {
@@ -493,7 +550,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .build());
     }
 
-    private static Mono<Void> requestCreateRoute(CloudFoundryOperations cloudFoundryOperations, String spaceName, String domainName, String hostName, String path) {
+    private static Mono<Integer> requestCreateRoute(CloudFoundryOperations cloudFoundryOperations, String spaceName, String domainName, String hostName, String path) {
         return cloudFoundryOperations.routes()
             .create(CreateRouteRequest.builder()
                 .domain(domainName)
@@ -503,7 +560,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .build());
     }
 
-    private static Mono<Void> requestCreateRoute(CloudFoundryOperations cloudFoundryOperations, String spaceName, String domainName, Integer port) {
+    private static Mono<Integer> requestCreateRoute(CloudFoundryOperations cloudFoundryOperations, String spaceName, String domainName, Integer port) {
         return cloudFoundryOperations.routes()
             .create(CreateRouteRequest.builder()
                 .domain(domainName)
@@ -512,10 +569,27 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .build());
     }
 
-    private static Mono<Void> requestCreateSharedDomain(CloudFoundryOperations cloudFoundryOperations, String domainName) {
+    private static Mono<Integer> requestCreateRoute(CloudFoundryOperations cloudFoundryOperations, String spaceName, String domainName, Boolean randomPort) {
+        return cloudFoundryOperations.routes()
+            .create(CreateRouteRequest.builder()
+                .domain(domainName)
+                .randomPort(randomPort)
+                .space(spaceName)
+                .build());
+    }
+
+    private static Mono<Void> requestCreateSharedDomain(CloudFoundryOperations cloudFoundryOperations, String domainName, String routerGroupId) {
         return cloudFoundryOperations.domains()
             .createShared(CreateSharedDomainRequest.builder()
                 .domain(domainName)
+                .routerGroup(routerGroupId)
+                .build());
+    }
+
+    private static Flux<Route> requestListRoutes(CloudFoundryOperations cloudFoundryOperations) {
+        return cloudFoundryOperations.routes()
+            .list(ListRoutesRequest.builder()
+                .level(SPACE)
                 .build());
     }
 

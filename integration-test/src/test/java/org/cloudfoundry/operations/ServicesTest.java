@@ -108,7 +108,7 @@ public final class ServicesTest extends AbstractIntegrationTest {
                 .build());
     }
 
-    private static Mono<Void> requestCreateRoute(CloudFoundryOperations cloudFoundryOperations, String domainName, String hostName, String path, String spaceName) {
+    private static Mono<Integer> requestCreateRoute(CloudFoundryOperations cloudFoundryOperations, String domainName, String hostName, String path, String spaceName) {
         return cloudFoundryOperations.routes()
             .create(CreateRouteRequest.builder()
                 .domain(domainName)

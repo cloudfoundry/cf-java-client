@@ -36,9 +36,9 @@ public interface Routes {
      * Create a new route
      *
      * @param request The Create Route request
-     * @return a completion indicator
+     * @return the port number for the route, if applicable
      */
-    Mono<Void> create(CreateRouteRequest request);
+    Mono<Integer> create(CreateRouteRequest request);
 
     /**
      * Remove a route
@@ -69,9 +69,9 @@ public interface Routes {
      * Add a URL route to an application
      *
      * @param request the Map Route request
-     * @return a completion indicator
+     * @return the port number for the route, if applicable
      */
-    Mono<Void> map(MapRouteRequest request);
+    Mono<Integer> map(MapRouteRequest request);
 
     /**
      * Remove a URL route from an application

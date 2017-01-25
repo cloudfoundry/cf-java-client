@@ -900,7 +900,7 @@ public final class DefaultApplications implements Applications {
                     .spaceId(spaceId)
                     .page(page)
                     .build()))
-            .map(OperationUtils.<ApplicationResource, AbstractApplicationResource>cast());
+            .cast(AbstractApplicationResource.class);
     }
 
     private static Mono<AssociateApplicationRouteResponse> requestAssociateRoute(CloudFoundryClient cloudFoundryClient, String applicationId, String routeId) {
@@ -982,7 +982,7 @@ public final class DefaultApplications implements Applications {
             .get(org.cloudfoundry.client.v2.applications.GetApplicationRequest.builder()
                 .applicationId(applicationId)
                 .build())
-            .map(OperationUtils.<GetApplicationResponse, AbstractApplicationResource>cast());
+            .cast(AbstractApplicationResource.class);
     }
 
     private static Flux<ServiceBindingResource> requestListServiceBindings(CloudFoundryClient cloudFoundryClient, String applicationId) {
@@ -1161,7 +1161,7 @@ public final class DefaultApplications implements Applications {
             .update(modifier.apply(UpdateApplicationRequest.builder()
                 .applicationId(applicationId))
                 .build())
-            .map(OperationUtils.<UpdateApplicationResponse, AbstractApplicationResource>cast());
+            .cast(AbstractApplicationResource.class);
     }
 
     private static Mono<AbstractApplicationResource> requestUpdateApplicationEnvironment(CloudFoundryClient cloudFoundryClient, String applicationId, Map<String, Object> environment) {
