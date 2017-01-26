@@ -16,6 +16,9 @@
 
 package org.cloudfoundry.reactor.tokenprovider;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.netty.util.AsciiString;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
@@ -32,11 +35,15 @@ import reactor.core.publisher.Mono;
 import reactor.ipc.netty.http.client.HttpClientRequest;
 import reactor.ipc.netty.http.client.HttpClientResponse;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Base64;
+import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static io.netty.handler.codec.http.HttpHeaderNames.ACCEPT;
@@ -60,6 +67,8 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
     private static final String TOKEN_ENDPOINT = "token_endpoint";
 
     private static final String TOKEN_TYPE = "token_type";
+
+    private static final ZoneId UTC = ZoneId.of("UTC");
 
     private final ConcurrentMap<ConnectionContext, Mono<String>> accessTokens = new ConcurrentHashMap<>(1);
 
@@ -110,10 +119,39 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
             .failOnServerError(false);
     }
 
+    private static String extractAccessToken(Map<String, String> payload) {
+        String accessToken = payload.get(ACCESS_TOKEN);
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Access Token: {}", accessToken);
+
+            parseToken(accessToken)
+                .ifPresent(claims -> {
+                    LOGGER.debug("Access Token Issued At:  {} UTC", toLocalDateTime(claims.getIssuedAt()));
+                    LOGGER.debug("Access Token Expires At: {} UTC", toLocalDateTime(claims.getExpiration()));
+                });
+        }
+
+        return String.format("%s %s", payload.get(TOKEN_TYPE), accessToken);
+    }
+
     private static String getTokenUri(String root) {
         return UriComponentsBuilder.fromUriString(root)
             .pathSegment("oauth", "token")
             .build().encode().toUriString();
+    }
+
+    private static Optional<Claims> parseToken(String token) {
+        try {
+            String jws = token.substring(0, token.lastIndexOf('.') + 1);
+            return Optional.of(Jwts.parser().parseClaimsJwt(jws).getBody());
+        } catch (UnsupportedJwtException e) {
+            return Optional.empty();
+        }
+    }
+
+    private static LocalDateTime toLocalDateTime(Date date) {
+        return LocalDateTime.from(date.toInstant().atZone(UTC));
     }
 
     private HttpClientRequest addAuthorization(HttpClientRequest request) {
@@ -121,21 +159,30 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
         return request.header(AUTHORIZATION, String.format("Basic %s", encoded));
     }
 
+    private Consumer<Map<String, String>> extractRefreshToken(ConnectionContext connectionContext) {
+        return payload -> Optional.ofNullable(payload.get(REFRESH_TOKEN))
+            .ifPresent(refreshToken -> {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Refresh Token: {}", refreshToken);
+
+                    parseToken(refreshToken)
+                        .ifPresent(claims -> {
+                            LOGGER.debug("Refresh Token Issued At:  {} UTC", toLocalDateTime(claims.getIssuedAt()));
+                            LOGGER.debug("Refresh Token Expires At: {} UTC", toLocalDateTime(claims.getExpiration()));
+                        });
+                }
+
+                this.refreshTokens.put(connectionContext, Mono.just(refreshToken));
+            });
+    }
+
+    @SuppressWarnings("unchecked")
     private Function<Mono<HttpClientResponse>, Mono<String>> extractTokens(ConnectionContext connectionContext) {
         return inbound -> inbound
             .transform(JsonCodec.decode(connectionContext.getObjectMapper(), Map.class))
-            .doOnNext(payload -> Optional.ofNullable(payload.get(REFRESH_TOKEN))
-                .map(s -> (String) s)
-                .ifPresent(refreshToken -> {
-                    LOGGER.debug("Refresh Token: {}", refreshToken);
-                    this.refreshTokens.put(connectionContext, Mono.just(refreshToken));
-                }))
-            .map(payload -> {
-                String token = String.format("%s %s", payload.get(TOKEN_TYPE), payload.get(ACCESS_TOKEN));
-                LOGGER.debug("Access Token:  {}", token);
-                return token;
-
-            });
+            .map(payload -> (Map<String, String>) payload)
+            .doOnNext(extractRefreshToken(connectionContext))
+            .map(AbstractUaaTokenProvider::extractAccessToken);
     }
 
     private Mono<HttpClientResponse> primaryToken(ConnectionContext connectionContext) {
