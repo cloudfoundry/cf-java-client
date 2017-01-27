@@ -18,7 +18,6 @@ package org.cloudfoundry.reactor.tokenprovider;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.UnsupportedJwtException;
 import io.netty.util.AsciiString;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
@@ -145,7 +144,7 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
         try {
             String jws = token.substring(0, token.lastIndexOf('.') + 1);
             return Optional.of(Jwts.parser().parseClaimsJwt(jws).getBody());
-        } catch (UnsupportedJwtException e) {
+        } catch (Exception e) {
             return Optional.empty();
         }
     }
