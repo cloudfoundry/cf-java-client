@@ -73,6 +73,7 @@ abstract class AbstractConnectionContext implements ConnectionContext {
     public HttpClient getHttpClient() {
         return HttpClient.create(options -> {
             options
+                .disablePool()
                 .option(SO_SNDBUF, SEND_BUFFER_SIZE)
                 .option(SO_RCVBUF, RECEIVE_BUFFER_SIZE)
                 .poolResources(PoolResources.fixed(this.name, getConnectionPoolSize()));
