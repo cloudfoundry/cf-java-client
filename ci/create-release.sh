@@ -5,8 +5,6 @@ set -e
 RELEASE=$1
 SNAPSHOT=$2
 
-cd cf-java-client
-
 ./mvnw versions:set -DnewVersion=$RELEASE -DgenerateBackupPoms=false
 git add .
 git commit --message "v$RELEASE Release"
