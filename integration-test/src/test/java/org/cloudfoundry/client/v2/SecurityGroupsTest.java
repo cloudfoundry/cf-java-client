@@ -329,7 +329,6 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
         String newSecurityGroupName = this.nameFactory.getSecurityGroupName();
 
         createSecurityGroupId(this.cloudFoundryClient, oldSecurityGroupName)
-            .log("stream.before")
             .then(securityGroupId -> this.cloudFoundryClient.securityGroups()
                 .update(UpdateSecurityGroupRequest.builder()
                     .securityGroupId(securityGroupId)
