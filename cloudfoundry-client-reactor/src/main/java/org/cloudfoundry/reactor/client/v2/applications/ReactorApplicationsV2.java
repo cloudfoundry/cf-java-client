@@ -54,6 +54,7 @@ import org.cloudfoundry.client.v2.applications.UploadApplicationResponse;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v2.AbstractClientV2Operations;
+import org.cloudfoundry.util.FileUtils;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -191,7 +192,7 @@ public final class ReactorApplicationsV2 extends AbstractClientV2Operations impl
                             form
                                 .multipart(true)
                                 .textFile("resources", resources, APPLICATION_JSON)
-                                .file("application", "application.zip", request.getApplication().toFile(), APPLICATION_ZIP);
+                                .file("application", "application.zip", FileUtils.compress(request.getApplication()).toFile(), APPLICATION_ZIP);
                         } catch (IOException e) {
                             throw Exceptions.propagate(e);
                         }

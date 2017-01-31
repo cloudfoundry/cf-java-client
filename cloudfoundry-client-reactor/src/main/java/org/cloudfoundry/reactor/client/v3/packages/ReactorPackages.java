@@ -34,6 +34,7 @@ import org.cloudfoundry.client.v3.packages.UploadPackageResponse;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
+import org.cloudfoundry.util.FileUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -97,7 +98,7 @@ public final class ReactorPackages extends AbstractClientV3Operations implements
                     .chunkedTransfer(false)
                     .sendForm(form -> form
                         .multipart(true)
-                        .file("bits", "application.zip", request.getBits().toFile(), APPLICATION_ZIP)))
+                        .file("bits", "application.zip", FileUtils.compress(request.getBits()).toFile(), APPLICATION_ZIP)))
                 .then());
     }
 
