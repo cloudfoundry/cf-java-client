@@ -75,7 +75,8 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
             options
                 .option(SO_SNDBUF, SEND_BUFFER_SIZE)
                 .option(SO_RCVBUF, RECEIVE_BUFFER_SIZE)
-                .poolResources(PoolResources.fixed("cloudfoundry-client", getConnectionPoolSize()));
+                .disablePool();
+//                .poolResources(PoolResources.fixed("cloudfoundry-client", getConnectionPoolSize()));
 
             getKeepAlive().ifPresent(keepAlive -> options.option(SO_KEEPALIVE, keepAlive));
             getProxyConfiguration().ifPresent(c -> options.proxy(ClientOptions.Proxy.HTTP, c.getHost(), c.getPort().orElse(null), c.getUsername().orElse(null), u -> c.getPassword().orElse(null)));
