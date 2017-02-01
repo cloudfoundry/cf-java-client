@@ -66,10 +66,10 @@ public abstract class AbstractReactorOperations {
                     .transform(requestTransformer)
                     .transform(serializedRequest(requestPayload)))
                 .doOnSubscribe(NetworkLogging.delete(uri))
-                .transform(NetworkLogging.response(uri))
-                .transform(this::invalidateToken)
-                .transform(responseTransformer)
-                .transform(ErrorPayloadMapper.fallback()))
+                .transform(NetworkLogging.response(uri)))
+            .transform(this::invalidateToken)
+            .transform(responseTransformer)
+            .transform(ErrorPayloadMapper.fallback())
             .transform(deserializedResponse(responseType));
     }
 
@@ -97,10 +97,10 @@ public abstract class AbstractReactorOperations {
                     .transform(requestTransformer)
                     .flatMap(HttpClientRequest::send))
                 .doOnSubscribe(NetworkLogging.get(uri))
-                .transform(NetworkLogging.response(uri))
-                .transform(this::invalidateToken)
-                .transform(responseTransformer)
-                .transform(ErrorPayloadMapper.fallback()));
+                .transform(NetworkLogging.response(uri)))
+            .transform(this::invalidateToken)
+            .transform(responseTransformer)
+            .transform(ErrorPayloadMapper.fallback());
     }
 
     protected final <T> Mono<T> doPatch(Object requestPayload, Class<T> responseType,
@@ -117,10 +117,10 @@ public abstract class AbstractReactorOperations {
                     .transform(requestTransformer)
                     .transform(serializedRequest(requestPayload)))
                 .doOnSubscribe(NetworkLogging.patch(uri))
-                .transform(NetworkLogging.response(uri))
-                .transform(this::invalidateToken)
-                .transform(responseTransformer)
-                .transform(ErrorPayloadMapper.fallback()))
+                .transform(NetworkLogging.response(uri)))
+            .transform(this::invalidateToken)
+            .transform(responseTransformer)
+            .transform(ErrorPayloadMapper.fallback())
             .transform(deserializedResponse(responseType));
     }
 
@@ -149,10 +149,10 @@ public abstract class AbstractReactorOperations {
                     .map(UserAgent::addUserAgent)
                     .transform(requestTransformer))
                 .doOnSubscribe(NetworkLogging.post(uri))
-                .transform(NetworkLogging.response(uri))
-                .transform(this::invalidateToken)
-                .transform(responseTransformer)
-                .transform(ErrorPayloadMapper.fallback()))
+                .transform(NetworkLogging.response(uri)))
+            .transform(this::invalidateToken)
+            .transform(responseTransformer)
+            .transform(ErrorPayloadMapper.fallback())
             .transform(deserializedResponse(responseType));
     }
 
@@ -181,10 +181,10 @@ public abstract class AbstractReactorOperations {
                     .map(UserAgent::addUserAgent)
                     .transform(requestTransformer))
                 .doOnSubscribe(NetworkLogging.put(uri))
-                .transform(NetworkLogging.response(uri))
-                .transform(this::invalidateToken)
-                .transform(responseTransformer)
-                .transform(ErrorPayloadMapper.fallback()))
+                .transform(NetworkLogging.response(uri)))
+            .transform(this::invalidateToken)
+            .transform(responseTransformer)
+            .transform(ErrorPayloadMapper.fallback())
             .transform(deserializedResponse(responseType));
     }
 
@@ -201,10 +201,10 @@ public abstract class AbstractReactorOperations {
                     .transform(requestTransformer)
                     .flatMap(HttpClientRequest::sendWebsocket))
                 .doOnSubscribe(NetworkLogging.ws(uri))
-                .transform(NetworkLogging.response(uri))
-                .transform(this::invalidateToken)
-                .transform(responseTransformer)
-                .transform(ErrorPayloadMapper.fallback()));
+                .transform(NetworkLogging.response(uri)))
+            .transform(this::invalidateToken)
+            .transform(responseTransformer)
+            .transform(ErrorPayloadMapper.fallback());
     }
 
     private static HttpClientRequest disableFailOnError(HttpClientRequest request) {

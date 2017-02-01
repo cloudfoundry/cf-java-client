@@ -21,13 +21,19 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import reactor.core.Exceptions;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigInteger;
 import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.PosixFileAttributes;
 import java.nio.file.attribute.PosixFilePermission;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
@@ -36,6 +42,8 @@ import java.util.stream.Stream;
 public final class FileUtils {
 
     private static final Integer DEFAULT_PERMISSIONS = 0744;
+
+    private static final int MIBIBYTE = 1_024 * 1_024;
 
     private static final Map<PosixFilePermission, Integer> PERMISSION_MODES = FluentMap.<PosixFilePermission, Integer>builder()
         .entry(PosixFilePermission.OWNER_READ, 0400)
@@ -53,7 +61,7 @@ public final class FileUtils {
     }
 
     /**
-     * Compresses a candidate {@link Path}if it is a directory.  Otherwise returns the original {@link Path}.
+     * Compresses a candidate {@link Path} if it is a directory.  Otherwise returns the original {@link Path}.
      *
      * @param candidate the candidate {@link Path} to compress
      * @return the {@link Path} for a compressed artifact
@@ -63,11 +71,23 @@ public final class FileUtils {
             return candidate;
         }
 
+        return compress(candidate, path -> true);
+    }
+
+    /**
+     * Compresses a candidate {@link Path} filtering out entries
+     *
+     * @param candidate the candidate {@link Path} to compress
+     * @param filter    a filter applied to each path
+     * @return the {@link Path} for a compressed artifact
+     */
+    public static Path compress(Path candidate, Predicate<String> filter) {
         try {
             Path staging = Files.createTempFile(null, null);
 
             try (Stream<Path> contents = Files.walk(candidate); ZipArchiveOutputStream out = new ZipArchiveOutputStream(staging.toFile())) {
                 contents
+                    .filter(path -> filter.test(getRelativePathName(candidate, path)))
                     .forEach(p -> write(candidate, p, out));
             }
 
@@ -77,9 +97,81 @@ public final class FileUtils {
         }
     }
 
-    private static String getRelativePathName(Path root, Path path) {
+    /**
+     * Get the relative path of an application
+     *
+     * @param root the root to relativize against
+     * @param path the path to relativize
+     * @return the relative path
+     */
+    public static String getRelativePathName(Path root, Path path) {
         Path relative = root.relativize(path);
         return Files.isDirectory(path) && !relative.toString().endsWith("/") ? String.format("%s/", relative.toString()) : relative.toString();
+    }
+
+    /**
+     * Calculates the SHA-1 hash for a {@link Path}
+     *
+     * @param path the {@link Path} to calculate the hash for
+     * @return a {@link String} representation of the hash
+     */
+    public static String hash(Path path) {
+        try (InputStream in = Files.newInputStream(path)) {
+            MessageDigest digest = MessageDigest.getInstance("sha1");
+
+            byte[] buffer = new byte[MIBIBYTE];
+            int length;
+            while ((length = in.read(buffer)) != -1) {
+                digest.update(buffer, 0, length);
+            }
+
+            return String.format("%040x", new BigInteger(1, digest.digest()));
+        } catch (IOException | NoSuchAlgorithmException e) {
+            throw Exceptions.propagate(e);
+        }
+    }
+
+    /**
+     * Returns a normalized {@link Path}.  In the case of directories, it returns the {@link Path} as it was passed in.  In the case of files, it returns a {@link Path} representing the root of a
+     * filesystem mounted using {@link FileSystems#newFileSystem}.
+     *
+     * @param path the {@link Path} to normalized
+     * @return the normalized path
+     */
+    public static Path normalize(Path path) {
+        try {
+            return Files.isDirectory(path) ? path : FileSystems.newFileSystem(path, null).getPath("/");
+        } catch (IOException e) {
+            throw Exceptions.propagate(e);
+        }
+    }
+
+    /**
+     * Calculates permissions for a {@link Path}
+     *
+     * @param path the {@link Path} to calculate the permissions for
+     * @return a {@link String} representation of the permissions
+     */
+    public static String permissions(Path path) {
+        try {
+            return Integer.toOctalString(getUnixMode(path));
+        } catch (IOException e) {
+            throw Exceptions.propagate(e);
+        }
+    }
+
+    /**
+     * Calculates the size of a {@link Path}
+     *
+     * @param path the {@link Path} to calculate the size for
+     * @return the size
+     */
+    public static int size(Path path) {
+        try {
+            return (int) Files.size(path);
+        } catch (IOException e) {
+            throw Exceptions.propagate(e);
+        }
     }
 
     private static int getUnixMode(Path path) throws IOException {
