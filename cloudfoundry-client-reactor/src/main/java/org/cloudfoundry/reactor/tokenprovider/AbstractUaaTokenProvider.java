@@ -217,8 +217,8 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
                     .map(AbstractUaaTokenProvider::addContentTypes)
                     .transform(tokenRequestTransformer))
                 .doOnSubscribe(NetworkLogging.post(uri))
-                .transform(NetworkLogging.response(uri))
-                .transform(ErrorPayloadMapper.uaa(connectionContext.getObjectMapper())));
+                .transform(NetworkLogging.response(uri)))
+            .transform(ErrorPayloadMapper.uaa(connectionContext.getObjectMapper()));
     }
 
     private Mono<String> token(ConnectionContext connectionContext) {
