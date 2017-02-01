@@ -9,8 +9,6 @@
         <outputRelativeToContentRoot value="true" />
         <module name="cloudfoundry-client" />
         <module name="cloudfoundry-client-reactor" />
-        <module name="cloudfoundry-gradle-plugin" />
-        <module name="cloudfoundry-maven-plugin" />
         <module name="cloudfoundry-operations" />
         <module name="cloudfoundry-util" />
         <module name="integration-test" />

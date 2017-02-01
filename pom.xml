@@ -39,11 +39,8 @@
     <modules>
         <module>cloudfoundry-client</module>
         <module>cloudfoundry-client-reactor</module>
-        <module>cloudfoundry-gradle-plugin</module>
-        <module>cloudfoundry-maven-plugin</module>
         <module>cloudfoundry-operations</module>
         <module>cloudfoundry-util</module>
-        <module>integration-test</module>
     </modules>
 
     <properties>
@@ -214,6 +211,7 @@
                                 <password>{{ARTIFACTORY_PASSWORD}}</password>
                                 <repoKey>{{ARTIFACTORY_REPO_KEY|"libs-release-local"}}</repoKey>
                                 <snapshotRepoKey>{{ARTIFACTORY_SNAPSHOT_REPO_KEY|"libs-snapshot-local"}}</snapshotRepoKey>
+                                <excludePatterns>*-tests.jar</excludePatterns>
                             </publisher>
                         </configuration>
                     </execution>
@@ -271,6 +269,11 @@
     <profiles>
         <profile>
             <id>integration-test</id>
+
+            <modules>
+                <module>integration-test</module>
+            </modules>
+
             <build>
                 <plugins>
                     <plugin>

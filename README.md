@@ -22,7 +22,6 @@ The `cf-java-client` project is a Java language binding for interacting with a C
 * `cloudfoundry-client` – Interfaces, request, and response objects mapping to the [Cloud Foundry REST APIs][a].  This project has no implementation and therefore cannot connect a Cloud Foundry instance on its own.
 * `cloudfoundry-client-reactor` – The default implementation of the `cloudfoundry-client` project.  This implementation is based on the Reactor Netty [`HttpClient`][h].
 * `cloudfoundry-operations` – An API and implementation that corresponds to the [Cloud Foundry CLI][c] operations.  This project builds on the `cloudfoundry-client` and therefore has a single implementation.
-* `cloudfoundry-maven-plugin` / `cloudfoundry-gradle-plugin` – Build plugins for [Maven][m] and [Gradle][g].  These projects build on `cloudfoundry-operations` and therefore have single implementations.
 
 Most projects will need two dependencies; the Operations API and an implementation of the Client API.  For Maven, the dependencies would be defined like this:
 
@@ -251,14 +250,6 @@ The above example is more complicated:
 1. `.list(...)` – Retrieves a page of Cloud Foundry organizations.
 1. `.flatMap(...)` – Substitutes the original `Mono` with a `Flux` of the `Resource`s returned by the requested page.
 1. `.map(...)` – Maps the `Resource` to an `Organization` type.
-
-### Maven Plugin
-
-TODO: Document once implemented
-
-### Gradle Plugin
-
-TODO: Document once implemented
 
 ## Development
 The project depends on Java 8.  To build from source and install to your local Maven cache, run the following:
