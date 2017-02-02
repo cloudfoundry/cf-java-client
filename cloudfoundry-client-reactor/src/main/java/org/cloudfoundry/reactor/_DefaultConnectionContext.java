@@ -77,7 +77,7 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
     public HttpClient getHttpClient() {
         return HttpClient.create(options -> {
             options
-                .loopResources(LoopResources.create("", getThreadPoolSize(), true))
+                .loopResources(LoopResources.create("cloudfoundry-client", getThreadPoolSize(), true))
                 .option(SO_SNDBUF, SEND_BUFFER_SIZE)
                 .option(SO_RCVBUF, RECEIVE_BUFFER_SIZE)
                 .disablePool();  // TODO: Remove once pooling fixed
