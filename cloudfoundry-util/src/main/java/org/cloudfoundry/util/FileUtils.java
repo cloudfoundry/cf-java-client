@@ -21,12 +21,14 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import reactor.core.Exceptions;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.PosixFileAttributes;
 import java.nio.file.attribute.PosixFilePermission;
 import java.security.MessageDigest;
@@ -116,13 +118,14 @@ public final class FileUtils {
      * @return a {@link String} representation of the hash
      */
     public static String hash(Path path) {
-        try (InputStream in = Files.newInputStream(path)) {
+        try (FileChannel fileChannel = FileChannel.open(path, StandardOpenOption.READ)) {
             MessageDigest digest = MessageDigest.getInstance("sha1");
 
-            byte[] buffer = new byte[MIBIBYTE];
-            int length;
-            while ((length = in.read(buffer)) != -1) {
-                digest.update(buffer, 0, length);
+            ByteBuffer buffer = ByteBuffer.allocateDirect(MIBIBYTE);
+            while (fileChannel.read(buffer) != -1) {
+                buffer.flip();
+                digest.update(buffer);
+                buffer.clear();
             }
 
             return String.format("%040x", new BigInteger(1, digest.digest()));
