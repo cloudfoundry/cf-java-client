@@ -64,6 +64,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
+
 /**
  * The Reactor-based implementation of {@link ApplicationsV2}
  */
@@ -185,18 +187,19 @@ public final class ReactorApplicationsV2 extends AbstractClientV2Operations impl
     public Mono<UploadApplicationResponse> upload(UploadApplicationRequest request) {
         return put(request, UploadApplicationResponse.class, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "bits"),
             outbound -> outbound
-                .flatMap(r -> r
+                .and(FileUtils.compress(request.getApplication()))
+                .flatMap(function((r, application) -> r
                     .chunkedTransfer(false)
                     .sendForm(form -> {
                         try (InputStream resources = new ByteArrayInputStream(this.connectionContext.getObjectMapper().writeValueAsBytes(request.getResources()))) {
                             form
                                 .multipart(true)
                                 .textFile("resources", resources, APPLICATION_JSON)
-                                .file("application", "application.zip", FileUtils.compress(request.getApplication()).toFile(), APPLICATION_ZIP);
+                                .file("application", "application.zip", application.toFile(), APPLICATION_ZIP);
                         } catch (IOException e) {
                             throw Exceptions.propagate(e);
                         }
-                    }))
+                    })))
                 .then());
     }
 

@@ -38,6 +38,8 @@ import org.cloudfoundry.util.FileUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
+
 /**
  * The Reactor-based implementation of {@link Packages}
  */
@@ -94,11 +96,12 @@ public final class ReactorPackages extends AbstractClientV3Operations implements
     public Mono<UploadPackageResponse> upload(UploadPackageRequest request) {
         return post(request, UploadPackageResponse.class, builder -> builder.pathSegment("v3", "packages", request.getPackageId(), "upload"),
             outbound -> outbound
-                .flatMap(r -> r
+                .and(FileUtils.compress(request.getBits()))
+                .flatMap(function((r, bits) -> r
                     .chunkedTransfer(false)
                     .sendForm(form -> form
                         .multipart(true)
-                        .file("bits", "application.zip", FileUtils.compress(request.getBits()).toFile(), APPLICATION_ZIP)))
+                        .file("bits", "application.zip", bits.toFile(), APPLICATION_ZIP))))
                 .then());
     }
 

@@ -1367,13 +1367,19 @@ public final class DefaultApplications implements Applications {
     }
 
     private static Mono<Void> uploadApplicationAndWait(CloudFoundryClient cloudFoundryClient, String applicationId, Path application, List<ResourceMatchingUtils.ArtifactMetadata> matchedResources) {
-        List<String> paths = matchedResources.stream()
-            .map(ResourceMatchingUtils.ArtifactMetadata::getPath)
-            .collect(Collectors.toList());
+        return Mono
+            .defer(() -> {
+                if (matchedResources.isEmpty()) {
+                    return Mono.just(application);
+                } else {
+                    List<String> paths = matchedResources.stream()
+                        .map(ResourceMatchingUtils.ArtifactMetadata::getPath)
+                        .collect(Collectors.toList());
 
-        Path filteredApplication = matchedResources.isEmpty() ? application : FileUtils.compress(FileUtils.normalize(application), p -> !paths.contains(p));
-
-        return requestUploadApplication(cloudFoundryClient, applicationId, filteredApplication, matchedResources)
+                    return FileUtils.compress(FileUtils.normalize(application), p -> !paths.contains(p));
+                }
+            })
+            .then(filteredApplication -> requestUploadApplication(cloudFoundryClient, applicationId, filteredApplication, matchedResources))
             .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
     }
 

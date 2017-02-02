@@ -19,6 +19,8 @@ package org.cloudfoundry.util;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import reactor.core.Exceptions;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -68,9 +70,9 @@ public final class FileUtils {
      * @param candidate the candidate {@link Path} to compress
      * @return the {@link Path} for a compressed artifact
      */
-    public static Path compress(Path candidate) {
+    public static Mono<Path> compress(Path candidate) {
         if (!Files.isDirectory(candidate)) {
-            return candidate;
+            return Mono.just(candidate);
         }
 
         return compress(candidate, path -> true);
@@ -83,20 +85,24 @@ public final class FileUtils {
      * @param filter    a filter applied to each path
      * @return the {@link Path} for a compressed artifact
      */
-    public static Path compress(Path candidate, Predicate<String> filter) {
-        try {
-            Path staging = Files.createTempFile(null, null);
+    public static Mono<Path> compress(Path candidate, Predicate<String> filter) {
+        return Mono
+            .defer(() -> {
+                try {
+                    Path staging = Files.createTempFile(null, null);
 
-            try (Stream<Path> contents = Files.walk(candidate); ZipArchiveOutputStream out = new ZipArchiveOutputStream(staging.toFile())) {
-                contents
-                    .filter(path -> filter.test(getRelativePathName(candidate, path)))
-                    .forEach(p -> write(candidate, p, out));
-            }
+                    try (Stream<Path> contents = Files.walk(candidate); ZipArchiveOutputStream out = new ZipArchiveOutputStream(staging.toFile())) {
+                        contents
+                            .filter(path -> filter.test(getRelativePathName(candidate, path)))
+                            .forEach(p -> write(candidate, p, out));
+                    }
 
-            return staging;
-        } catch (IOException e) {
-            throw Exceptions.propagate(e);
-        }
+                    return Mono.just(staging);
+                } catch (IOException e) {
+                    throw Exceptions.propagate(e);
+                }
+            })
+            .subscribeOn(Schedulers.elastic());
     }
 
     /**

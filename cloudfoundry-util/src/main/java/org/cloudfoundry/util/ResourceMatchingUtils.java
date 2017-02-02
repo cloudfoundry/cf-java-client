@@ -23,16 +23,15 @@ import org.cloudfoundry.client.v2.resourcematch.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.Exceptions;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * Utilities for matching resources
@@ -45,25 +44,27 @@ public final class ResourceMatchingUtils {
     }
 
     public static Mono<List<ArtifactMetadata>> getMatchedResources(CloudFoundryClient cloudFoundryClient, Path application) {
-        Map<String, ArtifactMetadata> artifactMetadatas;
-        try {
-            Path root = FileUtils.normalize(application);
+        Path root = FileUtils.normalize(application);
 
-            artifactMetadatas = Files.walk(root).parallel()
-                .filter(path -> !Files.isDirectory(path))
-                .map(path -> new ArtifactMetadata(FileUtils.hash(path), FileUtils.getRelativePathName(root, path), FileUtils.permissions(path), FileUtils.size(path)))
-                .collect(Collectors.toMap(ArtifactMetadata::getHash, Function.identity()));
-        } catch (IOException e) {
-            throw Exceptions.propagate(e);
-        }
-
-        return requestListMatchingResources(cloudFoundryClient, artifactMetadatas.values())
-            .flatMapIterable(ListMatchingResourcesResponse::getResources)
-            .map(resource -> artifactMetadatas.get(resource.getHash()))
+        return Flux
+            .defer(() -> {
+                try {
+                    return Flux.fromStream(Files.walk(root));
+                } catch (IOException e) {
+                    throw Exceptions.propagate(e);
+                }
+            })
+            .filter(path -> !Files.isDirectory(path))
+            .map(path -> new ArtifactMetadata(FileUtils.hash(path), FileUtils.getRelativePathName(root, path), FileUtils.permissions(path), FileUtils.size(path)))
+            .collectMap(ArtifactMetadata::getHash)
+            .flatMap(artifactMetadatas -> requestListMatchingResources(cloudFoundryClient, artifactMetadatas.values())
+                .flatMapIterable(ListMatchingResourcesResponse::getResources)
+                .map(resource -> artifactMetadatas.get(resource.getHash())))
             .collectList()
             .doOnNext(matched -> LOGGER.debug("{} resources matched totaling {}", matched.size(), SizeUtils.asIbi(matched.stream()
                 .mapToInt(ArtifactMetadata::getSize)
-                .sum())));
+                .sum())))
+            .subscribeOn(Schedulers.elastic());
     }
 
     private static Mono<ListMatchingResourcesResponse> requestListMatchingResources(CloudFoundryClient cloudFoundryClient, Collection<ArtifactMetadata> artifactMetadatas) {
