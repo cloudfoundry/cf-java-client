@@ -31,6 +31,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.ipc.netty.http.client.HttpClient;
 import reactor.ipc.netty.options.ClientOptions;
+import reactor.ipc.netty.resources.LoopResources;
 import reactor.ipc.netty.resources.PoolResources;
 
 import java.time.Duration;
@@ -63,6 +64,9 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
 
     private static final int UNDEFINED_PORT = -1;
 
+    /**
+     * The number of connections to use when processing requests and responses
+     */
     @Value.Default
     public Integer getConnectionPoolSize() {
         return 2 * PoolResources.DEFAULT_POOL_MAX_CONNECTION;
@@ -73,9 +77,10 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
     public HttpClient getHttpClient() {
         return HttpClient.create(options -> {
             options
+                .loopResources(LoopResources.create("", getThreadPoolSize(), true))
                 .option(SO_SNDBUF, SEND_BUFFER_SIZE)
                 .option(SO_RCVBUF, RECEIVE_BUFFER_SIZE)
-                .disablePool();
+                .disablePool();  // TODO: Remove once pooling fixed
 //                .poolResources(PoolResources.fixed("cloudfoundry-client", getConnectionPoolSize()));
 
             getKeepAlive().ifPresent(keepAlive -> options.option(SO_KEEPALIVE, keepAlive));
@@ -127,6 +132,14 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
         trust(components, getSslCertificateTruster());
 
         return Mono.just(components.toUriString());
+    }
+
+    /**
+     * The number of worker threads to use when processing requests and responses
+     */
+    @Value.Default
+    public Integer getThreadPoolSize() {
+        return LoopResources.DEFAULT_IO_WORKER_COUNT;
     }
 
     @Value.Check
