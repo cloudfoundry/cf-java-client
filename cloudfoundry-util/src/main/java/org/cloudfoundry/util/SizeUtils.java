@@ -30,7 +30,7 @@ public final class SizeUtils {
     private static final double GIBI = 1024 * MIBI;
 
     /**
-     * Converts a size to a {@link String} with -ibi suffixies
+     * Converts a size to a {@link String} with -ibi suffixes
      *
      * @param size the size to convert
      * @return a {@link String} representing the size
