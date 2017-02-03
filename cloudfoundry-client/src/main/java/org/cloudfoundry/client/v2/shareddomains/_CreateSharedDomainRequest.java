@@ -40,4 +40,3 @@ abstract class _CreateSharedDomainRequest {
     abstract String getRouterGroupId();
 
 }
-

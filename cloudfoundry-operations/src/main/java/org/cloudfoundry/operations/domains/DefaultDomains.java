@@ -54,21 +54,34 @@ public final class DefaultDomains implements Domains {
         this.routingClient = routingClient;
     }
 
+    @Override
     public Mono<Void> create(CreateDomainRequest request) {
         return this.cloudFoundryClient
-            .then(cloudFoundryClient -> Mono.when(
-                Mono.just(cloudFoundryClient),
-                getOrganizationId(cloudFoundryClient, request.getOrganization())
-            ))
+            .then(cloudFoundryClient -> Mono
+                .when(
+                    Mono.just(cloudFoundryClient),
+                    getOrganizationId(cloudFoundryClient, request.getOrganization())
+                ))
             .then(function((cloudFoundryClient, organizationId) -> requestCreateDomain(cloudFoundryClient, request.getDomain(), organizationId)))
             .then();
     }
 
     @Override
     public Mono<Void> createShared(CreateSharedDomainRequest request) {
-        return this.cloudFoundryClient
-            .then(cloudFoundryClient -> requestCreateSharedDomain(cloudFoundryClient, request.getDomain()))
-            .then();
+        if (request.getRouterGroup() == null) {
+            return this.cloudFoundryClient
+                .then(cloudFoundryClient -> requestCreateSharedDomain(cloudFoundryClient, request.getDomain(), null))
+                .then();
+        } else {
+            return Mono.when(this.cloudFoundryClient, this.routingClient)
+                .then(function((cloudFoundryClient, routingClient) -> Mono
+                    .when(
+                        Mono.just(cloudFoundryClient),
+                        getRouterGroupId(routingClient, request.getRouterGroup())
+                    )))
+                .then(function((cloudFoundryClient, routerGroupId) -> requestCreateSharedDomain(cloudFoundryClient, request.getDomain(), routerGroupId)))
+                .then();
+        }
     }
 
     @Override
@@ -133,6 +146,14 @@ public final class DefaultDomains implements Domains {
             .map(ResourceUtils::getId);
     }
 
+    private static Mono<String> getRouterGroupId(RoutingClient routingClient, String routerGroup) {
+        return requestListRouterGroups(routingClient)
+            .flatMapIterable(ListRouterGroupsResponse::getRouterGroups)
+            .filter(group -> routerGroup.equals(group.getName()))
+            .single()
+            .map(org.cloudfoundry.routing.v1.routergroups.RouterGroup::getRouterGroupId);
+    }
+
     private static Mono<AssociateOrganizationPrivateDomainResponse> requestAssociateOrganizationPrivateDomainRequest(CloudFoundryClient cloudFoundryClient, String domainId, String organizationId) {
         return cloudFoundryClient.organizations()
             .associatePrivateDomain(AssociateOrganizationPrivateDomainRequest.builder()
@@ -149,10 +170,11 @@ public final class DefaultDomains implements Domains {
                 .build());
     }
 
-    private static Mono<CreateSharedDomainResponse> requestCreateSharedDomain(CloudFoundryClient cloudFoundryClient, String domain) {
+    private static Mono<CreateSharedDomainResponse> requestCreateSharedDomain(CloudFoundryClient cloudFoundryClient, String domain, String routerGroupId) {
         return cloudFoundryClient.sharedDomains()
             .create(org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainRequest.builder()
                 .name(domain)
+                .routerGroupId(routerGroupId)
                 .build());
     }
 

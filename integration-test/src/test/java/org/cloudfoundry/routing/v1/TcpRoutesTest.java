@@ -179,7 +179,7 @@ public final class TcpRoutesTest extends AbstractIntegrationTest {
                 .build());
     }
 
-    private Mono<ListTcpRoutesResponse> requestListTcpRoutes(RoutingClient routingClient) {
+    private static Mono<ListTcpRoutesResponse> requestListTcpRoutes(RoutingClient routingClient) {
         return routingClient.tcpRoutes()
             .list(ListTcpRoutesRequest.builder()
                 .build());
