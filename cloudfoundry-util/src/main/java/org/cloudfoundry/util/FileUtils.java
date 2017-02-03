@@ -127,7 +127,7 @@ public final class FileUtils {
         try (FileChannel fileChannel = FileChannel.open(path, StandardOpenOption.READ)) {
             MessageDigest digest = MessageDigest.getInstance("sha1");
 
-            ByteBuffer buffer = ByteBuffer.allocateDirect(MIBIBYTE);
+            ByteBuffer buffer = ByteBuffer.allocate(MIBIBYTE);
             while (fileChannel.read(buffer) != -1) {
                 buffer.flip();
                 digest.update(buffer);
