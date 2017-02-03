@@ -138,6 +138,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = PCF_1_8)
     @Test
     public void createRouteTcpAssignedPort() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
@@ -153,6 +154,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = PCF_1_8)
     @Test
     public void createRouteTcpRandomPort() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
@@ -248,6 +250,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = PCF_1_8)
     @Test
     public void deleteTcpRoute() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
@@ -384,6 +387,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = PCF_1_8)
     @Test
     public void mapTcpRoute() throws TimeoutException, InterruptedException, IOException {
         String applicationName = this.nameFactory.getApplicationName();
@@ -475,6 +479,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = PCF_1_8)
     @Test
     public void unmapTcpRoute() throws TimeoutException, InterruptedException, IOException {
         String applicationName = this.nameFactory.getApplicationName();
