@@ -83,6 +83,13 @@ abstract class _UpdateOrganizationQuotaDefinitionRequest {
     abstract Integer getTotalPrivateDomains();
 
     /**
+     * The total reserved route ports
+     */
+    @JsonProperty("total_reserved_route_ports")
+    @Nullable
+    abstract Integer getTotalReservedRoutePorts();
+
+    /**
      * The total routes
      */
     @JsonProperty("total_routes")

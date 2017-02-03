@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import com.github.zafarkhaja.semver.Version;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.info.GetInfoRequest;
+import org.cloudfoundry.client.v2.organizationquotadefinitions.CreateOrganizationQuotaDefinitionRequest;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
@@ -266,11 +267,27 @@ public class IntegrationTestConfiguration {
 
     @Bean(initMethod = "block")
     @DependsOn("cloudFoundryCleaner")
-    Mono<String> organizationId(CloudFoundryClient cloudFoundryClient, String organizationName) throws InterruptedException {
-        return cloudFoundryClient.organizations()
-            .create(CreateOrganizationRequest.builder()
-                .name(organizationName)
+    Mono<String> organizationId(CloudFoundryClient cloudFoundryClient, String organizationName, String organizationQuotaName) throws InterruptedException {
+        return cloudFoundryClient.organizationQuotaDefinitions()
+            .create(CreateOrganizationQuotaDefinitionRequest.builder()
+                .applicationInstanceLimit(-1)
+                .applicationTaskLimit(-1)
+                .instanceMemoryLimit(-1)
+                .memoryLimit(8192)
+                .name(organizationQuotaName)
+                .nonBasicServicesAllowed(true)
+                .totalPrivateDomains(-1)
+                .totalReservedRoutePorts(-1)
+                .totalRoutes(-1)
+                .totalServiceKeys(-1)
+                .totalServices(-1)
                 .build())
+            .map(ResourceUtils::getId)
+            .then(quotaId -> cloudFoundryClient.organizations()
+                .create(CreateOrganizationRequest.builder()
+                    .name(organizationName)
+                    .quotaDefinitionId(quotaId)
+                    .build()))
             .map(ResourceUtils::getId)
             .doOnSubscribe(s -> this.logger.debug(">> ORGANIZATION ({}) <<", organizationName))
             .doOnError(Throwable::printStackTrace)
@@ -281,6 +298,11 @@ public class IntegrationTestConfiguration {
     @Bean
     String organizationName(NameFactory nameFactory) {
         return nameFactory.getOrganizationName();
+    }
+
+    @Bean
+    String organizationQuotaName(NameFactory nameFactory) {
+        return nameFactory.getQuotaDefinitionName();
     }
 
     @Bean
