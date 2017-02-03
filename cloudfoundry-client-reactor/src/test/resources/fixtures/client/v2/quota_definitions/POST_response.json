@@ -1,21 +1,22 @@
 {
   "metadata": {
-    "guid": "27a0466e-53c0-439a-ab9f-3e56854302f9",
-    "url": "/v2/quota_definitions/27a0466e-53c0-439a-ab9f-3e56854302f9",
-    "created_at": "2016-04-06T00:17:26Z",
-    "updated_at": null
+    "guid": "0a3df5cb-122e-4849-a6b1-abb70d1b1296",
+    "url": "/v2/quota_definitions/0a3df5cb-122e-4849-a6b1-abb70d1b1296",
+    "created_at": "2016-06-08T16:41:39Z",
+    "updated_at": "2016-06-08T16:41:26Z"
   },
   "entity": {
     "name": "gold_quota",
     "non_basic_services_allowed": true,
     "total_services": -1,
-    "total_routes": -1,
+    "total_routes": 4,
     "total_private_domains": -1,
     "memory_limit": 5120,
     "trial_db_allowed": false,
     "instance_memory_limit": 10240,
     "app_instance_limit": 10,
     "app_task_limit": 5,
-    "total_service_keys": -1
+    "total_service_keys": -1,
+    "total_reserved_route_ports": 3
   }
 }

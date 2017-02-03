@@ -1,12 +1,12 @@
 {
   "metadata": {
-    "guid": "cd10a1dd-f372-4b19-8ff6-60214b265f6f",
-    "url": "/v2/quota_definitions/cd10a1dd-f372-4b19-8ff6-60214b265f6f",
-    "created_at": "2016-04-06T00:17:26Z",
-    "updated_at": "2016-04-06T00:17:26Z"
+    "guid": "213b27a0-c937-4074-aade-bba2226980aa",
+    "url": "/v2/quota_definitions/213b27a0-c937-4074-aade-bba2226980aa",
+    "created_at": "2016-06-08T16:41:39Z",
+    "updated_at": "2016-06-08T16:41:39Z"
   },
   "entity": {
-    "name": "name-601",
+    "name": "name-1998",
     "non_basic_services_allowed": true,
     "total_services": 60,
     "total_routes": 1000,
@@ -16,6 +16,7 @@
     "instance_memory_limit": -1,
     "app_instance_limit": -1,
     "app_task_limit": -1,
-    "total_service_keys": -1
+    "total_service_keys": -1,
+    "total_reserved_route_ports": 5
   }
 }
