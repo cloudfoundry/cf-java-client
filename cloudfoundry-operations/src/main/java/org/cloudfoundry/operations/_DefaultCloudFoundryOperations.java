@@ -171,11 +171,15 @@ abstract class _DefaultCloudFoundryOperations implements CloudFoundryOperations 
 
     @Value.Derived
     Mono<String> getOrganizationId() {
-        return Optional.ofNullable(getOrganization())
-            .map(organization -> getOrganization(getCloudFoundryClientPublisher(), organization)
+        String organization = getOrganization();
+
+        if (hasText(organization)) {
+            return getOrganization(getCloudFoundryClientPublisher(), organization)
                 .map(ResourceUtils::getId)
-                .cache())
-            .orElse(Mono.error(new IllegalStateException("No organization targeted")));
+                .cache();
+        } else {
+            return Mono.error(new IllegalStateException("No organization targeted"));
+        }
     }
 
     /**
@@ -199,12 +203,16 @@ abstract class _DefaultCloudFoundryOperations implements CloudFoundryOperations 
 
     @Value.Derived
     Mono<String> getSpaceId() {
-        return Optional.ofNullable(getSpace())
-            .map(space -> getOrganizationId()
+        String space = getSpace();
+
+        if (hasText(getSpace())) {
+            return getOrganizationId()
                 .then(organizationId -> getSpace(getCloudFoundryClientPublisher(), organizationId, space))
                 .map(ResourceUtils::getId)
-                .cache())
-            .orElse(Mono.error(new IllegalStateException("No space targeted")));
+                .cache();
+        } else {
+            return Mono.error(new IllegalStateException("No space targeted"));
+        }
     }
 
     /**
@@ -236,6 +244,23 @@ abstract class _DefaultCloudFoundryOperations implements CloudFoundryOperations 
         return requestSpaces(cloudFoundryClient, organizationId, space)
             .single()
             .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Space %s does not exist", space));
+    }
+
+    private static boolean hasLength(CharSequence str) {
+        return (str != null && str.length() > 0);
+    }
+
+    private static boolean hasText(CharSequence str) {
+        if (!hasLength(str)) {
+            return false;
+        }
+        int strLen = str.length();
+        for (int i = 0; i < strLen; i++) {
+            if (!Character.isWhitespace(str.charAt(i))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static Flux<OrganizationResource> requestOrganizations(Mono<CloudFoundryClient> cloudFoundryClientPublisher, String organization) {
