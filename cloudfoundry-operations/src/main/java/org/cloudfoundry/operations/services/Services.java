@@ -101,7 +101,7 @@ public interface Services {
      *
      * @return the service instances
      */
-    Flux<ServiceInstance> listInstances();
+    Flux<ServiceInstanceSummary> listInstances();
 
     /**
      * List the service keys for a service instance

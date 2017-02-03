@@ -17,68 +17,50 @@
 package org.cloudfoundry.operations.services;
 
 import org.cloudfoundry.Nullable;
-import org.immutables.value.Value;
 
 import java.util.List;
 
 /**
- * A service instance
+ * A service instance summary base class
  */
-@Value.Immutable
-abstract class _ServiceInstance extends AbstractServiceInstanceSummary {
+public abstract class AbstractServiceInstanceSummary {
 
     /**
-     * The dashboard URL
+     * The bound applications
      */
-    @Nullable
-    abstract String getDashboardUrl();
+    abstract List<String> getApplications();
 
     /**
-     * The service description
+     * The service instance id
      */
-    @Nullable
-    abstract String getDescription();
+    abstract String getId();
 
     /**
-     * The documentation URL
-     */
-    @Nullable
-    abstract String getDocumentationUrl();
-
-    /**
-     * The last operation
+     * The last operation for the service
      */
     @Nullable
     abstract String getLastOperation();
 
     /**
-     * The message
+     * The service instance name
      */
-    @Nullable
-    abstract String getMessage();
+    abstract String getName();
 
     /**
-     * When the service was last started
+     * The managed service plan
      */
     @Nullable
-    abstract String getStartedAt();
+    abstract String getPlan();
 
     /**
-     * The status of the last operation
+     * The name of the managed service
      */
     @Nullable
-    abstract String getStatus();
+    abstract String getService();
 
     /**
-     * The tags for the service
+     * The type of the service instance
      */
-    @Nullable
-    abstract List<String> getTags();
-
-    /**
-     * When the service was last updated
-     */
-    @Nullable
-    abstract String getUpdatedAt();
+    abstract ServiceInstanceType getType();
 
 }

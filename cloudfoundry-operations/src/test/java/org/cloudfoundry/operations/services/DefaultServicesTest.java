@@ -50,6 +50,8 @@ import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceResponse;
 import org.cloudfoundry.client.v2.serviceinstances.LastOperation;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstanceServiceKeysRequest;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstanceServiceKeysResponse;
+import org.cloudfoundry.client.v2.serviceinstances.Plan;
+import org.cloudfoundry.client.v2.serviceinstances.Service;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceEntity;
 import org.cloudfoundry.client.v2.serviceinstances.UnionServiceInstanceEntity;
 import org.cloudfoundry.client.v2.serviceinstances.UnionServiceInstanceResource;
@@ -74,12 +76,15 @@ import org.cloudfoundry.client.v2.services.ServiceResource;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsResponse;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomainResource;
+import org.cloudfoundry.client.v2.spaces.GetSpaceSummaryRequest;
+import org.cloudfoundry.client.v2.spaces.GetSpaceSummaryResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceServiceInstancesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceServiceInstancesResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceServicesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceServicesResponse;
+import org.cloudfoundry.client.v2.spaces.SpaceApplicationSummary;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.AssociateUserProvidedServiceInstanceRouteRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.AssociateUserProvidedServiceInstanceRouteResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceResponse;
@@ -552,44 +557,50 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void listInstances() {
-        requestListSpaceServiceInstancesTwo(this.cloudFoundryClient, TEST_SPACE_ID, "test-service-instance1", "test-service-instance2");
-        requestListSpaceServiceBindingsEmpty(this.cloudFoundryClient, "test-service-instance1-id");
-        requestListSpaceServiceBindings(this.cloudFoundryClient, "test-service-instance2-id", "test-application-id");
-        requestGetServicePlan(this.cloudFoundryClient, "test-service-instance1-plan-id", "test-service-plan", "test-service-id");
-        requestGetServicePlan(this.cloudFoundryClient, "test-service-instance2-plan-id", "test-service-plan", "test-service-id");
-        requestGetService(this.cloudFoundryClient, "test-service-id", "test-service");
-        requestGetApplication(this.cloudFoundryClient, "test-application-id", "test-application");
+    public void listInstancesManagedServices() {
+        requestGetSpaceSummaryManagedServices(this.cloudFoundryClient, TEST_SPACE_ID);
 
         this.services
             .listInstances()
             .as(StepVerifier::create)
-            .expectNext(ServiceInstance.builder()
-                    .name("test-service-instance1")
-                    .id("test-service-instance1-id")
-                    .type(ServiceInstanceType.USER_PROVIDED)
-                    .build(),
-                fill(ServiceInstance.builder())
-                    .application("test-application")
-                    .documentationUrl("test-documentation-url")
-                    .id("test-service-instance2-id")
-                    .lastOperation("test-type")
-                    .name("test-service-instance2")
-                    .plan("test-service-plan")
-                    .tag("test-tag")
-                    .type(ServiceInstanceType.MANAGED)
-                    .build())
+            .expectNext(ServiceInstanceSummary.builder()
+                .application("test-application-name-1", "test-application-name-2")
+                .id("test-service-id-2")
+                .lastOperation("test-last-operation-description-2")
+                .name("test-service-name-2")
+                .plan("test-service-plan-name-2")
+                .service("test-provided-service-label")
+                .type(ServiceInstanceType.MANAGED)
+                .build())
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
 
     @Test
     public void listInstancesNoInstances() {
-        requestListSpaceServiceInstancesEmpty(this.cloudFoundryClient, TEST_SPACE_ID);
+        requestGetSpaceSummaryEmpty(this.cloudFoundryClient, TEST_SPACE_ID);
 
         this.services
             .listInstances()
             .as(StepVerifier::create)
+            .expectNextCount(0)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void listInstancesUserProvidedServices() {
+        requestGetSpaceSummaryUserProvidedServices(this.cloudFoundryClient, TEST_SPACE_ID);
+
+        this.services
+            .listInstances()
+            .as(StepVerifier::create)
+            .expectNext(ServiceInstanceSummary.builder()
+                .application("test-application-name-1", "test-application-name-2")
+                .id("test-service-id-2")
+                .name("test-service-name-2")
+                .type(ServiceInstanceType.USER_PROVIDED)
+                .build())
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -1221,6 +1232,82 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
                     .entity(ServicePlanEntity.builder()
                         .name(servicePlan)
                         .serviceId(serviceId)
+                        .build())
+                    .build()));
+    }
+
+    private static void requestGetSpaceSummaryEmpty(CloudFoundryClient cloudFoundryClient, String spaceId) {
+        when(cloudFoundryClient.spaces()
+            .getSummary(GetSpaceSummaryRequest.builder()
+                .spaceId(spaceId)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(GetSpaceSummaryResponse.builder())
+                    .build()));
+    }
+
+    private static void requestGetSpaceSummaryManagedServices(CloudFoundryClient cloudFoundryClient, String spaceId) {
+        when(cloudFoundryClient.spaces()
+            .getSummary(GetSpaceSummaryRequest.builder()
+                .spaceId(spaceId)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(GetSpaceSummaryResponse.builder())
+                    .id(spaceId)
+                    .application(SpaceApplicationSummary.builder()
+                        .id("test-application-id-1")
+                        .name("test-application-name-1")
+                        .serviceName("test-service-name-1", "test-service-name-2")
+                        .spaceId(spaceId)
+                        .build())
+                    .application(SpaceApplicationSummary.builder()
+                        .id("test-application-id-2")
+                        .name("test-application-name-2")
+                        .serviceName("test-service-name-2", "test-service-name-3")
+                        .spaceId(spaceId)
+                        .build())
+                    .service(org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.builder()
+                        .id("test-service-id-2")
+                        .lastOperation(LastOperation.builder()
+                            .description("test-last-operation-description-2")
+                            .build())
+                        .name("test-service-name-2")
+                        .servicePlan(Plan.builder()
+                            .id("test-service-plan-id-2")
+                            .name("test-service-plan-name-2")
+                            .service(Service.builder()
+                                .id("test-provided-service-id")
+                                .label("test-provided-service-label")
+                                .build())
+                            .build())
+                        .build())
+                    .build()));
+    }
+
+    private static void requestGetSpaceSummaryUserProvidedServices(CloudFoundryClient cloudFoundryClient, String spaceId) {
+        when(cloudFoundryClient.spaces()
+            .getSummary(GetSpaceSummaryRequest.builder()
+                .spaceId(spaceId)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(GetSpaceSummaryResponse.builder())
+                    .id(spaceId)
+                    .application(SpaceApplicationSummary.builder()
+                        .id("test-application-id-1")
+                        .name("test-application-name-1")
+                        .serviceName("test-service-name-1", "test-service-name-2")
+                        .spaceId(spaceId)
+                        .build())
+                    .application(SpaceApplicationSummary.builder()
+                        .id("test-application-id-2")
+                        .name("test-application-name-2")
+                        .serviceName("test-service-name-2", "test-service-name-3")
+                        .spaceId(spaceId)
+                        .build())
+                    .service(org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.builder()
+                        .id("test-service-id-2")
+                        .name("test-service-name-2")
+                        .boundApplicationCount(1)
                         .build())
                     .build()));
     }
