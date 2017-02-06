@@ -917,7 +917,7 @@ public final class DefaultServices implements Services {
 
         return Flux.fromIterable(response.getServices())
             .map(service -> ServiceInstanceSummary.builder()
-                .applications(applicationBindings.get(service.getName()))
+                .applications(Optional.ofNullable(applicationBindings.get(service.getName())).orElse(Collections.emptyList()))
                 .id(service.getId())
                 .lastOperation(service.getLastOperation() == null ? null : service.getLastOperation().getDescription())
                 .name(service.getName())
