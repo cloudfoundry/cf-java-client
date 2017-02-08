@@ -29,21 +29,18 @@ import reactor.ipc.netty.http.client.HttpClientRequest;
 import reactor.ipc.netty.http.client.HttpClientResponse;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.function.Function;
 
 public final class JsonCodec {
 
     public static <T> Function<Mono<HttpClientResponse>, Flux<T>> decode(ObjectMapper objectMapper, Class<T> responseType) {
         return inbound -> inbound
-            .flatMap(response -> response.addHandler(new JsonObjectDecoder()).receive().aggregate())
-            .map(byteBuf -> {
-                String content = byteBuf.toString(Charset.defaultCharset());
-
+            .flatMap(response -> response.addHandler(new JsonObjectDecoder()).receive().aggregate().asString())
+            .map(payload -> {
                 try {
-                    return objectMapper.readValue(content, responseType);
+                    return objectMapper.readValue(payload, responseType);
                 } catch (IOException e) {
-                    throw Exceptions.propagate(new JsonParsingException(e.getMessage(), e, content));
+                    throw Exceptions.propagate(new JsonParsingException(e.getMessage(), e, payload));
                 }
             });
     }

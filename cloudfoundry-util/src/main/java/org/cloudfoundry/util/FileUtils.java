@@ -23,14 +23,12 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigInteger;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.PosixFileAttributes;
 import java.nio.file.attribute.PosixFilePermission;
 import java.security.MessageDigest;
@@ -124,15 +122,19 @@ public final class FileUtils {
      * @return a {@link String} representation of the hash
      */
     public static String hash(Path path) {
-        try (FileChannel fileChannel = FileChannel.open(path, StandardOpenOption.READ)) {
+        try (InputStream in = Files.newInputStream(path)) {
             MessageDigest digest = MessageDigest.getInstance("sha1");
 
-            ByteBuffer buffer = ByteBuffer.allocate(MIBIBYTE);
-            while (fileChannel.read(buffer) != -1) {
-                buffer.flip();
-                digest.update(buffer);
-                buffer.clear();
-            }
+            ByteArrayPool.withByteArray(buffer -> {
+                try {
+                    int length;
+                    while ((length = in.read(buffer)) != -1) {
+                        digest.update(buffer, 0, length);
+                    }
+                } catch (IOException e) {
+                    throw Exceptions.propagate(e);
+                }
+            });
 
             return String.format("%040x", new BigInteger(1, digest.digest()));
         } catch (IOException | NoSuchAlgorithmException e) {
