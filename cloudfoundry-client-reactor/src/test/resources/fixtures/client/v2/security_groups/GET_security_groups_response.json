@@ -14,7 +14,6 @@
       "entity": {
         "name": "dummy1",
         "rules": [
-
         ],
         "running_default": false,
         "staging_default": false,
@@ -31,7 +30,6 @@
       "entity": {
         "name": "dummy2",
         "rules": [
-
         ],
         "running_default": false,
         "staging_default": false,

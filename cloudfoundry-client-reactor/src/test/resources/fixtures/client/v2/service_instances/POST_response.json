@@ -8,7 +8,7 @@
   "entity": {
     "name": "my-service-instance",
     "credentials": {
-      "creds-key-356" : "creds-val-356"
+      "creds-key-356": "creds-val-356"
     },
     "service_plan_guid": "2048a369-d2d3-48cf-bcfd-eaf9032fa0ab",
     "space_guid": "86b29f7e-721d-4eb8-b34f-3b1d1eccdf23",

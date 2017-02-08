@@ -1,20 +1,23 @@
 {
-  "new_invites" : [ {
-    "email" : "user1@pjy596.com",
-    "userId" : "68af461b-484e-464a-96ac-a336abed48ad",
-    "origin" : "uaa",
-    "success" : true,
-    "errorCode" : null,
-    "errorMessage" : null,
-    "inviteLink" : "http://localhost/invitations/accept?code=WEqtpOh73k"
-  }, {
-    "email" : "user2@pjy596.com",
-    "userId" : "d256cf96-5c14-4649-9a0d-5564c66411b5",
-    "origin" : "uaa",
-    "success" : true,
-    "errorCode" : null,
-    "errorMessage" : null,
-    "inviteLink" : "http://localhost/invitations/accept?code=n5X0hCsD3N"
-  } ],
-  "failed_invites" : [ ]
+  "new_invites": [
+    {
+      "email": "user1@pjy596.com",
+      "userId": "68af461b-484e-464a-96ac-a336abed48ad",
+      "origin": "uaa",
+      "success": true,
+      "errorCode": null,
+      "errorMessage": null,
+      "inviteLink": "http://localhost/invitations/accept?code=WEqtpOh73k"
+    },
+    {
+      "email": "user2@pjy596.com",
+      "userId": "d256cf96-5c14-4649-9a0d-5564c66411b5",
+      "origin": "uaa",
+      "success": true,
+      "errorCode": null,
+      "errorMessage": null,
+      "inviteLink": "http://localhost/invitations/accept?code=n5X0hCsD3N"
+    }
+  ],
+  "failed_invites": []
 }
