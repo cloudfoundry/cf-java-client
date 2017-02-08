@@ -48,7 +48,8 @@ import org.cloudfoundry.client.v2.applications.UpdateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.UpdateApplicationResponse;
 import org.cloudfoundry.client.v2.applications.UploadApplicationRequest;
 import org.cloudfoundry.client.v2.applications.UploadApplicationResponse;
-import org.cloudfoundry.client.v2.domains.CreateDomainRequest;
+import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainRequest;
+import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainResponse;
 import org.cloudfoundry.client.v2.routes.CreateRouteRequest;
 import org.cloudfoundry.client.v2.routes.CreateRouteResponse;
 import org.cloudfoundry.client.v2.routes.RouteResource;
@@ -846,14 +847,13 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .map(response -> createRouteResponse));
     }
 
+    private static Mono<String> createPrivateDomainId(CloudFoundryClient cloudFoundryClient, String name, String organizationId) {
+        return requestCreatePrivateDomain(cloudFoundryClient, name, organizationId)
+            .map(ResourceUtils::getId);
+    }
+
     private static Mono<CreateRouteResponse> createRouteWithDomain(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceId, String domainName, String host, String path) {
-        return cloudFoundryClient.domains()
-            .create(CreateDomainRequest.builder()
-                .name(domainName)
-                .owningOrganizationId(organizationId)
-                .wildcard(true)
-                .build())
-            .map(ResourceUtils::getId)
+        return createPrivateDomainId(cloudFoundryClient, domainName, organizationId)
             .then(domainId -> cloudFoundryClient.routes()
                 .create(CreateRouteRequest.builder()
                     .domainId(domainId)
@@ -943,6 +943,14 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .memory(memory)
                 .name(applicationName)
                 .spaceId(spaceId)
+                .build());
+    }
+
+    private static Mono<CreatePrivateDomainResponse> requestCreatePrivateDomain(CloudFoundryClient cloudFoundryClient, String name, String organizationId) {
+        return cloudFoundryClient.privateDomains()
+            .create(CreatePrivateDomainRequest.builder()
+                .name(name)
+                .owningOrganizationId(organizationId)
                 .build());
     }
 

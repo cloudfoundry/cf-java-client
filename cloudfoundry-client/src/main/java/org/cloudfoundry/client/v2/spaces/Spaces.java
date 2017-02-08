@@ -149,6 +149,7 @@ public interface Spaces {
      * @param request the List all Domains for the Space request
      * @return the response from the List all Domains for the Space request
      */
+    @Deprecated
     Mono<ListSpaceDomainsResponse> listDomains(ListSpaceDomainsRequest request);
 
     /**

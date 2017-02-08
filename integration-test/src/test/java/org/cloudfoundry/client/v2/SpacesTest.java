@@ -22,9 +22,7 @@ import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
-import org.cloudfoundry.client.v2.domains.CreateDomainRequest;
 import org.cloudfoundry.client.v2.domains.DomainEntity;
-import org.cloudfoundry.client.v2.domains.DomainResource;
 import org.cloudfoundry.client.v2.events.EventEntity;
 import org.cloudfoundry.client.v2.events.EventResource;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorRequest;
@@ -39,6 +37,9 @@ import org.cloudfoundry.client.v2.routes.RouteResource;
 import org.cloudfoundry.client.v2.securitygroups.CreateSecurityGroupRequest;
 import org.cloudfoundry.client.v2.securitygroups.CreateSecurityGroupResponse;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroupResource;
+import org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainRequest;
+import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
+import org.cloudfoundry.client.v2.shareddomains.SharedDomainResource;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorByUsernameRequest;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorRequest;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorResponse;
@@ -79,6 +80,7 @@ import org.cloudfoundry.client.v2.users.ListUsersRequest;
 import org.cloudfoundry.client.v2.users.UserEntity;
 import org.cloudfoundry.client.v2.users.UserResource;
 import org.cloudfoundry.util.DateUtils;
+import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
@@ -545,6 +547,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    @SuppressWarnings("deprecation")
     @Test
     public void listDomains() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
@@ -552,11 +555,12 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
         this.organizationId
             .then(organizationId -> createSpaceIdWithDomain(this.cloudFoundryClient, organizationId, spaceName, domainName))
-            .then(spaceId -> Mono.when(
-                Mono.just(spaceId),
-                getSpaceDomainId(this.cloudFoundryClient, spaceId, domainName)
-            ))
-            .flatMap(function((spaceId, domainId) -> requestListSpaceDomains(this.cloudFoundryClient, spaceId)))
+            .flatMap(spaceId -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.spaces()
+                    .listDomains(ListSpaceDomainsRequest.builder()
+                        .spaceId(spaceId)
+                        .page(page)
+                        .build())))
             .filter(domainResource -> domainName.equals(ResourceUtils.getEntity(domainResource).getName()))
             .as(StepVerifier::create)
             .expectNextCount(1)
@@ -564,6 +568,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    @SuppressWarnings("deprecation")
     @Test
     public void listDomainsFilterByName() throws TimeoutException, InterruptedException {
         String domainName = this.nameFactory.getDomainName();
@@ -571,7 +576,13 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
         this.organizationId
             .then(organizationId -> createSpaceIdWithDomain(this.cloudFoundryClient, organizationId, spaceName, domainName))
-            .flatMap(spaceId -> requestListSpaceDomains(this.cloudFoundryClient, spaceId, builder -> builder.name(domainName)))
+            .flatMap(spaceId -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.spaces()
+                    .listDomains(ListSpaceDomainsRequest.builder()
+                        .name(domainName)
+                        .page(page)
+                        .spaceId(spaceId)
+                        .build())))
             .map(ResourceUtils::getEntity)
             .map(DomainEntity::getName)
             .as(StepVerifier::create)
@@ -584,40 +595,40 @@ public final class SpacesTest extends AbstractIntegrationTest {
     @Ignore("Ready to implement, but see https://github.com/cloudfoundry/cloud_controller_ng/issues/584")
     @Test
     public void listDomainsFilterByOwningOrganizationId() throws TimeoutException, InterruptedException {
-        String domainName = this.nameFactory.getDomainName();
-        String spaceOrganizationName = this.nameFactory.getOrganizationName();
-        String domainOrganizationName = this.nameFactory.getOrganizationName();
-        String spaceName = this.nameFactory.getSpaceName();
-
-        Mono
-            .when(
-                createOrganizationId(this.cloudFoundryClient, spaceOrganizationName),
-                createOrganizationId(this.cloudFoundryClient, domainOrganizationName)
-            )
-            .then(function((spaceOrganizationId, domainOrganizationId) -> Mono.when(
-                Mono.just(domainOrganizationId),
-                this.cloudFoundryClient.domains()
-                    .create(CreateDomainRequest.builder()
-                        .name(domainName)
-                        .owningOrganizationId(domainOrganizationId)
-                        .wildcard(true)
-                        .build())
-                    .map(ResourceUtils::getId)
-                    .then(domainId -> this.cloudFoundryClient.spaces()
-                        .create(CreateSpaceRequest.builder()
-                            .domainId(domainId)
-                            .organizationId(spaceOrganizationId)
-                            .name(spaceName)
-                            .build()))
-                    .map(ResourceUtils::getId)
-            )))
-            .flatMap(function((domainOrganizationId, spaceId) -> requestListSpaceDomains(this.cloudFoundryClient, spaceId, builder -> builder.owningOrganizationId(domainOrganizationId))))
-            .map(ResourceUtils::getEntity)
-            .map(DomainEntity::getName)
-            .as(StepVerifier::create)
-            .expectNext(domainName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+//        String domainName = this.nameFactory.getDomainName();
+//        String spaceOrganizationName = this.nameFactory.getOrganizationName();
+//        String domainOrganizationName = this.nameFactory.getOrganizationName();
+//        String spaceName = this.nameFactory.getSpaceName();
+//
+//        Mono
+//            .when(
+//                createOrganizationId(this.cloudFoundryClient, spaceOrganizationName),
+//                createOrganizationId(this.cloudFoundryClient, domainOrganizationName)
+//            )
+//            .then(function((spaceOrganizationId, domainOrganizationId) -> Mono.when(
+//                Mono.just(domainOrganizationId),
+//                this.cloudFoundryClient.domains()
+//                    .create(CreateDomainRequest.builder()
+//                        .name(domainName)
+//                        .owningOrganizationId(domainOrganizationId)
+//                        .wildcard(true)
+//                        .build())
+//                    .map(ResourceUtils::getId)
+//                    .then(domainId -> this.cloudFoundryClient.spaces()
+//                        .create(CreateSpaceRequest.builder()
+//                            .domainId(domainId)
+//                            .organizationId(spaceOrganizationId)
+//                            .name(spaceName)
+//                            .build()))
+//                    .map(ResourceUtils::getId)
+//            )))
+//            .flatMap(function((domainOrganizationId, spaceId) -> requestListSpaceDomains(this.cloudFoundryClient, spaceId, builder -> builder.owningOrganizationId(domainOrganizationId))))
+//            .map(ResourceUtils::getEntity)
+//            .map(DomainEntity::getName)
+//            .as(StepVerifier::create)
+//            .expectNext(domainName)
+//            .expectComplete()
+//            .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -949,7 +960,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .then(organizationId -> createSpaceIdWithDomain(this.cloudFoundryClient, organizationId, spaceName, domainName))
             .then(spaceId -> Mono.when(
                 Mono.just(spaceId),
-                getSpaceDomainId(this.cloudFoundryClient, spaceId, domainName),
+                getSharedDomainId(this.cloudFoundryClient, domainName),
                 createRouteId(this.cloudFoundryClient, spaceId, domainName, hostName, "/test-path")
             ))
             .flatMap(function((spaceId, domainId, routeId) -> Mono.when(
@@ -1394,7 +1405,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     private static Mono<String> createRouteId(CloudFoundryClient cloudFoundryClient, String spaceId, String domainName, String host, String path) {
-        return getSpaceDomainId(cloudFoundryClient, spaceId, domainName)
+        return getSharedDomainId(cloudFoundryClient, domainName)
             .then(domainId -> requestCreateRoute(cloudFoundryClient, spaceId, domainId, path, host))
             .map(ResourceUtils::getId);
     }
@@ -1414,10 +1425,9 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     private static Mono<String> createSpaceIdWithDomain(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceName, String domainName) {
-        return cloudFoundryClient.domains()
-            .create(CreateDomainRequest.builder()
+        return cloudFoundryClient.sharedDomains()
+            .create(CreateSharedDomainRequest.builder()
                 .name(domainName)
-                .wildcard(true)
                 .build())
             .map(ResourceUtils::getId)
             .then(domainId -> cloudFoundryClient.spaces()
@@ -1461,10 +1471,11 @@ public final class SpacesTest extends AbstractIntegrationTest {
         return DateUtils.formatToIso8601(past);
     }
 
-    private static Mono<String> getSpaceDomainId(CloudFoundryClient cloudFoundryClient, String spaceId, String domainName) {
-        return requestListSpaceDomains(cloudFoundryClient, spaceId, builder -> builder.name(domainName))
+    private static Mono<String> getSharedDomainId(CloudFoundryClient cloudFoundryClient, String domain) {
+        return requestSharedDomain(cloudFoundryClient, domain)
+            .map(ResourceUtils::getId)
             .single()
-            .map(ResourceUtils::getId);
+            .otherwiseIfEmpty(ExceptionUtils.illegalArgument("Domain %s not found", domain));
     }
 
     private static Predicate<SpaceResource> hasOrganizationId(String organizationId) {
@@ -1550,19 +1561,6 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .build()));
     }
 
-    private static Flux<DomainResource> requestListSpaceDomains(CloudFoundryClient cloudFoundryClient, String spaceId) {
-        return requestListSpaceDomains(cloudFoundryClient, spaceId, UnaryOperator.identity());
-    }
-
-    private static Flux<DomainResource> requestListSpaceDomains(CloudFoundryClient cloudFoundryClient, String spaceId, UnaryOperator<ListSpaceDomainsRequest.Builder> transformer) {
-        return PaginationUtils
-            .requestClientV2Resources(page -> cloudFoundryClient.spaces()
-                .listDomains(transformer.apply(ListSpaceDomainsRequest.builder())
-                    .spaceId(spaceId)
-                    .page(page)
-                    .build()));
-    }
-
     private static Flux<EventResource> requestListSpaceEvents(CloudFoundryClient cloudFoundryClient, String spaceId) {
         return requestListSpaceEvents(cloudFoundryClient, spaceId, UnaryOperator.identity());
     }
@@ -1610,6 +1608,15 @@ public final class SpacesTest extends AbstractIntegrationTest {
         return PaginationUtils
             .requestClientV2Resources(page -> cloudFoundryClient.spaces()
                 .list(transformer.apply(ListSpacesRequest.builder())
+                    .page(page)
+                    .build()));
+    }
+
+    private static Flux<SharedDomainResource> requestSharedDomain(CloudFoundryClient cloudFoundryClient, String domain) {
+        return PaginationUtils
+            .requestClientV2Resources(page -> cloudFoundryClient.sharedDomains()
+                .list(ListSharedDomainsRequest.builder()
+                    .name(domain)
                     .page(page)
                     .build()));
     }

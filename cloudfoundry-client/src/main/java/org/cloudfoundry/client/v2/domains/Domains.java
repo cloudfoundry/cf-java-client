@@ -31,6 +31,7 @@ public interface Domains {
      * @param request the Create a Domain request
      * @return the response from the Create a Domain request
      */
+    @Deprecated
     Mono<CreateDomainResponse> create(CreateDomainRequest request);
 
     /**
@@ -39,6 +40,7 @@ public interface Domains {
      * @param request the Delete a Particular Domain request
      * @return the response from the Delete a Particular Domain request
      */
+    @Deprecated
     Mono<DeleteDomainResponse> delete(DeleteDomainRequest request);
 
     /**
@@ -47,6 +49,7 @@ public interface Domains {
      * @param request The Get Domain request
      * @return the response from the Get Domain request
      */
+    @Deprecated
     Mono<GetDomainResponse> get(GetDomainRequest request);
 
     /**
@@ -55,6 +58,7 @@ public interface Domains {
      * @param request the List all Domains request
      * @return the response from the List all Domains request
      */
+    @Deprecated
     Mono<ListDomainsResponse> list(ListDomainsRequest request);
 
     /**
@@ -64,6 +68,7 @@ public interface Domains {
      * @param request the List all Spaces for the Domain request
      * @return the response from the List all Spaces for the Domain request
      */
+    @Deprecated
     Mono<ListDomainSpacesResponse> listSpaces(ListDomainSpacesRequest request);
 
 }

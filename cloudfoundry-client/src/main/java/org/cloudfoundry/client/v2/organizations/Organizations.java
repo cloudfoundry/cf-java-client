@@ -179,6 +179,7 @@ public interface Organizations {
      * @param request the List all Domains for the Organization request
      * @return the response from the List all Domains for the Organization request
      */
+    @Deprecated
     Mono<ListOrganizationDomainsResponse> listDomains(ListOrganizationDomainsRequest request);
 
     /**

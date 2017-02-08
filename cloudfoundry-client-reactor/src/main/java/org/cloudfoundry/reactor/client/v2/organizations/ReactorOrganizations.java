@@ -212,6 +212,7 @@ public final class ReactorOrganizations extends AbstractClientV2Operations imple
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public Mono<ListOrganizationDomainsResponse> listDomains(ListOrganizationDomainsRequest request) {
         return get(request, ListOrganizationDomainsResponse.class, builder -> builder.pathSegment("v2", "organizations", request.getOrganizationId(), "domains"))
             .checkpoint();
