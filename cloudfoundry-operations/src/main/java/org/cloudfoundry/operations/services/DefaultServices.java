@@ -125,7 +125,8 @@ public final class DefaultServices implements Services {
                     getSpaceServiceInstanceId(cloudFoundryClient, request.getServiceInstanceName(), spaceId)
                 )))
             .then(function((cloudFoundryClient, applicationId, serviceInstanceId) -> createServiceBinding(cloudFoundryClient, applicationId, serviceInstanceId, request.getParameters())))
-            .then();
+            .then()
+            .checkpoint();
     }
 
     @Override
@@ -145,7 +146,8 @@ public final class DefaultServices implements Services {
                     getSpaceUserProvidedServiceInstanceId(cloudFoundryClient, request.getServiceInstanceName(), spaceId)
                 )))
             .then(function((cloudFoundryClient, routeId, userProvidedServiceInstanceId) -> createRouteBinding(cloudFoundryClient, routeId, userProvidedServiceInstanceId, request.getParameters())))
-            .then();
+            .then()
+            .checkpoint();
     }
 
     @Override
@@ -169,7 +171,8 @@ public final class DefaultServices implements Services {
                     Mono.just(cloudFoundryClient),
                     createServiceInstance(cloudFoundryClient, spaceId, planId, request)
                 )))
-            .then(function(DefaultServices::waitForCreateInstance));
+            .then(function(DefaultServices::waitForCreateInstance))
+            .checkpoint();
     }
 
     @Override
@@ -182,7 +185,8 @@ public final class DefaultServices implements Services {
                     getSpaceServiceInstanceId(cloudFoundryClient, request.getServiceInstanceName(), spaceId)
                 )))
             .then(function((cloudFoundryClient, serviceInstanceId) -> requestCreateServiceKey(cloudFoundryClient, serviceInstanceId, request.getServiceKeyName(), request.getParameters())))
-            .then();
+            .then()
+            .checkpoint();
     }
 
     @Override
@@ -191,7 +195,8 @@ public final class DefaultServices implements Services {
             .when(this.cloudFoundryClient, this.spaceId)
             .then(function((cloudFoundryClient, spaceId) -> requestCreateUserProvidedServiceInstance(cloudFoundryClient, request.getName(), request.getCredentials(), request.getRouteServiceUrl(),
                 spaceId, request.getSyslogDrainUrl())))
-            .then();
+            .then()
+            .checkpoint();
     }
 
     @Override
@@ -204,7 +209,8 @@ public final class DefaultServices implements Services {
                     getSpaceServiceInstance(cloudFoundryClient, request.getName(), spaceId)
                 )))
             .then(function(DefaultServices::deleteServiceInstance))
-            .then();
+            .then()
+            .checkpoint();
     }
 
     @Override
@@ -222,7 +228,8 @@ public final class DefaultServices implements Services {
                     getServiceKey(cloudFoundryClient, serviceInstanceId, request.getServiceKeyName())
                         .map(ResourceUtils::getId)
                 )))
-            .then(function(DefaultServices::requestDeleteServiceKey));
+            .then(function(DefaultServices::requestDeleteServiceKey))
+            .checkpoint();
     }
 
     @Override
@@ -247,7 +254,8 @@ public final class DefaultServices implements Services {
                     getBoundApplications(cloudFoundryClient, ResourceUtils.getId(resource)),
                     getServiceEntity(cloudFoundryClient, Optional.ofNullable(servicePlanEntity.getServiceId()))
                 )))
-            .map(function(DefaultServices::toServiceInstance));
+            .map(function(DefaultServices::toServiceInstance))
+            .checkpoint();
     }
 
     @Override
@@ -260,7 +268,8 @@ public final class DefaultServices implements Services {
                     getSpaceServiceInstanceId(cloudFoundryClient, request.getServiceInstanceName(), spaceId)
                 )))
             .then(function((cloudFoundryClient, serviceInstanceId) -> getServiceKey(cloudFoundryClient, serviceInstanceId, request.getServiceKeyName())))
-            .map(DefaultServices::toServiceKey);
+            .map(DefaultServices::toServiceKey)
+            .checkpoint();
     }
 
     public Flux<ServiceInstanceSummary> listInstances() {
@@ -270,7 +279,8 @@ public final class DefaultServices implements Services {
                 .getSummary(GetSpaceSummaryRequest.builder()
                     .spaceId(spaceId)
                     .build())))
-            .flatMap(DefaultServices::toServiceInstanceSummary);
+            .flatMap(DefaultServices::toServiceInstanceSummary)
+            .checkpoint();
     }
 
     @Override
@@ -283,7 +293,8 @@ public final class DefaultServices implements Services {
                     getSpaceServiceInstanceId(cloudFoundryClient, request.getServiceInstanceName(), spaceId)
                 )))
             .flatMap(function((cloudFoundryClient, serviceInstanceId) -> requestListServiceInstanceServiceKeys(cloudFoundryClient, serviceInstanceId)))
-            .map(DefaultServices::toServiceKey);
+            .map(DefaultServices::toServiceKey)
+            .checkpoint();
     }
 
     @Override
@@ -301,7 +312,8 @@ public final class DefaultServices implements Services {
                     Mono.just(resource),
                     getServicePlans(cloudFoundryClient, ResourceUtils.getId(resource))
                 )))
-            .map(function(DefaultServices::toServiceOffering));
+            .map(function(DefaultServices::toServiceOffering))
+            .checkpoint();
     }
 
     @Override
@@ -314,7 +326,8 @@ public final class DefaultServices implements Services {
                     getSpaceServiceInstance(cloudFoundryClient, request.getName(), spaceId)
                 )))
             .then(function((cloudFoundryClient, serviceInstance) -> renameServiceInstance(cloudFoundryClient, serviceInstance, request.getNewName())))
-            .then();
+            .then()
+            .checkpoint();
     }
 
     @Override
@@ -333,7 +346,8 @@ public final class DefaultServices implements Services {
                     getServiceBindingId(cloudFoundryClient, applicationId, serviceInstanceId, request.getServiceInstanceName())
                 )))
             .then(function(DefaultServices::deleteServiceBinding))
-            .then();
+            .then()
+            .checkpoint();
     }
 
     @Override
@@ -353,7 +367,8 @@ public final class DefaultServices implements Services {
                     getOptionalValidatedServicePlanId(cloudFoundryClient, request.getPlanName(), serviceInstance, organizationId)
                 )))
             .then(function((cloudFoundryClient, serviceInstanceId, servicePlanId) -> updateServiceInstance(cloudFoundryClient, request, serviceInstanceId, servicePlanId.orElse(null))))
-            .then();
+            .then()
+            .checkpoint();
     }
 
     @Override
@@ -366,7 +381,8 @@ public final class DefaultServices implements Services {
                     getSpaceUserProvidedServiceInstanceId(cloudFoundryClient, request.getUserProvidedServiceInstanceName(), spaceId)
                 )))
             .then(function((cloudFoundryClient, userProvidedServiceInstanceId) -> updateUserProvidedServiceInstance(cloudFoundryClient, request, userProvidedServiceInstanceId)))
-            .then();
+            .then()
+            .checkpoint();
     }
 
     private static Mono<Optional<String>> checkVisibility(CloudFoundryClient cloudFoundryClient, String organizationId, ServicePlanResource resource) {

@@ -31,7 +31,8 @@ public final class DefaultAdvanced implements Advanced {
     @Override
     public Mono<String> sshCode() {
         return this.uaaClient
-            .then(DefaultAdvanced::requestAuthorizeByAuthorizationCodeGrantApi);
+            .then(DefaultAdvanced::requestAuthorizeByAuthorizationCodeGrantApi)
+            .checkpoint();
     }
 
     private static Mono<String> requestAuthorizeByAuthorizationCodeGrantApi(UaaClient uaaClient) {

@@ -66,7 +66,8 @@ public final class ReactorAuthorizations extends AbstractUaaOperations implement
                 return Optional.ofNullable(candidate)
                     .map(Mono::just)
                     .orElse(ExceptionUtils.illegalState(String.format("Parameter %s not in URI %s", "code", location)));
-            });
+            })
+            .checkpoint();
     }
 
     @Override
@@ -74,7 +75,8 @@ public final class ReactorAuthorizations extends AbstractUaaOperations implement
         return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.CODE),
             outbound -> outbound
                 .map(ReactorAuthorizations::removeAuthorization))
-            .map(inbound -> inbound.responseHeaders().get(LOCATION));
+            .map(inbound -> inbound.responseHeaders().get(LOCATION))
+            .checkpoint();
     }
 
     @Override
@@ -82,7 +84,8 @@ public final class ReactorAuthorizations extends AbstractUaaOperations implement
         return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.CODE_AND_ID_TOKEN),
             outbound -> outbound
                 .map(ReactorAuthorizations::removeAuthorization))
-            .map(inbound -> inbound.responseHeaders().get(LOCATION));
+            .map(inbound -> inbound.responseHeaders().get(LOCATION))
+            .checkpoint();
     }
 
     @Override
@@ -90,7 +93,8 @@ public final class ReactorAuthorizations extends AbstractUaaOperations implement
         return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.TOKEN),
             outbound -> outbound
                 .map(ReactorAuthorizations::removeAuthorization))
-            .map(inbound -> inbound.responseHeaders().get(LOCATION));
+            .map(inbound -> inbound.responseHeaders().get(LOCATION))
+            .checkpoint();
     }
 
     @Override
@@ -98,19 +102,22 @@ public final class ReactorAuthorizations extends AbstractUaaOperations implement
         return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.CODE_AND_ID_TOKEN),
             outbound -> outbound
                 .map(ReactorAuthorizations::removeAuthorization))
-            .map(inbound -> inbound.responseHeaders().get(LOCATION));
+            .map(inbound -> inbound.responseHeaders().get(LOCATION))
+            .checkpoint();
     }
 
     @Override
     public Mono<String> openIdWithIdToken(AuthorizeByOpenIdWithIdTokenRequest request) {
         return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.ID_TOKEN))
-            .map(inbound -> inbound.responseHeaders().get(LOCATION));
+            .map(inbound -> inbound.responseHeaders().get(LOCATION))
+            .checkpoint();
     }
 
     @Override
     public Mono<String> openIdWithTokenAndIdToken(AuthorizeByOpenIdWithImplicitGrantRequest request) {
         return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.TOKEN_AND_ID_TOKEN))
-            .map(inbound -> inbound.responseHeaders().get(LOCATION));
+            .map(inbound -> inbound.responseHeaders().get(LOCATION))
+            .checkpoint();
     }
 
     private static HttpClientRequest removeAuthorization(HttpClientRequest request) {

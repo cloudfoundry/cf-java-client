@@ -49,7 +49,8 @@ public final class DefaultServiceAdmin implements ServiceAdmin {
             .when(this.cloudFoundryClient, this.spaceId)
             .then(function((cloudFoundryClient, spaceId) -> requestCreateServiceBroker(cloudFoundryClient, request.getName(), request.getUrl(), request.getUsername(), request.getPassword(),
                 request.getSpaceScoped(), spaceId)))
-            .then();
+            .then()
+            .checkpoint();
     }
 
     @Override
@@ -59,14 +60,16 @@ public final class DefaultServiceAdmin implements ServiceAdmin {
                 Mono.just(cloudFoundryClient),
                 getServiceBrokerId(cloudFoundryClient, request.getName())
             ))
-            .then(function(DefaultServiceAdmin::requestDeleteServiceBroker));
+            .then(function(DefaultServiceAdmin::requestDeleteServiceBroker))
+            .checkpoint();
     }
 
     @Override
     public Flux<ServiceBroker> list() {
         return this.cloudFoundryClient
             .flatMap(DefaultServiceAdmin::requestServiceBrokers)
-            .map(this::toServiceBroker);
+            .map(this::toServiceBroker)
+            .checkpoint();
     }
 
     private static Mono<ServiceBrokerResource> getServiceBroker(CloudFoundryClient cloudFoundryClient, String serviceBrokerName) {

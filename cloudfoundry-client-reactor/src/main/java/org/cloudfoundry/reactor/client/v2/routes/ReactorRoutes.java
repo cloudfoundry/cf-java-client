@@ -61,17 +61,20 @@ public final class ReactorRoutes extends AbstractClientV2Operations implements R
 
     @Override
     public Mono<AssociateRouteApplicationResponse> associateApplication(AssociateRouteApplicationRequest request) {
-        return put(request, AssociateRouteApplicationResponse.class, builder -> builder.pathSegment("v2", "routes", request.getRouteId(), "apps", request.getApplicationId()));
+        return put(request, AssociateRouteApplicationResponse.class, builder -> builder.pathSegment("v2", "routes", request.getRouteId(), "apps", request.getApplicationId()))
+            .checkpoint();
     }
 
     @Override
     public Mono<CreateRouteResponse> create(CreateRouteRequest request) {
-        return post(request, CreateRouteResponse.class, builder -> builder.pathSegment("v2", "routes"));
+        return post(request, CreateRouteResponse.class, builder -> builder.pathSegment("v2", "routes"))
+            .checkpoint();
     }
 
     @Override
     public Mono<DeleteRouteResponse> delete(DeleteRouteRequest request) {
-        return delete(request, DeleteRouteResponse.class, builder -> builder.pathSegment("v2", "routes", request.getRouteId()));
+        return delete(request, DeleteRouteResponse.class, builder -> builder.pathSegment("v2", "routes", request.getRouteId()))
+            .checkpoint();
     }
 
     @Override
@@ -83,32 +86,38 @@ public final class ReactorRoutes extends AbstractClientV2Operations implements R
                 return builder;
             })
             .defaultIfEmpty(true)
-            .otherwise(ExceptionUtils.statusCode(CF_NOT_FOUND), t -> Mono.just(false));
+            .otherwise(ExceptionUtils.statusCode(CF_NOT_FOUND), t -> Mono.just(false))
+            .checkpoint();
     }
 
     @Override
     public Mono<GetRouteResponse> get(GetRouteRequest request) {
-        return get(request, GetRouteResponse.class, builder -> builder.pathSegment("v2", "routes", request.getRouteId()));
+        return get(request, GetRouteResponse.class, builder -> builder.pathSegment("v2", "routes", request.getRouteId()))
+            .checkpoint();
     }
 
     @Override
     public Mono<ListRoutesResponse> list(ListRoutesRequest request) {
-        return get(request, ListRoutesResponse.class, builder -> builder.pathSegment("v2", "routes"));
+        return get(request, ListRoutesResponse.class, builder -> builder.pathSegment("v2", "routes"))
+            .checkpoint();
     }
 
     @Override
     public Mono<ListRouteApplicationsResponse> listApplications(ListRouteApplicationsRequest request) {
-        return get(request, ListRouteApplicationsResponse.class, builder -> builder.pathSegment("v2", "routes", request.getRouteId(), "apps"));
+        return get(request, ListRouteApplicationsResponse.class, builder -> builder.pathSegment("v2", "routes", request.getRouteId(), "apps"))
+            .checkpoint();
     }
 
     @Override
     public Mono<Void> removeApplication(RemoveRouteApplicationRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("v2", "routes", request.getRouteId(), "apps", request.getApplicationId()));
+        return delete(request, Void.class, builder -> builder.pathSegment("v2", "routes", request.getRouteId(), "apps", request.getApplicationId()))
+            .checkpoint();
     }
 
     @Override
     public Mono<UpdateRouteResponse> update(UpdateRouteRequest request) {
-        return put(request, UpdateRouteResponse.class, builder -> builder.pathSegment("v2", "routes", request.getRouteId()));
+        return put(request, UpdateRouteResponse.class, builder -> builder.pathSegment("v2", "routes", request.getRouteId()))
+            .checkpoint();
     }
 
 }

@@ -42,7 +42,8 @@ public final class ReactorUsers extends AbstractClientV2Operations implements Us
 
     @Override
     public Mono<ListUsersResponse> list(ListUsersRequest request) {
-        return get(request, ListUsersResponse.class, builder -> builder.pathSegment("v2", "users"));
+        return get(request, ListUsersResponse.class, builder -> builder.pathSegment("v2", "users"))
+            .checkpoint();
     }
 
 }

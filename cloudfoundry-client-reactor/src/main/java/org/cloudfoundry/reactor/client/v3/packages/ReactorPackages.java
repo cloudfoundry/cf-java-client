@@ -58,38 +58,45 @@ public final class ReactorPackages extends AbstractClientV3Operations implements
 
     @Override
     public Mono<CopyPackageResponse> copy(CopyPackageRequest request) {
-        return post(request, CopyPackageResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "packages"));
+        return post(request, CopyPackageResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "packages"))
+            .checkpoint();
     }
 
     @Override
     public Mono<CreatePackageResponse> create(CreatePackageRequest request) {
-        return post(request, CreatePackageResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "packages"));
+        return post(request, CreatePackageResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "packages"))
+            .checkpoint();
     }
 
     @Override
     public Mono<Void> delete(DeletePackageRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("v3", "packages", request.getPackageId()));
+        return delete(request, Void.class, builder -> builder.pathSegment("v3", "packages", request.getPackageId()))
+            .checkpoint();
     }
 
     @Override
     public Flux<byte[]> download(DownloadPackageRequest request) {
         return get(request, builder -> builder.pathSegment("v3", "packages", request.getPackageId(), "download"))
-            .flatMap(response -> response.receive().aggregate().asByteArray());
+            .flatMap(response -> response.receive().aggregate().asByteArray())
+            .checkpoint();
     }
 
     @Override
     public Mono<GetPackageResponse> get(GetPackageRequest request) {
-        return get(request, GetPackageResponse.class, builder -> builder.pathSegment("v3", "packages", request.getPackageId()));
+        return get(request, GetPackageResponse.class, builder -> builder.pathSegment("v3", "packages", request.getPackageId()))
+            .checkpoint();
     }
 
     @Override
     public Mono<ListPackagesResponse> list(ListPackagesRequest request) {
-        return get(request, ListPackagesResponse.class, builder -> builder.pathSegment("v3", "packages"));
+        return get(request, ListPackagesResponse.class, builder -> builder.pathSegment("v3", "packages"))
+            .checkpoint();
     }
 
     @Override
     public Mono<StagePackageResponse> stage(StagePackageRequest request) {
-        return post(request, StagePackageResponse.class, builder -> builder.pathSegment("v3", "packages", request.getPackageId(), "droplets"));
+        return post(request, StagePackageResponse.class, builder -> builder.pathSegment("v3", "packages", request.getPackageId(), "droplets"))
+            .checkpoint();
     }
 
     @Override
@@ -102,7 +109,8 @@ public final class ReactorPackages extends AbstractClientV3Operations implements
                     .sendForm(form -> form
                         .multipart(true)
                         .file("bits", "application.zip", bits.toFile(), APPLICATION_ZIP))))
-                .then());
+                .then())
+            .checkpoint();
     }
 
 }

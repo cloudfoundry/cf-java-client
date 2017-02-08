@@ -39,14 +39,16 @@ public final class DefaultStacks implements Stacks {
     public Mono<Stack> get(GetStackRequest request) {
         return this.cloudFoundryClient
             .then(cloudFoundryClient -> getStack(cloudFoundryClient, request.getName()))
-            .map(this::toStack);
+            .map(this::toStack)
+            .checkpoint();
     }
 
     @Override
     public Flux<Stack> list() {
         return this.cloudFoundryClient
             .flatMap(DefaultStacks::requestStacks)
-            .map(this::toStack);
+            .map(this::toStack)
+            .checkpoint();
     }
 
     private static Mono<StackResource> getStack(CloudFoundryClient cloudFoundryClient, String stack) {

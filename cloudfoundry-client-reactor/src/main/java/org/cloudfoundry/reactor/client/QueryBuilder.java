@@ -17,7 +17,6 @@
 package org.cloudfoundry.reactor.client;
 
 import org.cloudfoundry.QueryParameter;
-import org.cloudfoundry.reactor.client.MethodNameComparator;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.util.UriComponentsBuilder;

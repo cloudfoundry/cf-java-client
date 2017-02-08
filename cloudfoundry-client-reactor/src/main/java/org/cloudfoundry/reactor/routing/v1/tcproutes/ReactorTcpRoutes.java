@@ -55,12 +55,14 @@ public class ReactorTcpRoutes extends AbstractRoutingV1Operations implements Tcp
 
     @Override
     public Mono<CreateTcpRoutesResponse> create(CreateTcpRoutesRequest request) {
-        return post(request, CreateTcpRoutesResponse.class, builder -> builder.pathSegment("v1", "tcp_routes", "create"));
+        return post(request, CreateTcpRoutesResponse.class, builder -> builder.pathSegment("v1", "tcp_routes", "create"))
+            .checkpoint();
     }
 
     @Override
     public Mono<Void> delete(DeleteTcpRoutesRequest request) {
-        return post(request, Void.class, builder -> builder.pathSegment("v1", "tcp_routes", "delete"));
+        return post(request, Void.class, builder -> builder.pathSegment("v1", "tcp_routes", "delete"))
+            .checkpoint();
     }
 
     @Override
@@ -76,12 +78,14 @@ public class ReactorTcpRoutes extends AbstractRoutingV1Operations implements Tcp
                 } catch (IOException e) {
                     throw Exceptions.propagate(e);
                 }
-            });
+            })
+            .checkpoint();
     }
 
     @Override
     public Mono<ListTcpRoutesResponse> list(ListTcpRoutesRequest request) {
-        return get(ListTcpRoutesResponse.class, builder -> builder.pathSegment("v1", "tcp_routes"));
+        return get(ListTcpRoutesResponse.class, builder -> builder.pathSegment("v1", "tcp_routes"))
+            .checkpoint();
     }
 
 }

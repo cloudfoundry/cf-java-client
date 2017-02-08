@@ -50,27 +50,32 @@ public final class ReactorOrganizationQuotaDefinitions extends AbstractClientV2O
 
     @Override
     public Mono<CreateOrganizationQuotaDefinitionResponse> create(CreateOrganizationQuotaDefinitionRequest request) {
-        return post(request, CreateOrganizationQuotaDefinitionResponse.class, builder -> builder.pathSegment("v2", "quota_definitions"));
+        return post(request, CreateOrganizationQuotaDefinitionResponse.class, builder -> builder.pathSegment("v2", "quota_definitions"))
+            .checkpoint();
     }
 
     @Override
     public Mono<DeleteOrganizationQuotaDefinitionResponse> delete(DeleteOrganizationQuotaDefinitionRequest request) {
-        return delete(request, DeleteOrganizationQuotaDefinitionResponse.class, builder -> builder.pathSegment("v2", "quota_definitions", request.getOrganizationQuotaDefinitionId()));
+        return delete(request, DeleteOrganizationQuotaDefinitionResponse.class, builder -> builder.pathSegment("v2", "quota_definitions", request.getOrganizationQuotaDefinitionId()))
+            .checkpoint();
     }
 
     @Override
     public Mono<GetOrganizationQuotaDefinitionResponse> get(GetOrganizationQuotaDefinitionRequest request) {
-        return get(request, GetOrganizationQuotaDefinitionResponse.class, builder -> builder.pathSegment("v2", "quota_definitions", request.getOrganizationQuotaDefinitionId()));
+        return get(request, GetOrganizationQuotaDefinitionResponse.class, builder -> builder.pathSegment("v2", "quota_definitions", request.getOrganizationQuotaDefinitionId()))
+            .checkpoint();
     }
 
     @Override
     public Mono<ListOrganizationQuotaDefinitionsResponse> list(ListOrganizationQuotaDefinitionsRequest request) {
-        return get(request, ListOrganizationQuotaDefinitionsResponse.class, builder -> builder.pathSegment("v2", "quota_definitions"));
+        return get(request, ListOrganizationQuotaDefinitionsResponse.class, builder -> builder.pathSegment("v2", "quota_definitions"))
+            .checkpoint();
     }
 
     @Override
     public Mono<UpdateOrganizationQuotaDefinitionResponse> update(UpdateOrganizationQuotaDefinitionRequest request) {
-        return put(request, UpdateOrganizationQuotaDefinitionResponse.class, builder -> builder.pathSegment("v2", "quota_definitions", request.getOrganizationQuotaDefinitionId()));
+        return put(request, UpdateOrganizationQuotaDefinitionResponse.class, builder -> builder.pathSegment("v2", "quota_definitions", request.getOrganizationQuotaDefinitionId()))
+            .checkpoint();
     }
 
 }

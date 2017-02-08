@@ -76,97 +76,116 @@ public final class ReactorApplicationsV3 extends AbstractClientV3Operations impl
 
     @Override
     public Mono<AssignApplicationDropletResponse> assignDroplet(AssignApplicationDropletRequest request) {
-        return put(request, AssignApplicationDropletResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "current_droplet"));
+        return put(request, AssignApplicationDropletResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "current_droplet"))
+            .checkpoint();
     }
 
     @Override
     public Mono<CancelApplicationTaskResponse> cancelTask(CancelApplicationTaskRequest request) {
-        return put(request, CancelApplicationTaskResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "tasks", request.getTaskId(), "cancel"));
+        return put(request, CancelApplicationTaskResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "tasks", request.getTaskId(), "cancel"))
+            .checkpoint();
     }
 
     @Override
     public Mono<CreateApplicationResponse> create(CreateApplicationRequest request) {
-        return post(request, CreateApplicationResponse.class, builder -> builder.pathSegment("v3", "apps"));
+        return post(request, CreateApplicationResponse.class, builder -> builder.pathSegment("v3", "apps"))
+            .checkpoint();
     }
 
     @Override
     public Mono<Void> delete(DeleteApplicationRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId()));
+        return delete(request, Void.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId()))
+            .checkpoint();
     }
 
     @Override
     public Mono<GetApplicationResponse> get(GetApplicationRequest request) {
-        return get(request, GetApplicationResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId()));
+        return get(request, GetApplicationResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId()))
+            .checkpoint();
     }
 
     @Override
     public Mono<GetApplicationEnvironmentResponse> getEnvironment(GetApplicationEnvironmentRequest request) {
-        return get(request, GetApplicationEnvironmentResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "env"));
+        return get(request, GetApplicationEnvironmentResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "env"))
+            .checkpoint();
     }
 
     @Override
     public Mono<GetApplicationProcessResponse> getProcess(GetApplicationProcessRequest request) {
-        return get(request, GetApplicationProcessResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "processes", request.getType()));
+        return get(request, GetApplicationProcessResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "processes", request.getType()))
+            .checkpoint();
     }
 
     @Override
     public Mono<GetApplicationProcessStatisticsResponse> getProcessStatistics(GetApplicationProcessStatisticsRequest request) {
-        return get(request, GetApplicationProcessStatisticsResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "processes", request.getType(), "stats"));
+        return get(request, GetApplicationProcessStatisticsResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "processes", request.getType(), "stats"))
+            .checkpoint();
     }
 
     @Override
     public Mono<GetApplicationTaskResponse> getTask(GetApplicationTaskRequest request) {
-        return get(request, GetApplicationTaskResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "tasks", request.getTaskId()));
+        return get(request, GetApplicationTaskResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "tasks", request.getTaskId()))
+            .checkpoint();
     }
 
     @Override
     public Mono<ListApplicationsResponse> list(ListApplicationsRequest request) {
-        return get(request, ListApplicationsResponse.class, builder -> builder.pathSegment("v3", "apps"));
+        return get(request, ListApplicationsResponse.class, builder -> builder.pathSegment("v3", "apps"))
+            .checkpoint();
     }
 
     @Override
     public Mono<ListApplicationDropletsResponse> listDroplets(ListApplicationDropletsRequest request) {
-        return get(request, ListApplicationDropletsResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "droplets"));
+        return get(request, ListApplicationDropletsResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "droplets"))
+            .checkpoint();
     }
 
     @Override
     public Mono<ListApplicationPackagesResponse> listPackages(ListApplicationPackagesRequest request) {
-        return get(request, ListApplicationPackagesResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "packages"));
+        return get(request, ListApplicationPackagesResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "packages"))
+            .checkpoint();
     }
 
     @Override
     public Mono<ListApplicationProcessesResponse> listProcesses(ListApplicationProcessesRequest request) {
-        return get(request, ListApplicationProcessesResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "processes"));
+        return get(request, ListApplicationProcessesResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "processes"))
+            .checkpoint();
     }
 
     @Override
     public Mono<ListApplicationTasksResponse> listTasks(ListApplicationTasksRequest request) {
-        return get(request, ListApplicationTasksResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "tasks"));
+        return get(request, ListApplicationTasksResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "tasks"))
+            .checkpoint();
     }
 
     @Override
     public Mono<ScaleApplicationResponse> scale(ScaleApplicationRequest request) {
-        return put(request, ScaleApplicationResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "processes", request.getType(), "scale"));
+        return put(request, ScaleApplicationResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "processes", request.getType(), "scale"))
+            .checkpoint();
     }
 
     @Override
     public Mono<StartApplicationResponse> start(StartApplicationRequest request) {
-        return put(request, StartApplicationResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "start"));
+        return put(request, StartApplicationResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "start"))
+            .checkpoint();
     }
 
     @Override
     public Mono<StopApplicationResponse> stop(StopApplicationRequest request) {
-        return put(request, StopApplicationResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "stop"));
+        return put(request, StopApplicationResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "stop"))
+            .checkpoint();
     }
 
     @Override
     public Mono<Void> terminateInstance(TerminateApplicationInstanceRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "processes", request.getType(), "instances", request.getIndex()));
+        return delete(request, Void.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "processes", request.getType(), "instances", request.getIndex()))
+            .checkpoint();
     }
 
     @Override
     public Mono<UpdateApplicationResponse> update(UpdateApplicationRequest request) {
-        return patch(request, UpdateApplicationResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId()));
+        return patch(request, UpdateApplicationResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId()))
+            .checkpoint();
     }
 
 }

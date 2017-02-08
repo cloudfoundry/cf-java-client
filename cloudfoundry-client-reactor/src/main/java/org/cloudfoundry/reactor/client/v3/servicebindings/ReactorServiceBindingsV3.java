@@ -47,22 +47,26 @@ public final class ReactorServiceBindingsV3 extends AbstractClientV3Operations i
 
     @Override
     public Mono<CreateServiceBindingResponse> create(CreateServiceBindingRequest request) {
-        return post(request, CreateServiceBindingResponse.class, builder -> builder.pathSegment("v3", "service_bindings"));
+        return post(request, CreateServiceBindingResponse.class, builder -> builder.pathSegment("v3", "service_bindings"))
+            .checkpoint();
     }
 
     @Override
     public Mono<Void> delete(DeleteServiceBindingRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("v3", "service_bindings", request.getServiceBindingId()));
+        return delete(request, Void.class, builder -> builder.pathSegment("v3", "service_bindings", request.getServiceBindingId()))
+            .checkpoint();
     }
 
     @Override
     public Mono<GetServiceBindingResponse> get(GetServiceBindingRequest request) {
-        return get(request, GetServiceBindingResponse.class, builder -> builder.pathSegment("v3", "service_bindings", request.getServiceBindingId()));
+        return get(request, GetServiceBindingResponse.class, builder -> builder.pathSegment("v3", "service_bindings", request.getServiceBindingId()))
+            .checkpoint();
     }
 
     @Override
     public Mono<ListServiceBindingsResponse> list(ListServiceBindingsRequest request) {
-        return get(request, ListServiceBindingsResponse.class, builder -> builder.pathSegment("v3", "service_bindings"));
+        return get(request, ListServiceBindingsResponse.class, builder -> builder.pathSegment("v3", "service_bindings"))
+            .checkpoint();
     }
 
 }

@@ -55,7 +55,8 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
     public Mono<OrganizationQuota> createQuota(CreateQuotaRequest request) {
         return this.cloudFoundryClient
             .then(cloudFoundryClient -> createOrganizationQuota(cloudFoundryClient, request))
-            .map(DefaultOrganizationAdmin::toOrganizationQuota);
+            .map(DefaultOrganizationAdmin::toOrganizationQuota)
+            .checkpoint();
     }
 
     @Override
@@ -65,21 +66,24 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
                 Mono.just(cloudFoundryClient),
                 getOrganizationQuotaId(cloudFoundryClient, request.getName())
             ))
-            .then(function(DefaultOrganizationAdmin::deleteOrganizationQuota));
+            .then(function(DefaultOrganizationAdmin::deleteOrganizationQuota))
+            .checkpoint();
     }
 
     @Override
     public Mono<OrganizationQuota> getQuota(GetQuotaRequest request) {
         return this.cloudFoundryClient
             .then(cloudFoundryClient -> getOrganizationQuota(cloudFoundryClient, request.getName()))
-            .map(DefaultOrganizationAdmin::toOrganizationQuota);
+            .map(DefaultOrganizationAdmin::toOrganizationQuota)
+            .checkpoint();
     }
 
     @Override
     public Flux<OrganizationQuota> listQuotas() {
         return this.cloudFoundryClient
             .flatMap(DefaultOrganizationAdmin::requestListOrganizationQuotas)
-            .map(DefaultOrganizationAdmin::toOrganizationQuota);
+            .map(DefaultOrganizationAdmin::toOrganizationQuota)
+            .checkpoint();
     }
 
     @Override
@@ -91,7 +95,8 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
                 getOrganizationQuotaId(cloudFoundryClient, request.getQuotaName())
             ))
             .then(function((DefaultOrganizationAdmin::requestUpdateOrganization)))
-            .then();
+            .then()
+            .checkpoint();
     }
 
     @Override
@@ -102,7 +107,8 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
                 getOrganizationQuota(cloudFoundryClient, request.getName())
             ))
             .then(function((cloudFoundryClient, exitingQuotaDefinition) -> updateOrganizationQuota(cloudFoundryClient, request, exitingQuotaDefinition)))
-            .map(DefaultOrganizationAdmin::toOrganizationQuota);
+            .map(DefaultOrganizationAdmin::toOrganizationQuota)
+            .checkpoint();
     }
 
     private static Mono<CreateOrganizationQuotaDefinitionResponse> createOrganizationQuota(CloudFoundryClient cloudFoundryClient, CreateQuotaRequest request) {

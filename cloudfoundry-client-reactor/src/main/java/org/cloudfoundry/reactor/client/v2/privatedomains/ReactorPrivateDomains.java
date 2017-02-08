@@ -48,22 +48,26 @@ public final class ReactorPrivateDomains extends AbstractClientV2Operations impl
 
     @Override
     public Mono<CreatePrivateDomainResponse> create(CreatePrivateDomainRequest request) {
-        return post(request, CreatePrivateDomainResponse.class, builder -> builder.pathSegment("v2", "private_domains"));
+        return post(request, CreatePrivateDomainResponse.class, builder -> builder.pathSegment("v2", "private_domains"))
+            .checkpoint();
     }
 
     @Override
     public Mono<DeletePrivateDomainResponse> delete(DeletePrivateDomainRequest request) {
-        return delete(request, DeletePrivateDomainResponse.class, builder -> builder.pathSegment("v2", "private_domains", request.getPrivateDomainId()));
+        return delete(request, DeletePrivateDomainResponse.class, builder -> builder.pathSegment("v2", "private_domains", request.getPrivateDomainId()))
+            .checkpoint();
     }
 
     @Override
     public Mono<GetPrivateDomainResponse> get(GetPrivateDomainRequest request) {
-        return get(request, GetPrivateDomainResponse.class, builder -> builder.pathSegment("v2", "private_domains", request.getPrivateDomainId()));
+        return get(request, GetPrivateDomainResponse.class, builder -> builder.pathSegment("v2", "private_domains", request.getPrivateDomainId()))
+            .checkpoint();
     }
 
     @Override
     public Mono<ListPrivateDomainsResponse> list(ListPrivateDomainsRequest request) {
-        return get(request, ListPrivateDomainsResponse.class, builder -> builder.pathSegment("v2", "private_domains"));
+        return get(request, ListPrivateDomainsResponse.class, builder -> builder.pathSegment("v2", "private_domains"))
+            .checkpoint();
     }
 
 }

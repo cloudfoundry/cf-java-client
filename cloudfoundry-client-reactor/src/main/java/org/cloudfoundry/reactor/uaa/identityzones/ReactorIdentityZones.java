@@ -50,27 +50,32 @@ public final class ReactorIdentityZones extends AbstractUaaOperations implements
 
     @Override
     public Mono<CreateIdentityZoneResponse> create(CreateIdentityZoneRequest request) {
-        return post(request, CreateIdentityZoneResponse.class, builder -> builder.pathSegment("identity-zones"));
+        return post(request, CreateIdentityZoneResponse.class, builder -> builder.pathSegment("identity-zones"))
+            .checkpoint();
     }
 
     @Override
     public Mono<DeleteIdentityZoneResponse> delete(DeleteIdentityZoneRequest request) {
-        return delete(request, DeleteIdentityZoneResponse.class, builder -> builder.pathSegment("identity-zones", request.getIdentityZoneId()));
+        return delete(request, DeleteIdentityZoneResponse.class, builder -> builder.pathSegment("identity-zones", request.getIdentityZoneId()))
+            .checkpoint();
     }
 
     @Override
     public Mono<GetIdentityZoneResponse> get(GetIdentityZoneRequest request) {
-        return get(request, GetIdentityZoneResponse.class, builder -> builder.pathSegment("identity-zones", request.getIdentityZoneId()));
+        return get(request, GetIdentityZoneResponse.class, builder -> builder.pathSegment("identity-zones", request.getIdentityZoneId()))
+            .checkpoint();
     }
 
     @Override
     public Mono<ListIdentityZonesResponse> list(ListIdentityZonesRequest request) {
-        return get(request, ListIdentityZonesResponse.class, builder -> builder.pathSegment("identity-zones"));
+        return get(request, ListIdentityZonesResponse.class, builder -> builder.pathSegment("identity-zones"))
+            .checkpoint();
     }
 
     @Override
     public Mono<UpdateIdentityZoneResponse> update(UpdateIdentityZoneRequest request) {
-        return put(request, UpdateIdentityZoneResponse.class, builder -> builder.pathSegment("identity-zones", request.getIdentityZoneId()));
+        return put(request, UpdateIdentityZoneResponse.class, builder -> builder.pathSegment("identity-zones", request.getIdentityZoneId()))
+            .checkpoint();
     }
 
 }

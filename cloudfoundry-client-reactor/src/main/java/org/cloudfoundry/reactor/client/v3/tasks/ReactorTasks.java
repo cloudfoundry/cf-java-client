@@ -48,22 +48,26 @@ public final class ReactorTasks extends AbstractClientV3Operations implements Ta
 
     @Override
     public Mono<CancelTaskResponse> cancel(CancelTaskRequest request) {
-        return put(request, CancelTaskResponse.class, builder -> builder.pathSegment("v3", "tasks", request.getTaskId(), "cancel"));
+        return put(request, CancelTaskResponse.class, builder -> builder.pathSegment("v3", "tasks", request.getTaskId(), "cancel"))
+            .checkpoint();
     }
 
     @Override
     public Mono<CreateTaskResponse> create(CreateTaskRequest request) {
-        return post(request, CreateTaskResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "tasks"));
+        return post(request, CreateTaskResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "tasks"))
+            .checkpoint();
     }
 
     @Override
     public Mono<GetTaskResponse> get(GetTaskRequest request) {
-        return get(request, GetTaskResponse.class, builder -> builder.pathSegment("v3", "tasks", request.getTaskId()));
+        return get(request, GetTaskResponse.class, builder -> builder.pathSegment("v3", "tasks", request.getTaskId()))
+            .checkpoint();
     }
 
     @Override
     public Mono<ListTasksResponse> list(ListTasksRequest request) {
-        return get(request, ListTasksResponse.class, builder -> builder.pathSegment("v3", "tasks"));
+        return get(request, ListTasksResponse.class, builder -> builder.pathSegment("v3", "tasks"))
+            .checkpoint();
     }
 
 }

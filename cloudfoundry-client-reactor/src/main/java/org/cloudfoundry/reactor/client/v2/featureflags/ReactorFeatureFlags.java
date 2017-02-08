@@ -46,17 +46,20 @@ public final class ReactorFeatureFlags extends AbstractClientV2Operations implem
 
     @Override
     public Mono<GetFeatureFlagResponse> get(GetFeatureFlagRequest request) {
-        return get(request, GetFeatureFlagResponse.class, builder -> builder.pathSegment("v2", "config", "feature_flags", request.getName()));
+        return get(request, GetFeatureFlagResponse.class, builder -> builder.pathSegment("v2", "config", "feature_flags", request.getName()))
+            .checkpoint();
     }
 
     @Override
     public Mono<ListFeatureFlagsResponse> list(ListFeatureFlagsRequest request) {
-        return get(request, ListFeatureFlagsResponse.class, builder -> builder.pathSegment("v2", "config", "feature_flags"));
+        return get(request, ListFeatureFlagsResponse.class, builder -> builder.pathSegment("v2", "config", "feature_flags"))
+            .checkpoint();
     }
 
     @Override
     public Mono<SetFeatureFlagResponse> set(SetFeatureFlagRequest request) {
-        return put(request, SetFeatureFlagResponse.class, builder -> builder.pathSegment("v2", "config", "feature_flags", request.getName()));
+        return put(request, SetFeatureFlagResponse.class, builder -> builder.pathSegment("v2", "config", "feature_flags", request.getName()))
+            .checkpoint();
     }
 
 }

@@ -49,22 +49,26 @@ public final class ReactorServices extends AbstractClientV2Operations implements
 
     @Override
     public Mono<DeleteServiceResponse> delete(DeleteServiceRequest request) {
-        return delete(request, DeleteServiceResponse.class, builder -> builder.pathSegment("v2", "services", request.getServiceId()));
+        return delete(request, DeleteServiceResponse.class, builder -> builder.pathSegment("v2", "services", request.getServiceId()))
+            .checkpoint();
     }
 
     @Override
     public Mono<GetServiceResponse> get(GetServiceRequest request) {
-        return get(request, GetServiceResponse.class, builder -> builder.pathSegment("v2", "services", request.getServiceId()));
+        return get(request, GetServiceResponse.class, builder -> builder.pathSegment("v2", "services", request.getServiceId()))
+            .checkpoint();
     }
 
     @Override
     public Mono<ListServicesResponse> list(ListServicesRequest request) {
-        return get(request, ListServicesResponse.class, builder -> builder.pathSegment("v2", "services"));
+        return get(request, ListServicesResponse.class, builder -> builder.pathSegment("v2", "services"))
+            .checkpoint();
     }
 
     @Override
     public Mono<ListServiceServicePlansResponse> listServicePlans(ListServiceServicePlansRequest request) {
-        return get(request, ListServiceServicePlansResponse.class, builder -> builder.pathSegment("v2", "services", request.getServiceId(), "service_plans"));
+        return get(request, ListServiceServicePlansResponse.class, builder -> builder.pathSegment("v2", "services", request.getServiceId(), "service_plans"))
+            .checkpoint();
     }
 
 }

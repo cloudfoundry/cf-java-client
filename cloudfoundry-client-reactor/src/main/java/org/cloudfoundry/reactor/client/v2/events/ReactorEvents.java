@@ -44,12 +44,14 @@ public final class ReactorEvents extends AbstractClientV2Operations implements E
 
     @Override
     public Mono<GetEventResponse> get(GetEventRequest request) {
-        return get(request, GetEventResponse.class, builder -> builder.pathSegment("v2", "events", request.getEventId()));
+        return get(request, GetEventResponse.class, builder -> builder.pathSegment("v2", "events", request.getEventId()))
+            .checkpoint();
     }
 
     @Override
     public Mono<ListEventsResponse> list(ListEventsRequest request) {
-        return get(request, ListEventsResponse.class, builder -> builder.pathSegment("v2", "events"));
+        return get(request, ListEventsResponse.class, builder -> builder.pathSegment("v2", "events"))
+            .checkpoint();
     }
 
 }

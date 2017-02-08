@@ -80,7 +80,8 @@ public final class DefaultRoutes implements Routes {
                     getOptionalDomainId(cloudFoundryClient, organizationId, request.getDomain())
                 )))
             .then(function((cloudFoundryClient, domainId) -> requestRouteExists(cloudFoundryClient, domainId, request.getHost(), request.getPath())))
-            .defaultIfEmpty(false);
+            .defaultIfEmpty(false)
+            .checkpoint();
     }
 
     @Override
@@ -97,7 +98,8 @@ public final class DefaultRoutes implements Routes {
                 requestCreateRoute(cloudFoundryClient, domainId, request.getHost(), request.getPath(), request.getPort(), request.getRandomPort(), spaceId)
                     .map(ResourceUtils::getEntity)
                     .then(routeEntity -> Mono.justOrEmpty(routeEntity.getPort()))
-            ));
+            ))
+            .checkpoint();
     }
 
     @Override
@@ -114,7 +116,8 @@ public final class DefaultRoutes implements Routes {
                     Mono.just(cloudFoundryClient),
                     getRouteId(cloudFoundryClient, request.getHost(), request.getDomain(), domainId, request.getPath(), request.getPort())
                 )))
-            .then(function(DefaultRoutes::deleteRoute));
+            .then(function(DefaultRoutes::deleteRoute))
+            .checkpoint();
     }
 
     @Override
@@ -129,7 +132,8 @@ public final class DefaultRoutes implements Routes {
                 .map(applicationResources -> Tuples.of(cloudFoundryClient, applicationResources, routeId))))
             .filter(predicate((cloudFoundryClient, applicationResources, routeId) -> isApplicationOrphan(applicationResources)))
             .flatMap(function((cloudFoundryClient, applicationResources, routeId) -> deleteRoute(cloudFoundryClient, routeId)))
-            .then();
+            .then()
+            .checkpoint();
     }
 
     @Override
@@ -151,7 +155,8 @@ public final class DefaultRoutes implements Routes {
                     Mono.just(resource),
                     getSpaceName(spaces, ResourceUtils.getEntity(resource).getSpaceId())
                 )))
-            .map(function(DefaultRoutes::toRoute));
+            .map(function(DefaultRoutes::toRoute))
+            .checkpoint();
     }
 
     @Override
@@ -165,7 +170,8 @@ public final class DefaultRoutes implements Routes {
                     getApplicationId(cloudFoundryClient, request.getApplicationName(), spaceId)
                 )))
             .then(function((cloudFoundryClient, routeResource, applicationId) -> requestAssociateRoute(cloudFoundryClient, applicationId, ResourceUtils.getId(routeResource))))
-            .then(Mono.justOrEmpty(request.getPort()));
+            .then(Mono.justOrEmpty(request.getPort()))
+            .checkpoint();
     }
 
     @Override
@@ -179,7 +185,8 @@ public final class DefaultRoutes implements Routes {
                     getDomainId(cloudFoundryClient, organizationId, request.getDomain())
                         .then(domainId -> getRouteId(cloudFoundryClient, request.getHost(), request.getDomain(), domainId, request.getPath(), request.getPort()))
                 )))
-            .then(function(DefaultRoutes::requestRemoveRouteFromApplication));
+            .then(function(DefaultRoutes::requestRemoveRouteFromApplication))
+            .checkpoint();
     }
 
     private static Mono<Void> deleteRoute(CloudFoundryClient cloudFoundryClient, String routeId) {
