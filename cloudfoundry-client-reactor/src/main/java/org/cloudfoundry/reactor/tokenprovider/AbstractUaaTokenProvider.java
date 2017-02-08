@@ -229,7 +229,8 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
                 .doOnSubscribe(s -> LOGGER.debug("Negotiating using token provider")))
             .transform(ErrorPayloadMapper.fallback())
             .transform(extractTokens(connectionContext))
-            .cache();
+            .cache()
+            .checkpoint();
     }
 
 }
