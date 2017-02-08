@@ -19,7 +19,6 @@ package org.cloudfoundry.operations.organizations;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.ClientV2Exception;
 import org.cloudfoundry.client.v2.Metadata;
-import org.cloudfoundry.client.v2.domains.DomainResource;
 import org.cloudfoundry.client.v2.featureflags.GetFeatureFlagRequest;
 import org.cloudfoundry.client.v2.featureflags.GetFeatureFlagResponse;
 import org.cloudfoundry.client.v2.jobs.ErrorDetails;
@@ -38,8 +37,8 @@ import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserByUsern
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserByUsernameResponse;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationResponse;
 import org.cloudfoundry.client.v2.organizations.DeleteOrganizationResponse;
-import org.cloudfoundry.client.v2.organizations.ListOrganizationDomainsRequest;
-import org.cloudfoundry.client.v2.organizations.ListOrganizationDomainsResponse;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationPrivateDomainsRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationPrivateDomainsResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefinitionsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefinitionsResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesRequest;
@@ -49,6 +48,12 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.organizations.OrganizationEntity;
 import org.cloudfoundry.client.v2.organizations.OrganizationResource;
 import org.cloudfoundry.client.v2.organizations.UpdateOrganizationRequest;
+import org.cloudfoundry.client.v2.privatedomains.PrivateDomainEntity;
+import org.cloudfoundry.client.v2.privatedomains.PrivateDomainResource;
+import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
+import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsResponse;
+import org.cloudfoundry.client.v2.shareddomains.SharedDomainEntity;
+import org.cloudfoundry.client.v2.shareddomains.SharedDomainResource;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionResource;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.operations.AbstractOperationsTest;
@@ -120,13 +125,13 @@ public final class DefaultOrganizationsTest extends AbstractOperationsTest {
 
     @Test
     public void delete() {
-        requestOrganizations(this.cloudFoundryClient, "test-organization-name");
-        requestDeleteOrganization(this.cloudFoundryClient, "test-organization-id");
+        requestOrganizations(this.cloudFoundryClient, TEST_ORGANIZATION_NAME);
+        requestDeleteOrganization(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
         requestJobSuccess(this.cloudFoundryClient, "test-id");
 
         this.organizations
             .delete(DeleteOrganizationRequest.builder()
-                .name("test-organization-name")
+                .name(TEST_ORGANIZATION_NAME)
                 .build())
             .as(StepVerifier::create)
             .expectComplete()
@@ -135,13 +140,13 @@ public final class DefaultOrganizationsTest extends AbstractOperationsTest {
 
     @Test
     public void deleteFailure() {
-        requestOrganizations(this.cloudFoundryClient, "test-organization-name");
-        requestDeleteOrganization(this.cloudFoundryClient, "test-organization-id");
+        requestOrganizations(this.cloudFoundryClient, TEST_ORGANIZATION_NAME);
+        requestDeleteOrganization(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
         requestJobFailure(this.cloudFoundryClient, "test-id");
 
         this.organizations
             .delete(DeleteOrganizationRequest.builder()
-                .name("test-organization-name")
+                .name(TEST_ORGANIZATION_NAME)
                 .build())
             .as(StepVerifier::create)
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class).hasMessage("test-error-details-errorCode(1): test-error-details-description"))
@@ -150,23 +155,24 @@ public final class DefaultOrganizationsTest extends AbstractOperationsTest {
 
     @Test
     public void info() {
-        requestOrganizations(this.cloudFoundryClient, "test-organization-name");
-        requestDomains(this.cloudFoundryClient, "test-organization-id");
+        requestOrganizations(this.cloudFoundryClient, TEST_ORGANIZATION_NAME);
+        requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
+        requestSharedDomains(this.cloudFoundryClient);
         requestOrganizationQuotaDefinition(this.cloudFoundryClient, "test-organization-entity-quotaDefinitionId");
-        requestSpaceQuotaDefinitions(this.cloudFoundryClient, "test-organization-id");
-        requestSpaces(this.cloudFoundryClient, "test-organization-id");
+        requestSpaceQuotaDefinitions(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
+        requestSpaces(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
 
         this.organizations
             .get(OrganizationInfoRequest.builder()
-                .name("test-organization-name")
+                .name(TEST_ORGANIZATION_NAME)
                 .build())
             .as(StepVerifier::create)
             .expectNext(fill(OrganizationDetail.builder())
-                .domain("test-name")
-                .id("test-organization-id")
-                .name("test-organization-name")
+                .domain("test-private-domain-name", "test-shared-domain-name")
+                .id(TEST_ORGANIZATION_ID)
+                .name(TEST_ORGANIZATION_NAME)
                 .quota(fill(OrganizationQuota.builder())
-                    .organizationId("test-organization-id")
+                    .organizationId(TEST_ORGANIZATION_ID)
                     .build())
                 .space("test-name")
                 .spaceQuota(fill(SpaceQuota.builder())
@@ -191,12 +197,12 @@ public final class DefaultOrganizationsTest extends AbstractOperationsTest {
 
     @Test
     public void rename() {
-        requestOrganizations(this.cloudFoundryClient, "test-organization-name");
-        requestUpdateOrganization(this.cloudFoundryClient, "test-organization-id", "test-new-organization-name");
+        requestOrganizations(this.cloudFoundryClient, TEST_ORGANIZATION_NAME);
+        requestUpdateOrganization(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-new-organization-name");
 
         this.organizations
             .rename(RenameOrganizationRequest.builder()
-                .name("test-organization-name")
+                .name(TEST_ORGANIZATION_NAME)
                 .newName("test-new-organization-name")
                 .build())
             .as(StepVerifier::create)
@@ -245,19 +251,6 @@ public final class DefaultOrganizationsTest extends AbstractOperationsTest {
                 .build()))
             .thenReturn(Mono
                 .just(fill(DeleteOrganizationResponse.builder())
-                    .build()));
-    }
-
-    private static void requestDomains(CloudFoundryClient cloudFoundryClient, String organizationId) {
-        when(cloudFoundryClient.organizations()
-            .listDomains(ListOrganizationDomainsRequest.builder()
-                .organizationId(organizationId)
-                .page(1)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(ListOrganizationDomainsResponse.builder())
-                    .resource(fill(DomainResource.builder())
-                        .build())
                     .build()));
     }
 
@@ -396,6 +389,37 @@ public final class DefaultOrganizationsTest extends AbstractOperationsTest {
             .thenReturn(Mono
                 .just(fill(ListOrganizationsResponse.builder())
                     .resource(fill(OrganizationResource.builder(), "organization-")
+                        .build())
+                    .build()));
+    }
+
+    private static void requestPrivateDomains(CloudFoundryClient cloudFoundryClient, String organizationId) {
+        when(cloudFoundryClient.organizations()
+            .listPrivateDomains(ListOrganizationPrivateDomainsRequest.builder()
+                .organizationId(organizationId)
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(ListOrganizationPrivateDomainsResponse.builder())
+                    .resource(fill(PrivateDomainResource.builder())
+                        .entity(fill(PrivateDomainEntity.builder())
+                            .name("test-private-domain-name")
+                            .build())
+                        .build())
+                    .build()));
+    }
+
+    private static void requestSharedDomains(CloudFoundryClient cloudFoundryClient) {
+        when(cloudFoundryClient.sharedDomains()
+            .list(ListSharedDomainsRequest.builder()
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(ListSharedDomainsResponse.builder()
+                    .resource(fill(SharedDomainResource.builder())
+                        .entity(fill(SharedDomainEntity.builder())
+                            .name("test-shared-domain-name")
+                            .build())
                         .build())
                     .build()));
     }
