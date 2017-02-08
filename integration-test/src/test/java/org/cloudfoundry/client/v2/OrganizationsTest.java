@@ -20,7 +20,6 @@ import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
-import org.cloudfoundry.client.v2.domains.DomainResource;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorResponse;
@@ -47,7 +46,6 @@ import org.cloudfoundry.client.v2.organizations.GetOrganizationResponse;
 import org.cloudfoundry.client.v2.organizations.GetOrganizationUserRolesRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationAuditorsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationBillingManagersRequest;
-import org.cloudfoundry.client.v2.organizations.ListOrganizationDomainsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationManagersRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationPrivateDomainsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationServicesRequest;
@@ -76,6 +74,8 @@ import org.cloudfoundry.client.v2.services.ListServicesRequest;
 import org.cloudfoundry.client.v2.services.ServiceResource;
 import org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainRequest;
 import org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainResponse;
+import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
+import org.cloudfoundry.client.v2.shareddomains.SharedDomainResource;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorRequest;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorResponse;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceDeveloperRequest;
@@ -805,28 +805,6 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listDomains() throws TimeoutException, InterruptedException {
-        String organizationName = this.nameFactory.getOrganizationName();
-        String sharedDomainName = this.nameFactory.getDomainName();
-
-        Mono.when(
-            createOrganizationId(this.cloudFoundryClient, organizationName),
-            createSharedDomainId(this.cloudFoundryClient, sharedDomainName)
-        )
-            .then(function((organizationId, sharedDomainId) -> Mono.when(
-                Mono.just(sharedDomainId),
-                requestListOrganizationDomains(this.cloudFoundryClient, organizationId)
-                    .filter(resource -> sharedDomainName.equals(ResourceUtils.getEntity(resource).getName()))
-                    .single()
-                    .map(ResourceUtils::getId)))
-            )
-            .as(StepVerifier::create)
-            .consumeNextWith(tupleEquality())
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
-    }
-
-    @Test
     public void listDomainsFilterByName() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String sharedDomainName = this.nameFactory.getDomainName();
@@ -835,76 +813,42 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             createOrganizationId(this.cloudFoundryClient, organizationName),
             createSharedDomainId(this.cloudFoundryClient, sharedDomainName)
         )
-            .then(function((organizationId, sharedDomainId) -> Mono.when(
-                Mono.just(sharedDomainId),
-                requestListOrganizationDomains(this.cloudFoundryClient, organizationId, builder -> builder.name(sharedDomainName))
-                    .single()
-                    .map(ResourceUtils::getId)
-            )))
+            .flatMap(function((organizationId, sharedDomainId) -> getDomainNames(this.cloudFoundryClient, organizationId, builder -> builder.name(sharedDomainName))))
             .as(StepVerifier::create)
-            .consumeNextWith(tupleEquality())
+            .expectNextCount(1)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: https://github.com/cloudfoundry/cf-java-client/issues/618
-    @Ignore("https://github.com/cloudfoundry/cf-java-client/issues/618")
     @Test
-    public void listDomainsFilterByOwningOrganizationId() throws TimeoutException, InterruptedException {
-        String organizationName1 = this.nameFactory.getOrganizationName();
-        String organizationName2 = this.nameFactory.getOrganizationName();
+    public void listDomainsPrivate() throws TimeoutException, InterruptedException {
+        String organizationName = this.nameFactory.getOrganizationName();
         String privateDomainName = this.nameFactory.getDomainName();
 
-        Mono.when(
-            createOrganizationId(this.cloudFoundryClient, organizationName1),
-            createOrganizationId(this.cloudFoundryClient, organizationName2)
-        )
-            .then(function((organizationId1, organizationId2) -> Mono.when(
-                Mono.just(organizationId1),
-                Mono.just(organizationId2),
-                createPrivateDomainId(this.cloudFoundryClient, organizationId2, privateDomainName)
-            )))
-            .as(thenKeep(function((organizationId1, organizationId2, privateDomainId) -> requestAssociatePrivateDomain(this.cloudFoundryClient, organizationId1, privateDomainId))))
-            .as(thenKeep(function((organizationId1, organizationId2, privateDomainId) -> requestListOrganizationDomains(this.cloudFoundryClient, organizationId1).then())))
-            .as(thenKeep(function((organizationId1, organizationId2, privateDomainId) -> requestListOrganizationDomains(this.cloudFoundryClient, organizationId2).then())))
-            .then(function((organizationId1, organizationId2, privateDomainId) -> Mono.when(
-                Mono.just(privateDomainId),
-                requestListOrganizationDomains(this.cloudFoundryClient, organizationId1, builder -> builder.owningOrganizationId(organizationId2))
-                    .single()
-                    .map(ResourceUtils::getId)
-            )))
+        createOrganizationId(this.cloudFoundryClient, organizationName)
+            .then(organizationId -> createPrivateDomainId(this.cloudFoundryClient, organizationId, privateDomainName)
+                .map(ignore -> organizationId))
+            .flatMap(organizationId -> getDomainNames(this.cloudFoundryClient, organizationId))
+            .filter(privateDomainName::equals)
             .as(StepVerifier::create)
-            .consumeNextWith(tupleEquality())
+            .expectNextCount(1)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: https://github.com/cloudfoundry/cf-java-client/issues/618
-    @Ignore("https://github.com/cloudfoundry/cf-java-client/issues/618")
     @Test
-    public void listDomainsWithAssociatedPrivateDomain() throws TimeoutException, InterruptedException {
-        String organizationName1 = this.nameFactory.getOrganizationName();
-        String organizationName2 = this.nameFactory.getOrganizationName();
-        String privateDomainName = this.nameFactory.getDomainName();
+    public void listDomainsShared() throws TimeoutException, InterruptedException {
+        String organizationName = this.nameFactory.getOrganizationName();
+        String sharedDomainName = this.nameFactory.getDomainName();
 
         Mono.when(
-            createOrganizationId(this.cloudFoundryClient, organizationName1),
-            createOrganizationId(this.cloudFoundryClient, organizationName2)
+            createOrganizationId(this.cloudFoundryClient, organizationName),
+            createSharedDomainId(this.cloudFoundryClient, sharedDomainName)
         )
-            .then(function((organizationId1, organizationId2) -> Mono.when(
-                Mono.just(organizationId1),
-                createPrivateDomainId(this.cloudFoundryClient, organizationId2, privateDomainName)
-            )))
-            .as(thenKeep(function((organizationId, privateDomainId) -> requestAssociatePrivateDomain(this.cloudFoundryClient, organizationId, privateDomainId))))
-            .then(function((organizationId, privateDomainId) -> Mono.when(
-                Mono.just(privateDomainId),
-                requestListOrganizationDomains(this.cloudFoundryClient, organizationId)
-                    .filter(resource -> privateDomainName.equals(ResourceUtils.getEntity(resource).getName()))
-                    .single()
-                    .map(ResourceUtils::getId)
-            )))
+            .flatMap(function((organizationId, sharedDomainId) -> getDomainNames(this.cloudFoundryClient, organizationId)))
+            .filter(sharedDomainName::equals)
             .as(StepVerifier::create)
-            .consumeNextWith(tupleEquality())
+            .expectNextCount(1)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -1868,6 +1812,17 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             .map(ResourceUtils::getId);
     }
 
+    private static Flux<String> getDomainNames(CloudFoundryClient cloudFoundryClient, String organizationId) {
+        return getDomainNames(cloudFoundryClient, organizationId, UnaryOperator.identity());
+    }
+
+    private static Flux<String> getDomainNames(CloudFoundryClient cloudFoundryClient, String organizationId, UnaryOperator<ListSharedDomainsRequest.Builder> transformer) {
+        return requestListPrivateDomains(cloudFoundryClient, organizationId)
+            .map(resource -> ResourceUtils.getEntity(resource).getName())
+            .mergeWith(requestListSharedDomains(cloudFoundryClient, transformer)
+                .map(resource -> ResourceUtils.getEntity(resource).getName()));
+    }
+
     private static Mono<String> getUserDefaultSpaceId(CloudFoundryClient cloudFoundryClient, String userId) {
         return requestListUsers(cloudFoundryClient)
             .filter(resource -> userId.equals(ResourceUtils.getId(resource)))
@@ -2018,20 +1973,6 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .build()));
     }
 
-    private static Flux<DomainResource> requestListOrganizationDomains(CloudFoundryClient cloudFoundryClient, String organizationId) {
-        return requestListOrganizationDomains(cloudFoundryClient, organizationId, UnaryOperator.identity());
-    }
-
-    private static Flux<DomainResource> requestListOrganizationDomains(CloudFoundryClient cloudFoundryClient, String organizationId,
-                                                                       UnaryOperator<ListOrganizationDomainsRequest.Builder> transformer) {
-        return PaginationUtils.
-            requestClientV2Resources(page -> cloudFoundryClient.organizations()
-                .listDomains(transformer.apply(ListOrganizationDomainsRequest.builder())
-                    .page(page)
-                    .organizationId(organizationId)
-                    .build()));
-    }
-
     private static Flux<UserResource> requestListOrganizationManagers(CloudFoundryClient cloudFoundryClient, String organizationId) {
         return requestListOrganizationManagers(cloudFoundryClient, organizationId, UnaryOperator.identity());
     }
@@ -2112,10 +2053,27 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .build()));
     }
 
+    private static Flux<PrivateDomainResource> requestListPrivateDomains(CloudFoundryClient cloudFoundryClient, String organizationId) {
+        return PaginationUtils
+            .requestClientV2Resources(page -> cloudFoundryClient.organizations()
+                .listPrivateDomains(ListOrganizationPrivateDomainsRequest.builder()
+                    .organizationId(organizationId)
+                    .page(page)
+                    .build()));
+    }
+
     private static Flux<ServiceResource> requestListServices(CloudFoundryClient cloudFoundryClient) {
         return PaginationUtils.
             requestClientV2Resources(page -> cloudFoundryClient.services()
                 .list(ListServicesRequest.builder()
+                    .build()));
+    }
+
+    private static Flux<SharedDomainResource> requestListSharedDomains(CloudFoundryClient cloudFoundryClient, UnaryOperator<ListSharedDomainsRequest.Builder> transformer) {
+        return PaginationUtils
+            .requestClientV2Resources(page -> cloudFoundryClient.sharedDomains()
+                .list(transformer.apply(ListSharedDomainsRequest.builder())
+                    .page(page)
                     .build()));
     }
 

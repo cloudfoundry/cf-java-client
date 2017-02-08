@@ -17,7 +17,6 @@
 package org.cloudfoundry.operations.organizations;
 
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v2.domains.DomainResource;
 import org.cloudfoundry.client.v2.featureflags.GetFeatureFlagRequest;
 import org.cloudfoundry.client.v2.featureflags.GetFeatureFlagResponse;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.GetOrganizationQuotaDefinitionRequest;
@@ -30,13 +29,16 @@ import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserByUsern
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserByUsernameResponse;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationResponse;
 import org.cloudfoundry.client.v2.organizations.DeleteOrganizationResponse;
-import org.cloudfoundry.client.v2.organizations.ListOrganizationDomainsRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationPrivateDomainsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefinitionsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.OrganizationResource;
 import org.cloudfoundry.client.v2.organizations.UpdateOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.UpdateOrganizationResponse;
+import org.cloudfoundry.client.v2.privatedomains.PrivateDomainResource;
+import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
+import org.cloudfoundry.client.v2.shareddomains.SharedDomainResource;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionResource;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.operations.spaceadmin.SpaceQuota;
@@ -151,8 +153,10 @@ public final class DefaultOrganizations implements Organizations {
     }
 
     private static Mono<List<String>> getDomainNames(CloudFoundryClient cloudFoundryClient, String organizationId) {
-        return requestDomains(cloudFoundryClient, organizationId)
-            .map(resource -> ResourceUtils.getEntity(resource).getName())
+        return requestListPrivateDomains(cloudFoundryClient, organizationId)
+            .map(resource -> resource.getEntity().getName())
+            .mergeWith(requestListSharedDomains(cloudFoundryClient)
+                .map(resource -> resource.getEntity().getName()))
             .collectList();
     }
 
@@ -234,20 +238,28 @@ public final class DefaultOrganizations implements Organizations {
                 .build());
     }
 
-    private static Flux<DomainResource> requestDomains(CloudFoundryClient cloudFoundryClient, String organizationId) {
-        return PaginationUtils
-            .requestClientV2Resources(page -> cloudFoundryClient.organizations()
-                .listDomains(ListOrganizationDomainsRequest.builder()
-                    .page(page)
-                    .organizationId(organizationId)
-                    .build()));
-    }
-
     private static Mono<GetFeatureFlagResponse> requestGetFeatureFlag(CloudFoundryClient cloudFoundryClient, String featureFlag) {
         return cloudFoundryClient.featureFlags()
             .get(GetFeatureFlagRequest.builder()
                 .name(featureFlag)
                 .build());
+    }
+
+    private static Flux<PrivateDomainResource> requestListPrivateDomains(CloudFoundryClient cloudFoundryClient, String organizationId) {
+        return PaginationUtils
+            .requestClientV2Resources(page -> cloudFoundryClient.organizations()
+                .listPrivateDomains(ListOrganizationPrivateDomainsRequest.builder()
+                    .organizationId(organizationId)
+                    .page(page)
+                    .build()));
+    }
+
+    private static Flux<SharedDomainResource> requestListSharedDomains(CloudFoundryClient cloudFoundryClient) {
+        return PaginationUtils
+            .requestClientV2Resources(page -> cloudFoundryClient.sharedDomains()
+                .list(ListSharedDomainsRequest.builder()
+                    .page(page)
+                    .build()));
     }
 
     private static Mono<GetOrganizationQuotaDefinitionResponse> requestOrganizationQuotaDefinition(CloudFoundryClient cloudFoundryClient, String quotaDefinitionId) {
