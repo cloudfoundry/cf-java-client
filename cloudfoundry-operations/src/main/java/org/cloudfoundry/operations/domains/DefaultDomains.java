@@ -63,7 +63,8 @@ public final class DefaultDomains implements Domains {
                     getOrganizationId(cloudFoundryClient, request.getOrganization())
                 ))
             .then(function((cloudFoundryClient, organizationId) -> requestCreateDomain(cloudFoundryClient, request.getDomain(), organizationId)))
-            .then();
+            .then()
+            .checkpoint();
     }
 
     @Override
@@ -71,7 +72,8 @@ public final class DefaultDomains implements Domains {
         if (request.getRouterGroup() == null) {
             return this.cloudFoundryClient
                 .then(cloudFoundryClient -> requestCreateSharedDomain(cloudFoundryClient, request.getDomain(), null))
-                .then();
+                .then()
+                .checkpoint();
         } else {
             return Mono.when(this.cloudFoundryClient, this.routingClient)
                 .then(function((cloudFoundryClient, routingClient) -> Mono
@@ -80,7 +82,8 @@ public final class DefaultDomains implements Domains {
                         getRouterGroupId(routingClient, request.getRouterGroup())
                     )))
                 .then(function((cloudFoundryClient, routerGroupId) -> requestCreateSharedDomain(cloudFoundryClient, request.getDomain(), routerGroupId)))
-                .then();
+                .then()
+                .checkpoint();
         }
     }
 
@@ -90,7 +93,8 @@ public final class DefaultDomains implements Domains {
             .flatMap(cloudFoundryClient -> requestListPrivateDomains(cloudFoundryClient)
                 .map(DefaultDomains::toDomain)
                 .mergeWith(requestListSharedDomains(cloudFoundryClient)
-                    .map(DefaultDomains::toDomain)));
+                    .map(DefaultDomains::toDomain)))
+            .checkpoint();
     }
 
     @Override
@@ -98,7 +102,8 @@ public final class DefaultDomains implements Domains {
         return this.routingClient
             .flatMap(routingClient -> requestListRouterGroups(routingClient)
                 .flatMapIterable(ListRouterGroupsResponse::getRouterGroups)
-                .map(DefaultDomains::toRouterGroup));
+                .map(DefaultDomains::toRouterGroup))
+            .checkpoint();
     }
 
     @Override
@@ -110,7 +115,8 @@ public final class DefaultDomains implements Domains {
                 getOrganizationId(cloudFoundryClient, request.getOrganization())
             ))
             .then(function(DefaultDomains::requestAssociateOrganizationPrivateDomainRequest))
-            .then();
+            .then()
+            .checkpoint();
     }
 
     @Override
@@ -121,7 +127,8 @@ public final class DefaultDomains implements Domains {
                 getPrivateDomainId(cloudFoundryClient, request.getDomain()),
                 getOrganizationId(cloudFoundryClient, request.getOrganization())
             ))
-            .then(function(DefaultDomains::requestRemoveOrganizationPrivateDomainRequest));
+            .then(function(DefaultDomains::requestRemoveOrganizationPrivateDomainRequest))
+            .checkpoint();
     }
 
     private static Mono<OrganizationResource> getOrganization(CloudFoundryClient cloudFoundryClient, String organization) {

@@ -49,14 +49,16 @@ public final class DefaultBuildpacks implements Buildpacks {
                 requestCreateBuildpack(cloudFoundryClient, request.getName(), request.getPosition(), request.getEnable())
             ))
             .then(function((cloudFoundryClient, response) -> requestUploadBuildpackBits(cloudFoundryClient, ResourceUtils.getId(response), request.getFileName(), request.getBuildpack())))
-            .then();
+            .then()
+            .checkpoint();
     }
 
     @Override
     public Flux<Buildpack> list() {
         return this.cloudFoundryClient
             .flatMap(DefaultBuildpacks::requestBuildpacks)
-            .map(DefaultBuildpacks::toBuildpackResource);
+            .map(DefaultBuildpacks::toBuildpackResource)
+            .checkpoint();
     }
 
     private static Flux<BuildpackResource> requestBuildpacks(CloudFoundryClient cloudFoundryClient) {

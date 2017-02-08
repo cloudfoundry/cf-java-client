@@ -12,7 +12,9 @@
     "authorized_grant_types": [
       "client_credentials"
     ],
-    "autoapprove": [ "true" ],
+    "autoapprove": [
+      "true"
+    ],
     "client_id": "14pnUs",
     "client_secret": "secret",
     "name": "My Client Name",
@@ -39,7 +41,9 @@
     "authorized_grant_types": [
       "client_credentials"
     ],
-    "autoapprove": [ "true" ],
+    "autoapprove": [
+      "true"
+    ],
     "client_id": "0Tgnfy",
     "client_secret": "secret",
     "name": "My Client Name",

@@ -596,6 +596,18 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
+    public void listInstancesNoInstances() {
+        requestGetSpaceSummaryEmpty(this.cloudFoundryClient, TEST_SPACE_ID);
+
+        this.services
+            .listInstances()
+            .as(StepVerifier::create)
+            .expectNextCount(0)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
     public void listInstancesOneApplication() {
         requestGetSpaceSummaryManagedServicesOneApplication(this.cloudFoundryClient, TEST_SPACE_ID);
 
@@ -611,18 +623,6 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
                 .service("test-provided-service-label")
                 .type(ServiceInstanceType.MANAGED)
                 .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
-    }
-
-    @Test
-    public void listInstancesNoInstances() {
-        requestGetSpaceSummaryEmpty(this.cloudFoundryClient, TEST_SPACE_ID);
-
-        this.services
-            .listInstances()
-            .as(StepVerifier::create)
-            .expectNextCount(0)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -1323,6 +1323,32 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
                     .build()));
     }
 
+    private static void requestGetSpaceSummaryManagedServicesNoApplications(CloudFoundryClient cloudFoundryClient, String spaceId) {
+        when(cloudFoundryClient.spaces()
+            .getSummary(GetSpaceSummaryRequest.builder()
+                .spaceId(spaceId)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(GetSpaceSummaryResponse.builder())
+                    .id(spaceId)
+                    .service(org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.builder()
+                        .id("test-service-id")
+                        .lastOperation(LastOperation.builder()
+                            .description("test-last-operation-description")
+                            .build())
+                        .name("test-service-name")
+                        .servicePlan(Plan.builder()
+                            .id("test-service-plan-id")
+                            .name("test-service-plan-name")
+                            .service(Service.builder()
+                                .id("test-provided-service-id")
+                                .label("test-provided-service-label")
+                                .build())
+                            .build())
+                        .build())
+                    .build()));
+    }
+
     private static void requestGetSpaceSummaryManagedServicesOneApplication(CloudFoundryClient cloudFoundryClient, String spaceId) {
         when(cloudFoundryClient.spaces()
             .getSummary(GetSpaceSummaryRequest.builder()
@@ -1346,32 +1372,6 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
                         .servicePlan(Plan.builder()
                             .id("test-service-plan-id-1")
                             .name("test-service-plan-name-1")
-                            .service(Service.builder()
-                                .id("test-provided-service-id")
-                                .label("test-provided-service-label")
-                                .build())
-                            .build())
-                        .build())
-                    .build()));
-    }
-
-    private static void requestGetSpaceSummaryManagedServicesNoApplications(CloudFoundryClient cloudFoundryClient, String spaceId) {
-        when(cloudFoundryClient.spaces()
-            .getSummary(GetSpaceSummaryRequest.builder()
-                .spaceId(spaceId)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(GetSpaceSummaryResponse.builder())
-                    .id(spaceId)
-                    .service(org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.builder()
-                        .id("test-service-id")
-                        .lastOperation(LastOperation.builder()
-                            .description("test-last-operation-description")
-                            .build())
-                        .name("test-service-name")
-                        .servicePlan(Plan.builder()
-                            .id("test-service-plan-id")
-                            .name("test-service-plan-name")
                             .service(Service.builder()
                                 .id("test-provided-service-id")
                                 .label("test-provided-service-label")

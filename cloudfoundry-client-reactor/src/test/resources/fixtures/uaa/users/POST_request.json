@@ -1,16 +1,18 @@
 {
-  "externalId" : "test-user",
-  "userName" : "ZO6FEI@test.org",
-  "name" : {
-    "familyName" : "family name",
-    "givenName" : "given name"
+  "externalId": "test-user",
+  "userName": "ZO6FEI@test.org",
+  "name": {
+    "familyName": "family name",
+    "givenName": "given name"
   },
-  "emails" : [ {
-    "value" : "ZO6FEI@test.org",
-    "primary" : true
-  } ],
-  "active" : true,
-  "verified" : true,
-  "origin" : "",
-  "password" : "secret"
+  "emails": [
+    {
+      "value": "ZO6FEI@test.org",
+      "primary": true
+    }
+  ],
+  "active": true,
+  "verified": true,
+  "origin": "",
+  "password": "secret"
 }

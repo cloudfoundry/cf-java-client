@@ -80,7 +80,8 @@ public final class DefaultOrganizations implements Organizations {
                 Mono.just(username)
             )))
             .filter(predicate((cloudFoundryClient, organizationId, setRolesByUsernameEnabled, username) -> setRolesByUsernameEnabled))
-            .then(function((cloudFoundryClient, organizationId, setRolesByUsernameEnabled, username) -> setOrganizationManager(cloudFoundryClient, organizationId, username)));
+            .then(function((cloudFoundryClient, organizationId, setRolesByUsernameEnabled, username) -> setOrganizationManager(cloudFoundryClient, organizationId, username)))
+            .checkpoint();
     }
 
     @Override
@@ -90,7 +91,8 @@ public final class DefaultOrganizations implements Organizations {
                 Mono.just(cloudFoundryClient),
                 getOrganizationId(cloudFoundryClient, request.getName())
             ))
-            .then(function(DefaultOrganizations::deleteOrganization));
+            .then(function(DefaultOrganizations::deleteOrganization))
+            .checkpoint();
     }
 
     @Override
@@ -101,14 +103,16 @@ public final class DefaultOrganizations implements Organizations {
                 getOrganization(cloudFoundryClient, request.getName())
             ))
             .then(function((cloudFoundryClient, organizationResource) -> getAuxiliaryContent(cloudFoundryClient, organizationResource)
-                .map(function((domains, organizationQuota, spacesQuotas, spaces) -> toOrganizationDetail(domains, organizationQuota, spacesQuotas, spaces, organizationResource, request)))));
+                .map(function((domains, organizationQuota, spacesQuotas, spaces) -> toOrganizationDetail(domains, organizationQuota, spacesQuotas, spaces, organizationResource, request)))))
+            .checkpoint();
     }
 
     @Override
     public Flux<OrganizationSummary> list() {
         return this.cloudFoundryClient
             .flatMap(DefaultOrganizations::requestOrganizations)
-            .map(DefaultOrganizations::toOrganizationSummary);
+            .map(DefaultOrganizations::toOrganizationSummary)
+            .checkpoint();
     }
 
     @Override
@@ -119,7 +123,8 @@ public final class DefaultOrganizations implements Organizations {
                 getOrganizationId(cloudFoundryClient, request.getName())
             ))
             .then(function((cloudFoundryClient, organizationId) -> requestUpdateOrganization(cloudFoundryClient, organizationId, request.getNewName())))
-            .then();
+            .then()
+            .checkpoint();
     }
 
     private static Mono<String> createOrganization(CloudFoundryClient cloudFoundryClient, CreateOrganizationRequest request) {

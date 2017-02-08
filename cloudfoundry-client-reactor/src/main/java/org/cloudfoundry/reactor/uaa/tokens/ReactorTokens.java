@@ -76,7 +76,8 @@ public final class ReactorTokens extends AbstractUaaOperations implements Tokens
                     String encoded = Base64.getEncoder().encodeToString(new AsciiString(request.getClientId()).concat(":").concat(request.getClientSecret()).toByteArray());
                     r.requestHeaders().set(AUTHORIZATION, BASIC_PREAMBLE + encoded);
                     return r;
-                }));
+                }))
+            .checkpoint();
     }
 
     @Override
@@ -85,7 +86,8 @@ public final class ReactorTokens extends AbstractUaaOperations implements Tokens
             builder -> builder.pathSegment("oauth", "token").queryParam("grant_type", AUTHORIZATION_CODE).queryParam("response_type", ResponseType.TOKEN),
             outbound -> outbound
                 .map(ReactorTokens::removeAuthorization)
-                .map(ReactorTokens::setUrlEncoded));
+                .map(ReactorTokens::setUrlEncoded))
+            .checkpoint();
     }
 
     @Override
@@ -94,7 +96,8 @@ public final class ReactorTokens extends AbstractUaaOperations implements Tokens
             builder -> builder.pathSegment("oauth", "token").queryParam("grant_type", CLIENT_CREDENTIALS).queryParam("response_type", ResponseType.TOKEN),
             outbound -> outbound
                 .map(ReactorTokens::removeAuthorization)
-                .map(ReactorTokens::setUrlEncoded));
+                .map(ReactorTokens::setUrlEncoded))
+            .checkpoint();
     }
 
     @Override
@@ -103,7 +106,8 @@ public final class ReactorTokens extends AbstractUaaOperations implements Tokens
             builder -> builder.pathSegment("oauth", "token").queryParam("grant_type", PASSWORD).queryParam("response_type", ResponseType.TOKEN),
             outbound -> outbound
                 .map(ReactorTokens::removeAuthorization)
-                .map(ReactorTokens::setUrlEncoded));
+                .map(ReactorTokens::setUrlEncoded))
+            .checkpoint();
     }
 
     @Override
@@ -112,7 +116,8 @@ public final class ReactorTokens extends AbstractUaaOperations implements Tokens
             builder -> builder.pathSegment("oauth", "token").queryParam("grant_type", AUTHORIZATION_CODE).queryParam("response_type", ResponseType.ID_TOKEN),
             outbound -> outbound
                 .map(ReactorTokens::removeAuthorization)
-                .map(ReactorTokens::setUrlEncoded));
+                .map(ReactorTokens::setUrlEncoded))
+            .checkpoint();
     }
 
     @Override
@@ -120,17 +125,20 @@ public final class ReactorTokens extends AbstractUaaOperations implements Tokens
         return post(request, GetTokenByPasswordResponse.class, builder -> builder.pathSegment("oauth", "token").queryParam("grant_type", PASSWORD).queryParam("response_type", ResponseType.TOKEN),
             outbound -> outbound
                 .map(ReactorTokens::removeAuthorization)
-                .map(ReactorTokens::setUrlEncoded));
+                .map(ReactorTokens::setUrlEncoded))
+            .checkpoint();
     }
 
     @Override
     public Mono<GetTokenKeyResponse> getKey(GetTokenKeyRequest request) {
-        return get(request, GetTokenKeyResponse.class, builder -> builder.pathSegment("token_key"));
+        return get(request, GetTokenKeyResponse.class, builder -> builder.pathSegment("token_key"))
+            .checkpoint();
     }
 
     @Override
     public Mono<ListTokenKeysResponse> listKeys(ListTokenKeysRequest request) {
-        return get(request, ListTokenKeysResponse.class, builder -> builder.pathSegment("token_keys"));
+        return get(request, ListTokenKeysResponse.class, builder -> builder.pathSegment("token_keys"))
+            .checkpoint();
     }
 
     @Override
@@ -138,7 +146,8 @@ public final class ReactorTokens extends AbstractUaaOperations implements Tokens
         return post(request, RefreshTokenResponse.class, builder -> builder.pathSegment("oauth", "token").queryParam("grant_type", REFRESH_TOKEN),
             outbound -> outbound
                 .map(ReactorTokens::removeAuthorization)
-                .map(ReactorTokens::setUrlEncoded));
+                .map(ReactorTokens::setUrlEncoded))
+            .checkpoint();
     }
 
     private static HttpClientRequest removeAuthorization(HttpClientRequest request) {

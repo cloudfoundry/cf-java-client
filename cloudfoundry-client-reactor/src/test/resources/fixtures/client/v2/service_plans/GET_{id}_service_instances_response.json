@@ -23,7 +23,6 @@
         "type": "managed_service_instance",
         "last_operation": null,
         "tags": [
-
         ],
         "space_url": "/v2/spaces/cf5812f5-bf43-40cc-88d4-d50b76d7797d",
         "service_plan_url": "/v2/service_plans/bb29926c-7482-4ae5-803c-ec99e95aa278",

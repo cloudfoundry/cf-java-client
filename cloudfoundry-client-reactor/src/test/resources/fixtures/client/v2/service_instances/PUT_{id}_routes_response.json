@@ -17,7 +17,6 @@
     "type": "managed_service_instance",
     "last_operation": null,
     "tags": [
-
     ],
     "space_url": "/v2/spaces/36b01ada-ef02-4ff5-9f78-cd9e704211d2",
     "service_plan_url": "/v2/service_plans/957307f5-6811-4eba-8667-ffee5a704a4a",

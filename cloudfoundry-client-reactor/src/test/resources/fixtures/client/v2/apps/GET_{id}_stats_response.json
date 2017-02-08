@@ -1,20 +1,23 @@
-{"0": 
-  { "state":"RUNNING",
-    "stats": 
-      { "usage":
-        { "disk":66392064,
-          "mem":29880320,
-          "cpu":0.13511219703079957,
-          "time":"2014-06-19 22:37:58 +0000"
-        },
-        "name":"app_name",
-        "uris":["app_name.example.com"],
-        "host":"10.0.0.1",
-        "port":61035,
-        "uptime":65007,
-        "mem_quota":536870912,
-        "disk_quota":1073741824,
-        "fds_quota":16384
-      }
+{
+  "0": {
+    "state": "RUNNING",
+    "stats": {
+      "usage": {
+        "disk": 66392064,
+        "mem": 29880320,
+        "cpu": 0.13511219703079957,
+        "time": "2014-06-19 22:37:58 +0000"
+      },
+      "name": "app_name",
+      "uris": [
+        "app_name.example.com"
+      ],
+      "host": "10.0.0.1",
+      "port": 61035,
+      "uptime": 65007,
+      "mem_quota": 536870912,
+      "disk_quota": 1073741824,
+      "fds_quota": 16384
+    }
   }
 }

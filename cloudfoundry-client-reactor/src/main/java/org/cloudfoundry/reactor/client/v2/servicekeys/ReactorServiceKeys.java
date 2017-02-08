@@ -48,22 +48,26 @@ public final class ReactorServiceKeys extends AbstractClientV2Operations impleme
 
     @Override
     public Mono<CreateServiceKeyResponse> create(CreateServiceKeyRequest request) {
-        return post(request, CreateServiceKeyResponse.class, builder -> builder.pathSegment("v2", "service_keys"));
+        return post(request, CreateServiceKeyResponse.class, builder -> builder.pathSegment("v2", "service_keys"))
+            .checkpoint();
     }
 
     @Override
     public Mono<Void> delete(DeleteServiceKeyRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("v2", "service_keys", request.getServiceKeyId()));
+        return delete(request, Void.class, builder -> builder.pathSegment("v2", "service_keys", request.getServiceKeyId()))
+            .checkpoint();
     }
 
     @Override
     public Mono<GetServiceKeyResponse> get(GetServiceKeyRequest request) {
-        return get(request, GetServiceKeyResponse.class, builder -> builder.pathSegment("v2", "service_keys", request.getServiceKeyId()));
+        return get(request, GetServiceKeyResponse.class, builder -> builder.pathSegment("v2", "service_keys", request.getServiceKeyId()))
+            .checkpoint();
     }
 
     @Override
     public Mono<ListServiceKeysResponse> list(ListServiceKeysRequest request) {
-        return get(request, ListServiceKeysResponse.class, builder -> builder.pathSegment("v2", "service_keys"));
+        return get(request, ListServiceKeysResponse.class, builder -> builder.pathSegment("v2", "service_keys"))
+            .checkpoint();
     }
 
 }

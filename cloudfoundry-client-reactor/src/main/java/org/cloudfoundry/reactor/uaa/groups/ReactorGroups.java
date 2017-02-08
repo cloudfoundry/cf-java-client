@@ -66,52 +66,62 @@ public final class ReactorGroups extends AbstractUaaOperations implements Groups
 
     @Override
     public Mono<AddMemberResponse> addMember(AddMemberRequest request) {
-        return post(request, AddMemberResponse.class, builder -> builder.pathSegment("Groups", request.getGroupId(), "members"));
+        return post(request, AddMemberResponse.class, builder -> builder.pathSegment("Groups", request.getGroupId(), "members"))
+            .checkpoint();
     }
 
     @Override
     public Mono<CheckMembershipResponse> checkMembership(CheckMembershipRequest request) {
-        return get(request, CheckMembershipResponse.class, builder -> builder.pathSegment("Groups", request.getGroupId(), "members", request.getMemberId()));
+        return get(request, CheckMembershipResponse.class, builder -> builder.pathSegment("Groups", request.getGroupId(), "members", request.getMemberId()))
+            .checkpoint();
     }
 
     @Override
     public Mono<CreateGroupResponse> create(CreateGroupRequest request) {
-        return post(request, CreateGroupResponse.class, builder -> builder.pathSegment("Groups"));
+        return post(request, CreateGroupResponse.class, builder -> builder.pathSegment("Groups"))
+            .checkpoint();
     }
 
     @Override
     public Mono<DeleteGroupResponse> delete(DeleteGroupRequest request) {
-        return delete(request, DeleteGroupResponse.class, builder -> builder.pathSegment("Groups", request.getGroupId()));
+        return delete(request, DeleteGroupResponse.class, builder -> builder.pathSegment("Groups", request.getGroupId()))
+            .checkpoint();
     }
 
     @Override
     public Mono<GetGroupResponse> get(GetGroupRequest request) {
-        return get(request, GetGroupResponse.class, builder -> builder.pathSegment("Groups", request.getGroupId()));
+        return get(request, GetGroupResponse.class, builder -> builder.pathSegment("Groups", request.getGroupId()))
+            .checkpoint();
     }
 
     @Override
     public Mono<ListGroupsResponse> list(ListGroupsRequest request) {
-        return get(request, ListGroupsResponse.class, builder -> builder.pathSegment("Groups"));
+        return get(request, ListGroupsResponse.class, builder -> builder.pathSegment("Groups"))
+            .checkpoint();
     }
 
     @Override
     public Mono<ListExternalGroupMappingsResponse> listExternalGroupMappings(ListExternalGroupMappingsRequest request) {
-        return get(request, ListExternalGroupMappingsResponse.class, builder -> builder.pathSegment("Groups", "External"));
+        return get(request, ListExternalGroupMappingsResponse.class, builder -> builder.pathSegment("Groups", "External"))
+            .checkpoint();
     }
 
     @Override
     public Mono<ListMembersResponse> listMembers(ListMembersRequest request) {
-        return get(request, ListMembersResponse.class, builder -> builder.pathSegment("Groups", request.getGroupId(), "members"));
+        return get(request, ListMembersResponse.class, builder -> builder.pathSegment("Groups", request.getGroupId(), "members"))
+            .checkpoint();
     }
 
     @Override
     public Mono<MapExternalGroupResponse> mapExternalGroup(MapExternalGroupRequest request) {
-        return post(request, MapExternalGroupResponse.class, builder -> builder.pathSegment("Groups", "External"));
+        return post(request, MapExternalGroupResponse.class, builder -> builder.pathSegment("Groups", "External"))
+            .checkpoint();
     }
 
     @Override
     public Mono<RemoveMemberResponse> removeMember(RemoveMemberRequest request) {
-        return delete(request, RemoveMemberResponse.class, builder -> builder.pathSegment("Groups", request.getGroupId(), "members", request.getMemberId()));
+        return delete(request, RemoveMemberResponse.class, builder -> builder.pathSegment("Groups", request.getGroupId(), "members", request.getMemberId()))
+            .checkpoint();
     }
 
     @Override
@@ -119,7 +129,8 @@ public final class ReactorGroups extends AbstractUaaOperations implements Groups
         return delete(
             request,
             UnmapExternalGroupByGroupDisplayNameResponse.class,
-            builder -> builder.pathSegment("Groups", "External", "displayName", request.getGroupDisplayName(), "externalGroup", request.getExternalGroup(), "origin", request.getOrigin()));
+            builder -> builder.pathSegment("Groups", "External", "displayName", request.getGroupDisplayName(), "externalGroup", request.getExternalGroup(), "origin", request.getOrigin()))
+            .checkpoint();
     }
 
     @Override
@@ -127,12 +138,14 @@ public final class ReactorGroups extends AbstractUaaOperations implements Groups
         return delete(
             request,
             UnmapExternalGroupByGroupIdResponse.class,
-            builder -> builder.pathSegment("Groups", "External", "groupId", request.getGroupId(), "externalGroup", request.getExternalGroup(), "origin", request.getOrigin()));
+            builder -> builder.pathSegment("Groups", "External", "groupId", request.getGroupId(), "externalGroup", request.getExternalGroup(), "origin", request.getOrigin()))
+            .checkpoint();
     }
 
     @Override
     public Mono<UpdateGroupResponse> update(UpdateGroupRequest request) {
-        return put(request, UpdateGroupResponse.class, builder -> builder.pathSegment("Groups", request.getGroupId()));
+        return put(request, UpdateGroupResponse.class, builder -> builder.pathSegment("Groups", request.getGroupId()))
+            .checkpoint();
     }
 
 }

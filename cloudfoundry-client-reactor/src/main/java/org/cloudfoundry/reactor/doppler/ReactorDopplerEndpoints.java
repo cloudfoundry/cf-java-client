@@ -41,38 +41,40 @@ final class ReactorDopplerEndpoints extends AbstractDopplerOperations {
         return get(builder -> builder.pathSegment("apps", request.getApplicationId(), "containermetrics"))
             .flatMap(inbound -> inbound.addHandler(new MultipartDecoderChannelHandler(inbound)).receiveObject())
             .takeWhile(t -> MultipartDecoderChannelHandler.CLOSE_DELIMITER != t)
-            .window()
+            .windowWhile(t -> MultipartDecoderChannelHandler.DELIMITER != t)
             .concatMap(w -> w
-                .takeWhile(t -> MultipartDecoderChannelHandler.DELIMITER != t)
                 .as(ByteBufFlux::fromInbound)
                 .aggregate()
                 .asByteArray(), Integer.MAX_VALUE)
-            .map(ReactorDopplerEndpoints::toEnvelope);
+            .map(ReactorDopplerEndpoints::toEnvelope)
+            .checkpoint();
     }
 
     Flux<Envelope> firehose(FirehoseRequest request) {
         return ws(builder -> builder.pathSegment("firehose", request.getSubscriptionId()))
             .flatMap(response -> response.receiveWebsocket().aggregateFrames().receive().asByteArray())
-            .map(ReactorDopplerEndpoints::toEnvelope);
+            .map(ReactorDopplerEndpoints::toEnvelope)
+            .checkpoint();
     }
 
     Flux<Envelope> recentLogs(RecentLogsRequest request) {
         return get(builder -> builder.pathSegment("apps", request.getApplicationId(), "recentlogs"))
             .flatMap(inbound -> inbound.addHandler(new MultipartDecoderChannelHandler(inbound)).receiveObject())
             .takeWhile(t -> MultipartDecoderChannelHandler.CLOSE_DELIMITER != t)
-            .window()
+            .windowWhile(t -> MultipartDecoderChannelHandler.DELIMITER != t)
             .concatMap(w -> w
-                .takeWhile(t -> MultipartDecoderChannelHandler.DELIMITER != t)
                 .as(ByteBufFlux::fromInbound)
                 .aggregate()
                 .asByteArray(), Integer.MAX_VALUE)
-            .map(ReactorDopplerEndpoints::toEnvelope);
+            .map(ReactorDopplerEndpoints::toEnvelope)
+            .checkpoint();
     }
 
     Flux<Envelope> stream(StreamRequest request) {
         return ws(builder -> builder.pathSegment("apps", request.getApplicationId(), "stream"))
             .flatMap(response -> response.receiveWebsocket().aggregateFrames().receive().asByteArray())
-            .map(ReactorDopplerEndpoints::toEnvelope);
+            .map(ReactorDopplerEndpoints::toEnvelope)
+            .checkpoint();
     }
 
     private static Envelope toEnvelope(byte[] bytes) {

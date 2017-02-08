@@ -48,23 +48,27 @@ public final class ReactorSharedDomains extends AbstractClientV2Operations imple
 
     @Override
     public Mono<CreateSharedDomainResponse> create(CreateSharedDomainRequest request) {
-        return post(request, CreateSharedDomainResponse.class, builder -> builder.pathSegment("v2", "shared_domains"));
+        return post(request, CreateSharedDomainResponse.class, builder -> builder.pathSegment("v2", "shared_domains"))
+            .checkpoint();
     }
 
     @Override
     public Mono<DeleteSharedDomainResponse> delete(DeleteSharedDomainRequest request) {
-        return delete(request, DeleteSharedDomainResponse.class, builder -> builder.pathSegment("v2", "shared_domains", request.getSharedDomainId()));
+        return delete(request, DeleteSharedDomainResponse.class, builder -> builder.pathSegment("v2", "shared_domains", request.getSharedDomainId()))
+            .checkpoint();
     }
 
     @Override
     public Mono<GetSharedDomainResponse> get(GetSharedDomainRequest request) {
-        return get(request, GetSharedDomainResponse.class, builder -> builder.pathSegment("v2", "shared_domains", request.getSharedDomainId()));
+        return get(request, GetSharedDomainResponse.class, builder -> builder.pathSegment("v2", "shared_domains", request.getSharedDomainId()))
+            .checkpoint();
 
     }
 
     @Override
     public Mono<ListSharedDomainsResponse> list(ListSharedDomainsRequest request) {
-        return get(request, ListSharedDomainsResponse.class, builder -> builder.pathSegment("v2", "shared_domains"));
+        return get(request, ListSharedDomainsResponse.class, builder -> builder.pathSegment("v2", "shared_domains"))
+            .checkpoint();
     }
 
 }

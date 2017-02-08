@@ -34,16 +34,6 @@ public enum ServiceInstanceType {
         this.value = value;
     }
 
-    @JsonValue
-    public String getValue() {
-        return this.value;
-    }
-
-    @Override
-    public String toString() {
-        return this.getValue();
-    }
-
     @JsonCreator
     public static ServiceInstanceType from(String s) {
         switch (s.toLowerCase()) {
@@ -55,6 +45,16 @@ public enum ServiceInstanceType {
                 throw new IllegalArgumentException(String.format("Unknown service instance type: %s", s));
         }
 
+    }
+
+    @JsonValue
+    public String getValue() {
+        return this.value;
+    }
+
+    @Override
+    public String toString() {
+        return this.getValue();
     }
 
 }
