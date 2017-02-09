@@ -61,6 +61,7 @@ import static org.cloudfoundry.util.OperationUtils.thenKeep;
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
+@SuppressWarnings("deprecation")
 public final class DomainsTest extends AbstractIntegrationTest {
 
     @Autowired

@@ -187,6 +187,7 @@ public final class ReactorSpaces extends AbstractClientV2Operations implements S
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public Mono<ListSpaceDomainsResponse> listDomains(ListSpaceDomainsRequest request) {
         return get(request, ListSpaceDomainsResponse.class, builder -> builder.pathSegment("v2", "spaces", request.getSpaceId(), "domains"))
             .checkpoint();

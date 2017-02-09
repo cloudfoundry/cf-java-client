@@ -20,7 +20,6 @@ import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.ClientV2Exception;
 import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
-import org.cloudfoundry.client.v2.domains.DomainResource;
 import org.cloudfoundry.client.v2.jobs.ErrorDetails;
 import org.cloudfoundry.client.v2.jobs.GetJobRequest;
 import org.cloudfoundry.client.v2.jobs.GetJobResponse;
@@ -29,6 +28,8 @@ import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserByUsern
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserByUsernameResponse;
 import org.cloudfoundry.client.v2.organizations.GetOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.GetOrganizationResponse;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationPrivateDomainsRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationPrivateDomainsResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefinitionsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefinitionsResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesRequest;
@@ -36,10 +37,16 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.organizations.OrganizationResource;
+import org.cloudfoundry.client.v2.privatedomains.PrivateDomainEntity;
+import org.cloudfoundry.client.v2.privatedomains.PrivateDomainResource;
 import org.cloudfoundry.client.v2.securitygroups.RuleEntity;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroupEntity;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroupResource;
 import org.cloudfoundry.client.v2.services.ServiceResource;
+import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
+import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsResponse;
+import org.cloudfoundry.client.v2.shareddomains.SharedDomainEntity;
+import org.cloudfoundry.client.v2.shareddomains.SharedDomainResource;
 import org.cloudfoundry.client.v2.spacequotadefinitions.GetSpaceQuotaDefinitionRequest;
 import org.cloudfoundry.client.v2.spacequotadefinitions.GetSpaceQuotaDefinitionResponse;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionEntity;
@@ -52,8 +59,6 @@ import org.cloudfoundry.client.v2.spaces.CreateSpaceResponse;
 import org.cloudfoundry.client.v2.spaces.DeleteSpaceResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsResponse;
-import org.cloudfoundry.client.v2.spaces.ListSpaceDomainsRequest;
-import org.cloudfoundry.client.v2.spaces.ListSpaceDomainsResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceSecurityGroupsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceSecurityGroupsResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceServicesRequest;
@@ -296,7 +301,8 @@ public final class DefaultSpacesTest extends AbstractOperationsTest {
         requestOrganization(this.cloudFoundryClient, "test-space-organizationId");
         requestOrganizationSpaces(this.cloudFoundryClient, TEST_ORGANIZATION_ID, TEST_SPACE_NAME, "test-space-spaceQuotaDefinitionId");
         requestSpaceApplications(this.cloudFoundryClient, TEST_SPACE_ID);
-        requestSpaceDomains(this.cloudFoundryClient, TEST_SPACE_ID);
+        requestPrivateDomains(this.cloudFoundryClient, "test-space-organizationId");
+        requestSharedDomains(this.cloudFoundryClient);
         requestSpaceSecurityGroups(this.cloudFoundryClient, TEST_SPACE_ID);
         requestSpaceServices(this.cloudFoundryClient, TEST_SPACE_ID);
         requestSpaceQuotaDefinition(this.cloudFoundryClient, "test-space-spaceQuotaDefinitionId");
@@ -309,7 +315,7 @@ public final class DefaultSpacesTest extends AbstractOperationsTest {
             .as(StepVerifier::create)
             .expectNext(SpaceDetail.builder()
                 .application("test-application-name")
-                .domain("test-domain-name")
+                .domain("test-private-domain-name", "test-shared-domain-name")
                 .id(TEST_SPACE_ID)
                 .name(TEST_SPACE_NAME)
                 .organization("test-organization-name")
@@ -332,7 +338,8 @@ public final class DefaultSpacesTest extends AbstractOperationsTest {
         requestOrganization(this.cloudFoundryClient, "test-space-organizationId");
         requestOrganizationSpaces(this.cloudFoundryClient, TEST_ORGANIZATION_ID, TEST_SPACE_NAME, "test-space-spaceQuotaDefinitionId");
         requestSpaceApplications(this.cloudFoundryClient, TEST_SPACE_ID);
-        requestSpaceDomains(this.cloudFoundryClient, TEST_SPACE_ID);
+        requestPrivateDomains(this.cloudFoundryClient, "test-space-organizationId");
+        requestSharedDomains(this.cloudFoundryClient);
         requestSpaceSecurityGroups(this.cloudFoundryClient, TEST_SPACE_ID);
         requestSpaceServices(this.cloudFoundryClient, TEST_SPACE_ID);
         requestSpaceQuotaDefinition(this.cloudFoundryClient, "test-space-spaceQuotaDefinitionId");
@@ -344,7 +351,7 @@ public final class DefaultSpacesTest extends AbstractOperationsTest {
             .as(StepVerifier::create)
             .expectNext(SpaceDetail.builder()
                 .application("test-application-name")
-                .domain("test-domain-name")
+                .domain("test-private-domain-name", "test-shared-domain-name")
                 .id(TEST_SPACE_ID)
                 .name(TEST_SPACE_NAME)
                 .organization("test-organization-name")
@@ -365,7 +372,8 @@ public final class DefaultSpacesTest extends AbstractOperationsTest {
         requestOrganization(this.cloudFoundryClient, "test-space-organizationId");
         requestOrganizationSpaces(this.cloudFoundryClient, TEST_ORGANIZATION_ID, TEST_SPACE_NAME, null);
         requestSpaceApplications(this.cloudFoundryClient, TEST_SPACE_ID);
-        requestSpaceDomains(this.cloudFoundryClient, TEST_SPACE_ID);
+        requestPrivateDomains(this.cloudFoundryClient, "test-space-organizationId");
+        requestSharedDomains(this.cloudFoundryClient);
         requestSpaceSecurityGroups(this.cloudFoundryClient, TEST_SPACE_ID);
         requestSpaceServices(this.cloudFoundryClient, TEST_SPACE_ID);
 
@@ -377,7 +385,7 @@ public final class DefaultSpacesTest extends AbstractOperationsTest {
             .as(StepVerifier::create)
             .expectNext(SpaceDetail.builder()
                 .application("test-application-name")
-                .domain("test-domain-name")
+                .domain("test-private-domain-name", "test-shared-domain-name")
                 .id(TEST_SPACE_ID)
                 .name(TEST_SPACE_NAME)
                 .organization("test-organization-name")
@@ -683,6 +691,37 @@ public final class DefaultSpacesTest extends AbstractOperationsTest {
                     .build()));
     }
 
+    private static void requestPrivateDomains(CloudFoundryClient cloudFoundryClient, String organizationId) {
+        when(cloudFoundryClient.organizations()
+            .listPrivateDomains(ListOrganizationPrivateDomainsRequest.builder()
+                .organizationId(organizationId)
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(ListOrganizationPrivateDomainsResponse.builder())
+                    .resource(fill(PrivateDomainResource.builder())
+                        .entity(fill(PrivateDomainEntity.builder())
+                            .name("test-private-domain-name")
+                            .build())
+                        .build())
+                    .build()));
+    }
+
+    private static void requestSharedDomains(CloudFoundryClient cloudFoundryClient) {
+        when(cloudFoundryClient.sharedDomains()
+            .list(ListSharedDomainsRequest.builder()
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(ListSharedDomainsResponse.builder()
+                    .resource(fill(SharedDomainResource.builder())
+                        .entity(fill(SharedDomainEntity.builder())
+                            .name("test-shared-domain-name")
+                            .build())
+                        .build())
+                    .build()));
+    }
+
     private static void requestSpaceApplications(CloudFoundryClient cloudFoundryClient, String spaceId) {
         when(cloudFoundryClient.spaces()
             .listApplications(ListSpaceApplicationsRequest.builder()
@@ -692,19 +731,6 @@ public final class DefaultSpacesTest extends AbstractOperationsTest {
             .thenReturn(Mono
                 .just(fill(ListSpaceApplicationsResponse.builder())
                     .resource(fill(ApplicationResource.builder(), "application-")
-                        .build())
-                    .build()));
-    }
-
-    private static void requestSpaceDomains(CloudFoundryClient cloudFoundryClient, String spaceId) {
-        when(cloudFoundryClient.spaces()
-            .listDomains(ListSpaceDomainsRequest.builder()
-                .page(1)
-                .spaceId(spaceId)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(ListSpaceDomainsResponse.builder())
-                    .resource(fill(DomainResource.builder(), "domain-")
                         .build())
                     .build()));
     }

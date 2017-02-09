@@ -19,19 +19,22 @@ package org.cloudfoundry.operations.spaces;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
-import org.cloudfoundry.client.v2.domains.DomainResource;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserByUsernameResponse;
 import org.cloudfoundry.client.v2.organizations.GetOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.GetOrganizationResponse;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationPrivateDomainsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefinitionsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.OrganizationResource;
+import org.cloudfoundry.client.v2.privatedomains.PrivateDomainResource;
 import org.cloudfoundry.client.v2.securitygroups.RuleEntity;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroupEntity;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroupResource;
 import org.cloudfoundry.client.v2.services.ServiceResource;
+import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
+import org.cloudfoundry.client.v2.shareddomains.SharedDomainResource;
 import org.cloudfoundry.client.v2.spacequotadefinitions.GetSpaceQuotaDefinitionRequest;
 import org.cloudfoundry.client.v2.spacequotadefinitions.GetSpaceQuotaDefinitionResponse;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionEntity;
@@ -43,7 +46,6 @@ import org.cloudfoundry.client.v2.spaces.AssociateSpaceManagerByUsernameResponse
 import org.cloudfoundry.client.v2.spaces.CreateSpaceResponse;
 import org.cloudfoundry.client.v2.spaces.DeleteSpaceResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsRequest;
-import org.cloudfoundry.client.v2.spaces.ListSpaceDomainsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceSecurityGroupsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceServicesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
@@ -216,8 +218,10 @@ public final class DefaultSpaces implements Spaces {
     }
 
     private static Mono<List<String>> getDomainNames(CloudFoundryClient cloudFoundryClient, SpaceResource spaceResource) {
-        return requestSpaceDomains(cloudFoundryClient, ResourceUtils.getId(spaceResource))
-            .map(domainResource -> ResourceUtils.getEntity(domainResource).getName())
+        return requestListPrivateDomains(cloudFoundryClient, spaceResource.getEntity().getOrganizationId())
+            .map(resource -> resource.getEntity().getName())
+            .mergeWith(requestListSharedDomains(cloudFoundryClient)
+                .map(resource -> resource.getEntity().getName()))
             .collectList();
     }
 
@@ -366,6 +370,23 @@ public final class DefaultSpaces implements Spaces {
                 .build());
     }
 
+    private static Flux<PrivateDomainResource> requestListPrivateDomains(CloudFoundryClient cloudFoundryClient, String organizationId) {
+        return PaginationUtils
+            .requestClientV2Resources(page -> cloudFoundryClient.organizations()
+                .listPrivateDomains(ListOrganizationPrivateDomainsRequest.builder()
+                    .organizationId(organizationId)
+                    .page(page)
+                    .build()));
+    }
+
+    private static Flux<SharedDomainResource> requestListSharedDomains(CloudFoundryClient cloudFoundryClient) {
+        return PaginationUtils
+            .requestClientV2Resources(page -> cloudFoundryClient.sharedDomains()
+                .list(ListSharedDomainsRequest.builder()
+                    .page(page)
+                    .build()));
+    }
+
     private static Mono<GetOrganizationResponse> requestOrganization(CloudFoundryClient cloudFoundryClient, String organizationId) {
         return cloudFoundryClient.organizations()
             .get(GetOrganizationRequest.builder()
@@ -406,15 +427,6 @@ public final class DefaultSpaces implements Spaces {
         return PaginationUtils
             .requestClientV2Resources(page -> cloudFoundryClient.spaces()
                 .listApplications(ListSpaceApplicationsRequest.builder()
-                    .page(page)
-                    .spaceId(spaceId)
-                    .build()));
-    }
-
-    private static Flux<DomainResource> requestSpaceDomains(CloudFoundryClient cloudFoundryClient, String spaceId) {
-        return PaginationUtils
-            .requestClientV2Resources(page -> cloudFoundryClient.spaces()
-                .listDomains(ListSpaceDomainsRequest.builder()
                     .page(page)
                     .spaceId(spaceId)
                     .build()));
