@@ -1396,7 +1396,7 @@ public final class DefaultApplications implements Applications {
                         .map(ResourceMatchingUtils.ArtifactMetadata::getPath)
                         .collect(Collectors.toList());
 
-                    return FileUtils.compress(FileUtils.normalize(application), p -> !paths.contains(p));
+                    return FileUtils.compress(application, p -> !paths.contains(p));
                 }
             })
             .then(filteredApplication -> requestUploadApplication(cloudFoundryClient, applicationId, filteredApplication, matchedResources))

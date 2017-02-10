@@ -18,6 +18,7 @@ package org.cloudfoundry.util;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
+import org.apache.commons.compress.archivers.zip.ZipFile;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -25,21 +26,21 @@ import reactor.core.scheduler.Schedulers;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
 import java.nio.file.attribute.PosixFileAttributes;
 import java.nio.file.attribute.PosixFilePermission;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Enumeration;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
- * Utilities for {@link FileSystem}s
+ * Utilities for files
  */
 public final class FileUtils {
 
@@ -88,11 +89,12 @@ public final class FileUtils {
             .defer(() -> {
                 try {
                     Path staging = Files.createTempFile(null, null);
-
-                    try (Stream<Path> contents = Files.walk(candidate); ZipArchiveOutputStream out = new ZipArchiveOutputStream(staging.toFile())) {
-                        contents
-                            .filter(path -> filter.test(getRelativePathName(candidate, path)))
-                            .forEach(p -> write(candidate, p, out));
+                    try (ZipArchiveOutputStream out = new ZipArchiveOutputStream(staging.toFile())) {
+                        if (Files.isDirectory(candidate)) {
+                            compressFromDirectory(candidate, filter, out);
+                        } else {
+                            compressFromZip(candidate, filter, out);
+                        }
                     }
 
                     return Mono.just(staging);
@@ -123,6 +125,20 @@ public final class FileUtils {
      */
     public static String hash(Path path) {
         try (InputStream in = Files.newInputStream(path)) {
+            return hash(in);
+        } catch (IOException e) {
+            throw Exceptions.propagate(e);
+        }
+    }
+
+    /**
+     * Calculates the SHA-1 hash for an {@link InputStream}
+     *
+     * @param in the {@link InputStream} to calculate the hash for
+     * @return {@link String} representation of the hash
+     */
+    public static String hash(InputStream in) {
+        try {
             MessageDigest digest = MessageDigest.getInstance("sha1");
 
             ByteArrayPool.withByteArray(buffer -> {
@@ -137,22 +153,7 @@ public final class FileUtils {
             });
 
             return String.format("%040x", new BigInteger(1, digest.digest()));
-        } catch (IOException | NoSuchAlgorithmException e) {
-            throw Exceptions.propagate(e);
-        }
-    }
-
-    /**
-     * Returns a normalized {@link Path}.  In the case of directories, it returns the {@link Path} as it was passed in.  In the case of files, it returns a {@link Path} representing the root of a
-     * filesystem mounted using {@link FileSystems#newFileSystem}.
-     *
-     * @param path the {@link Path} to normalized
-     * @return the normalized path
-     */
-    public static Path normalize(Path path) {
-        try {
-            return Files.isDirectory(path) ? path : FileSystems.newFileSystem(path, null).getPath("/");
-        } catch (IOException e) {
+        } catch (NoSuchAlgorithmException e) {
             throw Exceptions.propagate(e);
         }
     }
@@ -165,10 +166,20 @@ public final class FileUtils {
      */
     public static String permissions(Path path) {
         try {
-            return Integer.toOctalString(getUnixMode(path));
+            return permissions(getUnixMode(path));
         } catch (IOException e) {
             throw Exceptions.propagate(e);
         }
+    }
+
+    /**
+     * Calculates permissions for a UNIX mode
+     *
+     * @param mode the UNIX mode to calculate the permissions for
+     * @return a {@link String} representation of the permissions
+     */
+    public static String permissions(int mode) {
+        return Integer.toOctalString(mode == 0 ? DEFAULT_PERMISSIONS : mode);
     }
 
     /**
@@ -185,6 +196,48 @@ public final class FileUtils {
         }
     }
 
+    private static void compressFromDirectory(Path candidate, Predicate<String> filter, ZipArchiveOutputStream out) {
+        try (Stream<Path> contents = Files.walk(candidate)) {
+            contents
+                .filter(path -> {
+                    try {
+                        return !Files.isSameFile(candidate, path);
+                    } catch (IOException e) {
+                        throw Exceptions.propagate(e);
+                    }
+                })
+                .filter(path -> filter.test(getRelativePathName(candidate, path)))
+                .forEach(path -> {
+                    try (InputStream in = Files.newInputStream(path)) {
+                        write(in, Files.getLastModifiedTime(path), getUnixMode(path), out, getRelativePathName(candidate, path));
+                    } catch (IOException e) {
+                        throw Exceptions.propagate(e);
+                    }
+                });
+        } catch (IOException e) {
+            throw Exceptions.propagate(e);
+        }
+    }
+
+    private static void compressFromZip(Path candidate, Predicate<String> filter, ZipArchiveOutputStream out) {
+        try (ZipFile zipFile = new ZipFile(candidate.toFile())) {
+            Enumeration<ZipArchiveEntry> entries = zipFile.getEntries();
+
+            while (entries.hasMoreElements()) {
+                ZipArchiveEntry entry = entries.nextElement();
+
+                if (filter.test(entry.getName())) {
+                    try (InputStream in = zipFile.getInputStream(entry)) {
+                        int mode = entry.getUnixMode();
+                        write(in, entry.getLastModifiedTime(), mode == 0 ? DEFAULT_PERMISSIONS : mode, out, entry.getName());
+                    }
+                }
+            }
+        } catch (IOException e) {
+            throw Exceptions.propagate(e);
+        }
+    }
+
     private static int getUnixMode(Path path) throws IOException {
         return Optional.ofNullable(Files.readAttributes(path, PosixFileAttributes.class))
             .map(attributes -> attributes.permissions().stream()
@@ -194,20 +247,23 @@ public final class FileUtils {
             .orElse(DEFAULT_PERMISSIONS);
     }
 
-    private static void write(Path root, Path path, ZipArchiveOutputStream out) {
+    private static void write(InputStream in, FileTime lastModifiedTime, int mode, ZipArchiveOutputStream out, String path) {
         try {
-            if (Files.isSameFile(root, path)) {
-                return;
-            }
-
-            ZipArchiveEntry entry = new ZipArchiveEntry(getRelativePathName(root, path));
-            entry.setUnixMode(getUnixMode(path));
-            entry.setLastModifiedTime(Files.getLastModifiedTime(path));
+            ZipArchiveEntry entry = new ZipArchiveEntry(path);
+            entry.setUnixMode(mode);
+            entry.setLastModifiedTime(lastModifiedTime);
             out.putArchiveEntry(entry);
 
-            if (Files.isRegularFile(path)) {
-                Files.copy(path, out);
-            }
+            ByteArrayPool.withByteArray(buffer -> {
+                try {
+                    int length;
+                    while ((length = in.read(buffer)) != -1) {
+                        out.write(buffer, 0, length);
+                    }
+                } catch (IOException e) {
+                    throw Exceptions.propagate(e);
+                }
+            });
 
             out.closeArchiveEntry();
         } catch (IOException e) {
