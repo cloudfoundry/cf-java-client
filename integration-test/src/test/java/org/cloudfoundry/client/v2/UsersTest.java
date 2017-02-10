@@ -17,12 +17,31 @@
 package org.cloudfoundry.client.v2;
 
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
+import org.cloudfoundry.client.v2.spaces.CreateSpaceResponse;
+import org.cloudfoundry.client.v2.users.CreateUserRequest;
+import org.cloudfoundry.client.v2.users.ListUsersRequest;
+import org.cloudfoundry.client.v2.users.UserResource;
+import org.cloudfoundry.util.PaginationUtils;
+import org.cloudfoundry.util.ResourceUtils;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
+import java.time.Duration;
 import java.util.concurrent.TimeoutException;
 
 public final class UsersTest extends AbstractIntegrationTest {
+
+    @Autowired
+    private CloudFoundryClient cloudFoundryClient;
+
+    @Autowired
+    private Mono<String> organizationId;
 
     //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/646
     @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/646")
@@ -73,11 +92,28 @@ public final class UsersTest extends AbstractIntegrationTest {
         //
     }
 
-    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/643
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/643")
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/653 - test works, but requires delete for cleanup
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/653")
     @Test
     public void create() throws TimeoutException, InterruptedException {
-        //
+        String spaceName = this.nameFactory.getSpaceName();
+        String userId = this.nameFactory.getUserId();
+
+        this.organizationId
+            .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .then(spaceId -> this.cloudFoundryClient.users()
+                .create(CreateUserRequest.builder()
+                    .spaceId(spaceId)
+                    .uaaId(userId)
+                    .build())
+                .then(Mono.just(spaceId)))
+            .flatMap(spaceId -> requestListUsers(this.cloudFoundryClient))
+            .filter(r -> userId.equals(r.getMetadata().getId()))
+            .map(ResourceUtils::getId)
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/653
@@ -204,6 +240,27 @@ public final class UsersTest extends AbstractIntegrationTest {
     @Test
     public void summary() throws TimeoutException, InterruptedException {
         //
+    }
+
+    private static Mono<String> createSpaceId(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceName) {
+        return requestCreateSpace(cloudFoundryClient, organizationId, spaceName)
+            .map(ResourceUtils::getId);
+    }
+
+    private static Mono<CreateSpaceResponse> requestCreateSpace(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceName) {
+        return cloudFoundryClient.spaces()
+            .create(CreateSpaceRequest.builder()
+                .organizationId(organizationId)
+                .name(spaceName)
+                .build());
+    }
+
+    private static Flux<UserResource> requestListUsers(CloudFoundryClient cloudFoundryClient) {
+        return PaginationUtils
+            .requestClientV2Resources(page -> cloudFoundryClient.users()
+                .list(ListUsersRequest.builder()
+                    .page(page)
+                    .build()));
     }
 
 }

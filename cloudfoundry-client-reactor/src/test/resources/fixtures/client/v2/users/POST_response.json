@@ -1,0 +1,20 @@
+{
+  "metadata": {
+    "guid": "guid-cb24b36d-4656-468e-a50d-b53113ac6177",
+    "url": "/v2/users/guid-cb24b36d-4656-468e-a50d-b53113ac6177",
+    "created_at": "2016-06-08T16:41:37Z",
+    "updated_at": "2016-06-08T16:41:26Z"
+  },
+  "entity": {
+    "admin": false,
+    "active": false,
+    "default_space_guid": null,
+    "spaces_url": "/v2/users/guid-cb24b36d-4656-468e-a50d-b53113ac6177/spaces",
+    "organizations_url": "/v2/users/guid-cb24b36d-4656-468e-a50d-b53113ac6177/organizations",
+    "managed_organizations_url": "/v2/users/guid-cb24b36d-4656-468e-a50d-b53113ac6177/managed_organizations",
+    "billing_managed_organizations_url": "/v2/users/guid-cb24b36d-4656-468e-a50d-b53113ac6177/billing_managed_organizations",
+    "audited_organizations_url": "/v2/users/guid-cb24b36d-4656-468e-a50d-b53113ac6177/audited_organizations",
+    "managed_spaces_url": "/v2/users/guid-cb24b36d-4656-468e-a50d-b53113ac6177/managed_spaces",
+    "audited_spaces_url": "/v2/users/guid-cb24b36d-4656-468e-a50d-b53113ac6177/audited_spaces"
+  }
+}

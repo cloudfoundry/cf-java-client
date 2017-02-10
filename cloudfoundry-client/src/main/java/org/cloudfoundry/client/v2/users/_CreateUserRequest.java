@@ -16,24 +16,27 @@
 
 package org.cloudfoundry.client.v2.users;
 
-import reactor.core.publisher.Mono;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.cloudfoundry.Nullable;
+import org.immutables.value.Value;
 
-public interface Users {
-
-    /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/users/creating_a_user.html">Creating a User</a> request
-     *
-     * @param request the Creating a User request
-     * @return the response from the Creating a User request
-     */
-    Mono<CreateUserResponse> create(CreateUserRequest request);
+/**
+ * The request payload for the Create a User operation
+ */
+@Value.Immutable
+abstract class _CreateUserRequest {
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/users/list_all_users.html">List all Users</a> request
-     *
-     * @param request the List all Users request
-     * @return the response from the List all Users request
+     * The ID of the default space for apps created by this user
      */
-    Mono<ListUsersResponse> list(ListUsersRequest request);
+    @JsonProperty("default_space_guid")
+    @Nullable
+    abstract String spaceId();
+
+    /**
+     * The UAA ID of the user to create
+     */
+    @JsonProperty("guid")
+    abstract String uaaId();
 
 }

@@ -17,6 +17,8 @@
 package org.cloudfoundry.reactor.client.v2.users;
 
 import org.cloudfoundry.client.v2.Metadata;
+import org.cloudfoundry.client.v2.users.CreateUserRequest;
+import org.cloudfoundry.client.v2.users.CreateUserResponse;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
 import org.cloudfoundry.client.v2.users.ListUsersResponse;
 import org.cloudfoundry.client.v2.users.UserEntity;
@@ -31,11 +33,54 @@ import reactor.test.StepVerifier;
 import java.time.Duration;
 
 import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorUsersTest extends AbstractClientApiTest {
 
     private final ReactorUsers users = new ReactorUsers(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+
+    @Test
+    public void create() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(POST).path("/v2/users")
+                .payload("fixtures/client/v2/users/POST_request.json")
+                .build())
+            .response(TestResponse.builder()
+                .status(CREATED)
+                .payload("fixtures/client/v2/users/POST_response.json")
+                .build())
+            .build());
+
+        this.users
+            .create(CreateUserRequest.builder()
+                .uaaId("guid-cb24b36d-4656-468e-a50d-b53113ac6177")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(CreateUserResponse.builder()
+                .metadata(Metadata.builder()
+                    .createdAt("2016-06-08T16:41:37Z")
+                    .id("guid-cb24b36d-4656-468e-a50d-b53113ac6177")
+                    .updatedAt("2016-06-08T16:41:26Z")
+                    .url("/v2/users/guid-cb24b36d-4656-468e-a50d-b53113ac6177")
+                    .build())
+                .entity(UserEntity.builder()
+                    .admin(false)
+                    .active(false)
+                    .auditedOrganizationsUrl("/v2/users/guid-cb24b36d-4656-468e-a50d-b53113ac6177/audited_organizations")
+                    .auditedSpacesUrl("/v2/users/guid-cb24b36d-4656-468e-a50d-b53113ac6177/audited_spaces")
+                    .billingManagedOrganizationsUrl("/v2/users/guid-cb24b36d-4656-468e-a50d-b53113ac6177/billing_managed_organizations")
+                    .managedOrganizationsUrl("/v2/users/guid-cb24b36d-4656-468e-a50d-b53113ac6177/managed_organizations")
+                    .managedSpacesUrl("/v2/users/guid-cb24b36d-4656-468e-a50d-b53113ac6177/managed_spaces")
+                    .organizationsUrl("/v2/users/guid-cb24b36d-4656-468e-a50d-b53113ac6177/organizations")
+                    .spacesUrl("/v2/users/guid-cb24b36d-4656-468e-a50d-b53113ac6177/spaces")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
 
     @Test
     public void list() {
