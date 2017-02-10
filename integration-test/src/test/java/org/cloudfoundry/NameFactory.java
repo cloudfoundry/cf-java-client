@@ -53,6 +53,8 @@ public interface NameFactory {
 
     String SPACE_PREFIX = "test-space-";
 
+    String USER_ID_PREFIX = "test-user-id-";
+
     String USER_PREFIX = "test-user-";
 
     String VARIABLE_NAME_PREFIX = "test-variable-name-";
@@ -223,6 +225,15 @@ public interface NameFactory {
      */
     default String getSpaceName() {
         return getName(SPACE_PREFIX);
+    }
+
+    /**
+     * Creates a user id
+     *
+     * @return the user id
+     */
+    default String getUserId() {
+        return getName(USER_ID_PREFIX);
     }
 
     /**
@@ -435,6 +446,16 @@ public interface NameFactory {
      */
     default boolean isSpaceName(String candidate) {
         return isName(SPACE_PREFIX, candidate);
+    }
+
+    /**
+     * Tests a name to determine if it is a user id
+     *
+     * @param candidate the candidate name
+     * @return {@code true} if the name is a user id, {@code false} otherwise
+     */
+    default boolean isUserId(String candidate) {
+        return isName(USER_ID_PREFIX, candidate);
     }
 
     /**
