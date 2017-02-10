@@ -16,6 +16,8 @@
 
 package org.cloudfoundry.util;
 
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.resourcematch.ListMatchingResourcesRequest;
 import org.cloudfoundry.client.v2.resourcematch.ListMatchingResourcesResponse;
@@ -28,9 +30,12 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.List;
 
 /**
@@ -44,18 +49,7 @@ public final class ResourceMatchingUtils {
     }
 
     public static Mono<List<ArtifactMetadata>> getMatchedResources(CloudFoundryClient cloudFoundryClient, Path application) {
-        Path root = FileUtils.normalize(application);
-
-        return Flux
-            .defer(() -> {
-                try {
-                    return Flux.fromStream(Files.walk(root));
-                } catch (IOException e) {
-                    throw Exceptions.propagate(e);
-                }
-            })
-            .filter(path -> !Files.isDirectory(path))
-            .map(path -> new ArtifactMetadata(FileUtils.hash(path), FileUtils.getRelativePathName(root, path), FileUtils.permissions(path), FileUtils.size(path)))
+        return (Files.isDirectory(application) ? getArtifactMetadataFromDirectory(application) : getArtifactMetadataFromZip(application))
             .collectMap(ArtifactMetadata::getHash)
             .flatMap(artifactMetadatas -> requestListMatchingResources(cloudFoundryClient, artifactMetadatas.values())
                 .flatMapIterable(ListMatchingResourcesResponse::getResources)
@@ -65,6 +59,47 @@ public final class ResourceMatchingUtils {
                 .mapToInt(ArtifactMetadata::getSize)
                 .sum())))
             .subscribeOn(Schedulers.elastic());
+    }
+
+    private static Flux<ArtifactMetadata> getArtifactMetadataFromDirectory(Path application) {
+        return Flux
+            .defer(() -> {
+                try {
+                    return Flux.fromStream(Files.walk(application));
+                } catch (IOException e) {
+                    throw Exceptions.propagate(e);
+                }
+            })
+            .filter(path -> !Files.isDirectory(path))
+            .map(path -> new ArtifactMetadata(FileUtils.hash(path), FileUtils.getRelativePathName(application, path), FileUtils.permissions(path), FileUtils.size(path)));
+    }
+
+    private static Flux<ArtifactMetadata> getArtifactMetadataFromZip(Path application) {
+        List<ArtifactMetadata> artifactMetadatas = new ArrayList<>();
+
+        try (ZipFile zipFile = new ZipFile(application.toFile())) {
+            Enumeration<ZipArchiveEntry> entries = zipFile.getEntries();
+
+            while (entries.hasMoreElements()) {
+                ZipArchiveEntry entry = entries.nextElement();
+
+                if (!entry.isDirectory()) {
+                    try (InputStream in = zipFile.getInputStream(entry)) {
+                        String hash = FileUtils.hash(in);
+                        String path = entry.getName();
+                        String permissions = FileUtils.permissions(entry.getUnixMode());
+                        int size = (int) entry.getSize();
+
+                        artifactMetadatas.add(new ArtifactMetadata(hash, path, permissions, size));
+                    }
+
+                }
+            }
+        } catch (IOException e) {
+            throw Exceptions.propagate(e);
+        }
+
+        return Flux.fromIterable(artifactMetadatas);
     }
 
     private static Mono<ListMatchingResourcesResponse> requestListMatchingResources(CloudFoundryClient cloudFoundryClient, Collection<ArtifactMetadata> artifactMetadatas) {

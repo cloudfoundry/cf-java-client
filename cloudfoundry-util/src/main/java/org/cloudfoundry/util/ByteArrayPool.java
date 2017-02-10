@@ -49,7 +49,7 @@ public final class ByteArrayPool {
 
     private static ByteArrayPool INSTANCE = new ByteArrayPool(MIBIBYTE, Duration.ofMinutes(1));
 
-    private final Queue<ByteBufferExpiry> cache = new ConcurrentLinkedQueue<>();
+    private final Queue<ByteArrayExpiry> cache = new ConcurrentLinkedQueue<>();
 
     private final int capacity;
 
@@ -74,13 +74,13 @@ public final class ByteArrayPool {
 
     private void doWithByteArray(Consumer<byte[]> consumer) {
         byte[] byteArray = Optional.ofNullable(this.cache.poll())
-            .map(ByteBufferExpiry::getByteArray)
+            .map(ByteArrayExpiry::getByteArray)
             .orElseGet(() -> new byte[this.capacity]);
 
         try {
             consumer.accept(byteArray);
         } finally {
-            this.cache.offer(new ByteBufferExpiry(byteArray, Instant.now().plus(this.ttl)));
+            this.cache.offer(new ByteArrayExpiry(byteArray, Instant.now().plus(this.ttl)));
         }
     }
 
@@ -92,13 +92,13 @@ public final class ByteArrayPool {
             .forEach(this.cache::remove);
     }
 
-    private static class ByteBufferExpiry {
+    private static class ByteArrayExpiry {
 
         private final byte[] byteArray;
 
         private final Instant expiration;
 
-        private ByteBufferExpiry(byte[] byteArray, Instant expiration) {
+        private ByteArrayExpiry(byte[] byteArray, Instant expiration) {
             this.byteArray = byteArray;
             this.expiration = expiration;
         }
