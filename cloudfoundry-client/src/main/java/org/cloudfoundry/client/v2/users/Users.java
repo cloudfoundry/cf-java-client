@@ -29,6 +29,14 @@ public interface Users {
     Mono<CreateUserResponse> create(CreateUserRequest request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/users/delete_a_particular_user.html">Delete a Particular User</a> request
+     *
+     * @param request the Delete a Particular User request
+     * @return the response from the Delete a Particular User request
+     */
+    Mono<DeleteUserResponse> delete(DeleteUserRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/users/list_all_users.html">List all Users</a> request
      *
      * @param request the List all Users request
