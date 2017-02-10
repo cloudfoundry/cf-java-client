@@ -16,7 +16,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" scope="TEST" name="Maven: com.github.zafarkhaja:java-semver:0.9.0" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: io.projectreactor.addons:reactor-test:3.0.4.RELEASE" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: io.projectreactor.addons:reactor-test:3.0.5.RELEASE" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: io.projectreactor:reactor-core:3.0.5.RELEASE" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.reactivestreams:reactive-streams:1.0.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.12" level="project" />
