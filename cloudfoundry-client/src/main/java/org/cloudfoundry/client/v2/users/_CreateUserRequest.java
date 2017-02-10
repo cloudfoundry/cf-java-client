@@ -31,12 +31,12 @@ abstract class _CreateUserRequest {
      */
     @JsonProperty("default_space_guid")
     @Nullable
-    abstract String spaceId();
+    abstract String getSpaceId();
 
     /**
      * The UAA ID of the user to create
      */
     @JsonProperty("guid")
-    abstract String uaaId();
+    abstract String getUaaId();
 
 }
