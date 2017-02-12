@@ -208,7 +208,7 @@ public final class FileUtils {
                 })
                 .filter(path -> filter.test(getRelativePathName(candidate, path)))
                 .forEach(path -> {
-                    try (InputStream in = Files.newInputStream(path)) {
+                    try (InputStream in = Files.isDirectory(path) ? null : Files.newInputStream(path)) {
                         write(in, Files.getLastModifiedTime(path), getUnixMode(path), out, getRelativePathName(candidate, path));
                     } catch (IOException e) {
                         throw Exceptions.propagate(e);
@@ -254,16 +254,18 @@ public final class FileUtils {
             entry.setLastModifiedTime(lastModifiedTime);
             out.putArchiveEntry(entry);
 
-            ByteArrayPool.withByteArray(buffer -> {
-                try {
-                    int length;
-                    while ((length = in.read(buffer)) != -1) {
-                        out.write(buffer, 0, length);
+            if (in != null) {
+                ByteArrayPool.withByteArray(buffer -> {
+                    try {
+                        int length;
+                        while ((length = in.read(buffer)) != -1) {
+                            out.write(buffer, 0, length);
+                        }
+                    } catch (IOException e) {
+                        throw Exceptions.propagate(e);
                     }
-                } catch (IOException e) {
-                    throw Exceptions.propagate(e);
-                }
-            });
+                });
+            }
 
             out.closeArchiveEntry();
         } catch (IOException e) {
