@@ -228,7 +228,7 @@ public abstract class AbstractReactorOperations {
     private <T> Function<Mono<HttpClientResponse>, Mono<T>> deserializedResponse(Class<T> responseType) {
         return inbound -> inbound
             .transform(JsonCodec.decode(this.connectionContext.getObjectMapper(), responseType))
-            .doOnError(JsonParsingException.class, e -> NetworkLogging.RESPONSE_LOGGER.debug("{}\n{}", e.getCause().getMessage(), e.getPayload()));
+            .doOnError(JsonParsingException.class, e -> NetworkLogging.RESPONSE_LOGGER.error("{}\n{}", e.getCause().getMessage(), e.getPayload()));
     }
 
     private Mono<HttpClientResponse> invalidateToken(Mono<HttpClientResponse> inbound) {
