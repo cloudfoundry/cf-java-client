@@ -21,8 +21,11 @@ import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceResponse;
 import org.cloudfoundry.client.v2.users.CreateUserRequest;
+import org.cloudfoundry.client.v2.users.CreateUserResponse;
+import org.cloudfoundry.client.v2.users.DeleteUserRequest;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
 import org.cloudfoundry.client.v2.users.UserResource;
+import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import org.junit.Ignore;
@@ -34,6 +37,8 @@ import reactor.test.StepVerifier;
 
 import java.time.Duration;
 import java.util.concurrent.TimeoutException;
+
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public final class UsersTest extends AbstractIntegrationTest {
 
@@ -92,8 +97,6 @@ public final class UsersTest extends AbstractIntegrationTest {
         //
     }
 
-    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/653 - test works, but requires delete for cleanup
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/653")
     @Test
     public void create() throws TimeoutException, InterruptedException {
         String spaceName = this.nameFactory.getSpaceName();
@@ -107,20 +110,52 @@ public final class UsersTest extends AbstractIntegrationTest {
                     .uaaId(userId)
                     .build())
                 .then(Mono.just(spaceId)))
-            .flatMap(spaceId -> requestListUsers(this.cloudFoundryClient))
-            .filter(r -> userId.equals(r.getMetadata().getId()))
-            .map(ResourceUtils::getId)
+            .flatMap(ignore -> requestListUsers(this.cloudFoundryClient))
+            .filter(resource -> userId.equals(resource.getMetadata().getId()))
             .as(StepVerifier::create)
             .expectNextCount(1)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/653
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/653")
+    //TODO: DON'T FORGET CLEANUP!!!
     @Test
-    public void delete() throws TimeoutException, InterruptedException {
-        //
+    public void deleteAsync() throws TimeoutException, InterruptedException {
+        String userId = this.nameFactory.getUserId();
+
+        requestCreateUser(this.cloudFoundryClient, userId)
+            .then(this.cloudFoundryClient.users()
+                .delete(DeleteUserRequest.builder()
+                    .async(true)
+                    .userId(userId)
+                    .build())
+                .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, job)))
+            .flatMap(ignore -> requestListUsers(this.cloudFoundryClient))
+            .filter(r -> userId.equals(r.getMetadata().getId()))
+            .as(StepVerifier::create)
+            .expectNextCount(0)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    //TODO: DON'T FORGET CLEANUP!!!
+    @Test
+    public void deleteNoAsync() throws TimeoutException, InterruptedException {
+        String userId = this.nameFactory.getUserId();
+
+        requestCreateUser(this.cloudFoundryClient, userId)
+            .then(this.cloudFoundryClient.users()
+                .delete(DeleteUserRequest.builder()
+                    .async(false)
+                    .userId(userId)
+                    .build()))
+            .flatMap(ignore -> requestListUsers(this.cloudFoundryClient))
+            .filter(r -> userId.equals(r.getMetadata().getId()))
+            .map(ResourceUtils::getId)
+            .as(StepVerifier::create)
+            .expectNextCount(0)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/669
@@ -130,11 +165,21 @@ public final class UsersTest extends AbstractIntegrationTest {
         //
     }
 
-    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/643 to allow user creation
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/643 to allow user creation")
-    @Test
     public void list() throws TimeoutException, InterruptedException {
-        //
+        String userId = this.nameFactory.getUserId();
+
+        requestCreateUser(this.cloudFoundryClient, userId)
+            .flatMap(ignore -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
+                    .list(ListUsersRequest.builder()
+                        .page(page)
+                        .build())))
+            .filter(resource -> userId.equals(resource.getMetadata().getId()))
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+
     }
 
     //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/655
@@ -156,6 +201,58 @@ public final class UsersTest extends AbstractIntegrationTest {
     @Test
     public void listBillingManagedOrganizations() throws TimeoutException, InterruptedException {
         //
+    }
+
+    //TODO: Await troubleshooting on filtering
+    @Ignore("Await troubleshooting on filtering")
+    @Test
+    public void listFilterByOrganization() throws TimeoutException, InterruptedException {
+        String spaceName = this.nameFactory.getSpaceName();
+        String userId = this.nameFactory.getUserId();
+
+        this.organizationId
+            .then(organizationId -> Mono.when(
+                Mono.just(organizationId),
+                createSpaceId(this.cloudFoundryClient, organizationId, spaceName)
+            ))
+            .then(function((organizationId, spaceId) -> Mono.when(
+                Mono.just(organizationId),
+                requestCreateUser(this.cloudFoundryClient, spaceId, userId))
+            ))
+            .flatMap(function((organizationId, spaceId) -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
+                    .list(ListUsersRequest.builder()
+                        .organizationId(organizationId)
+                        .page(page)
+                        .build()))))
+            .filter(resource -> userId.equals(resource.getMetadata().getId()))
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    //TODO: Await troubleshooting on filtering
+    @Ignore("Await troubleshooting on filtering")
+    @Test
+    public void listFilterBySpace() throws TimeoutException, InterruptedException {
+        String spaceName = this.nameFactory.getSpaceName();
+        String userId = this.nameFactory.getUserId();
+
+        this.organizationId
+            .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .flatMap(spaceId -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
+                .flatMap(ignore -> PaginationUtils
+                    .requestClientV2Resources(page -> this.cloudFoundryClient.users()
+                        .list(ListUsersRequest.builder()
+                            .page(page)
+                            .spaceId(spaceId)
+                            .build()))))
+            .filter(resource -> userId.equals(resource.getMetadata().getId()))
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/658
@@ -252,6 +349,21 @@ public final class UsersTest extends AbstractIntegrationTest {
             .create(CreateSpaceRequest.builder()
                 .organizationId(organizationId)
                 .name(spaceName)
+                .build());
+    }
+
+    private static Mono<CreateUserResponse> requestCreateUser(CloudFoundryClient cloudFoundryClient, String userId) {
+        return cloudFoundryClient.users()
+            .create(CreateUserRequest.builder()
+                .uaaId(userId)
+                .build());
+    }
+
+    private static Mono<CreateUserResponse> requestCreateUser(CloudFoundryClient cloudFoundryClient, String spaceId, String userId) {
+        return cloudFoundryClient.users()
+            .create(CreateUserRequest.builder()
+                .spaceId(spaceId)
+                .uaaId(userId)
                 .build());
     }
 
