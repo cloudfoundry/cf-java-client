@@ -1403,7 +1403,7 @@ public final class DefaultApplications implements Applications {
                         .then(filteredApplication -> requestUploadApplication(cloudFoundryClient, applicationId, filteredApplication, matchedResources)
                             .doOnTerminate((v, t) -> {
                                 try {
-                                    Files.delete(application);
+                                    Files.delete(filteredApplication);
                                 } catch (IOException e) {
                                     throw Exceptions.propagate(e);
                                 }
