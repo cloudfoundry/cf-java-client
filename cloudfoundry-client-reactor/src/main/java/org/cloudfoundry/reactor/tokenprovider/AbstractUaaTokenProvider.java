@@ -91,7 +91,7 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
 
     @Override
     public final Mono<String> getToken(ConnectionContext connectionContext) {
-        return this.accessTokens.getOrDefault(connectionContext, Mono.empty());
+        return this.accessTokens.computeIfAbsent(connectionContext, this::token);
     }
 
     @Override
