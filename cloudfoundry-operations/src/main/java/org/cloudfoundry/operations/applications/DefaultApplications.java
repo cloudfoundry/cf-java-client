@@ -90,12 +90,15 @@ import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceMatchingUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import org.cloudfoundry.util.SortingUtils;
+import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuple4;
 import reactor.util.function.Tuples;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Collections;
@@ -1390,16 +1393,23 @@ public final class DefaultApplications implements Applications {
         return Mono
             .defer(() -> {
                 if (matchedResources.isEmpty()) {
-                    return Mono.just(application);
+                    return requestUploadApplication(cloudFoundryClient, applicationId, application, matchedResources);
                 } else {
                     List<String> paths = matchedResources.stream()
                         .map(ResourceMatchingUtils.ArtifactMetadata::getPath)
                         .collect(Collectors.toList());
 
-                    return FileUtils.compress(application, p -> !paths.contains(p));
+                    return FileUtils.compress(application, p -> !paths.contains(p))
+                        .then(filteredApplication -> requestUploadApplication(cloudFoundryClient, applicationId, filteredApplication, matchedResources)
+                            .doOnTerminate((v, t) -> {
+                                try {
+                                    Files.delete(application);
+                                } catch (IOException e) {
+                                    throw Exceptions.propagate(e);
+                                }
+                            }));
                 }
             })
-            .then(filteredApplication -> requestUploadApplication(cloudFoundryClient, applicationId, filteredApplication, matchedResources))
             .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
     }
 

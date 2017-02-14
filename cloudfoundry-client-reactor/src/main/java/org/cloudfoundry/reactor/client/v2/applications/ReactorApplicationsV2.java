@@ -63,8 +63,8 @@ import reactor.ipc.netty.http.client.HttpClientRequest;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
  * The Reactor-based implementation of {@link ApplicationsV2}
@@ -206,21 +206,38 @@ public final class ReactorApplicationsV2 extends AbstractClientV2Operations impl
     public Mono<UploadApplicationResponse> upload(UploadApplicationRequest request) {
         return put(request, UploadApplicationResponse.class, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "bits"),
             outbound -> outbound
-                .and(FileUtils.compress(request.getApplication()))
-                .flatMap(function((r, application) -> r
-                    .chunkedTransfer(false)
-                    .sendForm(form -> {
-                        try (InputStream resources = new ByteArrayInputStream(this.connectionContext.getObjectMapper().writeValueAsBytes(request.getResources()))) {
-                            form
-                                .multipart(true)
-                                .textFile("resources", resources, APPLICATION_JSON)
-                                .file("application", "application.zip", application.toFile(), APPLICATION_ZIP);
-                        } catch (IOException e) {
-                            throw Exceptions.propagate(e);
-                        }
-                    })))
-                .then())
+                .then(r -> {
+                    if (Files.isDirectory(request.getApplication())) {
+                        return FileUtils.compress(request.getApplication())
+                            .then(application -> upload(application, r, request)
+                                .doOnTerminate((v, t) -> {
+                                    try {
+                                        Files.delete(application);
+                                    } catch (IOException e) {
+                                        throw Exceptions.propagate(e);
+                                    }
+                                }));
+                    } else {
+                        return upload(request.getApplication(), r, request);
+                    }
+                }))
             .checkpoint();
+    }
+
+    private Mono<Void> upload(Path application, HttpClientRequest r, UploadApplicationRequest request) {
+        return r
+            .chunkedTransfer(false)
+            .sendForm(form -> {
+                try (InputStream resources = new ByteArrayInputStream(this.connectionContext.getObjectMapper().writeValueAsBytes(request.getResources()))) {
+                    form
+                        .multipart(true)
+                        .textFile("resources", resources, APPLICATION_JSON)
+                        .file("application", "application.zip", application.toFile(), APPLICATION_ZIP);
+                } catch (IOException e) {
+                    throw Exceptions.propagate(e);
+                }
+            })
+            .then();
     }
 
 }

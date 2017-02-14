@@ -35,10 +35,14 @@ import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
 import org.cloudfoundry.util.FileUtils;
+import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.ipc.netty.http.client.HttpClientRequest;
 
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
  * The Reactor-based implementation of {@link Packages}
@@ -103,14 +107,32 @@ public final class ReactorPackages extends AbstractClientV3Operations implements
     public Mono<UploadPackageResponse> upload(UploadPackageRequest request) {
         return post(request, UploadPackageResponse.class, builder -> builder.pathSegment("v3", "packages", request.getPackageId(), "upload"),
             outbound -> outbound
-                .and(FileUtils.compress(request.getBits()))
-                .flatMap(function((r, bits) -> r
-                    .chunkedTransfer(false)
-                    .sendForm(form -> form
-                        .multipart(true)
-                        .file("bits", "application.zip", bits.toFile(), APPLICATION_ZIP))))
-                .then())
+                .flatMap(r -> {
+                    if (Files.isDirectory(request.getBits())) {
+                        return FileUtils.compress(request.getBits())
+                            .then(bits -> upload(bits, r)
+                                .doOnTerminate((v, t) -> {
+                                    try {
+                                        Files.delete(bits);
+                                    } catch (IOException e) {
+                                        throw Exceptions.propagate(e);
+                                    }
+                                })
+                            );
+                    } else {
+                        return upload(request.getBits(), r);
+                    }
+                }))
             .checkpoint();
+    }
+
+    private Mono<Void> upload(Path bits, HttpClientRequest r) {
+        return r
+            .chunkedTransfer(false)
+            .sendForm(form -> form
+                .multipart(true)
+                .file("bits", "application.zip", bits.toFile(), APPLICATION_ZIP))
+            .then();
     }
 
 }

@@ -70,10 +70,6 @@ public final class FileUtils {
      * @return the {@link Path} for a compressed artifact
      */
     public static Mono<Path> compress(Path candidate) {
-        if (!Files.isDirectory(candidate)) {
-            return Mono.just(candidate);
-        }
-
         return compress(candidate, path -> true);
     }
 
@@ -88,7 +84,8 @@ public final class FileUtils {
         return Mono
             .defer(() -> {
                 try {
-                    Path staging = Files.createTempFile(null, null);
+                    Path staging = Files.createTempFile(String.format("resource-matched-%s-", candidate.getFileName()), ".zip");
+
                     try (ZipArchiveOutputStream out = new ZipArchiveOutputStream(staging.toFile())) {
                         if (Files.isDirectory(candidate)) {
                             compressFromDirectory(candidate, filter, out);
