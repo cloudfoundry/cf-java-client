@@ -24,6 +24,7 @@ import org.cloudfoundry.client.v2.users.CreateUserRequest;
 import org.cloudfoundry.client.v2.users.CreateUserResponse;
 import org.cloudfoundry.client.v2.users.DeleteUserRequest;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
+import org.cloudfoundry.client.v2.users.UpdateUserRequest;
 import org.cloudfoundry.client.v2.users.UserResource;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
@@ -106,7 +107,7 @@ public final class UsersTest extends AbstractIntegrationTest {
             .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
             .then(spaceId -> this.cloudFoundryClient.users()
                 .create(CreateUserRequest.builder()
-                    .spaceId(spaceId)
+                    .defaultSpaceId(spaceId)
                     .uaaId(userId)
                     .build())
                 .then(Mono.just(spaceId)))
@@ -118,7 +119,6 @@ public final class UsersTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: DON'T FORGET CLEANUP!!!
     @Test
     public void deleteAsync() throws TimeoutException, InterruptedException {
         String userId = this.nameFactory.getUserId();
@@ -131,14 +131,13 @@ public final class UsersTest extends AbstractIntegrationTest {
                     .build())
                 .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, job)))
             .flatMap(ignore -> requestListUsers(this.cloudFoundryClient))
-            .filter(r -> userId.equals(r.getMetadata().getId()))
+            .filter(resource -> userId.equals(resource.getMetadata().getId()))
             .as(StepVerifier::create)
             .expectNextCount(0)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: DON'T FORGET CLEANUP!!!
     @Test
     public void deleteNoAsync() throws TimeoutException, InterruptedException {
         String userId = this.nameFactory.getUserId();
@@ -150,7 +149,7 @@ public final class UsersTest extends AbstractIntegrationTest {
                     .userId(userId)
                     .build()))
             .flatMap(ignore -> requestListUsers(this.cloudFoundryClient))
-            .filter(r -> userId.equals(r.getMetadata().getId()))
+            .filter(resource -> userId.equals(resource.getMetadata().getId()))
             .map(ResourceUtils::getId)
             .as(StepVerifier::create)
             .expectNextCount(0)
@@ -165,6 +164,7 @@ public final class UsersTest extends AbstractIntegrationTest {
         //
     }
 
+    @Test
     public void list() throws TimeoutException, InterruptedException {
         String userId = this.nameFactory.getUserId();
 
@@ -339,6 +339,29 @@ public final class UsersTest extends AbstractIntegrationTest {
         //
     }
 
+    @Test
+    public void update() throws TimeoutException, InterruptedException {
+        String spaceName = this.nameFactory.getSpaceName();
+        String userId = this.nameFactory.getUserId();
+
+        this.organizationId
+            .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .then(spaceId -> requestCreateUser(this.cloudFoundryClient, userId)
+                .map(ignore -> spaceId))
+            .then(spaceId -> this.cloudFoundryClient.users()
+                .update(UpdateUserRequest.builder()
+                    .defaultSpaceId(spaceId)
+                    .userId(userId)
+                    .build())
+                .map(ignore -> spaceId))
+            .flatMap(spaceId -> requestListUsers(this.cloudFoundryClient)
+                .filter(resource -> spaceId.equals(resource.getEntity().getDefaultSpaceId())))
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
     private static Mono<String> createSpaceId(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceName) {
         return requestCreateSpace(cloudFoundryClient, organizationId, spaceName)
             .map(ResourceUtils::getId);
@@ -362,7 +385,7 @@ public final class UsersTest extends AbstractIntegrationTest {
     private static Mono<CreateUserResponse> requestCreateUser(CloudFoundryClient cloudFoundryClient, String spaceId, String userId) {
         return cloudFoundryClient.users()
             .create(CreateUserRequest.builder()
-                .spaceId(spaceId)
+                .defaultSpaceId(spaceId)
                 .uaaId(userId)
                 .build());
     }

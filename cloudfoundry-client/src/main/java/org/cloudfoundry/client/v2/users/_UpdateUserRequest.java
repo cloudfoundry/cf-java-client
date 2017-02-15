@@ -16,22 +16,28 @@
 
 package org.cloudfoundry.client.v2.users;
 
-import org.junit.Test;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.cloudfoundry.Nullable;
+import org.immutables.value.Value;
 
-public final class CreateUserRequestTest {
+/**
+ * The request payload for the Update a User operation
+ */
+@Value.Immutable
+abstract class _UpdateUserRequest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noUaaId() {
-        CreateUserRequest.builder()
-            .defaultSpaceId("test-space-id")
-            .build();
-    }
+    /**
+     * The id of the default space for apps created by this user
+     */
+    @JsonProperty("default_space_guid")
+    @Nullable
+    abstract String getDefaultSpaceId();
 
-    @Test
-    public void valid() {
-        CreateUserRequest.builder()
-            .defaultSpaceId("test-space-id")
-            .uaaId("test-uaa-id")
-            .build();
-    }
+    /**
+     * The id of the user
+     */
+    @JsonIgnore
+    abstract String getUserId();
+
 }

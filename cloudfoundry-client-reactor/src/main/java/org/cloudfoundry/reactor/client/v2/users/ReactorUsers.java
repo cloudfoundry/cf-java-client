@@ -22,6 +22,8 @@ import org.cloudfoundry.client.v2.users.DeleteUserRequest;
 import org.cloudfoundry.client.v2.users.DeleteUserResponse;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
 import org.cloudfoundry.client.v2.users.ListUsersResponse;
+import org.cloudfoundry.client.v2.users.UpdateUserRequest;
+import org.cloudfoundry.client.v2.users.UpdateUserResponse;
 import org.cloudfoundry.client.v2.users.Users;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
@@ -59,6 +61,12 @@ public final class ReactorUsers extends AbstractClientV2Operations implements Us
     @Override
     public Mono<ListUsersResponse> list(ListUsersRequest request) {
         return get(request, ListUsersResponse.class, builder -> builder.pathSegment("v2", "users"))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<UpdateUserResponse> update(UpdateUserRequest request) {
+        return put(request, UpdateUserResponse.class, builder -> builder.pathSegment("v2", "users", request.getUserId()))
             .checkpoint();
     }
 
