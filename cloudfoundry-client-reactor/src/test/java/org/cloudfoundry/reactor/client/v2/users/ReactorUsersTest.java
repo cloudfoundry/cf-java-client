@@ -22,6 +22,8 @@ import org.cloudfoundry.client.v2.users.CreateUserResponse;
 import org.cloudfoundry.client.v2.users.DeleteUserRequest;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
 import org.cloudfoundry.client.v2.users.ListUsersResponse;
+import org.cloudfoundry.client.v2.users.UpdateUserRequest;
+import org.cloudfoundry.client.v2.users.UpdateUserResponse;
 import org.cloudfoundry.client.v2.users.UserEntity;
 import org.cloudfoundry.client.v2.users.UserResource;
 import org.cloudfoundry.reactor.InteractionContext;
@@ -36,6 +38,7 @@ import java.time.Duration;
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpMethod.PUT;
 import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
@@ -163,6 +166,50 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
                         .organizationsUrl("/v2/users/uaa-id-134/organizations")
                         .spacesUrl("/v2/users/uaa-id-134/spaces")
                         .build())
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void update() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(PUT).path("/v2/users/uaa-id-313")
+                .payload("fixtures/client/v2/users/PUT_{id}_request.json")
+                .build())
+            .response(TestResponse.builder()
+                .status(CREATED)
+                .payload("fixtures/client/v2/users/PUT_{id}_response.json")
+                .build())
+            .build());
+
+        this.users
+            .update(UpdateUserRequest.builder()
+                .defaultSpaceId("56d8e095-b2c8-4ba9-b540-dc42ba1c7351")
+                .userId("uaa-id-313")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(UpdateUserResponse.builder()
+                .metadata(Metadata.builder()
+                    .createdAt("2016-06-08T16:41:37Z")
+                    .id("uaa-id-313")
+                    .updatedAt("2016-06-08T16:41:37Z")
+                    .url("/v2/users/uaa-id-313")
+                    .build())
+                .entity(UserEntity.builder()
+                    .admin(false)
+                    .active(false)
+                    .auditedOrganizationsUrl("/v2/users/uaa-id-313/audited_organizations")
+                    .auditedSpacesUrl("/v2/users/uaa-id-313/audited_spaces")
+                    .billingManagedOrganizationsUrl("/v2/users/uaa-id-313/billing_managed_organizations")
+                    .defaultSpaceId("56d8e095-b2c8-4ba9-b540-dc42ba1c7351")
+                    .defaultSpaceUrl("/v2/spaces/56d8e095-b2c8-4ba9-b540-dc42ba1c7351")
+                    .managedOrganizationsUrl("/v2/users/uaa-id-313/managed_organizations")
+                    .managedSpacesUrl("/v2/users/uaa-id-313/managed_spaces")
+                    .organizationsUrl("/v2/users/uaa-id-313/organizations")
+                    .spacesUrl("/v2/users/uaa-id-313/spaces")
                     .build())
                 .build())
             .expectComplete()

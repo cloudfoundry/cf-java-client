@@ -18,20 +18,20 @@ package org.cloudfoundry.client.v2.users;
 
 import org.junit.Test;
 
-public final class CreateUserRequestTest {
+public final class UpdateUserRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noUaaId() {
-        CreateUserRequest.builder()
+        UpdateUserRequest.builder()
             .defaultSpaceId("test-space-id")
             .build();
     }
 
     @Test
     public void valid() {
-        CreateUserRequest.builder()
+        UpdateUserRequest.builder()
             .defaultSpaceId("test-space-id")
-            .uaaId("test-uaa-id")
+            .userId("test-uaa-id")
             .build();
     }
 }

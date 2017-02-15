@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.client.v2.users;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
@@ -31,7 +32,7 @@ abstract class _CreateUserRequest {
      */
     @JsonProperty("default_space_guid")
     @Nullable
-    abstract String getSpaceId();
+    abstract String getDefaultSpaceId();
 
     /**
      * The UAA ID of the user to create

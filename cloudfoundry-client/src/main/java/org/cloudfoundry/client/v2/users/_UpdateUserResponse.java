@@ -16,22 +16,14 @@
 
 package org.cloudfoundry.client.v2.users;
 
-import org.junit.Test;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.immutables.value.Value;
 
-public final class CreateUserRequestTest {
+/**
+ * The response payload for the Update a User operation
+ */
+@JsonDeserialize
+@Value.Immutable
+abstract class _UpdateUserResponse extends AbstractUserResource {
 
-    @Test(expected = IllegalStateException.class)
-    public void noUaaId() {
-        CreateUserRequest.builder()
-            .defaultSpaceId("test-space-id")
-            .build();
-    }
-
-    @Test
-    public void valid() {
-        CreateUserRequest.builder()
-            .defaultSpaceId("test-space-id")
-            .uaaId("test-uaa-id")
-            .build();
-    }
 }
