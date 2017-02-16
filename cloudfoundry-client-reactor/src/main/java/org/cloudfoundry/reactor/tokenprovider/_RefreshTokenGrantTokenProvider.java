@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.tokenprovider;
 
+import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.immutables.value.Value;
 import reactor.core.publisher.Mono;
@@ -31,6 +32,16 @@ abstract class _RefreshTokenGrantTokenProvider extends AbstractUaaTokenProvider 
      * The refresh token
      */
     abstract String getToken();
+
+    /**
+     * For a refresh token, authorization_endpoint from /v2/info endpoint
+     * should be used
+     */
+    @Override
+    Mono<String> getAuthorizationEndpoint(ConnectionContext connectionContext) {
+        return connectionContext
+            .getRoot(AUTHORIZATION_ENDPOINT);
+    }
 
     @Override
     Mono<Void> tokenRequestTransformer(Mono<HttpClientRequest> outbound) {

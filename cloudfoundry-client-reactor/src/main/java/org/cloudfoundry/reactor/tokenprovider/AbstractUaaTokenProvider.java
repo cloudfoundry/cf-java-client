@@ -63,7 +63,9 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
 
     private static final String REFRESH_TOKEN = "refresh_token";
 
-    private static final String TOKEN_ENDPOINT = "token_endpoint";
+    protected static final String TOKEN_ENDPOINT = "token_endpoint";
+
+    protected static final String AUTHORIZATION_ENDPOINT = "authorization_endpoint";
 
     private static final String TOKEN_TYPE = "token_type";
 
@@ -205,9 +207,17 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
                 .then());
     }
 
-    private Mono<HttpClientResponse> requestToken(ConnectionContext connectionContext, Function<Mono<HttpClientRequest>, Mono<Void>> tokenRequestTransformer) {
+    /**
+     * Gets the endpoint for retrieving a token.
+     * @return the url for the endpoint
+     */
+    Mono<String> getAuthorizationEndpoint(ConnectionContext connectionContext) {
         return connectionContext
-            .getRoot(TOKEN_ENDPOINT)
+            .getRoot(TOKEN_ENDPOINT);
+    }
+
+    private Mono<HttpClientResponse> requestToken(ConnectionContext connectionContext, Function<Mono<HttpClientRequest>, Mono<Void>> tokenRequestTransformer) {
+        return getAuthorizationEndpoint(connectionContext)
             .map(AbstractUaaTokenProvider::getTokenUri)
             .then(uri -> connectionContext.getHttpClient()
                 .post(uri, request -> Mono.just(request)
