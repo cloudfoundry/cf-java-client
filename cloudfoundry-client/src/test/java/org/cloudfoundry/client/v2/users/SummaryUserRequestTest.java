@@ -16,11 +16,21 @@
 
 package org.cloudfoundry.client.v2.users;
 
-import org.cloudfoundry.client.v2.Resource;
+import org.junit.Test;
 
-/**
- * The base class for User resources
- */
-public abstract class AbstractUserResource extends Resource<org.cloudfoundry.client.v2.users.UserEntity> {
+public final class SummaryUserRequestTest {
+
+    @Test(expected = IllegalStateException.class)
+    public void noUaaId() {
+        SummaryUserRequest.builder()
+            .build();
+    }
+
+    @Test
+    public void valid() {
+        SummaryUserRequest.builder()
+            .userId("test-uaa-id")
+            .build();
+    }
 
 }

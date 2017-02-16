@@ -16,11 +16,14 @@
 
 package org.cloudfoundry.client.v2.users;
 
-import org.cloudfoundry.client.v2.Resource;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.immutables.value.Value;
 
 /**
- * The base class for User resources
+ * The response payload for the Get User Summary operation
  */
-public abstract class AbstractUserResource extends Resource<org.cloudfoundry.client.v2.users.UserEntity> {
+@JsonDeserialize
+@Value.Immutable
+abstract class _SummaryUserResponse extends AbstractUserSummaryResource {
 
 }

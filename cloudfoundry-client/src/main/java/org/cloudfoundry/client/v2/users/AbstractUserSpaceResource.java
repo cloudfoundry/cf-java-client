@@ -19,8 +19,8 @@ package org.cloudfoundry.client.v2.users;
 import org.cloudfoundry.client.v2.Resource;
 
 /**
- * The base class for User resources
+ * The base class for User Space resources
  */
-public abstract class AbstractUserResource extends Resource<org.cloudfoundry.client.v2.users.UserEntity> {
+public abstract class AbstractUserSpaceResource extends Resource<org.cloudfoundry.client.v2.users.UserSpaceEntity> {
 
 }

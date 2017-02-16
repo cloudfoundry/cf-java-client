@@ -24,6 +24,7 @@ import org.cloudfoundry.client.v2.users.CreateUserRequest;
 import org.cloudfoundry.client.v2.users.CreateUserResponse;
 import org.cloudfoundry.client.v2.users.DeleteUserRequest;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
+import org.cloudfoundry.client.v2.users.SummaryUserRequest;
 import org.cloudfoundry.client.v2.users.UpdateUserRequest;
 import org.cloudfoundry.client.v2.users.UserResource;
 import org.cloudfoundry.util.JobUtils;
@@ -203,8 +204,8 @@ public final class UsersTest extends AbstractIntegrationTest {
         //
     }
 
-    //TODO: Await troubleshooting on filtering
-    @Ignore("Await troubleshooting on filtering")
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/651
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/651")
     @Test
     public void listFilterByOrganization() throws TimeoutException, InterruptedException {
         String spaceName = this.nameFactory.getSpaceName();
@@ -232,8 +233,8 @@ public final class UsersTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: Await troubleshooting on filtering
-    @Ignore("Await troubleshooting on filtering")
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/652
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/652")
     @Test
     public void listFilterBySpace() throws TimeoutException, InterruptedException {
         String spaceName = this.nameFactory.getSpaceName();
@@ -332,11 +333,20 @@ public final class UsersTest extends AbstractIntegrationTest {
         //
     }
 
-    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/654
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/654")
+    //TODO: Consider improving test when associate spaces/organizations is available
     @Test
     public void summary() throws TimeoutException, InterruptedException {
-        //
+        String userId = this.nameFactory.getUserId();
+
+        requestCreateUser(this.cloudFoundryClient, userId)
+            .then(this.cloudFoundryClient.users()
+                .summary(SummaryUserRequest.builder()
+                    .userId(userId)
+                    .build()))
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
