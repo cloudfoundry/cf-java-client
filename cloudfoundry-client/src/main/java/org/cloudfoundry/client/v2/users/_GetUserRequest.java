@@ -16,22 +16,19 @@
 
 package org.cloudfoundry.client.v2.users;
 
-import org.junit.Test;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.immutables.value.Value;
 
-public final class DeleteUserRequestTest {
+/**
+ * The request payload for the Get User operation
+ */
+@Value.Immutable
+abstract class _GetUserRequest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noUserId() {
-        DeleteUserRequest.builder()
-            .async(true)
-            .build();
-    }
-
-    @Test
-    public void valid() {
-        DeleteUserRequest.builder()
-            .userId("test-user-id")
-            .build();
-    }
+    /**
+     * The user id
+     */
+    @JsonIgnore
+    abstract String getUserId();
 
 }

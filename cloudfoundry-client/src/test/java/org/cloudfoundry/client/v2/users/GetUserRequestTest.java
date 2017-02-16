@@ -18,18 +18,17 @@ package org.cloudfoundry.client.v2.users;
 
 import org.junit.Test;
 
-public final class DeleteUserRequestTest {
+public final class GetUserRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noUserId() {
-        DeleteUserRequest.builder()
-            .async(true)
+        GetUserRequest.builder()
             .build();
     }
 
     @Test
     public void valid() {
-        DeleteUserRequest.builder()
+        GetUserRequest.builder()
             .userId("test-user-id")
             .build();
     }

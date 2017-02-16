@@ -23,6 +23,7 @@ import org.cloudfoundry.client.v2.spaces.CreateSpaceResponse;
 import org.cloudfoundry.client.v2.users.CreateUserRequest;
 import org.cloudfoundry.client.v2.users.CreateUserResponse;
 import org.cloudfoundry.client.v2.users.DeleteUserRequest;
+import org.cloudfoundry.client.v2.users.GetUserRequest;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
 import org.cloudfoundry.client.v2.users.SummaryUserRequest;
 import org.cloudfoundry.client.v2.users.UpdateUserRequest;
@@ -36,6 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import reactor.util.function.Tuples;
 
 import java.time.Duration;
 import java.util.concurrent.TimeoutException;
@@ -158,11 +160,23 @@ public final class UsersTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/669
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/669")
     @Test
     public void get() throws TimeoutException, InterruptedException {
-        //
+        String spaceName = this.nameFactory.getSpaceName();
+        String userId = this.nameFactory.getUserId();
+
+        this.organizationId
+            .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .then(spaceId -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
+                .then(this.cloudFoundryClient.users()
+                    .get(GetUserRequest.builder()
+                        .userId(userId)
+                        .build())
+                    .map(response -> Tuples.of(spaceId, response.getEntity().getDefaultSpaceId()))))
+            .as(StepVerifier::create)
+            .consumeNextWith(tupleEquality())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
