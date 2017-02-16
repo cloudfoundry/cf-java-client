@@ -16,11 +16,19 @@
 
 package org.cloudfoundry.client.v2.users;
 
-import org.cloudfoundry.client.v2.Resource;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.immutables.value.Value;
 
 /**
- * The base class for User resources
+ * The request payload for the Get User Summary operation
  */
-public abstract class AbstractUserResource extends Resource<org.cloudfoundry.client.v2.users.UserEntity> {
+@Value.Immutable
+abstract class _SummaryUserRequest {
+
+    /**
+     * The ID of the user
+     */
+    @JsonIgnore
+    abstract String getUserId();
 
 }

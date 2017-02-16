@@ -45,6 +45,14 @@ public interface Users {
     Mono<ListUsersResponse> list(ListUsersRequest request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/users/get_user_summary.html">Get User Summary</a> request
+     *
+     * @param request the Get User summary request
+     * @return the response from the Get User summary request
+     */
+    Mono<SummaryUserResponse> summary(SummaryUserRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/users/updating_a_user.html">Updating a User</a> request
      *
      * @param request the Updating a User request

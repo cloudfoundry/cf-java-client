@@ -1,0 +1,281 @@
+{
+  "metadata": {
+    "guid": "uaa-id-355",
+    "created_at": "2016-06-08T16:41:40Z",
+    "updated_at": "2016-06-08T16:41:26Z"
+  },
+  "entity": {
+    "organizations": [
+      {
+        "metadata": {
+          "guid": "a8f940a4-3b9f-4e26-9ceb-2e5062cc1513",
+          "created_at": "2016-06-08T16:41:40Z",
+          "updated_at": "2016-06-08T16:41:26Z"
+        },
+        "entity": {
+          "name": "name-2041",
+          "billing_enabled": false,
+          "status": "active",
+          "spaces": [
+            {
+              "metadata": {
+                "guid": "db69758e-14e9-4fed-b69a-353a98a05a2e",
+                "created_at": "2016-06-08T16:41:40Z",
+                "updated_at": "2016-06-08T16:41:26Z"
+              },
+              "entity": {
+                "name": "name-2043"
+              }
+            }
+          ],
+          "quota_definition": {
+            "metadata": {
+              "guid": "6c6b51c9-823d-4c91-ab5c-9487a93360bc",
+              "created_at": "2016-06-08T16:41:40Z",
+              "updated_at": "2016-06-08T16:41:26Z"
+            },
+            "entity": {
+              "name": "name-2042",
+              "non_basic_services_allowed": true,
+              "total_services": 60,
+              "memory_limit": 20480,
+              "trial_db_allowed": false,
+              "total_routes": 1000,
+              "instance_memory_limit": -1,
+              "total_private_domains": -1,
+              "app_instance_limit": -1,
+              "app_task_limit": -1
+            }
+          },
+          "managers": [
+            {
+              "metadata": {
+                "guid": "uaa-id-355",
+                "created_at": "2016-06-08T16:41:40Z",
+                "updated_at": "2016-06-08T16:41:26Z"
+              },
+              "entity": {
+                "admin": false,
+                "active": false,
+                "default_space_guid": null
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "managed_organizations": [
+      {
+        "metadata": {
+          "guid": "a8f940a4-3b9f-4e26-9ceb-2e5062cc1513",
+          "created_at": "2016-06-08T16:41:40Z",
+          "updated_at": "2016-06-08T16:41:26Z"
+        },
+        "entity": {
+          "name": "name-2041",
+          "billing_enabled": false,
+          "status": "active",
+          "spaces": [
+            {
+              "metadata": {
+                "guid": "db69758e-14e9-4fed-b69a-353a98a05a2e",
+                "created_at": "2016-06-08T16:41:40Z",
+                "updated_at": "2016-06-08T16:41:26Z"
+              },
+              "entity": {
+                "name": "name-2043"
+              }
+            }
+          ],
+          "quota_definition": {
+            "metadata": {
+              "guid": "6c6b51c9-823d-4c91-ab5c-9487a93360bc",
+              "created_at": "2016-06-08T16:41:40Z",
+              "updated_at": "2016-06-08T16:41:26Z"
+            },
+            "entity": {
+              "name": "name-2042",
+              "non_basic_services_allowed": true,
+              "total_services": 60,
+              "memory_limit": 20480,
+              "trial_db_allowed": false,
+              "total_routes": 1000,
+              "instance_memory_limit": -1,
+              "total_private_domains": -1,
+              "app_instance_limit": -1,
+              "app_task_limit": -1
+            }
+          },
+          "managers": [
+            {
+              "metadata": {
+                "guid": "uaa-id-355",
+                "created_at": "2016-06-08T16:41:40Z",
+                "updated_at": "2016-06-08T16:41:26Z"
+              },
+              "entity": {
+                "admin": false,
+                "active": false,
+                "default_space_guid": null
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "billing_managed_organizations": [
+      {
+        "metadata": {
+          "guid": "a8f940a4-3b9f-4e26-9ceb-2e5062cc1513",
+          "created_at": "2016-06-08T16:41:40Z",
+          "updated_at": "2016-06-08T16:41:26Z"
+        },
+        "entity": {
+          "name": "name-2041",
+          "billing_enabled": false,
+          "status": "active",
+          "spaces": [
+            {
+              "metadata": {
+                "guid": "db69758e-14e9-4fed-b69a-353a98a05a2e",
+                "created_at": "2016-06-08T16:41:40Z",
+                "updated_at": "2016-06-08T16:41:26Z"
+              },
+              "entity": {
+                "name": "name-2043"
+              }
+            }
+          ],
+          "quota_definition": {
+            "metadata": {
+              "guid": "6c6b51c9-823d-4c91-ab5c-9487a93360bc",
+              "created_at": "2016-06-08T16:41:40Z",
+              "updated_at": "2016-06-08T16:41:26Z"
+            },
+            "entity": {
+              "name": "name-2042",
+              "non_basic_services_allowed": true,
+              "total_services": 60,
+              "memory_limit": 20480,
+              "trial_db_allowed": false,
+              "total_routes": 1000,
+              "instance_memory_limit": -1,
+              "total_private_domains": -1,
+              "app_instance_limit": -1,
+              "app_task_limit": -1
+            }
+          },
+          "managers": [
+            {
+              "metadata": {
+                "guid": "uaa-id-355",
+                "created_at": "2016-06-08T16:41:40Z",
+                "updated_at": "2016-06-08T16:41:26Z"
+              },
+              "entity": {
+                "admin": false,
+                "active": false,
+                "default_space_guid": null
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "audited_organizations": [
+      {
+        "metadata": {
+          "guid": "a8f940a4-3b9f-4e26-9ceb-2e5062cc1513",
+          "created_at": "2016-06-08T16:41:40Z",
+          "updated_at": "2016-06-08T16:41:26Z"
+        },
+        "entity": {
+          "name": "name-2041",
+          "billing_enabled": false,
+          "status": "active",
+          "spaces": [
+            {
+              "metadata": {
+                "guid": "db69758e-14e9-4fed-b69a-353a98a05a2e",
+                "created_at": "2016-06-08T16:41:40Z",
+                "updated_at": "2016-06-08T16:41:26Z"
+              },
+              "entity": {
+                "name": "name-2043"
+              }
+            }
+          ],
+          "quota_definition": {
+            "metadata": {
+              "guid": "6c6b51c9-823d-4c91-ab5c-9487a93360bc",
+              "created_at": "2016-06-08T16:41:40Z",
+              "updated_at": "2016-06-08T16:41:26Z"
+            },
+            "entity": {
+              "name": "name-2042",
+              "non_basic_services_allowed": true,
+              "total_services": 60,
+              "memory_limit": 20480,
+              "trial_db_allowed": false,
+              "total_routes": 1000,
+              "instance_memory_limit": -1,
+              "total_private_domains": -1,
+              "app_instance_limit": -1,
+              "app_task_limit": -1
+            }
+          },
+          "managers": [
+            {
+              "metadata": {
+                "guid": "uaa-id-355",
+                "created_at": "2016-06-08T16:41:40Z",
+                "updated_at": "2016-06-08T16:41:26Z"
+              },
+              "entity": {
+                "admin": false,
+                "active": false,
+                "default_space_guid": null
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "spaces": [
+      {
+        "metadata": {
+          "guid": "db69758e-14e9-4fed-b69a-353a98a05a2e",
+          "created_at": "2016-06-08T16:41:40Z",
+          "updated_at": "2016-06-08T16:41:26Z"
+        },
+        "entity": {
+          "name": "name-2043"
+        }
+      }
+    ],
+    "managed_spaces": [
+      {
+        "metadata": {
+          "guid": "db69758e-14e9-4fed-b69a-353a98a05a2e",
+          "created_at": "2016-06-08T16:41:40Z",
+          "updated_at": "2016-06-08T16:41:26Z"
+        },
+        "entity": {
+          "name": "name-2043"
+        }
+      }
+    ],
+    "audited_spaces": [
+      {
+        "metadata": {
+          "guid": "db69758e-14e9-4fed-b69a-353a98a05a2e",
+          "created_at": "2016-06-08T16:41:40Z",
+          "updated_at": "2016-06-08T16:41:26Z"
+        },
+        "entity": {
+          "name": "name-2043"
+        }
+      }
+    ]
+  }
+}

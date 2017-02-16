@@ -34,4 +34,5 @@ public final class UpdateUserRequestTest {
             .userId("test-uaa-id")
             .build();
     }
+
 }

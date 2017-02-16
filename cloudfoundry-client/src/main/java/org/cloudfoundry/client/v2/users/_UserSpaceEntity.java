@@ -16,11 +16,23 @@
 
 package org.cloudfoundry.client.v2.users;
 
-import org.cloudfoundry.client.v2.Resource;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
+import org.immutables.value.Value;
 
 /**
- * The base class for User resources
+ * The entity response payload for the User Space resource
  */
-public abstract class AbstractUserResource extends Resource<org.cloudfoundry.client.v2.users.UserEntity> {
+@JsonDeserialize
+@Value.Immutable
+abstract class _UserSpaceEntity {
+
+    /**
+     * The name
+     */
+    @JsonProperty("name")
+    @Nullable
+    abstract String getName();
 
 }
