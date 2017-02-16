@@ -16,22 +16,14 @@
 
 package org.cloudfoundry.client.v2.users;
 
-import org.junit.Test;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.immutables.value.Value;
 
-public final class DeleteUserRequestTest {
-
-    @Test(expected = IllegalStateException.class)
-    public void noUserId() {
-        DeleteUserRequest.builder()
-            .async(true)
-            .build();
-    }
-
-    @Test
-    public void valid() {
-        DeleteUserRequest.builder()
-            .userId("test-user-id")
-            .build();
-    }
+/**
+ * The response payload for the Get User operation
+ */
+@JsonDeserialize
+@Value.Immutable
+abstract class _GetUserResponse extends AbstractUserResource {
 
 }
