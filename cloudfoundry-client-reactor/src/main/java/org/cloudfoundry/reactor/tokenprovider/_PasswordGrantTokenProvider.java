@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.tokenprovider;
 
+import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.immutables.value.Value;
 import reactor.core.publisher.Mono;
@@ -36,6 +37,16 @@ abstract class _PasswordGrantTokenProvider extends AbstractUaaTokenProvider {
      * The username
      */
     abstract String getUsername();
+
+    /**
+     * For a password based authentication with a user,
+     * the authorization endpoint is the authorization_endpoint from /v2/info endpoint
+     */
+    @Override
+    Mono<String> getAuthorizationEndpoint(ConnectionContext connectionContext) {
+        return connectionContext
+            .getRoot(AUTHORIZATION_ENDPOINT);
+    }
 
     @Override
     Mono<Void> tokenRequestTransformer(Mono<HttpClientRequest> outbound) {
