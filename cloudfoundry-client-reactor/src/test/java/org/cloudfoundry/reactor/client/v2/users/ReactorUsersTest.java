@@ -19,6 +19,8 @@ package org.cloudfoundry.reactor.client.v2.users;
 import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.OrganizationQuotaDefinitionEntity;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.OrganizationQuotaDefinitionResource;
+import org.cloudfoundry.client.v2.users.AssociateUserSpaceRequest;
+import org.cloudfoundry.client.v2.users.AssociateUserSpaceResponse;
 import org.cloudfoundry.client.v2.users.CreateUserRequest;
 import org.cloudfoundry.client.v2.users.CreateUserResponse;
 import org.cloudfoundry.client.v2.users.DeleteUserRequest;
@@ -57,6 +59,49 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 public final class ReactorUsersTest extends AbstractClientApiTest {
 
     private final ReactorUsers users = new ReactorUsers(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+
+    @Test
+    public void associateSpace() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(PUT).path("/v2/users/uaa-id-305/spaces/063d1561-16ab-4ece-825d-30e3814f4e2f")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/users/PUT_{id}_space_{id}_response.json")
+                .build())
+            .build());
+
+        this.users
+            .associateSpace(AssociateUserSpaceRequest.builder()
+                .spaceId("063d1561-16ab-4ece-825d-30e3814f4e2f")
+                .userId("uaa-id-305")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(AssociateUserSpaceResponse.builder()
+                .metadata(Metadata.builder()
+                    .createdAt("2016-06-08T16:41:36Z")
+                    .id("uaa-id-305")
+                    .updatedAt("2016-06-08T16:41:26Z")
+                    .url("/v2/users/uaa-id-305")
+                    .build())
+                .entity(UserEntity.builder()
+                    .active(false)
+                    .admin(false)
+                    .auditedOrganizationsUrl("/v2/users/uaa-id-305/audited_organizations")
+                    .auditedSpacesUrl("/v2/users/uaa-id-305/audited_spaces")
+                    .billingManagedOrganizationsUrl("/v2/users/uaa-id-305/billing_managed_organizations")
+                    .defaultSpaceUrl("/v2/spaces/063d1561-16ab-4ece-825d-30e3814f4e2f")
+                    .defaultSpaceId("063d1561-16ab-4ece-825d-30e3814f4e2f")
+                    .managedOrganizationsUrl("/v2/users/uaa-id-305/managed_organizations")
+                    .managedSpacesUrl("/v2/users/uaa-id-305/managed_spaces")
+                    .organizationsUrl("/v2/users/uaa-id-305/organizations")
+                    .spacesUrl("/v2/users/uaa-id-305/spaces")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
 
     @Test
     public void create() {

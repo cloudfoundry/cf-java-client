@@ -20,6 +20,7 @@ import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceResponse;
+import org.cloudfoundry.client.v2.users.AssociateUserSpaceRequest;
 import org.cloudfoundry.client.v2.users.CreateUserRequest;
 import org.cloudfoundry.client.v2.users.CreateUserResponse;
 import org.cloudfoundry.client.v2.users.DeleteUserRequest;
@@ -94,11 +95,30 @@ public final class UsersTest extends AbstractIntegrationTest {
         //
     }
 
-    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/652
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/652")
     @Test
     public void associateSpace() throws TimeoutException, InterruptedException {
-        //
+        String spaceName = this.nameFactory.getSpaceName();
+        String userId = this.nameFactory.getUserId();
+
+        this.organizationId
+            .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .then(spaceId -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
+                .then(this.cloudFoundryClient.users()
+                    .associateSpace(AssociateUserSpaceRequest.builder()
+                        .spaceId(spaceId)
+                        .userId(userId)
+                        .build())))
+            .then(this.cloudFoundryClient.users()
+                .summary(SummaryUserRequest.builder()
+                    .userId(userId)
+                    .build()))
+            .log("stream.this")
+            .flatMapIterable(response -> response.getEntity().getSpaces())
+            .filter(space -> spaceName.equals(space.getEntity().getName()))
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
