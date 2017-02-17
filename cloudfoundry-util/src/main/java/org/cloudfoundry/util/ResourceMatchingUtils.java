@@ -145,6 +145,8 @@ public final class ResourceMatchingUtils {
 
         /**
          * Returns the SHA-1 hash of the artifact
+         *
+         * @return the SHA-1 hash of the artifact
          */
         public String getHash() {
             return this.hash;
@@ -152,6 +154,8 @@ public final class ResourceMatchingUtils {
 
         /**
          * Returns the path of the artifact
+         *
+         * @return the path of the artifact
          */
         public String getPath() {
             return this.path;
@@ -159,6 +163,8 @@ public final class ResourceMatchingUtils {
 
         /**
          * Returns the permissions of the artifact
+         *
+         * @return the permissions of the artifact
          */
         public String getPermissions() {
             return this.permissions;
@@ -167,6 +173,8 @@ public final class ResourceMatchingUtils {
 
         /**
          * Returns the size of the artifact
+         *
+         * @return the size of the artifact
          */
         public int getSize() {
             return this.size;
