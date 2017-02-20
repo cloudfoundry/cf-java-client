@@ -19,6 +19,8 @@ package org.cloudfoundry.reactor.client.v2.users;
 import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.OrganizationQuotaDefinitionEntity;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.OrganizationQuotaDefinitionResource;
+import org.cloudfoundry.client.v2.spaces.SpaceEntity;
+import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.client.v2.users.AssociateUserSpaceRequest;
 import org.cloudfoundry.client.v2.users.AssociateUserSpaceResponse;
 import org.cloudfoundry.client.v2.users.CreateUserRequest;
@@ -26,6 +28,8 @@ import org.cloudfoundry.client.v2.users.CreateUserResponse;
 import org.cloudfoundry.client.v2.users.DeleteUserRequest;
 import org.cloudfoundry.client.v2.users.GetUserRequest;
 import org.cloudfoundry.client.v2.users.GetUserResponse;
+import org.cloudfoundry.client.v2.users.ListUserSpacesRequest;
+import org.cloudfoundry.client.v2.users.ListUserSpacesResponse;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
 import org.cloudfoundry.client.v2.users.ListUsersResponse;
 import org.cloudfoundry.client.v2.users.SummaryUserRequest;
@@ -263,6 +267,56 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
                         .managedSpacesUrl("/v2/users/uaa-id-134/managed_spaces")
                         .organizationsUrl("/v2/users/uaa-id-134/organizations")
                         .spacesUrl("/v2/users/uaa-id-134/spaces")
+                        .build())
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void listSpaces() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/v2/users/uaa-id-309/spaces")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/users/GET_{ID}_spaces_response.json")
+                .build())
+            .build());
+
+        this.users
+            .listUserSpaces(ListUserSpacesRequest.builder()
+                .userId("uaa-id-309")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ListUserSpacesResponse.builder()
+                .totalResults(1)
+                .totalPages(1)
+                .resource(SpaceResource.builder()
+                    .metadata(Metadata.builder()
+                        .createdAt("2016-06-08T16:41:37Z")
+                        .id("9881c79e-d269-4a53-9d77-cb21b745356e")
+                        .updatedAt("2016-06-08T16:41:26Z")
+                        .url("/v2/spaces/9881c79e-d269-4a53-9d77-cb21b745356e")
+                        .build())
+                    .entity(SpaceEntity.builder()
+                        .allowSsh(true)
+                        .applicationEventsUrl("/v2/spaces/9881c79e-d269-4a53-9d77-cb21b745356e/app_events")
+                        .applicationsUrl("/v2/spaces/9881c79e-d269-4a53-9d77-cb21b745356e/apps")
+                        .auditorsUrl("/v2/spaces/9881c79e-d269-4a53-9d77-cb21b745356e/auditors")
+                        .developersUrl("/v2/spaces/9881c79e-d269-4a53-9d77-cb21b745356e/developers")
+                        .domainsUrl("/v2/spaces/9881c79e-d269-4a53-9d77-cb21b745356e/domains")
+                        .eventsUrl("/v2/spaces/9881c79e-d269-4a53-9d77-cb21b745356e/events")
+                        .managersUrl("/v2/spaces/9881c79e-d269-4a53-9d77-cb21b745356e/managers")
+                        .name("name-1948")
+                        .organizationId("6a2a2d18-7620-43cf-a332-353824b431b2")
+                        .organizationUrl("/v2/organizations/6a2a2d18-7620-43cf-a332-353824b431b2")
+                        .routesUrl("/v2/spaces/9881c79e-d269-4a53-9d77-cb21b745356e/routes")
+                        .securityGroupsUrl("/v2/spaces/9881c79e-d269-4a53-9d77-cb21b745356e/security_groups")
+                        .serviceInstancesUrl("/v2/spaces/9881c79e-d269-4a53-9d77-cb21b745356e/service_instances")
+                        .stagingSecurityGroupsUrl("/v2/spaces/9881c79e-d269-4a53-9d77-cb21b745356e/staging_security_groups")
                         .build())
                     .build())
                 .build())

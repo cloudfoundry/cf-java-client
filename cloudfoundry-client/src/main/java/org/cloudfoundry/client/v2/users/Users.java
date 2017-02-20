@@ -61,6 +61,14 @@ public interface Users {
     Mono<ListUsersResponse> list(ListUsersRequest request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/users/list_all_spaces_for_the_user.html">List all Spaces for the User</a> request
+     *
+     * @param request the List all Spaces for the User request
+     * @return the response from the List all Spaces for the User request
+     */
+    Mono<ListUserSpacesResponse> listUserSpaces(ListUserSpacesRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/users/get_user_summary.html">Get User Summary</a> request
      *
      * @param request the Get User summary request

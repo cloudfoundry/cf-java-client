@@ -18,13 +18,17 @@ package org.cloudfoundry.client.v2;
 
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
+import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceResponse;
 import org.cloudfoundry.client.v2.users.AssociateUserSpaceRequest;
+import org.cloudfoundry.client.v2.users.AssociateUserSpaceResponse;
 import org.cloudfoundry.client.v2.users.CreateUserRequest;
 import org.cloudfoundry.client.v2.users.CreateUserResponse;
 import org.cloudfoundry.client.v2.users.DeleteUserRequest;
 import org.cloudfoundry.client.v2.users.GetUserRequest;
+import org.cloudfoundry.client.v2.users.ListUserSpacesRequest;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
 import org.cloudfoundry.client.v2.users.SummaryUserRequest;
 import org.cloudfoundry.client.v2.users.UpdateUserRequest;
@@ -112,7 +116,6 @@ public final class UsersTest extends AbstractIntegrationTest {
                 .summary(SummaryUserRequest.builder()
                     .userId(userId)
                     .build()))
-            .log("stream.this")
             .flatMapIterable(response -> response.getEntity().getSpaces())
             .filter(space -> spaceName.equals(space.getEntity().getName()))
             .as(StepVerifier::create)
@@ -311,11 +314,116 @@ public final class UsersTest extends AbstractIntegrationTest {
         //
     }
 
-    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/661
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/661")
     @Test
     public void listSpaces() throws TimeoutException, InterruptedException {
-        //
+        String spaceName = this.nameFactory.getSpaceName();
+        String userId = this.nameFactory.getUserId();
+
+        this.organizationId
+            .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .then(spaceId -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
+                .then(requestAssociateSpace(this.cloudFoundryClient, spaceId, userId)))
+            .flatMap(ignore -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
+                    .listUserSpaces(ListUserSpacesRequest.builder()
+                        .userId(userId)
+                        .build())))
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void listSpacesFilterByDeveloperId() throws TimeoutException, InterruptedException {
+        String spaceName = this.nameFactory.getSpaceName();
+        String userId = this.nameFactory.getUserId();
+
+        this.organizationId
+            .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .then(spaceId -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
+                .then(requestAssociateSpace(this.cloudFoundryClient, spaceId, userId)))
+            .flatMap(ignore -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
+                    .listUserSpaces(ListUserSpacesRequest.builder()
+                        .developerId(userId)
+                        .userId(userId)
+                        .build())))
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void listSpacesFilterByApplicationId() throws TimeoutException, InterruptedException {
+        String applicationName = this.nameFactory.getApplicationName();
+        String spaceName = this.nameFactory.getSpaceName();
+        String userId = this.nameFactory.getUserId();
+
+        this.organizationId
+            .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .then(spaceId -> Mono.when(
+                getApplicationId(this.cloudFoundryClient, applicationName, spaceId),
+                requestCreateUser(this.cloudFoundryClient, spaceId, userId)
+                    .then(requestAssociateSpace(this.cloudFoundryClient, spaceId, userId)))
+            )
+            .flatMap(function((applicationId, ignore) -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
+                    .listUserSpaces(ListUserSpacesRequest.builder()
+                        .applicationId(applicationId)
+                        .userId(userId)
+                        .build()))))
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void listSpacesFilterByName() throws TimeoutException, InterruptedException {
+        String spaceName = this.nameFactory.getSpaceName();
+        String userId = this.nameFactory.getUserId();
+
+        this.organizationId
+            .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .then(spaceId -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
+                .then(requestAssociateSpace(this.cloudFoundryClient, spaceId, userId)))
+            .flatMap(ignore -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
+                    .listUserSpaces(ListUserSpacesRequest.builder()
+                        .name(spaceName)
+                        .userId(userId)
+                        .build())))
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void listSpacesFilterByOrganizationId() throws TimeoutException, InterruptedException {
+        String spaceName = this.nameFactory.getSpaceName();
+        String userId = this.nameFactory.getUserId();
+
+        this.organizationId
+            .then(organizationId -> Mono.when(
+                Mono.just(organizationId),
+                createSpaceId(this.cloudFoundryClient, organizationId, spaceName)
+            ))
+            .then(function((organizationId, spaceId) -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
+                .then(requestAssociateSpace(this.cloudFoundryClient, spaceId, userId))
+                .map(ignore -> organizationId)))
+            .flatMap(organizationId -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
+                    .listUserSpaces(ListUserSpacesRequest.builder()
+                        .organizationId(organizationId)
+                        .userId(userId)
+                        .build())))
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/662
@@ -409,6 +517,27 @@ public final class UsersTest extends AbstractIntegrationTest {
     private static Mono<String> createSpaceId(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceName) {
         return requestCreateSpace(cloudFoundryClient, organizationId, spaceName)
             .map(ResourceUtils::getId);
+    }
+
+    private static Mono<String> getApplicationId(CloudFoundryClient cloudFoundryClient, String applicationName, String spaceId) {
+        return requestCreateApplication(cloudFoundryClient, spaceId, applicationName)
+            .map(ResourceUtils::getId);
+    }
+
+    private static Mono<AssociateUserSpaceResponse> requestAssociateSpace(CloudFoundryClient cloudFoundryClient, String spaceId, String userId) {
+        return cloudFoundryClient.users()
+            .associateSpace(AssociateUserSpaceRequest.builder()
+                .spaceId(spaceId)
+                .userId(userId)
+                .build());
+    }
+
+    private static Mono<CreateApplicationResponse> requestCreateApplication(CloudFoundryClient cloudFoundryClient, String spaceId, String applicationName) {
+        return cloudFoundryClient.applicationsV2()
+            .create(CreateApplicationRequest.builder()
+                .name(applicationName)
+                .spaceId(spaceId)
+                .build());
     }
 
     private static Mono<CreateSpaceResponse> requestCreateSpace(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceName) {
