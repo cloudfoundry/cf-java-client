@@ -54,7 +54,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <reactor-addons.version>3.0.5.RELEASE</reactor-addons.version>
         <reactor-core.version>3.0.5.RELEASE</reactor-core.version>
-        <reactor-netty.version>0.6.0.RELEASE</reactor-netty.version>
+        <reactor-netty.version>0.6.1.BUILD-SNAPSHOT</reactor-netty.version>
         <wire.version>2.2.0</wire.version>
     </properties>
 

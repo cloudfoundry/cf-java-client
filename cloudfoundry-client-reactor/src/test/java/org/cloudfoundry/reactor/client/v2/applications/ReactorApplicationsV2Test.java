@@ -963,7 +963,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
 
                     assertThat(body.readString(Charset.defaultCharset()))
                         .isEqualTo("--" + boundary + "\r\n" +
-                            "content-disposition: form-data; name=\"resources\";\r\n" +
+                            "content-disposition: form-data; name=\"resources\"\r\n" +
                             "content-length: 178\r\n" +
                             "content-type: application/json; charset=UTF-8\r\n" +
                             "\r\n" +
@@ -973,7 +973,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                             "content-disposition: form-data; name=\"application\"; filename=\"application.zip\"\r\n" +
                             "content-length: 13\r\n" +
                             "content-type: application/zip\r\n" +
-                            "content-transfer-encoding: application/octet-stream\r\n" +
+                            "content-transfer-encoding: binary\r\n" +
                             "\r\n" +
                             "test-content\n" +
                             "\r\n" +

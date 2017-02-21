@@ -20,8 +20,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import io.netty.buffer.UnpooledByteBufAllocator;
-import io.netty.channel.ChannelOption;
 import org.cloudfoundry.reactor.util.DefaultSslCertificateTruster;
 import org.cloudfoundry.reactor.util.JsonCodec;
 import org.cloudfoundry.reactor.util.NetworkLogging;
@@ -67,11 +65,11 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
     private static final int UNDEFINED_PORT = -1;
 
     /**
-     * The number of connections to use when processing requests and responses
+     * The number of connections to use when processing requests and responses.  Setting this to `null` disables connection pooling.
      */
     @Value.Default
-    public Integer getConnectionPoolSize() {
-        return 2 * PoolResources.DEFAULT_POOL_MAX_CONNECTION;
+    public Optional<Integer> getConnectionPoolSize() {
+        return Optional.of(PoolResources.DEFAULT_POOL_MAX_CONNECTION);
     }
 
     @Override
@@ -82,10 +80,9 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
                 .loopResources(LoopResources.create("cloudfoundry-client", getThreadPoolSize(), true))
                 .option(SO_SNDBUF, SEND_BUFFER_SIZE)
                 .option(SO_RCVBUF, RECEIVE_BUFFER_SIZE)
-                .option(ChannelOption.ALLOCATOR, UnpooledByteBufAllocator.DEFAULT)
-                .disablePool();  // TODO: Remove once pooling fixed
-//                .poolResources(PoolResources.fixed("cloudfoundry-client", getConnectionPoolSize()));
+                .disablePool();
 
+            getConnectionPoolSize().ifPresent(connectionPoolSize -> options.poolResources(PoolResources.fixed("cloudfoundry-client", connectionPoolSize)));
             getKeepAlive().ifPresent(keepAlive -> options.option(SO_KEEPALIVE, keepAlive));
             getProxyConfiguration().ifPresent(c -> options.proxy(ClientOptions.Proxy.HTTP, c.getHost(), c.getPort().orElse(null), c.getUsername().orElse(null), u -> c.getPassword().orElse(null)));
             getSocketTimeout().ifPresent(socketTimeout -> options.option(SO_TIMEOUT, (int) socketTimeout.toMillis()));

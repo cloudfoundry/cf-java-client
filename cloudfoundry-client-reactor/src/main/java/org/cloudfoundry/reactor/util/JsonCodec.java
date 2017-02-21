@@ -36,7 +36,7 @@ public final class JsonCodec {
 
     public static <T> Function<Mono<HttpClientResponse>, Flux<T>> decode(ObjectMapper objectMapper, Class<T> responseType) {
         return inbound -> inbound
-            .flatMap(response -> response.addHandler(new JsonObjectDecoder()).receive().aggregate().asByteArray())
+            .flatMap(response -> response.addHandler(new JsonObjectDecoder()).receive().asByteArray())
             .map(payload -> {
                 try {
                     return objectMapper.readValue(payload, responseType);

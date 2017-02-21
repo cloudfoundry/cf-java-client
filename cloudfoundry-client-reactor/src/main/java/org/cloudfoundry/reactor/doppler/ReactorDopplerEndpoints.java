@@ -39,7 +39,7 @@ final class ReactorDopplerEndpoints extends AbstractDopplerOperations {
 
     Flux<Envelope> containerMetrics(ContainerMetricsRequest request) {
         return get(builder -> builder.pathSegment("apps", request.getApplicationId(), "containermetrics"))
-            .flatMap(inbound -> inbound.addHandler(new MultipartDecoderChannelHandler(inbound)).receiveObject())
+            .flatMap(response -> response.addHandler(new MultipartDecoderChannelHandler(response)).receiveObject())
             .takeWhile(t -> MultipartDecoderChannelHandler.CLOSE_DELIMITER != t)
             .windowWhile(t -> MultipartDecoderChannelHandler.DELIMITER != t)
             .concatMap(w -> w
@@ -59,7 +59,7 @@ final class ReactorDopplerEndpoints extends AbstractDopplerOperations {
 
     Flux<Envelope> recentLogs(RecentLogsRequest request) {
         return get(builder -> builder.pathSegment("apps", request.getApplicationId(), "recentlogs"))
-            .flatMap(inbound -> inbound.addHandler(new MultipartDecoderChannelHandler(inbound)).receiveObject())
+            .flatMap(response -> response.addHandler(new MultipartDecoderChannelHandler(response)).receiveObject())
             .takeWhile(t -> MultipartDecoderChannelHandler.CLOSE_DELIMITER != t)
             .windowWhile(t -> MultipartDecoderChannelHandler.DELIMITER != t)
             .concatMap(w -> w
