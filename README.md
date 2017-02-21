@@ -45,7 +45,7 @@ Most projects will need two dependencies; the Operations API and an implementati
     <dependency>
         <groupId>io.projectreactor.ipc</groupId>
         <artifactId>reactor-netty</artifactId>
-        <version>0.6.1.BUILD-SNAPSHOT</version>
+        <version>0.6.0.RELEASE</version>
     </dependency>
     ...
 </dependencies>
@@ -74,7 +74,7 @@ dependencies {
     compile 'org.cloudfoundry:cloudfoundry-client-reactor:2.4.0.RELEASE'
     compile 'org.cloudfoundry:cloudfoundry-operations:2.4.0.RELEASE'
     compile 'io.projectreactor:reactor-core:3.0.5.RELEASE'
-    compile 'io.projectreactor.ipc:reactor-netty:0.6.1.BUILD-SNAPSHOT'
+    compile 'io.projectreactor.ipc:reactor-netty:0.6.0.RELEASE'
     ...
 }
 ```
