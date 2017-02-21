@@ -21,6 +21,14 @@ import reactor.core.publisher.Mono;
 public interface Users {
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/users/associate_space_with_the_user.html">Associate Space with the User</a> request
+     *
+     * @param request the Associate Space with the User request
+     * @return the response from the Associate Space with the User request
+     */
+    Mono<AssociateUserSpaceResponse> associateSpace(AssociateUserSpaceRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/users/creating_a_user.html">Creating a User</a> request
      *
      * @param request the Creating a User request
@@ -51,6 +59,22 @@ public interface Users {
      * @return the response from the List all Users request
      */
     Mono<ListUsersResponse> list(ListUsersRequest request);
+
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/users/list_all_spaces_for_the_user.html">List all Spaces for the User</a> request
+     *
+     * @param request the List all Spaces for the User request
+     * @return the response from the List all Spaces for the User request
+     */
+    Mono<ListUserSpacesResponse> listSpaces(ListUserSpacesRequest request);
+
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/users/associate_space_with_the_user.html">Remove Space from the User</a> request
+     *
+     * @param request the Remove Space from the User request
+     * @return the response from the Remove Space from the User request
+     */
+    Mono<Void> removeSpace(RemoveUserSpaceRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/users/get_user_summary.html">Get User Summary</a> request
