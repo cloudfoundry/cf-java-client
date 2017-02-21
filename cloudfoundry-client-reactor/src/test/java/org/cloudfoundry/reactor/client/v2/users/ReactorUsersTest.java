@@ -283,7 +283,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
-                .payload("fixtures/client/v2/users/GET_{ID}_spaces_response.json")
+                .payload("fixtures/client/v2/users/GET_{id}_spaces_response.json")
                 .build())
             .build());
 
