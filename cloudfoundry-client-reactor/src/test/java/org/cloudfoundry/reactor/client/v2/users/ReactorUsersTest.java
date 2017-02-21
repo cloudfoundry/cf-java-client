@@ -32,6 +32,7 @@ import org.cloudfoundry.client.v2.users.ListUserSpacesRequest;
 import org.cloudfoundry.client.v2.users.ListUserSpacesResponse;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
 import org.cloudfoundry.client.v2.users.ListUsersResponse;
+import org.cloudfoundry.client.v2.users.RemoveUserSpaceRequest;
 import org.cloudfoundry.client.v2.users.SummaryUserRequest;
 import org.cloudfoundry.client.v2.users.SummaryUserResponse;
 import org.cloudfoundry.client.v2.users.UpdateUserRequest;
@@ -287,7 +288,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
             .build());
 
         this.users
-            .listUserSpaces(ListUserSpacesRequest.builder()
+            .listSpaces(ListUserSpacesRequest.builder()
                 .userId("uaa-id-309")
                 .build())
             .as(StepVerifier::create)
@@ -320,6 +321,27 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
                         .build())
                     .build())
                 .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void removeSpace() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(DELETE).path("/v2/users/uaa-id-307/spaces/6c37bc37-f712-4399-be89-2272980b66ef")
+                .build())
+            .response(TestResponse.builder()
+                .status(NO_CONTENT)
+                .build())
+            .build());
+
+        this.users
+            .removeSpace(RemoveUserSpaceRequest.builder()
+                .spaceId("6c37bc37-f712-4399-be89-2272980b66ef")
+                .userId("uaa-id-307")
+                .build())
+            .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }

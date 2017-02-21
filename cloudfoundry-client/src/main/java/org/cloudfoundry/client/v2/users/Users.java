@@ -66,7 +66,15 @@ public interface Users {
      * @param request the List all Spaces for the User request
      * @return the response from the List all Spaces for the User request
      */
-    Mono<ListUserSpacesResponse> listUserSpaces(ListUserSpacesRequest request);
+    Mono<ListUserSpacesResponse> listSpaces(ListUserSpacesRequest request);
+
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/users/associate_space_with_the_user.html">Remove Space from the User</a> request
+     *
+     * @param request the Remove Space from the User request
+     * @return the response from the Remove Space from the User request
+     */
+    Mono<Void> removeSpace(RemoveUserSpaceRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/users/get_user_summary.html">Get User Summary</a> request
