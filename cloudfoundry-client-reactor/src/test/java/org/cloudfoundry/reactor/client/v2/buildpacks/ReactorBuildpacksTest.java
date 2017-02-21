@@ -281,7 +281,7 @@ public final class ReactorBuildpacksTest extends AbstractClientApiTest {
                             "content-disposition: form-data; name=\"buildpack\"; filename=\"test-filename\"\r\n" +
                             "content-length: 13\r\n" +
                             "content-type: application/zip\r\n" +
-                            "content-transfer-encoding: application/octet-stream\r\n" +
+                            "content-transfer-encoding: binary\r\n" +
                             "\r\n" +
                             "test-content\n" +
                             "\r\n" +
