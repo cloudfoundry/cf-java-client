@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import org.cloudfoundry.Nullable;
 import org.cloudfoundry.reactor.util.DefaultSslCertificateTruster;
 import org.cloudfoundry.reactor.util.JsonCodec;
 import org.cloudfoundry.reactor.util.NetworkLogging;
@@ -67,9 +68,10 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
     /**
      * The number of connections to use when processing requests and responses.  Setting this to `null` disables connection pooling.
      */
+    @Nullable
     @Value.Default
-    public Optional<Integer> getConnectionPoolSize() {
-        return Optional.of(PoolResources.DEFAULT_POOL_MAX_CONNECTION);
+    public Integer getConnectionPoolSize() {
+        return PoolResources.DEFAULT_POOL_MAX_CONNECTION;
     }
 
     @Override
@@ -82,7 +84,7 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
                 .option(SO_RCVBUF, RECEIVE_BUFFER_SIZE)
                 .disablePool();
 
-            getConnectionPoolSize().ifPresent(connectionPoolSize -> options.poolResources(PoolResources.fixed("cloudfoundry-client", connectionPoolSize)));
+            Optional.ofNullable(getConnectionPoolSize()).ifPresent(connectionPoolSize -> options.poolResources(PoolResources.fixed("cloudfoundry-client", connectionPoolSize)));
             getKeepAlive().ifPresent(keepAlive -> options.option(SO_KEEPALIVE, keepAlive));
             getProxyConfiguration().ifPresent(c -> options.proxy(ClientOptions.Proxy.HTTP, c.getHost(), c.getPort().orElse(null), c.getUsername().orElse(null), u -> c.getPassword().orElse(null)));
             getSocketTimeout().ifPresent(socketTimeout -> options.option(SO_TIMEOUT, (int) socketTimeout.toMillis()));
