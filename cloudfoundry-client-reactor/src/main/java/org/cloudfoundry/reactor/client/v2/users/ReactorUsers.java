@@ -16,6 +16,8 @@
 
 package org.cloudfoundry.reactor.client.v2.users;
 
+import org.cloudfoundry.client.v2.users.AssociateUserManagedSpaceRequest;
+import org.cloudfoundry.client.v2.users.AssociateUserManagedSpaceResponse;
 import org.cloudfoundry.client.v2.users.AssociateUserSpaceRequest;
 import org.cloudfoundry.client.v2.users.AssociateUserSpaceResponse;
 import org.cloudfoundry.client.v2.users.CreateUserRequest;
@@ -53,6 +55,12 @@ public final class ReactorUsers extends AbstractClientV2Operations implements Us
      */
     public ReactorUsers(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
         super(connectionContext, root, tokenProvider);
+    }
+
+    @Override
+    public Mono<AssociateUserManagedSpaceResponse> associateManagedSpace(AssociateUserManagedSpaceRequest request) {
+        return put(request, AssociateUserManagedSpaceResponse.class, builder -> builder.pathSegment("v2", "users", request.getUserId(), "managed_spaces", request.getManagedSpaceId()))
+            .checkpoint();
     }
 
     @Override

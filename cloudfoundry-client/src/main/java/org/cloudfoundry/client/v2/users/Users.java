@@ -21,6 +21,14 @@ import reactor.core.publisher.Mono;
 public interface Users {
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/users/associate_managed_space_with_the_user.html">Associate Managed Space with the User</a> request
+     *
+     * @param request the Associate Managed Space with the User request
+     * @return the response from the Associate Managed Space with the User request
+     */
+    Mono<AssociateUserManagedSpaceResponse> associateManagedSpace(AssociateUserManagedSpaceRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/users/associate_space_with_the_user.html">Associate Space with the User</a> request
      *
      * @param request the Associate Space with the User request
