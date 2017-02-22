@@ -101,6 +101,14 @@ public interface Users {
     Mono<ListUserSpacesResponse> listSpaces(ListUserSpacesRequest request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/users/remove_managed_space_from_the_user.html">Remove Audited Space from the User</a> request
+     *
+     * @param request the Remove Audited Space from the User request
+     * @return the response from the Remove Audited Space from the User request
+     */
+    Mono<Void> removeAuditedSpace(RemoveUserAuditedSpaceRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/users/remove_managed_space_from_the_user.html">Remove Managed Space from the User</a> request
      *
      * @param request the Remove Managed Space from the User request

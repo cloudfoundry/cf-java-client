@@ -36,6 +36,7 @@ import org.cloudfoundry.client.v2.users.ListUserAuditedSpacesRequest;
 import org.cloudfoundry.client.v2.users.ListUserManagedSpacesRequest;
 import org.cloudfoundry.client.v2.users.ListUserSpacesRequest;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
+import org.cloudfoundry.client.v2.users.RemoveUserAuditedSpaceRequest;
 import org.cloudfoundry.client.v2.users.RemoveUserManagedSpaceRequest;
 import org.cloudfoundry.client.v2.users.RemoveUserSpaceRequest;
 import org.cloudfoundry.client.v2.users.SummaryUserRequest;
@@ -685,11 +686,26 @@ public final class UsersTest extends AbstractIntegrationTest {
         //
     }
 
-    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/663
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/663")
     @Test
     public void removeAuditedSpace() throws TimeoutException, InterruptedException {
-        //
+        String spaceName = this.nameFactory.getSpaceName();
+        String userId = this.nameFactory.getUserId();
+
+        this.organizationId
+            .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .then(spaceId -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
+                .then(requestAssociateAuditedSpace(this.cloudFoundryClient, spaceId, userId))
+                .then(this.cloudFoundryClient.users()
+                    .removeAuditedSpace(RemoveUserAuditedSpaceRequest.builder()
+                        .auditedSpaceId(spaceId)
+                        .userId(userId)
+                        .build())))
+            .then(requestSummaryUser(this.cloudFoundryClient, userId))
+            .flatMapIterable(response -> response.getEntity().getAuditedSpaces())
+            .as(StepVerifier::create)
+            .expectNextCount(0)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/664
