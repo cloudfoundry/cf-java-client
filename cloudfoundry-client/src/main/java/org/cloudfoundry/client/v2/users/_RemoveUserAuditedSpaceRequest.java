@@ -16,14 +16,25 @@
 
 package org.cloudfoundry.client.v2.users;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.immutables.value.Value;
 
 /**
- * The response payload for the Associate Managed Space with the User operation
+ * The request payload for the Remove Audited Space from the User operation
  */
-@JsonDeserialize
 @Value.Immutable
-abstract class _AssociateUserManagedSpaceResponse extends AbstractUserResource {
+abstract class _RemoveUserAuditedSpaceRequest {
+
+    /**
+     * The id of the audited space
+     */
+    @JsonIgnore
+    abstract String getAuditedSpaceId();
+
+    /**
+     * The id of the user
+     */
+    @JsonIgnore
+    abstract String getUserId();
 
 }

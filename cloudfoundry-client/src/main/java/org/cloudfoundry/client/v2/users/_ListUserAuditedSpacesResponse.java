@@ -17,13 +17,15 @@
 package org.cloudfoundry.client.v2.users;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.client.v2.PaginatedResponse;
+import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.immutables.value.Value;
 
 /**
- * The response payload for the Associate Managed Space with the User operation
+ * The response payload for the List all Audited Spaces for the User operation
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _AssociateUserManagedSpaceResponse extends AbstractUserResource {
+abstract class _ListUserAuditedSpacesResponse extends PaginatedResponse<SpaceResource> {
 
 }

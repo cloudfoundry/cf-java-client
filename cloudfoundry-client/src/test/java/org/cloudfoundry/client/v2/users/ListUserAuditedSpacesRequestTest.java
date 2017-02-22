@@ -16,14 +16,22 @@
 
 package org.cloudfoundry.client.v2.users;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.immutables.value.Value;
+import org.junit.Test;
 
-/**
- * The response payload for the Associate Managed Space with the User operation
- */
-@JsonDeserialize
-@Value.Immutable
-abstract class _AssociateUserManagedSpaceResponse extends AbstractUserResource {
+public final class ListUserAuditedSpacesRequestTest {
+
+
+    @Test(expected = IllegalStateException.class)
+    public void noUserId() {
+        ListUserAuditedSpacesRequest.builder()
+            .build();
+    }
+
+    @Test
+    public void valid() {
+        ListUserAuditedSpacesRequest.builder()
+            .userId("test-user-id")
+            .build();
+    }
 
 }
