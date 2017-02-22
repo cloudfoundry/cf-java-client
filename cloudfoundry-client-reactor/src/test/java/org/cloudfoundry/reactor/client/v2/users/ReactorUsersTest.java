@@ -30,6 +30,8 @@ import org.cloudfoundry.client.v2.users.CreateUserResponse;
 import org.cloudfoundry.client.v2.users.DeleteUserRequest;
 import org.cloudfoundry.client.v2.users.GetUserRequest;
 import org.cloudfoundry.client.v2.users.GetUserResponse;
+import org.cloudfoundry.client.v2.users.ListUserManagedSpacesRequest;
+import org.cloudfoundry.client.v2.users.ListUserManagedSpacesResponse;
 import org.cloudfoundry.client.v2.users.ListUserSpacesRequest;
 import org.cloudfoundry.client.v2.users.ListUserSpacesResponse;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
@@ -314,6 +316,56 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
                         .managedSpacesUrl("/v2/users/uaa-id-134/managed_spaces")
                         .organizationsUrl("/v2/users/uaa-id-134/organizations")
                         .spacesUrl("/v2/users/uaa-id-134/spaces")
+                        .build())
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void listManagedSpaces() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/v2/users/uaa-id-270/managed_spaces")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/users/GET_{id}_managed_spaces_response.json")
+                .build())
+            .build());
+
+        this.users
+            .listManagedSpaces(ListUserManagedSpacesRequest.builder()
+                .userId("uaa-id-270")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ListUserManagedSpacesResponse.builder()
+                .totalResults(1)
+                .totalPages(1)
+                .resource(SpaceResource.builder()
+                    .metadata(Metadata.builder()
+                        .createdAt("2016-06-08T16:41:35Z")
+                        .id("b0e100bd-6d7c-4a3d-b0d3-0249d739a086")
+                        .updatedAt("2016-06-08T16:41:26Z")
+                        .url("/v2/spaces/b0e100bd-6d7c-4a3d-b0d3-0249d739a086")
+                        .build())
+                    .entity(SpaceEntity.builder()
+                        .allowSsh(true)
+                        .applicationEventsUrl("/v2/spaces/b0e100bd-6d7c-4a3d-b0d3-0249d739a086/app_events")
+                        .applicationsUrl("/v2/spaces/b0e100bd-6d7c-4a3d-b0d3-0249d739a086/apps")
+                        .auditorsUrl("/v2/spaces/b0e100bd-6d7c-4a3d-b0d3-0249d739a086/auditors")
+                        .developersUrl("/v2/spaces/b0e100bd-6d7c-4a3d-b0d3-0249d739a086/developers")
+                        .domainsUrl("/v2/spaces/b0e100bd-6d7c-4a3d-b0d3-0249d739a086/domains")
+                        .eventsUrl("/v2/spaces/b0e100bd-6d7c-4a3d-b0d3-0249d739a086/events")
+                        .managersUrl("/v2/spaces/b0e100bd-6d7c-4a3d-b0d3-0249d739a086/managers")
+                        .name("name-1820")
+                        .organizationId("14766fb1-d8fa-4604-ba7a-248f341492a2")
+                        .organizationUrl("/v2/organizations/14766fb1-d8fa-4604-ba7a-248f341492a2")
+                        .routesUrl("/v2/spaces/b0e100bd-6d7c-4a3d-b0d3-0249d739a086/routes")
+                        .securityGroupsUrl("/v2/spaces/b0e100bd-6d7c-4a3d-b0d3-0249d739a086/security_groups")
+                        .serviceInstancesUrl("/v2/spaces/b0e100bd-6d7c-4a3d-b0d3-0249d739a086/service_instances")
+                        .stagingSecurityGroupsUrl("/v2/spaces/b0e100bd-6d7c-4a3d-b0d3-0249d739a086/staging_security_groups")
                         .build())
                     .build())
                 .build())
