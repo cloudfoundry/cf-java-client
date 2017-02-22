@@ -112,27 +112,31 @@ final class CloudFoundryCleaner {
 
     void clean() {
         Flux.empty()
-            .thenMany(cleanBuildpacks(this.cloudFoundryClient, this.nameFactory))
-            .thenMany(cleanFeatureFlags(this.cloudFoundryClient))
-            .thenMany(cleanRoutes(this.cloudFoundryClient, this.nameFactory))
-            .thenMany(cleanUsers(this.cloudFoundryClient, this.nameFactory))
-            .thenMany(cleanApplicationsV2(this.cloudFoundryClient, this.nameFactory))
-            .thenMany(cleanApplicationsV3(this.cloudFoundryClient, this.nameFactory))
-            .thenMany(cleanPackages(this.cloudFoundryClient))
-            .thenMany(cleanSecurityGroups(this.cloudFoundryClient, this.nameFactory))
-            .thenMany(cleanServiceInstances(this.cloudFoundryClient, this.nameFactory))
-            .thenMany(cleanUserProvidedServiceInstances(this.cloudFoundryClient, this.nameFactory))
-            .thenMany(cleanSharedDomains(this.cloudFoundryClient, this.nameFactory))
-            .thenMany(cleanPrivateDomains(this.cloudFoundryClient, this.nameFactory))
-            .thenMany(cleanIdentityProviders(this.uaaClient, this.nameFactory))
-            .thenMany(cleanIdentityZones(this.uaaClient, this.nameFactory))
-            .thenMany(cleanGroups(this.uaaClient, this.nameFactory))
-            .thenMany(cleanUsers(this.uaaClient, this.nameFactory))
-            .thenMany(cleanClients(this.uaaClient, this.nameFactory))
-            .thenMany(cleanSpaceQuotaDefinitions(this.cloudFoundryClient, this.nameFactory))
-            .thenMany(cleanSpaces(this.cloudFoundryClient, this.nameFactory))
-            .thenMany(cleanOrganizations(this.cloudFoundryClient, this.nameFactory))
-            .thenMany(cleanOrganizationQuotaDefinitions(this.cloudFoundryClient, this.nameFactory))
+            .thenMany(Mono.when( // No prerequisites
+                cleanBuildpacks(this.cloudFoundryClient, this.nameFactory),
+                cleanClients(this.uaaClient, this.nameFactory),
+                cleanFeatureFlags(this.cloudFoundryClient),
+                cleanGroups(this.uaaClient, this.nameFactory),
+                cleanIdentityProviders(this.uaaClient, this.nameFactory),
+                cleanIdentityZones(this.uaaClient, this.nameFactory),
+                cleanPackages(this.cloudFoundryClient),
+                cleanRoutes(this.cloudFoundryClient, this.nameFactory),
+                cleanSecurityGroups(this.cloudFoundryClient, this.nameFactory),
+                cleanSpaceQuotaDefinitions(this.cloudFoundryClient, this.nameFactory),
+                cleanUsers(this.cloudFoundryClient, this.nameFactory),
+                cleanUsers(this.uaaClient, this.nameFactory)
+            ))
+            .thenMany(cleanApplicationsV2(this.cloudFoundryClient, this.nameFactory)) // After Routes, cannot run with other cleanApps
+            .thenMany(cleanApplicationsV3(this.cloudFoundryClient, this.nameFactory)) // After Routes, cannot run with other cleanApps
+            .thenMany(Mono.when( // After Routes/Applications
+                cleanPrivateDomains(this.cloudFoundryClient, this.nameFactory),
+                cleanServiceInstances(this.cloudFoundryClient, this.nameFactory),
+                cleanSharedDomains(this.cloudFoundryClient, this.nameFactory),
+                cleanSpaces(this.cloudFoundryClient, this.nameFactory),
+                cleanUserProvidedServiceInstances(this.cloudFoundryClient, this.nameFactory)
+            ))
+            .thenMany(cleanOrganizations(this.cloudFoundryClient, this.nameFactory)) // After Spaces
+            .thenMany(cleanOrganizationQuotaDefinitions(this.cloudFoundryClient, this.nameFactory)) // After Organizations
             .retry(5, t -> t instanceof SSLException)
             .doOnSubscribe(s -> LOGGER.debug(">> CLEANUP <<"))
             .doOnComplete(() -> LOGGER.debug("<< CLEANUP >>"))
