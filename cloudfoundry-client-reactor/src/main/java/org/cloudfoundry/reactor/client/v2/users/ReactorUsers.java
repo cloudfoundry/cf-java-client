@@ -28,6 +28,8 @@ import org.cloudfoundry.client.v2.users.DeleteUserRequest;
 import org.cloudfoundry.client.v2.users.DeleteUserResponse;
 import org.cloudfoundry.client.v2.users.GetUserRequest;
 import org.cloudfoundry.client.v2.users.GetUserResponse;
+import org.cloudfoundry.client.v2.users.ListUserAuditedSpacesRequest;
+import org.cloudfoundry.client.v2.users.ListUserAuditedSpacesResponse;
 import org.cloudfoundry.client.v2.users.ListUserManagedSpacesRequest;
 import org.cloudfoundry.client.v2.users.ListUserManagedSpacesResponse;
 import org.cloudfoundry.client.v2.users.ListUserSpacesRequest;
@@ -101,6 +103,12 @@ public final class ReactorUsers extends AbstractClientV2Operations implements Us
     @Override
     public Mono<ListUsersResponse> list(ListUsersRequest request) {
         return get(request, ListUsersResponse.class, builder -> builder.pathSegment("v2", "users"))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<ListUserAuditedSpacesResponse> listAuditedSpaces(ListUserAuditedSpacesRequest request) {
+        return get(request, ListUserAuditedSpacesResponse.class, builder -> builder.pathSegment("v2", "users", request.getUserId(), "audited_spaces"))
             .checkpoint();
     }
 
