@@ -16,22 +16,25 @@
 
 package org.cloudfoundry.client.v2.users;
 
-import org.junit.Test;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.immutables.value.Value;
 
-public final class ListUserManagedSpacesRequestTest {
+/**
+ * The request payload for the Remove Managed Space from the User operation
+ */
+@Value.Immutable
+abstract class _RemoveUserManagedSpaceRequest {
 
+    /**
+     * The id of the managed space
+     */
+    @JsonIgnore
+    abstract String getManagedSpaceId();
 
-    @Test(expected = IllegalStateException.class)
-    public void noUserId() {
-        ListUserManagedSpacesRequest.builder()
-            .build();
-    }
-
-    @Test
-    public void valid() {
-        ListUserManagedSpacesRequest.builder()
-            .userId("test-user-id")
-            .build();
-    }
+    /**
+     * The id of the user
+     */
+    @JsonIgnore
+    abstract String getUserId();
 
 }

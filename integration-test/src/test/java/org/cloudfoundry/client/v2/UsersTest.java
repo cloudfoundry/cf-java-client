@@ -33,6 +33,7 @@ import org.cloudfoundry.client.v2.users.GetUserRequest;
 import org.cloudfoundry.client.v2.users.ListUserManagedSpacesRequest;
 import org.cloudfoundry.client.v2.users.ListUserSpacesRequest;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
+import org.cloudfoundry.client.v2.users.RemoveUserManagedSpaceRequest;
 import org.cloudfoundry.client.v2.users.RemoveUserSpaceRequest;
 import org.cloudfoundry.client.v2.users.SummaryUserRequest;
 import org.cloudfoundry.client.v2.users.SummaryUserResponse;
@@ -579,11 +580,26 @@ public final class UsersTest extends AbstractIntegrationTest {
         //
     }
 
-    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/666
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/666")
     @Test
     public void removeManagedSpace() throws TimeoutException, InterruptedException {
-        //
+        String spaceName = this.nameFactory.getSpaceName();
+        String userId = this.nameFactory.getUserId();
+
+        this.organizationId
+            .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .then(spaceId -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
+                .then(requestAssociateManagedSpace(this.cloudFoundryClient, spaceId, userId))
+                .then(this.cloudFoundryClient.users()
+                    .removeManagedSpace(RemoveUserManagedSpaceRequest.builder()
+                        .managedSpaceId(spaceId)
+                        .userId(userId)
+                        .build())))
+            .then(requestSummaryUser(this.cloudFoundryClient, userId))
+            .flatMapIterable(response -> response.getEntity().getManagedSpaces())
+            .as(StepVerifier::create)
+            .expectNextCount(0)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/667
@@ -609,7 +625,6 @@ public final class UsersTest extends AbstractIntegrationTest {
                         .build())))
             .then(requestSummaryUser(this.cloudFoundryClient, userId))
             .flatMapIterable(response -> response.getEntity().getSpaces())
-            .filter(space -> spaceName.equals(space.getEntity().getName()))
             .as(StepVerifier::create)
             .expectNextCount(0)
             .expectComplete()
@@ -665,18 +680,18 @@ public final class UsersTest extends AbstractIntegrationTest {
             .map(ResourceUtils::getId);
     }
 
-    private static Mono<AssociateUserSpaceResponse> requestAssociateSpace(CloudFoundryClient cloudFoundryClient, String spaceId, String userId) {
-        return cloudFoundryClient.users()
-            .associateSpace(AssociateUserSpaceRequest.builder()
-                .spaceId(spaceId)
-                .userId(userId)
-                .build());
-    }
-
     private static Mono<AssociateUserManagedSpaceResponse> requestAssociateManagedSpace(CloudFoundryClient cloudFoundryClient, String spaceId, String userId) {
         return cloudFoundryClient.users()
             .associateManagedSpace(AssociateUserManagedSpaceRequest.builder()
                 .managedSpaceId(spaceId)
+                .userId(userId)
+                .build());
+    }
+
+    private static Mono<AssociateUserSpaceResponse> requestAssociateSpace(CloudFoundryClient cloudFoundryClient, String spaceId, String userId) {
+        return cloudFoundryClient.users()
+            .associateSpace(AssociateUserSpaceRequest.builder()
+                .spaceId(spaceId)
                 .userId(userId)
                 .build());
     }
