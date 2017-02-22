@@ -22,9 +22,19 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import com.github.zafarkhaja.semver.Version;
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v2.applications.ApplicationInstanceInfo;
+import org.cloudfoundry.client.v2.applications.ApplicationInstancesRequest;
+import org.cloudfoundry.client.v2.applications.AssociateApplicationRouteRequest;
+import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
+import org.cloudfoundry.client.v2.applications.GetApplicationRequest;
+import org.cloudfoundry.client.v2.applications.UpdateApplicationRequest;
+import org.cloudfoundry.client.v2.applications.UploadApplicationRequest;
 import org.cloudfoundry.client.v2.info.GetInfoRequest;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.CreateOrganizationQuotaDefinitionRequest;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
+import org.cloudfoundry.client.v2.routes.CreateRouteRequest;
+import org.cloudfoundry.client.v2.servicebrokers.CreateServiceBrokerRequest;
+import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
 import org.cloudfoundry.doppler.DopplerClient;
@@ -53,6 +63,7 @@ import org.cloudfoundry.uaa.users.CreateUserRequest;
 import org.cloudfoundry.uaa.users.CreateUserResponse;
 import org.cloudfoundry.uaa.users.Email;
 import org.cloudfoundry.uaa.users.Name;
+import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import org.slf4j.Logger;
@@ -63,12 +74,15 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.security.SecureRandom;
 import java.time.Duration;
 import java.util.Arrays;
@@ -80,6 +94,8 @@ import static org.cloudfoundry.uaa.tokens.GrantType.AUTHORIZATION_CODE;
 import static org.cloudfoundry.uaa.tokens.GrantType.CLIENT_CREDENTIALS;
 import static org.cloudfoundry.uaa.tokens.GrantType.PASSWORD;
 import static org.cloudfoundry.uaa.tokens.GrantType.REFRESH_TOKEN;
+import static org.cloudfoundry.util.DelayUtils.exponentialBackOff;
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 @Configuration
 @EnableAutoConfiguration
@@ -311,6 +327,11 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean
+    String planName(NameFactory nameFactory) {
+        return nameFactory.getPlanName();
+    }
+
+    @Bean
     SecureRandom random() {
         return new SecureRandom();
     }
@@ -321,6 +342,105 @@ public class IntegrationTestConfiguration {
             .connectionContext(connectionContext)
             .tokenProvider(tokenProvider)
             .build();
+    }
+
+    @Bean(initMethod = "block")
+    @DependsOn("cloudFoundryCleaner")
+    Mono<String> serviceBrokerId(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory, Mono<String> spaceId, String serviceBrokerName, String serviceName, String planName)
+        throws IOException {
+
+        Path application = new ClassPathResource("test-service-broker.jar").getFile().toPath();
+        String hostName = nameFactory.getHostName();
+
+        return Mono
+            .when(
+                spaceId,
+                PaginationUtils
+                    .requestClientV2Resources(page -> cloudFoundryClient.sharedDomains()
+                        .list(ListSharedDomainsRequest.builder()
+                            .page(page)
+                            .build()))
+                    .next()
+            )
+            .then(function((space, domain) -> Mono
+                .when(
+                    cloudFoundryClient.applicationsV2()
+                        .create(CreateApplicationRequest.builder()
+                            .name(nameFactory.getApplicationName())
+                            .spaceId(space)
+                            .build())
+                        .map(ResourceUtils::getId),
+                    cloudFoundryClient.routes()
+                        .create(CreateRouteRequest.builder()
+                            .domainId(ResourceUtils.getId(domain))
+                            .host(hostName)
+                            .spaceId(space)
+                            .build())
+                        .map(ResourceUtils::getId)
+                )
+                .then(function((applicationId, routeId) -> cloudFoundryClient.applicationsV2()
+                    .associateRoute(AssociateApplicationRouteRequest.builder()
+                        .applicationId(applicationId)
+                        .routeId(routeId)
+                        .build())
+                    .then(Mono.just(applicationId))))
+                .then(applicationId -> cloudFoundryClient.applicationsV2()
+                    .upload(UploadApplicationRequest.builder()
+                        .application(application)
+                        .applicationId(applicationId)
+                        .async(true)
+                        .build())
+                    .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, job))
+                    .then(Mono.just(applicationId)))
+                .then(applicationId -> cloudFoundryClient.applicationsV2()
+                    .update(UpdateApplicationRequest.builder()
+                        .applicationId(applicationId)
+                        .environmentJson("SERVICE_NAME", serviceName)
+                        .environmentJson("PLAN_NAME", planName)
+                        .state("STARTED")
+                        .build())
+                    .then(Mono.just(applicationId)))
+                .then(applicationId -> cloudFoundryClient.applicationsV2()
+                    .get(GetApplicationRequest.builder()
+                        .applicationId(applicationId)
+                        .build())
+                    .map(response -> ResourceUtils.getEntity(response).getPackageState())
+                    .filter(state -> "STAGED".equals(state) || "FAILED".equals(state))
+                    .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)))
+                    .then(Mono.just(applicationId)))
+                .then(applicationId -> cloudFoundryClient.applicationsV2()
+                    .instances(ApplicationInstancesRequest.builder()
+                        .applicationId(applicationId)
+                        .build())
+                    .flatMap(response -> Flux.fromIterable(response.getInstances().values()))
+                    .single()
+                    .map(ApplicationInstanceInfo::getState)
+                    .filter("RUNNING"::equals)
+                    .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5))))
+                .then(Mono.just(String.format("https://%s.%s", hostName, ResourceUtils.getEntity(domain).getName())))
+            ))
+            .then(url -> cloudFoundryClient.serviceBrokers()
+                .create(CreateServiceBrokerRequest.builder()
+                    .authenticationPassword("test-authentication-password")
+                    .authenticationUsername("test-authentication-username")
+                    .brokerUrl(url)
+                    .name(serviceBrokerName)
+                    .build()))
+            .map(ResourceUtils::getId)
+            .doOnSubscribe(s -> this.logger.debug(">> SERVICE BROKER ({}/{}/{}) <<", serviceBrokerName, serviceName, planName))
+            .doOnError(Throwable::printStackTrace)
+            .doOnSuccess(id -> this.logger.debug("<< SERVICE_BROKER ({})>>", id))
+            .cache();
+    }
+
+    @Bean
+    String serviceBrokerName(NameFactory nameFactory) {
+        return nameFactory.getServiceBrokerName();
+    }
+
+    @Bean
+    String serviceName(NameFactory nameFactory) {
+        return nameFactory.getServiceName();
     }
 
     @Bean(initMethod = "block")
