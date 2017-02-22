@@ -20,10 +20,10 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.immutables.value.Value;
 
 /**
- * The response payload for the Associate Managed Space with the User operation
+ * The response payload for the Associate Audited Space with the User operation
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _AssociateUserManagedSpaceResponse extends AbstractUserResource {
+abstract class _AssociateUserAuditedSpaceResponse extends AbstractUserResource {
 
 }

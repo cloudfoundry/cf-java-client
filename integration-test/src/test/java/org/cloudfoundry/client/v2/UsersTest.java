@@ -22,6 +22,7 @@ import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceResponse;
+import org.cloudfoundry.client.v2.users.AssociateUserAuditedSpaceRequest;
 import org.cloudfoundry.client.v2.users.AssociateUserManagedSpaceRequest;
 import org.cloudfoundry.client.v2.users.AssociateUserManagedSpaceResponse;
 import org.cloudfoundry.client.v2.users.AssociateUserSpaceRequest;
@@ -70,11 +71,26 @@ public final class UsersTest extends AbstractIntegrationTest {
         //
     }
 
-    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/647
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/647")
     @Test
     public void associateAuditedSpace() throws TimeoutException, InterruptedException {
-        //
+        String spaceName = this.nameFactory.getSpaceName();
+        String userId = this.nameFactory.getUserId();
+
+        this.organizationId
+            .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .then(spaceId -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
+                .then(this.cloudFoundryClient.users()
+                    .associateAuditedSpace(AssociateUserAuditedSpaceRequest.builder()
+                        .auditedSpaceId(spaceId)
+                        .userId(userId)
+                        .build())))
+            .then(requestSummaryUser(this.cloudFoundryClient, userId))
+            .flatMapIterable(response -> response.getEntity().getAuditedSpaces())
+            .map(space -> space.getEntity().getName())
+            .as(StepVerifier::create)
+            .expectNext(spaceName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/648
@@ -106,9 +122,9 @@ public final class UsersTest extends AbstractIntegrationTest {
                         .build())))
             .then(requestSummaryUser(this.cloudFoundryClient, userId))
             .flatMapIterable(response -> response.getEntity().getManagedSpaces())
-            .filter(space -> spaceName.equals(space.getEntity().getName()))
+            .map(space -> space.getEntity().getName())
             .as(StepVerifier::create)
-            .expectNextCount(1)
+            .expectNext(spaceName)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -135,9 +151,9 @@ public final class UsersTest extends AbstractIntegrationTest {
                         .build())))
             .then(requestSummaryUser(this.cloudFoundryClient, userId))
             .flatMapIterable(response -> response.getEntity().getSpaces())
-            .filter(space -> spaceName.equals(space.getEntity().getName()))
+            .map(space -> space.getEntity().getName())
             .as(StepVerifier::create)
-            .expectNextCount(1)
+            .expectNext(spaceName)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
