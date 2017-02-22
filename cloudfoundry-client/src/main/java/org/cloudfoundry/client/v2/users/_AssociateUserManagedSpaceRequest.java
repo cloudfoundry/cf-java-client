@@ -17,44 +17,19 @@
 package org.cloudfoundry.client.v2.users;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v2.InFilterParameter;
-import org.cloudfoundry.client.v2.PaginatedRequest;
 import org.immutables.value.Value;
 
 /**
- * The request payload for the List all Spaces for the User operation
+ * The request payload for the Associate Managed Space with the User operation
  */
 @Value.Immutable
-abstract class _ListUserSpacesRequest extends PaginatedRequest {
+abstract class _AssociateUserManagedSpaceRequest {
 
     /**
-     * The application id
+     * The id of the managed space
      */
-    @InFilterParameter("app_guid")
-    @Nullable
-    abstract String getApplicationId();
-
-    /**
-     * The developer id
-     */
-    @InFilterParameter("developer_guid")
-    @Nullable
-    abstract String getDeveloperId();
-
-    /**
-     * The name
-     */
-    @InFilterParameter("name")
-    @Nullable
-    abstract String getName();
-
-    /**
-     * The organization id
-     */
-    @InFilterParameter("organization_guid")
-    @Nullable
-    abstract String getOrganizationId();
+    @JsonIgnore
+    abstract String getManagedSpaceId();
 
     /**
      * The id of the user

@@ -23,10 +23,10 @@ import org.cloudfoundry.client.v2.PaginatedRequest;
 import org.immutables.value.Value;
 
 /**
- * The request payload for the List all Spaces for the User operation
+ * The request payload for the List all Managed Spaces for the User operation
  */
 @Value.Immutable
-abstract class _ListUserSpacesRequest extends PaginatedRequest {
+abstract class _ListUserManagedSpacesRequest extends PaginatedRequest {
 
     /**
      * The application id

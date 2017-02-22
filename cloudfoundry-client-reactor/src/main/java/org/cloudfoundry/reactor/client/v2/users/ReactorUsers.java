@@ -16,6 +16,8 @@
 
 package org.cloudfoundry.reactor.client.v2.users;
 
+import org.cloudfoundry.client.v2.users.AssociateUserManagedSpaceRequest;
+import org.cloudfoundry.client.v2.users.AssociateUserManagedSpaceResponse;
 import org.cloudfoundry.client.v2.users.AssociateUserSpaceRequest;
 import org.cloudfoundry.client.v2.users.AssociateUserSpaceResponse;
 import org.cloudfoundry.client.v2.users.CreateUserRequest;
@@ -24,10 +26,13 @@ import org.cloudfoundry.client.v2.users.DeleteUserRequest;
 import org.cloudfoundry.client.v2.users.DeleteUserResponse;
 import org.cloudfoundry.client.v2.users.GetUserRequest;
 import org.cloudfoundry.client.v2.users.GetUserResponse;
+import org.cloudfoundry.client.v2.users.ListUserManagedSpacesRequest;
+import org.cloudfoundry.client.v2.users.ListUserManagedSpacesResponse;
 import org.cloudfoundry.client.v2.users.ListUserSpacesRequest;
 import org.cloudfoundry.client.v2.users.ListUserSpacesResponse;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
 import org.cloudfoundry.client.v2.users.ListUsersResponse;
+import org.cloudfoundry.client.v2.users.RemoveUserManagedSpaceRequest;
 import org.cloudfoundry.client.v2.users.RemoveUserSpaceRequest;
 import org.cloudfoundry.client.v2.users.SummaryUserRequest;
 import org.cloudfoundry.client.v2.users.SummaryUserResponse;
@@ -53,6 +58,12 @@ public final class ReactorUsers extends AbstractClientV2Operations implements Us
      */
     public ReactorUsers(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
         super(connectionContext, root, tokenProvider);
+    }
+
+    @Override
+    public Mono<AssociateUserManagedSpaceResponse> associateManagedSpace(AssociateUserManagedSpaceRequest request) {
+        return put(request, AssociateUserManagedSpaceResponse.class, builder -> builder.pathSegment("v2", "users", request.getUserId(), "managed_spaces", request.getManagedSpaceId()))
+            .checkpoint();
     }
 
     @Override
@@ -86,8 +97,20 @@ public final class ReactorUsers extends AbstractClientV2Operations implements Us
     }
 
     @Override
+    public Mono<ListUserManagedSpacesResponse> listManagedSpaces(ListUserManagedSpacesRequest request) {
+        return get(request, ListUserManagedSpacesResponse.class, builder -> builder.pathSegment("v2", "users", request.getUserId(), "managed_spaces"))
+            .checkpoint();
+    }
+
+    @Override
     public Mono<ListUserSpacesResponse> listSpaces(ListUserSpacesRequest request) {
         return get(request, ListUserSpacesResponse.class, builder -> builder.pathSegment("v2", "users", request.getUserId(), "spaces"))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<Void> removeManagedSpace(RemoveUserManagedSpaceRequest request) {
+        return delete(request, Void.class, builder -> builder.pathSegment("v2", "users", request.getUserId(), "managed_spaces", request.getManagedSpaceId()))
             .checkpoint();
     }
 
