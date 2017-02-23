@@ -17,6 +17,7 @@
 package org.cloudfoundry.reactor.util;
 
 import io.netty.handler.codec.http.HttpHeaderNames;
+import reactor.ipc.netty.http.client.HttpClient;
 import reactor.ipc.netty.http.client.HttpClientRequest;
 
 import java.util.Optional;
@@ -29,7 +30,7 @@ public final class UserAgent {
     /**
      * The {@code User-Agent}
      */
-    public static final String USER_AGENT = String.format("Cloud Foundry Java Client/%s", version());
+    public static final String USER_AGENT = String.format("CloudFoundryJavaClient/%s ReactorNetty/%s", javaClientVersion(), reactorNettyVersion());
 
     private UserAgent() {
     }
@@ -44,8 +45,13 @@ public final class UserAgent {
         return request.header(HttpHeaderNames.USER_AGENT, USER_AGENT);
     }
 
-    private static String version() {
+    private static String javaClientVersion() {
         return Optional.ofNullable(UserAgent.class.getPackage().getImplementationVersion())
+            .orElse("unknown");
+    }
+
+    private static String reactorNettyVersion() {
+        return Optional.ofNullable(HttpClient.class.getPackage().getImplementationVersion())
             .orElse("unknown");
     }
 
