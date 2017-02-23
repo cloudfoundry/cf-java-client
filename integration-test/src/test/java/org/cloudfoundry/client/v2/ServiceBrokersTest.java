@@ -203,6 +203,7 @@ public final class ServiceBrokersTest extends AbstractIntegrationTest {
     private static Mono<CreateApplicationResponse> requestCreateApplication(CloudFoundryClient cloudFoundryClient, String spaceId, String applicationName) {
         return cloudFoundryClient.applicationsV2()
             .create(CreateApplicationRequest.builder()
+                .buildpack("http://github.com/cloudfoundry/java-buildpack.git")
                 .name(applicationName)
                 .spaceId(spaceId)
                 .build());

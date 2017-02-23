@@ -366,6 +366,7 @@ public class IntegrationTestConfiguration {
                 .when(
                     cloudFoundryClient.applicationsV2()
                         .create(CreateApplicationRequest.builder()
+                            .buildpack("http://github.com/cloudfoundry/java-buildpack.git")
                             .name(nameFactory.getApplicationName())
                             .spaceId(space)
                             .build())
