@@ -38,6 +38,8 @@ import org.cloudfoundry.client.v2.routes.ListRoutesRequest;
 import org.cloudfoundry.client.v2.routes.RouteEntity;
 import org.cloudfoundry.client.v2.securitygroups.DeleteSecurityGroupRequest;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupsRequest;
+import org.cloudfoundry.client.v2.servicebrokers.DeleteServiceBrokerRequest;
+import org.cloudfoundry.client.v2.servicebrokers.ListServiceBrokersRequest;
 import org.cloudfoundry.client.v2.serviceinstances.DeleteServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesRequest;
 import org.cloudfoundry.client.v2.shareddomains.DeleteSharedDomainRequest;
@@ -122,15 +124,16 @@ final class CloudFoundryCleaner {
                 cleanPackages(this.cloudFoundryClient),
                 cleanRoutes(this.cloudFoundryClient, this.nameFactory),
                 cleanSecurityGroups(this.cloudFoundryClient, this.nameFactory),
+                cleanServiceInstances(this.cloudFoundryClient, this.nameFactory),
                 cleanSpaceQuotaDefinitions(this.cloudFoundryClient, this.nameFactory),
                 cleanUsers(this.cloudFoundryClient, this.nameFactory),
                 cleanUsers(this.uaaClient, this.nameFactory)
             ))
+            .thenMany(cleanServiceBrokers(this.cloudFoundryClient, this.nameFactory)) // After Service Instances)
             .thenMany(cleanApplicationsV2(this.cloudFoundryClient, this.nameFactory)) // After Routes, cannot run with other cleanApps
             .thenMany(cleanApplicationsV3(this.cloudFoundryClient, this.nameFactory)) // After Routes, cannot run with other cleanApps
             .thenMany(Mono.when( // After Routes/Applications
                 cleanPrivateDomains(this.cloudFoundryClient, this.nameFactory),
-                cleanServiceInstances(this.cloudFoundryClient, this.nameFactory),
                 cleanSharedDomains(this.cloudFoundryClient, this.nameFactory),
                 cleanSpaces(this.cloudFoundryClient, this.nameFactory),
                 cleanUserProvidedServiceInstances(this.cloudFoundryClient, this.nameFactory)
@@ -372,6 +375,20 @@ final class CloudFoundryCleaner {
                     .build())
                 .doOnError(t -> LOGGER.error("Unable to delete security group {}", ResourceUtils.getEntity(securityGroup).getName(), t))
                 .then());
+    }
+
+    private static Flux<Void> cleanServiceBrokers(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
+        return PaginationUtils
+            .requestClientV2Resources(page -> cloudFoundryClient.serviceBrokers()
+                .list(ListServiceBrokersRequest.builder()
+                    .page(page)
+                    .build()))
+            .filter(serviceBroker -> nameFactory.isServiceBrokerName(ResourceUtils.getEntity(serviceBroker).getName()))
+            .flatMap(serviceBroker -> cloudFoundryClient.serviceBrokers()
+                .delete(DeleteServiceBrokerRequest.builder()
+                    .serviceBrokerId(ResourceUtils.getId(serviceBroker))
+                    .build())
+                .doOnError(t -> LOGGER.error("Unable to delete service broker {}", ResourceUtils.getEntity(serviceBroker).getName(), t)));
     }
 
     private static Flux<Void> cleanServiceInstances(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {

@@ -45,11 +45,17 @@ public interface NameFactory {
 
     String PATH_PREFIX = "/test-path-";
 
+    String PLAN_PREFIX = "test-plan-";
+
     String QUOTA_DEFINITION_PREFIX = "test-quota-definition-";
 
     String SECURITY_GROUP_PREFIX = "test-security-group-";
 
+    String SERVICE_BROKER_PREFIX = "test-service-broker-";
+
     String SERVICE_INSTANCE_PREFIX = "test-service-instance-";
+
+    String SERVICE_PREFIX = "test-service-";
 
     String SPACE_PREFIX = "test-space-";
 
@@ -185,6 +191,15 @@ public interface NameFactory {
     }
 
     /**
+     * Creates a plan name
+     *
+     * @return the plan name
+     */
+    default String getPlanName() {
+        return getName(PLAN_PREFIX);
+    }
+
+    /**
      * Creates a port
      *
      * @return a port
@@ -210,12 +225,30 @@ public interface NameFactory {
     }
 
     /**
+     * Creates a service broker name
+     *
+     * @return the service broker name
+     */
+    default String getServiceBrokerName() {
+        return getName(SERVICE_BROKER_PREFIX);
+    }
+
+    /**
      * Creates a service instance name
      *
      * @return the service instance name
      */
     default String getServiceInstanceName() {
         return getName(SERVICE_INSTANCE_PREFIX);
+    }
+
+    /**
+     * Creates a service name
+     *
+     * @return the service name
+     */
+    default String getServiceName() {
+        return getName(SERVICE_PREFIX);
     }
 
     /**
@@ -401,6 +434,16 @@ public interface NameFactory {
     }
 
     /**
+     * Tests a name to determine if it is a plan name
+     *
+     * @param candidate the candidate name
+     * @return {@code true} if the name is a plan name, {@code false} otherwise
+     */
+    default boolean isPlanName(String candidate) {
+        return isName(PLAN_PREFIX, candidate);
+    }
+
+    /**
      * Tests if an integer is a port
      *
      * @param candidate the candidate integer
@@ -429,6 +472,16 @@ public interface NameFactory {
     }
 
     /**
+     * Tests a name to determine if it is a service broker name
+     *
+     * @param candidate the candidate name
+     * @return {@code true} if the name is a service broker name, {@code false} otherwise
+     */
+    default boolean isServiceBrokerName(String candidate) {
+        return isName(SERVICE_BROKER_PREFIX, candidate);
+    }
+
+    /**
      * Tests a name to determine if it is a service instance name
      *
      * @param candidate the candidate name
@@ -436,6 +489,16 @@ public interface NameFactory {
      */
     default boolean isServiceInstanceName(String candidate) {
         return isName(SERVICE_INSTANCE_PREFIX, candidate);
+    }
+
+    /**
+     * Tests a name to determine if it is a service name
+     *
+     * @param candidate the candidate name
+     * @return {@code true} if the name is a service name, {@code false} otherwise
+     */
+    default boolean isServiceName(String candidate) {
+        return isName(SERVICE_PREFIX, candidate);
     }
 
     /**
