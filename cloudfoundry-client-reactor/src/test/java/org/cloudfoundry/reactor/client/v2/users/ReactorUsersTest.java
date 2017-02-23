@@ -25,6 +25,8 @@ import org.cloudfoundry.client.v2.users.AssociateUserAuditedSpaceRequest;
 import org.cloudfoundry.client.v2.users.AssociateUserAuditedSpaceResponse;
 import org.cloudfoundry.client.v2.users.AssociateUserManagedSpaceRequest;
 import org.cloudfoundry.client.v2.users.AssociateUserManagedSpaceResponse;
+import org.cloudfoundry.client.v2.users.AssociateUserOrganizationRequest;
+import org.cloudfoundry.client.v2.users.AssociateUserOrganizationResponse;
 import org.cloudfoundry.client.v2.users.AssociateUserSpaceRequest;
 import org.cloudfoundry.client.v2.users.AssociateUserSpaceResponse;
 import org.cloudfoundry.client.v2.users.CreateUserRequest;
@@ -155,6 +157,49 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
                     .managedSpacesUrl("/v2/users/uaa-id-268/managed_spaces")
                     .organizationsUrl("/v2/users/uaa-id-268/organizations")
                     .spacesUrl("/v2/users/uaa-id-268/spaces")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void associateOrganization() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(PUT).path("/v2/users/uaa-id-301/organizations/2f0bb84e-5229-4dd4-b053-855910833d2a")
+                .build())
+            .response(TestResponse.builder()
+                .status(CREATED)
+                .payload("fixtures/client/v2/users/PUT_{id}_organizations_{id}_response.json")
+                .build())
+            .build());
+
+        this.users
+            .associateOrganization(AssociateUserOrganizationRequest.builder()
+                .organizationId("2f0bb84e-5229-4dd4-b053-855910833d2a")
+                .userId("uaa-id-301")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(AssociateUserOrganizationResponse.builder()
+                .metadata(Metadata.builder()
+                    .createdAt("2016-06-08T16:41:36Z")
+                    .id("uaa-id-301")
+                    .updatedAt("2016-06-08T16:41:26Z")
+                    .url("/v2/users/uaa-id-301")
+                    .build())
+                .entity(UserEntity.builder()
+                    .active(false)
+                    .admin(false)
+                    .auditedOrganizationsUrl("/v2/users/uaa-id-301/audited_organizations")
+                    .auditedSpacesUrl("/v2/users/uaa-id-301/audited_spaces")
+                    .billingManagedOrganizationsUrl("/v2/users/uaa-id-301/billing_managed_organizations")
+                    .defaultSpaceId("10db6c03-3e24-4a2a-b311-a28b541376f1")
+                    .defaultSpaceUrl("/v2/spaces/10db6c03-3e24-4a2a-b311-a28b541376f1")
+                    .managedOrganizationsUrl("/v2/users/uaa-id-301/managed_organizations")
+                    .managedSpacesUrl("/v2/users/uaa-id-301/managed_spaces")
+                    .organizationsUrl("/v2/users/uaa-id-301/organizations")
+                    .spacesUrl("/v2/users/uaa-id-301/spaces")
                     .build())
                 .build())
             .expectComplete()

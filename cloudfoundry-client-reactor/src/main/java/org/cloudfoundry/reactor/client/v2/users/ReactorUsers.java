@@ -20,6 +20,8 @@ import org.cloudfoundry.client.v2.users.AssociateUserAuditedSpaceRequest;
 import org.cloudfoundry.client.v2.users.AssociateUserAuditedSpaceResponse;
 import org.cloudfoundry.client.v2.users.AssociateUserManagedSpaceRequest;
 import org.cloudfoundry.client.v2.users.AssociateUserManagedSpaceResponse;
+import org.cloudfoundry.client.v2.users.AssociateUserOrganizationRequest;
+import org.cloudfoundry.client.v2.users.AssociateUserOrganizationResponse;
 import org.cloudfoundry.client.v2.users.AssociateUserSpaceRequest;
 import org.cloudfoundry.client.v2.users.AssociateUserSpaceResponse;
 import org.cloudfoundry.client.v2.users.CreateUserRequest;
@@ -74,6 +76,12 @@ public final class ReactorUsers extends AbstractClientV2Operations implements Us
     @Override
     public Mono<AssociateUserManagedSpaceResponse> associateManagedSpace(AssociateUserManagedSpaceRequest request) {
         return put(request, AssociateUserManagedSpaceResponse.class, builder -> builder.pathSegment("v2", "users", request.getUserId(), "managed_spaces", request.getManagedSpaceId()))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<AssociateUserOrganizationResponse> associateOrganization(AssociateUserOrganizationRequest request) {
+        return put(request, AssociateUserOrganizationResponse.class, builder -> builder.pathSegment("v2", "users", request.getUserId(), "organizations", request.getOrganizationId()))
             .checkpoint();
     }
 

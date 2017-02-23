@@ -1,0 +1,21 @@
+{
+  "metadata": {
+    "guid": "uaa-id-301",
+    "url": "/v2/users/uaa-id-301",
+    "created_at": "2016-06-08T16:41:36Z",
+    "updated_at": "2016-06-08T16:41:26Z"
+  },
+  "entity": {
+    "admin": false,
+    "active": false,
+    "default_space_guid": "10db6c03-3e24-4a2a-b311-a28b541376f1",
+    "default_space_url": "/v2/spaces/10db6c03-3e24-4a2a-b311-a28b541376f1",
+    "spaces_url": "/v2/users/uaa-id-301/spaces",
+    "organizations_url": "/v2/users/uaa-id-301/organizations",
+    "managed_organizations_url": "/v2/users/uaa-id-301/managed_organizations",
+    "billing_managed_organizations_url": "/v2/users/uaa-id-301/billing_managed_organizations",
+    "audited_organizations_url": "/v2/users/uaa-id-301/audited_organizations",
+    "managed_spaces_url": "/v2/users/uaa-id-301/managed_spaces",
+    "audited_spaces_url": "/v2/users/uaa-id-301/audited_spaces"
+  }
+}

@@ -26,6 +26,7 @@ import org.cloudfoundry.client.v2.users.AssociateUserAuditedSpaceRequest;
 import org.cloudfoundry.client.v2.users.AssociateUserAuditedSpaceResponse;
 import org.cloudfoundry.client.v2.users.AssociateUserManagedSpaceRequest;
 import org.cloudfoundry.client.v2.users.AssociateUserManagedSpaceResponse;
+import org.cloudfoundry.client.v2.users.AssociateUserOrganizationRequest;
 import org.cloudfoundry.client.v2.users.AssociateUserSpaceRequest;
 import org.cloudfoundry.client.v2.users.AssociateUserSpaceResponse;
 import org.cloudfoundry.client.v2.users.CreateUserRequest;
@@ -132,11 +133,28 @@ public final class UsersTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/651
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/651")
     @Test
     public void associateOrganization() throws TimeoutException, InterruptedException {
-        //
+        String userId = this.nameFactory.getUserId();
+
+        this.organizationId
+            .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
+                .then(this.cloudFoundryClient.users()
+                    .associateOrganization(AssociateUserOrganizationRequest.builder()
+                        .organizationId(organizationId)
+                        .userId(userId)
+                        .build())
+                    .map(ignore -> organizationId)))
+            .then(organizationId -> Mono.when(
+                Mono.just(organizationId),
+                requestSummaryUser(this.cloudFoundryClient, userId)
+                    .flatMapIterable(response -> response.getEntity().getOrganizations())
+                    .single()
+                    .map(ResourceUtils::getId)))
+            .as(StepVerifier::create)
+            .consumeNextWith(tupleEquality())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
