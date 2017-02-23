@@ -34,9 +34,11 @@ import java.util.function.Function;
 
 public final class JsonCodec {
 
+    private static final int MAX_PAYLOAD_SIZE = 100 * 1024 * 1024;
+
     public static <T> Function<Mono<HttpClientResponse>, Flux<T>> decode(ObjectMapper objectMapper, Class<T> responseType) {
         return inbound -> inbound
-            .flatMap(response -> response.addHandler(new JsonObjectDecoder()).receive().asByteArray())
+            .flatMap(response -> response.addHandler(new JsonObjectDecoder(MAX_PAYLOAD_SIZE)).receive().asByteArray())
             .map(payload -> {
                 try {
                     return objectMapper.readValue(payload, responseType);
