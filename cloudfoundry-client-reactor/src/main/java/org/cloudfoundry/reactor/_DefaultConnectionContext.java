@@ -44,10 +44,10 @@ import java.util.regex.Pattern;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
+import static io.netty.channel.ChannelOption.CONNECT_TIMEOUT_MILLIS;
 import static io.netty.channel.ChannelOption.SO_KEEPALIVE;
 import static io.netty.channel.ChannelOption.SO_RCVBUF;
 import static io.netty.channel.ChannelOption.SO_SNDBUF;
-import static io.netty.channel.ChannelOption.SO_TIMEOUT;
 
 /**
  * The default implementation of the {@link ConnectionContext} interface.  This is the implementation that should be used for most non-testing cases.
@@ -87,7 +87,7 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
             Optional.ofNullable(getConnectionPoolSize()).ifPresent(connectionPoolSize -> options.poolResources(PoolResources.fixed("cloudfoundry-client", connectionPoolSize)));
             getKeepAlive().ifPresent(keepAlive -> options.option(SO_KEEPALIVE, keepAlive));
             getProxyConfiguration().ifPresent(c -> options.proxy(ClientOptions.Proxy.HTTP, c.getHost(), c.getPort().orElse(null), c.getUsername().orElse(null), u -> c.getPassword().orElse(null)));
-            getSocketTimeout().ifPresent(socketTimeout -> options.option(SO_TIMEOUT, (int) socketTimeout.toMillis()));
+            getConnectTimeout().ifPresent(socketTimeout -> options.option(CONNECT_TIMEOUT_MILLIS, (int) socketTimeout.toMillis()));
 
             options.sslSupport(ssl -> getSslCertificateTruster().ifPresent(trustManager -> ssl.trustManager(new StaticTrustManagerFactory(trustManager))));
             getSslHandshakeTimeout().ifPresent(options::sslHandshakeTimeout);
@@ -158,6 +158,11 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
      */
     abstract String getApiHost();
 
+    /**
+     * The {@code CONNECT_TIMEOUT_MILLIS} value
+     */
+    abstract Optional<Duration> getConnectTimeout();
+
     @SuppressWarnings("unchecked")
     @Value.Derived
     Mono<Map<String, String>> getInfo() {
@@ -205,11 +210,6 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
      * Whether to skip SSL certificate validation for all hosts reachable from the API host.  Defaults to {@code false}.
      */
     abstract Optional<Boolean> getSkipSslValidation();
-
-    /**
-     * The {@code SO_TIMEOUT} value
-     */
-    abstract Optional<Duration> getSocketTimeout();
 
     @Value.Derived
     Optional<SslCertificateTruster> getSslCertificateTruster() {
