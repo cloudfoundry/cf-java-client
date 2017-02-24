@@ -47,6 +47,7 @@ import org.cloudfoundry.client.v2.users.ListUserOrganizationsRequest;
 import org.cloudfoundry.client.v2.users.ListUserSpacesRequest;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
 import org.cloudfoundry.client.v2.users.RemoveUserAuditedSpaceRequest;
+import org.cloudfoundry.client.v2.users.RemoveUserManagedOrganizationRequest;
 import org.cloudfoundry.client.v2.users.RemoveUserManagedSpaceRequest;
 import org.cloudfoundry.client.v2.users.RemoveUserOrganizationRequest;
 import org.cloudfoundry.client.v2.users.RemoveUserSpaceRequest;
@@ -1027,11 +1028,25 @@ public final class UsersTest extends AbstractIntegrationTest {
         //
     }
 
-    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/665
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/665")
     @Test
     public void removeManagedOrganization() throws TimeoutException, InterruptedException {
-        //
+        String userId = this.nameFactory.getUserId();
+
+        this.organizationId
+            .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
+                .then(requestAssociateManagedOrganization(this.cloudFoundryClient, organizationId, userId)
+                    .map(ignore -> organizationId)))
+            .then(organizationId -> this.cloudFoundryClient.users()
+                .removeManagedOrganization(RemoveUserManagedOrganizationRequest.builder()
+                    .managedOrganizationId(organizationId)
+                    .userId(userId)
+                    .build()))
+            .then(requestSummaryUser(this.cloudFoundryClient, userId))
+            .flatMapIterable(response -> response.getEntity().getManagedOrganizations())
+            .as(StepVerifier::create)
+            .expectNextCount(0)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
