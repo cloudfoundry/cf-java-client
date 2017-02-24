@@ -20,7 +20,6 @@ import org.junit.Test;
 
 public final class ListUserAuditedSpacesRequestTest {
 
-
     @Test(expected = IllegalStateException.class)
     public void noUserId() {
         ListUserAuditedSpacesRequest.builder()

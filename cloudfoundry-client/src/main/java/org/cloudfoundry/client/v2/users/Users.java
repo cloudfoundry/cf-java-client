@@ -29,6 +29,14 @@ public interface Users {
     Mono<AssociateUserAuditedSpaceResponse> associateAuditedSpace(AssociateUserAuditedSpaceRequest request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/users/associate_managed_organization_with_the_user.html">Associate Managed Organization with the User</a> request
+     *
+     * @param request the Associate Managed Organization with the User request
+     * @return the response from the Associate Managed Organization with the User request
+     */
+    Mono<AssociateUserManagedOrganizationResponse> associateManagedOrganization(AssociateUserManagedOrganizationRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/users/associate_managed_space_with_the_user.html">Associate Managed Space with the User</a> request
      *
      * @param request the Associate Managed Space with the User request
@@ -93,6 +101,14 @@ public interface Users {
     Mono<ListUserAuditedSpacesResponse> listAuditedSpaces(ListUserAuditedSpacesRequest request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/users/list_all_managed_organizations_for_the_user.html">List all Managed Organizations for the User</a> request
+     *
+     * @param request the List all Managed Organizations for the User request
+     * @return the response from the List all Managed Organizations for the User request
+     */
+    Mono<ListUserManagedOrganizationsResponse> listManagedOrganizations(ListUserManagedOrganizationsRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/users/list_all_managed_spaces_for_the_user.html">List all Managed Spaces for the User</a> request
      *
      * @param request the List all Managed Spaces for the User request
@@ -123,6 +139,14 @@ public interface Users {
      * @return the response from the Remove Audited Space from the User request
      */
     Mono<Void> removeAuditedSpace(RemoveUserAuditedSpaceRequest request);
+
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/users/remove_managed_organization_from_the_user.html">Remove Managed Organization from the User</a> request
+     *
+     * @param request the Remove Managed Organization from the User request
+     * @return the response from the Remove Managed Organization from the User request
+     */
+    Mono<Void> removeManagedOrganization(RemoveUserManagedOrganizationRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/users/remove_managed_space_from_the_user.html">Remove Managed Space from the User</a> request

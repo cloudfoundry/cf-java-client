@@ -18,17 +18,26 @@ package org.cloudfoundry.client.v2.users;
 
 import org.junit.Test;
 
-public final class ListUserSpacesRequestTest {
+public final class AssociateUserManagedOrganizationRequestTest {
+
+    @Test(expected = IllegalStateException.class)
+    public void noManagedOrganizationId() {
+        AssociateUserManagedOrganizationRequest.builder()
+            .userId("test-user-id")
+            .build();
+    }
 
     @Test(expected = IllegalStateException.class)
     public void noUserId() {
-        ListUserSpacesRequest.builder()
+        AssociateUserManagedOrganizationRequest.builder()
+            .managedOrganizationId("test-managed-space-id")
             .build();
     }
 
     @Test
     public void valid() {
-        ListUserSpacesRequest.builder()
+        AssociateUserManagedOrganizationRequest.builder()
+            .managedOrganizationId("test-managed-space-id")
             .userId("test-user-id")
             .build();
     }
