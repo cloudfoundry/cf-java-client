@@ -26,6 +26,8 @@ import org.cloudfoundry.client.v2.users.AssociateUserAuditedSpaceRequest;
 import org.cloudfoundry.client.v2.users.AssociateUserAuditedSpaceResponse;
 import org.cloudfoundry.client.v2.users.AssociateUserManagedSpaceRequest;
 import org.cloudfoundry.client.v2.users.AssociateUserManagedSpaceResponse;
+import org.cloudfoundry.client.v2.users.AssociateUserOrganizationRequest;
+import org.cloudfoundry.client.v2.users.AssociateUserOrganizationResponse;
 import org.cloudfoundry.client.v2.users.AssociateUserSpaceRequest;
 import org.cloudfoundry.client.v2.users.AssociateUserSpaceResponse;
 import org.cloudfoundry.client.v2.users.CreateUserRequest;
@@ -34,10 +36,12 @@ import org.cloudfoundry.client.v2.users.DeleteUserRequest;
 import org.cloudfoundry.client.v2.users.GetUserRequest;
 import org.cloudfoundry.client.v2.users.ListUserAuditedSpacesRequest;
 import org.cloudfoundry.client.v2.users.ListUserManagedSpacesRequest;
+import org.cloudfoundry.client.v2.users.ListUserOrganizationsRequest;
 import org.cloudfoundry.client.v2.users.ListUserSpacesRequest;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
 import org.cloudfoundry.client.v2.users.RemoveUserAuditedSpaceRequest;
 import org.cloudfoundry.client.v2.users.RemoveUserManagedSpaceRequest;
+import org.cloudfoundry.client.v2.users.RemoveUserOrganizationRequest;
 import org.cloudfoundry.client.v2.users.RemoveUserSpaceRequest;
 import org.cloudfoundry.client.v2.users.SummaryUserRequest;
 import org.cloudfoundry.client.v2.users.SummaryUserResponse;
@@ -61,11 +65,16 @@ import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public final class UsersTest extends AbstractIntegrationTest {
 
+    private static final String STATUS_FILTER = "active";
+
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
 
     @Autowired
     private Mono<String> organizationId;
+
+    @Autowired
+    private String organizationName;
 
     //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/646
     @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/646")
@@ -132,11 +141,28 @@ public final class UsersTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/651
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/651")
     @Test
     public void associateOrganization() throws TimeoutException, InterruptedException {
-        //
+        String userId = this.nameFactory.getUserId();
+
+        this.organizationId
+            .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
+                .then(this.cloudFoundryClient.users()
+                    .associateOrganization(AssociateUserOrganizationRequest.builder()
+                        .organizationId(organizationId)
+                        .userId(userId)
+                        .build())
+                    .map(ignore -> organizationId)))
+            .then(organizationId -> Mono.when(
+                Mono.just(organizationId),
+                requestSummaryUser(this.cloudFoundryClient, userId)
+                    .flatMapIterable(response -> response.getEntity().getOrganizations())
+                    .single()
+                    .map(ResourceUtils::getId)))
+            .as(StepVerifier::create)
+            .consumeNextWith(tupleEquality())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -276,6 +302,7 @@ public final class UsersTest extends AbstractIntegrationTest {
             .flatMap(ignore -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listAuditedSpaces(ListUserAuditedSpacesRequest.builder()
+                        .page(page)
                         .userId(userId)
                         .build())))
             .as(StepVerifier::create)
@@ -301,6 +328,7 @@ public final class UsersTest extends AbstractIntegrationTest {
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listAuditedSpaces(ListUserAuditedSpacesRequest.builder()
                         .applicationId(applicationId)
+                        .page(page)
                         .userId(userId)
                         .build()))))
             .as(StepVerifier::create)
@@ -325,6 +353,7 @@ public final class UsersTest extends AbstractIntegrationTest {
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listAuditedSpaces(ListUserAuditedSpacesRequest.builder()
                         .developerId(userId)
+                        .page(page)
                         .userId(userId)
                         .build())))
             .as(StepVerifier::create)
@@ -346,6 +375,7 @@ public final class UsersTest extends AbstractIntegrationTest {
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listAuditedSpaces(ListUserAuditedSpacesRequest.builder()
                         .name(spaceName)
+                        .page(page)
                         .userId(userId)
                         .build())))
             .as(StepVerifier::create)
@@ -371,6 +401,7 @@ public final class UsersTest extends AbstractIntegrationTest {
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listAuditedSpaces(ListUserAuditedSpacesRequest.builder()
                         .organizationId(organizationId)
+                        .page(page)
                         .userId(userId)
                         .build())))
             .as(StepVerifier::create)
@@ -457,6 +488,7 @@ public final class UsersTest extends AbstractIntegrationTest {
             .flatMap(ignore -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listManagedSpaces(ListUserManagedSpacesRequest.builder()
+                        .page(page)
                         .userId(userId)
                         .build())))
             .as(StepVerifier::create)
@@ -482,6 +514,7 @@ public final class UsersTest extends AbstractIntegrationTest {
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listManagedSpaces(ListUserManagedSpacesRequest.builder()
                         .applicationId(applicationId)
+                        .page(page)
                         .userId(userId)
                         .build()))))
             .as(StepVerifier::create)
@@ -506,6 +539,7 @@ public final class UsersTest extends AbstractIntegrationTest {
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listManagedSpaces(ListUserManagedSpacesRequest.builder()
                         .developerId(userId)
+                        .page(page)
                         .userId(userId)
                         .build())))
             .as(StepVerifier::create)
@@ -527,6 +561,7 @@ public final class UsersTest extends AbstractIntegrationTest {
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listManagedSpaces(ListUserManagedSpacesRequest.builder()
                         .name(spaceName)
+                        .page(page)
                         .userId(userId)
                         .build())))
             .as(StepVerifier::create)
@@ -552,6 +587,7 @@ public final class UsersTest extends AbstractIntegrationTest {
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listManagedSpaces(ListUserManagedSpacesRequest.builder()
                         .organizationId(organizationId)
+                        .page(page)
                         .userId(userId)
                         .build())))
             .as(StepVerifier::create)
@@ -560,11 +596,115 @@ public final class UsersTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/660
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/660")
     @Test
     public void listOrganizations() throws TimeoutException, InterruptedException {
-        //
+        String userId = this.nameFactory.getUserId();
+
+        this.organizationId
+            .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
+                .then(requestAssociateOrganization(this.cloudFoundryClient, organizationId, userId)
+                    .map(ignore -> organizationId)))
+            .flatMap(ignore -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
+                    .listOrganizations(ListUserOrganizationsRequest.builder()
+                        .page(page)
+                        .userId(userId)
+                        .build())))
+            .map(resource -> resource.getEntity().getName())
+            .as(StepVerifier::create)
+            .expectNext(this.organizationName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/646
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/646")
+    @Test
+    public void listOrganizationsFilterByAuditorId() throws TimeoutException, InterruptedException {
+
+    }
+
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/648
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/648")
+    @Test
+    public void listOrganizationsFilterByBillingManagerId() throws TimeoutException, InterruptedException {
+
+    }
+
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/649
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/649")
+    @Test
+    public void listOrganizationsFilterByManagerId() throws TimeoutException, InterruptedException {
+
+    }
+
+    @Test
+    public void listOrganizationsFilterByName() throws TimeoutException, InterruptedException {
+        String userId = this.nameFactory.getUserId();
+
+        this.organizationId
+            .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
+                .then(requestAssociateOrganization(this.cloudFoundryClient, organizationId, userId)))
+            .flatMap(ignore -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
+                    .listOrganizations(ListUserOrganizationsRequest.builder()
+                        .name(this.organizationName)
+                        .page(page)
+                        .userId(userId)
+                        .build())))
+            .map(resource -> resource.getEntity().getName())
+            .as(StepVerifier::create)
+            .expectNext(this.organizationName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void listOrganizationsFilterBySpaceId() throws TimeoutException, InterruptedException {
+        String spaceName = this.nameFactory.getSpaceName();
+        String userId = this.nameFactory.getUserId();
+
+        this.organizationId
+            .then(organizationId -> Mono.when(
+                Mono.just(organizationId),
+                createSpaceId(this.cloudFoundryClient, organizationId, spaceName)))
+            .then(function((organizationId, spaceId) -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
+                .then(requestAssociateOrganization(this.cloudFoundryClient, organizationId, userId))
+                .map(ignore -> spaceId)))
+            .flatMap(spaceId -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
+                    .listOrganizations(ListUserOrganizationsRequest.builder()
+                        .page(page)
+                        .spaceId(spaceId)
+                        .userId(userId)
+                        .build())))
+            .map(resource -> resource.getEntity().getName())
+            .as(StepVerifier::create)
+            .expectNext(this.organizationName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void listOrganizationsFilterByStatus() throws TimeoutException, InterruptedException {
+        String userId = this.nameFactory.getUserId();
+
+        this.organizationId
+            .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
+                .then(requestAssociateOrganization(this.cloudFoundryClient, organizationId, userId)
+                    .map(ignore -> organizationId)))
+            .flatMap(ignore -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
+                    .listOrganizations(ListUserOrganizationsRequest.builder()
+                        .page(page)
+                        .status(STATUS_FILTER)
+                        .userId(userId)
+                        .build())))
+            .map(resource -> resource.getEntity().getName())
+            .as(StepVerifier::create)
+            .expectNext(this.organizationName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -579,6 +719,7 @@ public final class UsersTest extends AbstractIntegrationTest {
             .flatMap(ignore -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listSpaces(ListUserSpacesRequest.builder()
+                        .page(page)
                         .userId(userId)
                         .build())))
             .as(StepVerifier::create)
@@ -604,6 +745,7 @@ public final class UsersTest extends AbstractIntegrationTest {
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listSpaces(ListUserSpacesRequest.builder()
                         .applicationId(applicationId)
+                        .page(page)
                         .userId(userId)
                         .build()))))
             .as(StepVerifier::create)
@@ -625,10 +767,12 @@ public final class UsersTest extends AbstractIntegrationTest {
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listSpaces(ListUserSpacesRequest.builder()
                         .developerId(userId)
+                        .page(page)
                         .userId(userId)
                         .build())))
+            .map(resource -> resource.getEntity().getName())
             .as(StepVerifier::create)
-            .expectNextCount(1)
+            .expectNext(spaceName)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -646,10 +790,12 @@ public final class UsersTest extends AbstractIntegrationTest {
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listSpaces(ListUserSpacesRequest.builder()
                         .name(spaceName)
+                        .page(page)
                         .userId(userId)
                         .build())))
+            .map(resource -> resource.getEntity().getName())
             .as(StepVerifier::create)
-            .expectNextCount(1)
+            .expectNext(spaceName)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -671,10 +817,12 @@ public final class UsersTest extends AbstractIntegrationTest {
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listSpaces(ListUserSpacesRequest.builder()
                         .organizationId(organizationId)
+                        .page(page)
                         .userId(userId)
                         .build())))
+            .map(resource -> resource.getEntity().getName())
             .as(StepVerifier::create)
-            .expectNextCount(1)
+            .expectNext(spaceName)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -744,11 +892,25 @@ public final class UsersTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/667
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/667")
     @Test
     public void removeOrganization() throws TimeoutException, InterruptedException {
-        //
+        String userId = this.nameFactory.getUserId();
+
+        this.organizationId
+            .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
+                .then(requestAssociateOrganization(this.cloudFoundryClient, organizationId, userId)
+                    .map(ignore -> organizationId)))
+            .then(organizationId -> this.cloudFoundryClient.users()
+                .removeOrganization(RemoveUserOrganizationRequest.builder()
+                    .organizationId(organizationId)
+                    .userId(userId)
+                    .build()))
+            .then(requestSummaryUser(this.cloudFoundryClient, userId))
+            .flatMapIterable(response -> response.getEntity().getOrganizations())
+            .as(StepVerifier::create)
+            .expectNextCount(0)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -834,6 +996,14 @@ public final class UsersTest extends AbstractIntegrationTest {
         return cloudFoundryClient.users()
             .associateManagedSpace(AssociateUserManagedSpaceRequest.builder()
                 .managedSpaceId(spaceId)
+                .userId(userId)
+                .build());
+    }
+
+    private static Mono<AssociateUserOrganizationResponse> requestAssociateOrganization(CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
+        return cloudFoundryClient.users()
+            .associateOrganization(AssociateUserOrganizationRequest.builder()
+                .organizationId(organizationId)
                 .userId(userId)
                 .build());
     }

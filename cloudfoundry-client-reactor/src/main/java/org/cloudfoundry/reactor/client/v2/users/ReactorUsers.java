@@ -20,6 +20,8 @@ import org.cloudfoundry.client.v2.users.AssociateUserAuditedSpaceRequest;
 import org.cloudfoundry.client.v2.users.AssociateUserAuditedSpaceResponse;
 import org.cloudfoundry.client.v2.users.AssociateUserManagedSpaceRequest;
 import org.cloudfoundry.client.v2.users.AssociateUserManagedSpaceResponse;
+import org.cloudfoundry.client.v2.users.AssociateUserOrganizationRequest;
+import org.cloudfoundry.client.v2.users.AssociateUserOrganizationResponse;
 import org.cloudfoundry.client.v2.users.AssociateUserSpaceRequest;
 import org.cloudfoundry.client.v2.users.AssociateUserSpaceResponse;
 import org.cloudfoundry.client.v2.users.CreateUserRequest;
@@ -32,12 +34,15 @@ import org.cloudfoundry.client.v2.users.ListUserAuditedSpacesRequest;
 import org.cloudfoundry.client.v2.users.ListUserAuditedSpacesResponse;
 import org.cloudfoundry.client.v2.users.ListUserManagedSpacesRequest;
 import org.cloudfoundry.client.v2.users.ListUserManagedSpacesResponse;
+import org.cloudfoundry.client.v2.users.ListUserOrganizationsRequest;
+import org.cloudfoundry.client.v2.users.ListUserOrganizationsResponse;
 import org.cloudfoundry.client.v2.users.ListUserSpacesRequest;
 import org.cloudfoundry.client.v2.users.ListUserSpacesResponse;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
 import org.cloudfoundry.client.v2.users.ListUsersResponse;
 import org.cloudfoundry.client.v2.users.RemoveUserAuditedSpaceRequest;
 import org.cloudfoundry.client.v2.users.RemoveUserManagedSpaceRequest;
+import org.cloudfoundry.client.v2.users.RemoveUserOrganizationRequest;
 import org.cloudfoundry.client.v2.users.RemoveUserSpaceRequest;
 import org.cloudfoundry.client.v2.users.SummaryUserRequest;
 import org.cloudfoundry.client.v2.users.SummaryUserResponse;
@@ -74,6 +79,12 @@ public final class ReactorUsers extends AbstractClientV2Operations implements Us
     @Override
     public Mono<AssociateUserManagedSpaceResponse> associateManagedSpace(AssociateUserManagedSpaceRequest request) {
         return put(request, AssociateUserManagedSpaceResponse.class, builder -> builder.pathSegment("v2", "users", request.getUserId(), "managed_spaces", request.getManagedSpaceId()))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<AssociateUserOrganizationResponse> associateOrganization(AssociateUserOrganizationRequest request) {
+        return put(request, AssociateUserOrganizationResponse.class, builder -> builder.pathSegment("v2", "users", request.getUserId(), "organizations", request.getOrganizationId()))
             .checkpoint();
     }
 
@@ -120,6 +131,12 @@ public final class ReactorUsers extends AbstractClientV2Operations implements Us
     }
 
     @Override
+    public Mono<ListUserOrganizationsResponse> listOrganizations(ListUserOrganizationsRequest request) {
+        return get(request, ListUserOrganizationsResponse.class, builder -> builder.pathSegment("v2", "users", request.getUserId(), "organizations"))
+            .checkpoint();
+    }
+
+    @Override
     public Mono<ListUserSpacesResponse> listSpaces(ListUserSpacesRequest request) {
         return get(request, ListUserSpacesResponse.class, builder -> builder.pathSegment("v2", "users", request.getUserId(), "spaces"))
             .checkpoint();
@@ -134,6 +151,12 @@ public final class ReactorUsers extends AbstractClientV2Operations implements Us
     @Override
     public Mono<Void> removeManagedSpace(RemoveUserManagedSpaceRequest request) {
         return delete(request, Void.class, builder -> builder.pathSegment("v2", "users", request.getUserId(), "managed_spaces", request.getManagedSpaceId()))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<Void> removeOrganization(RemoveUserOrganizationRequest request) {
+        return delete(request, Void.class, builder -> builder.pathSegment("v2", "users", request.getUserId(), "organizations", request.getOrganizationId()))
             .checkpoint();
     }
 
