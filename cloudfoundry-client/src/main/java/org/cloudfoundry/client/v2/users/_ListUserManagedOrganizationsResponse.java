@@ -16,21 +16,16 @@
 
 package org.cloudfoundry.client.v2.users;
 
-import org.junit.Test;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.client.v2.PaginatedResponse;
+import org.cloudfoundry.client.v2.organizations.OrganizationResource;
+import org.immutables.value.Value;
 
-public final class ListUserSpacesRequestTest {
-
-    @Test(expected = IllegalStateException.class)
-    public void noUserId() {
-        ListUserSpacesRequest.builder()
-            .build();
-    }
-
-    @Test
-    public void valid() {
-        ListUserSpacesRequest.builder()
-            .userId("test-user-id")
-            .build();
-    }
+/**
+ * The response payload for the List all Managed Organizations for the User operation
+ */
+@JsonDeserialize
+@Value.Immutable
+abstract class _ListUserManagedOrganizationsResponse extends PaginatedResponse<OrganizationResource> {
 
 }

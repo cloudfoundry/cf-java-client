@@ -101,6 +101,14 @@ public interface Users {
     Mono<ListUserAuditedSpacesResponse> listAuditedSpaces(ListUserAuditedSpacesRequest request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/users/list_all_managed_organizations_for_the_user.html">List all Managed Organizations for the User</a> request
+     *
+     * @param request the List all Managed Organizations for the User request
+     * @return the response from the List all Managed Organizations for the User request
+     */
+    Mono<ListUserManagedOrganizationsResponse> listManagedOrganizations(ListUserManagedOrganizationsRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/users/list_all_managed_spaces_for_the_user.html">List all Managed Spaces for the User</a> request
      *
      * @param request the List all Managed Spaces for the User request

@@ -20,13 +20,11 @@ import org.junit.Test;
 
 public final class ListUserOrganizationsRequestTest {
 
-
     @Test(expected = IllegalStateException.class)
     public void noUserId() {
         ListUserOrganizationsRequest.builder()
             .build();
     }
-
 
     @Test
     public void valid() {
