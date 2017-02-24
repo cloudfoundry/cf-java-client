@@ -41,6 +41,7 @@ import org.cloudfoundry.client.v2.users.ListUserSpacesRequest;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
 import org.cloudfoundry.client.v2.users.RemoveUserAuditedSpaceRequest;
 import org.cloudfoundry.client.v2.users.RemoveUserManagedSpaceRequest;
+import org.cloudfoundry.client.v2.users.RemoveUserOrganizationRequest;
 import org.cloudfoundry.client.v2.users.RemoveUserSpaceRequest;
 import org.cloudfoundry.client.v2.users.SummaryUserRequest;
 import org.cloudfoundry.client.v2.users.SummaryUserResponse;
@@ -601,7 +602,7 @@ public final class UsersTest extends AbstractIntegrationTest {
 
         this.organizationId
             .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
-                .then(requestAssociateUserOrganization(this.cloudFoundryClient, organizationId, userId)
+                .then(requestAssociateOrganization(this.cloudFoundryClient, organizationId, userId)
                     .map(ignore -> organizationId)))
             .flatMap(ignore -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
@@ -643,7 +644,7 @@ public final class UsersTest extends AbstractIntegrationTest {
 
         this.organizationId
             .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
-                .then(requestAssociateUserOrganization(this.cloudFoundryClient, organizationId, userId)))
+                .then(requestAssociateOrganization(this.cloudFoundryClient, organizationId, userId)))
             .flatMap(ignore -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listOrganizations(ListUserOrganizationsRequest.builder()
@@ -668,7 +669,7 @@ public final class UsersTest extends AbstractIntegrationTest {
                 Mono.just(organizationId),
                 createSpaceId(this.cloudFoundryClient, organizationId, spaceName)))
             .then(function((organizationId, spaceId) -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
-                .then(requestAssociateUserOrganization(this.cloudFoundryClient, organizationId, userId))
+                .then(requestAssociateOrganization(this.cloudFoundryClient, organizationId, userId))
                 .map(ignore -> spaceId)))
             .flatMap(spaceId -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
@@ -690,7 +691,7 @@ public final class UsersTest extends AbstractIntegrationTest {
 
         this.organizationId
             .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
-                .then(requestAssociateUserOrganization(this.cloudFoundryClient, organizationId, userId)
+                .then(requestAssociateOrganization(this.cloudFoundryClient, organizationId, userId)
                     .map(ignore -> organizationId)))
             .flatMap(ignore -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
@@ -891,11 +892,25 @@ public final class UsersTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/667
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/667")
     @Test
     public void removeOrganization() throws TimeoutException, InterruptedException {
-        //
+        String userId = this.nameFactory.getUserId();
+
+        this.organizationId
+            .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
+                .then(requestAssociateOrganization(this.cloudFoundryClient, organizationId, userId)
+                    .map(ignore -> organizationId)))
+            .then(organizationId -> this.cloudFoundryClient.users()
+                .removeOrganization(RemoveUserOrganizationRequest.builder()
+                    .organizationId(organizationId)
+                    .userId(userId)
+                    .build()))
+            .then(requestSummaryUser(this.cloudFoundryClient, userId))
+            .flatMapIterable(response -> response.getEntity().getOrganizations())
+            .as(StepVerifier::create)
+            .expectNextCount(0)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -985,18 +1000,18 @@ public final class UsersTest extends AbstractIntegrationTest {
                 .build());
     }
 
-    private static Mono<AssociateUserSpaceResponse> requestAssociateSpace(CloudFoundryClient cloudFoundryClient, String spaceId, String userId) {
+    private static Mono<AssociateUserOrganizationResponse> requestAssociateOrganization(CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
         return cloudFoundryClient.users()
-            .associateSpace(AssociateUserSpaceRequest.builder()
-                .spaceId(spaceId)
+            .associateOrganization(AssociateUserOrganizationRequest.builder()
+                .organizationId(organizationId)
                 .userId(userId)
                 .build());
     }
 
-    private static Mono<AssociateUserOrganizationResponse> requestAssociateUserOrganization(CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
+    private static Mono<AssociateUserSpaceResponse> requestAssociateSpace(CloudFoundryClient cloudFoundryClient, String spaceId, String userId) {
         return cloudFoundryClient.users()
-            .associateOrganization(AssociateUserOrganizationRequest.builder()
-                .organizationId(organizationId)
+            .associateSpace(AssociateUserSpaceRequest.builder()
+                .spaceId(spaceId)
                 .userId(userId)
                 .build());
     }

@@ -42,6 +42,7 @@ import org.cloudfoundry.client.v2.users.ListUsersRequest;
 import org.cloudfoundry.client.v2.users.ListUsersResponse;
 import org.cloudfoundry.client.v2.users.RemoveUserAuditedSpaceRequest;
 import org.cloudfoundry.client.v2.users.RemoveUserManagedSpaceRequest;
+import org.cloudfoundry.client.v2.users.RemoveUserOrganizationRequest;
 import org.cloudfoundry.client.v2.users.RemoveUserSpaceRequest;
 import org.cloudfoundry.client.v2.users.SummaryUserRequest;
 import org.cloudfoundry.client.v2.users.SummaryUserResponse;
@@ -150,6 +151,12 @@ public final class ReactorUsers extends AbstractClientV2Operations implements Us
     @Override
     public Mono<Void> removeManagedSpace(RemoveUserManagedSpaceRequest request) {
         return delete(request, Void.class, builder -> builder.pathSegment("v2", "users", request.getUserId(), "managed_spaces", request.getManagedSpaceId()))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<Void> removeOrganization(RemoveUserOrganizationRequest request) {
+        return delete(request, Void.class, builder -> builder.pathSegment("v2", "users", request.getUserId(), "organizations", request.getOrganizationId()))
             .checkpoint();
     }
 
