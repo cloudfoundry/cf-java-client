@@ -271,7 +271,7 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
         requestSharedDomains(this.cloudFoundryClient, "test-domain");
         requestRoutes(this.cloudFoundryClient, "test-shared-domain-metadata-id", null, null, 9999);
         requestDeleteRoute(this.cloudFoundryClient, "test-route-id");
-        requestJobSuccess(this.cloudFoundryClient, "test-id");
+        requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
 
         this.routes
             .delete(DeleteRouteRequest.builder()
@@ -288,7 +288,7 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
         requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
         requestRoutes(this.cloudFoundryClient, "test-private-domain-metadata-id", "test-host", "test-path", null);
         requestDeleteRoute(this.cloudFoundryClient, "test-route-id");
-        requestJobFailure(this.cloudFoundryClient, "test-id");
+        requestJobFailure(this.cloudFoundryClient, "test-job-entity-id");
 
         this.routes
             .delete(DeleteRouteRequest.builder()
@@ -347,7 +347,6 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
 
     @Test
     public void deleteOrphanedRoutesAssociatedService() {
-
         requestSpaceRoutesService(this.cloudFoundryClient, TEST_SPACE_ID);
 
         this.routes
@@ -362,7 +361,7 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
         requestSpaceRoutes(this.cloudFoundryClient, TEST_SPACE_ID);
         requestApplicationsEmpty(this.cloudFoundryClient, "test-route-id");
         requestDeleteRoute(this.cloudFoundryClient, "test-route-id");
-        requestJobSuccess(this.cloudFoundryClient, "test-id");
+        requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
 
         this.routes
             .deleteOrphanedRoutes()
@@ -376,7 +375,7 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
         requestSpaceRoutes(this.cloudFoundryClient, TEST_SPACE_ID);
         requestApplicationsEmpty(this.cloudFoundryClient, "test-route-id");
         requestDeleteRoute(this.cloudFoundryClient, "test-route-id");
-        requestJobFailure(this.cloudFoundryClient, "test-id");
+        requestJobFailure(this.cloudFoundryClient, "test-job-entity-id");
 
         this.routes
             .deleteOrphanedRoutes()
@@ -401,7 +400,7 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
         requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
         requestRoutes(this.cloudFoundryClient, "test-private-domain-metadata-id", "test-host", "test-path", null);
         requestDeleteRoute(this.cloudFoundryClient, "test-route-id");
-        requestJobSuccess(this.cloudFoundryClient, "test-id");
+        requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
 
         this.routes
             .delete(DeleteRouteRequest.builder()
@@ -420,7 +419,7 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
         requestSharedDomains(this.cloudFoundryClient, "test-domain");
         requestRoutes(this.cloudFoundryClient, "test-shared-domain-metadata-id", "test-host", "test-path", null);
         requestDeleteRoute(this.cloudFoundryClient, "test-route-id");
-        requestJobSuccess(this.cloudFoundryClient, "test-id");
+        requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
 
         this.routes
             .delete(DeleteRouteRequest.builder()

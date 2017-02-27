@@ -23,6 +23,7 @@ import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v2.applications.GetApplicationResponse;
 import org.cloudfoundry.client.v2.applications.ListApplicationServiceBindingsRequest;
+import org.cloudfoundry.client.v2.jobs.JobEntity;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationPrivateDomainsRequest;
 import org.cloudfoundry.client.v2.privatedomains.PrivateDomainResource;
 import org.cloudfoundry.client.v2.routes.ListRoutesRequest;
@@ -70,9 +71,9 @@ import org.cloudfoundry.client.v2.userprovidedserviceinstances.AssociateUserProv
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.DeleteUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UpdateUserProvidedServiceInstanceResponse;
-import org.cloudfoundry.util.DelayUtils;
 import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.JobUtils;
+import org.cloudfoundry.util.LastOperationUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import reactor.core.Exceptions;
@@ -81,7 +82,6 @@ import reactor.core.publisher.Mono;
 import reactor.util.function.Tuples;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -89,6 +89,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
@@ -209,7 +210,6 @@ public final class DefaultServices implements Services {
                     getSpaceServiceInstance(cloudFoundryClient, request.getName(), spaceId)
                 )))
             .then(function(DefaultServices::deleteServiceInstance))
-            .then()
             .checkpoint();
     }
 
@@ -424,12 +424,17 @@ public final class DefaultServices implements Services {
             return requestDeleteUserProvidedServiceInstance(cloudFoundryClient, ResourceUtils.getId(serviceInstance));
         } else {
             return requestDeleteServiceInstance(cloudFoundryClient, ResourceUtils.getId(serviceInstance))
-                .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
+                .then(response -> {
+                    Object entity = response.getEntity();
+                    if (entity instanceof JobEntity) {
+                        return JobUtils.waitForCompletion(cloudFoundryClient, (JobEntity) response.getEntity());
+                    } else {
+                        return LastOperationUtils
+                            .waitForCompletion(() -> requestGetServiceInstance(cloudFoundryClient, ResourceUtils.getId(serviceInstance))
+                                .map(r -> ResourceUtils.getEntity(r).getLastOperation()));
+                    }
+                });
         }
-    }
-
-    private static String extractState(AbstractServiceInstanceResource serviceInstance) {
-        return ResourceUtils.getEntity(serviceInstance).getLastOperation().getState();
     }
 
     private static Mono<ApplicationResource> getApplication(CloudFoundryClient cloudFoundryClient, String applicationName, String spaceId) {
@@ -603,10 +608,6 @@ public final class DefaultServices implements Services {
         return s == null ? t == null : s.equals(t);
     }
 
-    private static boolean isNotInProgress(String state) {
-        return !state.equals("in progress");
-    }
-
     private static boolean isPlanUpdateable(GetServiceResponse response) {
         return response.getEntity().getPlanUpdateable();
     }
@@ -631,6 +632,7 @@ public final class DefaultServices implements Services {
                                                                                                      Map<String, Object> parameters) {
         return cloudFoundryClient.userProvidedServiceInstances()
             .associateRoute(AssociateUserProvidedServiceInstanceRouteRequest.builder()
+                .parameters(parameters)
                 .routeId(routeId)
                 .userProvidedServiceInstanceId(userProvidedServiceInstanceId)
                 .build());
@@ -691,6 +693,7 @@ public final class DefaultServices implements Services {
     private static Mono<DeleteServiceInstanceResponse> requestDeleteServiceInstance(CloudFoundryClient cloudFoundryClient, String serviceInstanceId) {
         return cloudFoundryClient.serviceInstances()
             .delete(org.cloudfoundry.client.v2.serviceinstances.DeleteServiceInstanceRequest.builder()
+                .acceptsIncomplete(true)
                 .serviceInstanceId(serviceInstanceId)
                 .async(true)
                 .build());
@@ -1006,15 +1009,18 @@ public final class DefaultServices implements Services {
     }
 
     private static Mono<Void> waitForCreateInstance(CloudFoundryClient cloudFoundryClient, AbstractServiceInstanceResource serviceInstance) {
-        if (isNotInProgress(extractState(serviceInstance))) {
-            return Mono.empty();
-        }
+        AtomicBoolean sentFirst = new AtomicBoolean(false);
 
-        return requestGetServiceInstance(cloudFoundryClient, ResourceUtils.getId(serviceInstance))
-            .map(DefaultServices::extractState)
-            .filter(DefaultServices::isNotInProgress)
-            .repeatWhenEmpty(DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)))
-            .then();
+        return LastOperationUtils
+            .waitForCompletion(() -> Mono
+                .defer(() -> {
+                    if (sentFirst.getAndSet(true)) {
+                        return requestGetServiceInstance(cloudFoundryClient, ResourceUtils.getId(serviceInstance));
+                    }
+
+                    return Mono.just(serviceInstance);
+                })
+                .map(response -> ResourceUtils.getEntity(response).getLastOperation()));
     }
 
     private Mono<List<ServicePlanResource>> getServicePlans(CloudFoundryClient cloudFoundryClient, String serviceId) {

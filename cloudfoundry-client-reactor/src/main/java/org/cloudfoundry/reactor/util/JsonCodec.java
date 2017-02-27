@@ -28,7 +28,6 @@ import reactor.core.publisher.Mono;
 import reactor.ipc.netty.http.client.HttpClientRequest;
 import reactor.ipc.netty.http.client.HttpClientResponse;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.function.Function;
 
@@ -42,8 +41,8 @@ public final class JsonCodec {
             .map(payload -> {
                 try {
                     return objectMapper.readValue(payload, responseType);
-                } catch (IOException e) {
-                    throw Exceptions.propagate(new JsonParsingException(e.getMessage(), e, new String(payload, Charset.defaultCharset())));
+                } catch (Throwable t) {
+                    throw new JsonParsingException(t.getMessage(), t, new String(payload, Charset.defaultCharset()));
                 }
             });
     }
@@ -58,7 +57,6 @@ public final class JsonCodec {
             .map(request -> request.header(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON))
             .flatMap(request -> {
                 try {
-
                     return request.sendByteArray(Mono.just(objectMapper.writeValueAsBytes(requestPayload)));
                 } catch (JsonProcessingException e) {
                     throw Exceptions.propagate(e);

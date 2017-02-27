@@ -16,15 +16,59 @@
 
 package org.cloudfoundry.client.v2.serviceinstances;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.DatabindContext;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.client.v2.jobs.AbstractJobResource;
+import com.fasterxml.jackson.databind.annotation.JsonTypeIdResolver;
+import com.fasterxml.jackson.databind.jsontype.impl.TypeIdResolverBase;
+import org.cloudfoundry.Nullable;
+import org.cloudfoundry.client.v2.Resource;
+import org.cloudfoundry.client.v2.jobs.JobEntity;
 import org.immutables.value.Value;
+
+import java.io.IOException;
 
 /**
  * The response for the Delete Service Instance operation
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _DeleteServiceInstanceResponse extends AbstractJobResource {
+abstract class _DeleteServiceInstanceResponse extends Resource<Object> {
+
+    /**
+     * The resource's entity
+     */
+    @JsonProperty("entity")
+    @JsonTypeIdResolver(_DeleteServiceInstanceResponse.DeleteServiceInstanceResponseTypeIdResolver.class)
+    @JsonTypeInfo(use = JsonTypeInfo.Id.CUSTOM, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", defaultImpl = JobEntity.class, visible = true)
+    @Nullable
+    public abstract Object getEntity();
+
+    static final class DeleteServiceInstanceResponseTypeIdResolver extends TypeIdResolverBase {
+
+
+        @Override
+        public JsonTypeInfo.Id getMechanism() {
+            return null;
+        }
+
+        @Override
+        public String idFromValue(Object value) {
+            return null;
+        }
+
+        @Override
+        public String idFromValueAndType(Object value, Class<?> suggestedType) {
+            return null;
+        }
+
+        @Override
+        public JavaType typeFromId(DatabindContext context, String id) throws IOException {
+            return context.constructType(ServiceInstanceEntity.class);
+        }
+
+    }
 
 }

@@ -1,0 +1,28 @@
+{
+  "metadata": {
+    "guid": "2e20eccf-6828-4c56-81cb-28c0e295ce19",
+    "url": "/v2/service_instances/2e20eccf-6828-4c56-81cb-28c0e295ce19",
+    "created_at": "2017-02-27T12:30:29Z",
+    "updated_at": "2017-02-27T12:30:29Z"
+  },
+  "entity": {
+    "name": "test-service",
+    "service_plan_guid": "07c64d77-4df5-4974-a4b2-3bc58cafcf0d",
+    "space_guid": "840d3266-8547-40fe-986e-ffc20eaba235",
+    "gateway_data": null,
+    "dashboard_url": "http://test-dashboard-host/2e20eccf-6828-4c56-81cb-28c0e295ce19",
+    "type": "managed_service_instance",
+    "last_operation": {
+      "type": "delete",
+      "state": "in progress",
+      "description": "",
+      "updated_at": "2017-02-27T12:30:59Z",
+      "created_at": "2017-02-27T12:30:59Z"
+    },
+    "space_url": "/v2/spaces/840d3266-8547-40fe-986e-ffc20eaba235",
+    "service_plan_url": "/v2/service_plans/07c64d77-4df5-4974-a4b2-3bc58cafcf0d",
+    "service_bindings_url": "/v2/service_instances/2e20eccf-6828-4c56-81cb-28c0e295ce19/service_bindings",
+    "service_keys_url": "/v2/service_instances/2e20eccf-6828-4c56-81cb-28c0e295ce19/service_keys",
+    "routes_url": "/v2/service_instances/2e20eccf-6828-4c56-81cb-28c0e295ce19/routes"
+  }
+}

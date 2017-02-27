@@ -34,6 +34,9 @@ import org.cloudfoundry.client.v2.organizationquotadefinitions.CreateOrganizatio
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v2.routes.CreateRouteRequest;
 import org.cloudfoundry.client.v2.servicebrokers.CreateServiceBrokerRequest;
+import org.cloudfoundry.client.v2.serviceplans.ListServicePlansRequest;
+import org.cloudfoundry.client.v2.serviceplans.UpdateServicePlanRequest;
+import org.cloudfoundry.client.v2.services.ListServicesRequest;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
@@ -407,7 +410,7 @@ public class IntegrationTestConfiguration {
                         .build())
                     .map(response -> ResourceUtils.getEntity(response).getPackageState())
                     .filter(state -> "STAGED".equals(state) || "FAILED".equals(state))
-                    .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)))
+                    .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(5), Duration.ofMinutes(5)))
                     .then(Mono.just(applicationId)))
                 .then(applicationId -> cloudFoundryClient.applicationsV2()
                     .instances(ApplicationInstancesRequest.builder()
@@ -417,7 +420,7 @@ public class IntegrationTestConfiguration {
                     .single()
                     .map(ApplicationInstanceInfo::getState)
                     .filter("RUNNING"::equals)
-                    .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5))))
+                    .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(5), Duration.ofMinutes(5))))
                 .then(Mono.just(String.format("https://%s.%s", hostName, ResourceUtils.getEntity(domain).getName())))
             ))
             .then(url -> cloudFoundryClient.serviceBrokers()
@@ -426,9 +429,30 @@ public class IntegrationTestConfiguration {
                     .authenticationUsername("test-authentication-username")
                     .brokerUrl(url)
                     .name(serviceBrokerName)
-                    .build()))
-            .map(ResourceUtils::getId)
-            .doOnSubscribe(s -> this.logger.debug(">> SERVICE BROKER ({}/{}/{}) <<", serviceBrokerName, serviceName, planName))
+                    .build())
+                .map(ResourceUtils::getId))
+            .then(serviceBrokerId -> PaginationUtils
+                .requestClientV2Resources(page -> cloudFoundryClient.services()
+                    .list(ListServicesRequest.builder()
+                        .label(serviceName)
+                        .build()))
+                .single()
+                .map(ResourceUtils::getId)
+                .then(serviceId -> PaginationUtils
+                    .requestClientV2Resources(page -> cloudFoundryClient.servicePlans()
+                        .list(ListServicePlansRequest.builder()
+                            .serviceId(serviceId)
+                            .page(page)
+                            .build()))
+                    .single()
+                    .map(ResourceUtils::getId))
+                .then(planId -> cloudFoundryClient.servicePlans()
+                    .update(UpdateServicePlanRequest.builder()
+                        .servicePlanId(planId)
+                        .publiclyVisible(true)
+                        .build())
+                    .then(Mono.just(serviceBrokerId))))
+            .doOnSubscribe(s -> this.logger.debug(">> SERVICE BROKER ({} {}/{}) <<", serviceBrokerName, serviceName, planName))
             .doOnError(Throwable::printStackTrace)
             .doOnSuccess(id -> this.logger.debug("<< SERVICE_BROKER ({})>>", id))
             .cache();

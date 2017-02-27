@@ -21,7 +21,7 @@ import org.junit.Test;
 public final class RemoveUserManagedOrganizationRequestTest {
 
     @Test(expected = IllegalStateException.class)
-    public void noOrganizationId() {
+    public void noManagedOrganizationId() {
         RemoveUserManagedOrganizationRequest.builder()
             .userId("test-user-id")
             .build();

@@ -27,6 +27,7 @@ import org.cloudfoundry.client.v2.buildpacks.ListBuildpacksRequest;
 import org.cloudfoundry.client.v2.featureflags.ListFeatureFlagsRequest;
 import org.cloudfoundry.client.v2.featureflags.ListFeatureFlagsResponse;
 import org.cloudfoundry.client.v2.featureflags.SetFeatureFlagRequest;
+import org.cloudfoundry.client.v2.jobs.JobEntity;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.DeleteOrganizationQuotaDefinitionRequest;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.ListOrganizationQuotaDefinitionsRequest;
 import org.cloudfoundry.client.v2.organizations.DeleteOrganizationRequest;
@@ -41,6 +42,7 @@ import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupsRequest;
 import org.cloudfoundry.client.v2.servicebrokers.DeleteServiceBrokerRequest;
 import org.cloudfoundry.client.v2.servicebrokers.ListServiceBrokersRequest;
 import org.cloudfoundry.client.v2.serviceinstances.DeleteServiceInstanceRequest;
+import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesRequest;
 import org.cloudfoundry.client.v2.shareddomains.DeleteSharedDomainRequest;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
@@ -69,6 +71,7 @@ import org.cloudfoundry.uaa.users.DeleteUserRequest;
 import org.cloudfoundry.uaa.users.ListUsersRequest;
 import org.cloudfoundry.util.FluentMap;
 import org.cloudfoundry.util.JobUtils;
+import org.cloudfoundry.util.LastOperationUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import org.slf4j.Logger;
@@ -114,6 +117,7 @@ final class CloudFoundryCleaner {
 
     void clean() {
         Flux.empty()
+            .thenMany(cleanServiceInstances(this.cloudFoundryClient, this.nameFactory)) // Before Routes
             .thenMany(Mono.when( // No prerequisites
                 cleanBuildpacks(this.cloudFoundryClient, this.nameFactory),
                 cleanClients(this.uaaClient, this.nameFactory),
@@ -124,12 +128,11 @@ final class CloudFoundryCleaner {
                 cleanPackages(this.cloudFoundryClient),
                 cleanRoutes(this.cloudFoundryClient, this.nameFactory),
                 cleanSecurityGroups(this.cloudFoundryClient, this.nameFactory),
-                cleanServiceInstances(this.cloudFoundryClient, this.nameFactory),
+                cleanServiceBrokers(this.cloudFoundryClient, this.nameFactory),
                 cleanSpaceQuotaDefinitions(this.cloudFoundryClient, this.nameFactory),
                 cleanUsers(this.cloudFoundryClient, this.nameFactory),
                 cleanUsers(this.uaaClient, this.nameFactory)
             ))
-            .thenMany(cleanServiceBrokers(this.cloudFoundryClient, this.nameFactory)) // After Service Instances)
             .thenMany(cleanApplicationsV2(this.cloudFoundryClient, this.nameFactory)) // After Routes, cannot run with other cleanApps
             .thenMany(cleanApplicationsV3(this.cloudFoundryClient, this.nameFactory)) // After Routes, cannot run with other cleanApps
             .thenMany(Mono.when( // After Routes/Applications
@@ -403,7 +406,19 @@ final class CloudFoundryCleaner {
                     .async(true)
                     .serviceInstanceId(ResourceUtils.getId(serviceInstance))
                     .build())
-                .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, job))
+                .then(response -> {
+                    Object entity = response.getEntity();
+                    if (entity instanceof JobEntity) {
+                        return JobUtils.waitForCompletion(cloudFoundryClient, (JobEntity) response.getEntity());
+                    } else {
+                        return LastOperationUtils
+                            .waitForCompletion(() -> cloudFoundryClient.serviceInstances()
+                                .get(GetServiceInstanceRequest.builder()
+                                    .serviceInstanceId(ResourceUtils.getId(serviceInstance))
+                                    .build())
+                                .map(r -> ResourceUtils.getEntity(r).getLastOperation()));
+                    }
+                })
                 .doOnError(t -> LOGGER.error("Unable to delete service instance {}", ResourceUtils.getEntity(serviceInstance).getName(), t)));
     }
 

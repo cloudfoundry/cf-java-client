@@ -118,7 +118,8 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
         requestListOrganizationPrivateDomains(this.cloudFoundryClient, "test-domain-name", TEST_ORGANIZATION_ID);
         requestListSpaceServiceInstancesUserProvided(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
         requestListRoutes(this.cloudFoundryClient, "test-private-domain-id");
-        requestAssociateUserProvidedServiceInstanceRouteError(this.cloudFoundryClient, "test-route-id", "test-service-instance-id", 130008);
+        requestAssociateUserProvidedServiceInstanceRouteError(this.cloudFoundryClient, "test-route-id", "test-service-instance-id",
+            Collections.singletonMap("test-parameter-key", "test-parameter-value"), 130008);
 
         this.services
             .bindRoute(BindRouteServiceInstanceRequest.builder()
@@ -152,7 +153,8 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
         requestListOrganizationPrivateDomains(this.cloudFoundryClient, "test-domain-name", TEST_ORGANIZATION_ID);
         requestListSpaceServiceInstancesUserProvided(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
         requestListRoutes(this.cloudFoundryClient, "test-private-domain-id");
-        requestAssociateUserProvidedServiceInstanceRoute(this.cloudFoundryClient, "test-route-id", "test-service-instance-id");
+        requestAssociateUserProvidedServiceInstanceRoute(this.cloudFoundryClient, "test-route-id", "test-service-instance-id",
+            Collections.singletonMap("test-parameter-key", "test-parameter-value"));
 
         this.services
             .bindRoute(BindRouteServiceInstanceRequest.builder()
@@ -170,7 +172,8 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
         requestListOrganizationPrivateDomains(this.cloudFoundryClient, "test-domain-name", TEST_ORGANIZATION_ID);
         requestListSpaceServiceInstancesUserProvided(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
         requestListRoutes(this.cloudFoundryClient, "test-private-domain-id", "test-host", "test-path");
-        requestAssociateUserProvidedServiceInstanceRoute(this.cloudFoundryClient, "test-route-id", "test-service-instance-id");
+        requestAssociateUserProvidedServiceInstanceRoute(this.cloudFoundryClient, "test-route-id", "test-service-instance-id",
+            Collections.singletonMap("test-parameter-key", "test-parameter-value"));
 
         this.services
             .bindRoute(BindRouteServiceInstanceRequest.builder()
@@ -208,7 +211,8 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
         requestListSharedDomains(this.cloudFoundryClient, "test-domain-name");
         requestListSpaceServiceInstancesUserProvided(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
         requestListRoutes(this.cloudFoundryClient, "test-shared-domain-id");
-        requestAssociateUserProvidedServiceInstanceRoute(this.cloudFoundryClient, "test-route-id", "test-service-instance-id");
+        requestAssociateUserProvidedServiceInstanceRoute(this.cloudFoundryClient, "test-route-id", "test-service-instance-id",
+            Collections.singletonMap("test-parameter-key", "test-parameter-value"));
 
         this.services
             .bindRoute(BindRouteServiceInstanceRequest.builder()
@@ -378,7 +382,22 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     public void deleteServiceInstance() {
         requestListSpaceServiceInstances(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
         requestDeleteServiceInstance(this.cloudFoundryClient, "test-service-instance-id");
-        requestJobSuccess(this.cloudFoundryClient, "test-id");
+        requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
+
+        this.services
+            .deleteInstance(DeleteServiceInstanceRequest.builder()
+                .name("test-service-instance-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void deleteServiceInstanceAcceptsIncomplete() {
+        requestListSpaceServiceInstances(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
+        requestDeleteServiceInstanceAcceptsIncomplete(this.cloudFoundryClient, "test-service-instance-id");
+        requestGetServiceInstanceNotExist(this.cloudFoundryClient, "test-service-instance-id");
 
         this.services
             .deleteInstance(DeleteServiceInstanceRequest.builder()
@@ -772,7 +791,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
         requestListSpaceServiceInstances(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
         requestApplicationsListServiceBindings(this.cloudFoundryClient, "test-application-id", "test-service-instance-id");
         requestDeleteServiceBinding(this.cloudFoundryClient, "test-service-binding-id");
-        requestJobSuccess(this.cloudFoundryClient, "test-id");
+        requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
 
         this.services
             .unbind(UnbindServiceInstanceRequest.builder()
@@ -790,7 +809,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
         requestListSpaceServiceInstances(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
         requestApplicationsListServiceBindings(this.cloudFoundryClient, "test-application-id", "test-service-instance-id");
         requestDeleteServiceBinding(this.cloudFoundryClient, "test-service-binding-id");
-        requestJobFailure(this.cloudFoundryClient, "test-id");
+        requestJobFailure(this.cloudFoundryClient, "test-job-entity-id");
 
         this.services
             .unbind(UnbindServiceInstanceRequest.builder()
@@ -1046,9 +1065,10 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
                     .build()));
     }
 
-    private static void requestAssociateUserProvidedServiceInstanceRoute(CloudFoundryClient cloudFoundryClient, String routeId, String userProvidedServiceInstanceId) {
+    private static void requestAssociateUserProvidedServiceInstanceRoute(CloudFoundryClient cloudFoundryClient, String routeId, String userProvidedServiceInstanceId, Map<String, Object> parameters) {
         when(cloudFoundryClient.userProvidedServiceInstances()
             .associateRoute(AssociateUserProvidedServiceInstanceRouteRequest.builder()
+                .parameters(parameters)
                 .routeId(routeId)
                 .userProvidedServiceInstanceId(userProvidedServiceInstanceId)
                 .build()))
@@ -1057,9 +1077,11 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
                     .build()));
     }
 
-    private static void requestAssociateUserProvidedServiceInstanceRouteError(CloudFoundryClient cloudFoundryClient, String routeId, String userProvidedServiceInstanceId, Integer code) {
+    private static void requestAssociateUserProvidedServiceInstanceRouteError(CloudFoundryClient cloudFoundryClient, String routeId, String userProvidedServiceInstanceId,
+                                                                              Map<String, Object> parameters, Integer code) {
         when(cloudFoundryClient.userProvidedServiceInstances()
             .associateRoute(AssociateUserProvidedServiceInstanceRouteRequest.builder()
+                .parameters(parameters)
                 .routeId(routeId)
                 .userProvidedServiceInstanceId(userProvidedServiceInstanceId)
                 .build()))
@@ -1163,12 +1185,31 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     private static void requestDeleteServiceInstance(CloudFoundryClient cloudFoundryClient, String serviceInstanceId) {
         when(cloudFoundryClient.serviceInstances()
             .delete(org.cloudfoundry.client.v2.serviceinstances.DeleteServiceInstanceRequest.builder()
+                .acceptsIncomplete(true)
                 .async(true)
                 .serviceInstanceId(serviceInstanceId)
                 .build()))
             .thenReturn(Mono
-                .just(fill(DeleteServiceInstanceResponse.builder())
+                .just(DeleteServiceInstanceResponse.builder()
                     .entity(fill(JobEntity.builder(), "job-entity-")
+                        .build())
+                    .build()));
+
+    }
+
+    private static void requestDeleteServiceInstanceAcceptsIncomplete(CloudFoundryClient cloudFoundryClient, String serviceInstanceId) {
+        when(cloudFoundryClient.serviceInstances()
+            .delete(org.cloudfoundry.client.v2.serviceinstances.DeleteServiceInstanceRequest.builder()
+                .acceptsIncomplete(true)
+                .async(true)
+                .serviceInstanceId(serviceInstanceId)
+                .build()))
+            .thenReturn(Mono
+                .just(DeleteServiceInstanceResponse.builder()
+                    .entity(fill(ServiceInstanceEntity.builder(), "service-instance-entity-")
+                        .lastOperation(LastOperation.builder()
+                            .state("in progress")
+                            .build())
                         .build())
                     .build()));
 
@@ -1241,6 +1282,14 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
                             .build())
                         .build())
                     .build()));
+    }
+
+    private static void requestGetServiceInstanceNotExist(CloudFoundryClient cloudFoundryClient, String serviceInstanceId) {
+        when(cloudFoundryClient.serviceInstances()
+            .get(org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceRequest.builder()
+                .serviceInstanceId(serviceInstanceId)
+                .build()))
+            .thenReturn(Mono.error(new ClientV2Exception(404, 404, "test-description", "test-error-code")));
     }
 
     private static void requestGetServiceNotPlanUpdateable(CloudFoundryClient cloudFoundryClient, String serviceId, String service) {

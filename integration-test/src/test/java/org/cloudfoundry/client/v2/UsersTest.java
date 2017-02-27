@@ -20,14 +20,22 @@ import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorResponse;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationBillingManagerRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationBillingManagerResponse;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerResponse;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationResponse;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceResponse;
+import org.cloudfoundry.client.v2.users.AssociateUserAuditedOrganizationRequest;
+import org.cloudfoundry.client.v2.users.AssociateUserAuditedOrganizationResponse;
 import org.cloudfoundry.client.v2.users.AssociateUserAuditedSpaceRequest;
 import org.cloudfoundry.client.v2.users.AssociateUserAuditedSpaceResponse;
+import org.cloudfoundry.client.v2.users.AssociateUserBillingManagedOrganizationRequest;
+import org.cloudfoundry.client.v2.users.AssociateUserBillingManagedOrganizationResponse;
 import org.cloudfoundry.client.v2.users.AssociateUserManagedOrganizationRequest;
 import org.cloudfoundry.client.v2.users.AssociateUserManagedOrganizationResponse;
 import org.cloudfoundry.client.v2.users.AssociateUserManagedSpaceRequest;
@@ -40,13 +48,17 @@ import org.cloudfoundry.client.v2.users.CreateUserRequest;
 import org.cloudfoundry.client.v2.users.CreateUserResponse;
 import org.cloudfoundry.client.v2.users.DeleteUserRequest;
 import org.cloudfoundry.client.v2.users.GetUserRequest;
+import org.cloudfoundry.client.v2.users.ListUserAuditedOrganizationsRequest;
 import org.cloudfoundry.client.v2.users.ListUserAuditedSpacesRequest;
+import org.cloudfoundry.client.v2.users.ListUserBillingManagedOrganizationsRequest;
 import org.cloudfoundry.client.v2.users.ListUserManagedOrganizationsRequest;
 import org.cloudfoundry.client.v2.users.ListUserManagedSpacesRequest;
 import org.cloudfoundry.client.v2.users.ListUserOrganizationsRequest;
 import org.cloudfoundry.client.v2.users.ListUserSpacesRequest;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
+import org.cloudfoundry.client.v2.users.RemoveUserAuditedOrganizationRequest;
 import org.cloudfoundry.client.v2.users.RemoveUserAuditedSpaceRequest;
+import org.cloudfoundry.client.v2.users.RemoveUserBillingManagedOrganizationRequest;
 import org.cloudfoundry.client.v2.users.RemoveUserManagedOrganizationRequest;
 import org.cloudfoundry.client.v2.users.RemoveUserManagedSpaceRequest;
 import org.cloudfoundry.client.v2.users.RemoveUserOrganizationRequest;
@@ -58,7 +70,6 @@ import org.cloudfoundry.client.v2.users.UserResource;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
@@ -81,11 +92,27 @@ public final class UsersTest extends AbstractIntegrationTest {
     @Autowired
     private Mono<String> organizationId;
 
-    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/646
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/646")
     @Test
     public void associateAuditedOrganization() throws TimeoutException, InterruptedException {
-        //
+        String organizationName = this.nameFactory.getOrganizationName();
+        String userId = this.nameFactory.getUserId();
+
+        createOrganizationId(this.cloudFoundryClient, organizationName)
+            .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
+                .then(requestAssociateOrganizationAuditor(this.cloudFoundryClient, organizationId, userId))
+                .then(this.cloudFoundryClient.users()
+                    .associateAuditedOrganization(AssociateUserAuditedOrganizationRequest.builder()
+                        .auditedOrganizationId(organizationId)
+                        .userId(userId)
+                        .build())))
+            .then(requestSummaryUser(this.cloudFoundryClient, userId)
+                .flatMapIterable(response -> response.getEntity().getAuditedOrganizations())
+                .map(resource -> resource.getEntity().getName())
+                .single())
+            .as(StepVerifier::create)
+            .expectNext(organizationName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -110,11 +137,27 @@ public final class UsersTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/648
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/648")
     @Test
     public void associateBillingManagedOrganization() throws TimeoutException, InterruptedException {
-        //
+        String organizationName = this.nameFactory.getOrganizationName();
+        String userId = this.nameFactory.getUserId();
+
+        createOrganizationId(this.cloudFoundryClient, organizationName)
+            .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
+                .then(requestAssociateOrganizationBillingManager(this.cloudFoundryClient, organizationId, userId))
+                .then(this.cloudFoundryClient.users()
+                    .associateBillingManagedOrganization(AssociateUserBillingManagedOrganizationRequest.builder()
+                        .billingManagedOrganizationId(organizationId)
+                        .userId(userId)
+                        .build())))
+            .then(requestSummaryUser(this.cloudFoundryClient, userId)
+                .flatMapIterable(response -> response.getEntity().getBillingManagedOrganizations())
+                .map(resource -> resource.getEntity().getName())
+                .single())
+            .as(StepVerifier::create)
+            .expectNext(organizationName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -217,8 +260,7 @@ public final class UsersTest extends AbstractIntegrationTest {
                 .create(CreateUserRequest.builder()
                     .defaultSpaceId(spaceId)
                     .uaaId(userId)
-                    .build())
-                .then(Mono.just(spaceId)))
+                    .build()))
             .flatMap(ignore -> requestListUsers(this.cloudFoundryClient))
             .filter(resource -> userId.equals(resource.getMetadata().getId()))
             .as(StepVerifier::create)
@@ -302,11 +344,170 @@ public final class UsersTest extends AbstractIntegrationTest {
 
     }
 
-    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/655
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/655")
     @Test
     public void listAuditedOrganizations() throws TimeoutException, InterruptedException {
-        //
+        String organizationName = this.nameFactory.getOrganizationName();
+        String userId = this.nameFactory.getUserId();
+
+        createOrganizationId(this.cloudFoundryClient, organizationName)
+            .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
+                .then(Mono.just(organizationId)))
+            .then(organizationId -> associateAuditorOrganization(this.cloudFoundryClient, organizationId, userId))
+            .flatMap(ignore -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
+                    .listAuditedOrganizations(ListUserAuditedOrganizationsRequest.builder()
+                        .page(page)
+                        .userId(userId)
+                        .build())))
+            .map(resource -> resource.getEntity().getName())
+            .as(StepVerifier::create)
+            .expectNext(organizationName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void listAuditedOrganizationsFilterByAuditorId() throws TimeoutException, InterruptedException {
+        String organizationName = this.nameFactory.getOrganizationName();
+        String userId = this.nameFactory.getUserId();
+
+        createOrganizationId(this.cloudFoundryClient, organizationName)
+            .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
+                .then(Mono.just(organizationId)))
+            .then(organizationId -> associateAuditorOrganization(this.cloudFoundryClient, organizationId, userId))
+            .flatMap(ignore -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
+                    .listAuditedOrganizations(ListUserAuditedOrganizationsRequest.builder()
+                        .auditorId(userId)
+                        .page(page)
+                        .userId(userId)
+                        .build())))
+            .map(resource -> resource.getEntity().getName())
+            .as(StepVerifier::create)
+            .expectNext(organizationName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void listAuditedOrganizationsFilterByBillingManagerId() throws TimeoutException, InterruptedException {
+        String organizationName = this.nameFactory.getOrganizationName();
+        String userId = this.nameFactory.getUserId();
+
+        createOrganizationId(this.cloudFoundryClient, organizationName)
+            .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
+                .then(Mono.just(organizationId)))
+            .then(organizationId -> Mono.when(
+                associateBillingManagerOrganization(this.cloudFoundryClient, organizationId, userId),
+                associateAuditorOrganization(this.cloudFoundryClient, organizationId, userId)))
+            .flatMap(ignore -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
+                    .listAuditedOrganizations(ListUserAuditedOrganizationsRequest.builder()
+                        .billingManagerId(userId)
+                        .page(page)
+                        .userId(userId)
+                        .build())))
+            .map(resource -> resource.getEntity().getName())
+            .as(StepVerifier::create)
+            .expectNext(organizationName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void listAuditedOrganizationsFilterByManagerId() throws TimeoutException, InterruptedException {
+        String organizationName = this.nameFactory.getOrganizationName();
+        String userId = this.nameFactory.getUserId();
+
+        createOrganizationId(this.cloudFoundryClient, organizationName)
+            .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
+                .then(Mono.just(organizationId)))
+            .then(organizationId -> Mono.when(
+                associateAuditorOrganization(this.cloudFoundryClient, organizationId, userId),
+                associateManagerOrganization(this.cloudFoundryClient, organizationId, userId)))
+            .flatMap(ignore -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
+                    .listAuditedOrganizations(ListUserAuditedOrganizationsRequest.builder()
+                        .managerId(userId)
+                        .page(page)
+                        .userId(userId)
+                        .build())))
+            .map(resource -> resource.getEntity().getName())
+            .as(StepVerifier::create)
+            .expectNext(organizationName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void listAuditedOrganizationsFilterByName() throws TimeoutException, InterruptedException {
+        String organizationName = this.nameFactory.getOrganizationName();
+        String userId = this.nameFactory.getUserId();
+
+        createOrganizationId(this.cloudFoundryClient, organizationName)
+            .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
+                .then(associateAuditorOrganization(this.cloudFoundryClient, organizationId, userId)))
+            .flatMap(ignore -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
+                    .listAuditedOrganizations(ListUserAuditedOrganizationsRequest.builder()
+                        .name(organizationName)
+                        .page(page)
+                        .userId(userId)
+                        .build())))
+            .map(resource -> resource.getEntity().getName())
+            .as(StepVerifier::create)
+            .expectNext(organizationName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void listAuditedOrganizationsFilterBySpaceId() throws TimeoutException, InterruptedException {
+        String organizationName = this.nameFactory.getOrganizationName();
+        String spaceName = this.nameFactory.getSpaceName();
+        String userId = this.nameFactory.getUserId();
+
+        createOrganizationId(this.cloudFoundryClient, organizationName)
+            .then(organizationId -> Mono.when(
+                Mono.just(organizationId),
+                createSpaceId(this.cloudFoundryClient, organizationId, spaceName)))
+            .then(function((organizationId, spaceId) -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
+                .then(associateAuditorOrganization(this.cloudFoundryClient, organizationId, userId))
+                .then(Mono.just(spaceId))))
+            .flatMap(spaceId -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
+                    .listAuditedOrganizations(ListUserAuditedOrganizationsRequest.builder()
+                        .page(page)
+                        .spaceId(spaceId)
+                        .userId(userId)
+                        .build())))
+            .map(resource -> resource.getEntity().getName())
+            .as(StepVerifier::create)
+            .expectNext(organizationName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void listAuditedOrganizationsFilterByStatus() throws TimeoutException, InterruptedException {
+        String organizationName = this.nameFactory.getOrganizationName();
+        String userId = this.nameFactory.getUserId();
+
+        createOrganizationId(this.cloudFoundryClient, organizationName)
+            .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
+                .then(associateAuditorOrganization(this.cloudFoundryClient, organizationId, userId)))
+            .flatMap(ignore -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
+                    .listAuditedOrganizations(ListUserAuditedOrganizationsRequest.builder()
+                        .page(page)
+                        .status(STATUS_FILTER)
+                        .userId(userId)
+                        .build())))
+            .map(resource -> resource.getEntity().getName())
+            .as(StepVerifier::create)
+            .expectNext(organizationName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -415,7 +616,7 @@ public final class UsersTest extends AbstractIntegrationTest {
             ))
             .then(function((organizationId, spaceId) -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
                 .then(requestAssociateAuditedSpace(this.cloudFoundryClient, spaceId, userId))
-                .map(ignore -> organizationId)))
+                .then(Mono.just(organizationId))))
             .flatMap(organizationId -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listAuditedSpaces(ListUserAuditedSpacesRequest.builder()
@@ -429,35 +630,187 @@ public final class UsersTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/657
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/657")
     @Test
     public void listBillingManagedOrganizations() throws TimeoutException, InterruptedException {
-        //
+        String organizationName = this.nameFactory.getOrganizationName();
+        String userId = this.nameFactory.getUserId();
+
+        createOrganizationId(this.cloudFoundryClient, organizationName)
+            .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
+                .then(Mono.just(organizationId)))
+            .then(organizationId -> associateBillingManagerOrganization(this.cloudFoundryClient, organizationId, userId))
+            .flatMap(ignore -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
+                    .listBillingManagedOrganizations(ListUserBillingManagedOrganizationsRequest.builder()
+                        .page(page)
+                        .userId(userId)
+                        .build())))
+            .map(resource -> resource.getEntity().getName())
+            .as(StepVerifier::create)
+            .expectNext(organizationName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/651
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/651")
     @Test
-    public void listFilterByOrganization() throws TimeoutException, InterruptedException {
+    public void listBillingManagedOrganizationsFilterByAuditorId() throws TimeoutException, InterruptedException {
+        String organizationName = this.nameFactory.getOrganizationName();
+        String userId = this.nameFactory.getUserId();
+
+        createOrganizationId(this.cloudFoundryClient, organizationName)
+            .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
+                .then(Mono.just(organizationId)))
+            .then(organizationId -> Mono.when(
+                associateBillingManagerOrganization(this.cloudFoundryClient, organizationId, userId),
+                associateAuditorOrganization(this.cloudFoundryClient, organizationId, userId)))
+            .flatMap(ignore -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
+                    .listBillingManagedOrganizations(ListUserBillingManagedOrganizationsRequest.builder()
+                        .auditorId(userId)
+                        .page(page)
+                        .userId(userId)
+                        .build())))
+            .map(resource -> resource.getEntity().getName())
+            .as(StepVerifier::create)
+            .expectNext(organizationName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void listBillingManagedOrganizationsFilterByBillingManagerId() throws TimeoutException, InterruptedException {
+        String organizationName = this.nameFactory.getOrganizationName();
+        String userId = this.nameFactory.getUserId();
+
+        createOrganizationId(this.cloudFoundryClient, organizationName)
+            .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
+                .then(Mono.just(organizationId)))
+            .then(organizationId -> associateBillingManagerOrganization(this.cloudFoundryClient, organizationId, userId))
+            .flatMap(ignore -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
+                    .listBillingManagedOrganizations(ListUserBillingManagedOrganizationsRequest.builder()
+                        .billingManagerId(userId)
+                        .page(page)
+                        .userId(userId)
+                        .build())))
+            .map(resource -> resource.getEntity().getName())
+            .as(StepVerifier::create)
+            .expectNext(organizationName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void listBillingManagedOrganizationsFilterByManagerId() throws TimeoutException, InterruptedException {
+        String organizationName = this.nameFactory.getOrganizationName();
+        String userId = this.nameFactory.getUserId();
+
+        createOrganizationId(this.cloudFoundryClient, organizationName)
+            .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
+                .then(Mono.just(organizationId)))
+            .then(organizationId -> Mono.when(
+                associateBillingManagerOrganization(this.cloudFoundryClient, organizationId, userId),
+                associateManagerOrganization(this.cloudFoundryClient, organizationId, userId)))
+            .flatMap(ignore -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
+                    .listBillingManagedOrganizations(ListUserBillingManagedOrganizationsRequest.builder()
+                        .managerId(userId)
+                        .page(page)
+                        .userId(userId)
+                        .build())))
+            .map(resource -> resource.getEntity().getName())
+            .as(StepVerifier::create)
+            .expectNext(organizationName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void listBillingManagedOrganizationsFilterByName() throws TimeoutException, InterruptedException {
+        String organizationName = this.nameFactory.getOrganizationName();
+        String userId = this.nameFactory.getUserId();
+
+        createOrganizationId(this.cloudFoundryClient, organizationName)
+            .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
+                .then(associateBillingManagerOrganization(this.cloudFoundryClient, organizationId, userId)))
+            .flatMap(ignore -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
+                    .listBillingManagedOrganizations(ListUserBillingManagedOrganizationsRequest.builder()
+                        .name(organizationName)
+                        .page(page)
+                        .userId(userId)
+                        .build())))
+            .map(resource -> resource.getEntity().getName())
+            .as(StepVerifier::create)
+            .expectNext(organizationName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void listBillingManagedOrganizationsFilterBySpaceId() throws TimeoutException, InterruptedException {
+        String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userId = this.nameFactory.getUserId();
 
-        this.organizationId
+        createOrganizationId(this.cloudFoundryClient, organizationName)
             .then(organizationId -> Mono.when(
                 Mono.just(organizationId),
-                createSpaceId(this.cloudFoundryClient, organizationId, spaceName)
-            ))
-            .then(function((organizationId, spaceId) -> Mono.when(
-                Mono.just(organizationId),
-                requestCreateUser(this.cloudFoundryClient, spaceId, userId))
-            ))
-            .flatMap(function((organizationId, spaceId) -> PaginationUtils
+                createSpaceId(this.cloudFoundryClient, organizationId, spaceName)))
+            .then(function((organizationId, spaceId) -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
+                .then(associateBillingManagerOrganization(this.cloudFoundryClient, organizationId, userId))
+                .then(Mono.just(spaceId))))
+            .flatMap(spaceId -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
+                    .listBillingManagedOrganizations(ListUserBillingManagedOrganizationsRequest.builder()
+                        .page(page)
+                        .spaceId(spaceId)
+                        .userId(userId)
+                        .build())))
+            .map(resource -> resource.getEntity().getName())
+            .as(StepVerifier::create)
+            .expectNext(organizationName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void listBillingManagedOrganizationsFilterByStatus() throws TimeoutException, InterruptedException {
+        String organizationName = this.nameFactory.getOrganizationName();
+        String userId = this.nameFactory.getUserId();
+
+        createOrganizationId(this.cloudFoundryClient, organizationName)
+            .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
+                .then(associateBillingManagerOrganization(this.cloudFoundryClient, organizationId, userId)))
+            .flatMap(ignore -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
+                    .listBillingManagedOrganizations(ListUserBillingManagedOrganizationsRequest.builder()
+                        .page(page)
+                        .status(STATUS_FILTER)
+                        .userId(userId)
+                        .build())))
+            .map(resource -> resource.getEntity().getName())
+            .as(StepVerifier::create)
+            .expectNext(organizationName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void listFilterByOrganization() throws TimeoutException, InterruptedException {
+        String userId = this.nameFactory.getUserId();
+
+        this.organizationId
+            .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
+                .then(Mono.just(organizationId)))
+            .then(organizationId -> requestAssociateOrganization(this.cloudFoundryClient, organizationId, userId)
+                .then(Mono.just(organizationId)))
+            .flatMap(organizationId -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .list(ListUsersRequest.builder()
                         .organizationId(organizationId)
                         .page(page)
-                        .build()))))
+                        .build())))
             .filter(resource -> userId.equals(resource.getMetadata().getId()))
             .as(StepVerifier::create)
             .expectNextCount(1)
@@ -465,8 +818,6 @@ public final class UsersTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/652
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/652")
     @Test
     public void listFilterBySpace() throws TimeoutException, InterruptedException {
         String spaceName = this.nameFactory.getSpaceName();
@@ -474,32 +825,21 @@ public final class UsersTest extends AbstractIntegrationTest {
 
         this.organizationId
             .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .flatMap(spaceId -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
-                .flatMap(ignore -> PaginationUtils
-                    .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                        .list(ListUsersRequest.builder()
-                            .page(page)
-                            .spaceId(spaceId)
-                            .build()))))
+            .then(spaceId -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
+                .then(Mono.just(spaceId)))
+            .then(spaceId -> requestAssociateSpace(this.cloudFoundryClient, spaceId, userId)
+                .then(Mono.just(spaceId)))
+            .flatMap(spaceId -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
+                    .list(ListUsersRequest.builder()
+                        .page(page)
+                        .spaceId(spaceId)
+                        .build())))
             .filter(resource -> userId.equals(resource.getMetadata().getId()))
             .as(StepVerifier::create)
             .expectNextCount(1)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
-    }
-
-    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/646
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/646")
-    @Test
-    public void listManagedOrganizationsFilterByAuditorId() throws TimeoutException, InterruptedException {
-
-    }
-
-    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/648
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/648")
-    @Test
-    public void listManagedOrganizationsFilterByBillingManagerId() throws TimeoutException, InterruptedException {
-
     }
 
     @Test
@@ -509,11 +849,61 @@ public final class UsersTest extends AbstractIntegrationTest {
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
-                .then(associateManagerOrganization(this.cloudFoundryClient, organizationId, userId)
-                    .map(ignore -> organizationId)))
+                .then(Mono.just(organizationId)))
+            .then(organizationId -> associateManagerOrganization(this.cloudFoundryClient, organizationId, userId))
             .flatMap(ignore -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listManagedOrganizations(ListUserManagedOrganizationsRequest.builder()
+                        .page(page)
+                        .userId(userId)
+                        .build())))
+            .map(resource -> resource.getEntity().getName())
+            .as(StepVerifier::create)
+            .expectNext(organizationName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void listManagedOrganizationsFilterByAuditorId() throws TimeoutException, InterruptedException {
+        String organizationName = this.nameFactory.getOrganizationName();
+        String userId = this.nameFactory.getUserId();
+
+        createOrganizationId(this.cloudFoundryClient, organizationName)
+            .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
+                .then(Mono.just(organizationId)))
+            .then(organizationId -> Mono.when(
+                associateAuditorOrganization(this.cloudFoundryClient, organizationId, userId),
+                associateManagerOrganization(this.cloudFoundryClient, organizationId, userId)))
+            .flatMap(ignore -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
+                    .listManagedOrganizations(ListUserManagedOrganizationsRequest.builder()
+                        .auditorId(userId)
+                        .page(page)
+                        .userId(userId)
+                        .build())))
+            .map(resource -> resource.getEntity().getName())
+            .as(StepVerifier::create)
+            .expectNext(organizationName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void listManagedOrganizationsFilterByBillingManagerId() throws TimeoutException, InterruptedException {
+        String organizationName = this.nameFactory.getOrganizationName();
+        String userId = this.nameFactory.getUserId();
+
+        createOrganizationId(this.cloudFoundryClient, organizationName)
+            .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
+                .then(Mono.just(organizationId)))
+            .then(organizationId -> Mono.when(
+                associateBillingManagerOrganization(this.cloudFoundryClient, organizationId, userId),
+                associateManagerOrganization(this.cloudFoundryClient, organizationId, userId)))
+            .flatMap(ignore -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
+                    .listManagedOrganizations(ListUserManagedOrganizationsRequest.builder()
+                        .billingManagerId(userId)
                         .page(page)
                         .userId(userId)
                         .build())))
@@ -531,9 +921,8 @@ public final class UsersTest extends AbstractIntegrationTest {
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
-                .then(Mono.when(
-                    requestAssociateOrganization(this.cloudFoundryClient, organizationId, userId),
-                    associateManagerOrganization(this.cloudFoundryClient, organizationId, userId))))
+                .then(Mono.just(organizationId)))
+            .then(organizationId -> associateManagerOrganization(this.cloudFoundryClient, organizationId, userId))
             .flatMap(ignore -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listManagedOrganizations(ListUserManagedOrganizationsRequest.builder()
@@ -582,7 +971,7 @@ public final class UsersTest extends AbstractIntegrationTest {
                 createSpaceId(this.cloudFoundryClient, organizationId, spaceName)))
             .then(function((organizationId, spaceId) -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
                 .then(associateManagerOrganization(this.cloudFoundryClient, organizationId, userId))
-                .map(ignore -> spaceId)))
+                .then(Mono.just(spaceId))))
             .flatMap(spaceId -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listManagedOrganizations(ListUserManagedOrganizationsRequest.builder()
@@ -604,8 +993,7 @@ public final class UsersTest extends AbstractIntegrationTest {
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
-                .then(associateManagerOrganization(this.cloudFoundryClient, organizationId, userId)
-                    .map(ignore -> organizationId)))
+                .then(associateManagerOrganization(this.cloudFoundryClient, organizationId, userId)))
             .flatMap(ignore -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listManagedOrganizations(ListUserManagedOrganizationsRequest.builder()
@@ -726,7 +1114,7 @@ public final class UsersTest extends AbstractIntegrationTest {
             ))
             .then(function((organizationId, spaceId) -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
                 .then(requestAssociateManagedSpace(this.cloudFoundryClient, spaceId, userId))
-                .map(ignore -> organizationId)))
+                .then(Mono.just(organizationId))))
             .flatMap(organizationId -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listManagedSpaces(ListUserManagedSpacesRequest.builder()
@@ -747,8 +1135,8 @@ public final class UsersTest extends AbstractIntegrationTest {
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
-                .then(requestAssociateOrganization(this.cloudFoundryClient, organizationId, userId)
-                    .map(ignore -> organizationId)))
+                .then(Mono.just(organizationId)))
+            .then(organizationId -> requestAssociateOrganization(this.cloudFoundryClient, organizationId, userId))
             .flatMap(ignore -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listOrganizations(ListUserOrganizationsRequest.builder()
@@ -762,18 +1150,52 @@ public final class UsersTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/646
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/646")
     @Test
     public void listOrganizationsFilterByAuditorId() throws TimeoutException, InterruptedException {
+        String organizationName = this.nameFactory.getOrganizationName();
+        String userId = this.nameFactory.getUserId();
 
+        createOrganizationId(this.cloudFoundryClient, organizationName)
+            .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
+                .then(Mono.when(
+                    requestAssociateOrganization(this.cloudFoundryClient, organizationId, userId),
+                    associateAuditorOrganization(this.cloudFoundryClient, organizationId, userId))))
+            .flatMap(ignore -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
+                    .listOrganizations(ListUserOrganizationsRequest.builder()
+                        .auditorId(userId)
+                        .page(page)
+                        .userId(userId)
+                        .build())))
+            .map(resource -> resource.getEntity().getName())
+            .as(StepVerifier::create)
+            .expectNext(organizationName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/648
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/648")
     @Test
     public void listOrganizationsFilterByBillingManagerId() throws TimeoutException, InterruptedException {
+        String organizationName = this.nameFactory.getOrganizationName();
+        String userId = this.nameFactory.getUserId();
 
+        createOrganizationId(this.cloudFoundryClient, organizationName)
+            .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
+                .then(Mono.when(
+                    requestAssociateOrganization(this.cloudFoundryClient, organizationId, userId),
+                    associateBillingManagerOrganization(this.cloudFoundryClient, organizationId, userId))))
+            .flatMap(ignore -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
+                    .listOrganizations(ListUserOrganizationsRequest.builder()
+                        .billingManagerId(userId)
+                        .page(page)
+                        .userId(userId)
+                        .build())))
+            .map(resource -> resource.getEntity().getName())
+            .as(StepVerifier::create)
+            .expectNext(organizationName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -834,7 +1256,7 @@ public final class UsersTest extends AbstractIntegrationTest {
                 createSpaceId(this.cloudFoundryClient, organizationId, spaceName)))
             .then(function((organizationId, spaceId) -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
                 .then(requestAssociateOrganization(this.cloudFoundryClient, organizationId, userId))
-                .map(ignore -> spaceId)))
+                .then(Mono.just(spaceId))))
             .flatMap(spaceId -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listOrganizations(ListUserOrganizationsRequest.builder()
@@ -856,8 +1278,7 @@ public final class UsersTest extends AbstractIntegrationTest {
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
-                .then(requestAssociateOrganization(this.cloudFoundryClient, organizationId, userId)
-                    .map(ignore -> organizationId)))
+                .then(requestAssociateOrganization(this.cloudFoundryClient, organizationId, userId)))
             .flatMap(ignore -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listOrganizations(ListUserOrganizationsRequest.builder()
@@ -977,7 +1398,7 @@ public final class UsersTest extends AbstractIntegrationTest {
             ))
             .then(function((organizationId, spaceId) -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
                 .then(requestAssociateSpace(this.cloudFoundryClient, spaceId, userId))
-                .map(ignore -> organizationId)))
+                .then(Mono.just(organizationId))))
             .flatMap(organizationId -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listSpaces(ListUserSpacesRequest.builder()
@@ -992,11 +1413,25 @@ public final class UsersTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/662
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/662")
     @Test
     public void removeAuditedOrganization() throws TimeoutException, InterruptedException {
-        //
+        String userId = this.nameFactory.getUserId();
+
+        this.organizationId
+            .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
+                .then(requestAssociateAuditedOrganization(this.cloudFoundryClient, organizationId, userId)
+                    .then(Mono.just(organizationId))))
+            .then(organizationId -> this.cloudFoundryClient.users()
+                .removeAuditedOrganization(RemoveUserAuditedOrganizationRequest.builder()
+                    .auditedOrganizationId(organizationId)
+                    .userId(userId)
+                    .build()))
+            .then(requestSummaryUser(this.cloudFoundryClient, userId))
+            .flatMapIterable(response -> response.getEntity().getAuditedOrganizations())
+            .as(StepVerifier::create)
+            .expectNextCount(0)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -1021,11 +1456,25 @@ public final class UsersTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/664
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/664")
     @Test
     public void removeBillingManagedOrganization() throws TimeoutException, InterruptedException {
-        //
+        String userId = this.nameFactory.getUserId();
+
+        this.organizationId
+            .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
+                .then(requestAssociateBillingManagedOrganization(this.cloudFoundryClient, organizationId, userId)
+                    .then(Mono.just(organizationId))))
+            .then(organizationId -> this.cloudFoundryClient.users()
+                .removeBillingManagedOrganization(RemoveUserBillingManagedOrganizationRequest.builder()
+                    .billingManagedOrganizationId(organizationId)
+                    .userId(userId)
+                    .build()))
+            .then(requestSummaryUser(this.cloudFoundryClient, userId))
+            .flatMapIterable(response -> response.getEntity().getBillingManagedOrganizations())
+            .as(StepVerifier::create)
+            .expectNextCount(0)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -1035,7 +1484,7 @@ public final class UsersTest extends AbstractIntegrationTest {
         this.organizationId
             .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
                 .then(requestAssociateManagedOrganization(this.cloudFoundryClient, organizationId, userId)
-                    .map(ignore -> organizationId)))
+                    .then(Mono.just(organizationId))))
             .then(organizationId -> this.cloudFoundryClient.users()
                 .removeManagedOrganization(RemoveUserManagedOrganizationRequest.builder()
                     .managedOrganizationId(organizationId)
@@ -1078,7 +1527,7 @@ public final class UsersTest extends AbstractIntegrationTest {
         this.organizationId
             .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
                 .then(requestAssociateOrganization(this.cloudFoundryClient, organizationId, userId)
-                    .map(ignore -> organizationId)))
+                    .then(Mono.just(organizationId))))
             .then(organizationId -> this.cloudFoundryClient.users()
                 .removeOrganization(RemoveUserOrganizationRequest.builder()
                     .organizationId(organizationId)
@@ -1114,7 +1563,6 @@ public final class UsersTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: Consider improving test when associate spaces/organizations is available
     @Test
     public void summary() throws TimeoutException, InterruptedException {
         String userId = this.nameFactory.getUserId();
@@ -1124,8 +1572,9 @@ public final class UsersTest extends AbstractIntegrationTest {
                 .summary(SummaryUserRequest.builder()
                     .userId(userId)
                     .build()))
+            .map(response -> response.getEntity().getManagedOrganizations())
             .as(StepVerifier::create)
-            .expectNextCount(1)
+            .expectNextCount(0)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -1138,19 +1587,29 @@ public final class UsersTest extends AbstractIntegrationTest {
         this.organizationId
             .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
             .then(spaceId -> requestCreateUser(this.cloudFoundryClient, userId)
-                .map(ignore -> spaceId))
+                .then(Mono.just(spaceId)))
             .then(spaceId -> this.cloudFoundryClient.users()
                 .update(UpdateUserRequest.builder()
                     .defaultSpaceId(spaceId)
                     .userId(userId)
                     .build())
-                .map(ignore -> spaceId))
+                .then(Mono.just(spaceId)))
             .flatMap(spaceId -> requestListUsers(this.cloudFoundryClient)
                 .filter(resource -> spaceId.equals(resource.getEntity().getDefaultSpaceId())))
             .as(StepVerifier::create)
             .expectNextCount(1)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
+    }
+
+    private static Mono<AssociateUserAuditedOrganizationResponse> associateAuditorOrganization(CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
+        return requestAssociateOrganizationAuditor(cloudFoundryClient, organizationId, userId)
+            .then(requestAssociateAuditedOrganization(cloudFoundryClient, organizationId, userId));
+    }
+
+    private static Mono<AssociateUserBillingManagedOrganizationResponse> associateBillingManagerOrganization(CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
+        return requestAssociateOrganizationBillingManager(cloudFoundryClient, organizationId, userId)
+            .then(requestAssociateBillingManagedOrganization(cloudFoundryClient, organizationId, userId));
     }
 
     private static Mono<AssociateUserManagedOrganizationResponse> associateManagerOrganization(CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
@@ -1173,10 +1632,26 @@ public final class UsersTest extends AbstractIntegrationTest {
             .map(ResourceUtils::getId);
     }
 
+    private static Mono<AssociateUserAuditedOrganizationResponse> requestAssociateAuditedOrganization(CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
+        return cloudFoundryClient.users()
+            .associateAuditedOrganization(AssociateUserAuditedOrganizationRequest.builder()
+                .auditedOrganizationId(organizationId)
+                .userId(userId)
+                .build());
+    }
+
     private static Mono<AssociateUserAuditedSpaceResponse> requestAssociateAuditedSpace(CloudFoundryClient cloudFoundryClient, String spaceId, String userId) {
         return cloudFoundryClient.users()
             .associateAuditedSpace(AssociateUserAuditedSpaceRequest.builder()
                 .auditedSpaceId(spaceId)
+                .userId(userId)
+                .build());
+    }
+
+    private static Mono<AssociateUserBillingManagedOrganizationResponse> requestAssociateBillingManagedOrganization(CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
+        return cloudFoundryClient.users()
+            .associateBillingManagedOrganization(AssociateUserBillingManagedOrganizationRequest.builder()
+                .billingManagedOrganizationId(organizationId)
                 .userId(userId)
                 .build());
     }
@@ -1202,6 +1677,22 @@ public final class UsersTest extends AbstractIntegrationTest {
             .associateOrganization(AssociateUserOrganizationRequest.builder()
                 .organizationId(organizationId)
                 .userId(userId)
+                .build());
+    }
+
+    private static Mono<AssociateOrganizationAuditorResponse> requestAssociateOrganizationAuditor(CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
+        return cloudFoundryClient.organizations()
+            .associateAuditor(AssociateOrganizationAuditorRequest.builder()
+                .auditorId(userId)
+                .organizationId(organizationId)
+                .build());
+    }
+
+    private static Mono<AssociateOrganizationBillingManagerResponse> requestAssociateOrganizationBillingManager(CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
+        return cloudFoundryClient.organizations()
+            .associateBillingManager(AssociateOrganizationBillingManagerRequest.builder()
+                .billingManagerId(userId)
+                .organizationId(organizationId)
                 .build());
     }
 

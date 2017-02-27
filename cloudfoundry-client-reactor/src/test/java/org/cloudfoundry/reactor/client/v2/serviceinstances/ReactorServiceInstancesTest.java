@@ -188,10 +188,59 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
     }
 
     @Test
+    public void deleteAcceptsIncomplete() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(DELETE).path("/v2/service_instances/test-service-instance-id?accepts_incomplete=true")
+                .build())
+            .response(TestResponse.builder()
+                .status(ACCEPTED)
+                .payload("fixtures/client/v2/service_instances/DELETE_{id}_accepts_incomplete_response.json")
+                .build())
+            .build());
+
+        this.serviceInstances
+            .delete(DeleteServiceInstanceRequest.builder()
+                .serviceInstanceId("test-service-instance-id")
+                .acceptsIncomplete(true)
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(DeleteServiceInstanceResponse.builder()
+                .metadata(Metadata.builder()
+                    .id("2e20eccf-6828-4c56-81cb-28c0e295ce19")
+                    .url("/v2/service_instances/2e20eccf-6828-4c56-81cb-28c0e295ce19")
+                    .createdAt("2017-02-27T12:30:29Z")
+                    .updatedAt("2017-02-27T12:30:29Z")
+                    .build())
+                .entity(ServiceInstanceEntity.builder()
+                    .name("test-service")
+                    .servicePlanId("07c64d77-4df5-4974-a4b2-3bc58cafcf0d")
+                    .spaceId("840d3266-8547-40fe-986e-ffc20eaba235")
+                    .dashboardUrl("http://test-dashboard-host/2e20eccf-6828-4c56-81cb-28c0e295ce19")
+                    .type("managed_service_instance")
+                    .lastOperation(LastOperation.builder()
+                        .type("delete")
+                        .state("in progress")
+                        .description("")
+                        .updatedAt("2017-02-27T12:30:59Z")
+                        .createdAt("2017-02-27T12:30:59Z")
+                        .build())
+                    .spaceUrl("/v2/spaces/840d3266-8547-40fe-986e-ffc20eaba235")
+                    .servicePlanUrl("/v2/service_plans/07c64d77-4df5-4974-a4b2-3bc58cafcf0d")
+                    .serviceBindingsUrl("/v2/service_instances/2e20eccf-6828-4c56-81cb-28c0e295ce19/service_bindings")
+                    .serviceKeysUrl("/v2/service_instances/2e20eccf-6828-4c56-81cb-28c0e295ce19/service_keys")
+                    .routesUrl("/v2/service_instances/2e20eccf-6828-4c56-81cb-28c0e295ce19/routes")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
     public void deleteAsync() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v2/service_instances/test-service-instance-id?accepts_incomplete=true&async=true&purge=true")
+                .method(DELETE).path("/v2/service_instances/test-service-instance-id?async=true&purge=true")
                 .build())
             .response(TestResponse.builder()
                 .status(ACCEPTED)
@@ -203,7 +252,6 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
             .delete(DeleteServiceInstanceRequest.builder()
                 .async(true)
                 .serviceInstanceId("test-service-instance-id")
-                .acceptsIncomplete(true)
                 .purge(true)
                 .build())
             .as(StepVerifier::create)
