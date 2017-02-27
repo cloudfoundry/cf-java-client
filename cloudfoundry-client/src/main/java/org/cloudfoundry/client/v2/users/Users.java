@@ -166,6 +166,14 @@ public interface Users {
     Mono<ListUserSpacesResponse> listSpaces(ListUserSpacesRequest request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/users/remove_audited_organization_from_the_user.html">Remove Audited Organization from the User</a> request
+     *
+     * @param request the Remove Audited Organization from the User request
+     * @return the response from the Remove Audited Organization from the User request
+     */
+    Mono<Void> removeAuditedOrganization(RemoveUserAuditedOrganizationRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/users/remove_managed_space_from_the_user.html">Remove Audited Space from the User</a> request
      *
      * @param request the Remove Audited Space from the User request

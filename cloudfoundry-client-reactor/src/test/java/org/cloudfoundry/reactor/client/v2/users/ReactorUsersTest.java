@@ -58,6 +58,7 @@ import org.cloudfoundry.client.v2.users.ListUserSpacesRequest;
 import org.cloudfoundry.client.v2.users.ListUserSpacesResponse;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
 import org.cloudfoundry.client.v2.users.ListUsersResponse;
+import org.cloudfoundry.client.v2.users.RemoveUserAuditedOrganizationRequest;
 import org.cloudfoundry.client.v2.users.RemoveUserAuditedSpaceRequest;
 import org.cloudfoundry.client.v2.users.RemoveUserBillingManagedOrganizationRequest;
 import org.cloudfoundry.client.v2.users.RemoveUserManagedOrganizationRequest;
@@ -906,6 +907,27 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
                         .build())
                     .build())
                 .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void removeAuditedOrganization() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(DELETE).path("/v2/users/uaa-id-293/audited_organizations/ab4226af-73e8-4c7d-a2e0-a713ebf9fd84")
+                .build())
+            .response(TestResponse.builder()
+                .status(NO_CONTENT)
+                .build())
+            .build());
+
+        this.users
+            .removeAuditedOrganization(RemoveUserAuditedOrganizationRequest.builder()
+                .auditedOrganizationId("ab4226af-73e8-4c7d-a2e0-a713ebf9fd84")
+                .userId("uaa-id-293")
+                .build())
+            .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }

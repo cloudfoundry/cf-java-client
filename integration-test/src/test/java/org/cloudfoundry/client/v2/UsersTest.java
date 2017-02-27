@@ -56,6 +56,7 @@ import org.cloudfoundry.client.v2.users.ListUserManagedSpacesRequest;
 import org.cloudfoundry.client.v2.users.ListUserOrganizationsRequest;
 import org.cloudfoundry.client.v2.users.ListUserSpacesRequest;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
+import org.cloudfoundry.client.v2.users.RemoveUserAuditedOrganizationRequest;
 import org.cloudfoundry.client.v2.users.RemoveUserAuditedSpaceRequest;
 import org.cloudfoundry.client.v2.users.RemoveUserBillingManagedOrganizationRequest;
 import org.cloudfoundry.client.v2.users.RemoveUserManagedOrganizationRequest;
@@ -69,7 +70,6 @@ import org.cloudfoundry.client.v2.users.UserResource;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
@@ -1413,11 +1413,25 @@ public final class UsersTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/662
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/662")
     @Test
     public void removeAuditedOrganization() throws TimeoutException, InterruptedException {
-        //
+        String userId = this.nameFactory.getUserId();
+
+        this.organizationId
+            .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
+                .then(requestAssociateAuditedOrganization(this.cloudFoundryClient, organizationId, userId)
+                    .then(Mono.just(organizationId))))
+            .then(organizationId -> this.cloudFoundryClient.users()
+                .removeAuditedOrganization(RemoveUserAuditedOrganizationRequest.builder()
+                    .auditedOrganizationId(organizationId)
+                    .userId(userId)
+                    .build()))
+            .then(requestSummaryUser(this.cloudFoundryClient, userId))
+            .flatMapIterable(response -> response.getEntity().getAuditedOrganizations())
+            .as(StepVerifier::create)
+            .expectNextCount(0)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -1549,7 +1563,6 @@ public final class UsersTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: Consider improving test when associate spaces/organizations is available
     @Test
     public void summary() throws TimeoutException, InterruptedException {
         String userId = this.nameFactory.getUserId();
@@ -1559,8 +1572,9 @@ public final class UsersTest extends AbstractIntegrationTest {
                 .summary(SummaryUserRequest.builder()
                     .userId(userId)
                     .build()))
+            .map(response -> response.getEntity().getManagedOrganizations())
             .as(StepVerifier::create)
-            .expectNextCount(1)
+            .expectNextCount(0)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
