@@ -55,6 +55,7 @@ import org.cloudfoundry.client.v2.users.ListUserSpacesResponse;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
 import org.cloudfoundry.client.v2.users.ListUsersResponse;
 import org.cloudfoundry.client.v2.users.RemoveUserAuditedSpaceRequest;
+import org.cloudfoundry.client.v2.users.RemoveUserBillingManagedOrganizationRequest;
 import org.cloudfoundry.client.v2.users.RemoveUserManagedOrganizationRequest;
 import org.cloudfoundry.client.v2.users.RemoveUserManagedSpaceRequest;
 import org.cloudfoundry.client.v2.users.RemoveUserOrganizationRequest;
@@ -828,6 +829,27 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
             .removeAuditedSpace(RemoveUserAuditedSpaceRequest.builder()
                 .auditedSpaceId("95b843ee-9f7a-4021-a155-ad9c0f76e6fc")
                 .userId("uaa-id-278")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void removeBillingManagedOrganization() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(DELETE).path("/v2/users/uaa-id-274/billing_managed_organizations/a2d908b0-504d-435c-83ef-82969d353741")
+                .build())
+            .response(TestResponse.builder()
+                .status(NO_CONTENT)
+                .build())
+            .build());
+
+        this.users
+            .removeBillingManagedOrganization(RemoveUserBillingManagedOrganizationRequest.builder()
+                .billingManagedOrganizationId("a2d908b0-504d-435c-83ef-82969d353741")
+                .userId("uaa-id-274")
                 .build())
             .as(StepVerifier::create)
             .expectComplete()

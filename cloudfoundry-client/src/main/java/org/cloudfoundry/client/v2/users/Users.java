@@ -158,6 +158,14 @@ public interface Users {
     Mono<Void> removeAuditedSpace(RemoveUserAuditedSpaceRequest request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/users/remove_billing_managed_organization_from_the_user.html">Remove Managed Billing Organization from the User</a> request
+     *
+     * @param request the Remove Billing Managed Organization from the User request
+     * @return the response from the Remove Billing Managed Organization from the User request
+     */
+    Mono<Void> removeBillingManagedOrganization(RemoveUserBillingManagedOrganizationRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/users/remove_managed_organization_from_the_user.html">Remove Managed Organization from the User</a> request
      *
      * @param request the Remove Managed Organization from the User request
