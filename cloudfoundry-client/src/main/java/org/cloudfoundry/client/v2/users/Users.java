@@ -21,6 +21,14 @@ import reactor.core.publisher.Mono;
 public interface Users {
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/users/associate_audited_organization_with_the_user.html">Associate Audited Organization with the User</a> request
+     *
+     * @param request the Associate Audited Organization with the User request
+     * @return the response from the Associate Audited Organization with the User request
+     */
+    Mono<AssociateUserAuditedOrganizationResponse> associateAuditedOrganization(AssociateUserAuditedOrganizationRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/users/associate_audited_space_with_the_user.html">Associate Audited Space with the User</a> request
      *
      * @param request the Associate Audited Space with the User request

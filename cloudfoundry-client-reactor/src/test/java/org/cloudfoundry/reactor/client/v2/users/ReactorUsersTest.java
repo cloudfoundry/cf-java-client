@@ -23,6 +23,8 @@ import org.cloudfoundry.client.v2.organizations.OrganizationEntity;
 import org.cloudfoundry.client.v2.organizations.OrganizationResource;
 import org.cloudfoundry.client.v2.spaces.SpaceEntity;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
+import org.cloudfoundry.client.v2.users.AssociateUserAuditedOrganizationRequest;
+import org.cloudfoundry.client.v2.users.AssociateUserAuditedOrganizationResponse;
 import org.cloudfoundry.client.v2.users.AssociateUserAuditedSpaceRequest;
 import org.cloudfoundry.client.v2.users.AssociateUserAuditedSpaceResponse;
 import org.cloudfoundry.client.v2.users.AssociateUserBillingManagedOrganizationRequest;
@@ -91,6 +93,49 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 public final class ReactorUsersTest extends AbstractClientApiTest {
 
     private final ReactorUsers users = new ReactorUsers(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+
+    @Test
+    public void associateAuditedOrganization() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(PUT).path("/v2/users/uaa-id-295/audited_organizations/52c32226-3446-4212-929a-c3b67d36f657")
+                .build())
+            .response(TestResponse.builder()
+                .status(CREATED)
+                .payload("fixtures/client/v2/users/PUT_{id}_audited_organizations_{id}_response.json")
+                .build())
+            .build());
+
+        this.users
+            .associateAuditedOrganization(AssociateUserAuditedOrganizationRequest.builder()
+                .auditedOrganizationId("52c32226-3446-4212-929a-c3b67d36f657")
+                .userId("uaa-id-295")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(AssociateUserAuditedOrganizationResponse.builder()
+                .metadata(Metadata.builder()
+                    .createdAt("2016-06-08T16:41:36Z")
+                    .id("uaa-id-295")
+                    .updatedAt("2016-06-08T16:41:26Z")
+                    .url("/v2/users/uaa-id-295")
+                    .build())
+                .entity(UserEntity.builder()
+                    .active(false)
+                    .admin(false)
+                    .auditedOrganizationsUrl("/v2/users/uaa-id-295/audited_organizations")
+                    .auditedSpacesUrl("/v2/users/uaa-id-295/audited_spaces")
+                    .billingManagedOrganizationsUrl("/v2/users/uaa-id-295/billing_managed_organizations")
+                    .defaultSpaceId("aa72aeb6-25aa-4cdc-9ef7-9231fe5b136d")
+                    .defaultSpaceUrl("/v2/spaces/aa72aeb6-25aa-4cdc-9ef7-9231fe5b136d")
+                    .managedOrganizationsUrl("/v2/users/uaa-id-295/managed_organizations")
+                    .managedSpacesUrl("/v2/users/uaa-id-295/managed_spaces")
+                    .organizationsUrl("/v2/users/uaa-id-295/organizations")
+                    .spacesUrl("/v2/users/uaa-id-295/spaces")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
 
     @Test
     public void associateAuditedSpace() {

@@ -16,6 +16,8 @@
 
 package org.cloudfoundry.reactor.client.v2.users;
 
+import org.cloudfoundry.client.v2.users.AssociateUserAuditedOrganizationRequest;
+import org.cloudfoundry.client.v2.users.AssociateUserAuditedOrganizationResponse;
 import org.cloudfoundry.client.v2.users.AssociateUserAuditedSpaceRequest;
 import org.cloudfoundry.client.v2.users.AssociateUserAuditedSpaceResponse;
 import org.cloudfoundry.client.v2.users.AssociateUserBillingManagedOrganizationRequest;
@@ -78,6 +80,13 @@ public final class ReactorUsers extends AbstractClientV2Operations implements Us
      */
     public ReactorUsers(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
         super(connectionContext, root, tokenProvider);
+    }
+
+    @Override
+    public Mono<AssociateUserAuditedOrganizationResponse> associateAuditedOrganization(AssociateUserAuditedOrganizationRequest request) {
+        return put(request, AssociateUserAuditedOrganizationResponse.class, builder ->
+            builder.pathSegment("v2", "users", request.getUserId(), "audited_organizations", request.getAuditedOrganizationId()))
+            .checkpoint();
     }
 
     @Override
