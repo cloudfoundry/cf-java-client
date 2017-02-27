@@ -16,6 +16,8 @@
 
 package org.cloudfoundry.reactor.client.v2.users;
 
+import org.cloudfoundry.client.v2.users.AssociateUserAuditedOrganizationRequest;
+import org.cloudfoundry.client.v2.users.AssociateUserAuditedOrganizationResponse;
 import org.cloudfoundry.client.v2.users.AssociateUserAuditedSpaceRequest;
 import org.cloudfoundry.client.v2.users.AssociateUserAuditedSpaceResponse;
 import org.cloudfoundry.client.v2.users.AssociateUserBillingManagedOrganizationRequest;
@@ -34,6 +36,8 @@ import org.cloudfoundry.client.v2.users.DeleteUserRequest;
 import org.cloudfoundry.client.v2.users.DeleteUserResponse;
 import org.cloudfoundry.client.v2.users.GetUserRequest;
 import org.cloudfoundry.client.v2.users.GetUserResponse;
+import org.cloudfoundry.client.v2.users.ListUserAuditedOrganizationsRequest;
+import org.cloudfoundry.client.v2.users.ListUserAuditedOrganizationsResponse;
 import org.cloudfoundry.client.v2.users.ListUserAuditedSpacesRequest;
 import org.cloudfoundry.client.v2.users.ListUserAuditedSpacesResponse;
 import org.cloudfoundry.client.v2.users.ListUserBillingManagedOrganizationsRequest;
@@ -48,6 +52,7 @@ import org.cloudfoundry.client.v2.users.ListUserSpacesRequest;
 import org.cloudfoundry.client.v2.users.ListUserSpacesResponse;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
 import org.cloudfoundry.client.v2.users.ListUsersResponse;
+import org.cloudfoundry.client.v2.users.RemoveUserAuditedOrganizationRequest;
 import org.cloudfoundry.client.v2.users.RemoveUserAuditedSpaceRequest;
 import org.cloudfoundry.client.v2.users.RemoveUserBillingManagedOrganizationRequest;
 import org.cloudfoundry.client.v2.users.RemoveUserManagedOrganizationRequest;
@@ -78,6 +83,13 @@ public final class ReactorUsers extends AbstractClientV2Operations implements Us
      */
     public ReactorUsers(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
         super(connectionContext, root, tokenProvider);
+    }
+
+    @Override
+    public Mono<AssociateUserAuditedOrganizationResponse> associateAuditedOrganization(AssociateUserAuditedOrganizationRequest request) {
+        return put(request, AssociateUserAuditedOrganizationResponse.class, builder ->
+            builder.pathSegment("v2", "users", request.getUserId(), "audited_organizations", request.getAuditedOrganizationId()))
+            .checkpoint();
     }
 
     @Override
@@ -143,6 +155,12 @@ public final class ReactorUsers extends AbstractClientV2Operations implements Us
     }
 
     @Override
+    public Mono<ListUserAuditedOrganizationsResponse> listAuditedOrganizations(ListUserAuditedOrganizationsRequest request) {
+        return get(request, ListUserAuditedOrganizationsResponse.class, builder -> builder.pathSegment("v2", "users", request.getUserId(), "audited_organizations"))
+            .checkpoint();
+    }
+
+    @Override
     public Mono<ListUserAuditedSpacesResponse> listAuditedSpaces(ListUserAuditedSpacesRequest request) {
         return get(request, ListUserAuditedSpacesResponse.class, builder -> builder.pathSegment("v2", "users", request.getUserId(), "audited_spaces"))
             .checkpoint();
@@ -175,6 +193,12 @@ public final class ReactorUsers extends AbstractClientV2Operations implements Us
     @Override
     public Mono<ListUserSpacesResponse> listSpaces(ListUserSpacesRequest request) {
         return get(request, ListUserSpacesResponse.class, builder -> builder.pathSegment("v2", "users", request.getUserId(), "spaces"))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<Void> removeAuditedOrganization(RemoveUserAuditedOrganizationRequest request) {
+        return delete(request, Void.class, builder -> builder.pathSegment("v2", "users", request.getUserId(), "audited_organizations", request.getAuditedOrganizationId()))
             .checkpoint();
     }
 

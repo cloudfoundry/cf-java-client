@@ -23,6 +23,8 @@ import org.cloudfoundry.client.v2.organizations.OrganizationEntity;
 import org.cloudfoundry.client.v2.organizations.OrganizationResource;
 import org.cloudfoundry.client.v2.spaces.SpaceEntity;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
+import org.cloudfoundry.client.v2.users.AssociateUserAuditedOrganizationRequest;
+import org.cloudfoundry.client.v2.users.AssociateUserAuditedOrganizationResponse;
 import org.cloudfoundry.client.v2.users.AssociateUserAuditedSpaceRequest;
 import org.cloudfoundry.client.v2.users.AssociateUserAuditedSpaceResponse;
 import org.cloudfoundry.client.v2.users.AssociateUserBillingManagedOrganizationRequest;
@@ -40,6 +42,8 @@ import org.cloudfoundry.client.v2.users.CreateUserResponse;
 import org.cloudfoundry.client.v2.users.DeleteUserRequest;
 import org.cloudfoundry.client.v2.users.GetUserRequest;
 import org.cloudfoundry.client.v2.users.GetUserResponse;
+import org.cloudfoundry.client.v2.users.ListUserAuditedOrganizationsRequest;
+import org.cloudfoundry.client.v2.users.ListUserAuditedOrganizationsResponse;
 import org.cloudfoundry.client.v2.users.ListUserAuditedSpacesRequest;
 import org.cloudfoundry.client.v2.users.ListUserAuditedSpacesResponse;
 import org.cloudfoundry.client.v2.users.ListUserBillingManagedOrganizationsRequest;
@@ -54,6 +58,7 @@ import org.cloudfoundry.client.v2.users.ListUserSpacesRequest;
 import org.cloudfoundry.client.v2.users.ListUserSpacesResponse;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
 import org.cloudfoundry.client.v2.users.ListUsersResponse;
+import org.cloudfoundry.client.v2.users.RemoveUserAuditedOrganizationRequest;
 import org.cloudfoundry.client.v2.users.RemoveUserAuditedSpaceRequest;
 import org.cloudfoundry.client.v2.users.RemoveUserBillingManagedOrganizationRequest;
 import org.cloudfoundry.client.v2.users.RemoveUserManagedOrganizationRequest;
@@ -91,6 +96,49 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 public final class ReactorUsersTest extends AbstractClientApiTest {
 
     private final ReactorUsers users = new ReactorUsers(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+
+    @Test
+    public void associateAuditedOrganization() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(PUT).path("/v2/users/uaa-id-295/audited_organizations/52c32226-3446-4212-929a-c3b67d36f657")
+                .build())
+            .response(TestResponse.builder()
+                .status(CREATED)
+                .payload("fixtures/client/v2/users/PUT_{id}_audited_organizations_{id}_response.json")
+                .build())
+            .build());
+
+        this.users
+            .associateAuditedOrganization(AssociateUserAuditedOrganizationRequest.builder()
+                .auditedOrganizationId("52c32226-3446-4212-929a-c3b67d36f657")
+                .userId("uaa-id-295")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(AssociateUserAuditedOrganizationResponse.builder()
+                .metadata(Metadata.builder()
+                    .createdAt("2016-06-08T16:41:36Z")
+                    .id("uaa-id-295")
+                    .updatedAt("2016-06-08T16:41:26Z")
+                    .url("/v2/users/uaa-id-295")
+                    .build())
+                .entity(UserEntity.builder()
+                    .active(false)
+                    .admin(false)
+                    .auditedOrganizationsUrl("/v2/users/uaa-id-295/audited_organizations")
+                    .auditedSpacesUrl("/v2/users/uaa-id-295/audited_spaces")
+                    .billingManagedOrganizationsUrl("/v2/users/uaa-id-295/billing_managed_organizations")
+                    .defaultSpaceId("aa72aeb6-25aa-4cdc-9ef7-9231fe5b136d")
+                    .defaultSpaceUrl("/v2/spaces/aa72aeb6-25aa-4cdc-9ef7-9231fe5b136d")
+                    .managedOrganizationsUrl("/v2/users/uaa-id-295/managed_organizations")
+                    .managedSpacesUrl("/v2/users/uaa-id-295/managed_spaces")
+                    .organizationsUrl("/v2/users/uaa-id-295/organizations")
+                    .spacesUrl("/v2/users/uaa-id-295/spaces")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
 
     @Test
     public void associateAuditedSpace() {
@@ -518,6 +566,55 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     }
 
     @Test
+    public void listAuditedOrganizations() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/v2/users/uaa-id-297/audited_organizations")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/users/GET_{id}_audited_organizations_response.json")
+                .build())
+            .build());
+
+        this.users
+            .listAuditedOrganizations(ListUserAuditedOrganizationsRequest.builder()
+                .userId("uaa-id-297")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ListUserAuditedOrganizationsResponse.builder()
+                .totalResults(1)
+                .totalPages(1)
+                .resource(OrganizationResource.builder()
+                    .metadata(Metadata.builder()
+                        .createdAt("2016-06-08T16:41:36Z")
+                        .id("3ced0de5-e2ce-403e-9706-17e2035947b4")
+                        .updatedAt("2016-06-08T16:41:26Z")
+                        .url("/v2/organizations/3ced0de5-e2ce-403e-9706-17e2035947b4")
+                        .build())
+                    .entity(OrganizationEntity.builder()
+                        .applicationEventsUrl("/v2/organizations/3ced0de5-e2ce-403e-9706-17e2035947b4/app_events")
+                        .auditorsUrl("/v2/organizations/3ced0de5-e2ce-403e-9706-17e2035947b4/auditors")
+                        .billingEnabled(false)
+                        .billingManagersUrl("/v2/organizations/3ced0de5-e2ce-403e-9706-17e2035947b4/billing_managers")
+                        .domainsUrl("/v2/organizations/3ced0de5-e2ce-403e-9706-17e2035947b4/domains")
+                        .managersUrl("/v2/organizations/3ced0de5-e2ce-403e-9706-17e2035947b4/managers")
+                        .name("name-1914")
+                        .privateDomainsUrl("/v2/organizations/3ced0de5-e2ce-403e-9706-17e2035947b4/private_domains")
+                        .quotaDefinitionId("8eb22221-a9ec-4345-a2a0-4a7e816ca689")
+                        .quotaDefinitionUrl("/v2/quota_definitions/8eb22221-a9ec-4345-a2a0-4a7e816ca689")
+                        .spaceQuotaDefinitionsUrl("/v2/organizations/3ced0de5-e2ce-403e-9706-17e2035947b4/space_quota_definitions")
+                        .spacesUrl("/v2/organizations/3ced0de5-e2ce-403e-9706-17e2035947b4/spaces")
+                        .status("active")
+                        .usersUrl("/v2/organizations/3ced0de5-e2ce-403e-9706-17e2035947b4/users")
+                        .build())
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
     public void listAuditedSpaces() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
@@ -810,6 +907,27 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
                         .build())
                     .build())
                 .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void removeAuditedOrganization() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(DELETE).path("/v2/users/uaa-id-293/audited_organizations/ab4226af-73e8-4c7d-a2e0-a713ebf9fd84")
+                .build())
+            .response(TestResponse.builder()
+                .status(NO_CONTENT)
+                .build())
+            .build());
+
+        this.users
+            .removeAuditedOrganization(RemoveUserAuditedOrganizationRequest.builder()
+                .auditedOrganizationId("ab4226af-73e8-4c7d-a2e0-a713ebf9fd84")
+                .userId("uaa-id-293")
+                .build())
+            .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
