@@ -46,12 +46,23 @@ public final class JobUtils {
      * @return {@code onComplete} once job has completed
      */
     public static <R extends Resource<JobEntity>> Mono<Void> waitForCompletion(CloudFoundryClient cloudFoundryClient, R resource) {
+        return waitForCompletion(cloudFoundryClient, ResourceUtils.getEntity(resource));
+    }
+
+    /**
+     * Waits for a job to complete
+     *
+     * @param cloudFoundryClient the client to use to request job status
+     * @param jobEntity          the entity representing the job
+     * @return {@code onComplete} once job has completed
+     */
+    public static Mono<Void> waitForCompletion(CloudFoundryClient cloudFoundryClient, JobEntity jobEntity) {
         Mono<JobEntity> job;
 
-        if (JobUtils.isComplete(ResourceUtils.getEntity(resource))) {
-            job = Mono.just(ResourceUtils.getEntity(resource));
+        if (JobUtils.isComplete(jobEntity)) {
+            job = Mono.just(jobEntity);
         } else {
-            job = requestJob(cloudFoundryClient, ResourceUtils.getId(resource))
+            job = requestJob(cloudFoundryClient, jobEntity.getId())
                 .map(GetJobResponse::getEntity)
                 .filter(JobUtils::isComplete)
                 .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)));

@@ -217,7 +217,7 @@ public final class DefaultSpacesTest extends AbstractOperationsTest {
     public void delete() {
         requestOrganizationSpaces(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name", "test-space-spaceQuotaDefinitionId");
         requestDeleteSpace(this.cloudFoundryClient, "test-space-id");
-        requestJobSuccess(this.cloudFoundryClient, "test-id");
+        requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
 
         this.spaces
             .delete(DeleteSpaceRequest.builder()
@@ -232,7 +232,7 @@ public final class DefaultSpacesTest extends AbstractOperationsTest {
     public void deleteFailure() {
         requestOrganizationSpaces(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name", "test-space-spaceQuotaDefinitionId");
         requestDeleteSpace(this.cloudFoundryClient, "test-space-id");
-        requestJobFailure(this.cloudFoundryClient, "test-id");
+        requestJobFailure(this.cloudFoundryClient, "test-job-entity-id");
 
         this.spaces
             .delete(DeleteSpaceRequest.builder()
