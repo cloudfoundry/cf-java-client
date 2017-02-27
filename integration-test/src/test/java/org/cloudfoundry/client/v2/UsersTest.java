@@ -20,6 +20,8 @@ import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationBillingManagerRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationBillingManagerResponse;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerResponse;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
@@ -28,6 +30,7 @@ import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceResponse;
 import org.cloudfoundry.client.v2.users.AssociateUserAuditedSpaceRequest;
 import org.cloudfoundry.client.v2.users.AssociateUserAuditedSpaceResponse;
+import org.cloudfoundry.client.v2.users.AssociateUserBillingManagedOrganizationRequest;
 import org.cloudfoundry.client.v2.users.AssociateUserManagedOrganizationRequest;
 import org.cloudfoundry.client.v2.users.AssociateUserManagedOrganizationResponse;
 import org.cloudfoundry.client.v2.users.AssociateUserManagedSpaceRequest;
@@ -110,11 +113,27 @@ public final class UsersTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/648
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/648")
     @Test
     public void associateBillingManagedOrganization() throws TimeoutException, InterruptedException {
-        //
+        String organizationName = this.nameFactory.getOrganizationName();
+        String userId = this.nameFactory.getUserId();
+
+        createOrganizationId(this.cloudFoundryClient, organizationName)
+            .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
+                .then(requestAssociateOrganizationBillingManager(this.cloudFoundryClient, organizationId, userId))
+                .then(this.cloudFoundryClient.users()
+                    .associateBillingManagedOrganization(AssociateUserBillingManagedOrganizationRequest.builder()
+                        .billingManagedOrganizationId(organizationId)
+                        .userId(userId)
+                        .build())))
+            .then(requestSummaryUser(this.cloudFoundryClient, userId)
+                .flatMapIterable(response -> response.getEntity().getBillingManagedOrganizations())
+                .map(resource -> resource.getEntity().getName())
+                .single())
+            .as(StepVerifier::create)
+            .expectNext(organizationName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -488,20 +507,6 @@ public final class UsersTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/646
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/646")
-    @Test
-    public void listManagedOrganizationsFilterByAuditorId() throws TimeoutException, InterruptedException {
-
-    }
-
-    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/648
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/648")
-    @Test
-    public void listManagedOrganizationsFilterByBillingManagerId() throws TimeoutException, InterruptedException {
-
-    }
-
     @Test
     public void listManagedOrganizations() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
@@ -522,6 +527,20 @@ public final class UsersTest extends AbstractIntegrationTest {
             .expectNext(organizationName)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
+    }
+
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/646
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/646")
+    @Test
+    public void listManagedOrganizationsFilterByAuditorId() throws TimeoutException, InterruptedException {
+
+    }
+
+    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/648
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/648")
+    @Test
+    public void listManagedOrganizationsFilterByBillingManagerId() throws TimeoutException, InterruptedException {
+
     }
 
     @Test
@@ -1202,6 +1221,14 @@ public final class UsersTest extends AbstractIntegrationTest {
             .associateOrganization(AssociateUserOrganizationRequest.builder()
                 .organizationId(organizationId)
                 .userId(userId)
+                .build());
+    }
+
+    private static Mono<AssociateOrganizationBillingManagerResponse> requestAssociateOrganizationBillingManager(CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
+        return cloudFoundryClient.organizations()
+            .associateBillingManager(AssociateOrganizationBillingManagerRequest.builder()
+                .billingManagerId(userId)
+                .organizationId(organizationId)
                 .build());
     }
 

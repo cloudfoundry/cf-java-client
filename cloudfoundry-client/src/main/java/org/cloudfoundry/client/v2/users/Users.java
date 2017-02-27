@@ -29,6 +29,15 @@ public interface Users {
     Mono<AssociateUserAuditedSpaceResponse> associateAuditedSpace(AssociateUserAuditedSpaceRequest request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/users/associate_billing_managed_organization_with_the_user.html">Associate Billing Managed Organization with the User</a>
+     * request
+     *
+     * @param request the Associate Billing Managed Organization with the User request
+     * @return the response from the Associate Billing Managed Organization with the User request
+     */
+    Mono<AssociateUserBillingManagedOrganizationResponse> associateBillingManagedOrganization(AssociateUserBillingManagedOrganizationRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/users/associate_managed_organization_with_the_user.html">Associate Managed Organization with the User</a> request
      *
      * @param request the Associate Managed Organization with the User request
