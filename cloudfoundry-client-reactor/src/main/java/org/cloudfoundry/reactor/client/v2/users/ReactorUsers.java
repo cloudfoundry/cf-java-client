@@ -18,6 +18,8 @@ package org.cloudfoundry.reactor.client.v2.users;
 
 import org.cloudfoundry.client.v2.users.AssociateUserAuditedSpaceRequest;
 import org.cloudfoundry.client.v2.users.AssociateUserAuditedSpaceResponse;
+import org.cloudfoundry.client.v2.users.AssociateUserBillingManagedOrganizationRequest;
+import org.cloudfoundry.client.v2.users.AssociateUserBillingManagedOrganizationResponse;
 import org.cloudfoundry.client.v2.users.AssociateUserManagedOrganizationRequest;
 import org.cloudfoundry.client.v2.users.AssociateUserManagedOrganizationResponse;
 import org.cloudfoundry.client.v2.users.AssociateUserManagedSpaceRequest;
@@ -34,6 +36,8 @@ import org.cloudfoundry.client.v2.users.GetUserRequest;
 import org.cloudfoundry.client.v2.users.GetUserResponse;
 import org.cloudfoundry.client.v2.users.ListUserAuditedSpacesRequest;
 import org.cloudfoundry.client.v2.users.ListUserAuditedSpacesResponse;
+import org.cloudfoundry.client.v2.users.ListUserBillingManagedOrganizationsRequest;
+import org.cloudfoundry.client.v2.users.ListUserBillingManagedOrganizationsResponse;
 import org.cloudfoundry.client.v2.users.ListUserManagedOrganizationsRequest;
 import org.cloudfoundry.client.v2.users.ListUserManagedOrganizationsResponse;
 import org.cloudfoundry.client.v2.users.ListUserManagedSpacesRequest;
@@ -45,6 +49,7 @@ import org.cloudfoundry.client.v2.users.ListUserSpacesResponse;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
 import org.cloudfoundry.client.v2.users.ListUsersResponse;
 import org.cloudfoundry.client.v2.users.RemoveUserAuditedSpaceRequest;
+import org.cloudfoundry.client.v2.users.RemoveUserBillingManagedOrganizationRequest;
 import org.cloudfoundry.client.v2.users.RemoveUserManagedOrganizationRequest;
 import org.cloudfoundry.client.v2.users.RemoveUserManagedSpaceRequest;
 import org.cloudfoundry.client.v2.users.RemoveUserOrganizationRequest;
@@ -78,6 +83,13 @@ public final class ReactorUsers extends AbstractClientV2Operations implements Us
     @Override
     public Mono<AssociateUserAuditedSpaceResponse> associateAuditedSpace(AssociateUserAuditedSpaceRequest request) {
         return put(request, AssociateUserAuditedSpaceResponse.class, builder -> builder.pathSegment("v2", "users", request.getUserId(), "audited_spaces", request.getAuditedSpaceId()))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<AssociateUserBillingManagedOrganizationResponse> associateBillingManagedOrganization(AssociateUserBillingManagedOrganizationRequest request) {
+        return put(request, AssociateUserBillingManagedOrganizationResponse.class, builder ->
+            builder.pathSegment("v2", "users", request.getUserId(), "billing_managed_organizations", request.getBillingManagedOrganizationId()))
             .checkpoint();
     }
 
@@ -137,6 +149,12 @@ public final class ReactorUsers extends AbstractClientV2Operations implements Us
     }
 
     @Override
+    public Mono<ListUserBillingManagedOrganizationsResponse> listBillingManagedOrganizations(ListUserBillingManagedOrganizationsRequest request) {
+        return get(request, ListUserBillingManagedOrganizationsResponse.class, builder -> builder.pathSegment("v2", "users", request.getUserId(), "billing_managed_organizations"))
+            .checkpoint();
+    }
+
+    @Override
     public Mono<ListUserManagedOrganizationsResponse> listManagedOrganizations(ListUserManagedOrganizationsRequest request) {
         return get(request, ListUserManagedOrganizationsResponse.class, builder -> builder.pathSegment("v2", "users", request.getUserId(), "managed_organizations"))
             .checkpoint();
@@ -163,6 +181,12 @@ public final class ReactorUsers extends AbstractClientV2Operations implements Us
     @Override
     public Mono<Void> removeAuditedSpace(RemoveUserAuditedSpaceRequest request) {
         return delete(request, Void.class, builder -> builder.pathSegment("v2", "users", request.getUserId(), "audited_spaces", request.getAuditedSpaceId()))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<Void> removeBillingManagedOrganization(RemoveUserBillingManagedOrganizationRequest request) {
+        return delete(request, Void.class, builder -> builder.pathSegment("v2", "users", request.getUserId(), "billing_managed_organizations", request.getBillingManagedOrganizationId()))
             .checkpoint();
     }
 
