@@ -42,6 +42,8 @@ import org.cloudfoundry.client.v2.users.CreateUserResponse;
 import org.cloudfoundry.client.v2.users.DeleteUserRequest;
 import org.cloudfoundry.client.v2.users.GetUserRequest;
 import org.cloudfoundry.client.v2.users.GetUserResponse;
+import org.cloudfoundry.client.v2.users.ListUserAuditedOrganizationsRequest;
+import org.cloudfoundry.client.v2.users.ListUserAuditedOrganizationsResponse;
 import org.cloudfoundry.client.v2.users.ListUserAuditedSpacesRequest;
 import org.cloudfoundry.client.v2.users.ListUserAuditedSpacesResponse;
 import org.cloudfoundry.client.v2.users.ListUserBillingManagedOrganizationsRequest;
@@ -555,6 +557,55 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
                         .managedSpacesUrl("/v2/users/uaa-id-134/managed_spaces")
                         .organizationsUrl("/v2/users/uaa-id-134/organizations")
                         .spacesUrl("/v2/users/uaa-id-134/spaces")
+                        .build())
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void listAuditedOrganizations() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/v2/users/uaa-id-297/audited_organizations")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/users/GET_{id}_audited_organizations_response.json")
+                .build())
+            .build());
+
+        this.users
+            .listAuditedOrganizations(ListUserAuditedOrganizationsRequest.builder()
+                .userId("uaa-id-297")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ListUserAuditedOrganizationsResponse.builder()
+                .totalResults(1)
+                .totalPages(1)
+                .resource(OrganizationResource.builder()
+                    .metadata(Metadata.builder()
+                        .createdAt("2016-06-08T16:41:36Z")
+                        .id("3ced0de5-e2ce-403e-9706-17e2035947b4")
+                        .updatedAt("2016-06-08T16:41:26Z")
+                        .url("/v2/organizations/3ced0de5-e2ce-403e-9706-17e2035947b4")
+                        .build())
+                    .entity(OrganizationEntity.builder()
+                        .applicationEventsUrl("/v2/organizations/3ced0de5-e2ce-403e-9706-17e2035947b4/app_events")
+                        .auditorsUrl("/v2/organizations/3ced0de5-e2ce-403e-9706-17e2035947b4/auditors")
+                        .billingEnabled(false)
+                        .billingManagersUrl("/v2/organizations/3ced0de5-e2ce-403e-9706-17e2035947b4/billing_managers")
+                        .domainsUrl("/v2/organizations/3ced0de5-e2ce-403e-9706-17e2035947b4/domains")
+                        .managersUrl("/v2/organizations/3ced0de5-e2ce-403e-9706-17e2035947b4/managers")
+                        .name("name-1914")
+                        .privateDomainsUrl("/v2/organizations/3ced0de5-e2ce-403e-9706-17e2035947b4/private_domains")
+                        .quotaDefinitionId("8eb22221-a9ec-4345-a2a0-4a7e816ca689")
+                        .quotaDefinitionUrl("/v2/quota_definitions/8eb22221-a9ec-4345-a2a0-4a7e816ca689")
+                        .spaceQuotaDefinitionsUrl("/v2/organizations/3ced0de5-e2ce-403e-9706-17e2035947b4/space_quota_definitions")
+                        .spacesUrl("/v2/organizations/3ced0de5-e2ce-403e-9706-17e2035947b4/spaces")
+                        .status("active")
+                        .usersUrl("/v2/organizations/3ced0de5-e2ce-403e-9706-17e2035947b4/users")
                         .build())
                     .build())
                 .build())

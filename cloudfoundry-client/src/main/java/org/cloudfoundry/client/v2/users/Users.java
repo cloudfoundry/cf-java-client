@@ -110,6 +110,14 @@ public interface Users {
     Mono<ListUsersResponse> list(ListUsersRequest request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/users/list_all_audited_organizations_for_the_user.html">List all Audited Organizations for the User</a> request
+     *
+     * @param request the List all Audited Organizations for the User request
+     * @return the response from the List all Audited Organizations for the User request
+     */
+    Mono<ListUserAuditedOrganizationsResponse> listAuditedOrganizations(ListUserAuditedOrganizationsRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/users/list_all_audited_spaces_for_the_user.html">List all Audited Spaces for the User</a> request
      *
      * @param request the List all Audited Spaces for the User request

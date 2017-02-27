@@ -36,6 +36,8 @@ import org.cloudfoundry.client.v2.users.DeleteUserRequest;
 import org.cloudfoundry.client.v2.users.DeleteUserResponse;
 import org.cloudfoundry.client.v2.users.GetUserRequest;
 import org.cloudfoundry.client.v2.users.GetUserResponse;
+import org.cloudfoundry.client.v2.users.ListUserAuditedOrganizationsRequest;
+import org.cloudfoundry.client.v2.users.ListUserAuditedOrganizationsResponse;
 import org.cloudfoundry.client.v2.users.ListUserAuditedSpacesRequest;
 import org.cloudfoundry.client.v2.users.ListUserAuditedSpacesResponse;
 import org.cloudfoundry.client.v2.users.ListUserBillingManagedOrganizationsRequest;
@@ -148,6 +150,12 @@ public final class ReactorUsers extends AbstractClientV2Operations implements Us
     @Override
     public Mono<ListUsersResponse> list(ListUsersRequest request) {
         return get(request, ListUsersResponse.class, builder -> builder.pathSegment("v2", "users"))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<ListUserAuditedOrganizationsResponse> listAuditedOrganizations(ListUserAuditedOrganizationsRequest request) {
+        return get(request, ListUserAuditedOrganizationsResponse.class, builder -> builder.pathSegment("v2", "users", request.getUserId(), "audited_organizations"))
             .checkpoint();
     }
 
