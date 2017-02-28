@@ -102,6 +102,7 @@ public final class ErrorPayloadMapper {
             }
 
             return response.receive().aggregate().asString()
+                .otherwiseIfEmpty(Mono.error(new UnknownCloudFoundryException(response.status().code())))
                 .then(payload -> {
                     try {
                         return Mono.error(exceptionGenerator.apply(response.status().code(), payload));

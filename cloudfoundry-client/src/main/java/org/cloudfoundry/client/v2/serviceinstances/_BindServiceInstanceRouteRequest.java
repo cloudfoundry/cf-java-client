@@ -29,7 +29,7 @@ import java.util.Map;
  * The request payload to Bind Service Instance To a Route
  */
 @Value.Immutable
-abstract class _BindServiceInstanceToRouteRequest {
+abstract class _BindServiceInstanceRouteRequest {
 
     /**
      * Key/value pairs of all arbitrary parameters to pass along to the service broker
