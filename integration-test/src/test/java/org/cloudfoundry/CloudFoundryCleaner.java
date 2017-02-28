@@ -43,7 +43,13 @@ import org.cloudfoundry.client.v2.servicebrokers.DeleteServiceBrokerRequest;
 import org.cloudfoundry.client.v2.servicebrokers.ListServiceBrokersRequest;
 import org.cloudfoundry.client.v2.serviceinstances.DeleteServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceRequest;
+import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstanceRoutesRequest;
+import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstanceServiceBindingsRequest;
+import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstanceServiceKeysRequest;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesRequest;
+import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceResource;
+import org.cloudfoundry.client.v2.serviceinstances.UnbindServiceInstanceRouteRequest;
+import org.cloudfoundry.client.v2.servicekeys.DeleteServiceKeyRequest;
 import org.cloudfoundry.client.v2.shareddomains.DeleteSharedDomainRequest;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
 import org.cloudfoundry.client.v2.spacequotadefinitions.DeleteSpaceQuotaDefinitionRequest;
@@ -51,7 +57,9 @@ import org.cloudfoundry.client.v2.spacequotadefinitions.ListSpaceQuotaDefinition
 import org.cloudfoundry.client.v2.spaces.DeleteSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.DeleteUserProvidedServiceInstanceRequest;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstanceServiceBindingsRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstancesRequest;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstanceResource;
 import org.cloudfoundry.client.v2.users.UserResource;
 import org.cloudfoundry.client.v3.packages.DeletePackageRequest;
 import org.cloudfoundry.client.v3.packages.ListPackagesRequest;
@@ -118,7 +126,10 @@ final class CloudFoundryCleaner {
 
     void clean() {
         Flux.empty()
-            .thenMany(cleanServiceInstances(this.cloudFoundryClient, this.nameFactory)) // Before Routes
+            .thenMany(Mono.when( // Before Routes
+                cleanServiceInstances(this.cloudFoundryClient, this.nameFactory),
+                cleanUserProvidedServiceInstances(this.cloudFoundryClient, this.nameFactory)
+            ))
             .thenMany(Mono.when( // No prerequisites
                 cleanBuildpacks(this.cloudFoundryClient, this.nameFactory),
                 cleanClients(this.uaaClient, this.nameFactory),
@@ -158,7 +169,7 @@ final class CloudFoundryCleaner {
                     .page(page)
                     .build()))
             .filter(application -> nameFactory.isApplicationName(ResourceUtils.getEntity(application).getName()))
-            .flatMap(application -> removeServiceBindings(cloudFoundryClient, application)
+            .flatMap(application -> removeApplicationServiceBindings(cloudFoundryClient, application)
                 .thenMany(Flux.just(application)))
             .flatMap(application -> cloudFoundryClient.applicationsV2()
                 .delete(DeleteApplicationRequest.builder()
@@ -402,6 +413,12 @@ final class CloudFoundryCleaner {
                     .page(page)
                     .build()))
             .filter(serviceInstance -> nameFactory.isServiceInstanceName(ResourceUtils.getEntity(serviceInstance).getName()))
+            .flatMap(serviceInstance -> removeRouteAssociations(cloudFoundryClient, serviceInstance)
+                .thenMany(Flux.just(serviceInstance)))
+            .flatMap(serviceInstance -> removeServiceInstanceServiceBindings(cloudFoundryClient, serviceInstance)
+                .thenMany(Flux.just(serviceInstance)))
+            .flatMap(serviceInstance -> removeServiceKeys(cloudFoundryClient, serviceInstance)
+                .thenMany(Flux.just(serviceInstance)))
             .flatMap(serviceInstance -> cloudFoundryClient.serviceInstances()
                 .delete(DeleteServiceInstanceRequest.builder()
                     .async(true)
@@ -478,6 +495,8 @@ final class CloudFoundryCleaner {
                     .page(page)
                     .build()))
             .filter(userProvidedServiceInstance -> nameFactory.isServiceInstanceName(ResourceUtils.getEntity(userProvidedServiceInstance).getName()))
+            .flatMap(userProvidedServiceInstance -> removeUserProvidedServiceInstanceServiceBindings(cloudFoundryClient, userProvidedServiceInstance)
+                .thenMany(Flux.just(userProvidedServiceInstance)))
             .flatMap(userProvidedServiceInstance -> cloudFoundryClient.userProvidedServiceInstances()
                 .delete(DeleteUserProvidedServiceInstanceRequest.builder()
                     .userProvidedServiceInstanceId(ResourceUtils.getId(userProvidedServiceInstance))
@@ -544,19 +563,74 @@ final class CloudFoundryCleaner {
         return nameFactory.isUserId(ResourceUtils.getId(resource)) || nameFactory.isUserId(ResourceUtils.getEntity(resource).getUsername());
     }
 
-    private static Flux<Void> removeServiceBindings(CloudFoundryClient cloudFoundryClient, ApplicationResource application) {
+    private static Flux<Void> removeApplicationServiceBindings(CloudFoundryClient cloudFoundryClient, ApplicationResource application) {
         return PaginationUtils
             .requestClientV2Resources(page -> cloudFoundryClient.applicationsV2()
                 .listServiceBindings(ListApplicationServiceBindingsRequest.builder()
                     .page(page)
                     .applicationId(ResourceUtils.getId(application))
                     .build()))
-            .flatMap(serviceBinding -> cloudFoundryClient.applicationsV2()
-                .removeServiceBinding(RemoveApplicationServiceBindingRequest.builder()
-                    .applicationId(ResourceUtils.getId(application))
-                    .serviceBindingId(ResourceUtils.getId(serviceBinding))
-                    .build())
+            .flatMap(serviceBinding -> requestRemoveServiceBinding(cloudFoundryClient, ResourceUtils.getId(application), ResourceUtils.getId(serviceBinding))
                 .doOnError(t -> LOGGER.error("Unable to remove service binding from {}", ResourceUtils.getEntity(application).getName(), t)));
+    }
+
+    private static Flux<Void> removeRouteAssociations(CloudFoundryClient cloudFoundryClient, ServiceInstanceResource serviceInstance) {
+        return PaginationUtils
+            .requestClientV2Resources(page -> cloudFoundryClient.serviceInstances()
+                .listRoutes(ListServiceInstanceRoutesRequest.builder()
+                    .page(page)
+                    .serviceInstanceId(ResourceUtils.getId(serviceInstance))
+                    .build()))
+            .flatMap(route -> cloudFoundryClient.serviceInstances()
+                .unbindRoute(UnbindServiceInstanceRouteRequest.builder()
+                    .routeId(ResourceUtils.getId(route))
+                    .serviceInstanceId(ResourceUtils.getId(serviceInstance))
+                    .build())
+                .doOnError(t -> LOGGER.error("Unable to remove route binding from {}", ResourceUtils.getEntity(serviceInstance).getName(), t)));
+    }
+
+    private static Flux<Void> removeServiceInstanceServiceBindings(CloudFoundryClient cloudFoundryClient, ServiceInstanceResource serviceInstance) {
+        return PaginationUtils
+            .requestClientV2Resources(page -> cloudFoundryClient.serviceInstances()
+                .listServiceBindings(ListServiceInstanceServiceBindingsRequest.builder()
+                    .page(page)
+                    .serviceInstanceId(ResourceUtils.getId(serviceInstance))
+                    .build()))
+            .flatMap(serviceBinding -> requestRemoveServiceBinding(cloudFoundryClient, ResourceUtils.getEntity(serviceBinding).getApplicationId(), ResourceUtils.getId(serviceBinding))
+                .doOnError(t -> LOGGER.error("Unable to remove service binding from {}", ResourceUtils.getEntity(serviceInstance).getName(), t)));
+    }
+
+    private static Flux<Void> removeServiceKeys(CloudFoundryClient cloudFoundryClient, ServiceInstanceResource serviceInstance) {
+        return PaginationUtils
+            .requestClientV2Resources(page -> cloudFoundryClient.serviceInstances()
+                .listServiceKeys(ListServiceInstanceServiceKeysRequest.builder()
+                    .page(page)
+                    .serviceInstanceId(ResourceUtils.getId(serviceInstance))
+                    .build()))
+            .flatMap(serviceKey -> cloudFoundryClient.serviceKeys()
+                .delete(DeleteServiceKeyRequest.builder()
+                    .serviceKeyId(ResourceUtils.getId(serviceKey))
+                    .build())
+                .doOnError(t -> LOGGER.error("Unable to remove service binding from {}", ResourceUtils.getEntity(serviceKey).getName(), t)));
+    }
+
+    private static Flux<Void> removeUserProvidedServiceInstanceServiceBindings(CloudFoundryClient cloudFoundryClient, UserProvidedServiceInstanceResource serviceInstance) {
+        return PaginationUtils
+            .requestClientV2Resources(page -> cloudFoundryClient.userProvidedServiceInstances()
+                .listServiceBindings(ListUserProvidedServiceInstanceServiceBindingsRequest.builder()
+                    .page(page)
+                    .userProvidedServiceInstanceId(ResourceUtils.getId(serviceInstance))
+                    .build()))
+            .flatMap(serviceBinding -> requestRemoveServiceBinding(cloudFoundryClient, ResourceUtils.getEntity(serviceBinding).getApplicationId(), ResourceUtils.getId(serviceBinding))
+                .doOnError(t -> LOGGER.error("Unable to remove service binding from {}", ResourceUtils.getEntity(serviceInstance).getName(), t)));
+    }
+
+    private static Mono<Void> requestRemoveServiceBinding(CloudFoundryClient cloudFoundryClient, String applicationId, String serviceBindingId) {
+        return cloudFoundryClient.applicationsV2()
+            .removeServiceBinding(RemoveApplicationServiceBindingRequest.builder()
+                .applicationId(applicationId)
+                .serviceBindingId(serviceBindingId)
+                .build());
     }
 
 }
