@@ -17,6 +17,7 @@
 package org.cloudfoundry.servicebroker.instance;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.cloudfoundry.servicebroker.Nullable;
 import org.immutables.value.Value;
 
 import java.util.UUID;
@@ -25,6 +26,7 @@ import java.util.UUID;
 abstract class _ProvisionAsyncResponse {
 
     @JsonProperty("operation")
+    @Nullable
     abstract String getOperation();
 
 }

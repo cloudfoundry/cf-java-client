@@ -41,11 +41,12 @@ final class InstanceController {
     }
 
     @DeleteMapping("/v2/service_instances/{instanceId}")
-    ResponseEntity<?> deprovision(@RequestParam("accepts_incomplete") Optional<Boolean> acceptsIncomplete) {
+    ResponseEntity<?> deprovision(@RequestParam("accepts_incomplete") Optional<Boolean> acceptsIncomplete, @PathVariable String instanceId) {
         if (acceptsIncomplete.orElse(false)) {
+            this.lastOperationRepository.register(instanceId, OperationType.DEPROVISION);
+
             return ResponseEntity.accepted()
                 .body(DeprovisionAsyncResponse.builder()
-                    .operation(this.lastOperationRepository.register(OperationType.DEPROVISION))
                     .build());
         }
 
@@ -59,9 +60,10 @@ final class InstanceController {
         boolean acceptsIncomplete = (boolean) payload.getOrDefault("accepts_incomplete", false);
 
         if (acceptsIncomplete) {
+            this.lastOperationRepository.register(instanceId, OperationType.PROVISION);
+
             return ResponseEntity.accepted()
                 .body(ProvisionAsyncResponse.builder()
-                    .operation(this.lastOperationRepository.register(OperationType.PROVISION))
                     .build());
         }
 
@@ -72,13 +74,14 @@ final class InstanceController {
     }
 
     @PatchMapping("/v2/service_instances/{instanceId}")
-    ResponseEntity<?> update(@RequestBody Map<String, Object> payload) {
+    ResponseEntity<?> update(@PathVariable String instanceId, @RequestBody Map<String, Object> payload) {
         boolean acceptsIncomplete = (boolean) payload.getOrDefault("accepts_incomplete", false);
 
         if (acceptsIncomplete) {
+            this.lastOperationRepository.register(instanceId, OperationType.UPDATE);
+
             return ResponseEntity.accepted()
                 .body(UpdateAsyncResponse.builder()
-                    .operation(this.lastOperationRepository.register(OperationType.UPDATE))
                     .build());
         }
 

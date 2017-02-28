@@ -17,12 +17,14 @@
 package org.cloudfoundry.servicebroker.instance;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.cloudfoundry.servicebroker.Nullable;
 import org.immutables.value.Value;
 
 @Value.Immutable
 abstract class _UpdateAsyncResponse {
 
     @JsonProperty("operation")
+    @Nullable
     abstract String getOperation();
 
 }
