@@ -21,7 +21,7 @@ package org.cloudfoundry;
  */
 public final class UnknownCloudFoundryException extends AbstractCloudFoundryException {
 
-    private static final long serialVersionUID = -8005943312948163194L;
+    private static final long serialVersionUID = 7543981972741374552L;
 
     private final String payload;
 
@@ -34,6 +34,15 @@ public final class UnknownCloudFoundryException extends AbstractCloudFoundryExce
     public UnknownCloudFoundryException(Integer statusCode, String payload) {
         super(statusCode, "Unknown Cloud Foundry Exception");
         this.payload = payload;
+    }
+
+    /**
+     * Creates a new instance
+     *
+     * @param statusCode the status code
+     */
+    public UnknownCloudFoundryException(Integer statusCode) {
+        this(statusCode, null);
     }
 
     /**

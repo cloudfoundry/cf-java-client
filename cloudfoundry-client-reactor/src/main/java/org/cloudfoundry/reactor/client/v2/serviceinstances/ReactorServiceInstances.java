@@ -16,8 +16,8 @@
 
 package org.cloudfoundry.reactor.client.v2.serviceinstances;
 
-import org.cloudfoundry.client.v2.serviceinstances.BindServiceInstanceToRouteRequest;
-import org.cloudfoundry.client.v2.serviceinstances.BindServiceInstanceToRouteResponse;
+import org.cloudfoundry.client.v2.serviceinstances.BindServiceInstanceRouteRequest;
+import org.cloudfoundry.client.v2.serviceinstances.BindServiceInstanceRouteResponse;
 import org.cloudfoundry.client.v2.serviceinstances.CreateServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.CreateServiceInstanceResponse;
 import org.cloudfoundry.client.v2.serviceinstances.DeleteServiceInstanceRequest;
@@ -33,6 +33,7 @@ import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstanceServiceKey
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesRequest;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesResponse;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstances;
+import org.cloudfoundry.client.v2.serviceinstances.UnbindServiceInstanceRouteRequest;
 import org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceResponse;
 import org.cloudfoundry.reactor.ConnectionContext;
@@ -57,8 +58,8 @@ public final class ReactorServiceInstances extends AbstractClientV2Operations im
     }
 
     @Override
-    public Mono<BindServiceInstanceToRouteResponse> bindToRoute(BindServiceInstanceToRouteRequest request) {
-        return put(request, BindServiceInstanceToRouteResponse.class, builder -> builder.pathSegment("v2", "service_instances", request.getServiceInstanceId(), "routes", request.getRouteId()))
+    public Mono<BindServiceInstanceRouteResponse> bindRoute(BindServiceInstanceRouteRequest request) {
+        return put(request, BindServiceInstanceRouteResponse.class, builder -> builder.pathSegment("v2", "service_instances", request.getServiceInstanceId(), "routes", request.getRouteId()))
             .checkpoint();
     }
 
@@ -101,6 +102,12 @@ public final class ReactorServiceInstances extends AbstractClientV2Operations im
     @Override
     public Mono<ListServiceInstanceServiceKeysResponse> listServiceKeys(ListServiceInstanceServiceKeysRequest request) {
         return get(request, ListServiceInstanceServiceKeysResponse.class, builder -> builder.pathSegment("v2", "service_instances", request.getServiceInstanceId(), "service_keys"))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<Void> unbindRoute(UnbindServiceInstanceRouteRequest request) {
+        return delete(request, Void.class, builder -> builder.pathSegment("v2", "service_instances", request.getServiceInstanceId(), "routes", request.getRouteId()))
             .checkpoint();
     }
 

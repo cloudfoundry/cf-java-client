@@ -29,7 +29,7 @@ public interface ServiceInstances {
      * @param request the Bind Service Instance To Route request
      * @return the response from the Bind Service Instance To Route request
      */
-    Mono<BindServiceInstanceToRouteResponse> bindToRoute(BindServiceInstanceToRouteRequest request);
+    Mono<BindServiceInstanceRouteResponse> bindRoute(BindServiceInstanceRouteRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/service_instances/creating_a_service_instance.html">Create Service Instance</a> request
@@ -88,6 +88,14 @@ public interface ServiceInstances {
      * @return the response from the List Service Keys request
      */
     Mono<ListServiceInstanceServiceKeysResponse> listServiceKeys(ListServiceInstanceServiceKeysRequest request);
+
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/service_instances/unbinding_a_service_instance_from_a_route.html">Unbinding a Service Instance from a Route</a> request
+     *
+     * @param request the Unbind Service Instance from a Route request
+     * @return the response from the Unbind Service Instance from a Route request
+     */
+    Mono<Void> unbindRoute(UnbindServiceInstanceRouteRequest request);
 
     /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/service_instances/update_a_service_instance.html">Update Service Instance</a> request

@@ -20,8 +20,8 @@ import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.jobs.JobEntity;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingEntity;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingResource;
-import org.cloudfoundry.client.v2.serviceinstances.BindServiceInstanceToRouteRequest;
-import org.cloudfoundry.client.v2.serviceinstances.BindServiceInstanceToRouteResponse;
+import org.cloudfoundry.client.v2.serviceinstances.BindServiceInstanceRouteRequest;
+import org.cloudfoundry.client.v2.serviceinstances.BindServiceInstanceRouteResponse;
 import org.cloudfoundry.client.v2.serviceinstances.CreateServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.CreateServiceInstanceResponse;
 import org.cloudfoundry.client.v2.serviceinstances.DeleteServiceInstanceRequest;
@@ -39,6 +39,7 @@ import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesRequest;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesResponse;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceEntity;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceResource;
+import org.cloudfoundry.client.v2.serviceinstances.UnbindServiceInstanceRouteRequest;
 import org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.UpdateServiceInstanceResponse;
 import org.cloudfoundry.client.v2.servicekeys.ServiceKeyEntity;
@@ -67,7 +68,7 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
     private final ReactorServiceInstances serviceInstances = new ReactorServiceInstances(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
     @Test
-    public void bindToRoute() {
+    public void bindRoute() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PUT).path("/v2/service_instances/test-service-instance-id/routes/route-id")
@@ -80,13 +81,13 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
             .build());
 
         this.serviceInstances
-            .bindToRoute(BindServiceInstanceToRouteRequest.builder()
+            .bindRoute(BindServiceInstanceRouteRequest.builder()
                 .serviceInstanceId("test-service-instance-id")
                 .routeId("route-id")
                 .parameter("the_service_broker", "wants this object")
                 .build())
             .as(StepVerifier::create)
-            .expectNext(BindServiceInstanceToRouteResponse.builder()
+            .expectNext(BindServiceInstanceRouteResponse.builder()
                 .metadata(Metadata.builder()
                     .createdAt("2015-12-22T18:27:58Z")
                     .id("e7e5b08e-c530-4c1c-b420-fa0b09b3770d")
@@ -477,6 +478,27 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
                         .build())
                     .build())
                 .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void unbindRoute() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(DELETE).path("/v2/service_instances/8fe97ac9-d53a-4858-b6a4-53c20f1fe409/routes/3bbd74b5-516d-409e-a107-19eaf9b2da18")
+                .build())
+            .response(TestResponse.builder()
+                .status(NO_CONTENT)
+                .build())
+            .build());
+
+        this.serviceInstances
+            .unbindRoute(UnbindServiceInstanceRouteRequest.builder()
+                .routeId("3bbd74b5-516d-409e-a107-19eaf9b2da18")
+                .serviceInstanceId("8fe97ac9-d53a-4858-b6a4-53c20f1fe409")
+                .build())
+            .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
