@@ -81,7 +81,6 @@ final class ReactorDopplerEndpoints extends AbstractDopplerOperations {
         try {
             return Envelope.from(org.cloudfoundry.dropsonde.events.Envelope.ADAPTER.decode(bytes));
         } catch (IOException e) {
-            e.printStackTrace();
             throw Exceptions.propagate(e);
         }
     }
