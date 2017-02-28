@@ -16,10 +16,8 @@
 
 package org.cloudfoundry.servicebroker.lastoperation;
 
-import java.util.UUID;
-
 public interface LastOperationRepository {
 
-    String register(OperationType operationType);
+    void register(String instanceId, OperationType operationType);
 
 }

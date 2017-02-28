@@ -19,29 +19,25 @@ package org.cloudfoundry.servicebroker.lastoperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
 final class LastOperationController implements LastOperationRepository {
 
-    private final Map<UUID, OperationType> operations = new ConcurrentHashMap<>();
+    private final Map<String, OperationType> operations = new ConcurrentHashMap<>();
 
     @Override
-    public String register(OperationType operationType) {
-        UUID operation = UUID.randomUUID();
-        this.operations.put(operation, operationType);
-        return operation.toString();
+    public void register(String instanceId, OperationType operationType) {
+        this.operations.put(instanceId, operationType);
     }
 
     @GetMapping("/v2/service_instances/{instanceId}/last_operation")
-    ResponseEntity<?> lastOperation(@RequestParam String operation) {
-        OperationType operationType = this.operations.get(UUID.fromString(operation));
+    ResponseEntity<?> lastOperation(@PathVariable String instanceId) {
+        OperationType operationType = this.operations.get(instanceId);
 
         if (OperationType.DEPROVISION == operationType) {
             return ResponseEntity.status(HttpStatus.GONE)
