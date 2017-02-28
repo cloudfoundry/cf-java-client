@@ -52,6 +52,7 @@ import org.cloudfoundry.client.v2.spaces.DeleteSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.DeleteUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstancesRequest;
+import org.cloudfoundry.client.v2.users.UserResource;
 import org.cloudfoundry.client.v3.packages.DeletePackageRequest;
 import org.cloudfoundry.client.v3.packages.ListPackagesRequest;
 import org.cloudfoundry.uaa.UaaClient;
@@ -490,8 +491,8 @@ final class CloudFoundryCleaner {
                 .list(org.cloudfoundry.client.v2.users.ListUsersRequest.builder()
                     .page(page)
                     .build()))
+            .filter(resource -> isCleanable(nameFactory, resource))
             .map(resource -> resource.getMetadata().getId())
-            .filter(nameFactory::isUserId)
             .flatMap(userId -> cloudFoundryClient.users()
                 .delete(org.cloudfoundry.client.v2.users.DeleteUserRequest.builder()
                     .async(true)
@@ -537,6 +538,10 @@ final class CloudFoundryCleaner {
                         .build()))
                 .map(response -> Tuples.of(ResourceUtils.getId(response), ResourceUtils.getEntity(response).getName())))
             .collectMap(function((id, name) -> id), function((id, name) -> name));
+    }
+
+    private static boolean isCleanable(NameFactory nameFactory, UserResource resource) {
+        return nameFactory.isUserId(ResourceUtils.getId(resource)) || nameFactory.isUserId(ResourceUtils.getEntity(resource).getUsername());
     }
 
     private static Flux<Void> removeServiceBindings(CloudFoundryClient cloudFoundryClient, ApplicationResource application) {
