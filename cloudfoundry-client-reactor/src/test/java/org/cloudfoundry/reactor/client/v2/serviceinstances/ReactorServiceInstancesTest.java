@@ -18,6 +18,8 @@ package org.cloudfoundry.reactor.client.v2.serviceinstances;
 
 import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.jobs.JobEntity;
+import org.cloudfoundry.client.v2.routes.RouteEntity;
+import org.cloudfoundry.client.v2.routes.RouteResource;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingEntity;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingResource;
 import org.cloudfoundry.client.v2.serviceinstances.BindServiceInstanceRouteRequest;
@@ -31,6 +33,8 @@ import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstancePermissions
 import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceResponse;
 import org.cloudfoundry.client.v2.serviceinstances.LastOperation;
+import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstanceRoutesRequest;
+import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstanceRoutesResponse;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstanceServiceBindingsRequest;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstanceServiceBindingsResponse;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstanceServiceKeysRequest;
@@ -393,6 +397,51 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
                             ("/v2/service_instances/24ec15f9-f6c7-434a-8893-51baab8408d8/service_bindings")
                         .serviceKeysUrl
                             ("/v2/service_instances/24ec15f9-f6c7-434a-8893-51baab8408d8/service_keys")
+                        .build())
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void listRoutes() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/v2/service_instances/26fae4d0-df82-42f3-ac67-da5873e3a277/routes")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/service_instances/GET_{id}_routes_response.json")
+                .build())
+            .build());
+
+        this.serviceInstances
+            .listRoutes(ListServiceInstanceRoutesRequest.builder()
+                .serviceInstanceId("26fae4d0-df82-42f3-ac67-da5873e3a277")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ListServiceInstanceRoutesResponse.builder()
+                .totalResults(1)
+                .totalPages(1)
+                .resource(RouteResource.builder()
+                    .metadata(Metadata.builder()
+                        .createdAt("2016-06-08T16:41:30Z")
+                        .id("674b6eac-4a22-4a9d-bee2-b61299a57bf4")
+                        .updatedAt("2016-06-08T16:41:26Z")
+                        .url("/v2/routes/674b6eac-4a22-4a9d-bee2-b61299a57bf4")
+                        .build())
+                    .entity(RouteEntity.builder()
+                        .applicationsUrl("/v2/routes/674b6eac-4a22-4a9d-bee2-b61299a57bf4/apps")
+                        .domainId("8580604f-60e0-4903-a73f-f2e5e6660a68")
+                        .domainUrl("/v2/private_domains/8580604f-60e0-4903-a73f-f2e5e6660a68")
+                        .host("host-17")
+                        .path("")
+                        .routeMappingsUrl("/v2/routes/674b6eac-4a22-4a9d-bee2-b61299a57bf4/route_mappings")
+                        .serviceInstanceId("26fae4d0-df82-42f3-ac67-da5873e3a277")
+                        .serviceInstanceUrl("/v2/service_instances/26fae4d0-df82-42f3-ac67-da5873e3a277")
+                        .spaceId("276011c4-0550-4a01-82d5-7e9c95feb9ae")
+                        .spaceUrl("/v2/spaces/276011c4-0550-4a01-82d5-7e9c95feb9ae")
                         .build())
                     .build())
                 .build())
