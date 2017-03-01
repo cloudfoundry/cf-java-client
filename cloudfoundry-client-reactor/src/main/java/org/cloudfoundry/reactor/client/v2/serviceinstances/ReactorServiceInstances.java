@@ -26,6 +26,8 @@ import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstancePermissions
 import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstancePermissionsResponse;
 import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceResponse;
+import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstanceRoutesRequest;
+import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstanceRoutesResponse;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstanceServiceBindingsRequest;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstanceServiceBindingsResponse;
 import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstanceServiceKeysRequest;
@@ -90,6 +92,12 @@ public final class ReactorServiceInstances extends AbstractClientV2Operations im
     @Override
     public Mono<ListServiceInstancesResponse> list(ListServiceInstancesRequest request) {
         return get(request, ListServiceInstancesResponse.class, builder -> builder.pathSegment("v2", "service_instances"))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<ListServiceInstanceRoutesResponse> listRoutes(ListServiceInstanceRoutesRequest request) {
+        return get(request, ListServiceInstanceRoutesResponse.class, builder -> builder.pathSegment("v2", "service_instances", request.getServiceInstanceId(), "routes"))
             .checkpoint();
     }
 
