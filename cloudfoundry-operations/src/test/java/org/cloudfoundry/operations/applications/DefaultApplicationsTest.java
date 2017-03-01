@@ -1676,7 +1676,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .build())
             .as(StepVerifier::create)
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalStateException.class).hasMessage("Application test-name failed during staging"))
-            .verify(/*Duration.ofSeconds(5)*/);
+            .verify(Duration.ofSeconds(5));
     }
 
     @Test
