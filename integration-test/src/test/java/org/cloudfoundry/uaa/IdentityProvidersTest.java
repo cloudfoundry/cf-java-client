@@ -100,7 +100,7 @@ public final class IdentityProvidersTest extends AbstractIntegrationTest {
 
         this.userId
             .then(userId -> requestCreateIdentityZone(this.uaaClient, identityZoneName, subdomainName))
-            .then(ignore -> this.uaaClient.identityProviders()
+            .then(this.uaaClient.identityProviders()
                 .create(CreateIdentityProviderRequest.builder()
                     .active(true)
                     .configuration(OAuth2Configuration.builder()
@@ -184,16 +184,16 @@ public final class IdentityProvidersTest extends AbstractIntegrationTest {
 
         this.userId
             .then(userId -> requestCreateIdentityZone(this.uaaClient, identityZoneName, subdomainName))
-            .then(ignore -> requestCreateIdentityProvider(this.uaaClient, identityZoneName, name))
+            .then(requestCreateIdentityProvider(this.uaaClient, identityZoneName, name))
             .then(response -> this.uaaClient.identityProviders()
                 .delete(DeleteIdentityProviderRequest.builder()
                     .identityProviderId(response.getId())
+                    .identityZoneId(response.getIdentityZoneId())
                     .build()))
             .then(requestListIdentityProviders(this.uaaClient, identityZoneName))
             .flatMapIterable(ListIdentityProvidersResponse::getIdentityProviders)
             .filter(provider -> name.equals(provider.getName()))
             .as(StepVerifier::create)
-            .expectNextCount(0)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }

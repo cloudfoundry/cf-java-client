@@ -235,7 +235,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
 
         createGroupId(this.uaaClient, displayName)
             .then(groupId -> requestMapExternalGroupResponse(this.uaaClient, displayName, groupId))
-            .flatMap(ignore -> PaginationUtils
+            .thenMany(PaginationUtils
                 .requestUaaResources(startIndex -> this.uaaClient.groups()
                     .listExternalGroupMappings(ListExternalGroupMappingsRequest.builder()
                         .startIndex(startIndex)
@@ -310,7 +310,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
                     .groupId(groupId)
                     .origin(displayName + "-origin")
                     .build()))
-            .flatMap(ignore -> requestListExternalGroupResource(this.uaaClient)
+            .thenMany(requestListExternalGroupResource(this.uaaClient)
                 .filter(group -> displayName.equals(group.getDisplayName())))
             .as(StepVerifier::create)
             .consumeNextWith(resource -> {
@@ -358,7 +358,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
                     .externalGroup(displayName + "-external-group")
                     .origin(displayName + "-origin")
                     .build()))
-            .flatMap(ignore -> requestListExternalGroupResources(this.uaaClient))
+            .thenMany(requestListExternalGroupResources(this.uaaClient))
             .filter(resource -> displayName.equals(resource.getDisplayName()))
             .as(StepVerifier::create)
             .expectComplete()
@@ -377,7 +377,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
                     .externalGroup(displayName + "-external-group")
                     .origin(displayName + "-origin")
                     .build()))
-            .flatMap(ignore -> requestListExternalGroupResources(this.uaaClient)
+            .thenMany(requestListExternalGroupResources(this.uaaClient)
                 .filter(resource -> displayName.equals(resource.getDisplayName())))
             .as(StepVerifier::create)
             .expectComplete()

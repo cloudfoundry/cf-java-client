@@ -26,7 +26,6 @@ import org.cloudfoundry.client.v2.securitygroups.DeleteSecurityGroupRequest;
 import org.cloudfoundry.client.v2.securitygroups.GetSecurityGroupRequest;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupRunningDefaultsRequest;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupSpacesRequest;
-import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupSpacesResponse;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupStagingDefaultsRequest;
 import org.cloudfoundry.client.v2.securitygroups.ListSecurityGroupsRequest;
 import org.cloudfoundry.client.v2.securitygroups.RemoveSecurityGroupRunningDefaultRequest;
@@ -42,6 +41,7 @@ import org.cloudfoundry.client.v2.securitygroups.SetSecurityGroupStagingDefaultR
 import org.cloudfoundry.client.v2.securitygroups.UpdateSecurityGroupRequest;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.SpaceEntity;
+import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
@@ -121,10 +121,8 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
                     .securityGroupId(securityGroupId)
                     .build())
                 .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, job)))
-            .then(requestListSecurityGroups(this.cloudFoundryClient, securityGroupName)
-                .single())
+            .thenMany(requestListSecurityGroups(this.cloudFoundryClient, securityGroupName))
             .as(StepVerifier::create)
-            .expectNextCount(0)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -149,7 +147,6 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
                 .then(Mono.just(Tuples.of(securityGroupId, spaceId)))))
             .flatMap(function((securityGroupId, spaceId) -> requestListSecurityGroupSpaces(this.cloudFoundryClient, spaceId, securityGroupId)))
             .as(StepVerifier::create)
-            .expectNextCount(0)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -176,7 +173,7 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
         String securityGroupName = this.nameFactory.getSecurityGroupName();
 
         requestCreateSecurityGroup(this.cloudFoundryClient, securityGroupName)
-            .flatMap(ignore -> PaginationUtils.
+            .thenMany(PaginationUtils.
                 requestClientV2Resources(page -> this.cloudFoundryClient.securityGroups()
                     .list(ListSecurityGroupsRequest.builder()
                         .name(securityGroupName)
@@ -199,7 +196,7 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
             .then(securityGroupId -> requestSetRunningDefault(this.cloudFoundryClient, securityGroupId))
             .then(createSecurityGroupId(this.cloudFoundryClient, securityGroupName2)
                 .then(securityGroupId -> requestSetRunningDefault(this.cloudFoundryClient, securityGroupId)))
-            .flatMap(ignore -> requestListRunningDefaults(this.cloudFoundryClient))
+            .thenMany(requestListRunningDefaults(this.cloudFoundryClient))
             .filter(response -> securityGroupName1.equals(response.getEntity().getName()) || securityGroupName2.equals(response.getEntity().getName()))
             .as(StepVerifier::create)
             .expectNextCount(2)
@@ -245,7 +242,7 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
             .then(securityGroupId -> requestSetStagingDefault(this.cloudFoundryClient, securityGroupId))
             .then(createSecurityGroupId(this.cloudFoundryClient, securityGroupName2)
                 .then(securityGroupId -> requestSetStagingDefault(this.cloudFoundryClient, securityGroupId)))
-            .flatMap(ignore -> requestListStagingDefaults(this.cloudFoundryClient))
+            .thenMany(requestListStagingDefaults(this.cloudFoundryClient))
             .filter(response -> securityGroupName1.equals(response.getEntity().getName()) || securityGroupName2.equals(response.getEntity().getName()))
             .as(StepVerifier::create)
             .expectNextCount(2)
@@ -297,10 +294,9 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
                     .removeRunningDefault(RemoveSecurityGroupRunningDefaultRequest.builder()
                         .securityGroupId(securityGroupId)
                         .build())))
-            .flatMap(ignore -> requestListRunningDefaults(this.cloudFoundryClient))
+            .thenMany(requestListRunningDefaults(this.cloudFoundryClient))
             .filter(response -> securityGroupName.equals(response.getEntity().getName()))
             .as(StepVerifier::create)
-            .expectNextCount(0)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -315,10 +311,9 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
                     .removeStagingDefault(RemoveSecurityGroupStagingDefaultRequest.builder()
                         .securityGroupId(securityGroupId)
                         .build())))
-            .flatMap(ignore -> requestListRunningDefaults(this.cloudFoundryClient))
+            .thenMany(requestListRunningDefaults(this.cloudFoundryClient))
             .filter(response -> securityGroupName.equals(response.getEntity().getName()))
             .as(StepVerifier::create)
-            .expectNextCount(0)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -380,12 +375,13 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
                     .build()));
     }
 
-    private static Mono<ListSecurityGroupSpacesResponse> requestListSecurityGroupSpaces(CloudFoundryClient cloudFoundryClient, String spaceId, String securityGroupId) {
-        return cloudFoundryClient.securityGroups()
+    private static Flux<SpaceResource> requestListSecurityGroupSpaces(CloudFoundryClient cloudFoundryClient, String spaceId, String securityGroupId) {
+        return PaginationUtils.requestClientV2Resources(page -> cloudFoundryClient.securityGroups()
             .listSpaces(ListSecurityGroupSpacesRequest.builder()
+                .page(page)
                 .securityGroupId(securityGroupId)
                 .spaceId(spaceId)
-                .build());
+                .build()));
     }
 
     private static Flux<SecurityGroupResource> requestListSecurityGroups(CloudFoundryClient cloudFoundryClient, String securityGroupName) {
