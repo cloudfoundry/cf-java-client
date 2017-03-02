@@ -261,7 +261,7 @@ public final class UsersTest extends AbstractIntegrationTest {
                     .defaultSpaceId(spaceId)
                     .uaaId(userId)
                     .build()))
-            .flatMap(ignore -> requestListUsers(this.cloudFoundryClient))
+            .thenMany(requestListUsers(this.cloudFoundryClient))
             .filter(resource -> userId.equals(resource.getMetadata().getId()))
             .as(StepVerifier::create)
             .expectNextCount(1)
@@ -280,10 +280,9 @@ public final class UsersTest extends AbstractIntegrationTest {
                     .userId(userId)
                     .build())
                 .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, job)))
-            .flatMap(ignore -> requestListUsers(this.cloudFoundryClient))
+            .thenMany(requestListUsers(this.cloudFoundryClient))
             .filter(resource -> userId.equals(resource.getMetadata().getId()))
             .as(StepVerifier::create)
-            .expectNextCount(0)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -298,11 +297,10 @@ public final class UsersTest extends AbstractIntegrationTest {
                     .async(false)
                     .userId(userId)
                     .build()))
-            .flatMap(ignore -> requestListUsers(this.cloudFoundryClient))
+            .thenMany(requestListUsers(this.cloudFoundryClient))
             .filter(resource -> userId.equals(resource.getMetadata().getId()))
             .map(ResourceUtils::getId)
             .as(StepVerifier::create)
-            .expectNextCount(0)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -331,7 +329,7 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         requestCreateUser(this.cloudFoundryClient, userId)
-            .flatMap(ignore -> PaginationUtils
+            .thenMany(PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .list(ListUsersRequest.builder()
                         .page(page)
@@ -353,7 +351,7 @@ public final class UsersTest extends AbstractIntegrationTest {
             .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
                 .then(Mono.just(organizationId)))
             .then(organizationId -> associateAuditorOrganization(this.cloudFoundryClient, organizationId, userId))
-            .flatMap(ignore -> PaginationUtils
+            .thenMany(PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listAuditedOrganizations(ListUserAuditedOrganizationsRequest.builder()
                         .page(page)
@@ -375,7 +373,7 @@ public final class UsersTest extends AbstractIntegrationTest {
             .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
                 .then(Mono.just(organizationId)))
             .then(organizationId -> associateAuditorOrganization(this.cloudFoundryClient, organizationId, userId))
-            .flatMap(ignore -> PaginationUtils
+            .thenMany(PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listAuditedOrganizations(ListUserAuditedOrganizationsRequest.builder()
                         .auditorId(userId)
@@ -400,7 +398,7 @@ public final class UsersTest extends AbstractIntegrationTest {
             .then(organizationId -> Mono.when(
                 associateBillingManagerOrganization(this.cloudFoundryClient, organizationId, userId),
                 associateAuditorOrganization(this.cloudFoundryClient, organizationId, userId)))
-            .flatMap(ignore -> PaginationUtils
+            .thenMany(PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listAuditedOrganizations(ListUserAuditedOrganizationsRequest.builder()
                         .billingManagerId(userId)
@@ -425,7 +423,7 @@ public final class UsersTest extends AbstractIntegrationTest {
             .then(organizationId -> Mono.when(
                 associateAuditorOrganization(this.cloudFoundryClient, organizationId, userId),
                 associateManagerOrganization(this.cloudFoundryClient, organizationId, userId)))
-            .flatMap(ignore -> PaginationUtils
+            .thenMany(PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listAuditedOrganizations(ListUserAuditedOrganizationsRequest.builder()
                         .managerId(userId)
@@ -447,7 +445,7 @@ public final class UsersTest extends AbstractIntegrationTest {
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
                 .then(associateAuditorOrganization(this.cloudFoundryClient, organizationId, userId)))
-            .flatMap(ignore -> PaginationUtils
+            .thenMany(PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listAuditedOrganizations(ListUserAuditedOrganizationsRequest.builder()
                         .name(organizationName)
@@ -496,7 +494,7 @@ public final class UsersTest extends AbstractIntegrationTest {
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
                 .then(associateAuditorOrganization(this.cloudFoundryClient, organizationId, userId)))
-            .flatMap(ignore -> PaginationUtils
+            .thenMany(PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listAuditedOrganizations(ListUserAuditedOrganizationsRequest.builder()
                         .page(page)
@@ -519,7 +517,7 @@ public final class UsersTest extends AbstractIntegrationTest {
             .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
             .then(spaceId -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
                 .then(requestAssociateAuditedSpace(this.cloudFoundryClient, spaceId, userId)))
-            .flatMap(ignore -> PaginationUtils
+            .thenMany(PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listAuditedSpaces(ListUserAuditedSpacesRequest.builder()
                         .page(page)
@@ -569,7 +567,7 @@ public final class UsersTest extends AbstractIntegrationTest {
                     requestAssociateSpace(this.cloudFoundryClient, spaceId, userId),
                     requestAssociateAuditedSpace(this.cloudFoundryClient, spaceId, userId))
                 ))
-            .flatMap(ignore -> PaginationUtils
+            .thenMany(PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listAuditedSpaces(ListUserAuditedSpacesRequest.builder()
                         .developerId(userId)
@@ -591,7 +589,7 @@ public final class UsersTest extends AbstractIntegrationTest {
             .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
             .then(spaceId -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
                 .then(requestAssociateAuditedSpace(this.cloudFoundryClient, spaceId, userId)))
-            .flatMap(ignore -> PaginationUtils
+            .thenMany(PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listAuditedSpaces(ListUserAuditedSpacesRequest.builder()
                         .name(spaceName)
@@ -639,7 +637,7 @@ public final class UsersTest extends AbstractIntegrationTest {
             .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
                 .then(Mono.just(organizationId)))
             .then(organizationId -> associateBillingManagerOrganization(this.cloudFoundryClient, organizationId, userId))
-            .flatMap(ignore -> PaginationUtils
+            .thenMany(PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listBillingManagedOrganizations(ListUserBillingManagedOrganizationsRequest.builder()
                         .page(page)
@@ -663,7 +661,7 @@ public final class UsersTest extends AbstractIntegrationTest {
             .then(organizationId -> Mono.when(
                 associateBillingManagerOrganization(this.cloudFoundryClient, organizationId, userId),
                 associateAuditorOrganization(this.cloudFoundryClient, organizationId, userId)))
-            .flatMap(ignore -> PaginationUtils
+            .thenMany(PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listBillingManagedOrganizations(ListUserBillingManagedOrganizationsRequest.builder()
                         .auditorId(userId)
@@ -686,7 +684,7 @@ public final class UsersTest extends AbstractIntegrationTest {
             .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
                 .then(Mono.just(organizationId)))
             .then(organizationId -> associateBillingManagerOrganization(this.cloudFoundryClient, organizationId, userId))
-            .flatMap(ignore -> PaginationUtils
+            .thenMany(PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listBillingManagedOrganizations(ListUserBillingManagedOrganizationsRequest.builder()
                         .billingManagerId(userId)
@@ -711,7 +709,7 @@ public final class UsersTest extends AbstractIntegrationTest {
             .then(organizationId -> Mono.when(
                 associateBillingManagerOrganization(this.cloudFoundryClient, organizationId, userId),
                 associateManagerOrganization(this.cloudFoundryClient, organizationId, userId)))
-            .flatMap(ignore -> PaginationUtils
+            .thenMany(PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listBillingManagedOrganizations(ListUserBillingManagedOrganizationsRequest.builder()
                         .managerId(userId)
@@ -733,7 +731,7 @@ public final class UsersTest extends AbstractIntegrationTest {
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
                 .then(associateBillingManagerOrganization(this.cloudFoundryClient, organizationId, userId)))
-            .flatMap(ignore -> PaginationUtils
+            .thenMany(PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listBillingManagedOrganizations(ListUserBillingManagedOrganizationsRequest.builder()
                         .name(organizationName)
@@ -782,7 +780,7 @@ public final class UsersTest extends AbstractIntegrationTest {
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
                 .then(associateBillingManagerOrganization(this.cloudFoundryClient, organizationId, userId)))
-            .flatMap(ignore -> PaginationUtils
+            .thenMany(PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listBillingManagedOrganizations(ListUserBillingManagedOrganizationsRequest.builder()
                         .page(page)
@@ -851,7 +849,7 @@ public final class UsersTest extends AbstractIntegrationTest {
             .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
                 .then(Mono.just(organizationId)))
             .then(organizationId -> associateManagerOrganization(this.cloudFoundryClient, organizationId, userId))
-            .flatMap(ignore -> PaginationUtils
+            .thenMany(PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listManagedOrganizations(ListUserManagedOrganizationsRequest.builder()
                         .page(page)
@@ -875,7 +873,7 @@ public final class UsersTest extends AbstractIntegrationTest {
             .then(organizationId -> Mono.when(
                 associateAuditorOrganization(this.cloudFoundryClient, organizationId, userId),
                 associateManagerOrganization(this.cloudFoundryClient, organizationId, userId)))
-            .flatMap(ignore -> PaginationUtils
+            .thenMany(PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listManagedOrganizations(ListUserManagedOrganizationsRequest.builder()
                         .auditorId(userId)
@@ -900,7 +898,7 @@ public final class UsersTest extends AbstractIntegrationTest {
             .then(organizationId -> Mono.when(
                 associateBillingManagerOrganization(this.cloudFoundryClient, organizationId, userId),
                 associateManagerOrganization(this.cloudFoundryClient, organizationId, userId)))
-            .flatMap(ignore -> PaginationUtils
+            .thenMany(PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listManagedOrganizations(ListUserManagedOrganizationsRequest.builder()
                         .billingManagerId(userId)
@@ -923,7 +921,7 @@ public final class UsersTest extends AbstractIntegrationTest {
             .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
                 .then(Mono.just(organizationId)))
             .then(organizationId -> associateManagerOrganization(this.cloudFoundryClient, organizationId, userId))
-            .flatMap(ignore -> PaginationUtils
+            .thenMany(PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listManagedOrganizations(ListUserManagedOrganizationsRequest.builder()
                         .managerId(userId)
@@ -945,7 +943,7 @@ public final class UsersTest extends AbstractIntegrationTest {
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
                 .then(associateManagerOrganization(this.cloudFoundryClient, organizationId, userId)))
-            .flatMap(ignore -> PaginationUtils
+            .thenMany(PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listManagedOrganizations(ListUserManagedOrganizationsRequest.builder()
                         .name(organizationName)
@@ -994,7 +992,7 @@ public final class UsersTest extends AbstractIntegrationTest {
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
                 .then(associateManagerOrganization(this.cloudFoundryClient, organizationId, userId)))
-            .flatMap(ignore -> PaginationUtils
+            .thenMany(PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listManagedOrganizations(ListUserManagedOrganizationsRequest.builder()
                         .page(page)
@@ -1017,7 +1015,7 @@ public final class UsersTest extends AbstractIntegrationTest {
             .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
             .then(spaceId -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
                 .then(requestAssociateManagedSpace(this.cloudFoundryClient, spaceId, userId)))
-            .flatMap(ignore -> PaginationUtils
+            .thenMany(PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listManagedSpaces(ListUserManagedSpacesRequest.builder()
                         .page(page)
@@ -1067,7 +1065,7 @@ public final class UsersTest extends AbstractIntegrationTest {
                     requestAssociateSpace(this.cloudFoundryClient, spaceId, userId),
                     requestAssociateManagedSpace(this.cloudFoundryClient, spaceId, userId))
                 ))
-            .flatMap(ignore -> PaginationUtils
+            .thenMany(PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listManagedSpaces(ListUserManagedSpacesRequest.builder()
                         .developerId(userId)
@@ -1089,7 +1087,7 @@ public final class UsersTest extends AbstractIntegrationTest {
             .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
             .then(spaceId -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
                 .then(requestAssociateManagedSpace(this.cloudFoundryClient, spaceId, userId)))
-            .flatMap(ignore -> PaginationUtils
+            .thenMany(PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listManagedSpaces(ListUserManagedSpacesRequest.builder()
                         .name(spaceName)
@@ -1137,7 +1135,7 @@ public final class UsersTest extends AbstractIntegrationTest {
             .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
                 .then(Mono.just(organizationId)))
             .then(organizationId -> requestAssociateOrganization(this.cloudFoundryClient, organizationId, userId))
-            .flatMap(ignore -> PaginationUtils
+            .thenMany(PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listOrganizations(ListUserOrganizationsRequest.builder()
                         .page(page)
@@ -1160,7 +1158,7 @@ public final class UsersTest extends AbstractIntegrationTest {
                 .then(Mono.when(
                     requestAssociateOrganization(this.cloudFoundryClient, organizationId, userId),
                     associateAuditorOrganization(this.cloudFoundryClient, organizationId, userId))))
-            .flatMap(ignore -> PaginationUtils
+            .thenMany(PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listOrganizations(ListUserOrganizationsRequest.builder()
                         .auditorId(userId)
@@ -1184,7 +1182,7 @@ public final class UsersTest extends AbstractIntegrationTest {
                 .then(Mono.when(
                     requestAssociateOrganization(this.cloudFoundryClient, organizationId, userId),
                     associateBillingManagerOrganization(this.cloudFoundryClient, organizationId, userId))))
-            .flatMap(ignore -> PaginationUtils
+            .thenMany(PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listOrganizations(ListUserOrganizationsRequest.builder()
                         .billingManagerId(userId)
@@ -1208,7 +1206,7 @@ public final class UsersTest extends AbstractIntegrationTest {
                 .then(Mono.when(
                     requestAssociateOrganization(this.cloudFoundryClient, organizationId, userId),
                     associateManagerOrganization(this.cloudFoundryClient, organizationId, userId))))
-            .flatMap(ignore -> PaginationUtils
+            .thenMany(PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listOrganizations(ListUserOrganizationsRequest.builder()
                         .managerId(userId)
@@ -1230,7 +1228,7 @@ public final class UsersTest extends AbstractIntegrationTest {
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
                 .then(requestAssociateOrganization(this.cloudFoundryClient, organizationId, userId)))
-            .flatMap(ignore -> PaginationUtils
+            .thenMany(PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listOrganizations(ListUserOrganizationsRequest.builder()
                         .name(organizationName)
@@ -1279,7 +1277,7 @@ public final class UsersTest extends AbstractIntegrationTest {
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
                 .then(requestAssociateOrganization(this.cloudFoundryClient, organizationId, userId)))
-            .flatMap(ignore -> PaginationUtils
+            .thenMany(PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listOrganizations(ListUserOrganizationsRequest.builder()
                         .page(page)
@@ -1302,7 +1300,7 @@ public final class UsersTest extends AbstractIntegrationTest {
             .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
             .then(spaceId -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
                 .then(requestAssociateSpace(this.cloudFoundryClient, spaceId, userId)))
-            .flatMap(ignore -> PaginationUtils
+            .thenMany(PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listSpaces(ListUserSpacesRequest.builder()
                         .page(page)
@@ -1349,7 +1347,7 @@ public final class UsersTest extends AbstractIntegrationTest {
             .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
             .then(spaceId -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
                 .then(requestAssociateSpace(this.cloudFoundryClient, spaceId, userId)))
-            .flatMap(ignore -> PaginationUtils
+            .thenMany(PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listSpaces(ListUserSpacesRequest.builder()
                         .developerId(userId)
@@ -1372,7 +1370,7 @@ public final class UsersTest extends AbstractIntegrationTest {
             .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
             .then(spaceId -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
                 .then(requestAssociateSpace(this.cloudFoundryClient, spaceId, userId)))
-            .flatMap(ignore -> PaginationUtils
+            .thenMany(PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.users()
                     .listSpaces(ListUserSpacesRequest.builder()
                         .name(spaceName)
@@ -1419,6 +1417,7 @@ public final class UsersTest extends AbstractIntegrationTest {
 
         this.organizationId
             .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
+                .then(requestAssociateOrganizationAuditor(this.cloudFoundryClient, organizationId, userId))
                 .then(requestAssociateAuditedOrganization(this.cloudFoundryClient, organizationId, userId)
                     .then(Mono.just(organizationId))))
             .then(organizationId -> this.cloudFoundryClient.users()
@@ -1429,7 +1428,6 @@ public final class UsersTest extends AbstractIntegrationTest {
             .then(requestSummaryUser(this.cloudFoundryClient, userId))
             .flatMapIterable(response -> response.getEntity().getAuditedOrganizations())
             .as(StepVerifier::create)
-            .expectNextCount(0)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -1451,7 +1449,6 @@ public final class UsersTest extends AbstractIntegrationTest {
             .then(requestSummaryUser(this.cloudFoundryClient, userId))
             .flatMapIterable(response -> response.getEntity().getAuditedSpaces())
             .as(StepVerifier::create)
-            .expectNextCount(0)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -1462,6 +1459,7 @@ public final class UsersTest extends AbstractIntegrationTest {
 
         this.organizationId
             .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
+                .then(requestAssociateOrganizationBillingManager(this.cloudFoundryClient, organizationId, userId))
                 .then(requestAssociateBillingManagedOrganization(this.cloudFoundryClient, organizationId, userId)
                     .then(Mono.just(organizationId))))
             .then(organizationId -> this.cloudFoundryClient.users()
@@ -1472,7 +1470,6 @@ public final class UsersTest extends AbstractIntegrationTest {
             .then(requestSummaryUser(this.cloudFoundryClient, userId))
             .flatMapIterable(response -> response.getEntity().getBillingManagedOrganizations())
             .as(StepVerifier::create)
-            .expectNextCount(0)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -1483,6 +1480,7 @@ public final class UsersTest extends AbstractIntegrationTest {
 
         this.organizationId
             .then(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
+                .then(requestAssociateOrganizationManager(this.cloudFoundryClient, organizationId, userId))
                 .then(requestAssociateManagedOrganization(this.cloudFoundryClient, organizationId, userId)
                     .then(Mono.just(organizationId))))
             .then(organizationId -> this.cloudFoundryClient.users()
@@ -1493,7 +1491,6 @@ public final class UsersTest extends AbstractIntegrationTest {
             .then(requestSummaryUser(this.cloudFoundryClient, userId))
             .flatMapIterable(response -> response.getEntity().getManagedOrganizations())
             .as(StepVerifier::create)
-            .expectNextCount(0)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -1515,7 +1512,6 @@ public final class UsersTest extends AbstractIntegrationTest {
             .then(requestSummaryUser(this.cloudFoundryClient, userId))
             .flatMapIterable(response -> response.getEntity().getManagedSpaces())
             .as(StepVerifier::create)
-            .expectNextCount(0)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -1536,7 +1532,6 @@ public final class UsersTest extends AbstractIntegrationTest {
             .then(requestSummaryUser(this.cloudFoundryClient, userId))
             .flatMapIterable(response -> response.getEntity().getOrganizations())
             .as(StepVerifier::create)
-            .expectNextCount(0)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -1558,7 +1553,6 @@ public final class UsersTest extends AbstractIntegrationTest {
             .then(requestSummaryUser(this.cloudFoundryClient, userId))
             .flatMapIterable(response -> response.getEntity().getSpaces())
             .as(StepVerifier::create)
-            .expectNextCount(0)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -1572,9 +1566,9 @@ public final class UsersTest extends AbstractIntegrationTest {
                 .summary(SummaryUserRequest.builder()
                     .userId(userId)
                     .build()))
-            .map(response -> response.getEntity().getManagedOrganizations())
+            .map(response -> response.getEntity().getOrganizations().size())
             .as(StepVerifier::create)
-            .expectNextCount(0)
+            .expectNext(0)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }

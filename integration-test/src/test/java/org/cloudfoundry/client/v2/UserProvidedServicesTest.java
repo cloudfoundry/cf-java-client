@@ -114,7 +114,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
 
         this.spaceId
             .then(spaceId -> requestCreateUserProvidedServiceInstance(this.cloudFoundryClient, instanceName, spaceId))
-            .flatMap(ignore -> PaginationUtils
+            .thenMany(PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.userProvidedServiceInstances()
                     .list(ListUserProvidedServiceInstancesRequest.builder()
                         .name(instanceName)

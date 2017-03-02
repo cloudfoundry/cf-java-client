@@ -145,7 +145,7 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
 
         this.organizationId
             .then(organizationId -> createSpaceQuotaDefinitionId(this.cloudFoundryClient, organizationId, quotaName))
-            .flatMap(ignore -> PaginationUtils
+            .thenMany(PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.spaceQuotaDefinitions()
                     .list(ListSpaceQuotaDefinitionsRequest.builder()
                         .page(page)
@@ -169,7 +169,7 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
                 createSpaceQuotaDefinitionId(this.cloudFoundryClient, organizationId, quotaName)
             ))
             .then(function((spaceId, quotaId) -> requestAssociateSpace(this.cloudFoundryClient, quotaId, spaceId)
-                .map(ignore -> quotaId)))
+                .then(Mono.just(quotaId))))
             .flatMap(quotaId -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.spaceQuotaDefinitions()
                     .listSpaces(ListSpaceQuotaDefinitionSpacesRequest.builder()
@@ -197,7 +197,7 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
             ))
             .then(function((quotaId, spaceId) -> Mono.when(
                 requestAssociateSpace(this.cloudFoundryClient, quotaId, spaceId)
-                    .map(ignore -> quotaId),
+                    .then(Mono.just(quotaId)),
                 createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
             ))
             .flatMap(function((quotaId, applicationId) -> PaginationUtils
@@ -233,7 +233,7 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
                 createSpaceQuotaDefinitionId(this.cloudFoundryClient, organizationId, quotaName)
             ))
             .then(function((spaceId, quotaId) -> requestAssociateSpace(this.cloudFoundryClient, quotaId, spaceId)
-                .map(ignore -> quotaId)))
+                .then(Mono.just(quotaId))))
             .flatMap(quotaId -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.spaceQuotaDefinitions()
                     .listSpaces(ListSpaceQuotaDefinitionSpacesRequest.builder()
@@ -261,7 +261,7 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
                 createSpaceQuotaDefinitionId(this.cloudFoundryClient, organizationId, quotaName)
             ))
             .then(function((organizationId, spaceId, quotaId) -> requestAssociateSpace(this.cloudFoundryClient, quotaId, spaceId)
-                .map(ignore -> Tuples.of(organizationId, quotaId))))
+                .then(Mono.just(Tuples.of(organizationId, quotaId)))))
             .flatMap(function((organizationId, quotaId) -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.spaceQuotaDefinitions()
                     .listSpaces(ListSpaceQuotaDefinitionSpacesRequest.builder()
@@ -289,7 +289,6 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
                         .spaceQuotaDefinitionId(quotaId)
                         .build())))
             .as(StepVerifier::create)
-            .expectNextCount(0)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -305,7 +304,7 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
                 createSpaceQuotaDefinitionId(this.cloudFoundryClient, organizationId, quotaName)
             ))
             .then(function((spaceId, quotaId) -> requestAssociateSpace(this.cloudFoundryClient, quotaId, spaceId)
-                .map(ignore -> quotaId)))
+                .then(Mono.just(quotaId))))
             .flatMap(quotaId -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.spaceQuotaDefinitions()
                     .listSpaces(ListSpaceQuotaDefinitionSpacesRequest.builder()
@@ -338,7 +337,6 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
                         .build()))
                 .then()))
             .as(StepVerifier::create)
-            .expectNextCount(0)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -355,7 +353,7 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
                     .name(quotaName2)
                     .spaceQuotaDefinitionId(quotaId)
                     .build()))
-            .flatMap(ignore -> requestList(this.cloudFoundryClient)
+            .thenMany(requestList(this.cloudFoundryClient)
                 .map(ResourceUtils::getEntity))
             .filter(quota -> quotaName2.equals(quota.getName()))
             .as(StepVerifier::create)

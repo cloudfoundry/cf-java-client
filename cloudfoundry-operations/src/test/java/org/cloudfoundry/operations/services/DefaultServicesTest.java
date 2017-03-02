@@ -621,7 +621,6 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
         this.services
             .listInstances()
             .as(StepVerifier::create)
-            .expectNextCount(0)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }

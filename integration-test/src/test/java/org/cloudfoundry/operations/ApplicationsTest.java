@@ -19,6 +19,7 @@ package org.cloudfoundry.operations;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.operations.applications.ApplicationDetail;
 import org.cloudfoundry.operations.applications.ApplicationEnvironments;
+import org.cloudfoundry.operations.applications.ApplicationEvent;
 import org.cloudfoundry.operations.applications.ApplicationHealthCheck;
 import org.cloudfoundry.operations.applications.DeleteApplicationRequest;
 import org.cloudfoundry.operations.applications.GetApplicationEnvironmentsRequest;
@@ -123,12 +124,15 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     public void getEvents() throws TimeoutException, InterruptedException, IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
-        createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, false)
-            .flatMap(ignore -> this.cloudFoundryOperations.applications()
+        createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, true)
+            .thenMany(this.cloudFoundryOperations.applications()
                 .getEvents(GetApplicationEventsRequest.builder()
                     .name(applicationName)
-                    .build()))
+                    .build())
+                .next())
+            .map(ApplicationEvent::getEvent)
             .as(StepVerifier::create)
+            .expectNext("audit.app.update")
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }

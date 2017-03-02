@@ -827,7 +827,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .then(organizationId -> createPrivateDomainId(this.cloudFoundryClient, organizationId, privateDomainName)
-                .map(ignore -> organizationId))
+                .then(Mono.just(organizationId)))
             .flatMap(organizationId -> getDomainNames(this.cloudFoundryClient, organizationId))
             .filter(privateDomainName::equals)
             .as(StepVerifier::create)
@@ -912,7 +912,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         String organizationName = this.nameFactory.getOrganizationName();
 
         requestCreateOrganization(this.cloudFoundryClient, organizationName)
-            .flatMap(ignore -> requestListOrganizations(this.cloudFoundryClient, builder -> builder.name(organizationName)))
+            .thenMany(requestListOrganizations(this.cloudFoundryClient, builder -> builder.name(organizationName)))
             .as(StepVerifier::create)
             .expectNextCount(1)
             .expectComplete()
