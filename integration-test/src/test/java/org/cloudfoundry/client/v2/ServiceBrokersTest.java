@@ -203,7 +203,8 @@ public final class ServiceBrokersTest extends AbstractIntegrationTest {
     private static Mono<CreateApplicationResponse> requestCreateApplication(CloudFoundryClient cloudFoundryClient, String spaceId, String applicationName) {
         return cloudFoundryClient.applicationsV2()
             .create(CreateApplicationRequest.builder()
-                .buildpack("http://github.com/cloudfoundry/java-buildpack.git")
+                .buildpack("https://github.com/cloudfoundry/java-buildpack.git#v3.14") //TODO: Restore to unversioned pending https://github.com/cloudfoundry/cf-java-client/issues/694
+//                .memory(768) TODO: Reinstate pending https://github.com/cloudfoundry/cf-java-client/issues/694
                 .name(applicationName)
                 .spaceId(spaceId)
                 .build());
