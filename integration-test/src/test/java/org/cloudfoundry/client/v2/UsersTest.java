@@ -17,6 +17,7 @@
 package org.cloudfoundry.client.v2;
 
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.IfCloudFoundryVersion;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
@@ -80,6 +81,7 @@ import reactor.util.function.Tuples;
 import java.time.Duration;
 import java.util.concurrent.TimeoutException;
 
+import static org.cloudfoundry.IfCloudFoundryVersion.CloudFoundryVersion.PCF_1_9;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public final class UsersTest extends AbstractIntegrationTest {
@@ -1474,6 +1476,8 @@ public final class UsersTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    //TODO: Remove this restriction, pending https://github.com/cloudfoundry/cf-java-client/issues/695
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = PCF_1_9)
     @Test
     public void removeManagedOrganization() throws TimeoutException, InterruptedException {
         String userId = this.nameFactory.getUserId();
