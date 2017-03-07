@@ -107,6 +107,11 @@ public final class ServiceBrokersTest extends AbstractIntegrationTest {
             .expectNextCount(1)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
+
+        deleteServiceBroker(this.cloudFoundryClient, serviceBrokerName)
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -183,6 +188,26 @@ public final class ServiceBrokersTest extends AbstractIntegrationTest {
             .expectNextCount(1)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
+
+        deleteServiceBroker(this.cloudFoundryClient, serviceBrokerName2)
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    private static Mono<Void> deleteServiceBroker(CloudFoundryClient cloudFoundryClient, String serviceBrokerName) {
+        return PaginationUtils
+            .requestClientV2Resources(page -> cloudFoundryClient.serviceBrokers()
+                .list(ListServiceBrokersRequest.builder()
+                    .name(serviceBrokerName)
+                    .page(page)
+                    .build()))
+            .single()
+            .map(ResourceUtils::getId)
+            .then(serviceBrokerId -> cloudFoundryClient.serviceBrokers()
+                .delete(DeleteServiceBrokerRequest.builder()
+                    .serviceBrokerId(serviceBrokerId)
+                    .build()));
     }
 
     private static Mono<ApplicationInstancesResponse> requestApplicationInstances(CloudFoundryClient cloudFoundryClient, String applicationId) {
@@ -203,8 +228,8 @@ public final class ServiceBrokersTest extends AbstractIntegrationTest {
     private static Mono<CreateApplicationResponse> requestCreateApplication(CloudFoundryClient cloudFoundryClient, String spaceId, String applicationName) {
         return cloudFoundryClient.applicationsV2()
             .create(CreateApplicationRequest.builder()
-                .buildpack("https://github.com/cloudfoundry/java-buildpack.git#v3.14") //TODO: Restore to unversioned pending https://github.com/cloudfoundry/cf-java-client/issues/694
-//                .memory(768) TODO: Reinstate pending https://github.com/cloudfoundry/cf-java-client/issues/694
+                .buildpack("https://github.com/cloudfoundry/java-buildpack.git")
+                .memory(768)
                 .name(applicationName)
                 .spaceId(spaceId)
                 .build());

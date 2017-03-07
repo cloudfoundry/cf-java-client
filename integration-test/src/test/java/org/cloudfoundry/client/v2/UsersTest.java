@@ -17,7 +17,6 @@
 package org.cloudfoundry.client.v2;
 
 import org.cloudfoundry.AbstractIntegrationTest;
-import org.cloudfoundry.IfCloudFoundryVersion;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
@@ -73,6 +72,7 @@ import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -81,7 +81,6 @@ import reactor.util.function.Tuples;
 import java.time.Duration;
 import java.util.concurrent.TimeoutException;
 
-import static org.cloudfoundry.IfCloudFoundryVersion.CloudFoundryVersion.PCF_1_9;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public final class UsersTest extends AbstractIntegrationTest {
@@ -93,7 +92,6 @@ public final class UsersTest extends AbstractIntegrationTest {
 
     @Autowired
     private Mono<String> organizationId;
-
     @Test
     public void associateAuditedOrganization() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
@@ -1476,8 +1474,6 @@ public final class UsersTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: Remove this restriction, pending https://github.com/cloudfoundry/cf-java-client/issues/695
-    @IfCloudFoundryVersion(greaterThanOrEqualTo = PCF_1_9)
     @Test
     public void removeManagedOrganization() throws TimeoutException, InterruptedException {
         String userId = this.nameFactory.getUserId();
