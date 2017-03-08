@@ -19,11 +19,21 @@ package org.cloudfoundry.operations.applications;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
+import java.time.Duration;
+
 /**
  * The request options for the delete application operation
  */
 @Value.Immutable
 abstract class _DeleteApplicationRequest {
+
+    /**
+     * How long to wait for deletion
+     */
+    @Value.Default
+    Duration getCompletionTimeout() {
+        return Duration.ofMinutes(5);
+    }
 
     /**
      * Whether to delete mapped routes

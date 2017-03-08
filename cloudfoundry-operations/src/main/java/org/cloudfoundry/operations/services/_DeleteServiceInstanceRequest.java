@@ -18,6 +18,8 @@ package org.cloudfoundry.operations.services;
 
 import org.immutables.value.Value;
 
+import java.time.Duration;
+
 /**
  * The request options for the delete service instance operation
  */
@@ -25,8 +27,15 @@ import org.immutables.value.Value;
 abstract class _DeleteServiceInstanceRequest {
 
     /**
+     * How long to wait for deletion
+     */
+    @Value.Default
+    Duration getCompletionTimeout() {
+        return Duration.ofMinutes(5);
+    }
+
+    /**
      * The name of the service instance
      */
     abstract String getName();
-
 }

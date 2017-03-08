@@ -38,6 +38,7 @@ import org.cloudfoundry.util.ResourceUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -64,6 +65,7 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
         return this.cloudFoundryClient
             .then(cloudFoundryClient -> Mono.when(
                 Mono.just(cloudFoundryClient),
+                Mono.just(request.getCompletionTimeout()),
                 getOrganizationQuotaId(cloudFoundryClient, request.getName())
             ))
             .then(function(DefaultOrganizationAdmin::deleteOrganizationQuota))
@@ -122,9 +124,9 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
             Optional.ofNullable(request.getTotalServices()).orElse(0));
     }
 
-    private static Mono<Void> deleteOrganizationQuota(CloudFoundryClient cloudFoundryClient, String quotaId) {
+    private static Mono<Void> deleteOrganizationQuota(CloudFoundryClient cloudFoundryClient, Duration completionTimeout, String quotaId) {
         return requestDeleteOrganizationQuota(cloudFoundryClient, quotaId)
-            .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
+            .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, completionTimeout, job));
     }
 
     private static Mono<String> getOrganizationId(CloudFoundryClient cloudFoundryClient, String name) {

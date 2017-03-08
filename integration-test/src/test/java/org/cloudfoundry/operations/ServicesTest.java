@@ -17,16 +17,27 @@
 package org.cloudfoundry.operations;
 
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v2.serviceinstances.ListServiceInstancesRequest;
+import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceResource;
+import org.cloudfoundry.client.v2.serviceplans.ServicePlanResource;
+import org.cloudfoundry.client.v2.services.ListServiceServicePlansRequest;
+import org.cloudfoundry.client.v2.services.ListServicesRequest;
+import org.cloudfoundry.client.v2.services.ServiceResource;
 import org.cloudfoundry.operations.domains.CreateDomainRequest;
 import org.cloudfoundry.operations.routes.CreateRouteRequest;
 import org.cloudfoundry.operations.services.BindRouteServiceInstanceRequest;
 import org.cloudfoundry.operations.services.CreateServiceInstanceRequest;
 import org.cloudfoundry.operations.services.CreateUserProvidedServiceInstanceRequest;
+import org.cloudfoundry.operations.services.DeleteServiceInstanceRequest;
 import org.cloudfoundry.operations.services.GetServiceInstanceRequest;
 import org.cloudfoundry.operations.services.ServiceInstance;
+import org.cloudfoundry.util.PaginationUtils;
+import org.cloudfoundry.util.ResourceUtils;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -36,10 +47,22 @@ import java.util.concurrent.TimeoutException;
 public final class ServicesTest extends AbstractIntegrationTest {
 
     @Autowired
+    private CloudFoundryClient cloudFoundryClient;
+
+    @Autowired
     private CloudFoundryOperations cloudFoundryOperations;
 
     @Autowired
     private String organizationName;
+
+    @Autowired
+    private String planName;
+
+    @Autowired
+    private Mono<String> serviceBrokerId;
+
+    @Autowired
+    private String serviceName;
 
     @Autowired
     private String spaceName;
@@ -77,6 +100,40 @@ public final class ServicesTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    @Test
+    public void create() {
+        String serviceInstanceName = this.nameFactory.getServiceInstanceName();
+
+        this.cloudFoundryOperations.services()
+            .createInstance(CreateServiceInstanceRequest.builder()
+                .planName(this.planName)
+                .serviceName(this.serviceName)
+                .serviceInstanceName(serviceInstanceName)
+                .build())
+            .thenMany(requestListServiceInstances(this.cloudFoundryClient, serviceInstanceName)
+                .map(resource -> ResourceUtils.getEntity(resource).getName()))
+            .as(StepVerifier::create)
+            .expectNext(serviceInstanceName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void delete() {
+        String serviceInstanceName = this.nameFactory.getServiceInstanceName();
+
+        this.serviceBrokerId
+            .then(serviceBrokerId -> requestCreateServiceInstance(this.cloudFoundryOperations, this.planName, serviceInstanceName, this.serviceName))
+            .then(this.cloudFoundryOperations.services()
+                .deleteInstance(DeleteServiceInstanceRequest.builder()
+                    .name(serviceInstanceName)
+                    .build()))
+            .thenMany(requestListServiceInstances(this.cloudFoundryClient, serviceInstanceName))
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
     //TODO: Ready to implement
     @Ignore("Ready to implement")
     @Test
@@ -100,6 +157,12 @@ public final class ServicesTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    private static Mono<String> getServicePlanName(CloudFoundryClient cloudFoundryClient, String serviceId) {
+        return requestListServicePlans(cloudFoundryClient, serviceId)
+            .map(resource -> ResourceUtils.getEntity(resource).getName())
+            .single();
+    }
+
     private static Mono<Void> requestCreatePrivateDomain(CloudFoundryOperations cloudFoundryOperations, String domainName, String organizationName) {
         return cloudFoundryOperations.domains()
             .create(CreateDomainRequest.builder()
@@ -118,12 +181,48 @@ public final class ServicesTest extends AbstractIntegrationTest {
                 .build());
     }
 
+    private static Mono<Void> requestCreateServiceInstance(CloudFoundryOperations cloudFoundryOperations, String planName, String serviceInstanceName, String serviceName) {
+        return cloudFoundryOperations.services()
+            .createInstance(CreateServiceInstanceRequest.builder()
+                .planName(planName)
+                .serviceName(serviceName)
+                .serviceInstanceName(serviceInstanceName)
+                .build());
+    }
+
     private static Mono<Void> requestCreateUserProvidedServiceInstance(CloudFoundryOperations cloudFoundryOperations, String userProvidedServiceInstanceName) {
         return cloudFoundryOperations.services()
             .createUserProvidedInstance(CreateUserProvidedServiceInstanceRequest.builder()
                 .name(userProvidedServiceInstanceName)
                 .routeServiceUrl("https://test.route.service.url")
                 .build());
+    }
+
+    private static Flux<ServiceInstanceResource> requestListServiceInstances(CloudFoundryClient cloudFoundryClient, String serviceInstanceName) {
+        return PaginationUtils
+            .requestClientV2Resources(page -> cloudFoundryClient.serviceInstances()
+                .list(ListServiceInstancesRequest.builder()
+                    .name(serviceInstanceName)
+                    .page(page)
+                    .build()));
+    }
+
+    private static Flux<ServicePlanResource> requestListServicePlans(CloudFoundryClient cloudFoundryClient, String serviceId) {
+        return PaginationUtils
+            .requestClientV2Resources(page -> cloudFoundryClient.services()
+                .listServicePlans(ListServiceServicePlansRequest.builder()
+                    .page(page)
+                    .serviceId(serviceId)
+                    .build()));
+    }
+
+    private static Flux<ServiceResource> requestListServices(CloudFoundryClient cloudFoundryClient, String serviceBrokerId) {
+        return PaginationUtils
+            .requestClientV2Resources(page -> cloudFoundryClient.services()
+                .list(ListServicesRequest.builder()
+                    .page(page)
+                    .serviceBrokerId(serviceBrokerId)
+                    .build()));
     }
 
 }

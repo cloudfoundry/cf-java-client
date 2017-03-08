@@ -114,7 +114,7 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
                     .async(true)
                     .spaceQuotaDefinitionId(quotaId)
                     .build())
-                .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, job)))
+                .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job)))
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofMinutes(5));

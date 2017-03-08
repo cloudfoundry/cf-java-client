@@ -26,6 +26,7 @@ import org.cloudfoundry.client.v2.jobs.JobEntity;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
+import java.util.Optional;
 
 import static org.cloudfoundry.util.DelayUtils.exponentialBackOff;
 
@@ -41,22 +42,24 @@ public final class JobUtils {
      * Waits for a job to complete
      *
      * @param cloudFoundryClient the client to use to request job status
+     * @param completionTimeout  the amount of time to wait for the job to complete.
      * @param resource           the resource representing the job
      * @param <R>                the Job resource type
      * @return {@code onComplete} once job has completed
      */
-    public static <R extends Resource<JobEntity>> Mono<Void> waitForCompletion(CloudFoundryClient cloudFoundryClient, R resource) {
-        return waitForCompletion(cloudFoundryClient, ResourceUtils.getEntity(resource));
+    public static <R extends Resource<JobEntity>> Mono<Void> waitForCompletion(CloudFoundryClient cloudFoundryClient, Duration completionTimeout, R resource) {
+        return waitForCompletion(cloudFoundryClient, completionTimeout, ResourceUtils.getEntity(resource));
     }
 
     /**
      * Waits for a job to complete
      *
      * @param cloudFoundryClient the client to use to request job status
+     * @param completionTimeout  the amount of time to wait for the job to complete.
      * @param jobEntity          the entity representing the job
      * @return {@code onComplete} once job has completed
      */
-    public static Mono<Void> waitForCompletion(CloudFoundryClient cloudFoundryClient, JobEntity jobEntity) {
+    public static Mono<Void> waitForCompletion(CloudFoundryClient cloudFoundryClient, Duration completionTimeout, JobEntity jobEntity) {
         Mono<JobEntity> job;
 
         if (JobUtils.isComplete(jobEntity)) {
@@ -65,7 +68,7 @@ public final class JobUtils {
             job = requestJob(cloudFoundryClient, jobEntity.getId())
                 .map(GetJobResponse::getEntity)
                 .filter(JobUtils::isComplete)
-                .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)));
+                .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), completionTimeout));
         }
 
         return job

@@ -48,14 +48,18 @@ abstract class _CopySourceApplicationRequest {
     /**
      * How long to wait for staging
      */
-    @Nullable
-    abstract Duration getStagingTimeout();
+    @Value.Default
+    Duration getStagingTimeout() {
+        return Duration.ofMinutes(5);
+    }
 
     /**
      * How long to wait for startup
      */
-    @Nullable
-    abstract Duration getStartupTimeout();
+    @Value.Default
+    Duration getStartupTimeout() {
+        return Duration.ofMinutes(5);
+    }
 
     /**
      * The name of the target application

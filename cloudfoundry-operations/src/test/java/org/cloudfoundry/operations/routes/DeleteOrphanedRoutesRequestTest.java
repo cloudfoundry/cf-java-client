@@ -14,34 +14,16 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.operations.services;
+package org.cloudfoundry.operations.routes;
 
-import org.immutables.value.Value;
+import org.junit.Test;
 
-import java.time.Duration;
+public final class DeleteOrphanedRoutesRequestTest {
 
-/**
- * The request options for the unbind service instance operation
- */
-@Value.Immutable
-abstract class _UnbindServiceInstanceRequest {
-
-    /**
-     * The name of the application to unbind
-     */
-    abstract String getApplicationName();
-
-    /**
-     * How long to wait for the unbind
-     */
-    @Value.Default
-    Duration getCompletionTimeout() {
-        return Duration.ofMinutes(5);
+    @Test
+    public void valid() {
+        DeleteOrphanedRoutesRequest.builder()
+            .build();
     }
-
-    /**
-     * The name of the service instance to unbind
-     */
-    abstract String getServiceInstanceName();
 
 }

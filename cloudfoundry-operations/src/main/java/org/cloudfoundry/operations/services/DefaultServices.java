@@ -82,6 +82,7 @@ import reactor.core.publisher.Mono;
 import reactor.util.function.Tuples;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -170,6 +171,7 @@ public final class DefaultServices implements Services {
             .then(function((cloudFoundryClient, spaceId, planId) -> Mono
                 .when(
                     Mono.just(cloudFoundryClient),
+                    Mono.just(request.getCompletionTimeout()),
                     createServiceInstance(cloudFoundryClient, spaceId, planId, request)
                 )))
             .then(function(DefaultServices::waitForCreateInstance))
@@ -207,6 +209,7 @@ public final class DefaultServices implements Services {
             .then(function((cloudFoundryClient, spaceId) -> Mono
                 .when(
                     Mono.just(cloudFoundryClient),
+                    Mono.just(request.getCompletionTimeout()),
                     getSpaceServiceInstance(cloudFoundryClient, request.getName(), spaceId)
                 )))
             .then(function(DefaultServices::deleteServiceInstance))
@@ -343,6 +346,7 @@ public final class DefaultServices implements Services {
             .then(function((cloudFoundryClient, applicationId, serviceInstanceId) -> Mono
                 .when(
                     Mono.just(cloudFoundryClient),
+                    Mono.just(request.getCompletionTimeout()),
                     getServiceBindingId(cloudFoundryClient, applicationId, serviceInstanceId, request.getServiceInstanceName())
                 )))
             .then(function(DefaultServices::deleteServiceBinding))
@@ -414,12 +418,12 @@ public final class DefaultServices implements Services {
             .cast(AbstractServiceInstanceResource.class);
     }
 
-    private static Mono<Void> deleteServiceBinding(CloudFoundryClient cloudFoundryClient, String serviceBindingId) {
+    private static Mono<Void> deleteServiceBinding(CloudFoundryClient cloudFoundryClient, Duration completionTimeout, String serviceBindingId) {
         return requestDeleteServiceBinding(cloudFoundryClient, serviceBindingId)
-            .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
+            .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, completionTimeout, job));
     }
 
-    private static Mono<Void> deleteServiceInstance(CloudFoundryClient cloudFoundryClient, UnionServiceInstanceResource serviceInstance) {
+    private static Mono<Void> deleteServiceInstance(CloudFoundryClient cloudFoundryClient, Duration completionTimeout, UnionServiceInstanceResource serviceInstance) {
         if (isUserProvidedService(serviceInstance)) {
             return requestDeleteUserProvidedServiceInstance(cloudFoundryClient, ResourceUtils.getId(serviceInstance));
         } else {
@@ -427,10 +431,10 @@ public final class DefaultServices implements Services {
                 .then(response -> {
                     Object entity = response.getEntity();
                     if (entity instanceof JobEntity) {
-                        return JobUtils.waitForCompletion(cloudFoundryClient, (JobEntity) response.getEntity());
+                        return JobUtils.waitForCompletion(cloudFoundryClient, completionTimeout, (JobEntity) response.getEntity());
                     } else {
                         return LastOperationUtils
-                            .waitForCompletion(() -> requestGetServiceInstance(cloudFoundryClient, ResourceUtils.getId(serviceInstance))
+                            .waitForCompletion(completionTimeout, () -> requestGetServiceInstance(cloudFoundryClient, ResourceUtils.getId(serviceInstance))
                                 .map(r -> ResourceUtils.getEntity(r).getLastOperation()));
                     }
                 });
@@ -1008,16 +1012,17 @@ public final class DefaultServices implements Services {
                 .build());
     }
 
-    private static Mono<Void> waitForCreateInstance(CloudFoundryClient cloudFoundryClient, AbstractServiceInstanceResource serviceInstance) {
+    private static Mono<Void> waitForCreateInstance(CloudFoundryClient cloudFoundryClient, Duration completionTimeout, AbstractServiceInstanceResource serviceInstance) {
         AtomicBoolean sentFirst = new AtomicBoolean(false);
 
         return LastOperationUtils
-            .waitForCompletion(() -> Mono
+            .waitForCompletion(completionTimeout, () -> Mono
                 .defer(() -> {
                     if (sentFirst.getAndSet(true)) {
                         return requestGetServiceInstance(cloudFoundryClient, ResourceUtils.getId(serviceInstance));
                     }
 
+                    System.out.println(serviceInstance);
                     return Mono.just(serviceInstance);
                 })
                 .map(response -> ResourceUtils.getEntity(response).getLastOperation()));

@@ -405,7 +405,7 @@ public class IntegrationTestConfiguration {
                         .applicationId(applicationId)
                         .async(true)
                         .build())
-                    .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, job))
+                    .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, Duration.ofMinutes(5), job))
                     .then(Mono.just(applicationId)))
                 .then(applicationId -> cloudFoundryClient.applicationsV2()
                     .update(UpdateApplicationRequest.builder()

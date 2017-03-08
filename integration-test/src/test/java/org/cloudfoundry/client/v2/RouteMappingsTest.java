@@ -120,7 +120,7 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
                     .async(true)
                     .routeMappingId(routeMappingId)
                     .build())
-                .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, job))))
+                .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job))))
             .then(routeMappingId -> requestGetRouteMapping(this.cloudFoundryClient, routeMappingId))
             .as(StepVerifier::create)
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class).hasMessageMatching(".*\\([0-9]+\\): .*"))

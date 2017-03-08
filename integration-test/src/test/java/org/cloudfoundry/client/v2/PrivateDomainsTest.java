@@ -75,7 +75,7 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
         this.organizationId
             .then(organizationId -> requestCreatePrivateDomain(this.cloudFoundryClient, organizationId, privateDomainName))
             .then(privateDomainResource -> requestDeletePrivateDomain(this.cloudFoundryClient, ResourceUtils.getId(privateDomainResource))
-                .then(jobResource -> JobUtils.waitForCompletion(this.cloudFoundryClient, jobResource))
+                .then(jobResource -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), jobResource))
                 .then(Mono.just(privateDomainResource)))
             .then(privateDomainResource -> requestGetPrivateDomain(this.cloudFoundryClient, ResourceUtils.getId(privateDomainResource)))
             .as(StepVerifier::create)

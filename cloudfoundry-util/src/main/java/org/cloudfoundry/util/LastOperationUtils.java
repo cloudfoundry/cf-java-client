@@ -33,11 +33,11 @@ public final class LastOperationUtils {
     private LastOperationUtils() {
     }
 
-    public static Mono<Void> waitForCompletion(Supplier<Mono<LastOperation>> lastOperationSupplier) {
+    public static Mono<Void> waitForCompletion(Duration completionTimeout, Supplier<Mono<LastOperation>> lastOperationSupplier) {
         return lastOperationSupplier.get()
             .map(LastOperation::getState)
             .filter(state -> !IN_PROGRESS.equals(state))
-            .repeatWhenEmpty(DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)))
+            .repeatWhenEmpty(DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), completionTimeout))
             .otherwise(t -> t instanceof ClientV2Exception && ((ClientV2Exception) t).getStatusCode() == 404, t -> Mono.empty())
             .then();
     }
