@@ -33,6 +33,7 @@ final class CatalogController {
             .service(Service.builder()
                 .id(UUID.randomUUID().toString())
                 .name(serviceName)
+                .require("route_forwarding")
                 .description("test-service-description")
                 .bindable(true)
                 .planUpdateable(true)

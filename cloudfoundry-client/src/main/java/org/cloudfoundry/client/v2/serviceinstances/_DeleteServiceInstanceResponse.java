@@ -48,7 +48,6 @@ abstract class _DeleteServiceInstanceResponse extends Resource<Object> {
 
     static final class DeleteServiceInstanceResponseTypeIdResolver extends TypeIdResolverBase {
 
-
         @Override
         public JsonTypeInfo.Id getMechanism() {
             return null;

@@ -55,6 +55,8 @@ public interface NameFactory {
 
     String SERVICE_INSTANCE_PREFIX = "test-service-instance-";
 
+    String SERVICE_KEY_PREFIX = "test-service-key-";
+
     String SERVICE_PREFIX = "test-service-";
 
     String SPACE_PREFIX = "test-space-";
@@ -240,6 +242,15 @@ public interface NameFactory {
      */
     default String getServiceInstanceName() {
         return getName(SERVICE_INSTANCE_PREFIX);
+    }
+
+    /**
+     * Creates a service key name
+     *
+     * @return the service key name
+     */
+    default String getServiceKeyName() {
+        return getName(SERVICE_KEY_PREFIX);
     }
 
     /**
@@ -489,6 +500,16 @@ public interface NameFactory {
      */
     default boolean isServiceInstanceName(String candidate) {
         return isName(SERVICE_INSTANCE_PREFIX, candidate);
+    }
+
+    /**
+     * Tests a name to determine if it is a service key name
+     *
+     * @param candidate the candidate name
+     * @return {@code true} if the name is a service key name, {@code false} otherwise
+     */
+    default boolean isServiceKeyName(String candidate) {
+        return isName(SERVICE_KEY_PREFIX, candidate);
     }
 
     /**
