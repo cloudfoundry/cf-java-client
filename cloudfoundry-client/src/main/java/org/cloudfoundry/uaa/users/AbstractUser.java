@@ -43,7 +43,6 @@ public abstract class AbstractUser extends AbstractUserSummary {
      * The groups for the user
      */
     @JsonProperty("groups")
-    //TODO: Remove explicit reference subject to resolution of https://github.com/immutables/immutables/issues/390)
     public abstract List<org.cloudfoundry.uaa.users.Group> getGroups();
 
 }

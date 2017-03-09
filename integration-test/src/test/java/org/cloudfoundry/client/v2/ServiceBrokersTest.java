@@ -25,6 +25,7 @@ import org.cloudfoundry.client.v2.applications.AssociateApplicationRouteRequest;
 import org.cloudfoundry.client.v2.applications.AssociateApplicationRouteResponse;
 import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
+import org.cloudfoundry.client.v2.applications.DeleteApplicationRequest;
 import org.cloudfoundry.client.v2.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v2.applications.GetApplicationResponse;
 import org.cloudfoundry.client.v2.applications.UpdateApplicationRequest;
@@ -51,8 +52,6 @@ import org.springframework.core.io.ClassPathResource;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import reactor.util.function.Tuple2;
-import reactor.util.function.Tuples;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -87,16 +86,18 @@ public final class ServiceBrokersTest extends AbstractIntegrationTest {
         String serviceName = this.nameFactory.getServiceName();
         String planName = this.nameFactory.getPlanName();
 
-        this.organizationId
+        ApplicationMetadata applicationMetadata = this.organizationId
             .then(organizationId -> pushServiceBroker(this.cloudFoundryClient, organizationId, serviceName, planName))
-            .then(function((spaceId, url) -> this.cloudFoundryClient.serviceBrokers()
-                .create(CreateServiceBrokerRequest.builder()
-                    .authenticationPassword("test-authentication-password")
-                    .authenticationUsername("test-authentication-username")
-                    .brokerUrl(url)
-                    .name(serviceBrokerName)
-                    .spaceId(spaceId)
-                    .build())))
+            .block(Duration.ofMinutes(5));
+
+        this.cloudFoundryClient.serviceBrokers()
+            .create(CreateServiceBrokerRequest.builder()
+                .authenticationPassword("test-authentication-password")
+                .authenticationUsername("test-authentication-username")
+                .brokerUrl(applicationMetadata.uri)
+                .name(serviceBrokerName)
+                .spaceId(applicationMetadata.spaceId)
+                .build())
             .flatMap(response -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.serviceBrokers()
                     .list(ListServiceBrokersRequest.builder()
@@ -108,10 +109,8 @@ public final class ServiceBrokersTest extends AbstractIntegrationTest {
             .expectComplete()
             .verify(Duration.ofMinutes(5));
 
-        deleteServiceBroker(this.cloudFoundryClient, serviceBrokerName)
-            .as(StepVerifier::create)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        deleteServiceBroker(this.cloudFoundryClient, applicationMetadata.applicationId)
+            .block(Duration.ofMinutes(5));
     }
 
     @Test
@@ -120,12 +119,14 @@ public final class ServiceBrokersTest extends AbstractIntegrationTest {
         String serviceName = this.nameFactory.getServiceName();
         String planName = this.nameFactory.getPlanName();
 
-        this.organizationId
+        ServiceBrokerMetadata serviceBrokerMetadata = this.organizationId
             .then(organizationId -> createServiceBroker(this.cloudFoundryClient, organizationId, serviceBrokerName, serviceName, planName))
-            .then(serviceBrokerId -> this.cloudFoundryClient.serviceBrokers()
-                .delete(DeleteServiceBrokerRequest.builder()
-                    .serviceBrokerId(serviceBrokerId)
-                    .build()))
+            .block(Duration.ofMinutes(5));
+
+        this.cloudFoundryClient.serviceBrokers()
+            .delete(DeleteServiceBrokerRequest.builder()
+                .serviceBrokerId(serviceBrokerMetadata.serviceBrokerId)
+                .build())
             .flatMap(response -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.serviceBrokers()
                     .list(ListServiceBrokersRequest.builder()
@@ -135,6 +136,9 @@ public final class ServiceBrokersTest extends AbstractIntegrationTest {
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
+
+        deleteServiceBroker(this.cloudFoundryClient, serviceBrokerMetadata.applicationMetadata.applicationId)
+            .block(Duration.ofMinutes(5));
     }
 
     @Test
@@ -171,13 +175,15 @@ public final class ServiceBrokersTest extends AbstractIntegrationTest {
         String serviceName = this.nameFactory.getServiceName();
         String planName = this.nameFactory.getPlanName();
 
-        this.organizationId
+        ServiceBrokerMetadata serviceBrokerMetadata = this.organizationId
             .then(organizationId -> createServiceBroker(this.cloudFoundryClient, organizationId, serviceBrokerName1, serviceName, planName))
-            .then(serviceBrokerId -> this.cloudFoundryClient.serviceBrokers()
-                .update(UpdateServiceBrokerRequest.builder()
-                    .serviceBrokerId(serviceBrokerId)
-                    .name(serviceBrokerName2)
-                    .build()))
+            .block(Duration.ofMinutes(5));
+
+        this.cloudFoundryClient.serviceBrokers()
+            .update(UpdateServiceBrokerRequest.builder()
+                .serviceBrokerId(serviceBrokerMetadata.serviceBrokerId)
+                .name(serviceBrokerName2)
+                .build())
             .flatMap(serviceBrokerId -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.serviceBrokers()
                     .list(ListServiceBrokersRequest.builder()
@@ -189,25 +195,15 @@ public final class ServiceBrokersTest extends AbstractIntegrationTest {
             .expectComplete()
             .verify(Duration.ofMinutes(5));
 
-        deleteServiceBroker(this.cloudFoundryClient, serviceBrokerName2)
-            .as(StepVerifier::create)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        deleteServiceBroker(this.cloudFoundryClient, serviceBrokerMetadata.applicationMetadata.applicationId)
+            .block(Duration.ofMinutes(5));
     }
 
-    private static Mono<Void> deleteServiceBroker(CloudFoundryClient cloudFoundryClient, String serviceBrokerName) {
-        return PaginationUtils
-            .requestClientV2Resources(page -> cloudFoundryClient.serviceBrokers()
-                .list(ListServiceBrokersRequest.builder()
-                    .name(serviceBrokerName)
-                    .page(page)
-                    .build()))
-            .single()
-            .map(ResourceUtils::getId)
-            .then(serviceBrokerId -> cloudFoundryClient.serviceBrokers()
-                .delete(DeleteServiceBrokerRequest.builder()
-                    .serviceBrokerId(serviceBrokerId)
-                    .build()));
+    private static Mono<Void> deleteServiceBroker(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        return cloudFoundryClient.applicationsV2()
+            .delete(DeleteApplicationRequest.builder()
+                .applicationId(applicationId)
+                .build());
     }
 
     private static Mono<ApplicationInstancesResponse> requestApplicationInstances(CloudFoundryClient cloudFoundryClient, String applicationId) {
@@ -286,20 +282,20 @@ public final class ServiceBrokersTest extends AbstractIntegrationTest {
                 .build());
     }
 
-    private Mono<String> createServiceBroker(CloudFoundryClient cloudFoundryClient, String organizationId, String serviceBrokerName, String serviceName, String planName) {
+    private Mono<ServiceBrokerMetadata> createServiceBroker(CloudFoundryClient cloudFoundryClient, String organizationId, String serviceBrokerName, String serviceName, String planName) {
         return pushServiceBroker(cloudFoundryClient, organizationId, serviceName, planName)
-            .then(function((spaceId, url) -> this.cloudFoundryClient.serviceBrokers()
+            .then(applicationMetadata -> this.cloudFoundryClient.serviceBrokers()
                 .create(CreateServiceBrokerRequest.builder()
                     .authenticationPassword("test-authentication-password")
                     .authenticationUsername("test-authentication-username")
-                    .brokerUrl(url)
+                    .brokerUrl(applicationMetadata.uri)
                     .name(serviceBrokerName)
-                    .spaceId(spaceId)
-                    .build())))
-            .map(ResourceUtils::getId);
+                    .spaceId(applicationMetadata.spaceId)
+                    .build())
+                .map(response -> new ServiceBrokerMetadata(applicationMetadata, ResourceUtils.getId(response))));
     }
 
-    private Mono<Tuple2<String, String>> pushServiceBroker(CloudFoundryClient cloudFoundryClient, String organizationId, String serviceName, String planName) {
+    private Mono<ApplicationMetadata> pushServiceBroker(CloudFoundryClient cloudFoundryClient, String organizationId, String serviceName, String planName) {
         String applicationName = this.nameFactory.getApplicationName();
         String hostName = this.nameFactory.getHostName();
         String spaceName = this.nameFactory.getSpaceName();
@@ -336,10 +332,37 @@ public final class ServiceBrokersTest extends AbstractIntegrationTest {
                     .single()
                     .map(ApplicationInstanceInfo::getState)
                     .filter("RUNNING"::equals)
-                    .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5))))
-                .then(Mono.just(Tuples.of(spaceId, String.format("https://%s.%s", hostName, ResourceUtils.getEntity(domain).getName()))))
+                    .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)))
+                    .map(status -> new ApplicationMetadata(applicationId, spaceId, String.format("https://%s.%s", hostName, ResourceUtils.getEntity(domain).getName()))))
             ));
+    }
 
+    private static final class ApplicationMetadata {
+
+        private final String applicationId;
+
+        private final String spaceId;
+
+        private final String uri;
+
+        private ApplicationMetadata(String applicationId, String spaceId, String uri) {
+            this.applicationId = applicationId;
+            this.spaceId = spaceId;
+            this.uri = uri;
+        }
+
+    }
+
+    private static final class ServiceBrokerMetadata {
+
+        private final ApplicationMetadata applicationMetadata;
+
+        private final String serviceBrokerId;
+
+        private ServiceBrokerMetadata(ApplicationMetadata applicationMetadata, String serviceBrokerId) {
+            this.applicationMetadata = applicationMetadata;
+            this.serviceBrokerId = serviceBrokerId;
+        }
 
     }
 
