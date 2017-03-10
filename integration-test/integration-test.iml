@@ -29,7 +29,7 @@
     <orderEntry type="library" scope="TEST" name="Maven: com.fasterxml.jackson.core:jackson-core:2.8.6" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.8.6" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: io.jsonwebtoken:jjwt:0.7.0" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: io.projectreactor.ipc:reactor-netty:0.6.2.BUILD-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: io.projectreactor.ipc:reactor-netty:0.6.2.RELEASE" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-codec-http:4.1.8.Final" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-codec:4.1.8.Final" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-handler:4.1.8.Final" level="project" />
