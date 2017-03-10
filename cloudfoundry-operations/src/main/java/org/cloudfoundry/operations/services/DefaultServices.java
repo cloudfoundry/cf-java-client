@@ -1022,7 +1022,6 @@ public final class DefaultServices implements Services {
                         return requestGetServiceInstance(cloudFoundryClient, ResourceUtils.getId(serviceInstance));
                     }
 
-                    System.out.println(serviceInstance);
                     return Mono.just(serviceInstance);
                 })
                 .map(response -> ResourceUtils.getEntity(response).getLastOperation()));
