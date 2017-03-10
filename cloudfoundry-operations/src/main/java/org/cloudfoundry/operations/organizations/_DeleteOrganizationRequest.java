@@ -18,11 +18,21 @@ package org.cloudfoundry.operations.organizations;
 
 import org.immutables.value.Value;
 
+import java.time.Duration;
+
 /**
  * The request options for the Delete Organization Operation
  */
 @Value.Immutable
 abstract class _DeleteOrganizationRequest {
+
+    /**
+     * How long to wait for deletion
+     */
+    @Value.Default
+    Duration getCompletionTimeout() {
+        return Duration.ofMinutes(5);
+    }
 
     /**
      * The name of the organization

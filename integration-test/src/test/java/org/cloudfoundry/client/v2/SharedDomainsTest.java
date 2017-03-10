@@ -88,7 +88,7 @@ public final class SharedDomainsTest extends AbstractIntegrationTest {
                     .async(true)
                     .sharedDomainId(sharedDomainId)
                     .build())
-                .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, job)))
+                .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job)))
             .then(requestListSharedDomains(this.cloudFoundryClient, domainName)
                 .singleOrEmpty())
             .as(StepVerifier::create)

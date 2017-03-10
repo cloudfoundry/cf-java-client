@@ -61,6 +61,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuples;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -141,6 +142,7 @@ public final class DefaultSpaces implements Spaces {
             .then(function((cloudFoundryClient, organizationId) -> Mono
                 .when(
                     Mono.just(cloudFoundryClient),
+                    Mono.just(request.getCompletionTimeout()),
                     getOrganizationSpaceId(cloudFoundryClient, organizationId, request.getName())
                 )))
             .then(function(DefaultSpaces::deleteSpace))
@@ -206,9 +208,9 @@ public final class DefaultSpaces implements Spaces {
             .checkpoint();
     }
 
-    private static Mono<Void> deleteSpace(CloudFoundryClient cloudFoundryClient, String spaceId) {
+    private static Mono<Void> deleteSpace(CloudFoundryClient cloudFoundryClient, Duration completionTimeout, String spaceId) {
         return requestDeleteSpace(cloudFoundryClient, spaceId)
-            .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
+            .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, completionTimeout, job));
     }
 
     private static Mono<List<String>> getApplicationNames(CloudFoundryClient cloudFoundryClient, SpaceResource spaceResource) {

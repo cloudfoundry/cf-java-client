@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.operations.applications;
 
-import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 import java.time.Duration;
@@ -35,13 +34,17 @@ abstract class _RestageApplicationRequest {
     /**
      * How long to wait for staging
      */
-    @Nullable
-    abstract Duration getStagingTimeout();
+    @Value.Default
+    Duration getStagingTimeout() {
+        return Duration.ofMinutes(5);
+    }
 
     /**
      * How long to wait for startup
      */
-    @Nullable
-    abstract Duration getStartupTimeout();
+    @Value.Default
+    Duration getStartupTimeout() {
+        return Duration.ofMinutes(5);
+    }
 
 }

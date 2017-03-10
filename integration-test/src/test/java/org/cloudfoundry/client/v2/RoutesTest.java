@@ -137,7 +137,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     .async(true)
                     .routeId(routeId)
                     .build())
-                .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, job))))
+                .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job))))
             .then(routeId -> requestGetRoute(this.cloudFoundryClient, routeId))
             .as(StepVerifier::create)
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class).hasMessageMatching("CF-RouteNotFound\\([0-9]+\\): The route could not be found: .*"))

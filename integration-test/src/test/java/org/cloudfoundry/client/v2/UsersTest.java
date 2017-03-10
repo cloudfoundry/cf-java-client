@@ -72,7 +72,6 @@ import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -92,6 +91,7 @@ public final class UsersTest extends AbstractIntegrationTest {
 
     @Autowired
     private Mono<String> organizationId;
+
     @Test
     public void associateAuditedOrganization() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
@@ -279,7 +279,7 @@ public final class UsersTest extends AbstractIntegrationTest {
                     .async(true)
                     .userId(userId)
                     .build())
-                .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, job)))
+                .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job)))
             .thenMany(requestListUsers(this.cloudFoundryClient))
             .filter(resource -> userId.equals(resource.getMetadata().getId()))
             .as(StepVerifier::create)

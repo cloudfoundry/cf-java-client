@@ -224,7 +224,7 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
 
     private static Mono<Void> deleteServiceBinding(CloudFoundryClient cloudFoundryClient, String serviceBindingId) {
         return requestDeleteServiceBinding(cloudFoundryClient, serviceBindingId)
-            .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
+            .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, Duration.ofMinutes(5), job));
     }
 
     private static Mono<CreateApplicationResponse> requestCreateApplication(CloudFoundryClient cloudFoundryClient, String spaceId, String applicationName, String buildpack, Boolean diego, Integer

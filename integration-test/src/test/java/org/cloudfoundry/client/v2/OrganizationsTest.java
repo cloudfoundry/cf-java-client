@@ -337,7 +337,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .organizationId(organizationId)
                     .async(true)
                     .build())
-                .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, job))))
+                .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job))))
             .then(organizationId -> requestGetOrganization(this.cloudFoundryClient, organizationId))
             .as(StepVerifier::create)
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class).hasMessageMatching("CF-OrganizationNotFound\\([0-9]+\\): The organization could not be found: .*"))

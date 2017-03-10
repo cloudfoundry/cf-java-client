@@ -19,6 +19,8 @@ package org.cloudfoundry.operations.routes;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
+import java.time.Duration;
+
 /**
  * The request options for the map route operation
  */
@@ -30,6 +32,14 @@ abstract class _DeleteRouteRequest {
         if (getPort() != null && hostOrPathSet()) {
             throw new IllegalStateException("Cannot specify port together with hostname and/or path");
         }
+    }
+
+    /**
+     * How long to wait for deletion
+     */
+    @Value.Default
+    Duration getCompletionTimeout() {
+        return Duration.ofMinutes(5);
     }
 
     /**

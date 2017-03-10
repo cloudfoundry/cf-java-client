@@ -318,7 +318,7 @@ public final class ServiceBrokersTest extends AbstractIntegrationTest {
                 .then(function((applicationId, routeId) -> requestAssociateApplicationRoute(cloudFoundryClient, applicationId, routeId)
                     .then(Mono.just(applicationId))))
                 .then(applicationId -> requestUploadApplication(cloudFoundryClient, applicationId, this.application)
-                    .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, job))
+                    .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, Duration.ofMinutes(5), job))
                     .then(Mono.just(applicationId)))
                 .then(applicationId -> requestUpdateApplication(cloudFoundryClient, applicationId, "STARTED", serviceName, planName)
                     .then(Mono.just(applicationId)))

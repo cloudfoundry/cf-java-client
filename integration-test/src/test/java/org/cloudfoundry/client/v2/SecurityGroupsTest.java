@@ -120,7 +120,7 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
                 .delete(DeleteSecurityGroupRequest.builder()
                     .securityGroupId(securityGroupId)
                     .build())
-                .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, job)))
+                .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job)))
             .thenMany(requestListSecurityGroups(this.cloudFoundryClient, securityGroupName))
             .as(StepVerifier::create)
             .expectComplete()

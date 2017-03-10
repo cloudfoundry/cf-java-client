@@ -55,7 +55,7 @@ public interface Routes {
      *
      * @return a completion indicator
      */
-    Mono<Void> deleteOrphanedRoutes();
+    Mono<Void> deleteOrphanedRoutes(DeleteOrphanedRoutesRequest request);
 
     /**
      * Lists the routes and the applications bound to those routes

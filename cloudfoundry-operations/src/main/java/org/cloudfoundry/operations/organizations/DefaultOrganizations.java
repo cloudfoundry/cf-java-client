@@ -50,6 +50,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple4;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -89,6 +90,7 @@ public final class DefaultOrganizations implements Organizations {
         return this.cloudFoundryClient
             .then(cloudFoundryClient -> Mono.when(
                 Mono.just(cloudFoundryClient),
+                Mono.just(request.getCompletionTimeout()),
                 getOrganizationId(cloudFoundryClient, request.getName())
             ))
             .then(function(DefaultOrganizations::deleteOrganization))
@@ -135,9 +137,9 @@ public final class DefaultOrganizations implements Organizations {
             .otherwiseIfEmpty(getCreateOrganizationId(cloudFoundryClient, request.getOrganizationName(), null));
     }
 
-    private static Mono<Void> deleteOrganization(CloudFoundryClient cloudFoundryClient, String organizationId) {
+    private static Mono<Void> deleteOrganization(CloudFoundryClient cloudFoundryClient, Duration completionTimeout, String organizationId) {
         return requestDeleteOrganization(cloudFoundryClient, organizationId)
-            .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
+            .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, completionTimeout, job));
     }
 
     private static Mono<Tuple4<List<String>, OrganizationQuota, List<SpaceQuota>, List<String>>> getAuxiliaryContent(CloudFoundryClient cloudFoundryClient, OrganizationResource organizationResource) {

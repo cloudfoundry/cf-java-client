@@ -168,7 +168,7 @@ public final class DefaultApplications implements Applications {
                 getApplicationId(cloudFoundryClient, request.getName(), spaceId),
                 getApplicationIdFromOrgSpace(cloudFoundryClient, request.getTargetName(), spaceId, request.getTargetOrganization(), request.getTargetSpace())
             )))
-            .then(function((cloudFoundryClient, sourceApplicationId, targetApplicationId) -> copyBits(cloudFoundryClient, sourceApplicationId, targetApplicationId)
+            .then(function((cloudFoundryClient, sourceApplicationId, targetApplicationId) -> copyBits(cloudFoundryClient, request.getStagingTimeout(), sourceApplicationId, targetApplicationId)
                 .then(Mono.just(Tuples.of(cloudFoundryClient, targetApplicationId)))))
             .filter(predicate((cloudFoundryClient, targetApplicationId) -> Optional.ofNullable(request.getRestart()).orElse(false)))
             .then(function((cloudFoundryClient, targetApplicationId) -> restartApplication(cloudFoundryClient, request.getTargetName(), targetApplicationId, request.getStagingTimeout(),
@@ -182,7 +182,7 @@ public final class DefaultApplications implements Applications {
             .when(this.cloudFoundryClient, this.spaceId)
             .then(function((cloudFoundryClient, spaceId) -> getRoutesAndApplicationId(cloudFoundryClient, request, spaceId, Optional.ofNullable(request.getDeleteRoutes()).orElse(false))
                 .map(function((routes, applicationId) -> Tuples.of(cloudFoundryClient, routes, applicationId)))))
-            .then(function((cloudFoundryClient, routes, applicationId) -> deleteRoutes(cloudFoundryClient, routes)
+            .then(function((cloudFoundryClient, routes, applicationId) -> deleteRoutes(cloudFoundryClient, request.getCompletionTimeout(), routes)
                 .then(Mono.just(Tuples.of(cloudFoundryClient, applicationId)))))
             .then(function((cloudFoundryClient, applicationId) -> removeServiceBindings(cloudFoundryClient, applicationId)
                 .then(Mono.just(Tuples.of(cloudFoundryClient, applicationId)))))
@@ -321,7 +321,8 @@ public final class DefaultApplications implements Applications {
                 )))
                 .then(function((cloudFoundryClient, applicationId, matchedResources, spaceId) -> prepareDomainsAndRoutes(cloudFoundryClient, request, applicationId, spaceId, this.randomWords)
                     .then(Mono.just(Tuples.of(cloudFoundryClient, applicationId, matchedResources)))))
-                .then(function((cloudFoundryClient, applicationId, matchedResources) -> uploadApplicationAndWait(cloudFoundryClient, applicationId, request.getApplication(), matchedResources)
+                .then(function((cloudFoundryClient, applicationId, matchedResources) -> uploadApplicationAndWait(cloudFoundryClient, applicationId, request.getApplication(), matchedResources,
+                    request.getStagingTimeout())
                     .then(Mono.just(Tuples.of(cloudFoundryClient, applicationId)))))
                 .then(function((cloudFoundryClient, applicationId) -> stopAndStartApplication(cloudFoundryClient, applicationId, request)))
                 .checkpoint();
@@ -537,22 +538,22 @@ public final class DefaultApplications implements Applications {
             .build();
     }
 
-    private static Mono<Void> copyBits(CloudFoundryClient cloudFoundryClient, String sourceApplicationId, String targetApplicationId) {
+    private static Mono<Void> copyBits(CloudFoundryClient cloudFoundryClient, Duration completionTimeout, String sourceApplicationId, String targetApplicationId) {
         return requestCopyBits(cloudFoundryClient, sourceApplicationId, targetApplicationId)
-            .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
+            .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, completionTimeout, job));
     }
 
-    private static Mono<Void> deleteRoute(CloudFoundryClient cloudFoundryClient, String routeId) {
+    private static Mono<Void> deleteRoute(CloudFoundryClient cloudFoundryClient, String routeId, Duration completionTimeout) {
         return requestDeleteRoute(cloudFoundryClient, routeId)
-            .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
+            .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, completionTimeout, job));
     }
 
-    private static Mono<Void> deleteRoutes(CloudFoundryClient cloudFoundryClient, Optional<List<Route>> routes) {
+    private static Mono<Void> deleteRoutes(CloudFoundryClient cloudFoundryClient, Duration completionTimeout, Optional<List<Route>> routes) {
         return routes
             .map(Flux::fromIterable)
             .orElse(Flux.empty())
             .map(Route::getId)
-            .flatMap(routeId -> deleteRoute(cloudFoundryClient, routeId))
+            .flatMap(routeId -> deleteRoute(cloudFoundryClient, routeId, completionTimeout))
             .then();
     }
 
@@ -1389,7 +1390,8 @@ public final class DefaultApplications implements Applications {
             .collectList();
     }
 
-    private static Mono<Void> uploadApplicationAndWait(CloudFoundryClient cloudFoundryClient, String applicationId, Path application, List<ResourceMatchingUtils.ArtifactMetadata> matchedResources) {
+    private static Mono<Void> uploadApplicationAndWait(CloudFoundryClient cloudFoundryClient, String applicationId, Path application, List<ResourceMatchingUtils.ArtifactMetadata> matchedResources,
+                                                       Duration stagingTimeout) {
         return Mono
             .defer(() -> {
                 if (matchedResources.isEmpty()) {
@@ -1410,7 +1412,7 @@ public final class DefaultApplications implements Applications {
                             }));
                 }
             })
-            .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
+            .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, stagingTimeout, job));
     }
 
     private static Mono<Void> waitForRunning(CloudFoundryClient cloudFoundryClient, String application, String applicationId, Duration startupTimeout) {

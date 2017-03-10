@@ -14,55 +14,23 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.operations.applications;
+package org.cloudfoundry.operations.routes;
 
-import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 import java.time.Duration;
 
 /**
- * The request options for the scale application operation
+ * The request options for the delete orphaned routes operation
  */
 @Value.Immutable
-abstract class _ScaleApplicationRequest {
+abstract class _DeleteOrphanedRoutesRequest {
 
     /**
-     * The disk limit in MB
-     */
-    @Nullable
-    abstract Integer getDiskLimit();
-
-    /**
-     * The number of instances
-     */
-    @Nullable
-    abstract Integer getInstances();
-
-    /**
-     * The memory limit in MB
-     */
-    @Nullable
-    abstract Integer getMemoryLimit();
-
-    /**
-     * The name of the application
-     */
-    abstract String getName();
-
-    /**
-     * How long to wait for staging
+     * How long to wait for deletion
      */
     @Value.Default
-    Duration getStagingTimeout() {
-        return Duration.ofMinutes(5);
-    }
-
-    /**
-     * How long to wait for startup
-     */
-    @Value.Default
-    Duration getStartupTimeout() {
+    Duration getCompletionTimeout() {
         return Duration.ofMinutes(5);
     }
 

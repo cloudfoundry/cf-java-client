@@ -339,7 +339,8 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
         requestApplications(this.cloudFoundryClient, "test-route-id");
 
         this.routes
-            .deleteOrphanedRoutes()
+            .deleteOrphanedRoutes(DeleteOrphanedRoutesRequest.builder()
+                .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -350,7 +351,8 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
         requestSpaceRoutesService(this.cloudFoundryClient, TEST_SPACE_ID);
 
         this.routes
-            .deleteOrphanedRoutes()
+            .deleteOrphanedRoutes(DeleteOrphanedRoutesRequest.builder()
+                .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -364,7 +366,8 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
         requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
 
         this.routes
-            .deleteOrphanedRoutes()
+            .deleteOrphanedRoutes(DeleteOrphanedRoutesRequest.builder()
+                .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -378,7 +381,8 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
         requestJobFailure(this.cloudFoundryClient, "test-job-entity-id");
 
         this.routes
-            .deleteOrphanedRoutes()
+            .deleteOrphanedRoutes(DeleteOrphanedRoutesRequest.builder()
+                .build())
             .as(StepVerifier::create)
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class).hasMessage("test-error-details-errorCode(1): test-error-details-description"))
             .verify(Duration.ofSeconds(5));
@@ -389,7 +393,8 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
         requestSpaceRoutesEmpty(this.cloudFoundryClient, TEST_SPACE_ID);
 
         this.routes
-            .deleteOrphanedRoutes()
+            .deleteOrphanedRoutes(DeleteOrphanedRoutesRequest.builder()
+                .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));

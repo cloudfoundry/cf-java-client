@@ -24,6 +24,7 @@ import org.cloudfoundry.operations.domains.CreateDomainRequest;
 import org.cloudfoundry.operations.domains.CreateSharedDomainRequest;
 import org.cloudfoundry.operations.routes.CheckRouteRequest;
 import org.cloudfoundry.operations.routes.CreateRouteRequest;
+import org.cloudfoundry.operations.routes.DeleteOrphanedRoutesRequest;
 import org.cloudfoundry.operations.routes.DeleteRouteRequest;
 import org.cloudfoundry.operations.routes.ListRoutesRequest;
 import org.cloudfoundry.operations.routes.MapRouteRequest;
@@ -237,7 +238,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
         createDomainAndRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
             .then(this.cloudFoundryOperations.routes()
-                .deleteOrphanedRoutes())
+                .deleteOrphanedRoutes(DeleteOrphanedRoutesRequest.builder()
+                    .build()))
             .then(this.cloudFoundryOperations.routes()
                 .check(CheckRouteRequest.builder()
                     .domain(domainName)

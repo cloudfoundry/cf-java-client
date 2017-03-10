@@ -46,6 +46,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuples;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -114,6 +115,7 @@ public final class DefaultRoutes implements Routes {
             .then(function((cloudFoundryClient, domainId) -> Mono
                 .when(
                     Mono.just(cloudFoundryClient),
+                    Mono.just(request.getCompletionTimeout()),
                     getRouteId(cloudFoundryClient, request.getHost(), request.getDomain(), domainId, request.getPath(), request.getPort())
                 )))
             .then(function(DefaultRoutes::deleteRoute))
@@ -121,7 +123,7 @@ public final class DefaultRoutes implements Routes {
     }
 
     @Override
-    public Mono<Void> deleteOrphanedRoutes() {
+    public Mono<Void> deleteOrphanedRoutes(DeleteOrphanedRoutesRequest request) {
         return Mono
             .when(this.cloudFoundryClient, this.spaceId)
             .flatMap(function((cloudFoundryClient, spaceId) -> requestSpaceRoutes(cloudFoundryClient, spaceId)
@@ -131,7 +133,7 @@ public final class DefaultRoutes implements Routes {
             .flatMap(function((cloudFoundryClient, routeId) -> getApplications(cloudFoundryClient, routeId)
                 .map(applicationResources -> Tuples.of(cloudFoundryClient, applicationResources, routeId))))
             .filter(predicate((cloudFoundryClient, applicationResources, routeId) -> isApplicationOrphan(applicationResources)))
-            .flatMap(function((cloudFoundryClient, applicationResources, routeId) -> deleteRoute(cloudFoundryClient, routeId)))
+            .flatMap(function((cloudFoundryClient, applicationResources, routeId) -> deleteRoute(cloudFoundryClient, request.getCompletionTimeout(), routeId)))
             .then()
             .checkpoint();
     }
@@ -189,9 +191,9 @@ public final class DefaultRoutes implements Routes {
             .checkpoint();
     }
 
-    private static Mono<Void> deleteRoute(CloudFoundryClient cloudFoundryClient, String routeId) {
+    private static Mono<Void> deleteRoute(CloudFoundryClient cloudFoundryClient, Duration completionTimeout, String routeId) {
         return requestDeleteRoute(cloudFoundryClient, routeId)
-            .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, job));
+            .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, completionTimeout, job));
     }
 
     private static Mono<Map<String, String>> getAllDomains(CloudFoundryClient cloudFoundryClient, String organizationId) {
