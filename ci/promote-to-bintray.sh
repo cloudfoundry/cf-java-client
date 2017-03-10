@@ -2,8 +2,8 @@
 
 set -e
 
-NAME=$(jq -r .name cf-java-client/target/build-info.json)
-NUMBER=$(jq -r .number cf-java-client/target/build-info.json)
+NAME=$(jq -r .name build-info/build-info.json)
+NUMBER=$(jq -r .number build-info/build-info.json)
 
 ## Promote to Bintray
 curl -X "POST" "https://repo.spring.io/api/build/distribute/$NAME/$NUMBER" \

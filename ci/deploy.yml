@@ -10,6 +10,9 @@ image_resource:
 inputs:
 - name: cf-java-client
 
+outputs:
+- name: build-info
+
 run:
   path: cf-java-client/ci/deploy.sh
 
