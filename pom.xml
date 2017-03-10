@@ -26,7 +26,7 @@
     <parent>
         <groupId>io.spring.platform</groupId>
         <artifactId>platform-bom</artifactId>
-        <version>Brussels-RELEASE</version>
+        <version>Brussels-SR1</version>
     </parent>
 
     <groupId>org.cloudfoundry</groupId>
