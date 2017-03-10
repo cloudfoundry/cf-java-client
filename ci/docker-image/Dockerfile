@@ -1,4 +1,4 @@
-FROM alpine
+FROM alpine:latest
 
 RUN apk add --update \
     jq \
