@@ -1,0 +1,20 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: openjdk
+    tag: 8-jdk-alpine
+
+inputs:
+- name: cf-java-client
+
+run:
+  path: cf-java-client/ci/promote-to-bintray.sh
+
+params:
+  ARTIFACTORY_USERNAME:
+  ARTIFACTORY_PASSWORD:
+  SOURCE_REPOSITORY:    libs-release-local
+  TARGET_REPOSITORY:    spring-distributions
