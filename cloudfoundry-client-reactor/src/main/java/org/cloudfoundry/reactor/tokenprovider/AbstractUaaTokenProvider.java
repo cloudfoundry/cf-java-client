@@ -30,13 +30,11 @@ import org.immutables.value.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.util.UriComponentsBuilder;
-import reactor.core.publisher.DirectProcessor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.ReplayProcessor;
 import reactor.ipc.netty.http.client.HttpClientRequest;
 import reactor.ipc.netty.http.client.HttpClientResponse;
-import reactor.util.function.Tuple2;
-import reactor.util.function.Tuples;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -75,7 +73,7 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
 
     private final ConcurrentMap<ConnectionContext, Mono<String>> accessTokens = new ConcurrentHashMap<>(1);
 
-    private final ConcurrentMap<ConnectionContext, Tuple2<DirectProcessor<String>, Flux<String>>> refreshTokenStreams = new ConcurrentHashMap<>(1);
+    private final ConcurrentMap<ConnectionContext, ReplayProcessor<String>> refreshTokenStreams = new ConcurrentHashMap<>(1);
 
     private final ConcurrentMap<ConnectionContext, Mono<String>> refreshTokens = new ConcurrentHashMap<>(1);
 
@@ -102,7 +100,7 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
      * @return a {@link Flux} that emits the last token on subscribe and new refresh tokens as they are negotiated
      */
     public Flux<String> getRefreshTokens(ConnectionContext connectionContext) {
-        return getRefreshTokenStream(connectionContext).getT2();
+        return getRefreshTokenStream(connectionContext);
     }
 
     @Override
@@ -188,7 +186,7 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
                 }
 
                 this.refreshTokens.put(connectionContext, Mono.just(refreshToken));
-                getRefreshTokenStream(connectionContext).getT1().onNext(refreshToken);
+                getRefreshTokenStream(connectionContext).onNext(refreshToken);
             });
     }
 
@@ -201,11 +199,8 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
             .map(AbstractUaaTokenProvider::extractAccessToken);
     }
 
-    private Tuple2<DirectProcessor<String>, Flux<String>> getRefreshTokenStream(ConnectionContext connectionContext) {
-        return this.refreshTokenStreams.computeIfAbsent(connectionContext, c -> {
-            DirectProcessor<String> processor = DirectProcessor.create();
-            return Tuples.of(processor, processor.cache(1));
-        });
+    private ReplayProcessor<String> getRefreshTokenStream(ConnectionContext connectionContext) {
+        return this.refreshTokenStreams.computeIfAbsent(connectionContext, c -> ReplayProcessor.create(1));
     }
 
     private Mono<HttpClientResponse> primaryToken(ConnectionContext connectionContext) {
