@@ -37,7 +37,7 @@ abstract class _BatchChangeSecretRequest implements IdentityZoned {
     @Value.Check
     void checkClients() {
         if (this.getChangeSecrets().isEmpty()) {
-            throw new IllegalStateException("Cannot build BatchChangeSecretsRequest, required attribute changeSecret is not set"); //TODO: Validate this ************************
+            throw new IllegalStateException("Cannot build BatchChangeSecretsRequest, required attribute changeSecret is not set");
         }
     }
 
