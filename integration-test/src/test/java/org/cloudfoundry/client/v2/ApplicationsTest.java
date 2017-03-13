@@ -827,6 +827,30 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    @Test
+    public void uploadDirectory() {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        this.spaceId
+            .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
+            .then(applicationId -> {
+                try {
+                    return this.cloudFoundryClient.applicationsV2()
+                        .upload(UploadApplicationRequest.builder()
+                            .application(new ClassPathResource("test-application").getFile().toPath())
+                            .async(true)
+                            .applicationId(applicationId)
+                            .build())
+                        .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            })
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
     private static Consumer<Tuple2<String, AbstractApplicationResource>> applicationIdAndNameEquality(String name) {
         Assert.notNull(name, "name must not be null");
 
