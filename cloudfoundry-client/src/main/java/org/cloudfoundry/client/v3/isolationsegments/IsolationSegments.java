@@ -16,13 +16,6 @@
 
 package org.cloudfoundry.client.v3.isolationsegments;
 
-import org.cloudfoundry.client.v3.servicebindings.CreateServiceBindingRequest;
-import org.cloudfoundry.client.v3.servicebindings.CreateServiceBindingResponse;
-import org.cloudfoundry.client.v3.servicebindings.DeleteServiceBindingRequest;
-import org.cloudfoundry.client.v3.servicebindings.GetServiceBindingRequest;
-import org.cloudfoundry.client.v3.servicebindings.GetServiceBindingResponse;
-import org.cloudfoundry.client.v3.servicebindings.ListServiceBindingsRequest;
-import org.cloudfoundry.client.v3.servicebindings.ListServiceBindingsResponse;
 import reactor.core.publisher.Mono;
 
 /**
@@ -37,5 +30,13 @@ public interface IsolationSegments {
      * @return the response from the Create Isolation Segment request
      */
     Mono<CreateIsolationSegmentResponse> create(CreateIsolationSegmentRequest request);
+
+    /**
+     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#delete-an-isolation-segment">Delete an Isolation Segment</a> request
+     *
+     * @param request the Delete Isolation Segment request
+     * @return the response from the Delete Isolation Segment request
+     */
+    Mono<Void> delete(DeleteIsolationSegmentRequest request);
 
 }
