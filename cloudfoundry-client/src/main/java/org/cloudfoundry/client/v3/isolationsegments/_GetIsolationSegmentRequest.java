@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.client.v3.isolationsegments;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.immutables.value.Value;
 
 /**
@@ -28,7 +28,7 @@ abstract class _GetIsolationSegmentRequest {
     /**
      * The id of the isolation segment
      */
-    @JsonProperty("guid")
+    @JsonIgnore
     abstract String getIsolationSegmentId();
 
 }

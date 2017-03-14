@@ -20,10 +20,10 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.immutables.value.Value;
 
 /**
- * The response payload for the Create Isolation Segment operation
+ * The response payload for the Update Isolation Segment operation
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _CreateIsolationSegmentResponse extends IsolationSegment {
+abstract class _UpdateIsolationSegmentResponse extends IsolationSegment {
 
 }

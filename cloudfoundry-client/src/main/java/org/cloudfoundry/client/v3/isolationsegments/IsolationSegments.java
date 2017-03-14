@@ -55,4 +55,12 @@ public interface IsolationSegments {
      */
     Mono<ListIsolationSegmentsResponse> list(ListIsolationSegmentsRequest request);
 
+    /**
+     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#update-an-isolation-segment">Update an Isolation Segment</a> request
+     *
+     * @param request the Update Isolation Segment request
+     * @return the response from the Update Isolation Segment request
+     */
+    Mono<UpdateIsolationSegmentResponse> update(UpdateIsolationSegmentRequest request);
+
 }
