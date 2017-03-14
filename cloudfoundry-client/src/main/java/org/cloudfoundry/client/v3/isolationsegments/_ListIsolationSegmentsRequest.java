@@ -14,36 +14,37 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.servicebindings;
+package org.cloudfoundry.client.v3.isolationsegments;
 
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import org.cloudfoundry.Nullable;
+import org.cloudfoundry.client.v3.FilterParameter;
+import org.cloudfoundry.client.v3.PaginatedRequest;
 import org.immutables.value.Value;
 
+import java.util.List;
+
 /**
- * The request payload for the Create Service Binding operation.
+ * The request payload for the List Isolation Segments operation.
  */
 @Value.Immutable
-abstract class _CreateServiceBindingRequest {
+abstract class _ListIsolationSegmentsRequest extends PaginatedRequest {
 
     /**
-     * The data
+     * The ids
      */
-    @JsonProperty("data")
-    @Nullable
-    abstract CreateServiceBindingData getData();
+    @FilterParameter("guids")
+    abstract List<String> getIds();
 
     /**
-     * The relationships
+     * The names
      */
-    @JsonProperty("relationships")
-    abstract Relationships getRelationships();
+    @FilterParameter("names")
+    abstract List<String> getNames();
 
     /**
-     * The type
+     * The organization ids
      */
-    @JsonProperty("type")
-    abstract ServiceBindingType getType();
+    @FilterParameter("organization_guids")
+    abstract List<String> getOrganizationIds();
 
 }

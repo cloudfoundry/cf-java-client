@@ -1,0 +1,88 @@
+{
+  "pagination": {
+    "total_results": 11,
+    "total_pages": 3,
+    "first": {
+      "href": "/v3/isolation_segments?page=1&per_page=5"
+    },
+    "last": {
+      "href": "/v3/isolation_segments?page=3&per_page=5"
+    },
+    "next": {
+      "href": "/v3/isolation_segments?page=2&per_page=5"
+    },
+    "previous": null
+  },
+  "resources": [
+    {
+      "guid": "b19f6525-cbd3-4155-b156-dc0c2a431b4c",
+      "name": "an_isolation_segment",
+      "created_at": "2016-10-19T20:25:04Z",
+      "updated_at": "2016-11-08T16:41:26Z",
+      "links": {
+        "self": {
+          "href": "/v3/isolation_segments/b19f6525-cbd3-4155-b156-dc0c2a431b4c"
+        },
+        "organizations": {
+          "href": "/v3/isolation_segments/b19f6525-cbd3-4155-b156-dc0c2a431b4c/organizations"
+        }
+      }
+    },
+    {
+      "guid": "68d54d31-9b3a-463b-ba94-e8e4c32edbac",
+      "name": "an_isolation_segment1",
+      "created_at": "2016-10-19T20:29:19Z",
+      "updated_at": "2016-11-08T16:41:26Z",
+      "links": {
+        "self": {
+          "href": "/v3/isolation_segments/68d54d31-9b3a-463b-ba94-e8e4c32edbac"
+        },
+        "organizations": {
+          "href": "/v3/isolation_segments/68d54d31-9b3a-463b-ba94-e8e4c32edbac/organizations"
+        }
+      }
+    },
+    {
+      "guid": "ecdc67c3-a71e-43ff-bddf-048930b8cd03",
+      "name": "an_isolation_segment2",
+      "created_at": "2016-10-19T20:29:22Z",
+      "updated_at": "2016-11-08T16:41:26Z",
+      "links": {
+        "self": {
+          "href": "/v3/isolation_segments/ecdc67c3-a71e-43ff-bddf-048930b8cd03"
+        },
+        "organizations": {
+          "href": "/v3/isolation_segments/ecdc67c3-a71e-43ff-bddf-048930b8cd03/organizations"
+        }
+      }
+    },
+    {
+      "guid": "424c89e4-4353-46b7-9bf4-f90bd9bacac0",
+      "name": "an_isolation_segment3",
+      "created_at": "2016-10-19T20:29:27Z",
+      "updated_at": "2016-11-08T16:41:26Z",
+      "links": {
+        "self": {
+          "href": "/v3/isolation_segments/424c89e4-4353-46b7-9bf4-f90bd9bacac0"
+        },
+        "organizations": {
+          "href": "/v3/isolation_segments/424c89e4-4353-46b7-9bf4-f90bd9bacac0/organizations"
+        }
+      }
+    },
+    {
+      "guid": "0a79fcec-a648-4eb8-a6c3-2b5be39047c7",
+      "name": "an_isolation_segment4",
+      "created_at": "2016-10-19T20:29:33Z",
+      "updated_at": "2016-11-08T16:41:26Z",
+      "links": {
+        "self": {
+          "href": "/v3/isolation_segments/0a79fcec-a648-4eb8-a6c3-2b5be39047c7"
+        },
+        "organizations": {
+          "href": "/v3/isolation_segments/0a79fcec-a648-4eb8-a6c3-2b5be39047c7/organizations"
+        }
+      }
+    }
+  ]
+}
