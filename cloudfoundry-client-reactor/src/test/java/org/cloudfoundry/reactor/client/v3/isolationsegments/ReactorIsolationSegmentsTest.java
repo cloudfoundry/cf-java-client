@@ -17,9 +17,13 @@
 package org.cloudfoundry.reactor.client.v3.isolationsegments;
 
 import org.cloudfoundry.client.v3.Link;
+import org.cloudfoundry.client.v3.Pagination;
 import org.cloudfoundry.client.v3.isolationsegments.CreateIsolationSegmentRequest;
 import org.cloudfoundry.client.v3.isolationsegments.CreateIsolationSegmentResponse;
 import org.cloudfoundry.client.v3.isolationsegments.DeleteIsolationSegmentRequest;
+import org.cloudfoundry.client.v3.isolationsegments.IsolationSegmentResource;
+import org.cloudfoundry.client.v3.isolationsegments.ListIsolationSegmentsRequest;
+import org.cloudfoundry.client.v3.isolationsegments.ListIsolationSegmentsResponse;
 import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
@@ -30,6 +34,7 @@ import reactor.test.StepVerifier;
 import java.time.Duration;
 
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
+import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
@@ -88,6 +93,101 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
                 .isolationSegmentId("test-isolation-segment-id")
                 .build())
             .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void list() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/v3/isolation_segments")
+                .build())
+            .response(TestResponse.builder()
+                .status(CREATED)
+                .payload("fixtures/client/v3/isolationsegments/GET_response.json")
+                .build())
+            .build());
+
+        this.isolationSegments
+            .list(ListIsolationSegmentsRequest.builder()
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ListIsolationSegmentsResponse.builder()
+                .pagination(Pagination.builder()
+                    .first(Link.builder()
+                        .href("/v3/isolation_segments?page=1&per_page=5")
+                        .build())
+                    .last(Link.builder()
+                        .href("/v3/isolation_segments?page=3&per_page=5")
+                        .build())
+                    .next(Link.builder()
+                        .href("/v3/isolation_segments?page=2&per_page=5")
+                        .build())
+                    .totalPages(3)
+                    .totalResults(11)
+                    .build())
+                .resource(IsolationSegmentResource.builder()
+                    .createdAt("2016-10-19T20:25:04Z")
+                    .id("b19f6525-cbd3-4155-b156-dc0c2a431b4c")
+                    .link("self", Link.builder()
+                        .href("/v3/isolation_segments/b19f6525-cbd3-4155-b156-dc0c2a431b4c")
+                        .build())
+                    .link("organizations", Link.builder()
+                        .href("/v3/isolation_segments/b19f6525-cbd3-4155-b156-dc0c2a431b4c/organizations")
+                        .build())
+                    .name("an_isolation_segment")
+                    .updatedAt("2016-11-08T16:41:26Z")
+                    .build())
+                .resource(IsolationSegmentResource.builder()
+                    .createdAt("2016-10-19T20:29:19Z")
+                    .id("68d54d31-9b3a-463b-ba94-e8e4c32edbac")
+                    .link("self", Link.builder()
+                        .href("/v3/isolation_segments/68d54d31-9b3a-463b-ba94-e8e4c32edbac")
+                        .build())
+                    .link("organizations", Link.builder()
+                        .href("/v3/isolation_segments/68d54d31-9b3a-463b-ba94-e8e4c32edbac/organizations")
+                        .build())
+                    .name("an_isolation_segment1")
+                    .updatedAt("2016-11-08T16:41:26Z")
+                    .build())
+                .resource(IsolationSegmentResource.builder()
+                    .createdAt("2016-10-19T20:29:22Z")
+                    .id("ecdc67c3-a71e-43ff-bddf-048930b8cd03")
+                    .link("self", Link.builder()
+                        .href("/v3/isolation_segments/ecdc67c3-a71e-43ff-bddf-048930b8cd03")
+                        .build())
+                    .link("organizations", Link.builder()
+                        .href("/v3/isolation_segments/ecdc67c3-a71e-43ff-bddf-048930b8cd03/organizations")
+                        .build())
+                    .name("an_isolation_segment2")
+                    .updatedAt("2016-11-08T16:41:26Z")
+                    .build())
+                .resource(IsolationSegmentResource.builder()
+                    .createdAt("2016-10-19T20:29:27Z")
+                    .id("424c89e4-4353-46b7-9bf4-f90bd9bacac0")
+                    .link("self", Link.builder()
+                        .href("/v3/isolation_segments/424c89e4-4353-46b7-9bf4-f90bd9bacac0")
+                        .build())
+                    .link("organizations", Link.builder()
+                        .href("/v3/isolation_segments/424c89e4-4353-46b7-9bf4-f90bd9bacac0/organizations")
+                        .build())
+                    .name("an_isolation_segment3")
+                    .updatedAt("2016-11-08T16:41:26Z")
+                    .build())
+                .resource(IsolationSegmentResource.builder()
+                    .createdAt("2016-10-19T20:29:33Z")
+                    .id("0a79fcec-a648-4eb8-a6c3-2b5be39047c7")
+                    .link("self", Link.builder()
+                        .href("/v3/isolation_segments/0a79fcec-a648-4eb8-a6c3-2b5be39047c7")
+                        .build())
+                    .link("organizations", Link.builder()
+                        .href("/v3/isolation_segments/0a79fcec-a648-4eb8-a6c3-2b5be39047c7/organizations")
+                        .build())
+                    .name("an_isolation_segment4")
+                    .updatedAt("2016-11-08T16:41:26Z")
+                    .build())
+                .build())
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }

@@ -20,6 +20,8 @@ import org.cloudfoundry.client.v3.isolationsegments.CreateIsolationSegmentReques
 import org.cloudfoundry.client.v3.isolationsegments.CreateIsolationSegmentResponse;
 import org.cloudfoundry.client.v3.isolationsegments.DeleteIsolationSegmentRequest;
 import org.cloudfoundry.client.v3.isolationsegments.IsolationSegments;
+import org.cloudfoundry.client.v3.isolationsegments.ListIsolationSegmentsRequest;
+import org.cloudfoundry.client.v3.isolationsegments.ListIsolationSegmentsResponse;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
@@ -50,6 +52,12 @@ public final class ReactorIsolationSegments extends AbstractClientV3Operations i
     @Override
     public Mono<Void> delete(DeleteIsolationSegmentRequest request) {
         return delete(request, Void.class, builder -> builder.pathSegment("v3", "isolation_segments", request.getIsolationSegmentId()))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<ListIsolationSegmentsResponse> list(ListIsolationSegmentsRequest request) {
+        return get(request, ListIsolationSegmentsResponse.class, builder -> builder.pathSegment("v3", "isolation_segments"))
             .checkpoint();
     }
 
