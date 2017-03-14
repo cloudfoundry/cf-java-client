@@ -14,36 +14,22 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.servicebindings;
+package org.cloudfoundry.client.v3.isolationsegments;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
- * The request payload for the Create Service Binding operation.
+ * The request payload for the Create Isolation Segment operation.
  */
 @Value.Immutable
-abstract class _CreateServiceBindingRequest {
+abstract class _CreateIsolationSegmentRequest {
 
     /**
-     * The data
+     * The name of the isolation segment
      */
-    @JsonProperty("data")
-    @Nullable
-    abstract CreateServiceBindingData getData();
-
-    /**
-     * The relationships
-     */
-    @JsonProperty("relationships")
-    abstract Relationships getRelationships();
-
-    /**
-     * The type
-     */
-    @JsonProperty("type")
-    abstract ServiceBindingType getType();
+    @JsonProperty("name")
+    abstract String getName();
 
 }
