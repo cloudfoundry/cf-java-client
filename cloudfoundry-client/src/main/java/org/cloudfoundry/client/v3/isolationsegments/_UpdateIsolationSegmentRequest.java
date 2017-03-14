@@ -16,14 +16,26 @@
 
 package org.cloudfoundry.client.v3.isolationsegments;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.immutables.value.Value;
 
 /**
- * The response payload for the Create Isolation Segment operation
+ * The request payload for the Update Isolation Segment operation.
  */
-@JsonDeserialize
 @Value.Immutable
-abstract class _CreateIsolationSegmentResponse extends IsolationSegment {
+abstract class _UpdateIsolationSegmentRequest {
+
+    /**
+     * The id of the isolation segment
+     */
+    @JsonIgnore
+    abstract String getIsolationSegmentId();
+
+    /**
+     * The name of the isolation segment
+     */
+    @JsonProperty("name")
+    abstract String getName();
 
 }

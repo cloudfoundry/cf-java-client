@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.client.v3.isolationsegments;
 
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.immutables.value.Value;
 

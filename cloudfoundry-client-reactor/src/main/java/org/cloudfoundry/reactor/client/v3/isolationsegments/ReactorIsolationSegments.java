@@ -19,9 +19,13 @@ package org.cloudfoundry.reactor.client.v3.isolationsegments;
 import org.cloudfoundry.client.v3.isolationsegments.CreateIsolationSegmentRequest;
 import org.cloudfoundry.client.v3.isolationsegments.CreateIsolationSegmentResponse;
 import org.cloudfoundry.client.v3.isolationsegments.DeleteIsolationSegmentRequest;
+import org.cloudfoundry.client.v3.isolationsegments.GetIsolationSegmentRequest;
+import org.cloudfoundry.client.v3.isolationsegments.GetIsolationSegmentResponse;
 import org.cloudfoundry.client.v3.isolationsegments.IsolationSegments;
 import org.cloudfoundry.client.v3.isolationsegments.ListIsolationSegmentsRequest;
 import org.cloudfoundry.client.v3.isolationsegments.ListIsolationSegmentsResponse;
+import org.cloudfoundry.client.v3.isolationsegments.UpdateIsolationSegmentRequest;
+import org.cloudfoundry.client.v3.isolationsegments.UpdateIsolationSegmentResponse;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
@@ -56,8 +60,20 @@ public final class ReactorIsolationSegments extends AbstractClientV3Operations i
     }
 
     @Override
+    public Mono<GetIsolationSegmentResponse> get(GetIsolationSegmentRequest request) {
+        return get(request, GetIsolationSegmentResponse.class, builder -> builder.pathSegment("v3", "isolation_segments", request.getIsolationSegmentId()))
+            .checkpoint();
+    }
+
+    @Override
     public Mono<ListIsolationSegmentsResponse> list(ListIsolationSegmentsRequest request) {
         return get(request, ListIsolationSegmentsResponse.class, builder -> builder.pathSegment("v3", "isolation_segments"))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<UpdateIsolationSegmentResponse> update(UpdateIsolationSegmentRequest request) {
+        return patch(request, UpdateIsolationSegmentResponse.class, builder -> builder.pathSegment("v3", "isolation_segments", request.getIsolationSegmentId()))
             .checkpoint();
     }
 

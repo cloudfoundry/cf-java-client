@@ -40,11 +40,27 @@ public interface IsolationSegments {
     Mono<Void> delete(DeleteIsolationSegmentRequest request);
 
     /**
+     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#get-an-isolation-segment">Get an Isolation Segment</a> request
+     *
+     * @param request the Get Isolation Segment request
+     * @return the response from the Get Isolation Segment request
+     */
+    Mono<GetIsolationSegmentResponse> get(GetIsolationSegmentRequest request);
+
+    /**
      * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#list-isolation-segments">List Isolation Segments</a> request
      *
      * @param request the List Isolation Segments request
      * @return the response from the List Isolation Segments request
      */
     Mono<ListIsolationSegmentsResponse> list(ListIsolationSegmentsRequest request);
+
+    /**
+     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#update-an-isolation-segment">Update an Isolation Segment</a> request
+     *
+     * @param request the Update Isolation Segment request
+     * @return the response from the Update Isolation Segment request
+     */
+    Mono<UpdateIsolationSegmentResponse> update(UpdateIsolationSegmentRequest request);
 
 }

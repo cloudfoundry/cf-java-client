@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.client.v3.isolationsegments;
 
-
 import org.cloudfoundry.client.v3.FilterParameter;
 import org.cloudfoundry.client.v3.PaginatedRequest;
 import org.immutables.value.Value;

@@ -16,14 +16,21 @@
 
 package org.cloudfoundry.client.v3.isolationsegments;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.immutables.value.Value;
+import org.junit.Test;
 
-/**
- * The response payload for the Create Isolation Segment operation
- */
-@JsonDeserialize
-@Value.Immutable
-abstract class _CreateIsolationSegmentResponse extends IsolationSegment {
+public final class GetIsolationSegmentRequestTest {
+
+    @Test(expected = IllegalStateException.class)
+    public void noId() {
+        GetIsolationSegmentRequest.builder()
+            .build();
+    }
+
+    @Test
+    public void valid() {
+        GetIsolationSegmentRequest.builder()
+            .isolationSegmentId("test-id")
+            .build();
+    }
 
 }

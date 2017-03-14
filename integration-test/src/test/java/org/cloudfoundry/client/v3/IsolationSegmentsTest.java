@@ -46,6 +46,13 @@ public final class IsolationSegmentsTest extends AbstractIntegrationTest {
     //TODO: Await 1.10 test environment
     @Ignore("Await 1.10 test environment")
     @Test
+    public void get() throws TimeoutException, InterruptedException {
+        //
+    }
+
+    //TODO: Await 1.10 test environment
+    @Ignore("Await 1.10 test environment")
+    @Test
     public void list() throws TimeoutException, InterruptedException {
         //
     }
@@ -68,6 +75,13 @@ public final class IsolationSegmentsTest extends AbstractIntegrationTest {
     @Ignore("Await 1.10 test environment")
     @Test
     public void listFilterByOrganizationId() throws TimeoutException, InterruptedException {
+        //
+    }
+
+    //TODO: Await 1.10 test environment
+    @Ignore("Await 1.10 test environment")
+    @Test
+    public void update() throws TimeoutException, InterruptedException {
         //
     }
 
