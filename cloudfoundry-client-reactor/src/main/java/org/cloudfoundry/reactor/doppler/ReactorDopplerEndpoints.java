@@ -41,11 +41,11 @@ final class ReactorDopplerEndpoints extends AbstractDopplerOperations {
         return get(builder -> builder.pathSegment("apps", request.getApplicationId(), "containermetrics"))
             .flatMap(response -> response.addHandler(new MultipartDecoderChannelHandler(response)).receiveObject())
             .takeWhile(t -> MultipartDecoderChannelHandler.CLOSE_DELIMITER != t)
-            .windowWhile(t -> MultipartDecoderChannelHandler.DELIMITER != t)
+            .windowWhile(t -> MultipartDecoderChannelHandler.DELIMITER != t, Integer.MAX_VALUE) // TODO: Remove Prefetch with reactor-core 3.0.6
             .concatMap(w -> w
                 .as(ByteBufFlux::fromInbound)
                 .aggregate()
-                .asByteArray(), Integer.MAX_VALUE)
+                .asByteArray())
             .map(ReactorDopplerEndpoints::toEnvelope)
             .checkpoint();
     }
@@ -61,11 +61,11 @@ final class ReactorDopplerEndpoints extends AbstractDopplerOperations {
         return get(builder -> builder.pathSegment("apps", request.getApplicationId(), "recentlogs"))
             .flatMap(response -> response.addHandler(new MultipartDecoderChannelHandler(response)).receiveObject())
             .takeWhile(t -> MultipartDecoderChannelHandler.CLOSE_DELIMITER != t)
-            .windowWhile(t -> MultipartDecoderChannelHandler.DELIMITER != t)
+            .windowWhile(t -> MultipartDecoderChannelHandler.DELIMITER != t, Integer.MAX_VALUE)  // TODO: Remove Prefetch with reactor-core 3.0.6
             .concatMap(w -> w
                 .as(ByteBufFlux::fromInbound)
                 .aggregate()
-                .asByteArray(), Integer.MAX_VALUE)
+                .asByteArray())
             .map(ReactorDopplerEndpoints::toEnvelope)
             .checkpoint();
     }
