@@ -16,34 +16,21 @@
 
 package org.cloudfoundry.client.v3.isolationsegments;
 
-import org.cloudfoundry.client.v3.FilterParameter;
-import org.cloudfoundry.client.v3.PaginatedRequest;
-import org.immutables.value.Value;
+import org.junit.Test;
 
-import java.util.List;
+public final class GetIsolationSegmentRequestTest {
 
-/**
- * The request payload for the List Isolation Segments operation.
- */
-@Value.Immutable
-abstract class _ListIsolationSegmentsRequest extends PaginatedRequest {
+    @Test(expected = IllegalStateException.class)
+    public void noId() {
+        GetIsolationSegmentRequest.builder()
+            .build();
+    }
 
-    /**
-     * The ids
-     */
-    @FilterParameter("guids")
-    abstract List<String> getIds();
-
-    /**
-     * The names
-     */
-    @FilterParameter("names")
-    abstract List<String> getNames();
-
-    /**
-     * The organization ids
-     */
-    @FilterParameter("organization_guids")
-    abstract List<String> getOrganizationIds();
+    @Test
+    public void valid() {
+        GetIsolationSegmentRequest.builder()
+            .isolationSegmentId("test-id")
+            .build();
+    }
 
 }

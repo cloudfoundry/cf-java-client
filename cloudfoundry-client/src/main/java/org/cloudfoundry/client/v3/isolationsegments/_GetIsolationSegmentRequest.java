@@ -16,34 +16,19 @@
 
 package org.cloudfoundry.client.v3.isolationsegments;
 
-import org.cloudfoundry.client.v3.FilterParameter;
-import org.cloudfoundry.client.v3.PaginatedRequest;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.immutables.value.Value;
 
-import java.util.List;
-
 /**
- * The request payload for the List Isolation Segments operation.
+ * The request payload for the Get Isolation Segment operation.
  */
 @Value.Immutable
-abstract class _ListIsolationSegmentsRequest extends PaginatedRequest {
+abstract class _GetIsolationSegmentRequest {
 
     /**
-     * The ids
+     * The id of the isolation segment
      */
-    @FilterParameter("guids")
-    abstract List<String> getIds();
-
-    /**
-     * The names
-     */
-    @FilterParameter("names")
-    abstract List<String> getNames();
-
-    /**
-     * The organization ids
-     */
-    @FilterParameter("organization_guids")
-    abstract List<String> getOrganizationIds();
+    @JsonProperty("guid")
+    abstract String getIsolationSegmentId();
 
 }

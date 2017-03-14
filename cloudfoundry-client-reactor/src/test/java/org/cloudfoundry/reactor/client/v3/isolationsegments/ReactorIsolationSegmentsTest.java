@@ -21,6 +21,8 @@ import org.cloudfoundry.client.v3.Pagination;
 import org.cloudfoundry.client.v3.isolationsegments.CreateIsolationSegmentRequest;
 import org.cloudfoundry.client.v3.isolationsegments.CreateIsolationSegmentResponse;
 import org.cloudfoundry.client.v3.isolationsegments.DeleteIsolationSegmentRequest;
+import org.cloudfoundry.client.v3.isolationsegments.GetIsolationSegmentRequest;
+import org.cloudfoundry.client.v3.isolationsegments.GetIsolationSegmentResponse;
 import org.cloudfoundry.client.v3.isolationsegments.IsolationSegmentResource;
 import org.cloudfoundry.client.v3.isolationsegments.ListIsolationSegmentsRequest;
 import org.cloudfoundry.client.v3.isolationsegments.ListIsolationSegmentsResponse;
@@ -38,6 +40,7 @@ import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
 
@@ -98,13 +101,46 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
     }
 
     @Test
+    public void get() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/v3/isolation_segments/b19f6525-cbd3-4155-b156-dc0c2a431b4c")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v3/isolationsegments/GET_{id}_response.json")
+                .build())
+            .build());
+
+        this.isolationSegments
+            .get(GetIsolationSegmentRequest.builder()
+                .isolationSegmentId("b19f6525-cbd3-4155-b156-dc0c2a431b4c")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(GetIsolationSegmentResponse.builder()
+                .createdAt("2016-10-19T20:25:04Z")
+                .id("b19f6525-cbd3-4155-b156-dc0c2a431b4c")
+                .link("self", Link.builder()
+                    .href("/v3/isolation_segments/b19f6525-cbd3-4155-b156-dc0c2a431b4c")
+                    .build())
+                .link("organizations", Link.builder()
+                    .href("/v3/isolation_segments/b19f6525-cbd3-4155-b156-dc0c2a431b4c/organizations")
+                    .build())
+                .name("an_isolation_segment")
+                .updatedAt("2016-11-08T16:41:26Z")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/v3/isolation_segments")
                 .build())
             .response(TestResponse.builder()
-                .status(CREATED)
+                .status(OK)
                 .payload("fixtures/client/v3/isolationsegments/GET_response.json")
                 .build())
             .build());
