@@ -26,6 +26,7 @@ import org.cloudfoundry.client.v3.isolationsegments.GetIsolationSegmentResponse;
 import org.cloudfoundry.client.v3.isolationsegments.IsolationSegments;
 import org.cloudfoundry.client.v3.isolationsegments.ListIsolationSegmentsRequest;
 import org.cloudfoundry.client.v3.isolationsegments.ListIsolationSegmentsResponse;
+import org.cloudfoundry.client.v3.isolationsegments.RemoveIsolationSegmentOrganizationEntitlementRequest;
 import org.cloudfoundry.client.v3.isolationsegments.UpdateIsolationSegmentRequest;
 import org.cloudfoundry.client.v3.isolationsegments.UpdateIsolationSegmentResponse;
 import org.cloudfoundry.reactor.ConnectionContext;
@@ -77,6 +78,12 @@ public final class ReactorIsolationSegments extends AbstractClientV3Operations i
     @Override
     public Mono<ListIsolationSegmentsResponse> list(ListIsolationSegmentsRequest request) {
         return get(request, ListIsolationSegmentsResponse.class, builder -> builder.pathSegment("v3", "isolation_segments"))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<Void> removeOrganizationEntitlement(RemoveIsolationSegmentOrganizationEntitlementRequest request) {
+        return delete(request, Void.class, builder -> builder.pathSegment("v3", "isolation_segments", request.getIsolationSegmentId(), "relationships", "organizations", request.getOrganizationId()))
             .checkpoint();
     }
 
