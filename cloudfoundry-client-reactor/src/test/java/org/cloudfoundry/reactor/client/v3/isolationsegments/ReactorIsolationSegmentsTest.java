@@ -27,6 +27,8 @@ import org.cloudfoundry.client.v3.isolationsegments.DeleteIsolationSegmentReques
 import org.cloudfoundry.client.v3.isolationsegments.GetIsolationSegmentRequest;
 import org.cloudfoundry.client.v3.isolationsegments.GetIsolationSegmentResponse;
 import org.cloudfoundry.client.v3.isolationsegments.IsolationSegmentResource;
+import org.cloudfoundry.client.v3.isolationsegments.ListIsolationSegmentOrganizationRelationshipRequest;
+import org.cloudfoundry.client.v3.isolationsegments.ListIsolationSegmentOrganizationRelationshipResponse;
 import org.cloudfoundry.client.v3.isolationsegments.ListIsolationSegmentsRequest;
 import org.cloudfoundry.client.v3.isolationsegments.ListIsolationSegmentsResponse;
 import org.cloudfoundry.client.v3.isolationsegments.RemoveIsolationSegmentOrganizationEntitlementRequest;
@@ -271,6 +273,41 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
                         .build())
                     .name("an_isolation_segment4")
                     .updatedAt("2016-11-08T16:41:26Z")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void listOrganizationRelationship() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/v3/isolation_segments/bdeg4371-cbd3-4155-b156-dc0c2a431b4c/relationships/organizations")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v3/isolationsegments/POST_{id}_relationships_organizations_response.json")
+                .build())
+            .build());
+
+        this.isolationSegments
+            .listOrganizationRelationship(ListIsolationSegmentOrganizationRelationshipRequest.builder()
+                .isolationSegmentId("bdeg4371-cbd3-4155-b156-dc0c2a431b4c")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ListIsolationSegmentOrganizationRelationshipResponse.builder()
+                .data(Relationship.builder()
+                    .id("68d54d31-9b3a-463b-ba94-e8e4c32edbac")
+                    .build())
+                .data(Relationship.builder()
+                    .id("b19f6525-cbd3-4155-b156-dc0c2a431b4c")
+                    .build())
+                .link("self", Link.builder()
+                    .href("/v3/isolation_segments/bdeg4371-cbd3-4155-b156-dc0c2a431b4c/relationships/organizations")
+                    .build())
+                .link("related", Link.builder()
+                    .href("/v3/isolation_segments/bdeg4371-cbd3-4155-b156-dc0c2a431b4c/organizations")
                     .build())
                 .build())
             .expectComplete()
