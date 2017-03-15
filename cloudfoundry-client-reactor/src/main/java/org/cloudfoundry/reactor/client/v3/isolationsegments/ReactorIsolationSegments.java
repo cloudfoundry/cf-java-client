@@ -16,6 +16,8 @@
 
 package org.cloudfoundry.reactor.client.v3.isolationsegments;
 
+import org.cloudfoundry.client.v3.isolationsegments.AddIsolationSegmentOrganizationEntitlementRequest;
+import org.cloudfoundry.client.v3.isolationsegments.AddIsolationSegmentOrganizationEntitlementResponse;
 import org.cloudfoundry.client.v3.isolationsegments.CreateIsolationSegmentRequest;
 import org.cloudfoundry.client.v3.isolationsegments.CreateIsolationSegmentResponse;
 import org.cloudfoundry.client.v3.isolationsegments.DeleteIsolationSegmentRequest;
@@ -45,6 +47,13 @@ public final class ReactorIsolationSegments extends AbstractClientV3Operations i
      */
     public ReactorIsolationSegments(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
         super(connectionContext, root, tokenProvider);
+    }
+
+    @Override
+    public Mono<AddIsolationSegmentOrganizationEntitlementResponse> addOrganizationEntitlement(AddIsolationSegmentOrganizationEntitlementRequest request) {
+        return post(request, AddIsolationSegmentOrganizationEntitlementResponse.class, builder ->
+            builder.pathSegment("v3", "isolation_segments", request.getIsolationSegmentId(), "relationships", "organizations"))
+            .checkpoint();
     }
 
     @Override

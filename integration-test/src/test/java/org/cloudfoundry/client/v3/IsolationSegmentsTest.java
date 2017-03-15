@@ -32,6 +32,13 @@ public final class IsolationSegmentsTest extends AbstractIntegrationTest {
     //TODO: Await 1.10 test environment
     @Ignore("Await 1.10 test environment")
     @Test
+    public void addOrganizationEntitlement() throws TimeoutException, InterruptedException {
+        //
+    }
+
+    //TODO: Await 1.10 test environment
+    @Ignore("Await 1.10 test environment")
+    @Test
     public void create() throws TimeoutException, InterruptedException {
         //
     }
