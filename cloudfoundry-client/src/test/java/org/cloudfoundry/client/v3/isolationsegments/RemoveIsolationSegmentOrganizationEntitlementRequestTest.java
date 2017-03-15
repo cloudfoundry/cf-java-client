@@ -18,27 +18,27 @@ package org.cloudfoundry.client.v3.isolationsegments;
 
 import org.junit.Test;
 
-public final class UpdateIsolationSegmentRequestTest {
+public final class RemoveIsolationSegmentOrganizationEntitlementRequestTest {
 
     @Test(expected = IllegalStateException.class)
-    public void noId() {
-        UpdateIsolationSegmentRequest.builder()
-            .name("test-name")
+    public void noIsolationSegmentId() {
+        RemoveIsolationSegmentOrganizationEntitlementRequest.builder()
+            .organizationId("test-organization-id")
             .build();
     }
 
     @Test(expected = IllegalStateException.class)
-    public void noName() {
-        UpdateIsolationSegmentRequest.builder()
-            .isolationSegmentId("test-id")
+    public void noOrganizationId() {
+        RemoveIsolationSegmentOrganizationEntitlementRequest.builder()
+            .isolationSegmentId("test-isolation-segment-id")
             .build();
     }
 
     @Test
     public void valid() {
-        UpdateIsolationSegmentRequest.builder()
-            .isolationSegmentId("test-id")
-            .name("test-name")
+        RemoveIsolationSegmentOrganizationEntitlementRequest.builder()
+            .isolationSegmentId("test-isolation-segment-id")
+            .organizationId("test-organization-id")
             .build();
     }
 

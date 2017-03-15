@@ -16,30 +16,25 @@
 
 package org.cloudfoundry.client.v3.isolationsegments;
 
-import org.junit.Test;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.immutables.value.Value;
 
-public final class UpdateIsolationSegmentRequestTest {
+/**
+ * The request payload for the Revoke Entitlement to Isolation Segment for an Organization operation
+ */
+@Value.Immutable
+abstract class _RemoveIsolationSegmentOrganizationEntitlementRequest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noId() {
-        UpdateIsolationSegmentRequest.builder()
-            .name("test-name")
-            .build();
-    }
+    /**
+     * The isolation segment id
+     */
+    @JsonIgnore
+    abstract String getIsolationSegmentId();
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        UpdateIsolationSegmentRequest.builder()
-            .isolationSegmentId("test-id")
-            .build();
-    }
-
-    @Test
-    public void valid() {
-        UpdateIsolationSegmentRequest.builder()
-            .isolationSegmentId("test-id")
-            .name("test-name")
-            .build();
-    }
+    /**
+     * The organization id
+     */
+    @JsonIgnore
+    abstract String getOrganizationId();
 
 }

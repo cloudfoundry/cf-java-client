@@ -1,0 +1,18 @@
+{
+  "data": [
+    {
+      "guid": "68d54d31-9b3a-463b-ba94-e8e4c32edbac"
+    },
+    {
+      "guid": "b19f6525-cbd3-4155-b156-dc0c2a431b4c"
+    }
+  ],
+  "links": {
+    "self": {
+      "href": "/v3/isolation_segments/bdeg4371-cbd3-4155-b156-dc0c2a431b4c/relationships/organizations"
+    },
+    "related": {
+      "href": "/v3/isolation_segments/bdeg4371-cbd3-4155-b156-dc0c2a431b4c/organizations"
+    }
+  }
+}

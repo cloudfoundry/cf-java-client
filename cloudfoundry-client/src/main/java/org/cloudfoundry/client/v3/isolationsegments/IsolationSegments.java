@@ -24,6 +24,15 @@ import reactor.core.publisher.Mono;
 public interface IsolationSegments {
 
     /**
+     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#entitle-one-or-more-organizations-for-an-isolation-segment">
+     * Add an Isolation Segment Organization Entitlement</a> request
+     *
+     * @param request the Add an Isolation Segment Organization Entitlement request
+     * @return the response from the Add an Isolation Segment Organization Entitlement request
+     */
+    Mono<AddIsolationSegmentOrganizationEntitlementResponse> addOrganizationEntitlement(AddIsolationSegmentOrganizationEntitlementRequest request);
+
+    /**
      * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#create-an-isolation-segment">Create an Isolation Segment</a> request
      *
      * @param request the Create Isolation Segment request
@@ -54,6 +63,15 @@ public interface IsolationSegments {
      * @return the response from the List Isolation Segments request
      */
     Mono<ListIsolationSegmentsResponse> list(ListIsolationSegmentsRequest request);
+
+    /**
+     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#revoke-entitlement-to-isolation-segment-for-an-organization">
+     * Remove an Isolation Segment Organization Entitlement</a> request
+     *
+     * @param request the Remove an Isolation Segment Organization Entitlement request
+     * @return the response from the Remove an Isolation Segment Organization Entitlement request
+     */
+    Mono<Void> removeOrganizationEntitlement(RemoveIsolationSegmentOrganizationEntitlementRequest request);
 
     /**
      * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#update-an-isolation-segment">Update an Isolation Segment</a> request

@@ -16,29 +16,34 @@
 
 package org.cloudfoundry.client.v3.isolationsegments;
 
+import org.cloudfoundry.client.v3.Relationship;
 import org.junit.Test;
 
-public final class UpdateIsolationSegmentRequestTest {
+public final class AddIsolationSegmentOrganizationEntitlementRequestTest {
 
     @Test(expected = IllegalStateException.class)
-    public void noId() {
-        UpdateIsolationSegmentRequest.builder()
-            .name("test-name")
+    public void noData() {
+        AddIsolationSegmentOrganizationEntitlementRequest.builder()
+            .isolationSegmentId("test-isolation-segment-id")
             .build();
     }
 
     @Test(expected = IllegalStateException.class)
-    public void noName() {
-        UpdateIsolationSegmentRequest.builder()
-            .isolationSegmentId("test-id")
+    public void noIsolationSegmentId() {
+        AddIsolationSegmentOrganizationEntitlementRequest.builder()
+            .data(Relationship.builder()
+                .id("test-organization-id")
+                .build())
             .build();
     }
 
     @Test
     public void valid() {
-        UpdateIsolationSegmentRequest.builder()
-            .isolationSegmentId("test-id")
-            .name("test-name")
+        AddIsolationSegmentOrganizationEntitlementRequest.builder()
+            .isolationSegmentId("test-isolation-segment-id")
+            .data(Relationship.builder()
+                .id("test-organization-id")
+                .build())
             .build();
     }
 

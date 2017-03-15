@@ -14,23 +14,39 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3;
+package org.cloudfoundry.client.v3.isolationsegments;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.AllowNulls;
+import org.cloudfoundry.Nullable;
+import org.cloudfoundry.client.v3.Link;
+import org.cloudfoundry.client.v3.Relationship;
 import org.immutables.value.Value;
 
+import java.util.List;
+import java.util.Map;
+
 /**
- * Represents a relationship to another entity
+ * The response payload for the Entitle one or more Organizations for an Isolation Segment operation
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _Relationship {
+abstract class _AddIsolationSegmentOrganizationEntitlementResponse {
 
     /**
-     * The id
+     * The entitled organizations
      */
-    @JsonProperty("guid")
-    abstract String getId();
+    @JsonProperty("data")
+    @Nullable
+    abstract List<Relationship> getData();
+
+    /**
+     * The links
+     */
+    @AllowNulls
+    @JsonProperty("links")
+    @Nullable
+    abstract Map<String, Link> getLinks();
 
 }

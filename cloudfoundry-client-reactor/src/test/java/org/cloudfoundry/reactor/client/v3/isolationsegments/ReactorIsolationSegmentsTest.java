@@ -18,6 +18,9 @@ package org.cloudfoundry.reactor.client.v3.isolationsegments;
 
 import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.Pagination;
+import org.cloudfoundry.client.v3.Relationship;
+import org.cloudfoundry.client.v3.isolationsegments.AddIsolationSegmentOrganizationEntitlementRequest;
+import org.cloudfoundry.client.v3.isolationsegments.AddIsolationSegmentOrganizationEntitlementResponse;
 import org.cloudfoundry.client.v3.isolationsegments.CreateIsolationSegmentRequest;
 import org.cloudfoundry.client.v3.isolationsegments.CreateIsolationSegmentResponse;
 import org.cloudfoundry.client.v3.isolationsegments.DeleteIsolationSegmentRequest;
@@ -26,6 +29,7 @@ import org.cloudfoundry.client.v3.isolationsegments.GetIsolationSegmentResponse;
 import org.cloudfoundry.client.v3.isolationsegments.IsolationSegmentResource;
 import org.cloudfoundry.client.v3.isolationsegments.ListIsolationSegmentsRequest;
 import org.cloudfoundry.client.v3.isolationsegments.ListIsolationSegmentsResponse;
+import org.cloudfoundry.client.v3.isolationsegments.RemoveIsolationSegmentOrganizationEntitlementRequest;
 import org.cloudfoundry.client.v3.isolationsegments.UpdateIsolationSegmentRequest;
 import org.cloudfoundry.client.v3.isolationsegments.UpdateIsolationSegmentResponse;
 import org.cloudfoundry.reactor.InteractionContext;
@@ -48,6 +52,48 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
 
     private final ReactorIsolationSegments isolationSegments = new ReactorIsolationSegments(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+
+    @Test
+    public void addOrganizationEntitlement() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(POST).path("/v3/isolation_segments/bdeg4371-cbd3-4155-b156-dc0c2a431b4c/relationships/organizations")
+                .payload("fixtures/client/v3/isolationsegments/POST_{id}_relationships_organizations_request.json")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v3/isolationsegments/POST_{id}_relationships_organizations_response.json")
+                .build())
+            .build());
+
+        this.isolationSegments
+            .addOrganizationEntitlement(AddIsolationSegmentOrganizationEntitlementRequest.builder()
+                .isolationSegmentId("bdeg4371-cbd3-4155-b156-dc0c2a431b4c")
+                .data(Relationship.builder()
+                    .id("68d54d31-9b3a-463b-ba94-e8e4c32edbac")
+                    .build())
+                .data(Relationship.builder()
+                    .id("b19f6525-cbd3-4155-b156-dc0c2a431b4c")
+                    .build())
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(AddIsolationSegmentOrganizationEntitlementResponse.builder()
+                .data(Relationship.builder()
+                    .id("68d54d31-9b3a-463b-ba94-e8e4c32edbac")
+                    .build())
+                .data(Relationship.builder()
+                    .id("b19f6525-cbd3-4155-b156-dc0c2a431b4c")
+                    .build())
+                .link("self", Link.builder()
+                    .href("/v3/isolation_segments/bdeg4371-cbd3-4155-b156-dc0c2a431b4c/relationships/organizations")
+                    .build())
+                .link("related", Link.builder()
+                    .href("/v3/isolation_segments/bdeg4371-cbd3-4155-b156-dc0c2a431b4c/organizations")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
 
     @Test
     public void create() {
@@ -227,6 +273,27 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
                     .updatedAt("2016-11-08T16:41:26Z")
                     .build())
                 .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void removeOrganizationEntitlement() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(DELETE).path("/v3/isolation_segments/test-isolation-segment-id/relationships/organizations/test-organization-id")
+                .build())
+            .response(TestResponse.builder()
+                .status(NO_CONTENT)
+                .build())
+            .build());
+
+        this.isolationSegments
+            .removeOrganizationEntitlement(RemoveIsolationSegmentOrganizationEntitlementRequest.builder()
+                .isolationSegmentId("test-isolation-segment-id")
+                .organizationId("test-organization-id")
+                .build())
+            .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
