@@ -26,6 +26,7 @@ import org.cloudfoundry.reactor.util.JsonCodec;
 import org.cloudfoundry.reactor.util.NetworkLogging;
 import org.cloudfoundry.reactor.util.SslCertificateTruster;
 import org.cloudfoundry.reactor.util.StaticTrustManagerFactory;
+import org.cloudfoundry.reactor.util.UserAgent;
 import org.immutables.value.Value;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -169,7 +170,9 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
         return getRoot()
             .map(uri -> UriComponentsBuilder.fromUriString(uri).pathSegment("v2", "info").build().toUriString())
             .then(uri -> getHttpClient()
-                .get(uri)
+                .get(uri, request -> Mono.just(request)
+                    .map(UserAgent::addUserAgent)
+                )
                 .doOnSubscribe(NetworkLogging.get(uri))
                 .transform(NetworkLogging.response(uri)))
             .transform(JsonCodec.decode(getObjectMapper(), Map.class))
