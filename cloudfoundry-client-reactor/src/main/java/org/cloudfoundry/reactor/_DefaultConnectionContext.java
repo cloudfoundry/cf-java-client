@@ -32,6 +32,7 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.ipc.netty.http.client.HttpClient;
+import reactor.ipc.netty.http.client.HttpClientRequest;
 import reactor.ipc.netty.options.ClientOptions;
 import reactor.ipc.netty.resources.LoopResources;
 import reactor.ipc.netty.resources.PoolResources;
@@ -172,7 +173,7 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
             .then(uri -> getHttpClient()
                 .get(uri, request -> Mono.just(request)
                     .map(UserAgent::addUserAgent)
-                )
+                    .flatMap(HttpClientRequest::send))
                 .doOnSubscribe(NetworkLogging.get(uri))
                 .transform(NetworkLogging.response(uri)))
             .transform(JsonCodec.decode(getObjectMapper(), Map.class))
