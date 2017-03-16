@@ -93,6 +93,29 @@ public final class ReactorDopplerClientTest extends AbstractDopplerApiTest {
     }
 
     @Test
+    public void containerMetricsLogs() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/apps/test-application-id/containermetrics")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .contentType("multipart/x-protobuf; boundary=d12911a0934bf75879de385a042c4037fa903841921ba84abb77cb73a444")
+                .payload("fixtures/doppler/apps/GET_{id}_containermetrics_response-large.bin")
+                .build())
+            .build());
+
+        this.dopplerEndpoints
+            .containerMetrics(ContainerMetricsRequest.builder()
+                .applicationId("test-application-id")
+                .build())
+            .as(StepVerifier::create)
+            .expectNextCount(3093)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
     public void recentLogs() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
@@ -146,6 +169,29 @@ public final class ReactorDopplerClientTest extends AbstractDopplerApiTest {
                     .origin("rep")
                     .timestamp(1461278188715653514L)
                     .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void recentLogsLarge() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/apps/test-application-id/recentlogs")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .contentType("multipart/x-protobuf; boundary=74684f6bed3ee99aa98a13c609c354cd849b01a6e6051226906140ad31b2")
+                .payload("fixtures/doppler/apps/GET_{id}_recentlogs_response-large.bin")
+                .build())
+            .build());
+
+        this.dopplerEndpoints
+            .recentLogs(RecentLogsRequest.builder()
+                .applicationId("test-application-id")
+                .build())
+            .as(StepVerifier::create)
+            .expectNextCount(3093)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
