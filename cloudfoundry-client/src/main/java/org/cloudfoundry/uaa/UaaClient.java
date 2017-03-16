@@ -33,7 +33,7 @@ public interface UaaClient {
     /**
      * The currently supported UAA API version
      */
-    String SUPPORTED_API_VERSION = "3.3.0";
+    String SUPPORTED_API_VERSION = "3.12.0";
 
     /**
      * Main entry point to the UAA Authorizations Client API
