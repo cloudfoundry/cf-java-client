@@ -22,13 +22,6 @@ import org.junit.Test;
 public final class AssignOrganizationDefaultIsolationSegmentRequestTest {
 
     @Test(expected = IllegalStateException.class)
-    public void noData() {
-        AssignOrganizationDefaultIsolationSegmentRequest.builder()
-            .organizationId("test-organization-id")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
     public void noOrganizationId() {
         AssignOrganizationDefaultIsolationSegmentRequest.builder()
             .data(Relationship.builder()
@@ -38,11 +31,18 @@ public final class AssignOrganizationDefaultIsolationSegmentRequestTest {
     }
 
     @Test
-    public void valid() {
+    public void validData() {
         AssignOrganizationDefaultIsolationSegmentRequest.builder()
             .data(Relationship.builder()
                 .id("test-isolation-segment-id")
                 .build())
+            .organizationId("test-organization-id")
+            .build();
+    }
+
+    @Test
+    public void validNoData() {
+        AssignOrganizationDefaultIsolationSegmentRequest.builder()
             .organizationId("test-organization-id")
             .build();
     }
