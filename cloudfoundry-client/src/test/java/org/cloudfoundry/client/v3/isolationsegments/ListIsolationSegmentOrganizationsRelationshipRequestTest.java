@@ -18,17 +18,17 @@ package org.cloudfoundry.client.v3.isolationsegments;
 
 import org.junit.Test;
 
-public final class ListIsolationSegmentOrganizationRelationshipRequestTest {
+public final class ListIsolationSegmentOrganizationsRelationshipRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noIsolationSegmentId() {
-        ListIsolationSegmentOrganizationRelationshipRequest.builder()
+        ListIsolationSegmentOrganizationsRelationshipRequest.builder()
             .build();
     }
 
     @Test
     public void valid() {
-        ListIsolationSegmentOrganizationRelationshipRequest.builder()
+        ListIsolationSegmentOrganizationsRelationshipRequest.builder()
             .isolationSegmentId("test-isolation-segment-id")
             .build();
     }

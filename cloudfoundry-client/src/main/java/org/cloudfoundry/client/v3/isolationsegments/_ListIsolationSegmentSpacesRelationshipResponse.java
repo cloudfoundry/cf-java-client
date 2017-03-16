@@ -28,14 +28,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The response payload for the List Organizations Relationship operation
+ * The response payload for the List Spaces Relationship operation
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _ListIsolationSegmentOrganizationRelationshipResponse {
+abstract class _ListIsolationSegmentSpacesRelationshipResponse {
 
     /**
-     * The entitled organizations
+     * The assigned spaces
      */
     @JsonProperty("data")
     @Nullable

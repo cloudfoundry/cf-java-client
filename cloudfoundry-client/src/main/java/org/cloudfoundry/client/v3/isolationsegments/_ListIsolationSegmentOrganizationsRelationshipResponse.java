@@ -16,19 +16,37 @@
 
 package org.cloudfoundry.client.v3.isolationsegments;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.AllowNulls;
+import org.cloudfoundry.Nullable;
+import org.cloudfoundry.client.v3.Link;
+import org.cloudfoundry.client.v3.Relationship;
 import org.immutables.value.Value;
 
+import java.util.List;
+import java.util.Map;
+
 /**
- * The request payload for the List Organizations Relationship operation.
+ * The response payload for the List Organizations Relationship operation
  */
+@JsonDeserialize
 @Value.Immutable
-abstract class _ListIsolationSegmentOrganizationRelationshipRequest {
+abstract class _ListIsolationSegmentOrganizationsRelationshipResponse {
 
     /**
-     * The isolation segment id
+     * The entitled organizations
      */
-    @JsonIgnore
-    abstract String getIsolationSegmentId();
+    @JsonProperty("data")
+    @Nullable
+    abstract List<Relationship> getData();
+
+    /**
+     * The links
+     */
+    @AllowNulls
+    @JsonProperty("links")
+    @Nullable
+    abstract Map<String, Link> getLinks();
 
 }
