@@ -16,33 +16,19 @@
 
 package org.cloudfoundry.client.v3.spaces;
 
-import org.cloudfoundry.client.v3.Relationship;
 import org.junit.Test;
 
-public final class AssignSpaceIsolationSegmentRequestTest {
+public final class GetSpaceIsolationSegmentRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noOrganizationId() {
-        AssignSpaceIsolationSegmentRequest.builder()
-            .data(Relationship.builder()
-                .id("test-isolation-segment-id")
-                .build())
+        GetSpaceIsolationSegmentRequest.builder()
             .build();
     }
 
     @Test
-    public void validData() {
-        AssignSpaceIsolationSegmentRequest.builder()
-            .data(Relationship.builder()
-                .id("test-isolation-segment-id")
-                .build())
-            .spaceId("test-space-id")
-            .build();
-    }
-
-    @Test
-    public void validNoData() {
-        AssignSpaceIsolationSegmentRequest.builder()
+    public void valid() {
+        GetSpaceIsolationSegmentRequest.builder()
             .spaceId("test-space-id")
             .build();
     }

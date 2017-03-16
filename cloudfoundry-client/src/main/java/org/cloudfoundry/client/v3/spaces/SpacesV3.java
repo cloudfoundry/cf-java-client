@@ -26,10 +26,18 @@ public interface SpacesV3 {
     /**
      * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#assign-an-isolation-segment">Assign an Isolation Segment</a> request
      *
-     * @param request theAssign an Isolation Segment request
+     * @param request the Assign an Isolation Segment request
      * @return the response from the Assign an Isolation Segment request
      */
     Mono<AssignSpaceIsolationSegmentResponse> assignIsolationSegment(AssignSpaceIsolationSegmentRequest request);
+
+    /**
+     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#get-assigned-isolation-segment">Get Assigned Isolation Segment</a> request
+     *
+     * @param request the Get Assigned Isolation Segment request
+     * @return the response from the Get Assigned Isolation Segment request
+     */
+    Mono<GetSpaceIsolationSegmentResponse> getIsolationSegment(GetSpaceIsolationSegmentRequest request);
 
     /**
      * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#list-isolation-segments">List Spaces</a> request

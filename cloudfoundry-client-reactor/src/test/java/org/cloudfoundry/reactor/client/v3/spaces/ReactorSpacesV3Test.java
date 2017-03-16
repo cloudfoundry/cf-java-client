@@ -21,6 +21,8 @@ import org.cloudfoundry.client.v3.Pagination;
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.spaces.AssignSpaceIsolationSegmentRequest;
 import org.cloudfoundry.client.v3.spaces.AssignSpaceIsolationSegmentResponse;
+import org.cloudfoundry.client.v3.spaces.GetSpaceIsolationSegmentRequest;
+import org.cloudfoundry.client.v3.spaces.GetSpaceIsolationSegmentResponse;
 import org.cloudfoundry.client.v3.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v3.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v3.spaces.SpaceResource;
@@ -63,6 +65,35 @@ public class ReactorSpacesV3Test extends AbstractClientApiTest {
                 .build())
             .as(StepVerifier::create)
             .expectNext(AssignSpaceIsolationSegmentResponse.builder()
+                .data(Relationship.builder()
+                    .id("e4c91047-3b29-4fda-b7f9-04033e5a9c9f")
+                    .build())
+                .link("self", Link.builder()
+                    .href("/v3/spaces/885735b5-aea4-4cf5-8e44-961af0e41920/relationships/isolation_segment")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void getDefaultIsolationSegment() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/v3/spaces/885735b5-aea4-4cf5-8e44-961af0e41920/relationships/isolation_segment")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v3/spaces/GET_{id}_relationships_isolation_segment_response.json")
+                .build())
+            .build());
+
+        this.spaces
+            .getIsolationSegment(GetSpaceIsolationSegmentRequest.builder()
+                .spaceId("885735b5-aea4-4cf5-8e44-961af0e41920")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(GetSpaceIsolationSegmentResponse.builder()
                 .data(Relationship.builder()
                     .id("e4c91047-3b29-4fda-b7f9-04033e5a9c9f")
                     .build())
