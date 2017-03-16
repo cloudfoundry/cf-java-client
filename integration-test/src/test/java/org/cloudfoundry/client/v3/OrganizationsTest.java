@@ -32,7 +32,21 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     //TODO: Await 1.10 test environment
     @Ignore("Await 1.10 test environment")
     @Test
+    public void assignDefaultOrganizationSegment() throws TimeoutException, InterruptedException {
+        //
+    }
+
+    //TODO: Await 1.10 test environment
+    @Ignore("Await 1.10 test environment")
+    @Test
     public void list() throws TimeoutException, InterruptedException {
+        //
+    }
+
+    //TODO: Await 1.10 test environment
+    @Ignore("Await 1.10 test environment")
+    @Test
+    public void listFilterByName() throws TimeoutException, InterruptedException {
         //
     }
 
