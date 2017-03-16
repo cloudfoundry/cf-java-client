@@ -24,6 +24,10 @@ import org.cloudfoundry.client.v3.isolationsegments.DeleteIsolationSegmentReques
 import org.cloudfoundry.client.v3.isolationsegments.GetIsolationSegmentRequest;
 import org.cloudfoundry.client.v3.isolationsegments.GetIsolationSegmentResponse;
 import org.cloudfoundry.client.v3.isolationsegments.IsolationSegments;
+import org.cloudfoundry.client.v3.isolationsegments.ListIsolationSegmentOrganizationsRelationshipRequest;
+import org.cloudfoundry.client.v3.isolationsegments.ListIsolationSegmentOrganizationsRelationshipResponse;
+import org.cloudfoundry.client.v3.isolationsegments.ListIsolationSegmentSpacesRelationshipRequest;
+import org.cloudfoundry.client.v3.isolationsegments.ListIsolationSegmentSpacesRelationshipResponse;
 import org.cloudfoundry.client.v3.isolationsegments.ListIsolationSegmentsRequest;
 import org.cloudfoundry.client.v3.isolationsegments.ListIsolationSegmentsResponse;
 import org.cloudfoundry.client.v3.isolationsegments.RemoveIsolationSegmentOrganizationEntitlementRequest;
@@ -78,6 +82,20 @@ public final class ReactorIsolationSegments extends AbstractClientV3Operations i
     @Override
     public Mono<ListIsolationSegmentsResponse> list(ListIsolationSegmentsRequest request) {
         return get(request, ListIsolationSegmentsResponse.class, builder -> builder.pathSegment("v3", "isolation_segments"))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<ListIsolationSegmentOrganizationsRelationshipResponse> listOrganizationsRelationship(ListIsolationSegmentOrganizationsRelationshipRequest request) {
+        return get(request, ListIsolationSegmentOrganizationsRelationshipResponse.class, builder ->
+            builder.pathSegment("v3", "isolation_segments", request.getIsolationSegmentId(), "relationships", "organizations"))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<ListIsolationSegmentSpacesRelationshipResponse> listSpacesRelationship(ListIsolationSegmentSpacesRelationshipRequest request) {
+        return get(request, ListIsolationSegmentSpacesRelationshipResponse.class, builder ->
+            builder.pathSegment("v3", "isolation_segments", request.getIsolationSegmentId(), "relationships", "spaces"))
             .checkpoint();
     }
 
