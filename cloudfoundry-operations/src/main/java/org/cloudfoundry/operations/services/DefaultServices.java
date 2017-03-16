@@ -90,7 +90,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
@@ -1013,17 +1012,8 @@ public final class DefaultServices implements Services {
     }
 
     private static Mono<Void> waitForCreateInstance(CloudFoundryClient cloudFoundryClient, Duration completionTimeout, AbstractServiceInstanceResource serviceInstance) {
-        AtomicBoolean sentFirst = new AtomicBoolean(false);
-
         return LastOperationUtils
-            .waitForCompletion(completionTimeout, () -> Mono
-                .defer(() -> {
-                    if (sentFirst.getAndSet(true)) {
-                        return requestGetServiceInstance(cloudFoundryClient, ResourceUtils.getId(serviceInstance));
-                    }
-
-                    return Mono.just(serviceInstance);
-                })
+            .waitForCompletion(completionTimeout, () -> requestGetServiceInstance(cloudFoundryClient, ResourceUtils.getId(serviceInstance))
                 .map(response -> ResourceUtils.getEntity(response).getLastOperation()));
     }
 

@@ -292,7 +292,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void createServiceInstanceDelay() {
+    public void createServiceInstance() {
         requestListSpaceServices(this.cloudFoundryClient, TEST_SPACE_ID, "test-service");
         requestListSpaceServicePlans(this.cloudFoundryClient, "test-service-id", "test-plan", "test-plan-id");
         requestCreateServiceInstance(this.cloudFoundryClient, TEST_SPACE_ID, "test-plan-id", "test-service-instance", null, null, "test-service-instance-id", "in progress");
@@ -303,26 +303,6 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
                 .planName("test-plan")
                 .serviceInstanceName("test-service-instance")
                 .serviceName("test-service")
-                .build())
-            .as(StepVerifier::create)
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
-    }
-
-    @Test
-    public void createServiceInstanceInstant() {
-        requestListSpaceServices(this.cloudFoundryClient, TEST_SPACE_ID, "test-service");
-        requestListSpaceServicePlans(this.cloudFoundryClient, "test-service-id", "test-plan", "test-plan-id");
-        requestCreateServiceInstance(this.cloudFoundryClient, TEST_SPACE_ID, "test-plan-id", "test-service-instance", Collections.singletonMap("test-parameter-key", "test-parameter-value"),
-            Collections.singletonList("test-tag"), "test-service-instance-id", "successful");
-
-        this.services
-            .createInstance(CreateServiceInstanceRequest.builder()
-                .parameter("test-parameter-key", "test-parameter-value")
-                .planName("test-plan")
-                .serviceInstanceName("test-service-instance")
-                .serviceName("test-service")
-                .tag("test-tag")
                 .build())
             .as(StepVerifier::create)
             .expectComplete()
