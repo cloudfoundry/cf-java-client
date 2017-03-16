@@ -21,6 +21,8 @@ import org.cloudfoundry.client.v3.Pagination;
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.organizations.AssignOrganizationDefaultIsolationSegmentRequest;
 import org.cloudfoundry.client.v3.organizations.AssignOrganizationDefaultIsolationSegmentResponse;
+import org.cloudfoundry.client.v3.organizations.GetOrganizationDefaultIsolationSegmentRequest;
+import org.cloudfoundry.client.v3.organizations.GetOrganizationDefaultIsolationSegmentResponse;
 import org.cloudfoundry.client.v3.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v3.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v3.organizations.OrganizationResource;
@@ -63,6 +65,35 @@ public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
                 .build())
             .as(StepVerifier::create)
             .expectNext(AssignOrganizationDefaultIsolationSegmentResponse.builder()
+                .data(Relationship.builder()
+                    .id("9d8e007c-ce52-4ea7-8a57-f2825d2c6b39")
+                    .build())
+                .link("self", Link.builder()
+                    .href("/v3/organizations/d4c91047-7b29-4fda-b7f9-04033e5c9c9f/relationships/default_isolation_segment")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void getDefaultIsolationSegment() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/v3/organizations/d4c91047-7b29-4fda-b7f9-04033e5c9c9f/relationships/default_isolation_segment")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v3/organizations/GET_{id}_relationships_default_isolation_segment_response.json")
+                .build())
+            .build());
+
+        this.organizations
+            .getDefaultIsolationSegment(GetOrganizationDefaultIsolationSegmentRequest.builder()
+                .organizationId("d4c91047-7b29-4fda-b7f9-04033e5c9c9f")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(GetOrganizationDefaultIsolationSegmentResponse.builder()
                 .data(Relationship.builder()
                     .id("9d8e007c-ce52-4ea7-8a57-f2825d2c6b39")
                     .build())

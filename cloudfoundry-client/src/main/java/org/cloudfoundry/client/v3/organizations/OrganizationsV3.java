@@ -19,7 +19,7 @@ package org.cloudfoundry.client.v3.organizations;
 import reactor.core.publisher.Mono;
 
 /**
- * Main entry point to the Cloud Foundry Organizations Client API
+ * Main entry point to the Cloud Foundry Organizations V3 Client API
  */
 public interface OrganizationsV3 {
 
@@ -30,6 +30,14 @@ public interface OrganizationsV3 {
      * @return the response from the Assign Default Isolation Segment request
      */
     Mono<AssignOrganizationDefaultIsolationSegmentResponse> assignDefaultIsolationSegment(AssignOrganizationDefaultIsolationSegmentRequest request);
+
+    /**
+     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#get-default-isolation-segment">Get Default Isolation Segment</a> request
+     *
+     * @param request the Get Default Isolation Segment request
+     * @return the response from the Get Default Isolation Segment request
+     */
+    Mono<GetOrganizationDefaultIsolationSegmentResponse> getDefaultIsolationSegment(GetOrganizationDefaultIsolationSegmentRequest request);
 
     /**
      * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#list-organizations">List Organizations</a> request
