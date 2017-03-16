@@ -39,6 +39,13 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     //TODO: Await 1.10 test environment
     @Ignore("Await 1.10 test environment")
     @Test
+    public void getDefaultOrganizationSegment() throws TimeoutException, InterruptedException {
+        //
+    }
+
+    //TODO: Await 1.10 test environment
+    @Ignore("Await 1.10 test environment")
+    @Test
     public void list() throws TimeoutException, InterruptedException {
         //
     }

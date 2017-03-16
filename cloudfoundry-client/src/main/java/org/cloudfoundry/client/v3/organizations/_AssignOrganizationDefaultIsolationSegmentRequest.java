@@ -18,6 +18,7 @@ package org.cloudfoundry.client.v3.organizations;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.Relationship;
 import org.immutables.value.Value;
 
@@ -31,6 +32,7 @@ abstract class _AssignOrganizationDefaultIsolationSegmentRequest {
      * The isolation segment to assign
      */
     @JsonProperty("data")
+    @Nullable
     abstract Relationship getData();
 
     /**
