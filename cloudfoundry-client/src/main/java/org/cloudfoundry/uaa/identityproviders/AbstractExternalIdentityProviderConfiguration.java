@@ -34,4 +34,11 @@ abstract class AbstractExternalIdentityProviderConfiguration extends AbstractIde
     @Nullable
     abstract List<String> getExternalGroupsWhitelist();
 
+    /**
+     * Set to true, to store custom user attributes to be fetched from the /userinfo endpoint
+     */
+    @JsonProperty("storeCustomAttributes")
+    @Nullable
+    abstract Boolean getStoreCustomAttributes();
+
 }

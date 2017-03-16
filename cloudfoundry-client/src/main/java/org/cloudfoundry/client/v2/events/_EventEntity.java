@@ -76,6 +76,13 @@ abstract class _EventEntity {
     abstract String getActorType();
 
     /**
+     * The actor name
+     */
+    @JsonProperty("actor_username")
+    @Nullable
+    abstract String getActorUserName();
+
+    /**
      * The metadatas
      */
     @AllowNulls

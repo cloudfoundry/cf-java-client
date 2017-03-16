@@ -17,6 +17,7 @@
 package org.cloudfoundry.uaa.users;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.cloudfoundry.Nullable;
 
 import java.util.List;
 
@@ -38,6 +39,13 @@ public abstract class AbstractUserSummary extends AbstractUserId {
     public abstract List<Email> getEmail();
 
     /**
+     * The unix epoch timestamp of when the user last authenticated
+     */
+    @JsonProperty("lastLogonTime")
+    @Nullable
+    public abstract Long getLastLogonTime();
+
+    /**
      * Metadata for the result
      */
     @JsonProperty("meta")
@@ -54,6 +62,13 @@ public abstract class AbstractUserSummary extends AbstractUserId {
      */
     @JsonProperty("passwordLastModified")
     public abstract String getPasswordLastModified();
+
+    /**
+     * The unix epoch timestamp of when the user last authenticated
+     */
+    @JsonProperty("previousLogonTime")
+    @Nullable
+    public abstract Long getPreviousLoginTime();
 
     /**
      * The schemas

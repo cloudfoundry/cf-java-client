@@ -45,11 +45,11 @@ public @interface IfCloudFoundryVersion {
 
     enum CloudFoundryVersion {
 
-        PCF_1_7(Version.forIntegers(2, 54, 0)),
-
         PCF_1_8(Version.forIntegers(2, 58, 0)),
 
         PCF_1_9(Version.forIntegers(2, 65, 0)),
+
+        PCF_1_10(Version.forIntegers(2, 75, 0)),
 
         UNSPECIFIED(Version.forIntegers(0));
 

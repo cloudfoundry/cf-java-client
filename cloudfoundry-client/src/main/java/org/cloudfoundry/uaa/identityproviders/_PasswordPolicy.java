@@ -18,6 +18,7 @@ package org.cloudfoundry.uaa.identityproviders;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
@@ -68,5 +69,12 @@ abstract class _PasswordPolicy {
      */
     @JsonProperty("expirePasswordInMonths")
     abstract Integer getPasswordExpirationInMonth();
+
+    /**
+     * This timestamp value can be used to force change password for every user. If the user’s passwordLastModified is older than this value, the password is expired (defaults to null).
+     */
+    @JsonProperty("passwordNewerThan")
+    @Nullable
+    abstract Integer getPasswordNewerThan();
 
 }

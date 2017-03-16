@@ -37,6 +37,13 @@ abstract class _ServicePlanEntity {
     abstract Boolean getActive();
 
     /**
+     * The bindable flag
+     */
+    @JsonProperty("bindable")
+    @Nullable
+    abstract Boolean getBindable();
+
+    /**
      * The description
      */
     @JsonProperty("description")

@@ -23,7 +23,9 @@
       "lifecycle": {
         "type": "buildpack",
         "data": {
-          "buildpack": "name-2374",
+          "buildpacks": [
+            "name-2374"
+          ],
           "stack": "name-2375"
         }
       },
@@ -73,7 +75,9 @@
       "lifecycle": {
         "type": "buildpack",
         "data": {
-          "buildpack": "name-2372",
+          "buildpacks": [
+            "name-2372"
+          ],
           "stack": "name-2373"
         }
       },

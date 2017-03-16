@@ -34,6 +34,7 @@ abstract class AbstractMetadata {
      * URL to which the app is linked
      */
     @JsonProperty("appLaunchUrl")
+    @Nullable
     abstract String getAppLaunchUrl();
 
     /**

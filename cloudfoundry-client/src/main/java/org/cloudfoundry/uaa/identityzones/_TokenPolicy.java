@@ -61,6 +61,20 @@ abstract class _TokenPolicy {
     abstract Map<String, Object> getKeys();
 
     /**
+     * The format for the refresh token
+     */
+    @JsonProperty("refreshTokenFormat")
+    @Nullable
+    abstract RefreshTokenFormat getRefreshTokenFormat();
+
+    /**
+     * If true, uaa will only issue one refresh token per client_id/user_id combination
+     */
+    @JsonProperty("refreshTokenUnique")
+    @Nullable
+    abstract Boolean getRefreshTokenUnique();
+
+    /**
      * Time in seconds between when a refresh token is issued and when it expires
      */
     @JsonProperty("refreshTokenValidity")
