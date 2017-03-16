@@ -18,6 +18,9 @@ package org.cloudfoundry.reactor.client.v3.spaces;
 
 import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.Pagination;
+import org.cloudfoundry.client.v3.Relationship;
+import org.cloudfoundry.client.v3.spaces.AssignSpaceIsolationSegmentRequest;
+import org.cloudfoundry.client.v3.spaces.AssignSpaceIsolationSegmentResponse;
 import org.cloudfoundry.client.v3.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v3.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v3.spaces.SpaceResource;
@@ -29,14 +32,47 @@ import org.junit.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
-import java.util.Collections;
 
 import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.PATCH;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public class ReactorSpacesV3Test extends AbstractClientApiTest {
 
     private final ReactorSpacesV3 spaces = new ReactorSpacesV3(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+
+    @Test
+    public void assignDefaultIsolationSegment() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(PATCH).path("/v3/spaces/885735b5-aea4-4cf5-8e44-961af0e41920/relationships/isolation_segment")
+                .payload("fixtures/client/v3/spaces/PATCH_{id}_relationships_isolation_segment_request.json")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v3/spaces/PATCH_{id}_relationships_isolation_segment_response.json")
+                .build())
+            .build());
+
+        this.spaces
+            .assignIsolationSegment(AssignSpaceIsolationSegmentRequest.builder()
+                .data(Relationship.builder()
+                    .id("e4c91047-3b29-4fda-b7f9-04033e5a9c9f")
+                    .build())
+                .spaceId("885735b5-aea4-4cf5-8e44-961af0e41920")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(AssignSpaceIsolationSegmentResponse.builder()
+                .data(Relationship.builder()
+                    .id("e4c91047-3b29-4fda-b7f9-04033e5a9c9f")
+                    .build())
+                .link("self", Link.builder()
+                    .href("/v3/spaces/885735b5-aea4-4cf5-8e44-961af0e41920/relationships/isolation_segment")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
 
     @Test
     public void list() {
