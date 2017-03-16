@@ -27,6 +27,8 @@ import org.cloudfoundry.client.v3.isolationsegments.DeleteIsolationSegmentReques
 import org.cloudfoundry.client.v3.isolationsegments.GetIsolationSegmentRequest;
 import org.cloudfoundry.client.v3.isolationsegments.GetIsolationSegmentResponse;
 import org.cloudfoundry.client.v3.isolationsegments.IsolationSegmentResource;
+import org.cloudfoundry.client.v3.isolationsegments.ListIsolationSegmentEntitledOrganizationsRequest;
+import org.cloudfoundry.client.v3.isolationsegments.ListIsolationSegmentEntitledOrganizationsResponse;
 import org.cloudfoundry.client.v3.isolationsegments.ListIsolationSegmentOrganizationsRelationshipRequest;
 import org.cloudfoundry.client.v3.isolationsegments.ListIsolationSegmentOrganizationsRelationshipResponse;
 import org.cloudfoundry.client.v3.isolationsegments.ListIsolationSegmentSpacesRelationshipRequest;
@@ -36,6 +38,7 @@ import org.cloudfoundry.client.v3.isolationsegments.ListIsolationSegmentsRespons
 import org.cloudfoundry.client.v3.isolationsegments.RemoveIsolationSegmentOrganizationEntitlementRequest;
 import org.cloudfoundry.client.v3.isolationsegments.UpdateIsolationSegmentRequest;
 import org.cloudfoundry.client.v3.isolationsegments.UpdateIsolationSegmentResponse;
+import org.cloudfoundry.client.v3.organizations.OrganizationResource;
 import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
@@ -275,6 +278,51 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
                         .build())
                     .name("an_isolation_segment4")
                     .updatedAt("2016-11-08T16:41:26Z")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void listEntitledOrganizations() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/v3/isolation_segments/933b4c58-120b-499a-b85d-4b6fc9e2903b/organizations")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v3/isolationsegments/GET_{id}_organizations_response.json")
+                .build())
+            .build());
+
+        this.isolationSegments
+            .listEntitledOrganizations(ListIsolationSegmentEntitledOrganizationsRequest.builder()
+                .isolationSegmentId("933b4c58-120b-499a-b85d-4b6fc9e2903b")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ListIsolationSegmentEntitledOrganizationsResponse.builder()
+                .pagination(Pagination.builder()
+                    .first(Link.builder()
+                        .href("/v3/isolation_segments/933b4c58-120b-499a-b85d-4b6fc9e2903b/organizations?page=1&per_page=50")
+                        .build())
+                    .last(Link.builder()
+                        .href("/v3/isolation_segments/933b4c58-120b-499a-b85d-4b6fc9e2903b/organizations?page=1&per_page=50")
+                        .build())
+                    .totalPages(1)
+                    .totalResults(2)
+                    .build())
+                .resource(OrganizationResource.builder()
+                    .createdAt("2017-02-01T01:33:58Z")
+                    .id("885735b5-aea4-4cf5-8e44-961af0e41920")
+                    .name("org1")
+                    .updatedAt("2017-02-01T01:33:58Z")
+                    .build())
+                .resource(OrganizationResource.builder()
+                    .createdAt("2017-02-02T00:14:30Z")
+                    .id("d4c91047-7b29-4fda-b7f9-04033e5c9c9f")
+                    .name("org2")
+                    .updatedAt("2017-02-02T00:14:30Z")
                     .build())
                 .build())
             .expectComplete()
