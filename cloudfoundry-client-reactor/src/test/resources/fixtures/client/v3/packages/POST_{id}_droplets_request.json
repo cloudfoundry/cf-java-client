@@ -5,7 +5,9 @@
   "lifecycle": {
     "type": "buildpack",
     "data": {
-      "buildpack": "http://github.com/myorg/awesome-buildpack",
+      "buildpacks": [
+        "http://github.com/myorg/awesome-buildpack"
+      ],
       "stack": "cflinuxfs2"
     }
   }

@@ -102,6 +102,13 @@ public abstract class AbstractApplicationEntity {
     public abstract Map<String, Object> getEnvironmentJsons();
 
     /**
+     * The health check HTTP endpoint
+     */
+    @JsonProperty("health_check_http_endpoint")
+    @Nullable
+    public abstract String getHealthCheckHttpEndpoint();
+
+    /**
      * The health check timeout
      */
     @JsonProperty("health_check_timeout")

@@ -19,7 +19,6 @@
       "lifecycle": {
         "type": "buildpack",
         "data": {
-          "buildpack": null,
           "stack": null
         }
       },
@@ -34,7 +33,9 @@
           "type": "sha1",
           "value": "0cd90dd63dd9f42db25340445d203fba25c69cf6"
         },
-        "buildpack": "ruby 1.6.14",
+        "buildpacks": [
+          "ruby 1.6.14"
+        ],
         "stack": "cflinuxfs2"
       },
       "environment_variables": {

@@ -61,6 +61,13 @@ abstract class _UnionServiceInstanceEntity extends BaseServiceInstanceEntity {
     abstract String getRouteServiceUrl();
 
     /**
+     * The service id
+     */
+    @JsonProperty("service_guid")
+    @Nullable
+    abstract String getServiceId();
+
+    /**
      * The service keys url
      */
     @JsonProperty("service_keys_url")
@@ -80,6 +87,13 @@ abstract class _UnionServiceInstanceEntity extends BaseServiceInstanceEntity {
     @JsonProperty("service_plan_url")
     @Nullable
     abstract String getServicePlanUrl();
+
+    /**
+     * The service url
+     */
+    @JsonProperty("service_url")
+    @Nullable
+    abstract String getServiceUrl();
 
     /**
      * The url for the syslog_drain to direct to

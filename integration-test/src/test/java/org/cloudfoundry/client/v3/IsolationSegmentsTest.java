@@ -17,6 +17,7 @@
 package org.cloudfoundry.client.v3;
 
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.IfCloudFoundryVersion;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -24,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.concurrent.TimeoutException;
 
+@IfCloudFoundryVersion(greaterThanOrEqualTo = IfCloudFoundryVersion.CloudFoundryVersion.PCF_1_10)
 public final class IsolationSegmentsTest extends AbstractIntegrationTest {
 
     @Autowired

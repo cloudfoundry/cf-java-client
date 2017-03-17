@@ -8,7 +8,9 @@
   "lifecycle": {
     "type": "buildpack",
     "data": {
-      "buildpack": "name-2438",
+      "buildpacks": [
+        "name-2438"
+      ],
       "stack": "name-2439"
     }
   },

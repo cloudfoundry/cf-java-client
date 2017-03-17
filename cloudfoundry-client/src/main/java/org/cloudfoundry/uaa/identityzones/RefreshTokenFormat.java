@@ -14,41 +14,32 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.uaa.groups;
+package org.cloudfoundry.uaa.identityzones;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
-/**
- * The member type of the group
- */
-public enum MemberType {
+public enum RefreshTokenFormat {
 
-    /**
-     * The group type
-     */
-    GROUP("GROUP"),
+    JWT("jwt"),
 
-    /**
-     * The user type
-     */
-    USER("USER");
+    OPAQUE("opaque");
 
     private final String value;
 
-    MemberType(String value) {
+    RefreshTokenFormat(String value) {
         this.value = value;
     }
 
     @JsonCreator
-    public static MemberType from(String s) {
+    public static RefreshTokenFormat from(String s) {
         switch (s.toLowerCase()) {
-            case "group":
-                return GROUP;
-            case "user":
-                return USER;
+            case "jwt":
+                return JWT;
+            case "opaque":
+                return OPAQUE;
             default:
-                throw new IllegalArgumentException(String.format("Unknown member type: %s", s));
+                throw new IllegalArgumentException(String.format("Unknown refresh token format: %s", s));
         }
     }
 
@@ -61,5 +52,4 @@ public enum MemberType {
     public String toString() {
         return getValue();
     }
-
 }

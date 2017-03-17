@@ -23,15 +23,16 @@ import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.Hash;
 import org.immutables.value.Value;
 
+import java.util.List;
 import java.util.Map;
 
 @JsonDeserialize
 @Value.Immutable
 abstract class _StagedResult implements Result {
 
-    @JsonProperty("buildpack")
+    @JsonProperty("buildpacks")
     @Nullable
-    abstract String getBuildpack();
+    abstract List<String> getBuildpacks();
 
     @JsonProperty("execution_metadata")
     @Nullable

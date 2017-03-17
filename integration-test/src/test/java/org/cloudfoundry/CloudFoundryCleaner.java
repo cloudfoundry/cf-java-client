@@ -61,8 +61,6 @@ import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedS
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstancesRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstanceResource;
 import org.cloudfoundry.client.v2.users.UserResource;
-import org.cloudfoundry.client.v3.packages.DeletePackageRequest;
-import org.cloudfoundry.client.v3.packages.ListPackagesRequest;
 import org.cloudfoundry.uaa.UaaClient;
 import org.cloudfoundry.uaa.clients.DeleteClientRequest;
 import org.cloudfoundry.uaa.clients.ListClientsRequest;
@@ -137,7 +135,6 @@ final class CloudFoundryCleaner {
                 cleanGroups(this.uaaClient, this.nameFactory),
                 cleanIdentityProviders(this.uaaClient, this.nameFactory),
                 cleanIdentityZones(this.uaaClient, this.nameFactory),
-                cleanPackages(this.cloudFoundryClient),
                 cleanRoutes(this.cloudFoundryClient, this.nameFactory),
                 cleanSecurityGroups(this.cloudFoundryClient, this.nameFactory),
                 cleanServiceBrokers(this.cloudFoundryClient, this.nameFactory),
@@ -146,7 +143,6 @@ final class CloudFoundryCleaner {
                 cleanUsers(this.uaaClient, this.nameFactory)
             ))
             .thenMany(cleanApplicationsV2(this.cloudFoundryClient, this.nameFactory)) // After Routes, cannot run with other cleanApps
-            .thenMany(cleanApplicationsV3(this.cloudFoundryClient, this.nameFactory)) // After Routes, cannot run with other cleanApps
             .thenMany(Mono.when( // After Routes/Applications
                 cleanPrivateDomains(this.cloudFoundryClient, this.nameFactory),
                 cleanSharedDomains(this.cloudFoundryClient, this.nameFactory),
@@ -176,20 +172,6 @@ final class CloudFoundryCleaner {
                     .applicationId(ResourceUtils.getId(application))
                     .build())
                 .doOnError(t -> LOGGER.error("Unable to delete V2 application {}", ResourceUtils.getEntity(application).getName(), t)));
-    }
-
-    private static Flux<Void> cleanApplicationsV3(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
-        return PaginationUtils
-            .requestClientV3Resources(page -> cloudFoundryClient.applicationsV3()
-                .list(org.cloudfoundry.client.v3.applications.ListApplicationsRequest.builder()
-                    .page(page)
-                    .build()))
-            .filter(application -> nameFactory.isApplicationName(application.getName()))
-            .flatMap(application -> cloudFoundryClient.applicationsV3()
-                .delete(org.cloudfoundry.client.v3.applications.DeleteApplicationRequest.builder()
-                    .applicationId(application.getId())
-                    .build())
-                .doOnError(t -> LOGGER.error("Unable to delete V3 application {}", application.getName(), t)));
     }
 
     private static Flux<Void> cleanBuildpacks(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
@@ -322,20 +304,6 @@ final class CloudFoundryCleaner {
                     .build())
                 .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, Duration.ofMinutes(5), job))
                 .doOnError(t -> LOGGER.error("Unable to delete organization {}", ResourceUtils.getEntity(organization).getName(), t)));
-    }
-
-    private static Flux<Void> cleanPackages(CloudFoundryClient cloudFoundryClient) {
-        return PaginationUtils
-            .requestClientV3Resources(page -> cloudFoundryClient.packages()
-                .list(ListPackagesRequest.builder()
-                    .page(page)
-                    .build()))
-            .filter(p -> true)
-            .flatMap(p -> cloudFoundryClient.packages()
-                .delete(DeletePackageRequest.builder()
-                    .packageId(p.getId())
-                    .build())
-                .doOnError(t -> LOGGER.error("Unable to delete package", t)));
     }
 
     private static Flux<Void> cleanPrivateDomains(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {

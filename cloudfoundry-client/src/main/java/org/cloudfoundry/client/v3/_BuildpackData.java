@@ -21,6 +21,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
+import java.util.List;
+
 @JsonDeserialize
 @Value.Immutable
 abstract class _BuildpackData implements Data {
@@ -28,9 +30,9 @@ abstract class _BuildpackData implements Data {
     /**
      * The buildpack
      */
-    @JsonProperty("buildpack")
+    @JsonProperty("buildpacks")
     @Nullable
-    abstract String getBuildpack();
+    abstract List<String> getBuildpacks();
 
     /**
      * The stack

@@ -8,7 +8,9 @@
   "lifecycle": {
     "type": "buildpack",
     "data": {
-      "buildpack": "http://gitwheel.org/my-app",
+      "buildpacks": [
+        "http://gitwheel.org/my-app"
+      ],
       "stack": "redhat"
     }
   },

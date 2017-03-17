@@ -17,6 +17,7 @@
 package org.cloudfoundry.client.v3;
 
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.IfCloudFoundryVersion;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v3.applications.Application;
 import org.cloudfoundry.client.v3.applications.CreateApplicationRequest;
@@ -26,6 +27,7 @@ import org.cloudfoundry.client.v3.packages.GetPackageRequest;
 import org.cloudfoundry.client.v3.packages.Package;
 import org.cloudfoundry.client.v3.packages.PackageType;
 import org.cloudfoundry.client.v3.packages.UploadPackageRequest;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -41,6 +43,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.client.v3.packages.State.PROCESSING_UPLOAD;
 import static org.cloudfoundry.client.v3.packages.State.READY;
 
+@Ignore("Until Packages are no longer experimental")
 public final class PackagesTest extends AbstractIntegrationTest {
 
     @Autowired
