@@ -19,7 +19,7 @@ package org.cloudfoundry.client.v2.securitygroups;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.QueryParameter;
-import org.cloudfoundry.client.v2.InFilterParameter;
+import org.cloudfoundry.client.v2.FilterParameter;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 import org.immutables.value.Value;
 
@@ -34,28 +34,28 @@ abstract class _ListSecurityGroupSpacesRequest extends PaginatedRequest {
     /**
      * The application ids
      */
-    @InFilterParameter("app_guid")
+    @FilterParameter("app_guid")
     @Nullable
     abstract List<String> getApplicationIds();
 
     /**
      * The developer ids
      */
-    @InFilterParameter("developer_guid")
+    @FilterParameter("developer_guid")
     @Nullable
     abstract List<String> getDeveloperIds();
 
     /**
      * The names
      */
-    @InFilterParameter("name")
+    @FilterParameter("name")
     @Nullable
     abstract List<String> getNames();
 
     /**
      * The organization ids
      */
-    @InFilterParameter("organization_guid")
+    @FilterParameter("organization_guid")
     @Nullable
     abstract List<String> getOrganizationIds();
 

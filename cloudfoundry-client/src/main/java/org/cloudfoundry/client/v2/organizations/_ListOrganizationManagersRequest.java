@@ -18,7 +18,7 @@ package org.cloudfoundry.client.v2.organizations;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v2.InFilterParameter;
+import org.cloudfoundry.client.v2.FilterParameter;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 import org.immutables.value.Value;
 
@@ -33,35 +33,35 @@ abstract class _ListOrganizationManagersRequest extends PaginatedRequest {
     /**
      * The audited organization ids
      */
-    @InFilterParameter("audited_organization_guid")
+    @FilterParameter("audited_organization_guid")
     @Nullable
     abstract List<String> getAuditedOrganizationIds();
 
     /**
      * The audited space ids
      */
-    @InFilterParameter("audited_space_guid")
+    @FilterParameter("audited_space_guid")
     @Nullable
     abstract List<String> getAuditedSpaceIds();
 
     /**
      * The billing managed organization ids
      */
-    @InFilterParameter("billing_managed_organization_guid")
+    @FilterParameter("billing_managed_organization_guid")
     @Nullable
     abstract List<String> getBillingManagedOrganizationIds();
 
     /**
      * The managed organization ids
      */
-    @InFilterParameter("managed_organization_guid")
+    @FilterParameter("managed_organization_guid")
     @Nullable
     abstract List<String> getManagedOrganizationIds();
 
     /**
      * The managed space ids
      */
-    @InFilterParameter("managed_space_guid")
+    @FilterParameter("managed_space_guid")
     @Nullable
     abstract List<String> getManagedSpaceIds();
 
@@ -74,7 +74,7 @@ abstract class _ListOrganizationManagersRequest extends PaginatedRequest {
     /**
      * The space ids
      */
-    @InFilterParameter("space_guid")
+    @FilterParameter("space_guid")
     @Nullable
     abstract List<String> getSpaceIds();
 

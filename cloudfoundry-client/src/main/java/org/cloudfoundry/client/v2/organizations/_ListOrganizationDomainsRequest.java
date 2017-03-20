@@ -18,7 +18,7 @@ package org.cloudfoundry.client.v2.organizations;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v2.InFilterParameter;
+import org.cloudfoundry.client.v2.FilterParameter;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 import org.immutables.value.Value;
 
@@ -33,7 +33,7 @@ abstract class _ListOrganizationDomainsRequest extends PaginatedRequest {
     /**
      * The names
      */
-    @InFilterParameter("name")
+    @FilterParameter("name")
     @Nullable
     abstract List<String> getNames();
 
@@ -46,7 +46,7 @@ abstract class _ListOrganizationDomainsRequest extends PaginatedRequest {
     /**
      * The owning organization ids
      */
-    @InFilterParameter("owning_organization_guid")
+    @FilterParameter("owning_organization_guid")
     @Nullable
     abstract List<String> getOwningOrganizationIds();
 

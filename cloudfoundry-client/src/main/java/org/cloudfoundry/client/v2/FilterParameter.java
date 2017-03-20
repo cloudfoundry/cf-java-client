@@ -24,20 +24,85 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import static org.cloudfoundry.client.v2.FilterParameter.Operation.IN;
+import static org.cloudfoundry.client.v2.FilterParameter.Operation.IS;
+
 /**
  * An annotation indicating that a method represents a Cloud Foundry V2 filter parameter
  */
-@Target(ElementType.ANNOTATION_TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-@JsonIgnore
 @JacksonAnnotationsInside
+@JsonIgnore
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
 public @interface FilterParameter {
 
     /**
-     * The filter's operator
+     * Returns the collection operation for the filter.  Defaults to {@link Operation#IN}
      *
-     * @return the filter's operator
+     * @return the collection operation for the filter
      */
-    String operator();
+    Operation collectionOperation() default IN;
+
+    /**
+     * Returns the operation for the filter.  Defaults to {@link Operation#IS}
+     *
+     * @return the operation for the filter
+     */
+    Operation operation() default IS;
+
+    /**
+     * Returns the name of the parameter
+     *
+     * @return the name of the parameter
+     */
+    String value();
+
+    /**
+     * Operations in a Cloud Foundry V2 filter
+     */
+    enum Operation {
+
+        /**
+         * Greater than or equal to.  Renders to {@code >}.
+         */
+        GREATER_THAN(">"),
+
+        /**
+         * Greater than or equal to.  Renders to {@code >=}.
+         */
+        GREATER_THAN_OR_EQUAL_TO(">="),
+
+        /**
+         * In.  Renders to {@code  IN }.
+         */
+        IN(" IN "),
+
+        /**
+         * Is.  Renders to {@code :}.
+         */
+        IS(":"),
+
+        /**
+         * Less than.  Renders to {@code <}.
+         */
+        LESS_THAN("<"),
+
+        /**
+         * Less than or equal to.  Renders to {@code <=}.
+         */
+        LESS_THAN_OR_EQUAL_TO("<=");
+
+        private final String value;
+
+        Operation(String value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return this.value;
+        }
+
+    }
 
 }

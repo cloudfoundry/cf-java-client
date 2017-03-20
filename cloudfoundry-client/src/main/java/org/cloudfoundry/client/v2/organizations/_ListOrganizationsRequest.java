@@ -17,7 +17,7 @@
 package org.cloudfoundry.client.v2.organizations;
 
 import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v2.InFilterParameter;
+import org.cloudfoundry.client.v2.FilterParameter;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 import org.immutables.value.Value;
 
@@ -32,49 +32,49 @@ abstract class _ListOrganizationsRequest extends PaginatedRequest {
     /**
      * The auditor ids
      */
-    @InFilterParameter("auditor_guid")
+    @FilterParameter("auditor_guid")
     @Nullable
     abstract List<String> getAuditorIds();
 
     /**
      * The billing manager ids
      */
-    @InFilterParameter("billing_manager_guid")
+    @FilterParameter("billing_manager_guid")
     @Nullable
     abstract List<String> getBillingManagerIds();
 
     /**
      * The manager ids
      */
-    @InFilterParameter("manager_guid")
+    @FilterParameter("manager_guid")
     @Nullable
     abstract List<String> getManagerIds();
 
     /**
      * The names
      */
-    @InFilterParameter("name")
+    @FilterParameter("name")
     @Nullable
     abstract List<String> getNames();
 
     /**
      * The space ids
      */
-    @InFilterParameter("space_guid")
+    @FilterParameter("space_guid")
     @Nullable
     abstract List<String> getSpaceIds();
 
     /**
      * The statuses
      */
-    @InFilterParameter("status")
+    @FilterParameter("status")
     @Nullable
     abstract List<String> getStatuses();
 
     /**
      * The user ids
      */
-    @InFilterParameter("user_guid")
+    @FilterParameter("user_guid")
     @Nullable
     abstract List<String> getUserIds();
 

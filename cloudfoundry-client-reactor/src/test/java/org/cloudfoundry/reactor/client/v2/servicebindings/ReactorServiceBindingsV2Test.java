@@ -186,7 +186,7 @@ public final class ReactorServiceBindingsV2Test extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/service_bindings?q=app_guid%20IN%20dd44fd4f-5e20-4c52-b66d-7af6e201f01e&page=-1")
+                .method(GET).path("/v2/service_bindings?q=app_guid:dd44fd4f-5e20-4c52-b66d-7af6e201f01e&page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)

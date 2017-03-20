@@ -22,6 +22,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,39 +35,65 @@ public final class QueryBuilderTest {
 
         QueryBuilder.augment(builder, new StubQueryParamsSubClass());
 
-        MultiValueMap<String, String> queryParams = builder.build().getQueryParams();
-        assertThat(queryParams).hasSize(3);
+        MultiValueMap<String, String> queryParams = builder.build().encode().getQueryParams();
 
-        assertThat(queryParams.getFirst("test-parameter-1")).isEqualTo("test-value-1,test-value-2");
-        assertThat(queryParams.getFirst("test-parameter-3")).isEqualTo("test-value-3");
-        assertThat(queryParams.getFirst("test-parameter-4")).isEqualTo("test-value-4 test-value-5");
+        assertThat(queryParams).hasSize(5);
+        assertThat(queryParams.getFirst("test-single")).isEqualTo("test-value-1");
+        assertThat(queryParams.getFirst("test-collection")).isEqualTo("test-value-2,test-value-3");
+        assertThat(queryParams.getFirst("test-collection-custom-delimiter")).isEqualTo("test-value-4%20test-value-5");
+        assertThat(queryParams.getFirst("test-subclass")).isEqualTo("test-value-6");
+        assertThat(queryParams.getFirst("test-override")).isEqualTo("test-value-7");
     }
 
-    private static abstract class StubQueryParams {
+    public static abstract class StubQueryParams {
 
-        @QueryParameter("test-parameter-2")
-        final String getNull() {
+        @QueryParameter("test-collection")
+        public final List<String> getCollection() {
+            return Arrays.asList("test-value-2", "test-value-3");
+        }
+
+        @QueryParameter(value = "test-collection-custom-delimiter", delimiter = " ")
+        public final List<String> getCollectionCustomDelimiter() {
+            return Arrays.asList("test-value-4", "test-value-5");
+        }
+
+        @QueryParameter("test-empty")
+        public final List<String> getEmpty() {
+            return Collections.emptyList();
+        }
+
+        @QueryParameter("test-empty-value")
+        public final String getEmptyValue() {
+            return "";
+        }
+
+        @QueryParameter("test-null")
+        public final String getNull() {
             return null;
         }
 
-        @QueryParameter("test-parameter-1")
-        final List<String> getParameter1() {
-            return Arrays.asList("test-value-1", "test-value-2");
+        @QueryParameter("test-single")
+        public final String getSingle() {
+            return "test-value-1";
         }
+
+        @QueryParameter("test-override")
+        abstract String getOverride();
 
     }
 
-    private static final class StubQueryParamsSubClass extends StubQueryParams {
+    public static final class StubQueryParamsSubClass extends StubQueryParams {
 
-        @QueryParameter("test-parameter-3")
-        String getParameter2() {
-            return "test-value-3";
+        @Override
+        public String getOverride() {
+            return "test-value-7";
         }
 
-        @QueryParameter(value = "test-parameter-4", delimiter = " ")
-        List<String> getParameter4() {
-            return Arrays.asList("test-value-4", "test-value-5");
+        @QueryParameter("test-subclass")
+        public String getSubclass() {
+            return "test-value-6";
         }
+
     }
 
 }

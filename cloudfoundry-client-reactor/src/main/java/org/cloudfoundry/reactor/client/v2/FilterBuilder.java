@@ -18,17 +18,17 @@ package org.cloudfoundry.reactor.client.v2;
 
 import org.cloudfoundry.client.v2.FilterParameter;
 import org.cloudfoundry.reactor.client.MethodNameComparator;
-import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.util.ObjectUtils;
-import org.springframework.util.ReflectionUtils;
-import org.springframework.util.StringUtils;
+import org.cloudfoundry.reactor.util.AnnotationUtils;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.Exceptions;
 
-import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -46,47 +46,58 @@ final class FilterBuilder {
      * @param instance the instance to inspect and invoke
      */
     public static void augment(UriComponentsBuilder builder, Object instance) {
-        Method[] methods = ReflectionUtils.getAllDeclaredMethods(instance.getClass());
-        Arrays.sort(methods, MethodNameComparator.INSTANCE);
+        Arrays.stream(instance.getClass().getMethods())
+            .sorted(MethodNameComparator.INSTANCE)
+            .forEach(processMethod(builder, instance));
+    }
 
-        for (Method method : methods) {
-            for (Annotation annotation : AnnotationUtils.getAnnotations(method)) {
-                if (AnnotationUtils.isAnnotationMetaPresent(annotation.getClass(), FilterParameter.class)) {
-                    Object value = getValue(method, instance);
-
-                    if (value != null) {
-                        FilterParameter filterParameter = AnnotationUtils.getAnnotation(annotation, FilterParameter.class);
-
-                        Object name = AnnotationUtils.getValue(annotation);
-                        String operation = filterParameter.operator();
-
-                        builder.queryParam("q", String.format("%s%s%s", name, operation, value));
-                    }
-
-                    break;
-                }
-            }
+    private static Optional<Object> getValue(Method method, Object instance) {
+        try {
+            return Optional.ofNullable(method.invoke(instance));
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw Exceptions.propagate(e);
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private static Object getValue(Method method, Object instance) {
-        ReflectionUtils.makeAccessible(method);
-        Object value = ReflectionUtils.invokeMethod(method, instance);
+    private static Consumer<FilterParameter> processAnnotation(UriComponentsBuilder builder, Method method, Object instance) {
+        return filterParameter -> getValue(method, instance)
+            .ifPresent(processValue(builder, filterParameter));
+    }
 
-        if (!(value instanceof Collection)) {
-            return value;
-        }
-
-        List<?> collection = (List<?>) ((Collection) value).stream()
-            .filter(o -> !ObjectUtils.isEmpty(o))
+    private static void processCollection(UriComponentsBuilder builder, FilterParameter filterParameter, Object value) {
+        List<String> collection = ((Collection<?>) value).stream()
+            .map(o -> o.toString().trim())
+            .filter(s -> !s.isEmpty())
             .collect(Collectors.toList());
 
-        if (collection.isEmpty()) {
-            return null;
+        if (collection.size() == 1) {
+            processValue(builder, filterParameter.value(), filterParameter.operation(), collection.get(0));
+        } else if (collection.size() > 1) {
+            processValue(builder, filterParameter.value(), filterParameter.collectionOperation(),
+                collection.stream()
+                    .collect(Collectors.joining(",")));
         }
+    }
 
-        return StringUtils.collectionToCommaDelimitedString(collection);
+    private static Consumer<Method> processMethod(UriComponentsBuilder builder, Object instance) {
+        return method -> AnnotationUtils.findAnnotation(method, FilterParameter.class)
+            .ifPresent(processAnnotation(builder, method, instance));
+    }
+
+    private static Consumer<Object> processValue(UriComponentsBuilder builder, FilterParameter filterParameter) {
+        return value -> {
+            if (value instanceof Collection) {
+                processCollection(builder, filterParameter, value);
+            } else {
+                processValue(builder, filterParameter.value(), filterParameter.operation(), value.toString().trim());
+            }
+        };
+    }
+
+    private static void processValue(UriComponentsBuilder builder, String name, FilterParameter.Operation operation, String value) {
+        if (!value.isEmpty()) {
+            builder.queryParam("q", String.format("%s%s%s", name, operation, value));
+        }
     }
 
 }

@@ -75,7 +75,7 @@ public final class ReactorStacksTest extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/stacks?q=name%20IN%20test-name&page=-1")
+                .method(GET).path("/v2/stacks?q=name:test-name&page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)

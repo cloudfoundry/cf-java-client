@@ -18,7 +18,7 @@ package org.cloudfoundry.client.v2.serviceinstances;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v2.InFilterParameter;
+import org.cloudfoundry.client.v2.FilterParameter;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 import org.immutables.value.Value;
 
@@ -33,28 +33,28 @@ abstract class _ListServiceInstanceServiceKeysRequest extends PaginatedRequest {
     /**
      * The gateway names
      */
-    @InFilterParameter("gateway_name")
+    @FilterParameter("gateway_name")
     @Nullable
     abstract List<String> getGatewayNames();
 
     /**
      * The names
      */
-    @InFilterParameter("name")
+    @FilterParameter("name")
     @Nullable
     abstract List<String> getNames();
 
     /**
      * The organization ids
      */
-    @InFilterParameter("organization_guid")
+    @FilterParameter("organization_guid")
     @Nullable
     abstract List<String> getOrganizationIds();
 
     /**
      * The service binding ids
      */
-    @InFilterParameter("service_binding_guid")
+    @FilterParameter("service_binding_guid")
     @Nullable
     abstract List<String> getServiceBindingIds();
 
@@ -67,21 +67,21 @@ abstract class _ListServiceInstanceServiceKeysRequest extends PaginatedRequest {
     /**
      * The service key ids
      */
-    @InFilterParameter("service_key_guid")
+    @FilterParameter("service_key_guid")
     @Nullable
     abstract List<String> getServiceKeyIds();
 
     /**
      * The service plan ids
      */
-    @InFilterParameter("service_plan_guid")
+    @FilterParameter("service_plan_guid")
     @Nullable
     abstract List<String> getServicePlanIds();
 
     /**
      * The space ids
      */
-    @InFilterParameter("space_guid")
+    @FilterParameter("space_guid")
     @Nullable
     abstract List<String> getSpaceIds();
 

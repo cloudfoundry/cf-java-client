@@ -38,6 +38,6 @@ public @interface FilterParameter {
      *
      * @return the name of the parameter
      */
-    String value() default "";
+    String value();
 
 }

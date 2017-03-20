@@ -151,7 +151,7 @@ public final class ReactorServicePlansTest extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/service_plans?q=service_guid%20IN%20test-service-id&page=-1")
+                .method(GET).path("/v2/service_plans?q=service_guid:test-service-id&page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -195,7 +195,7 @@ public final class ReactorServicePlansTest extends AbstractClientApiTest {
     public void listServiceInstances() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/service_plans/test-service-plan-id/service_instances?q=space_guid%20IN%20test-space-id&page=-1")
+                .method(GET).path("/v2/service_plans/test-service-plan-id/service_instances?q=space_guid:test-space-id&page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)

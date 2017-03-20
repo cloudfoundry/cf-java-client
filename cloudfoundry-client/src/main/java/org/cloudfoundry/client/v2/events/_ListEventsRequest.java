@@ -17,8 +17,7 @@
 package org.cloudfoundry.client.v2.events;
 
 import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v2.GreaterThanOrEqualToFilterParameter;
-import org.cloudfoundry.client.v2.InFilterParameter;
+import org.cloudfoundry.client.v2.FilterParameter;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 import org.immutables.value.Value;
 
@@ -33,21 +32,21 @@ abstract class _ListEventsRequest extends PaginatedRequest {
     /**
      * The actees
      */
-    @InFilterParameter("actee")
+    @FilterParameter("actee")
     @Nullable
     abstract List<String> getActees();
 
     /**
      * The timestamps
      */
-    @GreaterThanOrEqualToFilterParameter("timestamp")
+    @FilterParameter(value = "timestamp", operation = FilterParameter.Operation.GREATER_THAN_OR_EQUAL_TO)
     @Nullable
     abstract List<String> getTimestamps();
 
     /**
      * The types
      */
-    @InFilterParameter("type")
+    @FilterParameter("type")
     @Nullable
     abstract List<String> getTypes();
 

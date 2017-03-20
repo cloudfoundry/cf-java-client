@@ -18,7 +18,7 @@ package org.cloudfoundry.client.v2.userprovidedserviceinstances;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v2.InFilterParameter;
+import org.cloudfoundry.client.v2.FilterParameter;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 import org.immutables.value.Value;
 
@@ -33,7 +33,7 @@ abstract class _ListUserProvidedServiceInstanceServiceBindingsRequest extends Pa
     /**
      * The ids of the applications
      */
-    @InFilterParameter("app_guid")
+    @FilterParameter("app_guid")
     @Nullable
     abstract List<String> getApplicationIds();
 

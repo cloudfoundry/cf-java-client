@@ -217,7 +217,7 @@ public abstract class AbstractReactorOperations {
         return uri -> uri
             .map(UriComponentsBuilder::fromUriString)
             .map(uriTransformer)
-            .map(builder -> builder.build().encode().toString());
+            .map(builder -> builder.build().encode().toUriString());
     }
 
     private Mono<HttpClientRequest> addAuthorization(Mono<HttpClientRequest> outbound) {

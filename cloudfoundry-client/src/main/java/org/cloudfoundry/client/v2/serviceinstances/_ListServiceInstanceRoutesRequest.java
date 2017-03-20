@@ -18,7 +18,7 @@ package org.cloudfoundry.client.v2.serviceinstances;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v2.InFilterParameter;
+import org.cloudfoundry.client.v2.FilterParameter;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 import org.immutables.value.Value;
 
@@ -33,35 +33,35 @@ abstract class _ListServiceInstanceRoutesRequest extends PaginatedRequest {
     /**
      * The domain id
      */
-    @InFilterParameter("domain_guid")
+    @FilterParameter("domain_guid")
     @Nullable
     abstract List<String> getDomainId();
 
     /**
      * The host
      */
-    @InFilterParameter("host")
+    @FilterParameter("host")
     @Nullable
     abstract List<String> getHost();
 
     /**
      * The organization id
      */
-    @InFilterParameter("organization_guid")
+    @FilterParameter("organization_guid")
     @Nullable
     abstract List<String> getOrganizationId();
 
     /**
      * The path
      */
-    @InFilterParameter("path")
+    @FilterParameter("path")
     @Nullable
     abstract List<String> getPath();
 
     /**
      * The port
      */
-    @InFilterParameter("port")
+    @FilterParameter("port")
     @Nullable
     abstract List<String> getPort();
 

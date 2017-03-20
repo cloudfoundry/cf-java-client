@@ -18,7 +18,7 @@ package org.cloudfoundry.client.v2.applications;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v2.InFilterParameter;
+import org.cloudfoundry.client.v2.FilterParameter;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 import org.immutables.value.Value;
 
@@ -39,7 +39,7 @@ abstract class _ListApplicationServiceBindingsRequest extends PaginatedRequest {
     /**
      * The ids of the service instances
      */
-    @InFilterParameter("service_instance_guid")
+    @FilterParameter("service_instance_guid")
     @Nullable
     abstract List<String> getServiceInstanceIds();
 
