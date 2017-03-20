@@ -447,7 +447,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/apps?q=name%20IN%20test-name&page=-1")
+                .method(GET).path("/v2/apps?q=name:test-name&page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -619,7 +619,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     public void listServiceBindings() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/apps/test-application-id/service_bindings?q=service_instance_guid%20IN%20test-instance-id&page=-1")
+                .method(GET).path("/v2/apps/test-application-id/service_bindings?q=service_instance_guid:test-instance-id&page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)

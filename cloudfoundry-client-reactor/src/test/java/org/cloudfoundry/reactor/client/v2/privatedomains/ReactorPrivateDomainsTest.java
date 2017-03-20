@@ -175,7 +175,7 @@ public final class ReactorPrivateDomainsTest extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/private_domains?q=name%20IN%20test-name.com&page=-1")
+                .method(GET).path("/v2/private_domains?q=name:test-name.com&page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)

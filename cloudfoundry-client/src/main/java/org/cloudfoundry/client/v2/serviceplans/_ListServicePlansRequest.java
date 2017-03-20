@@ -17,8 +17,7 @@
 package org.cloudfoundry.client.v2.serviceplans;
 
 import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v2.InFilterParameter;
-import org.cloudfoundry.client.v2.IsFilterParameter;
+import org.cloudfoundry.client.v2.FilterParameter;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 import org.immutables.value.Value;
 
@@ -33,28 +32,28 @@ abstract class _ListServicePlansRequest extends PaginatedRequest {
     /**
      * The active flag
      */
-    @IsFilterParameter("active")
+    @FilterParameter("active")
     @Nullable
     abstract Boolean getActive();
 
     /**
      * The service broker ids
      */
-    @InFilterParameter("service_broker_guid")
+    @FilterParameter("service_broker_guid")
     @Nullable
     abstract List<String> getServiceBrokerIds();
 
     /**
      * The service ids
      */
-    @InFilterParameter("service_guid")
+    @FilterParameter("service_guid")
     @Nullable
     abstract List<String> getServiceIds();
 
     /**
      * The service instance ids
      */
-    @InFilterParameter("service_instance_guid")
+    @FilterParameter("service_instance_guid")
     @Nullable
     abstract List<String> getServiceInstanceIds();
 

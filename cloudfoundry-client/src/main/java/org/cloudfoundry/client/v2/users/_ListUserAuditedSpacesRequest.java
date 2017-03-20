@@ -18,7 +18,7 @@ package org.cloudfoundry.client.v2.users;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v2.InFilterParameter;
+import org.cloudfoundry.client.v2.FilterParameter;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 import org.immutables.value.Value;
 
@@ -31,28 +31,28 @@ abstract class _ListUserAuditedSpacesRequest extends PaginatedRequest {
     /**
      * The application id
      */
-    @InFilterParameter("app_guid")
+    @FilterParameter("app_guid")
     @Nullable
     abstract String getApplicationId();
 
     /**
      * The developer id
      */
-    @InFilterParameter("developer_guid")
+    @FilterParameter("developer_guid")
     @Nullable
     abstract String getDeveloperId();
 
     /**
      * The name
      */
-    @InFilterParameter("name")
+    @FilterParameter("name")
     @Nullable
     abstract String getName();
 
     /**
      * The organization id
      */
-    @InFilterParameter("organization_guid")
+    @FilterParameter("organization_guid")
     @Nullable
     abstract String getOrganizationId();
 

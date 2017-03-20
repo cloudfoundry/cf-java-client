@@ -18,7 +18,7 @@ package org.cloudfoundry.client.v2.spaces;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v2.InFilterParameter;
+import org.cloudfoundry.client.v2.FilterParameter;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 import org.immutables.value.Value;
 
@@ -33,21 +33,21 @@ abstract class _ListSpaceRoutesRequest extends PaginatedRequest {
     /**
      * The domain ids
      */
-    @InFilterParameter("domain_guid")
+    @FilterParameter("domain_guid")
     @Nullable
     abstract List<String> getDomainIds();
 
     /**
      * The hosts
      */
-    @InFilterParameter("host")
+    @FilterParameter("host")
     @Nullable
     abstract List<String> getHosts();
 
     /**
      * The paths
      */
-    @InFilterParameter("path")
+    @FilterParameter("path")
     @Nullable
     abstract List<String> getPaths();
 

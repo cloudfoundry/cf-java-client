@@ -18,7 +18,7 @@ package org.cloudfoundry.client.v2.serviceusageevents;
 
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.QueryParameter;
-import org.cloudfoundry.client.v2.InFilterParameter;
+import org.cloudfoundry.client.v2.FilterParameter;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 import org.immutables.value.Value;
 
@@ -40,14 +40,14 @@ abstract class _ListServiceUsageEventsRequest extends PaginatedRequest {
     /**
      * The service ids
      */
-    @InFilterParameter("service_guid")
+    @FilterParameter("service_guid")
     @Nullable
     abstract List<String> getServiceIds();
 
     /**
      * The service instance types
      */
-    @InFilterParameter("service_instance_type")
+    @FilterParameter("service_instance_type")
     @Nullable
     abstract List<String> getServiceInstanceTypes();
 

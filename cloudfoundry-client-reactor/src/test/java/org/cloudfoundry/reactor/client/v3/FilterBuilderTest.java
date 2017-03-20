@@ -35,42 +35,56 @@ public final class FilterBuilderTest {
 
         FilterBuilder.augment(builder, new StubFilterParamsSubClass());
 
-        MultiValueMap<String, String> queryParams = builder.build().getQueryParams();
+        MultiValueMap<String, String> queryParams = builder.build().encode().getQueryParams();
 
-        assertThat(queryParams).hasSize(3);
+        assertThat(queryParams).hasSize(4);
         assertThat(queryParams.getFirst("test-single")).isEqualTo("test-value-1");
         assertThat(queryParams.getFirst("test-collection")).isEqualTo("test-value-2,test-value-3");
         assertThat(queryParams.getFirst("test-subclass")).isEqualTo("test-value-4");
+        assertThat(queryParams.getFirst("test-override")).isEqualTo("test-value-7");
     }
 
-    private static abstract class StubFilterParams {
+    public static abstract class StubFilterParams {
 
         @FilterParameter("test-collection")
-        List<String> getCollection() {
+        public final List<String> getCollection() {
             return Arrays.asList("test-value-2", "test-value-3");
         }
 
         @FilterParameter("test-empty")
-        List<String> getEmpty() {
+        public final List<String> getEmpty() {
             return Collections.emptyList();
         }
 
+        @FilterParameter("test-empty-value")
+        public final String getEmptyValue() {
+            return "";
+        }
+
         @FilterParameter("test-null")
-        String getNull() {
+        public final String getNull() {
             return null;
         }
 
         @FilterParameter("test-single")
-        String getSingle() {
+        public final String getSingle() {
             return "test-value-1";
         }
 
+        @FilterParameter("test-override")
+        abstract String getOverride();
+
     }
 
-    private static final class StubFilterParamsSubClass extends StubFilterParams {
+    public static final class StubFilterParamsSubClass extends StubFilterParams {
+
+        @Override
+        public String getOverride() {
+            return "test-value-7";
+        }
 
         @FilterParameter("test-subclass")
-        String getSubclass() {
+        public String getSubclass() {
             return "test-value-4";
         }
 

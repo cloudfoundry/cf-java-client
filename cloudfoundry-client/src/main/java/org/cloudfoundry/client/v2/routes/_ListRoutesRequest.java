@@ -17,7 +17,7 @@
 package org.cloudfoundry.client.v2.routes;
 
 import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v2.InFilterParameter;
+import org.cloudfoundry.client.v2.FilterParameter;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 import org.immutables.value.Value;
 
@@ -32,35 +32,35 @@ abstract class _ListRoutesRequest extends PaginatedRequest {
     /**
      * The domain ids
      */
-    @InFilterParameter("domain_guid")
+    @FilterParameter("domain_guid")
     @Nullable
     abstract List<String> getDomainIds();
 
     /**
      * The hosts
      */
-    @InFilterParameter("host")
+    @FilterParameter("host")
     @Nullable
     abstract List<String> getHosts();
 
     /**
      * The organization ids
      */
-    @InFilterParameter("organization_guid")
+    @FilterParameter("organization_guid")
     @Nullable
     abstract String getOrganizationId();
 
     /**
      * The paths
      */
-    @InFilterParameter("path")
+    @FilterParameter("path")
     @Nullable
     abstract List<String> getPaths();
 
     /**
      * The port
      */
-    @InFilterParameter("port")
+    @FilterParameter("port")
     @Nullable
     abstract Integer getPort();
 

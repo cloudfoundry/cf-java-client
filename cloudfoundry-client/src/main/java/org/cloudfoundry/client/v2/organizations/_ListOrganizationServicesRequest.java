@@ -18,8 +18,7 @@ package org.cloudfoundry.client.v2.organizations;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v2.InFilterParameter;
-import org.cloudfoundry.client.v2.IsFilterParameter;
+import org.cloudfoundry.client.v2.FilterParameter;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 import org.immutables.value.Value;
 
@@ -34,14 +33,14 @@ abstract class _ListOrganizationServicesRequest extends PaginatedRequest {
     /**
      * The active flag
      */
-    @IsFilterParameter("active")
+    @FilterParameter("active")
     @Nullable
     abstract Boolean getActive();
 
     /**
      * The labels
      */
-    @InFilterParameter("label")
+    @FilterParameter("label")
     @Nullable
     abstract List<String> getLabels();
 
@@ -54,14 +53,14 @@ abstract class _ListOrganizationServicesRequest extends PaginatedRequest {
     /**
      * The providers
      */
-    @InFilterParameter("provider")
+    @FilterParameter("provider")
     @Nullable
     abstract List<String> getProviders();
 
     /**
      * The service broker ids
      */
-    @InFilterParameter("service_broker_guid")
+    @FilterParameter("service_broker_guid")
     @Nullable
     abstract List<String> getServiceBrokerIds();
 

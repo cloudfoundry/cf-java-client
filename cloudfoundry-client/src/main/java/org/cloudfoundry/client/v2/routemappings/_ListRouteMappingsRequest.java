@@ -17,7 +17,7 @@
 package org.cloudfoundry.client.v2.routemappings;
 
 import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v2.InFilterParameter;
+import org.cloudfoundry.client.v2.FilterParameter;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 import org.immutables.value.Value;
 
@@ -32,14 +32,14 @@ abstract class _ListRouteMappingsRequest extends PaginatedRequest {
     /**
      * The ids of the applications
      */
-    @InFilterParameter("app_guid")
+    @FilterParameter("app_guid")
     @Nullable
     abstract List<String> getApplicationIds();
 
     /**
      * The ids of the routes
      */
-    @InFilterParameter("route_guid")
+    @FilterParameter("route_guid")
     @Nullable
     abstract List<String> getRouteIds();
 

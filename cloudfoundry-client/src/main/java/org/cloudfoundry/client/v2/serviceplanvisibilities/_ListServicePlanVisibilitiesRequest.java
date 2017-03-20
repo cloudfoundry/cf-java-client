@@ -17,7 +17,7 @@
 package org.cloudfoundry.client.v2.serviceplanvisibilities;
 
 import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v2.InFilterParameter;
+import org.cloudfoundry.client.v2.FilterParameter;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 import org.immutables.value.Value;
 
@@ -32,14 +32,14 @@ abstract class _ListServicePlanVisibilitiesRequest extends PaginatedRequest {
     /**
      * The organization ids
      */
-    @InFilterParameter("organization_guid")
+    @FilterParameter("organization_guid")
     @Nullable
     abstract List<String> getOrganizationIds();
 
     /**
      * The service plan ids
      */
-    @InFilterParameter("service_plan_guid")
+    @FilterParameter("service_plan_guid")
     @Nullable
     abstract List<String> getServicePlanIds();
 

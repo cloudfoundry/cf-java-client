@@ -19,8 +19,7 @@ package org.cloudfoundry.client.v2.routes;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.QueryParameter;
-import org.cloudfoundry.client.v2.InFilterParameter;
-import org.cloudfoundry.client.v2.IsFilterParameter;
+import org.cloudfoundry.client.v2.FilterParameter;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 import org.immutables.value.Value;
 
@@ -42,21 +41,21 @@ abstract class _ListRouteApplicationsRequest extends PaginatedRequest {
     /**
      * The diego flag
      */
-    @IsFilterParameter("diego")
+    @FilterParameter("diego")
     @Nullable
     abstract Boolean getDiego();
 
     /**
      * The names
      */
-    @InFilterParameter("name")
+    @FilterParameter("name")
     @Nullable
     abstract List<String> getNames();
 
     /**
      * The organization ids
      */
-    @InFilterParameter("organization_guid")
+    @FilterParameter("organization_guid")
     @Nullable
     abstract List<String> getOrganizationIds();
 
@@ -69,14 +68,14 @@ abstract class _ListRouteApplicationsRequest extends PaginatedRequest {
     /**
      * The space ids
      */
-    @InFilterParameter("space_guid")
+    @FilterParameter("space_guid")
     @Nullable
     abstract List<String> getSpaceIds();
 
     /**
      * The stack ids
      */
-    @InFilterParameter("stack_guid")
+    @FilterParameter("stack_guid")
     @Nullable
     abstract List<String> getStackIds();
 

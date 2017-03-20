@@ -18,16 +18,16 @@ package org.cloudfoundry.reactor.client.v3;
 
 import org.cloudfoundry.client.v3.FilterParameter;
 import org.cloudfoundry.reactor.client.MethodNameComparator;
-import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.util.ObjectUtils;
-import org.springframework.util.ReflectionUtils;
-import org.springframework.util.StringUtils;
+import org.cloudfoundry.reactor.util.AnnotationUtils;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.Exceptions;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 final class FilterBuilder {
@@ -41,40 +41,52 @@ final class FilterBuilder {
      * @param builder  the builder to augment
      * @param instance the instance to inspect and invoke
      */
-    @SuppressWarnings("unchecked")
     public static void augment(UriComponentsBuilder builder, Object instance) {
-        Method[] methods = ReflectionUtils.getAllDeclaredMethods(instance.getClass());
-        Arrays.sort(methods, MethodNameComparator.INSTANCE);
+        Arrays.stream(instance.getClass().getMethods())
+            .sorted(MethodNameComparator.INSTANCE)
+            .forEach(processMethod(builder, instance));
+    }
 
-        for (Method method : methods) {
-            FilterParameter filterParameter = AnnotationUtils.getAnnotation(method, FilterParameter.class);
-            if (filterParameter == null) {
-                continue;
-            }
-
-            String value = getValue(method, instance);
-            if (StringUtils.hasText(value)) {
-                builder.queryParam(filterParameter.value(), value);
-            }
+    private static Optional<Object> getValue(Method method, Object instance) {
+        try {
+            return Optional.ofNullable(method.invoke(instance));
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw Exceptions.propagate(e);
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private static String getValue(Method method, Object instance) {
-        ReflectionUtils.makeAccessible(method);
-        Object value = ReflectionUtils.invokeMethod(method, instance);
+    private static Consumer<FilterParameter> processAnnotation(UriComponentsBuilder builder, Method method, Object instance) {
+        return filterParameter -> getValue(method, instance)
+            .ifPresent(processValue(builder, filterParameter));
+    }
 
-        if (value == null) {
-            return "";
-        } else if (value instanceof Collection) {
-            List<?> collection = (List<?>) ((Collection) value).stream()
-                .filter(o -> !ObjectUtils.isEmpty(o))
-                .collect(Collectors.toList());
+    private static void processCollection(UriComponentsBuilder builder, String name, Object value) {
+        processValue(builder, name,
+            ((Collection<?>) value).stream()
+                .map(o -> o.toString().trim())
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.joining(",")));
+    }
 
-            return StringUtils.collectionToCommaDelimitedString(collection);
-        } else {
-            return value.toString();
+    private static Consumer<Method> processMethod(UriComponentsBuilder builder, Object instance) {
+        return method -> AnnotationUtils.findAnnotation(method, FilterParameter.class)
+            .ifPresent(processAnnotation(builder, method, instance));
+    }
+
+    private static void processValue(UriComponentsBuilder builder, String name, String value) {
+        if (!value.isEmpty()) {
+            builder.queryParam(name, value);
         }
+    }
+
+    private static Consumer<Object> processValue(UriComponentsBuilder builder, FilterParameter filterParameter) {
+        return value -> {
+            if (value instanceof Collection) {
+                processCollection(builder, filterParameter.value(), value);
+            } else {
+                processValue(builder, filterParameter.value(), value.toString());
+            }
+        };
     }
 
 }

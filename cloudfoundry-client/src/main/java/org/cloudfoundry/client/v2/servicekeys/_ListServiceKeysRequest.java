@@ -17,7 +17,7 @@
 package org.cloudfoundry.client.v2.servicekeys;
 
 import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v2.InFilterParameter;
+import org.cloudfoundry.client.v2.FilterParameter;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 import org.immutables.value.Value;
 
@@ -32,14 +32,14 @@ abstract class _ListServiceKeysRequest extends PaginatedRequest {
     /**
      * The names
      */
-    @InFilterParameter("name")
+    @FilterParameter("name")
     @Nullable
     abstract List<String> getNames();
 
     /**
      * The service instance ids
      */
-    @InFilterParameter("service_instance_guid")
+    @FilterParameter("service_instance_guid")
     @Nullable
     abstract List<String> getServiceInstanceIds();
 

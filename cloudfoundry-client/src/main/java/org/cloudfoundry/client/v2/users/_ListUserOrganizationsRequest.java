@@ -18,7 +18,7 @@ package org.cloudfoundry.client.v2.users;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v2.InFilterParameter;
+import org.cloudfoundry.client.v2.FilterParameter;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 import org.immutables.value.Value;
 
@@ -31,42 +31,42 @@ abstract class _ListUserOrganizationsRequest extends PaginatedRequest {
     /**
      * The auditor id
      */
-    @InFilterParameter("auditor_guid")
+    @FilterParameter("auditor_guid")
     @Nullable
     abstract String getAuditorId();
 
     /**
      * The billing manager id
      */
-    @InFilterParameter("billing_manager_guid")
+    @FilterParameter("billing_manager_guid")
     @Nullable
     abstract String getBillingManagerId();
 
     /**
      * The manager id
      */
-    @InFilterParameter("manager_guid")
+    @FilterParameter("manager_guid")
     @Nullable
     abstract String getManagerId();
 
     /**
      * The name
      */
-    @InFilterParameter("name")
+    @FilterParameter("name")
     @Nullable
     abstract String getName();
 
     /**
      * The space id
      */
-    @InFilterParameter("space_guid")
+    @FilterParameter("space_guid")
     @Nullable
     abstract String getSpaceId();
 
     /**
      * The status
      */
-    @InFilterParameter("status")
+    @FilterParameter("status")
     @Nullable
     abstract String getStatus();
 

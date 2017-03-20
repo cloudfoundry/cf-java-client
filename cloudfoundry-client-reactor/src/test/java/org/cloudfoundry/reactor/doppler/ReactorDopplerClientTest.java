@@ -93,7 +93,7 @@ public final class ReactorDopplerClientTest extends AbstractDopplerApiTest {
     }
 
     @Test
-    public void containerMetricsLogs() {
+    public void containerMetricsLarge() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/apps/test-application-id/containermetrics")
@@ -112,7 +112,7 @@ public final class ReactorDopplerClientTest extends AbstractDopplerApiTest {
             .as(StepVerifier::create)
             .expectNextCount(3093)
             .expectComplete()
-            .verify(Duration.ofSeconds(5));
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -193,7 +193,7 @@ public final class ReactorDopplerClientTest extends AbstractDopplerApiTest {
             .as(StepVerifier::create)
             .expectNextCount(3093)
             .expectComplete()
-            .verify(Duration.ofSeconds(5));
+            .verify(Duration.ofMinutes(5));
     }
 
 }
