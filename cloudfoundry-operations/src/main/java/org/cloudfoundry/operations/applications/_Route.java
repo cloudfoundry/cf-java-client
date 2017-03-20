@@ -16,17 +16,21 @@
 
 package org.cloudfoundry.operations.applications;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.immutables.value.Value;
 
 /**
- * The request options for the get application manifest operation
+ * Represents a route
  */
+@JsonDeserialize
 @Value.Immutable
-abstract class _GetApplicationManifestRequest {
+abstract class _Route {
 
     /**
-     * The application name
+     * The route
      */
-    abstract String getName();
+    @JsonProperty("route")
+    abstract String getRoute();
 
 }
