@@ -81,6 +81,7 @@ abstract class _ServiceUsageEventEntity {
      * The service plan name
      */
     @JsonProperty("service_plan_name")
+    @Nullable
     abstract String getServicePlanName();
 
     /**
