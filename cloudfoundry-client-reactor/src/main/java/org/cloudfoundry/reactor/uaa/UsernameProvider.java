@@ -17,81 +17,62 @@
 package org.cloudfoundry.reactor.uaa;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.impl.Base64Codec;
+import io.jsonwebtoken.SigningKeyResolver;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
-import org.cloudfoundry.uaa.tokens.GetTokenKeyRequest;
-import org.cloudfoundry.uaa.tokens.GetTokenKeyResponse;
 import org.cloudfoundry.uaa.tokens.Tokens;
 import reactor.core.publisher.Mono;
 
-import java.security.GeneralSecurityException;
-import java.security.KeyFactory;
-import java.security.PublicKey;
-import java.security.spec.X509EncodedKeySpec;
 import java.util.Optional;
-
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 final class UsernameProvider {
 
-    private static final Base64Codec BASE64 = new Base64Codec();
-
-    private static final String BEGIN = "-----BEGIN PUBLIC KEY-----";
-
-    private static final String END = "-----END PUBLIC KEY-----";
-
     private final ConnectionContext connectionContext;
+
+    private final SigningKeyResolver signingKeyResolver;
 
     private final TokenProvider tokenProvider;
 
-    private final Tokens tokens;
-
     UsernameProvider(ConnectionContext connectionContext, TokenProvider tokenProvider, Tokens tokens) {
+        this(connectionContext, new UaaSigningKeyResolver(tokens), tokenProvider);
+    }
+
+    UsernameProvider(ConnectionContext connectionContext, SigningKeyResolver signingKeyResolver, TokenProvider tokenProvider) {
         this.connectionContext = connectionContext;
         this.tokenProvider = tokenProvider;
-        this.tokens = tokens;
+        this.signingKeyResolver = signingKeyResolver;
     }
 
     Mono<String> get() {
-        return Mono
-            .when(
-                getSigningKey(this.tokens),
-                this.tokenProvider.getToken(this.connectionContext)
-                    .map(s -> s.split(" ")[1]))
-            .map(function(UsernameProvider::getUsername));
+        return getToken(this.connectionContext, this.tokenProvider)
+            .map(this::getUsername)
+            .retry(1, t -> {
+                if (t instanceof ExpiredJwtException) {
+                    this.tokenProvider.invalidate(this.connectionContext);
+                    return true;
+                }
+
+                return false;
+            });
     }
 
-    private static PublicKey generateKey(String pem) {
-        try {
-            return KeyFactory
-                .getInstance("RSA")
-                .generatePublic(new X509EncodedKeySpec(BASE64.decode(pem)));
-        } catch (GeneralSecurityException e) {
-            throw new RuntimeException(e);
-        }
+    private static Mono<String> getToken(ConnectionContext connectionContext, TokenProvider tokenProvider) {
+        return Mono.defer(() -> tokenProvider
+            .getToken(connectionContext))
+            .map(s -> s.split(" ")[1]);
     }
 
-    private static Mono<PublicKey> getSigningKey(Tokens tokens) {
-        return requestTokenKey(tokens)
-            .map(GetTokenKeyResponse::getValue)
-            .map(pem -> pem.replace(BEGIN, "").replace(END, "").trim())
-            .map(UsernameProvider::generateKey);
-    }
+    private String getUsername(String token) {
+        Jws<Claims> jws = Jwts.parser()
+            .setSigningKeyResolver(this.signingKeyResolver)
+            .parseClaimsJws(token);
 
-    private static String getUsername(PublicKey publicKey, String token) {
-        Jws<Claims> jws = Jwts.parser().setSigningKey(publicKey).parseClaimsJws(token);
         return Optional
             .ofNullable(jws.getBody().get("user_name", String.class))
             .orElseThrow(() -> new IllegalStateException("Unable to retrieve username from token"));
-    }
-
-    private static Mono<GetTokenKeyResponse> requestTokenKey(Tokens tokens) {
-        return tokens
-            .getKey(GetTokenKeyRequest.builder()
-                .build());
     }
 
 }

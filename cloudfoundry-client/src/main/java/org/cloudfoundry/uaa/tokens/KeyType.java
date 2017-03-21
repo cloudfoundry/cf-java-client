@@ -17,6 +17,7 @@
 package org.cloudfoundry.uaa.tokens;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
  * The key type
@@ -26,12 +27,18 @@ public enum KeyType {
     /**
      * The MAC key type
      */
-    MAC,
+    MAC("MAC"),
 
     /**
      * The RSA key type
      */
-    RSA;
+    RSA("RSA");
+
+    private final String value;
+
+    KeyType(String value) {
+        this.value = value;
+    }
 
     @JsonCreator
     public static KeyType from(String s) {
@@ -43,6 +50,16 @@ public enum KeyType {
             default:
                 throw new IllegalArgumentException(String.format("Unknown key type: %s", s));
         }
+    }
+
+    @JsonValue
+    public String getValue() {
+        return this.value;
+    }
+
+    @Override
+    public String toString() {
+        return getValue();
     }
 
 }
