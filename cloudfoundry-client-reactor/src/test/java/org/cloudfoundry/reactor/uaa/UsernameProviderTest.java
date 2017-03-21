@@ -16,15 +16,14 @@
 
 package org.cloudfoundry.reactor.uaa;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwsHeader;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.impl.Base64Codec;
+import io.jsonwebtoken.SigningKeyResolver;
+import io.jsonwebtoken.impl.DefaultJwsHeader;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
-import org.cloudfoundry.uaa.tokens.GetTokenKeyRequest;
-import org.cloudfoundry.uaa.tokens.GetTokenKeyResponse;
-import org.cloudfoundry.uaa.tokens.KeyType;
-import org.cloudfoundry.uaa.tokens.Tokens;
 import org.junit.Test;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -33,43 +32,56 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.PublicKey;
+import java.sql.Date;
 import java.time.Duration;
+import java.time.Instant;
+import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public final class UsernameProviderTest {
 
-    private static final Base64Codec BASE64 = new Base64Codec();
-
     private final ConnectionContext connectionContext = mock(ConnectionContext.class);
 
-    private final String publicKey;
-
-    private final String token;
+    private final SigningKeyResolver signingKeyResolver = mock(SigningKeyResolver.class);
 
     private final TokenProvider tokenProvider = mock(TokenProvider.class);
 
-    private final Tokens tokens = mock(Tokens.class);
+    private final UsernameProvider usernameProvider = new UsernameProvider(this.connectionContext, this.signingKeyResolver, this.tokenProvider);
 
-    public UsernameProviderTest() throws NoSuchAlgorithmException {
-        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-        keyPairGenerator.initialize(1024);
+    @SuppressWarnings("unchecked")
+    @Test
+    public void getInvalidToken() throws InterruptedException, TimeoutException, NoSuchAlgorithmException {
+        KeyPair keyPair = getKeyPair();
+        when(this.signingKeyResolver.resolveSigningKey(any(JwsHeader.class), any(Claims.class))).thenReturn(keyPair.getPublic());
 
-        KeyPair keyPair = keyPairGenerator.generateKeyPair();
+        String invalidToken = String.format("bearer %s", getToken(keyPair.getPrivate(), Instant.now().minus(Duration.ofHours(1))));
+        String validToken = String.format("bearer %s", getToken(keyPair.getPrivate(), Instant.now().plus(Duration.ofHours(1))));
+        when(this.tokenProvider.getToken(this.connectionContext)).thenReturn(Mono.just(invalidToken), Mono.just(validToken));
 
-        this.publicKey = getPublicKey(keyPair.getPublic());
-        this.token = String.format("bearer %s", getToken(keyPair.getPrivate()));
+        this.usernameProvider
+            .get()
+            .as(StepVerifier::create)
+            .expectNext("test-username")
+            .expectComplete()
+            .verify(Duration.ofSeconds(1));
+
+        verify(this.tokenProvider).invalidate(this.connectionContext);
     }
 
     @Test
-    public void test() throws InterruptedException, TimeoutException {
-        requestTokenKey(this.tokens, this.publicKey);
-        when(this.tokenProvider.getToken(this.connectionContext)).thenReturn(Mono.just(this.token));
+    public void getValidToken() throws NoSuchAlgorithmException {
+        KeyPair keyPair = getKeyPair();
+        when(this.signingKeyResolver.resolveSigningKey(any(JwsHeader.class), any(Claims.class))).thenReturn(keyPair.getPublic());
 
-        new UsernameProvider(this.connectionContext, this.tokenProvider, this.tokens)
+        String token = String.format("bearer %s", getToken(keyPair.getPrivate(), Instant.now().plus(Duration.ofHours(1))));
+        when(this.tokenProvider.getToken(this.connectionContext)).thenReturn(Mono.just(token));
+
+        this.usernameProvider
             .get()
             .as(StepVerifier::create)
             .expectNext("test-username")
@@ -77,31 +89,20 @@ public final class UsernameProviderTest {
             .verify(Duration.ofSeconds(1));
     }
 
-    private static String getPublicKey(PublicKey publicKey) {
-        return String.format("-----BEGIN PUBLIC KEY-----\n%s\n-----END PUBLIC KEY-----", BASE64.encode(publicKey.getEncoded()));
-    }
-
-    private static String getToken(PrivateKey privateKey) {
-        return Jwts
-            .builder()
+    @SuppressWarnings("unchecked")
+    private static String getToken(PrivateKey privateKey, Instant expiration) {
+        return Jwts.builder()
+            .setHeader((Map<String, Object>) new DefaultJwsHeader().setKeyId("test-key"))
             .signWith(SignatureAlgorithm.RS256, privateKey)
             .claim("user_name", "test-username")
+            .setExpiration(Date.from(expiration))
             .compact();
     }
 
-    private static void requestTokenKey(Tokens tokens, String key) {
-        when(tokens
-            .getKey(GetTokenKeyRequest.builder()
-                .build()))
-            .thenReturn(Mono
-                .just(GetTokenKeyResponse.builder()
-                    .algorithm("test-algorithm")
-                    .e("test-e")
-                    .keyType(KeyType.RSA)
-                    .n("test-n")
-                    .use("test-use")
-                    .value(key)
-                    .build()));
+    private KeyPair getKeyPair() throws NoSuchAlgorithmException {
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+        keyPairGenerator.initialize(1024);
+        return keyPairGenerator.generateKeyPair();
     }
 
 }
