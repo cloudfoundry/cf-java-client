@@ -68,7 +68,7 @@ public class ReactorTcpRoutes extends AbstractRoutingV1Operations implements Tcp
     @Override
     public Flux<TcpRouteEvent> events(EventsRequest request) {
         return get(builder -> builder.pathSegment("v1", "tcp_routes", "events"))
-            .flatMap(response -> response.addHandler(new EventStreamDecoderChannelHandler()).receiveObject().doOnCancel(() -> response.channel().close())) // TODO: No way this is the proper way to close.
+            .flatMap(response -> response.addHandler(new EventStreamDecoderChannelHandler()).receiveObject())
             .cast(ServerSentEvent.class)
             .map(event -> {
                 try {
