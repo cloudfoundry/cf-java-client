@@ -1,0 +1,49 @@
+---
+buildpack: charlie-buildpack
+command: charlie-command
+disk_quota: -1
+health-check-http-endpoint: charlie-health-check-http-endpoint
+health-check-type: charlie-health-check-type
+instances: -1
+memory: -1
+no-route: true
+path: /charlie-path
+random-route: true
+routes:
+- route: charlie-route-1
+- route: charlie-route-2
+stack: charlie-stack
+timeout: -1
+env:
+  CHARLIE_KEY_1: charlie-value-1
+  CHARLIE_KEY_2: charlie-value-2
+services:
+- charlie-instance-1
+- charlie-instance-2
+
+applications:
+- name: charlie-application-1
+
+- name: charlie-application-2
+  buildpack: alternate-buildpack
+  command: alternate-command
+  disk_quota: -2
+  health-check-http-endpoint: alternate-health-check-http-endpoint
+  health-check-type: alternate-health-check-type
+  instances: -2
+  memory: -2
+  no-route: false
+  path: /alternate-path
+  random-route: false
+  routes:
+  - route: alternate-route-1
+  - route: alternate-route-2
+  stack: alternate-stack
+  timeout: -2
+  env:
+    ALTERNATE_KEY_1: alternate-value-1
+    ALTERNATE_KEY_2: alternate-value-2
+  services:
+  - alternate-instance-1
+  - alternate-instance-2
+
