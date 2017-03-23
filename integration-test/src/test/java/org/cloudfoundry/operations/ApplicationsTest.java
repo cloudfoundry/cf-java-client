@@ -21,10 +21,12 @@ import org.cloudfoundry.operations.applications.ApplicationDetail;
 import org.cloudfoundry.operations.applications.ApplicationEnvironments;
 import org.cloudfoundry.operations.applications.ApplicationEvent;
 import org.cloudfoundry.operations.applications.ApplicationHealthCheck;
+import org.cloudfoundry.operations.applications.ApplicationManifest;
 import org.cloudfoundry.operations.applications.DeleteApplicationRequest;
 import org.cloudfoundry.operations.applications.GetApplicationEnvironmentsRequest;
 import org.cloudfoundry.operations.applications.GetApplicationEventsRequest;
 import org.cloudfoundry.operations.applications.GetApplicationHealthCheckRequest;
+import org.cloudfoundry.operations.applications.GetApplicationManifestRequest;
 import org.cloudfoundry.operations.applications.GetApplicationRequest;
 import org.cloudfoundry.operations.applications.PushApplicationRequest;
 import org.cloudfoundry.operations.applications.RestartApplicationRequest;
@@ -148,6 +150,22 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .build()))
             .as(StepVerifier::create)
             .expectNext(ApplicationHealthCheck.PORT)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void getManifest() throws TimeoutException, InterruptedException, IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, true)
+            .then(this.cloudFoundryOperations.applications()
+                .getApplicationManifest(GetApplicationManifestRequest.builder()
+                    .name(applicationName)
+                    .build()))
+            .map(ApplicationManifest::getName)
+            .as(StepVerifier::create)
+            .expectNext(applicationName)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -382,8 +400,6 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String variableValue1 = this.nameFactory.getVariableValue();
         String variableValue2 = this.nameFactory.getVariableValue();
 
-        Map<String, Object> expected = Collections.emptyMap();
-
         createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, false)
             .then(this.cloudFoundryOperations.applications()
                 .setEnvironmentVariable(SetEnvironmentVariableApplicationRequest.builder()
@@ -413,7 +429,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .build()))
             .map(ApplicationEnvironments::getUserProvided)
             .as(StepVerifier::create)
-            .expectNext(expected)
+            .expectNext(Collections.emptyMap())
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }

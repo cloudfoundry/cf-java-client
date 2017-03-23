@@ -72,6 +72,20 @@ abstract class _ApplicationManifest {
     abstract Map<String, Object> getEnvironmentVariables();
 
     /**
+     * The HTTP health check endpoint
+     */
+    @JsonProperty("health-check-http-endpoint")
+    @Nullable
+    abstract String getHealthCheckHttpEndpoint();
+
+    /**
+     * The health check type
+     */
+    @JsonProperty("health-check-type")
+    @Nullable
+    abstract String getHealthCheckType();
+
+    /**
      * The collection of hosts bound to the application
      * <p>
      * This representation of an application manifest cannot preserve the correct relationship between domains and hosts. See <a href="https://github.com/cloudfoundry/cli/issues/765">this issue</a>
@@ -100,6 +114,41 @@ abstract class _ApplicationManifest {
      */
     @JsonProperty("name")
     abstract String getName();
+
+    /**
+     * Map the the root domain to the app
+     */
+    @JsonProperty("no-hostname")
+    @Nullable
+    abstract Boolean getNoHostname();
+
+    /**
+     * Prevent a route being created for the app
+     */
+    @JsonProperty("no-route")
+    @Nullable
+    abstract Boolean getNoRoute();
+
+    /**
+     * The location of the application
+     */
+    @JsonProperty("path")
+    @Nullable
+    abstract String getPath();
+
+    /**
+     * Generate a random route
+     */
+    @JsonProperty("random-route")
+    @Nullable
+    abstract Boolean getRandomRoute();
+
+    /**
+     * The collection of routes bound to the application
+     */
+    @JsonProperty("routes")
+    @Nullable
+    abstract List<Route> getRoutes();
 
     /**
      * The collection of service names bound to the application
