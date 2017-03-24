@@ -22,6 +22,7 @@ import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +32,23 @@ import java.util.Map;
  */
 @Value.Immutable
 abstract class _ApplicationManifest {
+
+    @Value.Check
+    void check() {
+        if (getRoutes() != null) {
+            if (getHosts() != null) {
+                throw new IllegalStateException("routes and hosts cannot both be set");
+            }
+
+            if (getDomains() != null) {
+                throw new IllegalStateException("routes and domains cannot both be set");
+            }
+
+            if (getNoHostname() != null) {
+                throw new IllegalStateException("routes and noHostname cannot both be set");
+            }
+        }
+    }
 
     /**
      * The buildpack used by the application
@@ -55,9 +73,6 @@ abstract class _ApplicationManifest {
 
     /**
      * The collection of domains bound to the application
-     * <p>
-     * This representation of an application manifest cannot preserve the correct relationship between domains and hosts. See <a href="https://github.com/cloudfoundry/cli/issues/765">this issue</a>
-     * for more information.
      */
     @JsonProperty("domains")
     @Nullable
@@ -87,9 +102,6 @@ abstract class _ApplicationManifest {
 
     /**
      * The collection of hosts bound to the application
-     * <p>
-     * This representation of an application manifest cannot preserve the correct relationship between domains and hosts. See <a href="https://github.com/cloudfoundry/cli/issues/765">this issue</a>
-     * for more information.
      */
     @JsonProperty("hosts")
     @Nullable
@@ -134,7 +146,7 @@ abstract class _ApplicationManifest {
      */
     @JsonProperty("path")
     @Nullable
-    abstract String getPath();
+    abstract Path getPath();
 
     /**
      * Generate a random route

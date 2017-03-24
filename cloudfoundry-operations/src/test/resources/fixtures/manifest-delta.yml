@@ -1,0 +1,24 @@
+---
+inherit: manifest-charlie.yml
+
+buildpack: delta-buildpack
+command: delta-command
+disk_quota: -3
+health-check-http-endpoint: delta-health-check-http-endpoint
+health-check-type: delta-health-check-type
+instances: -3
+memory: -3
+no-route: true
+path: /delta-path
+random-route: true
+routes:
+- route: delta-route-1
+- route: delta-route-2
+stack: delta-stack
+timeout: -3
+env:
+  DELTA_KEY_1: delta-value-1
+  DELTA_KEY_2: delta-value-2
+services:
+- delta-instance-1
+- delta-instance-2

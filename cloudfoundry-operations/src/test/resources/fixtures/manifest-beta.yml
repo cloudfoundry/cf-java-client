@@ -1,0 +1,78 @@
+---
+inherit: manifest-alpha.yml
+
+applications:
+- name: alpha-application-1
+  buildpack: beta-buildpack
+  command: beta-command
+  disk_quota: -2
+  health-check-http-endpoint: beta-health-check-http-endpoint
+  health-check-type: beta-health-check-type
+  instances: -2
+  memory: -2
+  no-route: false
+  path: /beta-path
+  random-route: false
+  routes:
+  - route: beta-route-1
+  - route: beta-route-2
+  stack: beta-stack
+  timeout: -2
+  env:
+    BETA_KEY_1: beta-value-1
+    BETA_KEY_2: beta-value-2
+  services:
+  - beta-instance-1
+  - beta-instance-2
+
+- name: beta-application-1
+  buildpack: beta-buildpack
+  command: beta-command
+  disk_quota: -1
+  health-check-http-endpoint: beta-health-check-http-endpoint
+  health-check-type: beta-health-check-type
+  instances: -1
+  memory: -1
+  no-route: true
+  path: /beta-path
+  random-route: true
+  routes:
+  - route: beta-route-1
+  - route: beta-route-2
+  stack: beta-stack
+  timeout: -1
+  env:
+    BETA_KEY_1: beta-value-1
+    BETA_KEY_2: beta-value-2
+  services:
+  - beta-instance-1
+  - beta-instance-2
+
+- name: beta-application-2
+  buildpack: beta-buildpack
+  command: beta-command
+  disk_quota: -1
+  domain: beta-domain
+  domains:
+  - beta-domains-1
+  - beta-domains-2
+  health-check-http-endpoint: beta-health-check-http-endpoint
+  health-check-type: beta-health-check-type
+  host: beta-host
+  hosts:
+  - beta-hosts-1
+  - beta-hosts-2
+  instances: -1
+  memory: -1
+  no-hostname: true
+  no-route: true
+  path: /beta-path
+  random-route: true
+  stack: beta-stack
+  timeout: -1
+  env:
+    BETA_KEY_1: beta-value-1
+    BETA_KEY_2: beta-value-2
+  services:
+  - beta-instance-1
+  - beta-instance-2
