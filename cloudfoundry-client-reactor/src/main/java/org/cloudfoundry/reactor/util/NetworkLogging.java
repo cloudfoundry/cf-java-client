@@ -19,15 +19,15 @@ package org.cloudfoundry.reactor.util;
 import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
 import reactor.ipc.netty.http.client.HttpClientResponse;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
+import java.util.stream.Collectors;
 
 public final class NetworkLogging {
 
@@ -66,19 +66,28 @@ public final class NetworkLogging {
     }
 
     public static Function<Mono<HttpClientResponse>, Mono<HttpClientResponse>> response(String uri) {
+        if (!RESPONSE_LOGGER.isDebugEnabled()) {
+            return inbound -> inbound;
+        }
+
+        AtomicLong startTimeHolder = new AtomicLong();
+        AtomicReference<HttpClientResponse> responseHolder = new AtomicReference<>();
+
         return inbound -> inbound
-            .elapsed()
-            .map(function((elapsed, response) -> {
+            .doOnSubscribe(s -> startTimeHolder.set(System.currentTimeMillis()))
+            .doOnNext(responseHolder::set)
+            .doFinally(signalType -> {
+                String elapsed = asTime(System.currentTimeMillis() - startTimeHolder.get());
+                HttpClientResponse response = responseHolder.get();
+
                 List<String> warnings = response.responseHeaders().getAll(CF_WARNINGS);
 
                 if (!warnings.isEmpty()) {
-                    RESPONSE_LOGGER.warn("{}    {} ({}) [{}]", response.status().code(), uri, asTime(elapsed), StringUtils.collectionToCommaDelimitedString(warnings));
+                    RESPONSE_LOGGER.warn("{}    {} ({}) [{}]", response.status().code(), uri, elapsed, warnings.stream().collect(Collectors.joining(", ")));
                 } else if (RESPONSE_LOGGER.isDebugEnabled()) {
-                    RESPONSE_LOGGER.debug("{}    {} ({})", response.status().code(), uri, asTime(elapsed));
+                    RESPONSE_LOGGER.debug("{}    {} ({})", response.status().code(), uri, elapsed);
                 }
-
-                return response;
-            }));
+            });
     }
 
     public static Consumer<Subscription> ws(String uri) {
