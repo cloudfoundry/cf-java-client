@@ -31,6 +31,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.ipc.netty.http.client.HttpClient;
 
+import java.io.IOException;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
@@ -49,13 +51,18 @@ public abstract class AbstractRestTest {
         SLF4JBridgeHandler.install();
     }
 
-    protected final MockWebServer mockWebServer = new MockWebServer();
+    final MockWebServer mockWebServer = new MockWebServer();
 
     protected final Mono<String> root = Mono.just(UriComponentsBuilder.newInstance()
         .scheme("http").host(this.mockWebServer.getHostName()).port(this.mockWebServer.getPort())
         .build().encode().toUriString());
 
     private InteractionContext interactionContext;
+
+    @After
+    public final void shutdown() throws IOException {
+        this.mockWebServer.shutdown();
+    }
 
     @After
     public final void verify() {
