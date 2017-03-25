@@ -23,13 +23,13 @@ import org.cloudfoundry.doppler.RecentLogsRequest;
 import org.cloudfoundry.doppler.StreamRequest;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
-import org.cloudfoundry.reactor.util.MultipartDecoderChannelHandler;
+import org.cloudfoundry.reactor.util.MultipartCodec;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.ipc.netty.ByteBufFlux;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 final class ReactorDopplerEndpoints extends AbstractDopplerOperations {
 
@@ -39,47 +39,35 @@ final class ReactorDopplerEndpoints extends AbstractDopplerOperations {
 
     Flux<Envelope> containerMetrics(ContainerMetricsRequest request) {
         return get(builder -> builder.pathSegment("apps", request.getApplicationId(), "containermetrics"))
-            .flatMap(response -> response.addHandler(new MultipartDecoderChannelHandler(response)).receiveObject())
-            .takeWhile(t -> MultipartDecoderChannelHandler.CLOSE_DELIMITER != t)
-            .windowWhile(t -> MultipartDecoderChannelHandler.DELIMITER != t, Integer.MAX_VALUE) // TODO: Remove Prefetch with reactor-core 3.0.6
-            .concatMap(w -> w
-                .as(ByteBufFlux::fromInbound)
-                .aggregate()
-                .asByteArray())
+            .flatMap(MultipartCodec::decode)
             .map(ReactorDopplerEndpoints::toEnvelope)
             .checkpoint();
     }
 
     Flux<Envelope> firehose(FirehoseRequest request) {
         return ws(builder -> builder.pathSegment("firehose", request.getSubscriptionId()))
-            .flatMap(response -> response.receiveWebsocket().aggregateFrames().receive().asByteArray())
+            .flatMap(response -> response.receiveWebsocket().aggregateFrames().receive().asInputStream())
             .map(ReactorDopplerEndpoints::toEnvelope)
             .checkpoint();
     }
 
     Flux<Envelope> recentLogs(RecentLogsRequest request) {
         return get(builder -> builder.pathSegment("apps", request.getApplicationId(), "recentlogs"))
-            .flatMap(response -> response.addHandler(new MultipartDecoderChannelHandler(response)).receiveObject())
-            .takeWhile(t -> MultipartDecoderChannelHandler.CLOSE_DELIMITER != t)
-            .windowWhile(t -> MultipartDecoderChannelHandler.DELIMITER != t, Integer.MAX_VALUE)  // TODO: Remove Prefetch with reactor-core 3.0.6
-            .concatMap(w -> w
-                .as(ByteBufFlux::fromInbound)
-                .aggregate()
-                .asByteArray())
+            .flatMap(MultipartCodec::decode)
             .map(ReactorDopplerEndpoints::toEnvelope)
             .checkpoint();
     }
 
     Flux<Envelope> stream(StreamRequest request) {
         return ws(builder -> builder.pathSegment("apps", request.getApplicationId(), "stream"))
-            .flatMap(response -> response.receiveWebsocket().aggregateFrames().receive().asByteArray())
+            .flatMap(response -> response.receiveWebsocket().aggregateFrames().receive().asInputStream())
             .map(ReactorDopplerEndpoints::toEnvelope)
             .checkpoint();
     }
 
-    private static Envelope toEnvelope(byte[] bytes) {
-        try {
-            return Envelope.from(org.cloudfoundry.dropsonde.events.Envelope.ADAPTER.decode(bytes));
+    private static Envelope toEnvelope(InputStream content) {
+        try (InputStream in = content) {
+            return Envelope.from(org.cloudfoundry.dropsonde.events.Envelope.ADAPTER.decode(in));
         } catch (IOException e) {
             throw Exceptions.propagate(e);
         }

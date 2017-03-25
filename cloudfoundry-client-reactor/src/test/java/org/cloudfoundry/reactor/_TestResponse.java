@@ -30,6 +30,8 @@ import java.util.Optional;
 @Value.Immutable
 abstract class _TestResponse {
 
+    private static final int MAX_CHUNK_SIZE = 16 * 1024;
+
     abstract Optional<String> getContentType();
 
     @AllowNulls
@@ -44,7 +46,7 @@ abstract class _TestResponse {
             .map(_TestResponse::getBuffer)
             .ifPresent(buffer -> response
                 .setHeader("Content-Type", getContentType().orElse("application/json"))
-                .setBody(buffer));
+                .setChunkedBody(buffer, MAX_CHUNK_SIZE));
 
         return response;
     }

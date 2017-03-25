@@ -112,7 +112,7 @@ public final class ReactorDopplerClientTest extends AbstractDopplerApiTest {
             .as(StepVerifier::create)
             .expectNextCount(3093)
             .expectComplete()
-            .verify(Duration.ofMinutes(5));
+            .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -193,7 +193,7 @@ public final class ReactorDopplerClientTest extends AbstractDopplerApiTest {
             .as(StepVerifier::create)
             .expectNextCount(3093)
             .expectComplete()
-            .verify(Duration.ofMinutes(5));
+            .verify(Duration.ofSeconds(5));
     }
 
 }
