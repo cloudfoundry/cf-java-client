@@ -1,0 +1,3 @@
+data: YHOO
+data: +2
+data: 10

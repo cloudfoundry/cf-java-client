@@ -1,0 +1,9 @@
+: test stream
+
+data: first event
+id: 1
+
+data:second event
+id
+
+data:  third event

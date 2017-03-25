@@ -19,11 +19,24 @@ package org.cloudfoundry.reactor.routing.v1.tcproutes;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 @Value.Immutable
 abstract class _ServerSentEvent {
 
+    @Value.Derived
     @Nullable
-    abstract String getData();
+    String getData() {
+        return Optional.ofNullable(getDatas())
+            .map(datas -> datas.stream()
+                .collect(Collectors.joining("\n")))
+            .orElse(null);
+    }
+
+    @Nullable
+    abstract List<String> getDatas();
 
     @Nullable
     abstract String getEventType();

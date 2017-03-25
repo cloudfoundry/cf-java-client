@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.reactor.util;
+package org.cloudfoundry.reactor.doppler;
 
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.DelimiterBasedFrameDecoder;
@@ -27,13 +27,16 @@ import java.nio.charset.Charset;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public final class MultipartCodec {
+final class MultipartCodec {
 
     private static final Pattern BOUNDARY_PATTERN = Pattern.compile("multipart/.+; boundary=(.*)");
 
-    private static final int MAX_PAYLOAD_SIZE = 100 * 1024 * 1024;
+    private static final int MAX_PAYLOAD_SIZE = 1024 * 1024;
 
-    public static Flux<InputStream> decode(HttpClientResponse response) {
+    private MultipartCodec() {
+    }
+
+    static Flux<InputStream> decode(HttpClientResponse response) {
         return response
             .addHandler(createDecoder(response))
             .receive()
