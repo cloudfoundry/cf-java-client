@@ -3,7 +3,7 @@ buildpack: charlie-buildpack
 command: charlie-command
 disk_quota: -1
 health-check-http-endpoint: charlie-health-check-http-endpoint
-health-check-type: charlie-health-check-type
+health-check-type: none
 instances: -1
 memory: -1
 no-route: true
@@ -29,7 +29,7 @@ applications:
   command: alternate-command
   disk_quota: -2
   health-check-http-endpoint: alternate-health-check-http-endpoint
-  health-check-type: alternate-health-check-type
+  health-check-type: port
   instances: -2
   memory: -2
   no-route: false

@@ -28,18 +28,25 @@ import org.cloudfoundry.operations.applications.GetApplicationEventsRequest;
 import org.cloudfoundry.operations.applications.GetApplicationHealthCheckRequest;
 import org.cloudfoundry.operations.applications.GetApplicationManifestRequest;
 import org.cloudfoundry.operations.applications.GetApplicationRequest;
+import org.cloudfoundry.operations.applications.PushApplicationManifestRequest;
 import org.cloudfoundry.operations.applications.PushApplicationRequest;
 import org.cloudfoundry.operations.applications.RestartApplicationRequest;
+import org.cloudfoundry.operations.applications.Route;
 import org.cloudfoundry.operations.applications.SetEnvironmentVariableApplicationRequest;
 import org.cloudfoundry.operations.applications.StartApplicationRequest;
 import org.cloudfoundry.operations.applications.UnsetEnvironmentVariableApplicationRequest;
 import org.cloudfoundry.operations.domains.CreateDomainRequest;
+import org.cloudfoundry.operations.routes.ListRoutesRequest;
 import org.cloudfoundry.operations.services.BindServiceInstanceRequest;
+import org.cloudfoundry.operations.services.CreateServiceInstanceRequest;
 import org.cloudfoundry.operations.services.CreateUserProvidedServiceInstanceRequest;
+import org.cloudfoundry.operations.services.GetServiceInstanceRequest;
+import org.cloudfoundry.operations.services.ServiceInstance;
 import org.cloudfoundry.util.FluentMap;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -59,6 +66,12 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Autowired
     private String organizationName;
+
+    @Autowired
+    private String planName;
+
+    @Autowired
+    private String serviceName;
 
     @Test
     public void deleteApplication() throws IOException, TimeoutException, InterruptedException {
@@ -187,6 +200,35 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
+    public void pushBindServices() throws TimeoutException, InterruptedException, IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+        String serviceInstanceName = this.nameFactory.getServiceInstanceName();
+
+        createServiceInstance(this.cloudFoundryOperations, this.planName, serviceInstanceName, this.serviceName)
+            .then(this.cloudFoundryOperations.applications()
+                .pushManifest(PushApplicationManifestRequest.builder()
+                    .manifest(ApplicationManifest.builder()
+                        .path(new ClassPathResource("test-application.zip").getFile().toPath())
+                        .buildpack("staticfile_buildpack")
+                        .disk(512)
+                        .healthCheckType(ApplicationHealthCheck.PORT)
+                        .memory(64)
+                        .name(applicationName)
+                        .service(serviceInstanceName)
+                        .build())
+                    .noStart(false)
+                    .build()))
+            .then(getServiceInstance(this.cloudFoundryOperations, serviceInstanceName)
+                .flatMapIterable(ServiceInstance::getApplications)
+                .filter(applicationName::equals)
+                .single())
+            .as(StepVerifier::create)
+            .expectNext(applicationName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
     public void pushDirectory() throws TimeoutException, InterruptedException, IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
@@ -203,7 +245,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
         this.cloudFoundryOperations.applications()
             .push(PushApplicationRequest.builder()
-                .application(new ClassPathResource("test-application.zip").getFile().toPath())
+                .path(new ClassPathResource("test-application.zip").getFile().toPath())
                 .buildpack("staticfile_buildpack")
                 .domain(domainName)
                 .diskQuota(512)
@@ -211,7 +253,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .name(applicationName)
                 .build())
             .as(StepVerifier::create)
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Domain %s not found", domainName))
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("The route %s did not match any existing domains", domainName))
             .verify(Duration.ofMinutes(5));
     }
 
@@ -222,13 +264,48 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, false)
             .then(this.cloudFoundryOperations.applications()
                 .push(PushApplicationRequest.builder()
-                    .application(new ClassPathResource("test-application.zip").getFile().toPath())
+                    .path(new ClassPathResource("test-application.zip").getFile().toPath())
                     .buildpack("staticfile_buildpack")
                     .diskQuota(512)
                     .memory(64)
                     .name(applicationName)
                     .build()))
             .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void pushMultipleRoutes() throws TimeoutException, InterruptedException, IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+        String domainName = this.nameFactory.getDomainName();
+
+        requestCreateDomain(this.cloudFoundryOperations, domainName, this.organizationName)
+            .then(this.cloudFoundryOperations.applications()
+                .pushManifest(PushApplicationManifestRequest.builder()
+                    .manifest(ApplicationManifest.builder()
+                        .path(new ClassPathResource("test-application.zip").getFile().toPath())
+                        .buildpack("staticfile_buildpack")
+                        .disk(512)
+                        .healthCheckType(ApplicationHealthCheck.PORT)
+                        .memory(64)
+                        .name(applicationName)
+                        .route(Route.builder()
+                            .route(String.format("test1.%s.com", domainName))
+                            .build())
+                        .route(Route.builder()
+                            .route(String.format("test2.%s.com", domainName))
+                            .build())
+                        .build())
+                    .noStart(false)
+                    .build()))
+            .thenMany(this.cloudFoundryOperations.routes()
+                .list(ListRoutesRequest.builder()
+                    .build()))
+            .filter(response -> domainName.equals(response.getDomain()))
+            .map(org.cloudfoundry.operations.routes.Route::getApplications)
+            .as(StepVerifier::create)
+            .expectNextCount(2)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -254,18 +331,48 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
+    public void pushNoRoute() throws TimeoutException, InterruptedException, IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+        String domainName = this.nameFactory.getDomainName();
+
+        createDomain(this.cloudFoundryOperations, domainName, this.organizationName)
+            .then(this.cloudFoundryOperations.applications()
+                .push(PushApplicationRequest.builder()
+                    .path(new ClassPathResource("test-application.zip").getFile().toPath())
+                    .buildpack("staticfile_buildpack")
+                    .diskQuota(512)
+                    .domain(domainName)
+                    .memory(64)
+                    .name(applicationName)
+                    .noStart(true)
+                    .build()))
+            .then(this.cloudFoundryOperations.applications()
+                .push(PushApplicationRequest.builder()
+                    .path(new ClassPathResource("test-application.zip").getFile().toPath())
+                    .buildpack("staticfile_buildpack")
+                    .diskQuota(512)
+                    .memory(64)
+                    .name(applicationName)
+                    .noRoute(true)
+                    .noStart(true)
+                    .build()))
+            .thenMany(listRoutes(this.cloudFoundryOperations))
+            .flatMapIterable(org.cloudfoundry.operations.routes.Route::getApplications)
+            .filter(applicationName::equals)
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
     public void pushPrivateDomain() throws TimeoutException, InterruptedException, IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
-        this.cloudFoundryOperations.domains()
-            .create(CreateDomainRequest.builder()
-                .domain(domainName)
-                .organization(this.organizationName)
-                .build())
+        createDomain(this.cloudFoundryOperations, domainName, this.organizationName)
             .then(this.cloudFoundryOperations.applications()
                 .push(PushApplicationRequest.builder()
-                    .application(new ClassPathResource("test-application.zip").getFile().toPath())
+                    .path(new ClassPathResource("test-application.zip").getFile().toPath())
                     .buildpack("staticfile_buildpack")
                     .diskQuota(512)
                     .domain(domainName)
@@ -284,7 +391,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
         this.cloudFoundryOperations.applications()
             .push(PushApplicationRequest.builder()
-                .application(new ClassPathResource("test-application.zip").getFile().toPath())
+                .path(new ClassPathResource("test-application.zip").getFile().toPath())
                 .buildpack("staticfile_buildpack")
                 .diskQuota(512)
                 .healthCheckType(ApplicationHealthCheck.PORT)
@@ -489,7 +596,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     private static Mono<Void> createApplication(CloudFoundryOperations cloudFoundryOperations, Path application, String name, Boolean noStart) {
         return cloudFoundryOperations.applications()
             .push(PushApplicationRequest.builder()
-                .application(application)
+                .path(application)
                 .buildpack("staticfile_buildpack")
                 .diskQuota(512)
                 .healthCheckType(ApplicationHealthCheck.PORT)
@@ -508,6 +615,44 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .memory(64)
                 .name(name)
                 .noStart(noStart)
+                .build());
+    }
+
+    private static Mono<Void> createDomain(CloudFoundryOperations cloudFoundryOperations, String domainName, String organizationName) {
+        return cloudFoundryOperations.domains()
+            .create(CreateDomainRequest.builder()
+                .domain(domainName)
+                .organization(organizationName)
+                .build());
+    }
+
+    private static Mono<Void> createServiceInstance(CloudFoundryOperations cloudFoundryOperations, String planName, String serviceInstanceName, String serviceName) {
+        return cloudFoundryOperations.services()
+            .createInstance(CreateServiceInstanceRequest.builder()
+                .planName(planName)
+                .serviceInstanceName(serviceInstanceName)
+                .serviceName(serviceName)
+                .build());
+    }
+
+    private static Mono<ServiceInstance> getServiceInstance(CloudFoundryOperations cloudFoundryOperations, String serviceInstanceName) {
+        return cloudFoundryOperations.services()
+            .getInstance(GetServiceInstanceRequest.builder()
+                .name(serviceInstanceName)
+                .build());
+    }
+
+    private static Flux<org.cloudfoundry.operations.routes.Route> listRoutes(CloudFoundryOperations cloudFoundryOperations) {
+        return cloudFoundryOperations.routes()
+            .list(ListRoutesRequest.builder()
+                .build());
+    }
+
+    private static Mono<Void> requestCreateDomain(CloudFoundryOperations cloudFoundryOperations, String domainName, String organizationName) {
+        return cloudFoundryOperations.domains()
+            .create(CreateDomainRequest.builder()
+                .domain(domainName)
+                .organization(organizationName)
                 .build());
     }
 

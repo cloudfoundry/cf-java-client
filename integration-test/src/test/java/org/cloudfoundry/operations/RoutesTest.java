@@ -512,7 +512,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     private static Mono<Void> requestCreateApplication(CloudFoundryOperations cloudFoundryOperations, Path application, String name, Boolean noStart) {
         return cloudFoundryOperations.applications()
             .push(PushApplicationRequest.builder()
-                .application(application)
+                .path(application)
                 .healthCheckType(ApplicationHealthCheck.PORT)
                 .buildpack("staticfile_buildpack")
                 .diskQuota(512)

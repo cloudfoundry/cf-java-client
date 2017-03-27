@@ -5,7 +5,7 @@ applications:
   command: alpha-command
   disk_quota: -1
   health-check-http-endpoint: alpha-health-check-http-endpoint
-  health-check-type: alpha-health-check-type
+  health-check-type: none
   instances: -1
   memory: -1
   no-route: true
@@ -32,7 +32,7 @@ applications:
   - alpha-domains-1
   - alpha-domains-2
   health-check-http-endpoint: alpha-health-check-http-endpoint
-  health-check-type: alpha-health-check-type
+  health-check-type: port
   host: alpha-host
   hosts:
   - alpha-hosts-1

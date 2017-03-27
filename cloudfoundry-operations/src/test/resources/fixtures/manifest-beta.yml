@@ -7,7 +7,7 @@ applications:
   command: beta-command
   disk_quota: -2
   health-check-http-endpoint: beta-health-check-http-endpoint
-  health-check-type: beta-health-check-type
+  health-check-type: none
   instances: -2
   memory: -2
   no-route: false
@@ -30,7 +30,7 @@ applications:
   command: beta-command
   disk_quota: -1
   health-check-http-endpoint: beta-health-check-http-endpoint
-  health-check-type: beta-health-check-type
+  health-check-type: none
   instances: -1
   memory: -1
   no-route: true
@@ -57,7 +57,7 @@ applications:
   - beta-domains-1
   - beta-domains-2
   health-check-http-endpoint: beta-health-check-http-endpoint
-  health-check-type: beta-health-check-type
+  health-check-type: none
   host: beta-host
   hosts:
   - beta-hosts-1

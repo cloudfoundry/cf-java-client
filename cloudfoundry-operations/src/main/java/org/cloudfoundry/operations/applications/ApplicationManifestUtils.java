@@ -197,7 +197,7 @@ public final class ApplicationManifestUtils {
         asListOfString(application, "domains", builder::domain);
         asMapOfStringString(application, "env", builder::environmentVariable);
         asString(application, "health-check-http-endpoint", builder::healthCheckHttpEndpoint);
-        asString(application, "health-check-type", builder::healthCheckType);
+        asString(application, "health-check-type", healthCheckType -> builder.healthCheckType(ApplicationHealthCheck.from(healthCheckType)));
         asString(application, "host", builder::host);
         asListOfString(application, "hosts", builder::host);
         asInteger(application, "instances", builder::instances);

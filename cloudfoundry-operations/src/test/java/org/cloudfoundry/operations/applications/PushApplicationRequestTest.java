@@ -25,7 +25,7 @@ public final class PushApplicationRequestTest {
     @Test(expected = IllegalStateException.class)
     public void applicationAndDocker() {
         PushApplicationRequest.builder()
-            .application(Paths.get("test-application"))
+            .path(Paths.get("test-application"))
             .dockerImage("test-docker")
             .name("test-name")
             .build();
@@ -41,14 +41,14 @@ public final class PushApplicationRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noName() {
         PushApplicationRequest.builder()
-            .application(Paths.get("test-application"))
+            .path(Paths.get("test-application"))
             .build();
     }
 
     @Test
     public void validApplication() {
         PushApplicationRequest.builder()
-            .application(Paths.get("test-application"))
+            .path(Paths.get("test-application"))
             .name("test-name")
             .build();
     }

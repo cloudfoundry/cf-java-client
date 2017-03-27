@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * An application manifest which captures some of the details of how an application is deployed.  See <a href="https://docs.cloudfoundry.org/devguide/deploy-apps/manifest.html">the manifest
+ * An application manifest that captures some of the details of how an application is deployed.  See <a href="https://docs.cloudfoundry.org/devguide/deploy-apps/manifest.html">the manifest
  * definition</a> for more details.
  */
 @Value.Immutable
@@ -47,6 +47,10 @@ abstract class _ApplicationManifest {
             if (getNoHostname() != null) {
                 throw new IllegalStateException("routes and noHostname cannot both be set");
             }
+        }
+
+        if (getDockerImage() != null && getPath() != null) {
+            throw new IllegalStateException("docker image and path cannot both be set");
         }
     }
 
@@ -70,6 +74,13 @@ abstract class _ApplicationManifest {
     @JsonProperty("disk_quota")
     @Nullable
     abstract Integer getDisk();
+
+    /**
+     * The docker image
+     */
+    @JsonProperty("docker_image")
+    @Nullable
+    abstract String getDockerImage();
 
     /**
      * The collection of domains bound to the application
@@ -98,7 +109,7 @@ abstract class _ApplicationManifest {
      */
     @JsonProperty("health-check-type")
     @Nullable
-    abstract String getHealthCheckType();
+    abstract ApplicationHealthCheck getHealthCheckType();
 
     /**
      * The collection of hosts bound to the application

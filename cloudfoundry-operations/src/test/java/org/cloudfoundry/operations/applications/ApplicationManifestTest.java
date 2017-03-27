@@ -18,7 +18,18 @@ package org.cloudfoundry.operations.applications;
 
 import org.junit.Test;
 
+import java.nio.file.Paths;
+
 public final class ApplicationManifestTest {
+
+    @Test(expected = IllegalStateException.class)
+    public void dockerAndPath() {
+        ApplicationManifest.builder()
+            .name("test-name")
+            .dockerImage("test-docker-image")
+            .path(Paths.get("test-application"))
+            .build();
+    }
 
     @Test(expected = IllegalStateException.class)
     public void routesAndDomains() {

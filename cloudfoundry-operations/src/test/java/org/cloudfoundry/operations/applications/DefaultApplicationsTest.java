@@ -36,8 +36,11 @@ import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
 import org.cloudfoundry.client.v2.applications.GetApplicationResponse;
 import org.cloudfoundry.client.v2.applications.InstanceStatistics;
+import org.cloudfoundry.client.v2.applications.ListApplicationRoutesRequest;
+import org.cloudfoundry.client.v2.applications.ListApplicationRoutesResponse;
 import org.cloudfoundry.client.v2.applications.ListApplicationServiceBindingsRequest;
 import org.cloudfoundry.client.v2.applications.ListApplicationServiceBindingsResponse;
+import org.cloudfoundry.client.v2.applications.RemoveApplicationRouteRequest;
 import org.cloudfoundry.client.v2.applications.RemoveApplicationServiceBindingRequest;
 import org.cloudfoundry.client.v2.applications.RestageApplicationResponse;
 import org.cloudfoundry.client.v2.applications.Statistics;
@@ -65,6 +68,7 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.organizations.OrganizationEntity;
 import org.cloudfoundry.client.v2.organizations.OrganizationResource;
+import org.cloudfoundry.client.v2.privatedomains.PrivateDomainEntity;
 import org.cloudfoundry.client.v2.privatedomains.PrivateDomainResource;
 import org.cloudfoundry.client.v2.resourcematch.ListMatchingResourcesRequest;
 import org.cloudfoundry.client.v2.resourcematch.ListMatchingResourcesResponse;
@@ -74,11 +78,12 @@ import org.cloudfoundry.client.v2.routes.CreateRouteResponse;
 import org.cloudfoundry.client.v2.routes.DeleteRouteResponse;
 import org.cloudfoundry.client.v2.routes.ListRoutesRequest;
 import org.cloudfoundry.client.v2.routes.ListRoutesResponse;
-import org.cloudfoundry.client.v2.routes.Route;
 import org.cloudfoundry.client.v2.routes.RouteEntity;
 import org.cloudfoundry.client.v2.routes.RouteResource;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingResource;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstance;
+import org.cloudfoundry.client.v2.shareddomains.GetSharedDomainRequest;
+import org.cloudfoundry.client.v2.shareddomains.GetSharedDomainResponse;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsResponse;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomainEntity;
@@ -136,13 +141,12 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     private RandomWords randomWords = mock(RandomWords.class, RETURNS_SMART_NULLS);
 
-    private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID),
-        this.randomWords);
+    private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID), this.randomWords);
 
     @Test
     public void copySourceNoRestartOrgSpace() {
         requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-metadata-id");
-        requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, "test-organization-id");
+        requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
         requestOrganizations(this.cloudFoundryClient, "test-target-organization");
         requestOrganizationSpacesByName(this.cloudFoundryClient, "test-organization-resource-metadata-id", "test-target-space");
         requestApplications(this.cloudFoundryClient, "test-target-application-name", "test-space-resource-metadata-id", "test-metadata-id");
@@ -164,8 +168,8 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     @Test
     public void copySourceNoRestartSpace() {
         requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-metadata-id");
-        requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, "test-organization-id");
-        requestOrganizationSpacesByName(this.cloudFoundryClient, "test-organization-id", "test-target-space");
+        requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
+        requestOrganizationSpacesByName(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-target-space");
         requestApplications(this.cloudFoundryClient, "test-target-application-name", "test-space-resource-metadata-id", "test-metadata-id");
         requestCopyBits(this.cloudFoundryClient, "test-metadata-id", "test-metadata-id");
         requestJobSuccess(this.cloudFoundryClient, "test-copy-bits-id");
@@ -184,7 +188,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     @Test
     public void copySourceOrganizationNotFound() {
         requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-metadata-id");
-        requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, "test-organization-id");
+        requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
         requestOrganizationsNotFound(this.cloudFoundryClient, "test-target-organization");
 
         this.applications
@@ -202,7 +206,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     @Test
     public void copySourceRestart() {
         requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-metadata-id");
-        requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, "test-organization-id");
+        requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
         requestApplications(this.cloudFoundryClient, "test-target-application-name", TEST_SPACE_ID, "test-metadata-id");
         requestCopyBits(this.cloudFoundryClient, "test-metadata-id", "test-metadata-id");
         requestJobSuccess(this.cloudFoundryClient, "test-copy-bits-id");
@@ -225,8 +229,8 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     @Test
     public void copySourceSpaceNotFound() {
         requestApplications(this.cloudFoundryClient, "test-application-name", "test-space-id", "test-metadata-id");
-        requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, "test-organization-id");
-        requestOrganizationSpacesByNameNotFound(this.cloudFoundryClient, "test-organization-id", "test-target-space");
+        requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
+        requestOrganizationSpacesByNameNotFound(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-target-space");
 
         this.applications
             .copySource(CopySourceApplicationRequest.builder()
@@ -1104,13 +1108,17 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
         requestCreateDockerApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
             .dockerImage("cloudfoundry/lattice-app")
-            .domain("test-domain")
+            .domain("test-shared-domain")
             .name("test-name")
             .build(), TEST_SPACE_ID, null, "test-application-id");
         requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
-        requestPrivateDomain(this.cloudFoundryClient, "test-domain", TEST_ORGANIZATION_ID, "test-domain-id");
-        requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-name", null);
-        requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
+        requestPrivateDomainNotFound(this.cloudFoundryClient, "test-shared-domain", TEST_ORGANIZATION_ID);
+        requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
+        requestSharedDomain(this.cloudFoundryClient, "test-shared-domain", "test-shared-domain-id");
+        requestSharedDomains(this.cloudFoundryClient, "test-shared-domain", "test-shared-domain-id");
+        requestGetSharedDomain(this.cloudFoundryClient, "test-shared-domain-id");
+        requestRoutesEmpty(this.cloudFoundryClient, "test-shared-domain-id", "test-name", null);
+        requestCreateRoute(this.cloudFoundryClient, "test-shared-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
         requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
@@ -1120,7 +1128,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         this.applications
             .push(PushApplicationRequest.builder()
                 .dockerImage("cloudfoundry/lattice-app")
-                .domain("test-domain")
+                .domain("test-shared-domain")
                 .name("test-name")
                 .build())
             .as(StepVerifier::create)
@@ -1134,24 +1142,24 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
         requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
-            .application(testApplication)
-            .domain("test-domain")
+            .path(testApplication)
+            .domain("test-shared-domain")
             .name("test-name")
             .build(), TEST_SPACE_ID, null, "test-application-id");
         requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
-        requestPrivateDomainNotFound(this.cloudFoundryClient, "test-domain", TEST_ORGANIZATION_ID);
-        requestSharedDomainNotFound(this.cloudFoundryClient, "test-domain");
+        requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
+        requestSharedDomainsEmpty(this.cloudFoundryClient);
         requestListMatchingResources(this.cloudFoundryClient, Arrays.asList(new ResourceMatchingUtils.ArtifactMetadata("da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "100644", 0),
             new ResourceMatchingUtils.ArtifactMetadata("45044a6ddbfe11415a8f8a6219de68a2c66b496b", "index.html", "100644", 178)));
 
         this.applications
             .push(PushApplicationRequest.builder()
-                .application(testApplication)
-                .domain("test-domain")
+                .path(testApplication)
+                .domain("test-shared-domain")
                 .name("test-name")
                 .build())
             .as(StepVerifier::create)
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Domain test-domain not found"))
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("The route test-shared-domain did not match any existing domains"))
             .verify(Duration.ofSeconds(5));
     }
 
@@ -1161,16 +1169,17 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
         requestApplications(this.cloudFoundryClient, "test-name", TEST_SPACE_ID, "test-application-id");
         requestUpdateApplication(this.cloudFoundryClient, "test-application-id", PushApplicationRequest.builder()
-            .application(testApplication)
-            .domain("test-domain")
+            .path(testApplication)
+            .domain("test-shared-domain")
             .name("test-name")
             .build(), null);
         requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
-        requestPrivateDomain(this.cloudFoundryClient, "test-domain", TEST_ORGANIZATION_ID, "test-domain-id");
-        requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-name", null);
+        requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
+        requestSharedDomains(this.cloudFoundryClient, "test-shared-domain", "test-shared-domain-id");
+        requestRoutesEmpty(this.cloudFoundryClient, "test-shared-domain-id", "test-name", null);
         requestListMatchingResources(this.cloudFoundryClient, Arrays.asList(new ResourceMatchingUtils.ArtifactMetadata("da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "100644", 0),
             new ResourceMatchingUtils.ArtifactMetadata("45044a6ddbfe11415a8f8a6219de68a2c66b496b", "index.html", "100644", 178)));
-        requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
+        requestCreateRoute(this.cloudFoundryClient, "test-shared-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
         requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
         requestUpload(this.cloudFoundryClient, "test-application-id", testApplication, "test-job-id");
         requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
@@ -1181,8 +1190,8 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
         this.applications
             .push(PushApplicationRequest.builder()
-                .application(testApplication)
-                .domain("test-domain")
+                .path(testApplication)
+                .domain("test-shared-domain")
                 .name("test-name")
                 .build())
             .as(StepVerifier::create)
@@ -1196,14 +1205,15 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
         requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
-            .application(testApplication)
-            .domain("test-domain")
+            .path(testApplication)
+            .domain("test-shared-domain")
             .host("test-host")
             .name("test-name")
             .build(), TEST_SPACE_ID, null, "test-application-id");
         requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
-        requestPrivateDomain(this.cloudFoundryClient, "test-domain", TEST_ORGANIZATION_ID, "test-domain-id");
-        requestRoutes(this.cloudFoundryClient, "test-domain-id", "test-host", null, "test-route-id");
+        requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
+        requestSharedDomains(this.cloudFoundryClient, "test-shared-domain", "test-shared-domain-id");
+        requestRoutes(this.cloudFoundryClient, "test-shared-domain-id", "test-host", null, "test-route-id");
         requestListMatchingResources(this.cloudFoundryClient, Arrays.asList(new ResourceMatchingUtils.ArtifactMetadata("da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "100644", 0),
             new ResourceMatchingUtils.ArtifactMetadata("45044a6ddbfe11415a8f8a6219de68a2c66b496b", "index.html", "100644", 178)));
         requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
@@ -1216,8 +1226,8 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
         this.applications
             .push(PushApplicationRequest.builder()
-                .application(testApplication)
-                .domain("test-domain")
+                .path(testApplication)
+                .domain("test-shared-domain")
                 .host("test-host")
                 .name("test-name")
                 .build())
@@ -1232,14 +1242,15 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
         requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
-            .application(testApplication)
-            .domain("test-domain")
+            .path(testApplication)
+            .domain("test-shared-domain")
             .noHostname(true)
             .name("test-name")
             .build(), TEST_SPACE_ID, null, "test-application-id");
         requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
-        requestPrivateDomain(this.cloudFoundryClient, "test-domain", TEST_ORGANIZATION_ID, "test-domain-id");
-        requestRoutes(this.cloudFoundryClient, "test-domain-id", null, null, "test-route-id");
+        requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
+        requestSharedDomains(this.cloudFoundryClient, "test-shared-domain", "test-shared-domain-id");
+        requestRoutes(this.cloudFoundryClient, "test-shared-domain-id", "test-name", null, "test-route-id");
         requestListMatchingResources(this.cloudFoundryClient, Arrays.asList(new ResourceMatchingUtils.ArtifactMetadata("da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "100644", 0),
             new ResourceMatchingUtils.ArtifactMetadata("45044a6ddbfe11415a8f8a6219de68a2c66b496b", "index.html", "100644", 178)));
         requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
@@ -1252,8 +1263,8 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
         this.applications
             .push(PushApplicationRequest.builder()
-                .application(testApplication)
-                .domain("test-domain")
+                .path(testApplication)
+                .domain("test-shared-domain")
                 .noHostname(true)
                 .name("test-name")
                 .build())
@@ -1266,11 +1277,14 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     public void pushInvalidStack() throws IOException {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
+        requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
+        requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
+        requestSharedDomains(this.cloudFoundryClient, "test-shared-domain", "test-shared-domain-id");
         requestStackIdEmpty(this.cloudFoundryClient, "invalid-stack");
 
         this.applications
             .push(PushApplicationRequest.builder()
-                .application(testApplication)
+                .path(testApplication)
                 .name("test-name")
                 .stack("invalid-stack")
                 .build())
@@ -1280,21 +1294,67 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
+    public void pushMultipleRoutes() throws IOException {
+        Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
+
+        requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
+        requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
+        requestSharedDomains(this.cloudFoundryClient, "test-shared-domain", "test-shared-domain-id");
+        requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
+        requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
+            .path(testApplication)
+            .domain("test-shared-domain")
+            .name("test-name")
+            .build(), TEST_SPACE_ID, null, "test-application-id");
+        requestListMatchingResources(this.cloudFoundryClient, Arrays.asList(new ResourceMatchingUtils.ArtifactMetadata("da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "100644", 0),
+            new ResourceMatchingUtils.ArtifactMetadata("45044a6ddbfe11415a8f8a6219de68a2c66b496b", "index.html", "100644", 178)));
+        requestRoutesEmpty(this.cloudFoundryClient, "test-shared-domain-id", "test1", null);
+        requestCreateRoute(this.cloudFoundryClient, "test-shared-domain-id", "test1", null, TEST_SPACE_ID, "test-route-id");
+        requestRoutesEmpty(this.cloudFoundryClient, "test-shared-domain-id", "test2", null);
+        requestCreateRoute(this.cloudFoundryClient, "test-shared-domain-id", "test2", null, TEST_SPACE_ID, "test-route-id");
+        requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
+        requestUpload(this.cloudFoundryClient, "test-application-id", testApplication, "test-job-id");
+        requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+        requestGetApplication(this.cloudFoundryClient, "test-application-id");
+        requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
+
+        this.applications
+            .pushManifest(PushApplicationManifestRequest.builder()
+                .manifest(ApplicationManifest.builder()
+                    .path(testApplication)
+                    .name("test-name")
+                    .route(Route.builder()
+                        .route("test1.test-shared-domain-id")
+                        .build())
+                    .route(Route.builder()
+                        .route("test2.test-shared-domain-id")
+                        .build())
+                    .build())
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
     public void pushNewApplication() throws IOException {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
         requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
-            .application(testApplication)
-            .domain("test-domain")
+            .path(testApplication)
+            .domain("test-shared-domain")
             .name("test-name")
             .build(), TEST_SPACE_ID, null, "test-application-id");
         requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
-        requestPrivateDomain(this.cloudFoundryClient, "test-domain", TEST_ORGANIZATION_ID, "test-domain-id");
-        requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-name", null);
         requestListMatchingResources(this.cloudFoundryClient, Arrays.asList(new ResourceMatchingUtils.ArtifactMetadata("da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "100644", 0),
             new ResourceMatchingUtils.ArtifactMetadata("45044a6ddbfe11415a8f8a6219de68a2c66b496b", "index.html", "100644", 178)));
-        requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
+        requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
+        requestSharedDomains(this.cloudFoundryClient, "test-shared-domain", "test-shared-domain-id");
+        requestRoutesEmpty(this.cloudFoundryClient, "test-shared-domain-id", "test-name", null);
+        requestCreateRoute(this.cloudFoundryClient, "test-shared-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
         requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
         requestUpload(this.cloudFoundryClient, "test-application-id", testApplication, "test-job-id");
         requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
@@ -1305,8 +1365,8 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
         this.applications
             .push(PushApplicationRequest.builder()
-                .application(testApplication)
-                .domain("test-domain")
+                .path(testApplication)
+                .domain("test-shared-domain")
                 .name("test-name")
                 .build())
             .as(StepVerifier::create)
@@ -1320,17 +1380,18 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
         requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
-            .application(testApplication)
-            .domain("test-domain")
+            .path(testApplication)
+            .domain("test-shared-domain")
             .host("test-host")
             .name("test-name")
             .build(), TEST_SPACE_ID, null, "test-application-id");
         requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
-        requestPrivateDomain(this.cloudFoundryClient, "test-domain", TEST_ORGANIZATION_ID, "test-domain-id");
-        requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-host", null);
+        requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
+        requestSharedDomains(this.cloudFoundryClient, "test-shared-domain", "test-shared-domain-id");
+        requestRoutesEmpty(this.cloudFoundryClient, "test-shared-domain-id", "test-host", null);
         requestListMatchingResources(this.cloudFoundryClient, Arrays.asList(new ResourceMatchingUtils.ArtifactMetadata("da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "100644", 0),
             new ResourceMatchingUtils.ArtifactMetadata("45044a6ddbfe11415a8f8a6219de68a2c66b496b", "index.html", "100644", 178)));
-        requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-host", null, TEST_SPACE_ID, "test-route-id");
+        requestCreateRoute(this.cloudFoundryClient, "test-shared-domain-id", "test-host", null, TEST_SPACE_ID, "test-route-id");
         requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
         requestUpload(this.cloudFoundryClient, "test-application-id", testApplication, "test-job-id");
         requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
@@ -1341,8 +1402,8 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
         this.applications
             .push(PushApplicationRequest.builder()
-                .application(testApplication)
-                .domain("test-domain")
+                .path(testApplication)
+                .domain("test-shared-domain")
                 .host("test-host")
                 .name("test-name")
                 .build())
@@ -1357,17 +1418,18 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
         requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
-            .application(testApplication)
-            .domain("test-domain")
+            .path(testApplication)
+            .domain("test-shared-domain")
             .noHostname(true)
             .name("test-name")
             .build(), TEST_SPACE_ID, null, "test-application-id");
         requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
-        requestPrivateDomain(this.cloudFoundryClient, "test-domain", TEST_ORGANIZATION_ID, "test-domain-id");
-        requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", null, null);
+        requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
+        requestSharedDomains(this.cloudFoundryClient, "test-shared-domain", "test-shared-domain-id");
+        requestRoutesEmpty(this.cloudFoundryClient, "test-shared-domain-id", "test-name", null);
         requestListMatchingResources(this.cloudFoundryClient, Arrays.asList(new ResourceMatchingUtils.ArtifactMetadata("da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "100644", 0),
             new ResourceMatchingUtils.ArtifactMetadata("45044a6ddbfe11415a8f8a6219de68a2c66b496b", "index.html", "100644", 178)));
-        requestCreateRoute(this.cloudFoundryClient, "test-domain-id", null, null, TEST_SPACE_ID, "test-route-id");
+        requestCreateRoute(this.cloudFoundryClient, "test-shared-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
         requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
         requestUpload(this.cloudFoundryClient, "test-application-id", testApplication, "test-job-id");
         requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
@@ -1378,8 +1440,8 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
         this.applications
             .push(PushApplicationRequest.builder()
-                .application(testApplication)
-                .domain("test-domain")
+                .path(testApplication)
+                .domain("test-shared-domain")
                 .noHostname(true)
                 .name("test-name")
                 .build())
@@ -1394,22 +1456,22 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
         requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
-            .application(testApplication)
+            .path(testApplication)
             .name("test-name")
             .build(), TEST_SPACE_ID, null, "test-application-id");
         requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
-        requestSharedDomainsEmpty(this.cloudFoundryClient);
         requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
+        requestSharedDomainsEmpty(this.cloudFoundryClient);
         requestListMatchingResources(this.cloudFoundryClient, Arrays.asList(new ResourceMatchingUtils.ArtifactMetadata("da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "100644", 0),
             new ResourceMatchingUtils.ArtifactMetadata("45044a6ddbfe11415a8f8a6219de68a2c66b496b", "index.html", "100644", 178)));
 
         this.applications
             .push(PushApplicationRequest.builder()
-                .application(testApplication)
+                .path(testApplication)
                 .name("test-name")
                 .build())
             .as(StepVerifier::create)
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Domain not found"))
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("No default domain found"))
             .verify(Duration.ofSeconds(5));
     }
 
@@ -1419,31 +1481,22 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
         requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
-            .application(testApplication)
+            .path(testApplication)
             .name("test-name")
             .build(), TEST_SPACE_ID, null, "test-application-id");
         requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
+        requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-private-domain-id");
         requestSharedDomainsEmpty(this.cloudFoundryClient);
-        requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain-id");
-        requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-name", null);
         requestListMatchingResources(this.cloudFoundryClient, Arrays.asList(new ResourceMatchingUtils.ArtifactMetadata("da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "100644", 0),
             new ResourceMatchingUtils.ArtifactMetadata("45044a6ddbfe11415a8f8a6219de68a2c66b496b", "index.html", "100644", 178)));
-        requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
-        requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
-        requestUpload(this.cloudFoundryClient, "test-application-id", testApplication, "test-job-id");
-        requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
-        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
-        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
-        requestGetApplication(this.cloudFoundryClient, "test-application-id");
-        requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
 
         this.applications
             .push(PushApplicationRequest.builder()
-                .application(testApplication)
+                .path(testApplication)
                 .name("test-name")
                 .build())
             .as(StepVerifier::create)
-            .expectComplete()
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("No default domain found"))
             .verify(Duration.ofSeconds(5));
     }
 
@@ -1453,15 +1506,16 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
         requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
-            .application(testApplication)
+            .path(testApplication)
             .name("test-name")
             .build(), TEST_SPACE_ID, null, "test-application-id");
         requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
-        requestSharedDomains(this.cloudFoundryClient, "test-domain-id");
-        requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-name", null);
+        requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
+        requestSharedDomains(this.cloudFoundryClient, "test-shared-domain", "test-shared-domain-id");
+        requestRoutesEmpty(this.cloudFoundryClient, "test-shared-domain-id", "test-name", null);
         requestListMatchingResources(this.cloudFoundryClient, Arrays.asList(new ResourceMatchingUtils.ArtifactMetadata("da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "100644", 0),
             new ResourceMatchingUtils.ArtifactMetadata("45044a6ddbfe11415a8f8a6219de68a2c66b496b", "index.html", "100644", 178)));
-        requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
+        requestCreateRoute(this.cloudFoundryClient, "test-shared-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
         requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
         requestUpload(this.cloudFoundryClient, "test-application-id", testApplication, "test-job-id");
         requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
@@ -1472,8 +1526,46 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
         this.applications
             .push(PushApplicationRequest.builder()
-                .application(testApplication)
+                .path(testApplication)
                 .name("test-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void pushNoHostnameFlag() throws IOException {
+        Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
+
+        requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
+        requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
+        requestSharedDomains(this.cloudFoundryClient, "test-shared-domain", "test-shared-domain-id");
+        requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
+        requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
+            .path(testApplication)
+            .domain("test-shared-domain")
+            .name("test-name")
+            .build(), TEST_SPACE_ID, null, "test-application-id");
+        requestListMatchingResources(this.cloudFoundryClient, Arrays.asList(new ResourceMatchingUtils.ArtifactMetadata("da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "100644", 0),
+            new ResourceMatchingUtils.ArtifactMetadata("45044a6ddbfe11415a8f8a6219de68a2c66b496b", "index.html", "100644", 178)));
+        requestRoutesEmpty(this.cloudFoundryClient, "test-shared-domain-id", null, null);
+        requestCreateRoute(this.cloudFoundryClient, "test-shared-domain-id", null, null, TEST_SPACE_ID, "test-route-id");
+        requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
+        requestUpload(this.cloudFoundryClient, "test-application-id", testApplication, "test-job-id");
+        requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+        requestGetApplication(this.cloudFoundryClient, "test-application-id");
+        requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
+
+        this.applications
+            .pushManifest(PushApplicationManifestRequest.builder()
+                .manifest(ApplicationManifest.builder()
+                    .path(testApplication)
+                    .name("test-name")
+                    .noHostname(true)
+                    .build())
                 .build())
             .as(StepVerifier::create)
             .expectComplete()
@@ -1486,14 +1578,51 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
         requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
-            .application(testApplication)
+            .path(testApplication)
             .noRoute(true)
             .name("test-name")
             .build(), TEST_SPACE_ID, null, "test-application-id");
         requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
-        requestSharedDomains(this.cloudFoundryClient, "test-domain-id");
+        requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
+        requestSharedDomains(this.cloudFoundryClient, "test-shared-domain", "test-shared-domain-id");
         requestListMatchingResources(this.cloudFoundryClient, Arrays.asList(new ResourceMatchingUtils.ArtifactMetadata("da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "100644", 0),
             new ResourceMatchingUtils.ArtifactMetadata("45044a6ddbfe11415a8f8a6219de68a2c66b496b", "index.html", "100644", 178)));
+        requestApplicationRoutesEmpty(this.cloudFoundryClient, "test-application-id");
+        requestUpload(this.cloudFoundryClient, "test-application-id", testApplication, "test-job-id");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+        requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
+        requestGetApplication(this.cloudFoundryClient, "test-application-id");
+        requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
+
+        this.applications
+            .push(PushApplicationRequest.builder()
+                .path(testApplication)
+                .noRoute(true)
+                .name("test-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void pushNoRouteFlag() throws IOException {
+        Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
+
+        requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
+        requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
+        requestSharedDomains(this.cloudFoundryClient, "test-shared-domain", "test-shared-domain-id");
+        requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
+        requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
+            .path(testApplication)
+            .domain("test-shared-domain")
+            .name("test-name")
+            .build(), TEST_SPACE_ID, null, "test-application-id");
+        requestListMatchingResources(this.cloudFoundryClient, Arrays.asList(new ResourceMatchingUtils.ArtifactMetadata("da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "100644", 0),
+            new ResourceMatchingUtils.ArtifactMetadata("45044a6ddbfe11415a8f8a6219de68a2c66b496b", "index.html", "100644", 178)));
+        requestApplicationRoutes(this.cloudFoundryClient, "test-application-id", "test-route-id");
+        requestRemoveApplicationRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
         requestUpload(this.cloudFoundryClient, "test-application-id", testApplication, "test-job-id");
         requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
@@ -1502,10 +1631,12 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
 
         this.applications
-            .push(PushApplicationRequest.builder()
-                .application(testApplication)
-                .noRoute(true)
-                .name("test-name")
+            .pushManifest(PushApplicationManifestRequest.builder()
+                .manifest(ApplicationManifest.builder()
+                    .path(testApplication)
+                    .name("test-name")
+                    .noRoute(true)
+                    .build())
                 .build())
             .as(StepVerifier::create)
             .expectComplete()
@@ -1518,16 +1649,17 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
         requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
-            .application(testApplication)
+            .path(testApplication)
             .name("test-name")
             .noStart(true)
             .build(), TEST_SPACE_ID, null, "test-application-id");
         requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
-        requestSharedDomains(this.cloudFoundryClient, "test-domain-id");
-        requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-name", null);
+        requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
+        requestSharedDomains(this.cloudFoundryClient, "test-shared-domain", "test-shared-domain-id");
+        requestRoutesEmpty(this.cloudFoundryClient, "test-shared-domain-id", "test-name", null);
         requestListMatchingResources(this.cloudFoundryClient, Arrays.asList(new ResourceMatchingUtils.ArtifactMetadata("da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "100644", 0),
             new ResourceMatchingUtils.ArtifactMetadata("45044a6ddbfe11415a8f8a6219de68a2c66b496b", "index.html", "100644", 178)));
-        requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
+        requestCreateRoute(this.cloudFoundryClient, "test-shared-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
         requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
         requestUpload(this.cloudFoundryClient, "test-application-id", testApplication, "test-job-id");
         requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
@@ -1535,9 +1667,45 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
         this.applications
             .push(PushApplicationRequest.builder()
-                .application(testApplication)
+                .path(testApplication)
                 .name("test-name")
                 .noStart(true)
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void pushPrivateDomain() throws IOException {
+        Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
+
+        requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
+        requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
+            .path(testApplication)
+            .domain("test-private-domain")
+            .name("test-name")
+            .build(), TEST_SPACE_ID, null, "test-application-id");
+        requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
+        requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-private-domain-id");
+        requestSharedDomainsEmpty(this.cloudFoundryClient);
+        requestRoutesEmpty(this.cloudFoundryClient, "test-private-domain-id", "test-name", null);
+        requestListMatchingResources(this.cloudFoundryClient, Arrays.asList(new ResourceMatchingUtils.ArtifactMetadata("da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "100644", 0),
+            new ResourceMatchingUtils.ArtifactMetadata("45044a6ddbfe11415a8f8a6219de68a2c66b496b", "index.html", "100644", 178)));
+        requestCreateRoute(this.cloudFoundryClient, "test-private-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
+        requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
+        requestUpload(this.cloudFoundryClient, "test-application-id", testApplication, "test-job-id");
+        requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+        requestGetApplication(this.cloudFoundryClient, "test-application-id");
+        requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
+
+        this.applications
+            .push(PushApplicationRequest.builder()
+                .path(testApplication)
+                .domain("test-private-domain")
+                .name("test-name")
                 .build())
             .as(StepVerifier::create)
             .expectComplete()
@@ -1550,18 +1718,19 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
         requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
-            .application(testApplication)
-            .domain("test-domain")
+            .path(testApplication)
+            .domain("test-shared-domain")
             .name("test-name")
             .randomRoute(true)
             .build(), TEST_SPACE_ID, null, "test-application-id");
         requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
-        requestPrivateDomain(this.cloudFoundryClient, "test-domain", TEST_ORGANIZATION_ID, "test-domain-id");
+        requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
+        requestSharedDomains(this.cloudFoundryClient, "test-shared-domain", "test-shared-domain-id");
         provideRandomWords(this.randomWords);
-        requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-name-test-adjective-test-noun", null);
+        requestRoutesEmpty(this.cloudFoundryClient, "test-shared-domain-id", "test-name-test-adjective-test-noun", null);
         requestListMatchingResources(this.cloudFoundryClient, Arrays.asList(new ResourceMatchingUtils.ArtifactMetadata("da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "100644", 0),
             new ResourceMatchingUtils.ArtifactMetadata("45044a6ddbfe11415a8f8a6219de68a2c66b496b", "index.html", "100644", 178)));
-        requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-name-test-adjective-test-noun", null, TEST_SPACE_ID, "test-route-id");
+        requestCreateRoute(this.cloudFoundryClient, "test-shared-domain-id", "test-name-test-adjective-test-noun", null, TEST_SPACE_ID, "test-route-id");
         requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
         requestUpload(this.cloudFoundryClient, "test-application-id", testApplication, "test-job-id");
         requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
@@ -1572,8 +1741,8 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
         this.applications
             .push(PushApplicationRequest.builder()
-                .application(testApplication)
-                .domain("test-domain")
+                .path(testApplication)
+                .domain("test-shared-domain")
                 .name("test-name")
                 .randomRoute(true)
                 .build())
@@ -1588,17 +1757,17 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
         requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
-            .application(testApplication)
-            .domain("test-domain")
+            .path(testApplication)
+            .domain("test-shared-domain")
             .name("test-name")
             .build(), TEST_SPACE_ID, null, "test-application-id");
         requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
-        requestPrivateDomainNotFound(this.cloudFoundryClient, "test-domain", TEST_ORGANIZATION_ID);
-        requestSharedDomain(this.cloudFoundryClient, "test-domain", "test-domain-id");
-        requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-name", null);
+        requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
+        requestSharedDomains(this.cloudFoundryClient, "test-shared-domain", "test-shared-domain-id");
+        requestRoutesEmpty(this.cloudFoundryClient, "test-shared-domain-id", "test-name", null);
         requestListMatchingResources(this.cloudFoundryClient, Arrays.asList(new ResourceMatchingUtils.ArtifactMetadata("da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "100644", 0),
             new ResourceMatchingUtils.ArtifactMetadata("45044a6ddbfe11415a8f8a6219de68a2c66b496b", "index.html", "100644", 178)));
-        requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
+        requestCreateRoute(this.cloudFoundryClient, "test-shared-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
         requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
         requestUpload(this.cloudFoundryClient, "test-application-id", testApplication, "test-job-id");
         requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
@@ -1609,8 +1778,8 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
         this.applications
             .push(PushApplicationRequest.builder()
-                .application(testApplication)
-                .domain("test-domain")
+                .path(testApplication)
+                .domain("test-shared-domain")
                 .name("test-name")
                 .build())
             .as(StepVerifier::create)
@@ -1624,16 +1793,17 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
         requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
-            .application(testApplication)
-            .domain("test-domain")
+            .path(testApplication)
+            .domain("test-shared-domain")
             .name("test-name")
             .build(), TEST_SPACE_ID, null, "test-application-id");
         requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
-        requestPrivateDomain(this.cloudFoundryClient, "test-domain", TEST_ORGANIZATION_ID, "test-domain-id");
-        requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-name", null);
+        requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
+        requestSharedDomains(this.cloudFoundryClient, "test-shared-domain", "test-shared-domain-id");
+        requestRoutesEmpty(this.cloudFoundryClient, "test-shared-domain-id", "test-name", null);
         requestListMatchingResources(this.cloudFoundryClient, Arrays.asList(new ResourceMatchingUtils.ArtifactMetadata("da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "100644", 0),
             new ResourceMatchingUtils.ArtifactMetadata("45044a6ddbfe11415a8f8a6219de68a2c66b496b", "index.html", "100644", 178)));
-        requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
+        requestCreateRoute(this.cloudFoundryClient, "test-shared-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
         requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
         requestUpload(this.cloudFoundryClient, "test-application-id", testApplication, "test-job-id");
         requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
@@ -1644,8 +1814,8 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
         this.applications
             .push(PushApplicationRequest.builder()
-                .application(testApplication)
-                .domain("test-domain")
+                .path(testApplication)
+                .domain("test-shared-domain")
                 .name("test-name")
                 .build())
             .as(StepVerifier::create)
@@ -1659,16 +1829,17 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
         requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
-            .application(testApplication)
-            .domain("test-domain")
+            .path(testApplication)
+            .domain("test-shared-domain")
             .name("test-name")
             .build(), TEST_SPACE_ID, null, "test-application-id");
         requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
-        requestPrivateDomain(this.cloudFoundryClient, "test-domain", TEST_ORGANIZATION_ID, "test-domain-id");
-        requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-name", null);
+        requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-private-domain-id");
+        requestSharedDomains(this.cloudFoundryClient, "test-shared-domain", "test-shared-domain-id");
+        requestRoutesEmpty(this.cloudFoundryClient, "test-shared-domain-id", "test-name", null);
         requestListMatchingResources(this.cloudFoundryClient, Arrays.asList(new ResourceMatchingUtils.ArtifactMetadata("da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "100644", 0),
             new ResourceMatchingUtils.ArtifactMetadata("45044a6ddbfe11415a8f8a6219de68a2c66b496b", "index.html", "100644", 178)));
-        requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
+        requestCreateRoute(this.cloudFoundryClient, "test-shared-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
         requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
         requestUpload(this.cloudFoundryClient, "test-application-id", testApplication, "test-job-id");
         requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
@@ -1678,12 +1849,48 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
         this.applications
             .push(PushApplicationRequest.builder()
-                .application(testApplication)
-                .domain("test-domain")
+                .path(testApplication)
+                .domain("test-shared-domain")
                 .name("test-name")
                 .build())
             .as(StepVerifier::create)
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalStateException.class).hasMessage("Application test-name failed during staging"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void pushTcpRoute() throws IOException {
+        Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
+
+        requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
+        requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
+            .path(testApplication)
+            .domain("test-tcp-domain")
+            .name("test-name")
+            .build(), TEST_SPACE_ID, null, "test-application-id");
+        requestListMatchingResources(this.cloudFoundryClient, Arrays.asList(new ResourceMatchingUtils.ArtifactMetadata("da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "100644", 0),
+            new ResourceMatchingUtils.ArtifactMetadata("45044a6ddbfe11415a8f8a6219de68a2c66b496b", "index.html", "100644", 178)));
+        requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
+        requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
+        requestTcpDomains(this.cloudFoundryClient, "test-tcp-domain", "test-tcp-domain-id");
+        requestRoutesEmpty(this.cloudFoundryClient, "test-tcp-domain-id", null, null);
+        requestCreateRoute(this.cloudFoundryClient, "test-tcp-domain-id", null, null, TEST_SPACE_ID, "test-route-id");
+        requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
+        requestUpload(this.cloudFoundryClient, "test-application-id", testApplication, "test-job-id");
+        requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+        requestGetApplication(this.cloudFoundryClient, "test-application-id");
+        requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
+
+        this.applications
+            .push(PushApplicationRequest.builder()
+                .path(testApplication)
+                .domain("test-tcp-domain")
+                .name("test-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
 
@@ -1693,24 +1900,25 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
         requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
-            .application(testApplication)
-            .domain("test-domain")
+            .path(testApplication)
+            .domain("test-shared-domain")
             .name("test-name")
             .build(), TEST_SPACE_ID, null, "test-application-id");
         requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
-        requestPrivateDomain(this.cloudFoundryClient, "test-domain", TEST_ORGANIZATION_ID, "test-domain-id");
-        requestRoutesEmpty(this.cloudFoundryClient, "test-domain-id", "test-name", null);
+        requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
+        requestSharedDomains(this.cloudFoundryClient, "test-shared-domain", "test-shared-domain-id");
+        requestRoutesEmpty(this.cloudFoundryClient, "test-shared-domain-id", "test-name", null);
         requestListMatchingResources(this.cloudFoundryClient, Arrays.asList(new ResourceMatchingUtils.ArtifactMetadata("da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "100644", 0),
             new ResourceMatchingUtils.ArtifactMetadata("45044a6ddbfe11415a8f8a6219de68a2c66b496b", "index.html", "100644", 178)));
-        requestCreateRoute(this.cloudFoundryClient, "test-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
+        requestCreateRoute(this.cloudFoundryClient, "test-shared-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
         requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
         requestUpload(this.cloudFoundryClient, "test-application-id", testApplication, "test-job-id");
         requestJobFailure(this.cloudFoundryClient, "test-job-entity-id");
 
         this.applications
             .push(PushApplicationRequest.builder()
-                .application(testApplication)
-                .domain("test-domain")
+                .path(testApplication)
+                .domain("test-shared-domain")
                 .name("test-name")
                 .build())
             .as(StepVerifier::create)
@@ -2434,6 +2642,35 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                     .build()));
     }
 
+    private static void requestApplicationRoutes(CloudFoundryClient cloudFoundryClient, String applicationId, String routeId) {
+        when(cloudFoundryClient.applicationsV2()
+            .listRoutes(ListApplicationRoutesRequest.builder()
+                .applicationId(applicationId)
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(ListApplicationRoutesResponse.builder())
+                    .resource(fill(RouteResource.builder())
+                        .metadata(fill(Metadata.builder())
+                            .id(routeId)
+                            .build())
+                        .build())
+                    .totalPages(1)
+                    .build()));
+    }
+
+    private static void requestApplicationRoutesEmpty(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        when(cloudFoundryClient.applicationsV2()
+            .listRoutes(ListApplicationRoutesRequest.builder()
+                .applicationId(applicationId)
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(ListApplicationRoutesResponse.builder())
+                    .totalPages(1)
+                    .build()));
+    }
+
     private static void requestApplicationServiceBindings(CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient.applicationsV2()
             .listServiceBindings(ListApplicationServiceBindingsRequest.builder()
@@ -2492,7 +2729,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .build()))
             .thenReturn(Mono
                 .just(fill(SummaryApplicationResponse.builder(), "application-summary-")
-                    .route(fill(Route.builder(), "route-")
+                    .route(fill(org.cloudfoundry.client.v2.routes.Route.builder(), "route-")
                         .domain(fill(org.cloudfoundry.client.v2.domains.Domain.builder(), "domain-").build())
                         .build())
                     .service(fill(ServiceInstance.builder(), "service-instance-").build())
@@ -2507,7 +2744,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .build()))
             .thenReturn(Mono
                 .just(fill(SummaryApplicationResponse.builder(), "application-summary-")
-                    .route(fill(Route.builder(), "route-")
+                    .route(fill(org.cloudfoundry.client.v2.routes.Route.builder(), "route-")
                         .domain(fill(org.cloudfoundry.client.v2.domains.Domain.builder(), "domain-")
                             .build())
                         .build())
@@ -2523,7 +2760,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .build()))
             .thenReturn(Mono
                 .just(fill(SummaryApplicationResponse.builder(), "application-summary-")
-                    .route(fill(Route.builder(), "route-")
+                    .route(fill(org.cloudfoundry.client.v2.routes.Route.builder(), "route-")
                         .domain(fill(org.cloudfoundry.client.v2.domains.Domain.builder(), "domain-")
                             .build())
                         .build())
@@ -2700,6 +2937,8 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                     .metadata(fill(Metadata.builder())
                         .id(routeId)
                         .build())
+                    .entity(fill(RouteEntity.builder())
+                        .build())
                     .build()));
     }
 
@@ -2800,6 +3039,18 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .just(fill(GetApplicationResponse.builder())
                     .entity(fill(ApplicationEntity.builder())
                         .packageState("STAGING")
+                        .build())
+                    .build()));
+    }
+
+    private static void requestGetSharedDomain(CloudFoundryClient cloudFoundryClient, String domainId) {
+        when(cloudFoundryClient.sharedDomains()
+            .get(GetSharedDomainRequest.builder()
+                .sharedDomainId(domainId)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(GetSharedDomainResponse.builder())
+                    .entity(SharedDomainEntity.builder()
                         .build())
                     .build()));
     }
@@ -2970,23 +3221,6 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                     .build()));
     }
 
-    private static void requestPrivateDomain(CloudFoundryClient cloudFoundryClient, String domain, String organizationId, String domainId) {
-        when(cloudFoundryClient.organizations()
-            .listPrivateDomains(ListOrganizationPrivateDomainsRequest.builder()
-                .name(domain)
-                .organizationId(organizationId)
-                .page(1)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(ListOrganizationPrivateDomainsResponse.builder())
-                    .resource(fill(PrivateDomainResource.builder())
-                        .metadata(fill(Metadata.builder())
-                            .id(domainId)
-                            .build())
-                        .build())
-                    .build()));
-    }
-
     private static void requestPrivateDomainNotFound(CloudFoundryClient cloudFoundryClient, String domain, String organizationId) {
         when(cloudFoundryClient.organizations()
             .listPrivateDomains(ListOrganizationPrivateDomainsRequest.builder()
@@ -3011,6 +3245,9 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                         .metadata(fill(Metadata.builder())
                             .id(domainId)
                             .build())
+                        .entity(fill(PrivateDomainEntity.builder())
+                            .name("test-private-domain")
+                            .build())
                         .build())
                     .build()));
     }
@@ -3024,6 +3261,15 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
             .thenReturn(Mono
                 .just(fill(ListOrganizationPrivateDomainsResponse.builder())
                     .build()));
+    }
+
+    private static void requestRemoveApplicationRoute(CloudFoundryClient cloudFoundryClient, String applicationId, String routeId) {
+        when(cloudFoundryClient.applicationsV2()
+            .removeRoute(RemoveApplicationRouteRequest.builder()
+                .applicationId(applicationId)
+                .routeId(routeId)
+                .build()))
+            .thenReturn(Mono.empty());
     }
 
     private static void requestRemoveServiceBinding(CloudFoundryClient cloudFoundryClient, String applicationId, String serviceBindingId) {
@@ -3073,12 +3319,12 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestRoutesEmpty(CloudFoundryClient cloudFoundryClient, String domainId, String host, String routePath) {
         ListRoutesRequest.Builder requestBuilder = ListRoutesRequest.builder();
 
+        Optional.ofNullable(domainId).ifPresent(requestBuilder::domainId);
         Optional.ofNullable(host).ifPresent(requestBuilder::host);
         Optional.ofNullable(routePath).ifPresent(requestBuilder::path);
 
         when(cloudFoundryClient.routes()
             .list(requestBuilder
-                .domainId(domainId)
                 .page(1)
                 .build()))
             .thenReturn(Mono
@@ -3099,23 +3345,13 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                             .id(domainId)
                             .build())
                         .entity(SharedDomainEntity.builder()
+                            .name(domain)
                             .build())
                         .build())
                     .build()));
     }
 
-    private static void requestSharedDomainNotFound(CloudFoundryClient cloudFoundryClient, String domain) {
-        when(cloudFoundryClient.sharedDomains()
-            .list(ListSharedDomainsRequest.builder()
-                .page(1)
-                .name(domain)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(ListSharedDomainsResponse.builder())
-                    .build()));
-    }
-
-    private static void requestSharedDomains(CloudFoundryClient cloudFoundryClient, String domainId) {
+    private static void requestSharedDomains(CloudFoundryClient cloudFoundryClient, String domain, String domainId) {
         when(cloudFoundryClient.sharedDomains()
             .list(ListSharedDomainsRequest.builder()
                 .page(1)
@@ -3126,7 +3362,8 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                         .metadata(fill(Metadata.builder())
                             .id(domainId)
                             .build())
-                        .entity(SharedDomainEntity.builder()
+                        .entity(fill(SharedDomainEntity.builder())
+                            .name(domain)
                             .build())
                         .build())
                     .build()));
@@ -3187,6 +3424,25 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .build()))
             .thenReturn(Mono
                 .just(fill(ListStacksResponse.builder())
+                    .build()));
+    }
+
+    private static void requestTcpDomains(CloudFoundryClient cloudFoundryClient, String domain, String domainId) {
+        when(cloudFoundryClient.sharedDomains()
+            .list(ListSharedDomainsRequest.builder()
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(ListSharedDomainsResponse.builder())
+                    .resource(SharedDomainResource.builder()
+                        .metadata(fill(Metadata.builder())
+                            .id(domainId)
+                            .build())
+                        .entity(fill(SharedDomainEntity.builder())
+                            .name(domain)
+                            .routerGroupType("tcp")
+                            .build())
+                        .build())
                     .build()));
     }
 
