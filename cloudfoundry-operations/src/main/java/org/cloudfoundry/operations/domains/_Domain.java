@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.operations.domains;
 
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
@@ -35,8 +36,14 @@ abstract class _Domain {
     abstract String getName();
 
     /**
-     * The status of the domain indicating shared or private domain
+     * The status of the domain indicating shared or private ('owned')
      */
     abstract Status getStatus();
+
+    /**
+     * The type of the domain
+     */
+    @Nullable
+    abstract String getType();
 
 }
