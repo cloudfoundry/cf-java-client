@@ -19,11 +19,14 @@ package org.cloudfoundry.operations;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.client.v2.ClientV2Exception;
 import org.cloudfoundry.operations.domains.CreateDomainRequest;
+import org.cloudfoundry.operations.domains.CreateSharedDomainRequest;
+import org.cloudfoundry.operations.domains.Domain;
 import org.cloudfoundry.operations.domains.ShareDomainRequest;
 import org.cloudfoundry.operations.domains.UnshareDomainRequest;
 import org.cloudfoundry.operations.organizations.CreateOrganizationRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -31,6 +34,8 @@ import java.time.Duration;
 import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.cloudfoundry.operations.domains.Status.OWNED;
+import static org.cloudfoundry.operations.domains.Status.SHARED;
 
 public final class DomainsTest extends AbstractIntegrationTest {
 
@@ -41,20 +46,6 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     @Autowired
     private String organizationName;
-
-    @Test
-    public void create() throws TimeoutException, InterruptedException {
-        String domainName = this.nameFactory.getDomainName();
-
-        this.cloudFoundryOperations.domains()
-            .create(CreateDomainRequest.builder()
-                .domain(domainName)
-                .organization(this.organizationName)
-                .build())
-            .as(StepVerifier::create)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
-    }
 
     @Test
     public void createInvalidDomain() throws TimeoutException, InterruptedException {
@@ -69,12 +60,95 @@ public final class DomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
+    public void createPrivate() throws TimeoutException, InterruptedException {
+        String domainName = this.nameFactory.getDomainName();
+
+        this.cloudFoundryOperations.domains()
+            .create(CreateDomainRequest.builder()
+                .domain(domainName)
+                .organization(this.organizationName)
+                .build())
+            .thenMany(requestListDomains(this.cloudFoundryOperations))
+            .filter(domain -> domainName.equals(domain.getName()))
+            .map(Domain::getStatus)
+            .as(StepVerifier::create)
+            .expectNext(OWNED)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void createShared() throws TimeoutException, InterruptedException {
+        String domainName = this.nameFactory.getDomainName();
+
+        this.cloudFoundryOperations.domains()
+            .createShared(CreateSharedDomainRequest.builder()
+                .domain(domainName)
+                .build())
+            .thenMany(requestListDomains(this.cloudFoundryOperations))
+            .filter(domain -> domainName.equals(domain.getName()))
+            .map(Domain::getStatus)
+            .as(StepVerifier::create)
+            .expectNext(SHARED)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void createSharedTcp() throws TimeoutException, InterruptedException {
+        String domainName = this.nameFactory.getDomainName();
+
+        this.cloudFoundryOperations.domains()
+            .createShared(CreateSharedDomainRequest.builder()
+                .domain(domainName)
+                .routerGroup(DEFAULT_ROUTER_GROUP)
+                .build())
+            .thenMany(requestListDomains(this.cloudFoundryOperations))
+            .filter(domain -> domainName.equals(domain.getName()))
+            .map(Domain::getType)
+            .as(StepVerifier::create)
+            .expectNext("tcp")
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void list() throws TimeoutException, InterruptedException {
+        String domainName = this.nameFactory.getDomainName();
+
+        requestCreateDomain(this.cloudFoundryOperations, domainName, this.organizationName)
+            .thenMany(this.cloudFoundryOperations.domains()
+                .list()
+                .filter(domain -> domainName.equals(domain.getName())))
+            .map(Domain::getStatus)
+            .as(StepVerifier::create)
+            .expectNext(OWNED)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
     public void listRouterGroups() throws TimeoutException, InterruptedException {
         this.cloudFoundryOperations.domains()
             .listRouterGroups()
             .filter(response -> DEFAULT_ROUTER_GROUP.equals(response.getName()))
             .as(StepVerifier::create)
             .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void listTcp() throws TimeoutException, InterruptedException {
+        String domainName = this.nameFactory.getDomainName();
+
+        requestCreateTcpDomain(this.cloudFoundryOperations, domainName)
+            .thenMany(this.cloudFoundryOperations.domains()
+                .list()
+                .filter(domain -> domainName.equals(domain.getName())))
+            .map(Domain::getType)
+            .as(StepVerifier::create)
+            .expectNext("tcp")
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -127,6 +201,19 @@ public final class DomainsTest extends AbstractIntegrationTest {
             .create(CreateOrganizationRequest.builder()
                 .organizationName(name)
                 .build());
+    }
+
+    private static Mono<Void> requestCreateTcpDomain(CloudFoundryOperations cloudFoundryOperations, String domainName) {
+        return cloudFoundryOperations.domains()
+            .createShared(CreateSharedDomainRequest.builder()
+                .domain(domainName)
+                .routerGroup(DEFAULT_ROUTER_GROUP)
+                .build());
+    }
+
+    private static Flux<Domain> requestListDomains(CloudFoundryOperations cloudFoundryOperations) {
+        return cloudFoundryOperations.domains()
+            .list();
     }
 
     private static Mono<Void> requestShareDomain(CloudFoundryOperations cloudFoundryOperations, String organizationName, String domainName) {

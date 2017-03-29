@@ -31,6 +31,7 @@ import org.cloudfoundry.client.v2.privatedomains.PrivateDomainResource;
 import org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainResponse;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsResponse;
+import org.cloudfoundry.client.v2.shareddomains.SharedDomainEntity;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomainResource;
 import org.cloudfoundry.operations.AbstractOperationsTest;
 import org.cloudfoundry.routing.RoutingClient;
@@ -130,6 +131,29 @@ public final class DefaultDomainsTest extends AbstractOperationsTest {
                 .name("test-shared-domain-name")
                 .status(Status.SHARED)
                 .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void listDomainsTcp() {
+        requestPrivateDomains(this.cloudFoundryClient);
+        requestSharedDomainsTcp(this.cloudFoundryClient);
+
+        this.domains
+            .list()
+            .as(StepVerifier::create)
+            .expectNext(Domain.builder()
+                    .id("test-private-domain-id")
+                    .name("test-private-domain-name")
+                    .status(Status.OWNED)
+                    .build(),
+                Domain.builder()
+                    .id("test-shared-domain-id")
+                    .name("test-shared-domain-name")
+                    .status(Status.SHARED)
+                    .type("test-shared-domain-type")
+                    .build())
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -279,17 +303,6 @@ public final class DefaultDomainsTest extends AbstractOperationsTest {
                     .build()));
     }
 
-    private static void requestOrganizationsEmpty(CloudFoundryClient cloudFoundryClient, String organization) {
-        when(cloudFoundryClient.organizations()
-            .list(ListOrganizationsRequest.builder()
-                .name(organization)
-                .page(1)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(ListOrganizationsResponse.builder(), "organization-")
-                    .build()));
-    }
-
     private static void requestPrivateDomains(CloudFoundryClient cloudFoundryClient) {
         when(cloudFoundryClient.privateDomains()
             .list(ListPrivateDomainsRequest.builder()
@@ -329,6 +342,9 @@ public final class DefaultDomainsTest extends AbstractOperationsTest {
             .thenReturn(Mono
                 .just(fill(ListSharedDomainsResponse.builder())
                     .resource(fill(SharedDomainResource.builder(), "shared-domain-")
+                        .entity(fill(SharedDomainEntity.builder(), "shared-domain-")
+                            .routerGroupType(null)
+                            .build())
                         .build())
                     .build()));
     }
@@ -340,6 +356,21 @@ public final class DefaultDomainsTest extends AbstractOperationsTest {
                 .build()))
             .thenReturn(Mono
                 .just(fill(ListSharedDomainsResponse.builder())
+                    .build()));
+    }
+
+    private static void requestSharedDomainsTcp(CloudFoundryClient cloudFoundryClient) {
+        when(cloudFoundryClient.sharedDomains()
+            .list(ListSharedDomainsRequest.builder()
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(ListSharedDomainsResponse.builder())
+                    .resource(fill(SharedDomainResource.builder(), "shared-domain-")
+                        .entity(fill(SharedDomainEntity.builder(), "shared-domain-")
+                            .routerGroupType("test-shared-domain-type")
+                            .build())
+                        .build())
                     .build()));
     }
 

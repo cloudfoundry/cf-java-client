@@ -250,6 +250,7 @@ public final class DefaultDomains implements Domains {
             .id(ResourceUtils.getId(resource))
             .name(entity.getName())
             .status(Status.SHARED)
+            .type(entity.getRouterGroupType())
             .build();
     }
 
