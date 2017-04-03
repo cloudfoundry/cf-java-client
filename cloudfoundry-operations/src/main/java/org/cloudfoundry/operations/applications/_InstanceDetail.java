@@ -46,6 +46,11 @@ abstract class _InstanceDetail {
     abstract Long getDiskUsage();
 
     /**
+     * The index of this instance
+     */
+    abstract String getIndex();
+
+    /**
      * The memoryUsage quota, in bytes, of this instance
      */
     @Nullable
