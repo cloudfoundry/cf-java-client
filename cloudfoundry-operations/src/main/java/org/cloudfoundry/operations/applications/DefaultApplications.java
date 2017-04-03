@@ -1359,6 +1359,7 @@ public final class DefaultApplications implements Applications {
         Usage usage = Optional.ofNullable(stats.getUsage()).orElse(emptyApplicationUsage());
 
         return InstanceDetail.builder()
+            .index(entry.getKey())
             .state(entry.getValue().getState())
             .since(toDate(entry.getValue().getSince()))
             .cpu(usage.getCpu())
