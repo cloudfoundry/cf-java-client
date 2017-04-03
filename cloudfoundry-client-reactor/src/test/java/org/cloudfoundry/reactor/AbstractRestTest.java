@@ -27,7 +27,6 @@ import okhttp3.mockwebserver.RecordedRequest;
 import org.junit.After;
 import org.junit.ComparisonFailure;
 import org.slf4j.bridge.SLF4JBridgeHandler;
-import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.ipc.netty.http.client.HttpClient;
 
@@ -53,9 +52,7 @@ public abstract class AbstractRestTest {
 
     final MockWebServer mockWebServer = new MockWebServer();
 
-    protected final Mono<String> root = Mono.just(UriComponentsBuilder.newInstance()
-        .scheme("http").host(this.mockWebServer.getHostName()).port(this.mockWebServer.getPort())
-        .build().encode().toUriString());
+    protected final Mono<String> root = Mono.just(this.mockWebServer.url("/").uri().toString());
 
     private InteractionContext interactionContext;
 
@@ -73,6 +70,8 @@ public abstract class AbstractRestTest {
 
     protected final void mockRequest(InteractionContext interactionContext) {
         this.interactionContext = interactionContext;
+
+
         this.mockWebServer.setDispatcher(new Dispatcher() {
 
             @Override
