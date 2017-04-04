@@ -5,9 +5,9 @@
 | Job | Status
 | --- | ------
 | `unit-test` | [![unit-test-master](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/cf-java-client/jobs/unit-test-master/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/cf-java-client/jobs/unit-test-master)
-| `integration-test-1.7` | [![unit-test-master](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/cf-java-client/jobs/integration-test-1.7-master/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/cf-java-client/jobs/integration-test-1.7-master)
 | `integration-test-1.8` | [![unit-test-master](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/cf-java-client/jobs/integration-test-1.8-master/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/cf-java-client/jobs/integration-test-1.8-master)
 | `integration-test-1.9` | [![unit-test-master](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/cf-java-client/jobs/integration-test-1.9-master/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/cf-java-client/jobs/integration-test-1.9-master)
+| `integration-test-1.10` | [![unit-test-master](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/cf-java-client/jobs/integration-test-1.10-master/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/cf-java-client/jobs/integration-test-1.10-master)
 | `deploy` | [![deploy-master](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/cf-java-client/jobs/deploy-master/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/cf-java-client/jobs/deploy-master)
 
 | Artifact | Javadocs
