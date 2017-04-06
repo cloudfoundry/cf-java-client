@@ -23,6 +23,7 @@ import reactor.core.publisher.Mono;
 import reactor.ipc.netty.http.client.HttpClientResponse;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -78,15 +79,17 @@ public final class NetworkLogging {
             .doOnNext(responseHolder::set)
             .doFinally(signalType -> {
                 String elapsed = asTime(System.currentTimeMillis() - startTimeHolder.get());
-                HttpClientResponse response = responseHolder.get();
 
-                List<String> warnings = response.responseHeaders().getAll(CF_WARNINGS);
+                Optional.ofNullable(responseHolder.get())
+                    .ifPresent(response -> {
+                        List<String> warnings = response.responseHeaders().getAll(CF_WARNINGS);
 
-                if (!warnings.isEmpty()) {
-                    RESPONSE_LOGGER.warn("{}    {} ({}) [{}]", response.status().code(), uri, elapsed, warnings.stream().collect(Collectors.joining(", ")));
-                } else if (RESPONSE_LOGGER.isDebugEnabled()) {
-                    RESPONSE_LOGGER.debug("{}    {} ({})", response.status().code(), uri, elapsed);
-                }
+                        if (warnings.isEmpty()) {
+                            RESPONSE_LOGGER.debug("{}    {} ({})", response.status().code(), uri, elapsed);
+                        } else {
+                            RESPONSE_LOGGER.warn("{}    {} ({}) [{}]", response.status().code(), uri, elapsed, warnings.stream().collect(Collectors.joining(", ")));
+                        }
+                    });
             });
     }
 
