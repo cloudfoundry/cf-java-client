@@ -29,13 +29,11 @@ import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
-import java.nio.file.attribute.PosixFileAttributes;
 import java.nio.file.attribute.PosixFilePermission;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Enumeration;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -45,8 +43,6 @@ import java.util.stream.Stream;
 public final class FileUtils {
 
     private static final Integer DEFAULT_PERMISSIONS = 0744;
-
-    private static final int MIBIBYTE = 1_024 * 1_024;
 
     private static final Map<PosixFilePermission, Integer> PERMISSION_MODES = FluentMap.<PosixFilePermission, Integer>builder()
         .entry(PosixFilePermission.OWNER_READ, 0400)
@@ -236,12 +232,17 @@ public final class FileUtils {
     }
 
     private static int getUnixMode(Path path) throws IOException {
-        return Optional.ofNullable(Files.readAttributes(path, PosixFileAttributes.class))
-            .map(attributes -> attributes.permissions().stream()
-                .map(PERMISSION_MODES::get)
-                .mapToInt(i -> i)
-                .sum())
-            .orElse(DEFAULT_PERMISSIONS);
+        if (!isPosixFile(path)) {
+            return DEFAULT_PERMISSIONS;
+        }
+
+        return Files.getPosixFilePermissions(path).stream()
+            .mapToInt(PERMISSION_MODES::get)
+            .sum();
+    }
+
+    private static boolean isPosixFile(Path path) {
+        return path.getFileSystem().supportedFileAttributeViews().contains("posix");
     }
 
     private static void write(InputStream in, FileTime lastModifiedTime, int mode, ZipArchiveOutputStream out, String path) {
