@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.util;
 
+import org.cloudfoundry.util.TimeUtils;
 import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,19 +33,14 @@ import java.util.stream.Collectors;
 
 public final class NetworkLogging {
 
-    public static final Logger REQUEST_LOGGER = LoggerFactory.getLogger("cloudfoundry-client.request");
-
-    public static final Logger RESPONSE_LOGGER = LoggerFactory.getLogger("cloudfoundry-client.response");
+    static final Logger RESPONSE_LOGGER = LoggerFactory.getLogger("cloudfoundry-client.response");
 
     private static final String CF_WARNINGS = "X-Cf-Warnings";
 
-    private static final double MILLISECOND = 1;
+    private static final Logger REQUEST_LOGGER = LoggerFactory.getLogger("cloudfoundry-client.request");
 
-    private static final double SECOND = 1000 * MILLISECOND;
-
-    private static final double MINUTE = 60 * SECOND;
-
-    private static final double HOUR = 60 * MINUTE;
+    private NetworkLogging() {
+    }
 
     public static Consumer<Subscription> delete(String uri) {
         return s -> REQUEST_LOGGER.debug("DELETE {}", uri);
@@ -78,7 +74,7 @@ public final class NetworkLogging {
             .doOnSubscribe(s -> startTimeHolder.set(System.currentTimeMillis()))
             .doOnNext(responseHolder::set)
             .doFinally(signalType -> {
-                String elapsed = asTime(System.currentTimeMillis() - startTimeHolder.get());
+                String elapsed = TimeUtils.asTime(System.currentTimeMillis() - startTimeHolder.get());
 
                 Optional.ofNullable(responseHolder.get())
                     .ifPresent(response -> {
@@ -97,16 +93,5 @@ public final class NetworkLogging {
         return s -> REQUEST_LOGGER.debug("WS     {}", uri);
     }
 
-    private static String asTime(long elapsed) {
-        if (elapsed > HOUR) {
-            return String.format("%.1f h", (elapsed / HOUR));
-        } else if (elapsed > MINUTE) {
-            return String.format("%.1f m", (elapsed / MINUTE));
-        } else if (elapsed > SECOND) {
-            return String.format("%.1f s", (elapsed / SECOND));
-        } else {
-            return String.format("%d ms", elapsed);
-        }
-    }
 
 }

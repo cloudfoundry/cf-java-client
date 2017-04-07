@@ -23,8 +23,8 @@
         </encoder>
     </appender>
 
-    <logger name="cloudfoundry-client.delay"    level="${CLIENT_LOGGING_LEVEL:-INFO}"/>
-    <logger name="stream"                       level="INFO"/>
+    <logger name="cloudfoundry-client.delay" level="${CLIENT_LOGGING_LEVEL:-INFO}"/>
+    <logger name="stream"                    level="INFO"/>
 
     <root level="WARN">
         <appender-ref ref="STDOUT"/>

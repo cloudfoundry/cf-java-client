@@ -80,6 +80,7 @@ import org.cloudfoundry.doppler.EventType;
 import org.cloudfoundry.doppler.LogMessage;
 import org.cloudfoundry.doppler.RecentLogsRequest;
 import org.cloudfoundry.doppler.StreamRequest;
+import org.cloudfoundry.operations.util.OperationsLogging;
 import org.cloudfoundry.util.DateUtils;
 import org.cloudfoundry.util.DelayTimeoutException;
 import org.cloudfoundry.util.ExceptionUtils;
@@ -173,6 +174,7 @@ public final class DefaultApplications implements Applications {
             .filter(predicate((cloudFoundryClient, targetApplicationId) -> Optional.ofNullable(request.getRestart()).orElse(false)))
             .then(function((cloudFoundryClient, targetApplicationId) -> restartApplication(cloudFoundryClient, request.getTargetName(), targetApplicationId, request.getStagingTimeout(),
                 request.getStartupTimeout())))
+            .transform(OperationsLogging.log("Copy Application Source"))
             .checkpoint();
     }
 
@@ -187,6 +189,7 @@ public final class DefaultApplications implements Applications {
             .then(function((cloudFoundryClient, applicationId) -> removeServiceBindings(cloudFoundryClient, applicationId)
                 .then(Mono.just(Tuples.of(cloudFoundryClient, applicationId)))))
             .then(function(DefaultApplications::requestDeleteApplication))
+            .transform(OperationsLogging.log("Delete Application"))
             .checkpoint();
     }
 
@@ -200,6 +203,7 @@ public final class DefaultApplications implements Applications {
             )))
             .then(function((cloudFoundryClient, applicationId) -> requestUpdateApplicationSsh(cloudFoundryClient, applicationId, false)))
             .then()
+            .transform(OperationsLogging.log("Disable Application SSH"))
             .checkpoint();
     }
 
@@ -213,6 +217,7 @@ public final class DefaultApplications implements Applications {
             )))
             .then(function((cloudFoundryClient, applicationId) -> requestUpdateApplicationSsh(cloudFoundryClient, applicationId, true)))
             .then()
+            .transform(OperationsLogging.log("Enable Application SSH"))
             .checkpoint();
     }
 
@@ -226,6 +231,7 @@ public final class DefaultApplications implements Applications {
             )))
             .then(function(DefaultApplications::getAuxiliaryContent))
             .map(function(DefaultApplications::toApplicationDetail))
+            .transform(OperationsLogging.log("Get Application"))
             .checkpoint();
     }
 
@@ -246,6 +252,7 @@ public final class DefaultApplications implements Applications {
                 getStackName(cloudFoundryClient, response.getStackId())
             )))
             .then(function(DefaultApplications::toApplicationManifest))
+            .transform(OperationsLogging.log("Get Application Manifest"))
             .checkpoint();
     }
 
@@ -259,6 +266,7 @@ public final class DefaultApplications implements Applications {
             )))
             .then(function(DefaultApplications::requestApplicationEnvironment))
             .map(DefaultApplications::toApplicationEnvironments)
+            .transform(OperationsLogging.log("Get Application Environments"))
             .checkpoint();
     }
 
@@ -273,6 +281,7 @@ public final class DefaultApplications implements Applications {
             .flatMap(function((cloudFoundryClient, applicationId) -> requestEvents(applicationId, cloudFoundryClient)
                 .take(Optional.ofNullable(request.getMaxNumberOfEvents()).orElse(MAX_NUMBER_OF_RECENT_EVENTS))))
             .map(DefaultApplications::convertToApplicationEvent)
+            .transform(OperationsLogging.log("Get Application Events"))
             .checkpoint();
     }
 
@@ -282,6 +291,7 @@ public final class DefaultApplications implements Applications {
             .when(this.cloudFoundryClient, this.spaceId)
             .then(function((cloudFoundryClient, spaceId) -> getApplication(cloudFoundryClient, request.getName(), spaceId)))
             .map(DefaultApplications::toHealthCheck)
+            .transform(OperationsLogging.log("Get Application Health Check"))
             .checkpoint();
     }
 
@@ -292,6 +302,7 @@ public final class DefaultApplications implements Applications {
             .then(function(DefaultApplications::requestSpaceSummary))
             .flatMap(DefaultApplications::extractApplications)
             .map(DefaultApplications::toApplicationSummary)
+            .transform(OperationsLogging.log("List Applications"))
             .checkpoint();
     }
 
@@ -301,6 +312,7 @@ public final class DefaultApplications implements Applications {
             .when(this.cloudFoundryClient, this.spaceId)
             .then(function((cloudFoundryClient, spaceId) -> getApplicationId(cloudFoundryClient, request.getName(), spaceId)))
             .flatMap(applicationId -> getLogs(this.dopplerClient, applicationId, request.getRecent()))
+            .transform(OperationsLogging.log("Application Logs"))
             .checkpoint();
     }
 
@@ -325,6 +337,7 @@ public final class DefaultApplications implements Applications {
                     request.getStagingTimeout())
                     .then(Mono.just(Tuples.of(cloudFoundryClient, applicationId)))))
                 .then(function((cloudFoundryClient, applicationId) -> stopAndStartApplication(cloudFoundryClient, applicationId, request)))
+                .transform(OperationsLogging.log("Push Application"))
                 .checkpoint();
         } else if (request.getDockerImage() != null) {
             return this.cloudFoundryClient
@@ -341,6 +354,7 @@ public final class DefaultApplications implements Applications {
                 .then(function((cloudFoundryClient, applicationId, spaceId) -> prepareDomainsAndRoutes(cloudFoundryClient, request, applicationId, spaceId, this.randomWords)
                     .then(Mono.just(Tuples.of(cloudFoundryClient, applicationId)))))
                 .then(function((cloudFoundryClient, applicationId) -> stopAndStartApplication(cloudFoundryClient, applicationId, request)))
+                .transform(OperationsLogging.log("Push Application"))
                 .checkpoint();
         } else {
             throw new IllegalStateException("One of application or dockerImage must be supplied");
@@ -357,6 +371,7 @@ public final class DefaultApplications implements Applications {
             )))
             .then(function((cloudFoundryClient, applicationId) -> requestUpdateApplicationName(cloudFoundryClient, applicationId, request.getNewName())))
             .then()
+            .transform(OperationsLogging.log("Rename Application"))
             .checkpoint();
     }
 
@@ -369,6 +384,7 @@ public final class DefaultApplications implements Applications {
                 getApplicationId(cloudFoundryClient, request.getName(), spaceId)
             )))
             .then(function((cloudFoundryClient, applicationId) -> restageApplication(cloudFoundryClient, request.getName(), applicationId, request.getStagingTimeout(), request.getStartupTimeout())))
+            .transform(OperationsLogging.log("Restage Application"))
             .checkpoint();
     }
 
@@ -386,6 +402,7 @@ public final class DefaultApplications implements Applications {
             )))
             .then(function((cloudFoundryClient, stoppedApplication) -> startApplicationAndWait(cloudFoundryClient, request.getName(), ResourceUtils.getId(stoppedApplication),
                 request.getStagingTimeout(), request.getStartupTimeout())))
+            .transform(OperationsLogging.log("Restart Application"))
             .checkpoint();
     }
 
@@ -398,6 +415,7 @@ public final class DefaultApplications implements Applications {
                 getApplicationId(cloudFoundryClient, request.getName(), spaceId)
             )))
             .then(function((cloudFoundryClient, applicationId) -> requestTerminateApplicationInstance(cloudFoundryClient, applicationId, String.valueOf(request.getInstanceIndex()))))
+            .transform(OperationsLogging.log("Restart Application Instance"))
             .checkpoint();
     }
 
@@ -417,6 +435,7 @@ public final class DefaultApplications implements Applications {
             .filter(predicate((cloudFoundryClient, resource) -> isRestartRequired(request, resource)))
             .then(function((cloudFoundryClient, resource) -> restartApplication(cloudFoundryClient, request.getName(), ResourceUtils.getId(resource), request.getStagingTimeout(),
                 request.getStartupTimeout())))
+            .transform(OperationsLogging.log("Scale Application"))
             .checkpoint();
     }
 
@@ -431,6 +450,7 @@ public final class DefaultApplications implements Applications {
             .then(function((cloudFoundryClient, resource) -> requestUpdateApplicationEnvironment(cloudFoundryClient, ResourceUtils.getId(resource), addToEnvironment(getEnvironment(resource),
                 request.getVariableName(), request.getVariableValue()))))
             .then()
+            .transform(OperationsLogging.log("Set Application Environment Variable"))
             .checkpoint();
     }
 
@@ -444,6 +464,7 @@ public final class DefaultApplications implements Applications {
             )))
             .then(function((cloudFoundryClient, applicationId) -> requestUpdateApplicationHealthCheckType(cloudFoundryClient, applicationId, request.getType())))
             .then()
+            .transform(OperationsLogging.log("Set Application Health Check"))
             .checkpoint();
     }
 
@@ -453,6 +474,7 @@ public final class DefaultApplications implements Applications {
             .when(this.cloudFoundryClient, this.spaceId)
             .then(function((cloudFoundryClient, spaceId) -> getApplication(cloudFoundryClient, request.getName(), spaceId)))
             .map(applicationResource -> ResourceUtils.getEntity(applicationResource).getEnableSsh())
+            .transform(OperationsLogging.log("Application SSH Enabled"))
             .checkpoint();
     }
 
@@ -466,6 +488,7 @@ public final class DefaultApplications implements Applications {
             )))
             .then(function((cloudFoundryClient, applicationId) -> startApplicationAndWait(cloudFoundryClient, request.getName(), applicationId, request.getStagingTimeout(),
                 request.getStartupTimeout())))
+            .transform(OperationsLogging.log("Start Application"))
             .checkpoint();
     }
 
@@ -479,6 +502,7 @@ public final class DefaultApplications implements Applications {
             )))
             .then(function(DefaultApplications::stopApplication))
             .then()
+            .transform(OperationsLogging.log("Stop Application"))
             .checkpoint();
     }
 
@@ -493,6 +517,7 @@ public final class DefaultApplications implements Applications {
             .then(function((cloudFoundryClient, resource) -> requestUpdateApplicationEnvironment(cloudFoundryClient, ResourceUtils.getId(resource), removeFromEnvironment(getEnvironment(resource),
                 request.getVariableName()))))
             .then()
+            .transform(OperationsLogging.log("Unset Application Environment Variable"))
             .checkpoint();
     }
 
