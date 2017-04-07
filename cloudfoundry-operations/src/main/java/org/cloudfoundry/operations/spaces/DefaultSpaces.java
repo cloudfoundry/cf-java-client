@@ -53,6 +53,7 @@ import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.client.v2.spaces.UpdateSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.UpdateSpaceResponse;
 import org.cloudfoundry.operations.spaceadmin.SpaceQuota;
+import org.cloudfoundry.operations.util.OperationsLogging;
 import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
@@ -96,6 +97,7 @@ public final class DefaultSpaces implements Spaces {
                 )))
             .then(function((cloudFoundryClient, spaceId) -> requestUpdateSpaceSsh(cloudFoundryClient, spaceId, true)))
             .then()
+            .transform(OperationsLogging.log("Allow Space SSH"))
             .checkpoint();
     }
 
@@ -132,6 +134,7 @@ public final class DefaultSpaces implements Spaces {
                     requestAssociateSpaceDeveloperByUsername(cloudFoundryClient, spaceId, username)
                 )))
             .then()
+            .transform(OperationsLogging.log("Create Space"))
             .checkpoint();
     }
 
@@ -146,6 +149,7 @@ public final class DefaultSpaces implements Spaces {
                     getOrganizationSpaceId(cloudFoundryClient, organizationId, request.getName())
                 )))
             .then(function(DefaultSpaces::deleteSpace))
+            .transform(OperationsLogging.log("Delete Space"))
             .checkpoint();
     }
 
@@ -160,6 +164,7 @@ public final class DefaultSpaces implements Spaces {
                 )))
             .then(function((cloudFoundryClient, spaceId) -> requestUpdateSpaceSsh(cloudFoundryClient, spaceId, false)))
             .then()
+            .transform(OperationsLogging.log("Disallow Space SSH"))
             .checkpoint();
     }
 
@@ -173,6 +178,7 @@ public final class DefaultSpaces implements Spaces {
                     getOrganizationSpace(cloudFoundryClient, organizationId, request.getName())
                 )))
             .then(function((cloudFoundryClient, resource) -> getSpaceDetail(cloudFoundryClient, resource, request)))
+            .transform(OperationsLogging.log("Get Space"))
             .checkpoint();
     }
 
@@ -182,6 +188,7 @@ public final class DefaultSpaces implements Spaces {
             .when(this.cloudFoundryClient, this.organizationId)
             .flatMap(function(DefaultSpaces::requestSpaces))
             .map(DefaultSpaces::toSpaceSummary)
+            .transform(OperationsLogging.log("List Spaces"))
             .checkpoint();
     }
 
@@ -196,6 +203,7 @@ public final class DefaultSpaces implements Spaces {
                 )))
             .then(function((cloudFoundryClient, spaceId) -> requestUpdateSpace(cloudFoundryClient, spaceId, request.getNewName())))
             .then()
+            .transform(OperationsLogging.log("Rename Space"))
             .checkpoint();
     }
 
@@ -205,6 +213,7 @@ public final class DefaultSpaces implements Spaces {
             .when(this.cloudFoundryClient, this.organizationId)
             .then(function((cloudFoundryClient, organizationId) -> getOrganizationSpace(cloudFoundryClient, organizationId, request.getName())))
             .map(resource -> ResourceUtils.getEntity(resource).getAllowSsh())
+            .transform(OperationsLogging.log("Is Space SSH Allowed"))
             .checkpoint();
     }
 

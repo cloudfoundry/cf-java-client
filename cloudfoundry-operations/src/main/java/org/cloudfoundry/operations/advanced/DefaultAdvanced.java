@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.operations.advanced;
 
+import org.cloudfoundry.operations.util.OperationsLogging;
 import org.cloudfoundry.uaa.UaaClient;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByAuthorizationCodeGrantApiRequest;
 import reactor.core.publisher.Mono;
@@ -32,6 +33,7 @@ public final class DefaultAdvanced implements Advanced {
     public Mono<String> sshCode() {
         return this.uaaClient
             .then(DefaultAdvanced::requestAuthorizeByAuthorizationCodeGrantApi)
+            .transform(OperationsLogging.log("Get SSH Code"))
             .checkpoint();
     }
 

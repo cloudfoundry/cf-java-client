@@ -19,6 +19,7 @@ package org.cloudfoundry.operations.stacks;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
 import org.cloudfoundry.client.v2.stacks.StackResource;
+import org.cloudfoundry.operations.util.OperationsLogging;
 import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
@@ -40,6 +41,7 @@ public final class DefaultStacks implements Stacks {
         return this.cloudFoundryClient
             .then(cloudFoundryClient -> getStack(cloudFoundryClient, request.getName()))
             .map(this::toStack)
+            .transform(OperationsLogging.log("Get Stack"))
             .checkpoint();
     }
 
@@ -48,6 +50,7 @@ public final class DefaultStacks implements Stacks {
         return this.cloudFoundryClient
             .flatMap(DefaultStacks::requestStacks)
             .map(this::toStack)
+            .transform(OperationsLogging.log("List Stacks"))
             .checkpoint();
     }
 

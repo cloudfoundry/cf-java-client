@@ -23,6 +23,7 @@ import org.cloudfoundry.client.v2.buildpacks.CreateBuildpackResponse;
 import org.cloudfoundry.client.v2.buildpacks.ListBuildpacksRequest;
 import org.cloudfoundry.client.v2.buildpacks.UploadBuildpackRequest;
 import org.cloudfoundry.client.v2.buildpacks.UploadBuildpackResponse;
+import org.cloudfoundry.operations.util.OperationsLogging;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import reactor.core.publisher.Flux;
@@ -50,6 +51,7 @@ public final class DefaultBuildpacks implements Buildpacks {
             ))
             .then(function((cloudFoundryClient, response) -> requestUploadBuildpackBits(cloudFoundryClient, ResourceUtils.getId(response), request.getFileName(), request.getBuildpack())))
             .then()
+            .transform(OperationsLogging.log("Create Buildpack"))
             .checkpoint();
     }
 
@@ -58,6 +60,7 @@ public final class DefaultBuildpacks implements Buildpacks {
         return this.cloudFoundryClient
             .flatMap(DefaultBuildpacks::requestBuildpacks)
             .map(DefaultBuildpacks::toBuildpackResource)
+            .transform(OperationsLogging.log("List Buildpacks"))
             .checkpoint();
     }
 

@@ -31,6 +31,7 @@ import org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainResponse;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomainEntity;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomainResource;
+import org.cloudfoundry.operations.util.OperationsLogging;
 import org.cloudfoundry.routing.RoutingClient;
 import org.cloudfoundry.routing.v1.routergroups.ListRouterGroupsResponse;
 import org.cloudfoundry.util.ExceptionUtils;
@@ -64,6 +65,7 @@ public final class DefaultDomains implements Domains {
                 ))
             .then(function((cloudFoundryClient, organizationId) -> requestCreateDomain(cloudFoundryClient, request.getDomain(), organizationId)))
             .then()
+            .transform(OperationsLogging.log("Create Domain"))
             .checkpoint();
     }
 
@@ -73,6 +75,7 @@ public final class DefaultDomains implements Domains {
             return this.cloudFoundryClient
                 .then(cloudFoundryClient -> requestCreateSharedDomain(cloudFoundryClient, request.getDomain(), null))
                 .then()
+                .transform(OperationsLogging.log("Create Shared Domain"))
                 .checkpoint();
         } else {
             return Mono.when(this.cloudFoundryClient, this.routingClient)
@@ -83,6 +86,7 @@ public final class DefaultDomains implements Domains {
                     )))
                 .then(function((cloudFoundryClient, routerGroupId) -> requestCreateSharedDomain(cloudFoundryClient, request.getDomain(), routerGroupId)))
                 .then()
+                .transform(OperationsLogging.log("Create Shared Domain"))
                 .checkpoint();
         }
     }
@@ -94,15 +98,17 @@ public final class DefaultDomains implements Domains {
                 .map(DefaultDomains::toDomain)
                 .mergeWith(requestListSharedDomains(cloudFoundryClient)
                     .map(DefaultDomains::toDomain)))
+            .transform(OperationsLogging.log("List Domains"))
             .checkpoint();
     }
 
     @Override
     public Flux<RouterGroup> listRouterGroups() {
         return this.routingClient
-            .flatMap(routingClient -> requestListRouterGroups(routingClient)
-                .flatMapIterable(ListRouterGroupsResponse::getRouterGroups)
-                .map(DefaultDomains::toRouterGroup))
+            .flatMap(DefaultDomains::requestListRouterGroups)
+            .flatMapIterable(ListRouterGroupsResponse::getRouterGroups)
+            .map(DefaultDomains::toRouterGroup)
+            .transform(OperationsLogging.log("List Router Groups"))
             .checkpoint();
     }
 
@@ -116,6 +122,7 @@ public final class DefaultDomains implements Domains {
             ))
             .then(function(DefaultDomains::requestAssociateOrganizationPrivateDomainRequest))
             .then()
+            .transform(OperationsLogging.log("Share Domain"))
             .checkpoint();
     }
 
@@ -128,6 +135,7 @@ public final class DefaultDomains implements Domains {
                 getOrganizationId(cloudFoundryClient, request.getOrganization())
             ))
             .then(function(DefaultDomains::requestRemoveOrganizationPrivateDomainRequest))
+            .transform(OperationsLogging.log("Unshare Domain"))
             .checkpoint();
     }
 

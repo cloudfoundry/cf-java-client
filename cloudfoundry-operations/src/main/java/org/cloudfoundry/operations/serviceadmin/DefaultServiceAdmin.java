@@ -21,6 +21,7 @@ import org.cloudfoundry.client.v2.servicebrokers.CreateServiceBrokerResponse;
 import org.cloudfoundry.client.v2.servicebrokers.ListServiceBrokersRequest;
 import org.cloudfoundry.client.v2.servicebrokers.ServiceBrokerEntity;
 import org.cloudfoundry.client.v2.servicebrokers.ServiceBrokerResource;
+import org.cloudfoundry.operations.util.OperationsLogging;
 import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
@@ -50,6 +51,7 @@ public final class DefaultServiceAdmin implements ServiceAdmin {
             .then(function((cloudFoundryClient, spaceId) -> requestCreateServiceBroker(cloudFoundryClient, request.getName(), request.getUrl(), request.getUsername(), request.getPassword(),
                 request.getSpaceScoped(), spaceId)))
             .then()
+            .transform(OperationsLogging.log("Create Service Broker"))
             .checkpoint();
     }
 
@@ -61,6 +63,7 @@ public final class DefaultServiceAdmin implements ServiceAdmin {
                 getServiceBrokerId(cloudFoundryClient, request.getName())
             ))
             .then(function(DefaultServiceAdmin::requestDeleteServiceBroker))
+            .transform(OperationsLogging.log("Delete Service Broker"))
             .checkpoint();
     }
 
@@ -69,6 +72,7 @@ public final class DefaultServiceAdmin implements ServiceAdmin {
         return this.cloudFoundryClient
             .flatMap(DefaultServiceAdmin::requestServiceBrokers)
             .map(this::toServiceBroker)
+            .transform(OperationsLogging.log("List Service Brokers"))
             .checkpoint();
     }
 

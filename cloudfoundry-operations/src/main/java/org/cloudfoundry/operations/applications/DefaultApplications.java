@@ -312,7 +312,7 @@ public final class DefaultApplications implements Applications {
             .when(this.cloudFoundryClient, this.spaceId)
             .then(function((cloudFoundryClient, spaceId) -> getApplicationId(cloudFoundryClient, request.getName(), spaceId)))
             .flatMap(applicationId -> getLogs(this.dopplerClient, applicationId, request.getRecent()))
-            .transform(OperationsLogging.log("Application Logs"))
+            .transform(OperationsLogging.log("Get Application Logs"))
             .checkpoint();
     }
 
@@ -474,7 +474,7 @@ public final class DefaultApplications implements Applications {
             .when(this.cloudFoundryClient, this.spaceId)
             .then(function((cloudFoundryClient, spaceId) -> getApplication(cloudFoundryClient, request.getName(), spaceId)))
             .map(applicationResource -> ResourceUtils.getEntity(applicationResource).getEnableSsh())
-            .transform(OperationsLogging.log("Application SSH Enabled"))
+            .transform(OperationsLogging.log("Is Application SSH Enabled"))
             .checkpoint();
     }
 

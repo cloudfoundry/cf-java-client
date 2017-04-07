@@ -37,6 +37,7 @@ import org.cloudfoundry.client.v2.shareddomains.SharedDomainResource;
 import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceRoutesRequest;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
+import org.cloudfoundry.operations.util.OperationsLogging;
 import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.OperationUtils;
@@ -82,6 +83,7 @@ public final class DefaultRoutes implements Routes {
                 )))
             .then(function((cloudFoundryClient, domainId) -> requestRouteExists(cloudFoundryClient, domainId, request.getHost(), request.getPath())))
             .defaultIfEmpty(false)
+            .transform(OperationsLogging.log("Check Route Exists"))
             .checkpoint();
     }
 
@@ -100,6 +102,7 @@ public final class DefaultRoutes implements Routes {
                     .map(ResourceUtils::getEntity)
                     .then(routeEntity -> Mono.justOrEmpty(routeEntity.getPort()))
             ))
+            .transform(OperationsLogging.log("Create Route"))
             .checkpoint();
     }
 
@@ -119,6 +122,7 @@ public final class DefaultRoutes implements Routes {
                     getRouteId(cloudFoundryClient, request.getHost(), request.getDomain(), domainId, request.getPath(), request.getPort())
                 )))
             .then(function(DefaultRoutes::deleteRoute))
+            .transform(OperationsLogging.log("Delete Route"))
             .checkpoint();
     }
 
@@ -135,6 +139,7 @@ public final class DefaultRoutes implements Routes {
             .filter(predicate((cloudFoundryClient, applicationResources, routeId) -> isApplicationOrphan(applicationResources)))
             .flatMap(function((cloudFoundryClient, applicationResources, routeId) -> deleteRoute(cloudFoundryClient, request.getCompletionTimeout(), routeId)))
             .then()
+            .transform(OperationsLogging.log("Delete Orphaned Routes"))
             .checkpoint();
     }
 
@@ -158,6 +163,7 @@ public final class DefaultRoutes implements Routes {
                     getSpaceName(spaces, ResourceUtils.getEntity(resource).getSpaceId())
                 )))
             .map(function(DefaultRoutes::toRoute))
+            .transform(OperationsLogging.log("List Routes"))
             .checkpoint();
     }
 
@@ -173,6 +179,7 @@ public final class DefaultRoutes implements Routes {
                 )))
             .then(function((cloudFoundryClient, routeResource, applicationId) -> requestAssociateRoute(cloudFoundryClient, applicationId, ResourceUtils.getId(routeResource))))
             .then(Mono.justOrEmpty(request.getPort()))
+            .transform(OperationsLogging.log("Map Route"))
             .checkpoint();
     }
 
@@ -188,6 +195,7 @@ public final class DefaultRoutes implements Routes {
                         .then(domainId -> getRouteId(cloudFoundryClient, request.getHost(), request.getDomain(), domainId, request.getPath(), request.getPort()))
                 )))
             .then(function(DefaultRoutes::requestRemoveRouteFromApplication))
+            .transform(OperationsLogging.log("Unmap Route"))
             .checkpoint();
     }
 

@@ -71,6 +71,7 @@ import org.cloudfoundry.client.v2.userprovidedserviceinstances.AssociateUserProv
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.DeleteUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UpdateUserProvidedServiceInstanceResponse;
+import org.cloudfoundry.operations.util.OperationsLogging;
 import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.LastOperationUtils;
@@ -127,6 +128,7 @@ public final class DefaultServices implements Services {
                 )))
             .then(function((cloudFoundryClient, applicationId, serviceInstanceId) -> createServiceBinding(cloudFoundryClient, applicationId, serviceInstanceId, request.getParameters())))
             .then()
+            .transform(OperationsLogging.log("Bind Service Instance"))
             .checkpoint();
     }
 
@@ -148,6 +150,7 @@ public final class DefaultServices implements Services {
                 )))
             .then(function((cloudFoundryClient, routeId, userProvidedServiceInstanceId) -> createRouteBinding(cloudFoundryClient, routeId, userProvidedServiceInstanceId, request.getParameters())))
             .then()
+            .transform(OperationsLogging.log("Bind Route to Service Instance"))
             .checkpoint();
     }
 
@@ -174,6 +177,7 @@ public final class DefaultServices implements Services {
                     createServiceInstance(cloudFoundryClient, spaceId, planId, request)
                 )))
             .then(function(DefaultServices::waitForCreateInstance))
+            .transform(OperationsLogging.log("Create Service Instance"))
             .checkpoint();
     }
 
@@ -188,6 +192,7 @@ public final class DefaultServices implements Services {
                 )))
             .then(function((cloudFoundryClient, serviceInstanceId) -> requestCreateServiceKey(cloudFoundryClient, serviceInstanceId, request.getServiceKeyName(), request.getParameters())))
             .then()
+            .transform(OperationsLogging.log("Create Service Key"))
             .checkpoint();
     }
 
@@ -198,6 +203,7 @@ public final class DefaultServices implements Services {
             .then(function((cloudFoundryClient, spaceId) -> requestCreateUserProvidedServiceInstance(cloudFoundryClient, request.getName(), request.getCredentials(), request.getRouteServiceUrl(),
                 spaceId, request.getSyslogDrainUrl())))
             .then()
+            .transform(OperationsLogging.log("Create User Provided Service Instance"))
             .checkpoint();
     }
 
@@ -212,6 +218,7 @@ public final class DefaultServices implements Services {
                     getSpaceServiceInstance(cloudFoundryClient, request.getName(), spaceId)
                 )))
             .then(function(DefaultServices::deleteServiceInstance))
+            .transform(OperationsLogging.log("Delete Service Instance"))
             .checkpoint();
     }
 
@@ -231,6 +238,7 @@ public final class DefaultServices implements Services {
                         .map(ResourceUtils::getId)
                 )))
             .then(function(DefaultServices::requestDeleteServiceKey))
+            .transform(OperationsLogging.log("Delete Service Key"))
             .checkpoint();
     }
 
@@ -257,6 +265,7 @@ public final class DefaultServices implements Services {
                     getServiceEntity(cloudFoundryClient, Optional.ofNullable(servicePlanEntity.getServiceId()))
                 )))
             .map(function(DefaultServices::toServiceInstance))
+            .transform(OperationsLogging.log("Get Service Instance"))
             .checkpoint();
     }
 
@@ -271,9 +280,11 @@ public final class DefaultServices implements Services {
                 )))
             .then(function((cloudFoundryClient, serviceInstanceId) -> getServiceKey(cloudFoundryClient, serviceInstanceId, request.getServiceKeyName())))
             .map(DefaultServices::toServiceKey)
+            .transform(OperationsLogging.log("Get Service Key"))
             .checkpoint();
     }
 
+    @Override
     public Flux<ServiceInstanceSummary> listInstances() {
         return Mono
             .when(this.cloudFoundryClient, this.spaceId)
@@ -282,6 +293,7 @@ public final class DefaultServices implements Services {
                     .spaceId(spaceId)
                     .build())))
             .flatMap(DefaultServices::toServiceInstanceSummary)
+            .transform(OperationsLogging.log("List Service Instances"))
             .checkpoint();
     }
 
@@ -296,6 +308,7 @@ public final class DefaultServices implements Services {
                 )))
             .flatMap(function((cloudFoundryClient, serviceInstanceId) -> requestListServiceInstanceServiceKeys(cloudFoundryClient, serviceInstanceId)))
             .map(DefaultServices::toServiceKey)
+            .transform(OperationsLogging.log("List Service Keys"))
             .checkpoint();
     }
 
@@ -315,6 +328,7 @@ public final class DefaultServices implements Services {
                     getServicePlans(cloudFoundryClient, ResourceUtils.getId(resource))
                 )))
             .map(function(DefaultServices::toServiceOffering))
+            .transform(OperationsLogging.log("List Service Offerings"))
             .checkpoint();
     }
 
@@ -329,6 +343,7 @@ public final class DefaultServices implements Services {
                 )))
             .then(function((cloudFoundryClient, serviceInstance) -> renameServiceInstance(cloudFoundryClient, serviceInstance, request.getNewName())))
             .then()
+            .transform(OperationsLogging.log("Rename Service Instance"))
             .checkpoint();
     }
 
@@ -350,6 +365,7 @@ public final class DefaultServices implements Services {
                 )))
             .then(function(DefaultServices::deleteServiceBinding))
             .then()
+            .transform(OperationsLogging.log("Unbind Service Instance"))
             .checkpoint();
     }
 
@@ -371,6 +387,7 @@ public final class DefaultServices implements Services {
                 )))
             .then(function((cloudFoundryClient, serviceInstanceId, servicePlanId) -> updateServiceInstance(cloudFoundryClient, request, serviceInstanceId, servicePlanId.orElse(null))))
             .then()
+            .transform(OperationsLogging.log("Update Service Instance"))
             .checkpoint();
     }
 
@@ -385,6 +402,7 @@ public final class DefaultServices implements Services {
                 )))
             .then(function((cloudFoundryClient, userProvidedServiceInstanceId) -> updateUserProvidedServiceInstance(cloudFoundryClient, request, userProvidedServiceInstanceId)))
             .then()
+            .transform(OperationsLogging.log("Update User Provided Service Instance"))
             .checkpoint();
     }
 

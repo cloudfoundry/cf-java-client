@@ -23,7 +23,7 @@
         </encoder>
     </appender>
 
-    <logger name="cloudfoundry-client.operations" level="${CLIENT_LOGGING_LEVEL:-DEBUG}"/>
+    <logger name="cloudfoundry-client.operations" level="${CLIENT_LOGGING_LEVEL:-INFO}"/>
     <logger name="stream"                         level="INFO"/>
 
     <root level="WARN">

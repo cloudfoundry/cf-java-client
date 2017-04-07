@@ -20,6 +20,7 @@ import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefinitionsRequest;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionEntity;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionResource;
+import org.cloudfoundry.operations.util.OperationsLogging;
 import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
@@ -47,6 +48,7 @@ public final class DefaultSpaceAdmin implements SpaceAdmin {
             .when(this.cloudFoundryClient, this.organizationId)
             .then(function((cloudFoundryClient, organizationId) -> getSpaceQuotaDefinition(cloudFoundryClient, organizationId, request.getName())))
             .map(DefaultSpaceAdmin::toSpaceQuota)
+            .transform(OperationsLogging.log("Get Space Quota"))
             .checkpoint();
     }
 
@@ -56,6 +58,7 @@ public final class DefaultSpaceAdmin implements SpaceAdmin {
             .when(this.cloudFoundryClient, this.organizationId)
             .flatMap(function(DefaultSpaceAdmin::requestSpaceQuotaDefinitions))
             .map(DefaultSpaceAdmin::toSpaceQuota)
+            .transform(OperationsLogging.log("List Space Quota"))
             .checkpoint();
     }
 

@@ -31,6 +31,7 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.OrganizationResource;
 import org.cloudfoundry.client.v2.organizations.UpdateOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.UpdateOrganizationResponse;
+import org.cloudfoundry.operations.util.OperationsLogging;
 import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
@@ -57,6 +58,7 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
         return this.cloudFoundryClient
             .then(cloudFoundryClient -> createOrganizationQuota(cloudFoundryClient, request))
             .map(DefaultOrganizationAdmin::toOrganizationQuota)
+            .transform(OperationsLogging.log("Create Organization Quota"))
             .checkpoint();
     }
 
@@ -69,6 +71,7 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
                 getOrganizationQuotaId(cloudFoundryClient, request.getName())
             ))
             .then(function(DefaultOrganizationAdmin::deleteOrganizationQuota))
+            .transform(OperationsLogging.log("Delete Organization Quota"))
             .checkpoint();
     }
 
@@ -77,6 +80,7 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
         return this.cloudFoundryClient
             .then(cloudFoundryClient -> getOrganizationQuota(cloudFoundryClient, request.getName()))
             .map(DefaultOrganizationAdmin::toOrganizationQuota)
+            .transform(OperationsLogging.log("Get Organization Quota"))
             .checkpoint();
     }
 
@@ -85,6 +89,7 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
         return this.cloudFoundryClient
             .flatMap(DefaultOrganizationAdmin::requestListOrganizationQuotas)
             .map(DefaultOrganizationAdmin::toOrganizationQuota)
+            .transform(OperationsLogging.log("List Organization Quotas"))
             .checkpoint();
     }
 
@@ -98,6 +103,7 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
             ))
             .then(function((DefaultOrganizationAdmin::requestUpdateOrganization)))
             .then()
+            .transform(OperationsLogging.log("Set Organization Quota"))
             .checkpoint();
     }
 
@@ -110,6 +116,7 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
             ))
             .then(function((cloudFoundryClient, exitingQuotaDefinition) -> updateOrganizationQuota(cloudFoundryClient, request, exitingQuotaDefinition)))
             .map(DefaultOrganizationAdmin::toOrganizationQuota)
+            .transform(OperationsLogging.log("Update Organization Quota"))
             .checkpoint();
     }
 

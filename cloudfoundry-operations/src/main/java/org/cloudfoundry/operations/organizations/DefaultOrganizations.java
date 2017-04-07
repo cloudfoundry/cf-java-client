@@ -42,6 +42,7 @@ import org.cloudfoundry.client.v2.shareddomains.SharedDomainResource;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionResource;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.operations.spaceadmin.SpaceQuota;
+import org.cloudfoundry.operations.util.OperationsLogging;
 import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
@@ -82,6 +83,7 @@ public final class DefaultOrganizations implements Organizations {
             )))
             .filter(predicate((cloudFoundryClient, organizationId, setRolesByUsernameEnabled, username) -> setRolesByUsernameEnabled))
             .then(function((cloudFoundryClient, organizationId, setRolesByUsernameEnabled, username) -> setOrganizationManager(cloudFoundryClient, organizationId, username)))
+            .transform(OperationsLogging.log("Create Organization"))
             .checkpoint();
     }
 
@@ -94,6 +96,7 @@ public final class DefaultOrganizations implements Organizations {
                 getOrganizationId(cloudFoundryClient, request.getName())
             ))
             .then(function(DefaultOrganizations::deleteOrganization))
+            .transform(OperationsLogging.log("Delete Organization"))
             .checkpoint();
     }
 
@@ -106,6 +109,7 @@ public final class DefaultOrganizations implements Organizations {
             ))
             .then(function((cloudFoundryClient, organizationResource) -> getAuxiliaryContent(cloudFoundryClient, organizationResource)
                 .map(function((domains, organizationQuota, spacesQuotas, spaces) -> toOrganizationDetail(domains, organizationQuota, spacesQuotas, spaces, organizationResource, request)))))
+            .transform(OperationsLogging.log("Get Organization"))
             .checkpoint();
     }
 
@@ -114,6 +118,7 @@ public final class DefaultOrganizations implements Organizations {
         return this.cloudFoundryClient
             .flatMap(DefaultOrganizations::requestOrganizations)
             .map(DefaultOrganizations::toOrganizationSummary)
+            .transform(OperationsLogging.log("List Organizations"))
             .checkpoint();
     }
 
@@ -126,6 +131,7 @@ public final class DefaultOrganizations implements Organizations {
             ))
             .then(function((cloudFoundryClient, organizationId) -> requestUpdateOrganization(cloudFoundryClient, organizationId, request.getNewName())))
             .then()
+            .transform(OperationsLogging.log("Rename Organization"))
             .checkpoint();
     }
 
