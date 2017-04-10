@@ -531,10 +531,10 @@ public final class DefaultServices implements Services {
             .otherwiseIfEmpty(ExceptionUtils.illegalArgument("Route %s.%s does not exist", host, domain));
     }
 
-    private static Mono<RouteResource> getRoute(CloudFoundryClient cloudFoundryClient, String domainId, String host, String path) {
-        return requestRoutes(cloudFoundryClient, domainId, host, path)
+    private static Mono<RouteResource> getRoute(CloudFoundryClient cloudFoundryClient, String domainId, String host, String routePath) {
+        return requestRoutes(cloudFoundryClient, domainId, host, routePath)
             .filter(resource -> isIdentical(host, ResourceUtils.getEntity(resource).getHost()))
-            .filter(resource -> isIdentical(path, ResourceUtils.getEntity(resource).getPath()))
+            .filter(resource -> isIdentical(Optional.ofNullable(routePath).orElse(""), ResourceUtils.getEntity(resource).getPath()))
             .singleOrEmpty();
     }
 
