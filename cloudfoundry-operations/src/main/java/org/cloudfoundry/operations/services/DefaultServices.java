@@ -146,7 +146,7 @@ public final class DefaultServices implements Services {
                 .when(
                     Mono.just(cloudFoundryClient),
                     getRouteId(cloudFoundryClient, request.getDomainName(), domainId, request.getHostname(), request.getPath()),
-                    getSpaceUserProvidedServiceInstanceId(cloudFoundryClient, request.getServiceInstanceName(), spaceId)
+                    getSpaceServiceInstanceId(cloudFoundryClient, request.getServiceInstanceName(), spaceId)
                 )))
             .then(function((cloudFoundryClient, routeId, userProvidedServiceInstanceId) -> createRouteBinding(cloudFoundryClient, routeId, userProvidedServiceInstanceId, request.getParameters())))
             .then()
