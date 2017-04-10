@@ -128,7 +128,7 @@ PasswordGrantTokenProvider tokenProvider(@Value("${cf.username}") String usernam
 
 `CloudFoundryClient`, `DopplerClient`, and `UaaClient` are only interfaces.  Each has a [Reactor][p]-based implementation.  To instantiate them, you configure them with builders:
 
-```
+```java
 ReactorCloudFoundryClient.builder()
     .connectionContext(connectionContext)
     .tokenProvider(tokenProvider)
@@ -147,7 +147,7 @@ ReactorUaaClient.builder()
 
 In Spring-based applications, you'll want to encapsulate them in bean definitions:
 
-```
+```java
 @Bean
 ReactorCloudFoundryClient cloudFoundryClient(ConnectionContext connectionContext, TokenProvider tokenProvider) {
     return ReactorCloudFoundryClient.builder()
@@ -219,14 +219,14 @@ Once you've got a reference to the `CloudFoundryOperations`, it's time to start 
 ```java
 cloudFoundryOperations.organizations()
     .list()
-    .map(Organization::getName)
+    .map(OrganizationSummary::getName)
     .subscribe(System.out::println);
 ```
 
 To relate the example to the description above the following happens:
 
 1. `.list()` – Lists the Cloud Foundry organizations as a `Flux` of elements of type `Organization`.
-1. `.map(...)` – Maps each organization to its name (type `String`).  This example uses a method reference; the equivalent lambda would look like `organization -> organization.getName()`.
+1. `.map(...)` – Maps each organization to its name (type `String`).  This example uses a method reference; the equivalent lambda would look like `organizationSummary -> organizationSummary.getName()`.
 1. `subscribe...` – The terminal operation that receives each name in the `Flux`.  Again, this example uses a method reference and the equivalent lambda would look like `name -> System.out.println(name)`.
 
 ### `CloudFoundryClient` APIs
@@ -238,8 +238,8 @@ cloudFoundryClient.organizations()
     .list(ListOrganizationsRequest.builder()
         .page(1)
         .build())
-    .flatMap(response -> Flux.fromIterable(response.getResources))
-    .map(resource -> Organization.builder()
+    .flatMapIterable(ListOrganizationsResponse::getResources)
+    .map(resource -> OrganizationSummary.builder()
         .id(resource.getMetadata().getId())
         .name(resource.getEntity().getName())
         .build());
@@ -248,8 +248,8 @@ cloudFoundryClient.organizations()
 The above example is more complicated:
 
 1. `.list(...)` – Retrieves a page of Cloud Foundry organizations.
-1. `.flatMap(...)` – Substitutes the original `Mono` with a `Flux` of the `Resource`s returned by the requested page.
-1. `.map(...)` – Maps the `Resource` to an `Organization` type.
+1. `.flatMapIterable(...)` – Substitutes the original `Mono` with a `Flux` of the `Resource`s returned by the requested page.
+1. `.map(...)` – Maps the `Resource` to an `OrganizationSummary` type.
 
 ## Development
 The project depends on Java 8.  To build from source and install to your local Maven cache, run the following:
@@ -261,7 +261,7 @@ $ ./mvnw clean install
 
 To run the integration tests, run the following:
 
-```
+```shell
 $ ./mvnw -Pintegration-test clean test
 ```
 
