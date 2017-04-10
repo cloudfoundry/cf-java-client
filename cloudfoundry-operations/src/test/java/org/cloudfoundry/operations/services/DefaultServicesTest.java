@@ -191,7 +191,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     @Test
     public void bindRouteServiceInstanceServiceInstanceNotFound() {
         requestListOrganizationPrivateDomains(this.cloudFoundryClient, "test-domain-name", TEST_ORGANIZATION_ID);
-        requestListSpaceServiceInstancesUserProvidedEmpty(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
+        requestListSpaceServiceInstancesEmpty(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
         requestListRoutes(this.cloudFoundryClient, "test-private-domain-id");
 
         this.services
@@ -201,7 +201,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
                 .serviceInstanceName("test-service-instance-name")
                 .build())
             .as(StepVerifier::create)
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("User provided service instance test-service-instance-name does not exist"))
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Service instance test-service-instance-name does not exist"))
             .verify(Duration.ofSeconds(5));
     }
 
