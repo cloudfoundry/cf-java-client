@@ -44,14 +44,14 @@ public final class OperationsLogging {
 
         AtomicLong startTimeHolder = new AtomicLong();
 
-        Consumer<Subscription> start = s -> {
+        Consumer<Subscription> start = subscription -> {
             startTimeHolder.set(System.currentTimeMillis());
             LOGGER.debug("START  {}", message);
         };
 
-        Consumer<SignalType> finish = s -> {
+        Consumer<SignalType> finish = signalType -> {
             String elapsed = TimeUtils.asTime(System.currentTimeMillis() - startTimeHolder.get());
-            LOGGER.debug("FINISH {} ({})", message, elapsed);
+            LOGGER.debug("FINISH {} ({}/{})", message, signalType, elapsed);
         };
 
         return f -> {
