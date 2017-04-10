@@ -1555,6 +1555,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
                     .resource(fill(RouteResource.builder(), "route-")
                         .entity(RouteEntity.builder()
                             .domainId(domainId)
+                            .path("")
                             .serviceInstanceId("test-service-instance-id")
                             .build())
                         .build())
