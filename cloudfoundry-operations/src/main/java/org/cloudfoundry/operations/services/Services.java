@@ -136,6 +136,14 @@ public interface Services {
     Mono<Void> unbind(UnbindServiceInstanceRequest request);
 
     /**
+     * Unbind a service instance from a route
+     *
+     * @param request the unbind service instance from a route request
+     * @return a completion indicator
+     */
+    Mono<Void> unbindRoute(UnbindRouteServiceInstanceRequest request);
+
+    /**
      * Update a service instance
      *
      * @param request the update service instance request
