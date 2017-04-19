@@ -23,6 +23,7 @@ import java.util.UUID;
 public class LoggregatorClient {
 	private static final UriTemplate loggregatorStreamUriTemplate = new UriTemplate("{endpoint}/{kind}/?app={appId}");
 	private static final UriTemplate loggregatorRecentUriTemplate = new UriTemplate("{scheme}://{host}/recent");
+	private static final UriTemplate loggregatorRecentUriTemplateNew = new UriTemplate("{scheme}://{host}/apps/{appId}/recentlogs");
 
 	private boolean trustSelfSignedCerts;
 
@@ -43,6 +44,21 @@ public class LoggregatorClient {
 		}
 
 		return loggregatorRecentUriTemplate.expand(scheme, host).toString();
+	}
+
+	public String getRecentHttpEndpoint(String endpoint, UUID appId) {
+		URI uri = stringToUri(endpoint);
+
+		String scheme = uri.getScheme();
+		String host = uri.getHost();
+
+		if ("wss".equals(scheme)) {
+			scheme = "https";
+		} else {
+			scheme = "http";
+		}
+
+		return loggregatorRecentUriTemplateNew.expand(scheme, host, appId).toString();
 	}
 
 	private URI stringToUri(String endPoint) {

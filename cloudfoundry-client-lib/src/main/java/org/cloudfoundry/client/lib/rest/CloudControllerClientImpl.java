@@ -111,6 +111,7 @@ import org.springframework.web.client.RequestCallback;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.ResponseExtractor;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -242,9 +243,18 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		UUID appId = getAppId(appName);
 
 		String endpoint = getInfo().getLoggregatorEndpoint();
-		String uri = loggregatorClient.getRecentHttpEndpoint(endpoint);
 
-		ApplicationLogs logs = getRestTemplate().getForObject(uri + "?app={guid}", ApplicationLogs.class, appId);
+		ApplicationLogs logs;
+		try {
+			// The new endpoint introduced:
+			// https://github.com/cloudfoundry/loggregator/wiki/Loggregator-Component-Properties
+			String uriNew = loggregatorClient.getRecentHttpEndpoint(endpoint, appId);
+			logs = getRestTemplate().getForObject(uriNew, ApplicationLogs.class, new Object[0]);
+		} catch (RestClientException e) {
+			// Handles the old logging_endpoint (loggregator)
+			String uri = loggregatorClient.getRecentHttpEndpoint(endpoint);
+			logs = getRestTemplate().getForObject(uri + "?app={guid}", ApplicationLogs.class, appId);
+		}
 
 		Collections.sort(logs);
 
