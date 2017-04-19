@@ -246,9 +246,12 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 
 		ApplicationLogs logs;
 		try {
+			// The new endpoint introduced:
+			// https://github.com/cloudfoundry/loggregator/wiki/Loggregator-Component-Properties
 			String uriNew = loggregatorClient.getRecentHttpEndpoint(endpoint, appId);
 			logs = getRestTemplate().getForObject(uriNew, ApplicationLogs.class, new Object[0]);
 		} catch (RestClientException e) {
+			// Handles the old logging_endpoint (loggregator)
 			String uri = loggregatorClient.getRecentHttpEndpoint(endpoint);
 			logs = getRestTemplate().getForObject(uri + "?app={guid}", ApplicationLogs.class, appId);
 		}
