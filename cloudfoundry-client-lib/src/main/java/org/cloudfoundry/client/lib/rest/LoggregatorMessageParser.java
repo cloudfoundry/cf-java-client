@@ -40,7 +40,6 @@ public class LoggregatorMessageParser {
 			if (newLogMessage.hasSourceType() && !newLogMessage.getSourceType().isEmpty()) {
 				return createApplicationLog(newLogMessage);
 			}
-			return createApplicationLog(newLogMessage);
 		} catch (Exception e) {
 			logger.error("ApplicationLog was unable to be parsed with the new protobuf dropsonde protocol, falling back to old version!");
 		}
