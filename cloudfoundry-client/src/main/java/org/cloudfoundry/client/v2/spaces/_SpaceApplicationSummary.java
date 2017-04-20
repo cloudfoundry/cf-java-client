@@ -40,6 +40,13 @@ abstract class _SpaceApplicationSummary extends AbstractApplicationEntity {
     abstract String getDetectedBuildpack();
 
     /**
+     * The detected buildpack id
+     */
+    @JsonProperty("detected_buildpack_guid")
+    @Nullable
+    abstract String getDetectedBuildpackId();
+
+    /**
      * Whether SSH is enabled
      */
     @JsonProperty("enable_ssh")
