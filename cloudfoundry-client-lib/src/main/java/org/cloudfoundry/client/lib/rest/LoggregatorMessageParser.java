@@ -3,6 +3,7 @@ package org.cloudfoundry.client.lib.rest;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.TextFormat;
 import loggregator.LogMessages;
+import org.cloudfoundry.dropsonde.events.EventFactory;
 import org.cloudfoundry.dropsonde.events.LogFactory;
 import org.cloudfoundry.client.lib.domain.ApplicationLog;
 
@@ -14,11 +15,17 @@ public class LoggregatorMessageParser {
 
 	public ApplicationLog parseMessage(byte[] rawMessage) throws InvalidProtocolBufferException {
 		try {
+
 			// First tries to parse the message with the new protobuf of dropsonde protocol
 			// https://github.com/cloudfoundry/cf-release/releases/v244
-			LogFactory.LogMessage logMessage = LogFactory.LogMessage.parseFrom(rawMessage);
-			if (logMessage.hasSourceType() && !logMessage.getSourceType().isEmpty()) {
-				return createApplicationLog(logMessage);
+			EventFactory.Envelope envelope = EventFactory.Envelope.parseFrom(rawMessage);
+			LogFactory.LogMessage logMessage = envelope.getLogMessage();
+			if (logMessage != null) {
+				if (logMessage.hasSourceType() && !logMessage.getSourceType().isEmpty()) {
+					return createApplicationLog(logMessage);
+				}
+			} else {
+				logger.error("logMessage that is retrieved from envelope is null!");
 			}
 		} catch (InvalidProtocolBufferException ipbe) {
 			logger.error(ipbe.getMessage());
@@ -34,13 +41,19 @@ public class LoggregatorMessageParser {
 		try {
 			// First tries to parse the message with the new protobuf of dropsonde protocol
 			// https://github.com/cloudfoundry/cf-release/releases/v244
-			LogFactory.LogMessage.Builder newProtoLogMessageBuilder = LogFactory.LogMessage.newBuilder();
-			TextFormat.merge(messageString, newProtoLogMessageBuilder);
-			LogFactory.LogMessage newLogMessage = newProtoLogMessageBuilder.build();
-			if (newLogMessage.hasSourceType() && !newLogMessage.getSourceType().isEmpty()) {
-				return createApplicationLog(newLogMessage);
+			EventFactory.Envelope.Builder newProtoEnvelopeBuilder = EventFactory.Envelope.newBuilder();
+			TextFormat.merge(messageString, newProtoEnvelopeBuilder);
+			EventFactory.Envelope envelope = newProtoEnvelopeBuilder.build();
+			LogFactory.LogMessage logMessage = envelope.getLogMessage();
+			if (logMessage != null) {
+				if (logMessage.hasSourceType() && !logMessage.getSourceType().isEmpty()) {
+					return createApplicationLog(logMessage);
+				}
+			} else {
+				logger.error("logMessage that is retrieved from envelope is null!");
 			}
 		} catch (Exception e) {
+			logger.error(e.getMessage());
 			logger.error("ApplicationLog was unable to be parsed with the new protobuf dropsonde protocol, falling back to old version!");
 		}
 		// Drop to old style message which support is cut after - cf release v244
