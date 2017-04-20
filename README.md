@@ -23,6 +23,7 @@ The `cf-java-client` project is a Java language binding for interacting with a C
 * `cloudfoundry-client-reactor` – The default implementation of the `cloudfoundry-client` project.  This implementation is based on the Reactor Netty [`HttpClient`][h].
 * `cloudfoundry-operations` – An API and implementation that corresponds to the [Cloud Foundry CLI][c] operations.  This project builds on the `cloudfoundry-client` and therefore has a single implementation.
 
+## Dependencies
 Most projects will need two dependencies; the Operations API and an implementation of the Client API.  For Maven, the dependencies would be defined like this:
 
 ```xml
