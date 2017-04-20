@@ -83,7 +83,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 createRouteId(this.cloudFoundryClient, domainId, spaceId)
             )))
             .as(thenKeep(function((applicationId, routeId) -> associateApplicationWithRoute(this.cloudFoundryClient, applicationId, routeId))))
-            .flatMap(function((applicationId, routeId) -> PaginationUtils
+            .flatMapMany(function((applicationId, routeId) -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.routes()
                     .listApplications(ListRouteApplicationsRequest.builder()
                         .page(page)
@@ -271,7 +271,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 createRouteId(this.cloudFoundryClient, domainId, spaceId)
             )))
             .as(thenKeep(function((applicationId, routeId) -> associateApplicationWithRoute(this.cloudFoundryClient, applicationId, routeId))))
-            .flatMap(function((applicationId, routeId) -> PaginationUtils
+            .flatMapMany(function((applicationId, routeId) -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.routes()
                     .listApplications(ListRouteApplicationsRequest.builder()
                         .page(page)
@@ -299,7 +299,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 createRouteId(this.cloudFoundryClient, domainId, spaceId)
             )))
             .as(thenKeep(function((applicationId, routeId) -> associateApplicationWithRoute(this.cloudFoundryClient, applicationId, routeId))))
-            .flatMap(function((applicationId, routeId) -> PaginationUtils
+            .flatMapMany(function((applicationId, routeId) -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.routes()
                     .listApplications(ListRouteApplicationsRequest.builder()
                         .diego(true)
@@ -328,7 +328,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 createRouteId(this.cloudFoundryClient, domainId, spaceId)
             )))
             .as(thenKeep(function((applicationId, routeId) -> associateApplicationWithRoute(this.cloudFoundryClient, applicationId, routeId))))
-            .flatMap(function((applicationId, routeId) -> PaginationUtils
+            .flatMapMany(function((applicationId, routeId) -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.routes()
                     .listApplications(ListRouteApplicationsRequest.builder()
                         .name(applicationName)
@@ -360,7 +360,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     Mono.just(organizationId)
                 )))
             .as(thenKeep(function((applicationId, routeId, organizationId) -> associateApplicationWithRoute(this.cloudFoundryClient, applicationId, routeId))))
-            .flatMap(function((applicationId, routeId, organizationId) -> PaginationUtils
+            .flatMapMany(function((applicationId, routeId, organizationId) -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.routes()
                     .listApplications(ListRouteApplicationsRequest.builder()
                         .organizationId(organizationId)
@@ -390,7 +390,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 Mono.just(spaceId)
             )))
             .as(thenKeep(function((applicationId, routeId, spaceId) -> associateApplicationWithRoute(this.cloudFoundryClient, applicationId, routeId))))
-            .flatMap(function((applicationId, routeId, spaceId) -> PaginationUtils
+            .flatMapMany(function((applicationId, routeId, spaceId) -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.routes()
                     .listApplications(ListRouteApplicationsRequest.builder()
                         .page(page)
@@ -423,7 +423,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 )
             ))
             .as(thenKeep(function((applicationId, routeId, stackId) -> associateApplicationWithRoute(this.cloudFoundryClient, applicationId, routeId))))
-            .flatMap(function((aplicationId, routeId, stackId) -> PaginationUtils
+            .flatMapMany(function((aplicationId, routeId, stackId) -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.routes()
                     .listApplications(ListRouteApplicationsRequest.builder()
                         .page(page)
@@ -447,7 +447,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 this.spaceId
             )
             .as(thenKeep(function((domainId, spaceId) -> requestCreateRoute(this.cloudFoundryClient, domainId, spaceId))))
-            .flatMap(function((domainId, spaceId) -> PaginationUtils
+            .flatMapMany(function((domainId, spaceId) -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.routes()
                     .list(ListRoutesRequest.builder()
                         .domainId(domainId)
@@ -476,7 +476,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     .host(host)
                     .spaceId(spaceId)
                     .build())))
-            .flatMap(response -> PaginationUtils
+            .flatMapMany(response -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.routes()
                     .list(ListRoutesRequest.builder()
                         .host(host)
@@ -500,7 +500,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     Mono.just(organizationId)
                 ))
             .as(thenKeep(function((domainId, spaceId, organizationId) -> requestCreateRoute(this.cloudFoundryClient, domainId, spaceId))))
-            .flatMap(function((domainId, spaceId, organizationId) -> PaginationUtils
+            .flatMapMany(function((domainId, spaceId, organizationId) -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.routes()
                     .list(ListRoutesRequest.builder()
                         .organizationId(organizationId)
@@ -530,7 +530,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     .path(path)
                     .spaceId(spaceId)
                     .build())))
-            .flatMap(response -> PaginationUtils
+            .flatMapMany(response -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.routes()
                     .list(ListRoutesRequest.builder()
                         .page(page)
@@ -563,7 +563,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     .applicationId(applicationId)
                     .routeId(routeId)
                     .build()))))
-            .flatMap(function((applicationId, routeId) -> PaginationUtils
+            .flatMapMany(function((applicationId, routeId) -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.routes()
                     .listApplications(ListRouteApplicationsRequest.builder()
                         .page(page)

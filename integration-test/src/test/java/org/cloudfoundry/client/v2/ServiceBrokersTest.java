@@ -98,7 +98,7 @@ public final class ServiceBrokersTest extends AbstractIntegrationTest {
                 .name(serviceBrokerName)
                 .spaceId(applicationMetadata.spaceId)
                 .build())
-            .flatMap(response -> PaginationUtils
+            .flatMapMany(response -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.serviceBrokers()
                     .list(ListServiceBrokersRequest.builder()
                         .name(serviceBrokerName)
@@ -127,7 +127,7 @@ public final class ServiceBrokersTest extends AbstractIntegrationTest {
             .delete(DeleteServiceBrokerRequest.builder()
                 .serviceBrokerId(serviceBrokerMetadata.serviceBrokerId)
                 .build())
-            .flatMap(response -> PaginationUtils
+            .flatMapMany(response -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.serviceBrokers()
                     .list(ListServiceBrokersRequest.builder()
                         .name(serviceBrokerName)
@@ -184,7 +184,7 @@ public final class ServiceBrokersTest extends AbstractIntegrationTest {
                 .serviceBrokerId(serviceBrokerMetadata.serviceBrokerId)
                 .name(serviceBrokerName2)
                 .build())
-            .flatMap(serviceBrokerId -> PaginationUtils
+            .flatMapMany(serviceBrokerId -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.serviceBrokers()
                     .list(ListServiceBrokersRequest.builder()
                         .name(serviceBrokerName2)
@@ -328,7 +328,7 @@ public final class ServiceBrokersTest extends AbstractIntegrationTest {
                     .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)))
                     .then(Mono.just(applicationId)))
                 .then(applicationId -> requestApplicationInstances(cloudFoundryClient, applicationId)
-                    .flatMap(response -> Flux.fromIterable(response.getInstances().values()))
+                    .flatMapMany(response -> Flux.fromIterable(response.getInstances().values()))
                     .single()
                     .map(ApplicationInstanceInfo::getState)
                     .filter("RUNNING"::equals)

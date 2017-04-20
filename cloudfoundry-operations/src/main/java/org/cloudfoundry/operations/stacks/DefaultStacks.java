@@ -48,7 +48,7 @@ public final class DefaultStacks implements Stacks {
     @Override
     public Flux<Stack> list() {
         return this.cloudFoundryClient
-            .flatMap(DefaultStacks::requestStacks)
+            .flatMapMany(DefaultStacks::requestStacks)
             .map(this::toStack)
             .transform(OperationsLogging.log("List Stacks"))
             .checkpoint();
@@ -57,7 +57,7 @@ public final class DefaultStacks implements Stacks {
     private static Mono<StackResource> getStack(CloudFoundryClient cloudFoundryClient, String stack) {
         return requestStack(cloudFoundryClient, stack)
             .single()
-            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Stack %s does not exist", stack));
+            .onErrorResume(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Stack %s does not exist", stack));
     }
 
     private static Flux<StackResource> requestStack(CloudFoundryClient cloudFoundryClient, String stack) {

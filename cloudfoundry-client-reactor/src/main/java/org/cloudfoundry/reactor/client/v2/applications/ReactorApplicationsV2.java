@@ -112,14 +112,14 @@ public final class ReactorApplicationsV2 extends AbstractClientV2Operations impl
     @Override
     public Flux<byte[]> download(DownloadApplicationRequest request) {
         return get(request, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "download"), outbound -> outbound.map(HttpClientRequest::followRedirect))
-            .flatMap(response -> response.receive().asByteArray())
+            .flatMapMany(response -> response.receive().asByteArray())
             .checkpoint();
     }
 
     @Override
     public Flux<byte[]> downloadDroplet(DownloadApplicationDropletRequest request) {
         return get(request, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "droplet", "download"), outbound -> outbound.map(HttpClientRequest::followRedirect))
-            .flatMap(response -> response.receive().asByteArray())
+            .flatMapMany(response -> response.receive().asByteArray())
             .checkpoint();
     }
 

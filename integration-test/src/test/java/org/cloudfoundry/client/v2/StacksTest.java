@@ -57,7 +57,7 @@ public final class StacksTest extends AbstractIntegrationTest {
     @Test
     public void list() throws TimeoutException, InterruptedException {
         getStackId(this.cloudFoundryClient, this.stackName)
-            .flatMap(stackId -> PaginationUtils
+            .flatMapMany(stackId -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.stacks()
                     .list(ListStacksRequest.builder()
                         .page(page)

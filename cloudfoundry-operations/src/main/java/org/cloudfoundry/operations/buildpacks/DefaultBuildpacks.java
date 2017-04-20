@@ -58,7 +58,7 @@ public final class DefaultBuildpacks implements Buildpacks {
     @Override
     public Flux<Buildpack> list() {
         return this.cloudFoundryClient
-            .flatMap(DefaultBuildpacks::requestBuildpacks)
+            .flatMapMany(DefaultBuildpacks::requestBuildpacks)
             .map(DefaultBuildpacks::toBuildpackResource)
             .transform(OperationsLogging.log("List Buildpacks"))
             .checkpoint();

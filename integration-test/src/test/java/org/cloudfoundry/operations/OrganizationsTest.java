@@ -55,7 +55,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     @Test
     public void list() throws TimeoutException, InterruptedException {
         this.organizationId
-            .flatMap(organizationId -> this.cloudFoundryOperations.organizations()
+            .flatMapMany(organizationId -> this.cloudFoundryOperations.organizations()
                 .list()
                 .filter(organization -> organization.getId().equals(organizationId)))
             .as(StepVerifier::create)

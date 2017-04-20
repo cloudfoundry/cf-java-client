@@ -70,7 +70,7 @@ public final class DefaultServiceAdmin implements ServiceAdmin {
     @Override
     public Flux<ServiceBroker> list() {
         return this.cloudFoundryClient
-            .flatMap(DefaultServiceAdmin::requestServiceBrokers)
+            .flatMapMany(DefaultServiceAdmin::requestServiceBrokers)
             .map(this::toServiceBroker)
             .transform(OperationsLogging.log("List Service Brokers"))
             .checkpoint();
@@ -79,7 +79,7 @@ public final class DefaultServiceAdmin implements ServiceAdmin {
     private static Mono<ServiceBrokerResource> getServiceBroker(CloudFoundryClient cloudFoundryClient, String serviceBrokerName) {
         return requestListServiceBrokers(cloudFoundryClient, serviceBrokerName)
             .single()
-            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Service Broker %s does not exist", serviceBrokerName));
+            .onErrorResume(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Service Broker %s does not exist", serviceBrokerName));
     }
 
     private static Mono<String> getServiceBrokerId(CloudFoundryClient cloudFoundryClient, String serviceBrokerName) {

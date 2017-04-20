@@ -38,28 +38,28 @@ final class ReactorDopplerEndpoints extends AbstractDopplerOperations {
 
     Flux<Envelope> containerMetrics(ContainerMetricsRequest request) {
         return get(builder -> builder.pathSegment("apps", request.getApplicationId(), "containermetrics"))
-            .flatMap(MultipartCodec::decode)
+            .flatMapMany(MultipartCodec::decode)
             .map(ReactorDopplerEndpoints::toEnvelope)
             .checkpoint();
     }
 
     Flux<Envelope> firehose(FirehoseRequest request) {
         return ws(builder -> builder.pathSegment("firehose", request.getSubscriptionId()))
-            .flatMap(response -> response.receiveWebsocket().aggregateFrames().receive().asInputStream())
+            .flatMapMany(response -> response.receiveWebsocket().aggregateFrames().receive().asInputStream())
             .map(ReactorDopplerEndpoints::toEnvelope)
             .checkpoint();
     }
 
     Flux<Envelope> recentLogs(RecentLogsRequest request) {
         return get(builder -> builder.pathSegment("apps", request.getApplicationId(), "recentlogs"))
-            .flatMap(MultipartCodec::decode)
+            .flatMapMany(MultipartCodec::decode)
             .map(ReactorDopplerEndpoints::toEnvelope)
             .checkpoint();
     }
 
     Flux<Envelope> stream(StreamRequest request) {
         return ws(builder -> builder.pathSegment("apps", request.getApplicationId(), "stream"))
-            .flatMap(response -> response.receiveWebsocket().aggregateFrames().receive().asInputStream())
+            .flatMapMany(response -> response.receiveWebsocket().aggregateFrames().receive().asInputStream())
             .map(ReactorDopplerEndpoints::toEnvelope)
             .checkpoint();
     }

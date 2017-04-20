@@ -38,7 +38,7 @@ public final class LastOperationUtils {
             .map(LastOperation::getState)
             .filter(state -> !IN_PROGRESS.equals(state))
             .repeatWhenEmpty(DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), completionTimeout))
-            .otherwise(t -> t instanceof ClientV2Exception && ((ClientV2Exception) t).getStatusCode() == 404, t -> Mono.empty())
+            .onErrorResume(t -> t instanceof ClientV2Exception && ((ClientV2Exception) t).getStatusCode() == 404, t -> Mono.empty())
             .then();
     }
 

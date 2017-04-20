@@ -210,7 +210,7 @@ public final class UsersTest extends AbstractIntegrationTest {
                     .userName(userName)
                     .version("0")
                     .build()))
-            .flatMap(response -> Flux.fromIterable(response.getEmail())
+            .flatMapMany(response -> Flux.fromIterable(response.getEmail())
                 .map(Email::getValue))
             .as(StepVerifier::create)
             .expectNext("test-email-2")

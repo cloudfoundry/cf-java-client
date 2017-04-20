@@ -165,7 +165,7 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
             )))
             .then(function((applicationId, routeId) -> requestCreateRouteMapping(this.cloudFoundryClient, applicationId, routeId)
                 .then(Mono.just(applicationId))))
-            .flatMap(applicationId -> PaginationUtils
+            .flatMapMany(applicationId -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.routeMappings()
                     .list(ListRouteMappingsRequest.builder()
                         .page(page)
@@ -196,7 +196,7 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
             )))
             .then(function((applicationId, routeId) -> requestCreateRouteMapping(this.cloudFoundryClient, applicationId, routeId)
                 .then(Mono.just(routeId))))
-            .flatMap(routeId -> PaginationUtils
+            .flatMapMany(routeId -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.routeMappings()
                     .list(ListRouteMappingsRequest.builder()
                         .page(page)

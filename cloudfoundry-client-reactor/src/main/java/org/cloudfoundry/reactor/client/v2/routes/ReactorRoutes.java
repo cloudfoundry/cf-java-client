@@ -86,7 +86,7 @@ public final class ReactorRoutes extends AbstractClientV2Operations implements R
                 return builder;
             })
             .defaultIfEmpty(true)
-            .otherwise(ExceptionUtils.statusCode(CF_NOT_FOUND), t -> Mono.just(false))
+            .onErrorResume(ExceptionUtils.statusCode(CF_NOT_FOUND), t -> Mono.just(false))
             .checkpoint();
     }
 

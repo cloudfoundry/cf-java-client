@@ -173,7 +173,7 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
             .then(uri -> getHttpClient()
                 .get(uri, request -> Mono.just(request)
                     .map(UserAgent::addUserAgent)
-                    .flatMap(HttpClientRequest::send))
+                    .flatMapMany(HttpClientRequest::send))
                 .doOnSubscribe(NetworkLogging.get(uri))
                 .transform(NetworkLogging.response(uri)))
             .transform(JsonCodec.decode(getObjectMapper(), Map.class))

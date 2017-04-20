@@ -293,7 +293,7 @@ public final class DefaultServices implements Services {
                 .getSummary(GetSpaceSummaryRequest.builder()
                     .spaceId(spaceId)
                     .build())))
-            .flatMap(DefaultServices::toServiceInstanceSummary)
+            .flatMapMany(DefaultServices::toServiceInstanceSummary)
             .transform(OperationsLogging.log("List Service Instances"))
             .checkpoint();
     }
@@ -307,7 +307,7 @@ public final class DefaultServices implements Services {
                     Mono.just(cloudFoundryClient),
                     getSpaceServiceInstanceId(cloudFoundryClient, request.getServiceInstanceName(), spaceId)
                 )))
-            .flatMap(function((cloudFoundryClient, serviceInstanceId) -> requestListServiceInstanceServiceKeys(cloudFoundryClient, serviceInstanceId)))
+            .flatMapMany(function((cloudFoundryClient, serviceInstanceId) -> requestListServiceInstanceServiceKeys(cloudFoundryClient, serviceInstanceId)))
             .map(DefaultServices::toServiceKey)
             .transform(OperationsLogging.log("List Service Keys"))
             .checkpoint();
@@ -317,7 +317,7 @@ public final class DefaultServices implements Services {
     public Flux<ServiceOffering> listServiceOfferings(ListServiceOfferingsRequest request) {
         return Mono
             .when(this.cloudFoundryClient, this.spaceId)
-            .flatMap(function((cloudFoundryClient, spaceId) -> Optional
+            .flatMapMany(function((cloudFoundryClient, spaceId) -> Optional
                 .ofNullable(request.getServiceName())
                 .map(serviceName -> getSpaceService(cloudFoundryClient, spaceId, serviceName).flux())
                 .orElse(requestListServices(cloudFoundryClient, spaceId))
@@ -438,19 +438,19 @@ public final class DefaultServices implements Services {
 
         return requestListServicePlanVisibilities(cloudFoundryClient, organizationId, servicePlanId)
             .next()
-            .otherwiseIfEmpty(ExceptionUtils.illegalArgument("Service Plan %s is not visible to your organization", resource.getEntity().getName()))
+            .switchIfEmpty(ExceptionUtils.illegalArgument("Service Plan %s is not visible to your organization", resource.getEntity().getName()))
             .then(Mono.just(Optional.of(servicePlanId)));
     }
 
     private static Mono<AssociateUserProvidedServiceInstanceRouteResponse> createRouteBinding(CloudFoundryClient cloudFoundryClient, String routeId, String userProvidedServiceInstanceId,
                                                                                               Map<String, Object> parameters) {
         return requestCreateRouteBinding(cloudFoundryClient, routeId, userProvidedServiceInstanceId, parameters)
-            .otherwise(ExceptionUtils.statusCode(CF_ROUTE_SERVICE_ALREADY_BOUND), t -> Mono.empty());
+            .onErrorResume(ExceptionUtils.statusCode(CF_ROUTE_SERVICE_ALREADY_BOUND), t -> Mono.empty());
     }
 
     private static Mono<CreateServiceBindingResponse> createServiceBinding(CloudFoundryClient cloudFoundryClient, String applicationId, String serviceInstanceId, Map<String, Object> parameters) {
         return requestCreateServiceBinding(cloudFoundryClient, applicationId, serviceInstanceId, parameters)
-            .otherwise(ExceptionUtils.statusCode(CF_SERVICE_ALREADY_BOUND), t -> Mono.empty());
+            .onErrorResume(ExceptionUtils.statusCode(CF_SERVICE_ALREADY_BOUND), t -> Mono.empty());
     }
 
     private static Mono<AbstractServiceInstanceResource> createServiceInstance(CloudFoundryClient cloudFoundryClient, String spaceId, String planId, CreateServiceInstanceRequest request) {
@@ -484,7 +484,7 @@ public final class DefaultServices implements Services {
     private static Mono<ApplicationResource> getApplication(CloudFoundryClient cloudFoundryClient, String applicationName, String spaceId) {
         return requestListApplications(cloudFoundryClient, applicationName, spaceId)
             .single()
-            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Application %s does not exist", applicationName));
+            .onErrorResume(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Application %s does not exist", applicationName));
     }
 
     private static Mono<String> getApplicationId(CloudFoundryClient cloudFoundryClient, String applicationName, String spaceId) {
@@ -503,8 +503,8 @@ public final class DefaultServices implements Services {
 
     private static Mono<String> getDomainId(CloudFoundryClient cloudFoundryClient, String domain, String organizationId) {
         return getPrivateDomainId(cloudFoundryClient, domain, organizationId)
-            .otherwiseIfEmpty(getSharedDomainId(cloudFoundryClient, domain))
-            .otherwiseIfEmpty(ExceptionUtils.illegalArgument("Domain %s not found", domain));
+            .switchIfEmpty(getSharedDomainId(cloudFoundryClient, domain))
+            .switchIfEmpty(ExceptionUtils.illegalArgument("Domain %s not found", domain));
     }
 
     @SuppressWarnings("unchecked")
@@ -535,11 +535,11 @@ public final class DefaultServices implements Services {
         return getServiceId(cloudFoundryClient, servicePlanId)
             .then(serviceId -> requestGetService(cloudFoundryClient, serviceId))
             .filter(DefaultServices::isPlanUpdateable)
-            .otherwiseIfEmpty(ExceptionUtils.illegalArgument("Plan for the %s service cannot be updated", serviceInstance.getEntity().getName()))
-            .flatMap(response -> requestListServicePlans(cloudFoundryClient, ResourceUtils.getId(response)))
+            .switchIfEmpty(ExceptionUtils.illegalArgument("Plan for the %s service cannot be updated", serviceInstance.getEntity().getName()))
+            .flatMapMany(response -> requestListServicePlans(cloudFoundryClient, ResourceUtils.getId(response)))
             .filter(resource -> planName.equals(resource.getEntity().getName()))
             .singleOrEmpty()
-            .otherwiseIfEmpty(ExceptionUtils.illegalArgument("New service plan %s not found", planName))
+            .switchIfEmpty(ExceptionUtils.illegalArgument("New service plan %s not found", planName))
             .then(resource -> checkVisibility(cloudFoundryClient, organizationId, resource));
     }
 
@@ -551,7 +551,7 @@ public final class DefaultServices implements Services {
 
     private static Mono<RouteResource> getRoute(CloudFoundryClient cloudFoundryClient, String domain, String domainId, String host, String path) {
         return getRoute(cloudFoundryClient, domainId, host, path)
-            .otherwiseIfEmpty(ExceptionUtils.illegalArgument("Route %s.%s does not exist", host, domain));
+            .switchIfEmpty(ExceptionUtils.illegalArgument("Route %s.%s does not exist", host, domain));
     }
 
     private static Mono<RouteResource> getRoute(CloudFoundryClient cloudFoundryClient, String domainId, String host, String routePath) {
@@ -569,7 +569,7 @@ public final class DefaultServices implements Services {
     private static Mono<String> getServiceBindingId(CloudFoundryClient cloudFoundryClient, String applicationId, String serviceInstanceId, String serviceInstanceName) {
         return requestListServiceBindings(cloudFoundryClient, applicationId, serviceInstanceId)
             .singleOrEmpty()
-            .otherwiseIfEmpty(ExceptionUtils.illegalState("Service instance %s is not bound to application", serviceInstanceName))
+            .switchIfEmpty(ExceptionUtils.illegalState("Service instance %s is not bound to application", serviceInstanceName))
             .map(ResourceUtils::getId);
     }
 
@@ -578,7 +578,7 @@ public final class DefaultServices implements Services {
             .justOrEmpty(serviceId)
             .then(serviceId1 -> requestGetService(cloudFoundryClient, serviceId1))
             .map(ResourceUtils::getEntity)
-            .otherwiseIfEmpty(Mono.just(ServiceEntity.builder().build()));
+            .switchIfEmpty(Mono.just(ServiceEntity.builder().build()));
     }
 
     private static Mono<String> getServiceId(CloudFoundryClient cloudFoundryClient, String servicePlanId) {
@@ -594,7 +594,7 @@ public final class DefaultServices implements Services {
     private static Mono<ServiceKeyResource> getServiceKey(CloudFoundryClient cloudFoundryClient, String serviceInstanceId, String serviceKey) {
         return requestListServiceInstanceServiceKeys(cloudFoundryClient, serviceInstanceId, serviceKey)
             .single()
-            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Service key %s does not exist", serviceKey));
+            .onErrorResume(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Service key %s does not exist", serviceKey));
     }
 
     private static Mono<ServicePlanEntity> getServicePlanEntity(CloudFoundryClient cloudFoundryClient, String servicePlanId) {
@@ -602,7 +602,7 @@ public final class DefaultServices implements Services {
             .justOrEmpty(servicePlanId)
             .then(servicePlanId1 -> requestGetServicePlan(cloudFoundryClient, servicePlanId1))
             .map(ResourceUtils::getEntity)
-            .otherwiseIfEmpty(Mono.just(ServicePlanEntity.builder().build()));
+            .switchIfEmpty(Mono.just(ServicePlanEntity.builder().build()));
     }
 
     private static Mono<String> getServicePlanIdByName(CloudFoundryClient cloudFoundryClient, String serviceId, String plan) {
@@ -610,7 +610,7 @@ public final class DefaultServices implements Services {
             .filter(resource -> plan.equals(ResourceUtils.getEntity(resource).getName()))
             .single()
             .map(ResourceUtils::getId)
-            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Service plan %s does not exist", plan));
+            .onErrorResume(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Service plan %s does not exist", plan));
     }
 
     private static Mono<List<ServicePlanResource>> getServicePlans(CloudFoundryClient cloudFoundryClient, String serviceId) {
@@ -627,13 +627,13 @@ public final class DefaultServices implements Services {
     private static Mono<ServiceResource> getSpaceService(CloudFoundryClient cloudFoundryClient, String spaceId, String service) {
         return requestListServices(cloudFoundryClient, spaceId, service)
             .single()
-            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Service %s does not exist", service));
+            .onErrorResume(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Service %s does not exist", service));
     }
 
     private static Mono<UnionServiceInstanceResource> getSpaceServiceInstance(CloudFoundryClient cloudFoundryClient, String serviceInstanceName, String spaceId) {
         return requestListServiceInstances(cloudFoundryClient, spaceId, serviceInstanceName)
             .single()
-            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Service instance %s does not exist", serviceInstanceName));
+            .onErrorResume(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Service instance %s does not exist", serviceInstanceName));
     }
 
     private static Mono<String> getSpaceServiceInstanceId(CloudFoundryClient cloudFoundryClient, String serviceInstanceName, String spaceId) {
@@ -645,7 +645,7 @@ public final class DefaultServices implements Services {
         return requestListServiceInstances(cloudFoundryClient, spaceId, serviceInstanceName)
             .filter(DefaultServices::isUserProvidedService)
             .single()
-            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("User provided service instance %s does not exist", serviceInstanceName));
+            .onErrorResume(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("User provided service instance %s does not exist", serviceInstanceName));
     }
 
     private static Mono<String> getSpaceUserProvidedServiceInstanceId(CloudFoundryClient cloudFoundryClient, String serviceInstanceName, String spaceId) {

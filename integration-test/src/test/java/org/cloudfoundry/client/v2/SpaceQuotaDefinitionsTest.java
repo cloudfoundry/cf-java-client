@@ -170,7 +170,7 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
             ))
             .then(function((spaceId, quotaId) -> requestAssociateSpace(this.cloudFoundryClient, quotaId, spaceId)
                 .then(Mono.just(quotaId))))
-            .flatMap(quotaId -> PaginationUtils
+            .flatMapMany(quotaId -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.spaceQuotaDefinitions()
                     .listSpaces(ListSpaceQuotaDefinitionSpacesRequest.builder()
                         .page(page)
@@ -200,7 +200,7 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
                     .then(Mono.just(quotaId)),
                 createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
             ))
-            .flatMap(function((quotaId, applicationId) -> PaginationUtils
+            .flatMapMany(function((quotaId, applicationId) -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.spaceQuotaDefinitions()
                     .listSpaces(ListSpaceQuotaDefinitionSpacesRequest.builder()
                         .applicationId(applicationId)
@@ -234,7 +234,7 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
             ))
             .then(function((spaceId, quotaId) -> requestAssociateSpace(this.cloudFoundryClient, quotaId, spaceId)
                 .then(Mono.just(quotaId))))
-            .flatMap(quotaId -> PaginationUtils
+            .flatMapMany(quotaId -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.spaceQuotaDefinitions()
                     .listSpaces(ListSpaceQuotaDefinitionSpacesRequest.builder()
                         .name(spaceName)
@@ -262,7 +262,7 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
             ))
             .then(function((organizationId, spaceId, quotaId) -> requestAssociateSpace(this.cloudFoundryClient, quotaId, spaceId)
                 .then(Mono.just(Tuples.of(organizationId, quotaId)))))
-            .flatMap(function((organizationId, quotaId) -> PaginationUtils
+            .flatMapMany(function((organizationId, quotaId) -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.spaceQuotaDefinitions()
                     .listSpaces(ListSpaceQuotaDefinitionSpacesRequest.builder()
                         .organizationId(organizationId)
@@ -283,7 +283,7 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
 
         this.organizationId
             .then(organizationId -> createSpaceQuotaDefinitionId(this.cloudFoundryClient, organizationId, quotaName))
-            .flatMap(quotaId -> PaginationUtils
+            .flatMapMany(quotaId -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.spaceQuotaDefinitions()
                     .listSpaces(ListSpaceQuotaDefinitionSpacesRequest.builder()
                         .spaceQuotaDefinitionId(quotaId)
@@ -305,7 +305,7 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
             ))
             .then(function((spaceId, quotaId) -> requestAssociateSpace(this.cloudFoundryClient, quotaId, spaceId)
                 .then(Mono.just(quotaId))))
-            .flatMap(quotaId -> PaginationUtils
+            .flatMapMany(quotaId -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.spaceQuotaDefinitions()
                     .listSpaces(ListSpaceQuotaDefinitionSpacesRequest.builder()
                         .page(page)

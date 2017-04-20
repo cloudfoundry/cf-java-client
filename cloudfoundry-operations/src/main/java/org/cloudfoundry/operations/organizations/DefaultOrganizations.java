@@ -116,7 +116,7 @@ public final class DefaultOrganizations implements Organizations {
     @Override
     public Flux<OrganizationSummary> list() {
         return this.cloudFoundryClient
-            .flatMap(DefaultOrganizations::requestOrganizations)
+            .flatMapMany(DefaultOrganizations::requestOrganizations)
             .map(DefaultOrganizations::toOrganizationSummary)
             .transform(OperationsLogging.log("List Organizations"))
             .checkpoint();
@@ -140,7 +140,7 @@ public final class DefaultOrganizations implements Organizations {
             .justOrEmpty(request.getQuotaDefinitionName())
             .then(quotaDefinitionName -> getOrganizationQuotaDefinitionId(cloudFoundryClient, quotaDefinitionName))
             .then(organizationQuotaDefinitionId -> getCreateOrganizationId(cloudFoundryClient, request.getOrganizationName(), organizationQuotaDefinitionId))
-            .otherwiseIfEmpty(getCreateOrganizationId(cloudFoundryClient, request.getOrganizationName(), null));
+            .switchIfEmpty(getCreateOrganizationId(cloudFoundryClient, request.getOrganizationName(), null));
     }
 
     private static Mono<Void> deleteOrganization(CloudFoundryClient cloudFoundryClient, Duration completionTimeout, String organizationId) {
@@ -181,7 +181,7 @@ public final class DefaultOrganizations implements Organizations {
     private static Mono<OrganizationResource> getOrganization(CloudFoundryClient cloudFoundryClient, String organization) {
         return requestOrganizations(cloudFoundryClient, organization)
             .single()
-            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Organization %s does not exist", organization));
+            .onErrorResume(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Organization %s does not exist", organization));
     }
 
     private static Mono<String> getOrganizationId(CloudFoundryClient cloudFoundryClient, String organization) {
@@ -198,7 +198,7 @@ public final class DefaultOrganizations implements Organizations {
     private static Mono<OrganizationQuotaDefinitionResource> getOrganizationQuotaDefinition(CloudFoundryClient cloudFoundryClient, String quotaDefinitionName) {
         return requestOrganizationQuotaDefinitions(cloudFoundryClient, quotaDefinitionName)
             .single()
-            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Organization quota %s does not exist", quotaDefinitionName));
+            .onErrorResume(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Organization quota %s does not exist", quotaDefinitionName));
     }
 
     private static Mono<String> getOrganizationQuotaDefinitionId(CloudFoundryClient cloudFoundryClient, String quotaDefinitionName) {

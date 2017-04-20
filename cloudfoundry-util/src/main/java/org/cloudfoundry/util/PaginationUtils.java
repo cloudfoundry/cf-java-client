@@ -43,7 +43,7 @@ public final class PaginationUtils {
 
         return pageSupplier
             .apply(1)
-            .flatMap(requestClientV2AdditionalPages(pageSupplier))
+            .flatMapMany(requestClientV2AdditionalPages(pageSupplier))
             .flatMap(ResourceUtils::getResources);
     }
 
@@ -59,7 +59,7 @@ public final class PaginationUtils {
     public static <T, U extends org.cloudfoundry.client.v3.PaginatedResponse<T>> Flux<T> requestClientV3Resources(Function<Integer, Mono<U>> pageSupplier) {
         return pageSupplier
             .apply(1)
-            .flatMap(requestClientV3AdditionalPages(pageSupplier))
+            .flatMapMany(requestClientV3AdditionalPages(pageSupplier))
             .flatMapIterable(org.cloudfoundry.client.v3.PaginatedResponse::getResources);
     }
 
@@ -75,7 +75,7 @@ public final class PaginationUtils {
     public static <T, U extends org.cloudfoundry.uaa.PaginatedResponse<T>> Flux<T> requestUaaResources(Function<Integer, Mono<U>> pageSupplier) {
         return pageSupplier
             .apply(1)
-            .flatMap(requestUaaAdditionalPages(pageSupplier))
+            .flatMapMany(requestUaaAdditionalPages(pageSupplier))
             .flatMapIterable(org.cloudfoundry.uaa.PaginatedResponse::getResources);
     }
 

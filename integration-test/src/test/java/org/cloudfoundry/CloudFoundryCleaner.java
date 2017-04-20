@@ -286,7 +286,7 @@ final class CloudFoundryCleaner {
                     .async(true)
                     .organizationQuotaDefinitionId(ResourceUtils.getId(organizationQuotaDefinition))
                     .build())
-                .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, Duration.ofMinutes(5), job))
+                .flatMapMany(job -> JobUtils.waitForCompletion(cloudFoundryClient, Duration.ofMinutes(5), job))
                 .doOnError(t -> LOGGER.error("Unable to delete organization quota definition {}", ResourceUtils.getEntity(organizationQuotaDefinition).getName(), t)));
     }
 
@@ -302,7 +302,7 @@ final class CloudFoundryCleaner {
                     .async(true)
                     .organizationId(ResourceUtils.getId(organization))
                     .build())
-                .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, Duration.ofMinutes(5), job))
+                .flatMapMany(job -> JobUtils.waitForCompletion(cloudFoundryClient, Duration.ofMinutes(5), job))
                 .doOnError(t -> LOGGER.error("Unable to delete organization {}", ResourceUtils.getEntity(organization).getName(), t)));
     }
 
@@ -318,13 +318,13 @@ final class CloudFoundryCleaner {
                     .async(true)
                     .privateDomainId(ResourceUtils.getId(privateDomain))
                     .build())
-                .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, Duration.ofMinutes(5), job))
+                .flatMapMany(job -> JobUtils.waitForCompletion(cloudFoundryClient, Duration.ofMinutes(5), job))
                 .doOnError(t -> LOGGER.error("Unable to delete private domain {}", ResourceUtils.getEntity(privateDomain).getName(), t)));
     }
 
     private static Flux<Void> cleanRoutes(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
         return getAllDomains(cloudFoundryClient)
-            .flatMap(domains -> PaginationUtils
+            .flatMapMany(domains -> PaginationUtils
                 .requestClientV2Resources(page -> cloudFoundryClient.routes()
                     .list(ListRoutesRequest.builder()
                         .page(page)
@@ -338,7 +338,7 @@ final class CloudFoundryCleaner {
                     .async(true)
                     .routeId(ResourceUtils.getId(route))
                     .build())
-                .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, Duration.ofMinutes(5), job))
+                .flatMapMany(job -> JobUtils.waitForCompletion(cloudFoundryClient, Duration.ofMinutes(5), job))
                 .doOnError(t -> {
                     RouteEntity entity = ResourceUtils.getEntity(route);
                     LOGGER.error("Unable to delete route {}.{}:{}{}", entity.getHost(), domains.get(entity.getDomainId()), entity.getPort(), entity.getPath(), t);
@@ -420,7 +420,7 @@ final class CloudFoundryCleaner {
                     .async(true)
                     .sharedDomainId(ResourceUtils.getId(domain))
                     .build())
-                .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, Duration.ofMinutes(5), job))
+                .flatMapMany(job -> JobUtils.waitForCompletion(cloudFoundryClient, Duration.ofMinutes(5), job))
                 .doOnError(t -> LOGGER.error("Unable to delete domain {}", ResourceUtils.getEntity(domain).getName(), t)));
     }
 
@@ -436,7 +436,7 @@ final class CloudFoundryCleaner {
                     .async(true)
                     .spaceQuotaDefinitionId(ResourceUtils.getId(quota))
                     .build()))
-                .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, Duration.ofMinutes(5), job))
+                .flatMapMany(job -> JobUtils.waitForCompletion(cloudFoundryClient, Duration.ofMinutes(5), job))
                 .doOnError(t -> LOGGER.error("Unable to delete space quota definition {}", ResourceUtils.getEntity(quota).getName(), t)));
     }
 
@@ -452,7 +452,7 @@ final class CloudFoundryCleaner {
                     .async(true)
                     .spaceId(ResourceUtils.getId(space))
                     .build())
-                .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, Duration.ofMinutes(5), job))
+                .flatMapMany(job -> JobUtils.waitForCompletion(cloudFoundryClient, Duration.ofMinutes(5), job))
                 .doOnError(t -> LOGGER.error("Unable to delete space {}", ResourceUtils.getEntity(space).getName(), t)));
     }
 
