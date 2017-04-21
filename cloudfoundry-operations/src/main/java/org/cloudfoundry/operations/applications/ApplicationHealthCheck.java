@@ -16,10 +16,12 @@
 
 package org.cloudfoundry.operations.applications;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 /**
  * The health check type of an application
  */
-
 public enum ApplicationHealthCheck {
 
     /**
@@ -38,6 +40,19 @@ public enum ApplicationHealthCheck {
         this.value = value;
     }
 
+    @JsonCreator
+    public static ApplicationHealthCheck from(String s) {
+        switch (s.toLowerCase()) {
+            case "none":
+                return NONE;
+            case "port":
+                return PORT;
+            default:
+                throw new IllegalArgumentException(String.format("Unknown application health check: %s", s));
+        }
+    }
+
+    @JsonValue
     public String getValue() {
         return this.value;
     }

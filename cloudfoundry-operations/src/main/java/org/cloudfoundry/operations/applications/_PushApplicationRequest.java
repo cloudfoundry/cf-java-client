@@ -28,20 +28,26 @@ import java.time.Duration;
 @Value.Immutable
 abstract class _PushApplicationRequest {
 
+    @SuppressWarnings("deprecation")
     @Value.Check
     void check() {
-        if (getApplication() == null && getDockerImage() == null) {
-            throw new IllegalStateException("One of application or dockerImage must be supplied");
+        if (getApplication() == null && getPath() == null && getDockerImage() == null) {
+            throw new IllegalStateException("One of path or dockerImage must be supplied");
         }
 
-        if (getApplication() != null && getDockerImage() != null) {
-            throw new IllegalStateException("Only one of application or dockerImage can be supplied");
+        if ((getApplication() != null || getPath() != null) && getDockerImage() != null) {
+            throw new IllegalStateException("Only one of path or dockerImage can be supplied");
         }
     }
 
     /**
      * The path to the application
+     *
+     * @deprecated in favor of variants of {@code path}
+     * @see #getPath()
+     * @see PushApplicationRequest.Builder#path(String)
      */
+    @Deprecated
     @Nullable
     abstract Path getApplication();
 
@@ -126,7 +132,7 @@ abstract class _PushApplicationRequest {
      * The path for the application
      */
     @Nullable
-    abstract String getPath();
+    abstract Path getPath();
 
     /**
      * Use a random route for the application

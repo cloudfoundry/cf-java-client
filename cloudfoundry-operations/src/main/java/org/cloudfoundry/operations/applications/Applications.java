@@ -123,6 +123,14 @@ public interface Applications {
     Mono<Void> push(PushApplicationRequest request);
 
     /**
+     * Push a manifest
+     *
+     * @param request the push manifest request
+     * @return a completion indicator
+     */
+    Mono<Void> pushManifest(PushApplicationManifestRequest request);
+
+    /**
      * Rename a specific application
      *
      * @param request the rename application request

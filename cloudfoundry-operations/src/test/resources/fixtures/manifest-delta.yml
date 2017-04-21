@@ -5,7 +5,7 @@ buildpack: delta-buildpack
 command: delta-command
 disk_quota: -3
 health-check-http-endpoint: delta-health-check-http-endpoint
-health-check-type: delta-health-check-type
+health-check-type: none
 instances: -3
 memory: -3
 no-route: true
