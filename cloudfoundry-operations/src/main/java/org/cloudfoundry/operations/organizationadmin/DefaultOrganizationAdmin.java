@@ -87,7 +87,7 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
     @Override
     public Flux<OrganizationQuota> listQuotas() {
         return this.cloudFoundryClient
-            .flatMap(DefaultOrganizationAdmin::requestListOrganizationQuotas)
+            .flatMapMany(DefaultOrganizationAdmin::requestListOrganizationQuotas)
             .map(DefaultOrganizationAdmin::toOrganizationQuota)
             .transform(OperationsLogging.log("List Organization Quotas"))
             .checkpoint();
@@ -139,14 +139,14 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
     private static Mono<String> getOrganizationId(CloudFoundryClient cloudFoundryClient, String name) {
         return requestListOrganizations(cloudFoundryClient, name)
             .single()
-            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Organization %s does not exist", name))
+            .onErrorResume(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Organization %s does not exist", name))
             .map(ResourceUtils::getId);
     }
 
     private static Mono<OrganizationQuotaDefinitionResource> getOrganizationQuota(CloudFoundryClient cloudFoundryClient, String name) {
         return requestListOrganizationQuotas(cloudFoundryClient, name)
             .single()
-            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Quota %s does not exist", name));
+            .onErrorResume(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Quota %s does not exist", name));
     }
 
     private static Mono<String> getOrganizationQuotaId(CloudFoundryClient cloudFoundryClient, String name) {

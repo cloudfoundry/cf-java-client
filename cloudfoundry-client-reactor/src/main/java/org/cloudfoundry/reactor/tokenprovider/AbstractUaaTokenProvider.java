@@ -209,7 +209,7 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
 
     private Mono<HttpClientResponse> refreshToken(ConnectionContext connectionContext, String refreshToken) {
         return requestToken(connectionContext, refreshTokenGrantTokenRequestTransformer(refreshToken))
-            .otherwise(t -> t instanceof UaaException && ((UaaException) t).getStatusCode() == UNAUTHORIZED.code(), t -> Mono.empty());
+            .onErrorResume(t -> t instanceof UaaException && ((UaaException) t).getStatusCode() == UNAUTHORIZED.code(), t -> Mono.empty());
     }
 
     private Function<Mono<HttpClientRequest>, Mono<Void>> refreshTokenGrantTokenRequestTransformer(String refreshToken) {
@@ -244,7 +244,7 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
         return this.refreshTokens.getOrDefault(connectionContext, Mono.empty())
             .then(refreshToken -> refreshToken(connectionContext, refreshToken)
                 .doOnSubscribe(s -> LOGGER.debug("Negotiating using refresh token")))
-            .otherwiseIfEmpty(primaryToken(connectionContext)
+            .switchIfEmpty(primaryToken(connectionContext)
                 .doOnSubscribe(s -> LOGGER.debug("Negotiating using token provider")))
             .transform(ErrorPayloadMapper.fallback())
             .transform(extractTokens(connectionContext))

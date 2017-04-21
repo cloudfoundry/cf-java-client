@@ -56,7 +56,7 @@ public final class DefaultSpaceAdmin implements SpaceAdmin {
     public Flux<SpaceQuota> listQuotas() {
         return Mono
             .when(this.cloudFoundryClient, this.organizationId)
-            .flatMap(function(DefaultSpaceAdmin::requestSpaceQuotaDefinitions))
+            .flatMapMany(function(DefaultSpaceAdmin::requestSpaceQuotaDefinitions))
             .map(DefaultSpaceAdmin::toSpaceQuota)
             .transform(OperationsLogging.log("List Space Quota"))
             .checkpoint();
@@ -66,7 +66,7 @@ public final class DefaultSpaceAdmin implements SpaceAdmin {
         return requestSpaceQuotaDefinitions(cloudFoundryClient, organizationId)
             .filter(resource -> name.equals(ResourceUtils.getEntity(resource).getName()))
             .single()
-            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Space Quota %s does not exist", name));
+            .onErrorResume(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Space Quota %s does not exist", name));
     }
 
     private static Flux<SpaceQuotaDefinitionResource> requestSpaceQuotaDefinitions(CloudFoundryClient cloudFoundryClient, String organizationId) {

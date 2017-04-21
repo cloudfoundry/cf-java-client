@@ -81,7 +81,7 @@ public final class ReactorPackages extends AbstractClientV3Operations implements
     @Override
     public Flux<byte[]> download(DownloadPackageRequest request) {
         return get(request, builder -> builder.pathSegment("v3", "packages", request.getPackageId(), "download"))
-            .flatMap(response -> response.receive().aggregate().asByteArray())
+            .flatMapMany(response -> response.receive().aggregate().asByteArray())
             .checkpoint();
     }
 
@@ -107,7 +107,7 @@ public final class ReactorPackages extends AbstractClientV3Operations implements
     public Mono<UploadPackageResponse> upload(UploadPackageRequest request) {
         return post(request, UploadPackageResponse.class, builder -> builder.pathSegment("v3", "packages", request.getPackageId(), "upload"),
             outbound -> outbound
-                .flatMap(r -> {
+                .flatMapMany(r -> {
                     if (Files.isDirectory(request.getBits())) {
                         return FileUtils.compress(request.getBits())
                             .then(bits -> upload(bits, r)

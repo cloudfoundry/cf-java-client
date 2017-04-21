@@ -186,7 +186,7 @@ public final class TokensTest extends AbstractIntegrationTest {
                     this.uaaClient.tokens()
                         .listKeys(ListTokenKeysRequest.builder()
                             .build())
-                        .flatMap(response -> Flux.fromIterable(response.getKeys()))
+                        .flatMapMany(response -> Flux.fromIterable(response.getKeys()))
                         .filter(tokenKey -> getKey.getValue().equals(tokenKey.getValue()))
                         .single()
                         .map(TokenKey::getId),

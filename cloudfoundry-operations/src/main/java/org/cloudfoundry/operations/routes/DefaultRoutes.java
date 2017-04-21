@@ -130,7 +130,7 @@ public final class DefaultRoutes implements Routes {
     public Mono<Void> deleteOrphanedRoutes(DeleteOrphanedRoutesRequest request) {
         return Mono
             .when(this.cloudFoundryClient, this.spaceId)
-            .flatMap(function((cloudFoundryClient, spaceId) -> requestSpaceRoutes(cloudFoundryClient, spaceId)
+            .flatMapMany(function((cloudFoundryClient, spaceId) -> requestSpaceRoutes(cloudFoundryClient, spaceId)
                 .filter(route -> isRouteOrphan(ResourceUtils.getEntity(route)))
                 .map(ResourceUtils::getId)
                 .map(routeId -> Tuples.of(cloudFoundryClient, routeId))))
@@ -153,7 +153,7 @@ public final class DefaultRoutes implements Routes {
                     getAllDomains(cloudFoundryClient, organizationId),
                     getAllSpaces(cloudFoundryClient, organizationId)
                 )))
-            .flatMap(function((cloudFoundryClient, domains, spaces) -> getRoutes(cloudFoundryClient, request, this.organizationId, this.spaceId)
+            .flatMapMany(function((cloudFoundryClient, domains, spaces) -> getRoutes(cloudFoundryClient, request, this.organizationId, this.spaceId)
                 .map(resource -> Tuples.of(cloudFoundryClient, domains, resource, spaces))))
             .flatMap(function((cloudFoundryClient, domains, resource, spaces) -> Mono
                 .when(
@@ -221,7 +221,7 @@ public final class DefaultRoutes implements Routes {
     private static Mono<ApplicationResource> getApplication(CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
         return requestApplications(cloudFoundryClient, application, spaceId)
             .single()
-            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Application %s does not exist", application));
+            .onErrorResume(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Application %s does not exist", application));
     }
 
     private static Mono<String> getApplicationId(CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
@@ -243,7 +243,7 @@ public final class DefaultRoutes implements Routes {
     private static Mono<Resource<?>> getDomain(CloudFoundryClient cloudFoundryClient, String organizationId, String domain) {
         return getDomains(cloudFoundryClient, organizationId, domain)
             .single()
-            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Domain %s does not exist", domain));
+            .onErrorResume(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Domain %s does not exist", domain));
     }
 
     private static Mono<String> getDomainId(CloudFoundryClient cloudFoundryClient, String organizationId, String domain) {
@@ -272,12 +272,12 @@ public final class DefaultRoutes implements Routes {
         return getDomainId(cloudFoundryClient, organizationId, domain)
             .then(domainId -> getRoute(cloudFoundryClient, domainId, host, path, port)
                 .cast(AbstractRouteResource.class)
-                .otherwiseIfEmpty(requestCreateRoute(cloudFoundryClient, domainId, host, path, port, randomPort, spaceId)));
+                .switchIfEmpty(requestCreateRoute(cloudFoundryClient, domainId, host, path, port, randomPort, spaceId)));
     }
 
     private static Mono<RouteResource> getRoute(CloudFoundryClient cloudFoundryClient, String domainId, String domain, String host, String path, Integer port) {
         return getRoute(cloudFoundryClient, domainId, host, path, port)
-            .otherwiseIfEmpty(ExceptionUtils.illegalArgument("Route for %s does not exist", domain));
+            .switchIfEmpty(ExceptionUtils.illegalArgument("Route for %s does not exist", domain));
     }
 
     private static Mono<RouteResource> getRoute(CloudFoundryClient cloudFoundryClient, String domainId, String host, String path, Integer port) {
@@ -300,17 +300,17 @@ public final class DefaultRoutes implements Routes {
     private static Flux<RouteResource> getRoutes(CloudFoundryClient cloudFoundryClient, ListRoutesRequest request, Mono<String> organizationId, Mono<String> spaceId) {
         if (Level.ORGANIZATION == request.getLevel()) {
             return organizationId
-                .flatMap(organizationId1 -> requestRoutes(cloudFoundryClient, builder -> builder.organizationId(organizationId1)));
+                .flatMapMany(organizationId1 -> requestRoutes(cloudFoundryClient, builder -> builder.organizationId(organizationId1)));
         } else {
             return spaceId
-                .flatMap(spaceId1 -> requestSpaceRoutes(cloudFoundryClient, spaceId1));
+                .flatMapMany(spaceId1 -> requestSpaceRoutes(cloudFoundryClient, spaceId1));
         }
     }
 
     private static Mono<SpaceResource> getSpace(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
         return requestSpaces(cloudFoundryClient, organizationId, space)
             .single()
-            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Space %s does not exist", space));
+            .onErrorResume(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Space %s does not exist", space));
     }
 
     private static Mono<String> getSpaceId(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {

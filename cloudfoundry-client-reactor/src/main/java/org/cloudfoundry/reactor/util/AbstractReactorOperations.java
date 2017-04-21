@@ -199,7 +199,7 @@ public abstract class AbstractReactorOperations {
                     .transform(this::addAuthorization)
                     .map(UserAgent::addUserAgent)
                     .transform(requestTransformer)
-                    .flatMap(HttpClientRequest::sendWebsocket))
+                    .flatMapMany(HttpClientRequest::sendWebsocket))
                 .doOnSubscribe(NetworkLogging.ws(uri))
                 .transform(NetworkLogging.response(uri)))
             .transform(this::invalidateToken)

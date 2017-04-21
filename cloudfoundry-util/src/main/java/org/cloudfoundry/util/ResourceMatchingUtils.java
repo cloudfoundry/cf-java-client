@@ -51,7 +51,7 @@ public final class ResourceMatchingUtils {
     public static Mono<List<ArtifactMetadata>> getMatchedResources(CloudFoundryClient cloudFoundryClient, Path application) {
         return (Files.isDirectory(application) ? getArtifactMetadataFromDirectory(application) : getArtifactMetadataFromZip(application))
             .collectMap(ArtifactMetadata::getHash)
-            .flatMap(artifactMetadatas -> requestListMatchingResources(cloudFoundryClient, artifactMetadatas.values())
+            .flatMapMany(artifactMetadatas -> requestListMatchingResources(cloudFoundryClient, artifactMetadatas.values())
                 .flatMapIterable(ListMatchingResourcesResponse::getResources)
                 .map(resource -> artifactMetadatas.get(resource.getHash())))
             .collectList()

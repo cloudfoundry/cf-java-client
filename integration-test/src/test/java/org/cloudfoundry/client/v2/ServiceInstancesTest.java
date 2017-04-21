@@ -99,7 +99,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
                     .serviceInstanceId(serviceInstanceId)
                     .build())
                 .then(Mono.just(serviceInstanceId))))
-            .flatMap(serviceInstanceId -> requestListRoutes(this.cloudFoundryClient, serviceInstanceId)
+            .flatMapMany(serviceInstanceId -> requestListRoutes(this.cloudFoundryClient, serviceInstanceId)
                 .filter(route -> serviceInstanceId.equals(route.getEntity().getServiceInstanceId())))
             .map(route -> ResourceUtils.getEntity(route).getHost())
             .as(StepVerifier::create)
@@ -363,7 +363,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
         Mono.when(this.organizationId, this.spaceId)
             .then(function((organizationId, spaceId) -> createServiceInstanceId(this.cloudFoundryClient, this.serviceBrokerId, serviceInstanceName, spaceId)
                 .then(Mono.just(organizationId))))
-            .flatMap(organizationId -> PaginationUtils
+            .flatMapMany(organizationId -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.serviceInstances()
                     .list(ListServiceInstancesRequest.builder()
                         .organizationId(organizationId)
@@ -389,7 +389,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
                     createServiceInstanceId(this.cloudFoundryClient, this.serviceBrokerId, serviceInstanceName, spaceId)
                 ))
             .then(function((applicationId, serviceInstanceId) -> createServiceBindingId(this.cloudFoundryClient, applicationId, serviceInstanceId)))
-            .flatMap(serviceBindingId -> PaginationUtils
+            .flatMapMany(serviceBindingId -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.serviceInstances()
                     .list(ListServiceInstancesRequest.builder()
                         .serviceBindingId(serviceBindingId)
@@ -410,7 +410,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
         this.spaceId
             .then(spaceId -> createServiceInstanceId(this.cloudFoundryClient, this.serviceBrokerId, serviceInstanceName, spaceId))
             .then(serviceInstanceId -> createServiceKeyId(this.cloudFoundryClient, serviceInstanceId, serviceKeyName))
-            .flatMap(serviceKeyId -> PaginationUtils
+            .flatMapMany(serviceKeyId -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.serviceInstances()
                     .list(ListServiceInstancesRequest.builder()
                         .serviceKeyId(serviceKeyId)
@@ -434,7 +434,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
             )))
             .then(function((planId, spaceId) -> requestCreateServiceInstance(this.cloudFoundryClient, planId, serviceInstanceName, spaceId)
                 .then(Mono.just(planId))))
-            .flatMap(planId -> PaginationUtils
+            .flatMapMany(planId -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.serviceInstances()
                     .list(ListServiceInstancesRequest.builder()
                         .servicePlanId(planId)
@@ -455,7 +455,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
         this.spaceId
             .then(spaceId -> createServiceInstanceId(this.cloudFoundryClient, this.serviceBrokerId, serviceInstanceName, spaceId)
                 .then(Mono.just(spaceId)))
-            .flatMap(spaceId -> PaginationUtils
+            .flatMapMany(spaceId -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.serviceInstances()
                     .list(ListServiceInstancesRequest.builder()
                         .spaceId(spaceId)
@@ -482,7 +482,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
                 ))
             .then(function((applicationId, serviceInstanceId) -> createServiceBindingId(this.cloudFoundryClient, applicationId, serviceInstanceId)
                 .then(Mono.just(Tuples.of(applicationId, serviceInstanceId)))))
-            .flatMap(function((applicationId, serviceInstanceId) -> Mono
+            .flatMapMany(function((applicationId, serviceInstanceId) -> Mono
                 .when(
                     Mono.just(applicationId),
                     PaginationUtils
@@ -513,7 +513,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
                 ))
             .then(function((applicationId, serviceInstanceId) -> createServiceBindingId(this.cloudFoundryClient, applicationId, serviceInstanceId)
                 .then(Mono.just(Tuples.of(applicationId, serviceInstanceId)))))
-            .flatMap(function((applicationId, serviceInstanceId) -> PaginationUtils
+            .flatMapMany(function((applicationId, serviceInstanceId) -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.serviceInstances()
                     .listServiceBindings(ListServiceInstanceServiceBindingsRequest.builder()
                         .applicationId(applicationId)
@@ -549,7 +549,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
                         .serviceInstanceId(serviceInstanceId)
                         .build()))
                 .then(Mono.just(serviceInstanceId))))
-            .flatMap(serviceInstanceId -> requestListRoutes(this.cloudFoundryClient, serviceInstanceId)
+            .flatMapMany(serviceInstanceId -> requestListRoutes(this.cloudFoundryClient, serviceInstanceId)
                 .filter(route -> serviceInstanceId.equals(route.getEntity().getServiceInstanceId())))
             .as(StepVerifier::create)
             .expectComplete()
@@ -643,7 +643,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
         return requestListServices(cloudFoundryClient, serviceBrokerId)
             .single()
             .map(ResourceUtils::getId)
-            .flatMap(serviceId -> requestListServicePlans(cloudFoundryClient, serviceId))
+            .flatMapMany(serviceId -> requestListServicePlans(cloudFoundryClient, serviceId))
             .single()
             .map(ResourceUtils::getId);
     }

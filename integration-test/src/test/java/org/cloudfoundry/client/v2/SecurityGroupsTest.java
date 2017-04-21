@@ -139,7 +139,7 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
             ))
             .then(function((securityGroupId, spaceId) -> associateSpace(this.cloudFoundryClient, spaceId, securityGroupId)
                 .then(Mono.just(Tuples.of(securityGroupId, spaceId)))))
-            .flatMap(function((securityGroupId, spaceId) -> this.cloudFoundryClient.securityGroups()
+            .flatMapMany(function((securityGroupId, spaceId) -> this.cloudFoundryClient.securityGroups()
                 .removeSpace(RemoveSecurityGroupSpaceRequest.builder()
                     .securityGroupId(securityGroupId)
                     .spaceId(spaceId)
@@ -217,7 +217,7 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
                 ))
             .then(function((securityGroupId, spaceId) -> associateSpace(this.cloudFoundryClient, spaceId, securityGroupId)
                 .then(Mono.just(Tuples.of(securityGroupId, spaceId)))))
-            .flatMap(function((securityGroupId, spaceId) -> PaginationUtils.
+            .flatMapMany(function((securityGroupId, spaceId) -> PaginationUtils.
                 requestClientV2Resources(page -> this.cloudFoundryClient.securityGroups()
                     .listSpaces(ListSecurityGroupSpacesRequest.builder()
                         .page(page)

@@ -94,7 +94,7 @@ public final class DefaultDomains implements Domains {
     @Override
     public Flux<Domain> list() {
         return this.cloudFoundryClient
-            .flatMap(cloudFoundryClient -> requestListPrivateDomains(cloudFoundryClient)
+            .flatMapMany(cloudFoundryClient -> requestListPrivateDomains(cloudFoundryClient)
                 .map(DefaultDomains::toDomain)
                 .mergeWith(requestListSharedDomains(cloudFoundryClient)
                     .map(DefaultDomains::toDomain)))
@@ -105,7 +105,7 @@ public final class DefaultDomains implements Domains {
     @Override
     public Flux<RouterGroup> listRouterGroups() {
         return this.routingClient
-            .flatMap(DefaultDomains::requestListRouterGroups)
+            .flatMapMany(DefaultDomains::requestListRouterGroups)
             .flatMapIterable(ListRouterGroupsResponse::getRouterGroups)
             .map(DefaultDomains::toRouterGroup)
             .transform(OperationsLogging.log("List Router Groups"))
@@ -142,7 +142,7 @@ public final class DefaultDomains implements Domains {
     private static Mono<OrganizationResource> getOrganization(CloudFoundryClient cloudFoundryClient, String organization) {
         return requestOrganizations(cloudFoundryClient, organization)
             .single()
-            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Organization %s does not exist", organization));
+            .onErrorResume(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Organization %s does not exist", organization));
     }
 
     private static Mono<String> getOrganizationId(CloudFoundryClient cloudFoundryClient, String organization) {
@@ -153,7 +153,7 @@ public final class DefaultDomains implements Domains {
     private static Mono<PrivateDomainResource> getPrivateDomain(CloudFoundryClient cloudFoundryClient, String domain) {
         return requestListPrivateDomains(cloudFoundryClient, domain)
             .single()
-            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Private domain %s does not exist", domain));
+            .onErrorResume(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Private domain %s does not exist", domain));
     }
 
     private static Mono<String> getPrivateDomainId(CloudFoundryClient cloudFoundryClient, String domain) {

@@ -414,7 +414,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         String organizationName = this.nameFactory.getOrganizationName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .flatMap(organizationId -> PaginationUtils.
+            .flatMapMany(organizationId -> PaginationUtils.
                 requestClientV2Resources(page -> this.cloudFoundryClient.organizations()
                     .getUserRoles(GetOrganizationUserRolesRequest.builder()
                         .organizationId(organizationId)
@@ -430,7 +430,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         String organizationName = this.nameFactory.getOrganizationName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .flatMap(organizationId -> requestListOrganizations(this.cloudFoundryClient)
+            .flatMapMany(organizationId -> requestListOrganizations(this.cloudFoundryClient)
                 .map(ResourceUtils::getId)
                 .filter(organizationId::equals))
             .as(StepVerifier::create)
@@ -813,7 +813,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             createOrganizationId(this.cloudFoundryClient, organizationName),
             createSharedDomainId(this.cloudFoundryClient, sharedDomainName)
         )
-            .flatMap(function((organizationId, sharedDomainId) -> getDomainNames(this.cloudFoundryClient, organizationId, builder -> builder.name(sharedDomainName))))
+            .flatMapMany(function((organizationId, sharedDomainId) -> getDomainNames(this.cloudFoundryClient, organizationId, builder -> builder.name(sharedDomainName))))
             .as(StepVerifier::create)
             .expectNextCount(1)
             .expectComplete()
@@ -828,7 +828,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .then(organizationId -> createPrivateDomainId(this.cloudFoundryClient, organizationId, privateDomainName)
                 .then(Mono.just(organizationId)))
-            .flatMap(organizationId -> getDomainNames(this.cloudFoundryClient, organizationId))
+            .flatMapMany(organizationId -> getDomainNames(this.cloudFoundryClient, organizationId))
             .filter(privateDomainName::equals)
             .as(StepVerifier::create)
             .expectNextCount(1)
@@ -845,7 +845,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             createOrganizationId(this.cloudFoundryClient, organizationName),
             createSharedDomainId(this.cloudFoundryClient, sharedDomainName)
         )
-            .flatMap(function((organizationId, sharedDomainId) -> getDomainNames(this.cloudFoundryClient, organizationId)))
+            .flatMapMany(function((organizationId, sharedDomainId) -> getDomainNames(this.cloudFoundryClient, organizationId)))
             .filter(sharedDomainName::equals)
             .as(StepVerifier::create)
             .expectNextCount(1)
@@ -862,7 +862,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             this.userId
         )
             .as(thenKeep(function((organizationId, userId) -> requestAssociateAuditor(this.cloudFoundryClient, organizationId, userId))))
-            .flatMap(function((organizationId, auditorId) -> requestListOrganizations(this.cloudFoundryClient, builder -> builder.auditorId(auditorId))
+            .flatMapMany(function((organizationId, auditorId) -> requestListOrganizations(this.cloudFoundryClient, builder -> builder.auditorId(auditorId))
                 .map(ResourceUtils::getId)
                 .filter(organizationId::equals)))
             .as(StepVerifier::create)
@@ -880,7 +880,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             this.userId
         )
             .as(thenKeep(function((organizationId, userId) -> requestAssociateBillingManager(this.cloudFoundryClient, organizationId, userId))))
-            .flatMap(function((organizationId, userId) -> requestListOrganizations(this.cloudFoundryClient, builder -> builder.billingManagerId(userId))
+            .flatMapMany(function((organizationId, userId) -> requestListOrganizations(this.cloudFoundryClient, builder -> builder.billingManagerId(userId))
                 .map(ResourceUtils::getId)
                 .filter(organizationId::equals)))
             .as(StepVerifier::create)
@@ -898,7 +898,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             this.userId
         )
             .as(thenKeep(function((organizationId, userId) -> requestAssociateManager(this.cloudFoundryClient, organizationId, userId))))
-            .flatMap(function((organizationId, userId) -> requestListOrganizations(this.cloudFoundryClient, builder -> builder.managerId(userId))
+            .flatMapMany(function((organizationId, userId) -> requestListOrganizations(this.cloudFoundryClient, builder -> builder.managerId(userId))
                 .map(ResourceUtils::getId)
                 .filter(organizationId::equals)))
             .as(StepVerifier::create)
@@ -948,7 +948,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
         requestCreateOrganization(this.cloudFoundryClient, organizationName, builder -> builder.status(organizationStatus))
             .map(ResourceUtils::getId)
-            .flatMap(organizationId -> requestListOrganizations(this.cloudFoundryClient, builder -> builder.status(organizationStatus))
+            .flatMapMany(organizationId -> requestListOrganizations(this.cloudFoundryClient, builder -> builder.status(organizationStatus))
                 .filter(resource -> organizationId.equals(ResourceUtils.getId(resource)))
                 .map(ResourceUtils::getEntity)
                 .map(OrganizationEntity::getName))
@@ -967,7 +967,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             this.userId
         )
             .as(thenKeep(function((organizationId, userId) -> requestAssociateUser(this.cloudFoundryClient, organizationId, userId))))
-            .flatMap(function((organizationId, userId) -> requestListOrganizations(this.cloudFoundryClient, builder -> builder.userId(userId))
+            .flatMapMany(function((organizationId, userId) -> requestListOrganizations(this.cloudFoundryClient, builder -> builder.userId(userId))
                 .map(ResourceUtils::getId)
                 .filter(organizationId::equals)))
             .as(StepVerifier::create)
@@ -1269,7 +1269,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         String organizationName = this.nameFactory.getOrganizationName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .flatMap(organizationId -> PaginationUtils.
+            .flatMapMany(organizationId -> PaginationUtils.
                 requestClientV2Resources(page -> this.cloudFoundryClient.organizations()
                     .listSpaceQuotaDefinitions(ListOrganizationSpaceQuotaDefinitionsRequest.builder()
                         .organizationId(organizationId)
@@ -1287,7 +1287,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .as(thenKeep(organizationId -> requestCreateSpace(this.cloudFoundryClient, organizationId, spaceName)))
-            .flatMap(organizationId -> requestListOrganizationSpaces(this.cloudFoundryClient, organizationId))
+            .flatMapMany(organizationId -> requestListOrganizationSpaces(this.cloudFoundryClient, organizationId))
             .as(StepVerifier::create)
             .expectNextCount(1)
             .expectComplete()
@@ -1310,7 +1310,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 Mono.just(spaceId),
                 createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
             )))
-            .flatMap((function((organizationId, spaceId, applicationId) -> Mono.when(
+            .flatMapMany((function((organizationId, spaceId, applicationId) -> Mono.when(
                 Mono.just(spaceId),
                 requestListOrganizationSpaces(this.cloudFoundryClient, organizationId, builder -> builder.applicationId(applicationId))
                     .single()
@@ -1338,7 +1338,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 Mono.just(userId)
             )))
             .as(thenKeep(function((organizationId, spaceId, userId) -> requestAssociateSpaceDeveloper(this.cloudFoundryClient, spaceId, userId))))
-            .flatMap((function((organizationId, spaceId, userId) -> Mono.when(
+            .flatMapMany((function((organizationId, spaceId, userId) -> Mono.when(
                 Mono.just(spaceId),
                 requestListOrganizationSpaces(this.cloudFoundryClient, organizationId, builder -> builder.developerId(userId))
                     .single()
@@ -1360,7 +1360,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 Mono.just(organizationId),
                 createSpaceId(this.cloudFoundryClient, organizationId, spaceName)
             ))
-            .flatMap((function((organizationId, spaceId) -> Mono.when(
+            .flatMapMany((function((organizationId, spaceId) -> Mono.when(
                 Mono.just(spaceId),
                 requestListOrganizationSpaces(this.cloudFoundryClient, organizationId, builder -> builder.name(spaceName))
                     .single()
@@ -1579,7 +1579,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .auditorId(userId)
                     .organizationId(organizationId)
                     .build()))))
-            .flatMap(function((organizationId, userId) -> requestListOrganizationAuditors(this.cloudFoundryClient, organizationId)))
+            .flatMapMany(function((organizationId, userId) -> requestListOrganizationAuditors(this.cloudFoundryClient, organizationId)))
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
@@ -1599,7 +1599,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .username(this.username)
                     .organizationId(organizationId)
                     .build()))))
-            .flatMap(function((organizationId, userId) -> requestListOrganizationAuditors(this.cloudFoundryClient, organizationId)))
+            .flatMapMany(function((organizationId, userId) -> requestListOrganizationAuditors(this.cloudFoundryClient, organizationId)))
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
@@ -1619,7 +1619,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .billingManagerId(userId)
                     .organizationId(organizationId)
                     .build()))))
-            .flatMap(function((organizationId, userId) -> requestListOrganizationBillingManagers(this.cloudFoundryClient, organizationId)))
+            .flatMapMany(function((organizationId, userId) -> requestListOrganizationBillingManagers(this.cloudFoundryClient, organizationId)))
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
@@ -1639,7 +1639,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .username(this.username)
                     .organizationId(organizationId)
                     .build()))))
-            .flatMap(function((organizationId, userId) -> requestListOrganizationBillingManagers(this.cloudFoundryClient, organizationId)))
+            .flatMapMany(function((organizationId, userId) -> requestListOrganizationBillingManagers(this.cloudFoundryClient, organizationId)))
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
@@ -1659,7 +1659,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .managerId(userId)
                     .organizationId(organizationId)
                     .build()))))
-            .flatMap(function((organizationId, userId) -> requestListOrganizationManagers(this.cloudFoundryClient, organizationId)))
+            .flatMapMany(function((organizationId, userId) -> requestListOrganizationManagers(this.cloudFoundryClient, organizationId)))
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
@@ -1679,7 +1679,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .username(this.username)
                     .organizationId(organizationId)
                     .build()))))
-            .flatMap(function((organizationId, userId) -> requestListOrganizationManagers(this.cloudFoundryClient, organizationId)))
+            .flatMapMany(function((organizationId, userId) -> requestListOrganizationManagers(this.cloudFoundryClient, organizationId)))
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
@@ -1705,7 +1705,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .privateDomainId(privateDomainId)
                     .organizationId(organizationId)
                     .build()))))
-            .flatMap(function((organizationId, privateDomainId) -> requestListOrganizationPrivateDomains(this.cloudFoundryClient, organizationId)))
+            .flatMapMany(function((organizationId, privateDomainId) -> requestListOrganizationPrivateDomains(this.cloudFoundryClient, organizationId)))
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
@@ -1725,7 +1725,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .userId(userId)
                     .organizationId(organizationId)
                     .build()))))
-            .flatMap(function((organizationId, userId) -> requestListOrganizationUsers(this.cloudFoundryClient, organizationId)))
+            .flatMapMany(function((organizationId, userId) -> requestListOrganizationUsers(this.cloudFoundryClient, organizationId)))
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
@@ -1745,7 +1745,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .username(this.username)
                     .organizationId(organizationId)
                     .build()))))
-            .flatMap(function((organizationId, userId) -> requestListOrganizationUsers(this.cloudFoundryClient, organizationId)))
+            .flatMapMany(function((organizationId, userId) -> requestListOrganizationUsers(this.cloudFoundryClient, organizationId)))
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofMinutes(5));

@@ -114,7 +114,7 @@ public final class TcpRoutesTest extends AbstractIntegrationTest {
 
         Flux.firstEmitting(
             getRouterGroupId(this.routingClient, DEFAULT_ROUTER_GROUP)
-                .flatMap(routerGroupId -> Flux.interval(Duration.ofMillis(500))
+                .flatMapMany(routerGroupId -> Flux.interval(Duration.ofMillis(500))
                     .flatMap(i -> createTcpRoute(this.routingClient, backendIp, backendPort, port, routerGroupId)))
                 .then(),
             this.routingClient.tcpRoutes()

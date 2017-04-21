@@ -68,7 +68,7 @@ public class ReactorTcpRoutes extends AbstractRoutingV1Operations implements Tcp
     @Override
     public Flux<TcpRouteEvent> events(EventsRequest request) {
         return get(builder -> builder.pathSegment("v1", "tcp_routes", "events"))
-            .flatMap(EventStreamCodec::decode)
+            .flatMapMany(EventStreamCodec::decode)
             .map(event -> {
                 try {
                     return this.connectionContext.getObjectMapper().readValue(event.getData(), TcpRouteEvent.Builder.class)

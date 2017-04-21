@@ -282,7 +282,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
 
         createUserId(this.uaaClient, userName)
             .then(userId -> createGroupIdWithMember(this.uaaClient, displayName, userId))
-            .flatMap(groupId -> this.uaaClient.groups()
+            .flatMapMany(groupId -> this.uaaClient.groups()
                 .listMembers(ListMembersRequest.builder()
                     .groupId(groupId)
                     .returnEntities(true)

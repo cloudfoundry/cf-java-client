@@ -62,7 +62,7 @@ public final class EventsTest extends AbstractIntegrationTest {
                 this.cloudFoundryClient.events()
                     .list(ListEventsRequest.builder()
                         .build())
-                    .flatMap(ResourceUtils::getResources)
+                    .flatMapMany(ResourceUtils::getResources)
                     .next()
             ))
             .as(StepVerifier::create)
@@ -80,7 +80,7 @@ public final class EventsTest extends AbstractIntegrationTest {
                     .list(ListEventsRequest.builder()
                         .actee(ResourceUtils.getEntity(resource).getActee())
                         .build())
-                    .flatMap(ResourceUtils::getResources)
+                    .flatMapMany(ResourceUtils::getResources)
                     .next()
             ))
             .as(StepVerifier::create)
@@ -98,7 +98,7 @@ public final class EventsTest extends AbstractIntegrationTest {
                     .list(ListEventsRequest.builder()
                         .timestamp(ResourceUtils.getEntity(resource).getTimestamp())
                         .build())
-                    .flatMap(ResourceUtils::getResources)
+                    .flatMapMany(ResourceUtils::getResources)
                     .next()
             ))
             .as(StepVerifier::create)
@@ -116,7 +116,7 @@ public final class EventsTest extends AbstractIntegrationTest {
                     .list(ListEventsRequest.builder()
                         .type(ResourceUtils.getEntity(resource).getType())
                         .build())
-                    .flatMap(ResourceUtils::getResources)
+                    .flatMapMany(ResourceUtils::getResources)
                     .next()
             ))
             .as(StepVerifier::create)
@@ -134,7 +134,7 @@ public final class EventsTest extends AbstractIntegrationTest {
         return cloudFoundryClient.events()
             .list(ListEventsRequest.builder()
                 .build())
-            .flatMap(ResourceUtils::getResources);
+            .flatMapMany(ResourceUtils::getResources);
     }
 
 }

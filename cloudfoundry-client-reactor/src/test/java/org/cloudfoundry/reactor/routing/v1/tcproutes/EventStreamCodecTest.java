@@ -44,7 +44,7 @@ public final class EventStreamCodecTest extends AbstractRestTest {
 
         CONNECTION_CONTEXT.getHttpClient()
             .get(this.root.block())
-            .flatMap(EventStreamCodec::decode)
+            .flatMapMany(EventStreamCodec::decode)
             .as(StepVerifier::create)
             .expectNext(ServerSentEvent.builder()
                 .data("This is the first message.")
@@ -74,7 +74,7 @@ public final class EventStreamCodecTest extends AbstractRestTest {
 
         CONNECTION_CONTEXT.getHttpClient()
             .get(this.root.block())
-            .flatMap(EventStreamCodec::decode)
+            .flatMapMany(EventStreamCodec::decode)
             .as(StepVerifier::create)
             .expectNext(ServerSentEvent.builder()
                 .data("test")
@@ -100,7 +100,7 @@ public final class EventStreamCodecTest extends AbstractRestTest {
 
         CONNECTION_CONTEXT.getHttpClient()
             .get(this.root.block())
-            .flatMap(EventStreamCodec::decode)
+            .flatMapMany(EventStreamCodec::decode)
             .as(StepVerifier::create)
             .expectNext(ServerSentEvent.builder()
                 .data("")
@@ -127,7 +127,7 @@ public final class EventStreamCodecTest extends AbstractRestTest {
 
         CONNECTION_CONTEXT.getHttpClient()
             .get(this.root.block())
-            .flatMap(EventStreamCodec::decode)
+            .flatMapMany(EventStreamCodec::decode)
             .as(StepVerifier::create)
             .expectNext(ServerSentEvent.builder()
                 .data("YHOO")
@@ -152,7 +152,7 @@ public final class EventStreamCodecTest extends AbstractRestTest {
 
         CONNECTION_CONTEXT.getHttpClient()
             .get(this.root.block())
-            .flatMap(EventStreamCodec::decode)
+            .flatMapMany(EventStreamCodec::decode)
             .as(StepVerifier::create)
             .expectNext(ServerSentEvent.builder()
                 .id("1")
@@ -183,7 +183,7 @@ public final class EventStreamCodecTest extends AbstractRestTest {
 
         CONNECTION_CONTEXT.getHttpClient()
             .get(this.root.block())
-            .flatMap(EventStreamCodec::decode)
+            .flatMapMany(EventStreamCodec::decode)
             .as(StepVerifier::create)
             .expectNext(ServerSentEvent.builder()
                 .eventType("add")

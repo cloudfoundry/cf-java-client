@@ -200,7 +200,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         this.spaceId
             .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
             .as(thenKeep(applicationId -> uploadAndStartApplication(this.cloudFoundryClient, applicationId)))
-            .flatMap(applicationId -> this.cloudFoundryClient.applicationsV2()
+            .flatMapMany(applicationId -> this.cloudFoundryClient.applicationsV2()
                 .downloadDroplet(DownloadApplicationDropletRequest.builder()
                     .applicationId(applicationId)
                     .build())
@@ -642,7 +642,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .applicationId(applicationId)
                     .routeId(ResourceUtils.getId(routeResponse))
                     .build()))))
-            .flatMap(function((applicationId, routeResponse) -> requestRoutes(this.cloudFoundryClient, applicationId)))
+            .flatMapMany(function((applicationId, routeResponse) -> requestRoutes(this.cloudFoundryClient, applicationId)))
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
@@ -667,7 +667,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .applicationId(applicationId)
                     .serviceBindingId(serviceBindingId)
                     .build()))))
-            .flatMap(function((applicationId, serviceBindingId) -> requestServiceBindings(this.cloudFoundryClient, applicationId)))
+            .flatMapMany(function((applicationId, serviceBindingId) -> requestServiceBindings(this.cloudFoundryClient, applicationId)))
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
@@ -1089,7 +1089,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .instances(ApplicationInstancesRequest.builder()
                 .applicationId(applicationId)
                 .build())
-            .flatMap(response -> Flux.fromIterable(response.getInstances().values()))
+            .flatMapMany(response -> Flux.fromIterable(response.getInstances().values()))
             .filter(applicationInstanceInfo -> "RUNNING".equals(applicationInstanceInfo.getState()))
             .next()
             .repeatWhenEmpty(DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)));

@@ -288,7 +288,7 @@ public final class DefaultApplications implements Applications {
                 Mono.just(cloudFoundryClient),
                 getApplicationId(cloudFoundryClient, request.getName(), spaceId)
             )))
-            .flatMap(function((cloudFoundryClient, applicationId) -> requestEvents(applicationId, cloudFoundryClient)
+            .flatMapMany(function((cloudFoundryClient, applicationId) -> requestEvents(applicationId, cloudFoundryClient)
                 .take(Optional.ofNullable(request.getMaxNumberOfEvents()).orElse(MAX_NUMBER_OF_RECENT_EVENTS))))
             .map(DefaultApplications::convertToApplicationEvent)
             .transform(OperationsLogging.log("Get Application Events"))
@@ -310,7 +310,7 @@ public final class DefaultApplications implements Applications {
         return Mono
             .when(this.cloudFoundryClient, this.spaceId)
             .then(function(DefaultApplications::requestSpaceSummary))
-            .flatMap(DefaultApplications::extractApplications)
+            .flatMapMany(DefaultApplications::extractApplications)
             .map(DefaultApplications::toApplicationSummary)
             .transform(OperationsLogging.log("List Applications"))
             .checkpoint();
@@ -321,7 +321,7 @@ public final class DefaultApplications implements Applications {
         return Mono
             .when(this.cloudFoundryClient, this.spaceId)
             .then(function((cloudFoundryClient, spaceId) -> getApplicationId(cloudFoundryClient, request.getName(), spaceId)))
-            .flatMap(applicationId -> getLogs(this.dopplerClient, applicationId, request.getRecent()))
+            .flatMapMany(applicationId -> getLogs(this.dopplerClient, applicationId, request.getRecent()))
             .transform(OperationsLogging.log("Get Application Logs"))
             .checkpoint();
     }
@@ -384,7 +384,7 @@ public final class DefaultApplications implements Applications {
                 Mono.just(cloudFoundryClient),
                 listAvailableDomains(cloudFoundryClient, organizationId),
                 Mono.just(spaceId))))
-            .flatMap(function((cloudFoundryClient, availableDomains, spaceId) -> Flux.fromIterable(request.getManifests())
+            .flatMapMany(function((cloudFoundryClient, availableDomains, spaceId) -> Flux.fromIterable(request.getManifests())
                 .flatMap(manifest -> {
                     if (manifest.getPath() != null) {
                         return pushApplication(cloudFoundryClient, availableDomains, manifest, this.randomWords, request, spaceId);
@@ -578,7 +578,7 @@ public final class DefaultApplications implements Applications {
         return Flux.fromIterable(manifest.getServices())
             .flatMap(serviceInstanceName -> getServiceId(cloudFoundryClient, serviceInstanceName, spaceId))
             .flatMap(serviceInstanceId -> requestCreateServiceBinding(cloudFoundryClient, applicationId, serviceInstanceId)
-                .otherwise(ExceptionUtils.statusCode(CF_SERVICE_ALREADY_BOUND), t -> Mono.empty()))
+                .onErrorResume(ExceptionUtils.statusCode(CF_SERVICE_ALREADY_BOUND), t -> Mono.empty()))
             .then();
     }
 
@@ -688,7 +688,7 @@ public final class DefaultApplications implements Applications {
     private static Mono<AbstractApplicationResource> getApplication(CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
         return requestApplications(cloudFoundryClient, application, spaceId)
             .single()
-            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Application %s does not exist", application));
+            .onErrorResume(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Application %s does not exist", application));
     }
 
     private static Mono<String> getApplicationId(CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
@@ -702,7 +702,7 @@ public final class DefaultApplications implements Applications {
             .map(ResourceUtils::getId)
             .then(applicationId -> requestUpdateApplication(cloudFoundryClient, applicationId, manifest, stackId)
                 .map(ResourceUtils::getId))
-            .otherwiseIfEmpty(requestCreateApplication(cloudFoundryClient, manifest, spaceId, stackId)
+            .switchIfEmpty(requestCreateApplication(cloudFoundryClient, manifest, spaceId, stackId)
                 .map(ResourceUtils::getId));
     }
 
@@ -722,13 +722,13 @@ public final class DefaultApplications implements Applications {
 
     private static Mono<ApplicationInstancesResponse> getApplicationInstances(CloudFoundryClient cloudFoundryClient, String applicationId) {
         return requestApplicationInstances(cloudFoundryClient, applicationId)
-            .otherwise(ExceptionUtils.statusCode(CF_BUILDPACK_COMPILED_FAILED, CF_INSTANCES_ERROR, CF_STAGING_NOT_FINISHED, CF_STAGING_TIME_EXPIRED),
+            .onErrorResume(ExceptionUtils.statusCode(CF_BUILDPACK_COMPILED_FAILED, CF_INSTANCES_ERROR, CF_STAGING_NOT_FINISHED, CF_STAGING_TIME_EXPIRED),
                 t -> Mono.just(ApplicationInstancesResponse.builder().build()));
     }
 
     private static Mono<ApplicationStatisticsResponse> getApplicationStatistics(CloudFoundryClient cloudFoundryClient, String applicationId) {
         return requestApplicationStatistics(cloudFoundryClient, applicationId)
-            .otherwise(ExceptionUtils.statusCode(CF_APP_STOPPED_STATS_ERROR), t -> Mono.just(ApplicationStatisticsResponse.builder().build()));
+            .onErrorResume(ExceptionUtils.statusCode(CF_APP_STOPPED_STATS_ERROR), t -> Mono.just(ApplicationStatisticsResponse.builder().build()));
     }
 
     private static Mono<Tuple4<SummaryApplicationResponse, GetStackResponse, List<InstanceDetail>, List<String>>>
@@ -761,7 +761,7 @@ public final class DefaultApplications implements Applications {
         return requestSharedDomains(cloudFoundryClient)
             .map(ResourceUtils::getId)
             .next()
-            .otherwiseIfEmpty(ExceptionUtils.illegalArgument("No default domain found"));
+            .switchIfEmpty(ExceptionUtils.illegalArgument("No default domain found"));
     }
 
     private static String getDomainId(List<DomainSummary> availableDomains, String domainName) {
@@ -825,7 +825,7 @@ public final class DefaultApplications implements Applications {
     private static Mono<OrganizationResource> getOrganization(CloudFoundryClient cloudFoundryClient, String organization) {
         return requestOrganizations(cloudFoundryClient, organization)
             .single()
-            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Organization %s not found", organization));
+            .onErrorResume(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Organization %s not found", organization));
     }
 
     private static Mono<String> getOrganizationId(CloudFoundryClient cloudFoundryClient, String organization) {
@@ -836,7 +836,7 @@ public final class DefaultApplications implements Applications {
     private static Mono<SpaceResource> getOrganizationSpaceByName(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
         return requestOrganizationSpacesByName(cloudFoundryClient, organizationId, space)
             .single()
-            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Space %s not found", space));
+            .onErrorResume(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Space %s not found", space));
     }
 
     private static Flux<String> getPushRouteId(CloudFoundryClient cloudFoundryClient, List<DomainSummary> availableDomains, String domainId, ApplicationManifest manifest, String spaceId) {
@@ -848,7 +848,7 @@ public final class DefaultApplications implements Applications {
 
         if (manifest.getNoHostname() != null && manifest.getNoHostname()) {
             return getRouteId(cloudFoundryClient, domainId, null, null)
-                .otherwiseIfEmpty(requestCreateRoute(cloudFoundryClient, domainId, null, null, spaceId)
+                .switchIfEmpty(requestCreateRoute(cloudFoundryClient, domainId, null, null, spaceId)
                     .map(ResourceUtils::getId))
                 .flux();
         }
@@ -857,7 +857,7 @@ public final class DefaultApplications implements Applications {
 
         return Flux.fromIterable(hosts)
             .flatMap(host -> getRouteId(cloudFoundryClient, domainId, host, null)
-                .otherwiseIfEmpty(requestCreateRoute(cloudFoundryClient, domainId, host, null, spaceId)
+                .switchIfEmpty(requestCreateRoute(cloudFoundryClient, domainId, host, null, spaceId)
                     .map(ResourceUtils::getId)));
     }
 
@@ -886,13 +886,13 @@ public final class DefaultApplications implements Applications {
                                                        RandomWords randomWords) {
         String derivedHost = deriveHostname(decomposedRoute.getHost(), manifest, randomWords);
         return getRouteId(cloudFoundryClient, domainId, derivedHost, decomposedRoute.getPath())
-            .otherwiseIfEmpty(requestCreateRoute(cloudFoundryClient, domainId, derivedHost, decomposedRoute.getPath(), spaceId)
+            .switchIfEmpty(requestCreateRoute(cloudFoundryClient, domainId, derivedHost, decomposedRoute.getPath(), spaceId)
                 .map(ResourceUtils::getId));
     }
 
     private static Mono<String> getRouteIdForTcpRoute(CloudFoundryClient cloudFoundryClient, DecomposedRoute decomposedRoute, String domainId, String spaceId) {
         return getTcpRouteId(cloudFoundryClient, domainId, decomposedRoute.getPort())
-            .otherwiseIfEmpty(requestCreateTcpRoute(cloudFoundryClient, domainId, decomposedRoute.getPort(), spaceId)
+            .switchIfEmpty(requestCreateTcpRoute(cloudFoundryClient, domainId, decomposedRoute.getPort(), spaceId)
                 .map(ResourceUtils::getId));
     }
 
@@ -912,7 +912,7 @@ public final class DefaultApplications implements Applications {
         return requestListServiceInstances(cloudFoundryClient, serviceInstanceName, spaceId)
             .map(ResourceUtils::getId)
             .single()
-            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Service instance %s could not be found", serviceInstanceName));
+            .onErrorResume(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Service instance %s could not be found", serviceInstanceName));
     }
 
     private static Mono<String> getSpaceId(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
@@ -929,7 +929,7 @@ public final class DefaultApplications implements Applications {
         return requestStacks(cloudFoundryClient, stack)
             .map(ResourceUtils::getId)
             .single()
-            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Stack %s does not exist", stack));
+            .onErrorResume(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Stack %s does not exist", stack));
     }
 
     private static Mono<String> getStackName(CloudFoundryClient cloudFoundryClient, String stackId) {
@@ -1024,7 +1024,7 @@ public final class DefaultApplications implements Applications {
     private static Flux<Void> pushApplication(CloudFoundryClient cloudFoundryClient, List<DomainSummary> availableDomains, ApplicationManifest manifest, RandomWords randomWords,
                                               PushApplicationManifestRequest request, String spaceId) {
         return getOptionalStackId(cloudFoundryClient, manifest.getStack())
-            .flatMap(stackId -> Mono.when(
+            .flatMapMany(stackId -> Mono.when(
                 getApplicationId(cloudFoundryClient, manifest, spaceId, stackId.orElse(null)),
                 ResourceMatchingUtils.getMatchedResources(cloudFoundryClient, manifest.getPath())
             ))
@@ -1042,7 +1042,7 @@ public final class DefaultApplications implements Applications {
     private static Flux<Void> pushDocker(CloudFoundryClient cloudFoundryClient, List<DomainSummary> availableDomains, ApplicationManifest manifest, RandomWords randomWords,
                                          PushApplicationManifestRequest request, String spaceId) {
         return getOptionalStackId(cloudFoundryClient, manifest.getStack())
-            .flatMap(stackId -> getApplicationId(cloudFoundryClient, manifest, spaceId, stackId.orElse(null)))
+            .flatMapMany(stackId -> getApplicationId(cloudFoundryClient, manifest, spaceId, stackId.orElse(null)))
             .flatMap(applicationId -> prepareDomainsAndRoutes(cloudFoundryClient, applicationId, availableDomains, manifest, spaceId, randomWords)
                 .then(Mono.just(applicationId)))
             .flatMap(applicationId -> bindServices(cloudFoundryClient, applicationId, manifest, spaceId)
@@ -1258,7 +1258,7 @@ public final class DefaultApplications implements Applications {
 
     private static Flux<Envelope> requestLogsRecent(Mono<DopplerClient> dopplerClient, String applicationId) {
         return dopplerClient
-            .flatMap(client -> client
+            .flatMapMany(client -> client
                 .recentLogs(RecentLogsRequest.builder()
                     .applicationId(applicationId)
                     .build()));
@@ -1266,7 +1266,7 @@ public final class DefaultApplications implements Applications {
 
     private static Flux<Envelope> requestLogsStream(Mono<DopplerClient> dopplerClient, String applicationId) {
         return dopplerClient
-            .flatMap(client -> client
+            .flatMapMany(client -> client
                 .stream(StreamRequest.builder()
                     .applicationId(applicationId)
                     .build()));
@@ -1656,14 +1656,14 @@ public final class DefaultApplications implements Applications {
         Duration timeout = Optional.ofNullable(startupTimeout).orElse(Duration.ofMinutes(5));
 
         return requestApplicationInstances(cloudFoundryClient, applicationId)
-            .flatMap(response -> Flux.fromIterable(response.getInstances().values()))
+            .flatMapMany(response -> Flux.fromIterable(response.getInstances().values()))
             .map(ApplicationInstanceInfo::getState)
             .reduce("UNKNOWN", collectStates())
             .filter(isInstanceComplete())
             .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), timeout))
             .filter(isRunning())
-            .otherwiseIfEmpty(ExceptionUtils.illegalState("Application %s failed during start", application))
-            .otherwise(DelayTimeoutException.class, t -> ExceptionUtils.illegalState("Application %s timed out during start", application))
+            .switchIfEmpty(ExceptionUtils.illegalState("Application %s failed during start", application))
+            .onErrorResume(DelayTimeoutException.class, t -> ExceptionUtils.illegalState("Application %s timed out during start", application))
             .then();
     }
 
@@ -1675,8 +1675,8 @@ public final class DefaultApplications implements Applications {
             .filter(isStagingComplete())
             .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), timeout))
             .filter(isStaged())
-            .otherwiseIfEmpty(ExceptionUtils.illegalState("Application %s failed during staging", application))
-            .otherwise(DelayTimeoutException.class, t -> ExceptionUtils.illegalState("Application %s timed out during staging", application))
+            .switchIfEmpty(ExceptionUtils.illegalState("Application %s failed during staging", application))
+            .onErrorResume(DelayTimeoutException.class, t -> ExceptionUtils.illegalState("Application %s timed out during staging", application))
             .then();
     }
 

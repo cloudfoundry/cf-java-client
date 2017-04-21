@@ -237,13 +237,13 @@ abstract class _DefaultCloudFoundryOperations implements CloudFoundryOperations 
     private static Mono<OrganizationResource> getOrganization(Mono<CloudFoundryClient> cloudFoundryClient, String organization) {
         return requestOrganizations(cloudFoundryClient, organization)
             .single()
-            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Organization %s does not exist", organization));
+            .onErrorResume(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Organization %s does not exist", organization));
     }
 
     private static Mono<SpaceResource> getSpace(Mono<CloudFoundryClient> cloudFoundryClient, String organizationId, String space) {
         return requestSpaces(cloudFoundryClient, organizationId, space)
             .single()
-            .otherwise(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Space %s does not exist", space));
+            .onErrorResume(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Space %s does not exist", space));
     }
 
     private static boolean hasLength(CharSequence str) {
@@ -265,7 +265,7 @@ abstract class _DefaultCloudFoundryOperations implements CloudFoundryOperations 
 
     private static Flux<OrganizationResource> requestOrganizations(Mono<CloudFoundryClient> cloudFoundryClientPublisher, String organization) {
         return cloudFoundryClientPublisher
-            .flatMap(cloudFoundryClient -> PaginationUtils
+            .flatMapMany(cloudFoundryClient -> PaginationUtils
                 .requestClientV2Resources(page -> cloudFoundryClient.organizations()
                     .list(ListOrganizationsRequest.builder()
                         .name(organization)
@@ -275,7 +275,7 @@ abstract class _DefaultCloudFoundryOperations implements CloudFoundryOperations 
 
     private static Flux<SpaceResource> requestSpaces(Mono<CloudFoundryClient> cloudFoundryClientPublisher, String organizationId, String space) {
         return cloudFoundryClientPublisher
-            .flatMap(cloudFoundryClient -> PaginationUtils
+            .flatMapMany(cloudFoundryClient -> PaginationUtils
                 .requestClientV2Resources(page -> cloudFoundryClient.spaces()
                     .list(ListSpacesRequest.builder()
                         .organizationId(organizationId)
