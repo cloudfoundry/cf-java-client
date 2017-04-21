@@ -50,6 +50,8 @@ import java.util.stream.StreamSupport;
  */
 public final class ApplicationManifestUtils {
 
+    private static final int GIBI = 1_024;
+
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper(new YAMLFactory()
         .enable(YAMLGenerator.Feature.MINIMIZE_QUOTES))
         .setSerializationInclusion(JsonInclude.Include.NON_NULL);
@@ -130,6 +132,26 @@ public final class ApplicationManifestUtils {
         asMap(payload, key, JsonNode::asText, consumer);
     }
 
+    private static void asMemoryInteger(JsonNode payload, String key, Consumer<Integer> consumer) {
+        as(payload, key, raw -> {
+            if (raw.isNumber()) {
+                return raw.asInt();
+            } else if (raw.isTextual()) {
+                String text = raw.asText();
+
+                if (text.endsWith("G")) {
+                    return Integer.parseInt(text.substring(0, text.length() - 1)) * GIBI;
+                } else if (text.endsWith("M")) {
+                    return Integer.parseInt(text.substring(0, text.length() - 1));
+                } else {
+                    return 0;
+                }
+            } else {
+                return 0;
+            }
+        }, consumer);
+    }
+
     private static void asString(JsonNode payload, String key, Consumer<String> consumer) {
         as(payload, key, JsonNode::asText, consumer);
     }
@@ -201,11 +223,11 @@ public final class ApplicationManifestUtils {
         asString(application, "host", builder::host);
         asListOfString(application, "hosts", builder::host);
         asInteger(application, "instances", builder::instances);
-        asInteger(application, "memory", builder::memory);
+        asMemoryInteger(application, "memory", builder::memory);
         asString(application, "name", builder::name);
         asBoolean(application, "no-hostname", builder::noHostname);
         asBoolean(application, "no-route", builder::noRoute);
-        asString(application, "path", path -> builder.path(root.resolve(path)));
+        asString(application, "path", path -> builder.path(root.getParent().resolve(path)));
         asBoolean(application, "random-route", builder::randomRoute);
         asList(application, "routes", route -> Route.builder().route(route.get("route").asText()).build(), builder::route);
         asListOfString(application, "services", builder::service);

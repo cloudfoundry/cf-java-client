@@ -7,7 +7,7 @@ applications:
   health-check-http-endpoint: alpha-health-check-http-endpoint
   health-check-type: none
   instances: -1
-  memory: -1
+  memory: 1M
   no-route: true
   path: /alpha-path
   random-route: true
@@ -38,7 +38,7 @@ applications:
   - alpha-hosts-1
   - alpha-hosts-2
   instances: -1
-  memory: -1
+  memory: 1G
   no-hostname: true
   no-route: true
   path: /alpha-path

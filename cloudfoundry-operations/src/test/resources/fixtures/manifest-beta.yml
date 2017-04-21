@@ -9,7 +9,7 @@ applications:
   health-check-http-endpoint: beta-health-check-http-endpoint
   health-check-type: none
   instances: -2
-  memory: -2
+  memory: 2M
   no-route: false
   path: /beta-path
   random-route: false
@@ -32,7 +32,7 @@ applications:
   health-check-http-endpoint: beta-health-check-http-endpoint
   health-check-type: none
   instances: -1
-  memory: -1
+  memory: 2G
   no-route: true
   path: /beta-path
   random-route: true
@@ -63,7 +63,7 @@ applications:
   - beta-hosts-1
   - beta-hosts-2
   instances: -1
-  memory: -1
+  memory: 2
   no-hostname: true
   no-route: true
   path: /beta-path
