@@ -385,6 +385,50 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
+    public void pushUpdateRoute() throws TimeoutException, InterruptedException, IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+        String domainName = this.nameFactory.getDomainName();
+
+        requestCreateDomain(this.cloudFoundryOperations, domainName, this.organizationName)
+            .then(this.cloudFoundryOperations.applications()
+                .pushManifest(PushApplicationManifestRequest.builder()
+                    .manifest(ApplicationManifest.builder()
+                        .path(new ClassPathResource("test-application.zip").getFile().toPath())
+                        .buildpack("staticfile_buildpack")
+                        .disk(512)
+                        .healthCheckType(ApplicationHealthCheck.PORT)
+                        .memory(64)
+                        .name(applicationName)
+                        .route(Route.builder()
+                            .route(String.format("test.%s.com", domainName))
+                            .build())
+                        .build())
+                    .noStart(true)
+                    .build()))
+            .then(this.cloudFoundryOperations.applications()
+                .pushManifest(PushApplicationManifestRequest.builder()
+                    .manifest(ApplicationManifest.builder()
+                        .path(new ClassPathResource("test-application.zip").getFile().toPath())
+                        .buildpack("staticfile_buildpack")
+                        .disk(512)
+                        .healthCheckType(ApplicationHealthCheck.PORT)
+                        .memory(64)
+                        .name(applicationName)
+                        .build())
+                    .noStart(true)
+                    .build()))
+            .thenMany(this.cloudFoundryOperations.routes()
+                .list(ListRoutesRequest.builder()
+                    .build()))
+            .flatMapIterable(org.cloudfoundry.operations.routes.Route::getApplications)
+            .filter(applicationName::equals)
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
     public void pushWithHost() throws TimeoutException, InterruptedException, IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String host = this.nameFactory.getHostName();
