@@ -85,8 +85,7 @@ public final class TcpRoutesTest extends AbstractIntegrationTest {
         Integer port = this.nameFactory.getPort();
 
         getRouterGroupId(this.routingClient, DEFAULT_ROUTER_GROUP)
-            .flatMap(routerGroupId -> createTcpRoute(this.routingClient, backendIp, backendPort, port, routerGroupId)
-                .then(Mono.just(routerGroupId)))
+            .delayUntil(routerGroupId -> createTcpRoute(this.routingClient, backendIp, backendPort, port, routerGroupId))
             .flatMap(routerGroupId -> this.routingClient.tcpRoutes()
                 .delete(DeleteTcpRoutesRequest.builder()
                     .tcpRoute(TcpRouteDeletion.builder()

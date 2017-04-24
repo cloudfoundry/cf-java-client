@@ -60,7 +60,6 @@ import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuples;
 
 import java.time.Duration;
 import java.util.Collections;
@@ -126,8 +125,7 @@ public final class DefaultSpaces implements Spaces {
                         .map(ResourceUtils::getId),
                     Mono.just(username)
                 )))
-            .flatMap(function((cloudFoundryClient, organizationId, spaceId, username) -> requestAssociateOrganizationUserByUsername(cloudFoundryClient, organizationId, username)
-                .then(Mono.just(Tuples.of(cloudFoundryClient, organizationId, spaceId, username)))))
+            .delayUntil(function((cloudFoundryClient, organizationId, spaceId, username) -> requestAssociateOrganizationUserByUsername(cloudFoundryClient, organizationId, username)))
             .flatMap(function((cloudFoundryClient, organizationId, spaceId, username) -> Mono
                 .when(
                     requestAssociateSpaceManagerByUsername(cloudFoundryClient, spaceId, username),

@@ -47,7 +47,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import reactor.util.function.Tuples;
 
 import java.time.Duration;
 
@@ -368,8 +367,7 @@ public final class ServicePlansTest extends AbstractIntegrationTest {
                     getServicePlanId(this.cloudFoundryClient, serviceBrokerId),
                     this.spaceId
                 ))
-            .flatMap(function((servicePlanId, spaceId) -> createServiceInstanceId(this.cloudFoundryClient, serviceInstanceName, servicePlanId, spaceId)
-                .then(Mono.just(Tuples.of(servicePlanId, spaceId)))))
+            .delayUntil(function((servicePlanId, spaceId) -> createServiceInstanceId(this.cloudFoundryClient, serviceInstanceName, servicePlanId, spaceId)))
             .flatMapMany(function((servicePlanId, spaceId) -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.servicePlans()
                     .listServiceInstances(ListServicePlanServiceInstancesRequest.builder()

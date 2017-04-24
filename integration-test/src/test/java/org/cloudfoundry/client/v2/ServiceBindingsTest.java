@@ -48,7 +48,6 @@ import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.cloudfoundry.util.OperationUtils.thenKeep;
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
@@ -90,7 +89,7 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
                     Mono.just(applicationId),
                     createServiceBindingId(this.cloudFoundryClient, applicationId, serviceInstanceId)
                 )))
-            .as(thenKeep(function((serviceInstanceId, applicationId, serviceBindingId) -> deleteServiceBinding(this.cloudFoundryClient, serviceBindingId))))
+            .delayUntil(function((serviceInstanceId, applicationId, serviceBindingId) -> deleteServiceBinding(this.cloudFoundryClient, serviceBindingId)))
             .flatMap(function((serviceInstanceId, applicationId, serviceBindingId) -> requestGetServiceBinding(this.cloudFoundryClient, serviceBindingId)))
             .as(StepVerifier::create)
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class).hasMessageMatching("CF-ServiceBindingNotFound\\([0-9]+\\): The service binding could not be found: .*"))

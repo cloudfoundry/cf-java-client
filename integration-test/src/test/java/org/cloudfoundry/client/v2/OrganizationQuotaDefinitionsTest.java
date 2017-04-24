@@ -38,7 +38,6 @@ import java.time.Duration;
 import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.cloudfoundry.util.OperationUtils.thenKeep;
 
 public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationTest {
 
@@ -85,12 +84,12 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
 
         requestCreateOrganizationQuotaDefinition(this.cloudFoundryClient, quotaDefinitionName)
             .map(ResourceUtils::getId)
-            .as(thenKeep(organizationQuotaDefinitionId -> this.cloudFoundryClient.organizationQuotaDefinitions()
+            .delayUntil(organizationQuotaDefinitionId -> this.cloudFoundryClient.organizationQuotaDefinitions()
                 .delete(DeleteOrganizationQuotaDefinitionRequest.builder()
                     .async(true)
                     .organizationQuotaDefinitionId(organizationQuotaDefinitionId)
                     .build())
-                .flatMap(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job))))
+                .flatMap(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job)))
             .flatMap(organizationQuotaDefinitionId -> requestGetOrganizationQuotaDefinition(this.cloudFoundryClient, organizationQuotaDefinitionId))
             .as(StepVerifier::create)
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class).hasMessageMatching("CF-QuotaDefinitionNotFound\\([0-9]+\\): Quota Definition could not be found: .*"))
@@ -156,12 +155,12 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
 
         requestCreateOrganizationQuotaDefinition(this.cloudFoundryClient, quotaDefinitionName)
             .map(ResourceUtils::getId)
-            .as(thenKeep(organizationQuotaDefinitionId -> this.cloudFoundryClient.organizationQuotaDefinitions()
+            .delayUntil(organizationQuotaDefinitionId -> this.cloudFoundryClient.organizationQuotaDefinitions()
                 .update(UpdateOrganizationQuotaDefinitionRequest.builder()
                     .organizationQuotaDefinitionId(organizationQuotaDefinitionId)
                     .totalServices(10)
                     .memoryLimit(1000)
-                    .build())))
+                    .build()))
             .flatMap(organizationQuotaDefinitionId -> this.cloudFoundryClient.organizationQuotaDefinitions()
                 .get(GetOrganizationQuotaDefinitionRequest.builder()
                     .organizationQuotaDefinitionId(organizationQuotaDefinitionId)

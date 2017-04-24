@@ -194,8 +194,7 @@ public final class DefaultApplications implements Applications {
                 .map(function((routes, applicationId) -> Tuples.of(cloudFoundryClient, routes, applicationId)))))
             .flatMap(function((cloudFoundryClient, routes, applicationId) -> deleteRoutes(cloudFoundryClient, request.getCompletionTimeout(), routes)
                 .then(Mono.just(Tuples.of(cloudFoundryClient, applicationId)))))
-            .flatMap(function((cloudFoundryClient, applicationId) -> removeServiceBindings(cloudFoundryClient, applicationId)
-                .then(Mono.just(Tuples.of(cloudFoundryClient, applicationId)))))
+            .delayUntil(function(DefaultApplications::removeServiceBindings))
             .flatMap(function(DefaultApplications::requestDeleteApplication))
             .transform(OperationsLogging.log("Delete Application"))
             .checkpoint();
@@ -1074,8 +1073,7 @@ public final class DefaultApplications implements Applications {
             ))
             .flatMap(function((applicationId, existingRoutes) -> prepareDomainsAndRoutes(cloudFoundryClient, applicationId, availableDomains, manifest, existingRoutes, randomWords, spaceId)
                 .then(Mono.just(applicationId))))
-            .flatMap(applicationId -> bindServices(cloudFoundryClient, applicationId, manifest, spaceId)
-                .then(Mono.just(applicationId)))
+            .delayUntil(applicationId -> bindServices(cloudFoundryClient, applicationId, manifest, spaceId))
             .flatMap(applicationId -> stopAndStartApplication(cloudFoundryClient, applicationId, manifest.getName(), request));
     }
 

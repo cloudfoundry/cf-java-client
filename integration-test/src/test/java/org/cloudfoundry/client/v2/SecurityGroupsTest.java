@@ -50,7 +50,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import reactor.util.function.Tuples;
 
 import java.time.Duration;
 
@@ -137,15 +136,13 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
                 createSecurityGroupId(this.cloudFoundryClient, securityGroupName),
                 createSpaceId(this.cloudFoundryClient, organizationId, spaceName)
             ))
-            .flatMap(function((securityGroupId, spaceId) -> associateSpace(this.cloudFoundryClient, spaceId, securityGroupId)
-                .then(Mono.just(Tuples.of(securityGroupId, spaceId)))))
-            .flatMapMany(function((securityGroupId, spaceId) -> this.cloudFoundryClient.securityGroups()
+            .delayUntil(function((securityGroupId, spaceId) -> associateSpace(this.cloudFoundryClient, spaceId, securityGroupId)))
+            .delayUntil(function((securityGroupId, spaceId) -> this.cloudFoundryClient.securityGroups()
                 .removeSpace(RemoveSecurityGroupSpaceRequest.builder()
                     .securityGroupId(securityGroupId)
                     .spaceId(spaceId)
-                    .build())
-                .then(Mono.just(Tuples.of(securityGroupId, spaceId)))))
-            .flatMap(function((securityGroupId, spaceId) -> requestListSecurityGroupSpaces(this.cloudFoundryClient, spaceId, securityGroupId)))
+                    .build())))
+            .flatMapMany(function((securityGroupId, spaceId) -> requestListSecurityGroupSpaces(this.cloudFoundryClient, spaceId, securityGroupId)))
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
@@ -215,8 +212,7 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
                     createSecurityGroupId(this.cloudFoundryClient, securityGroupName),
                     createSpaceId(this.cloudFoundryClient, organizationId, spaceName)
                 ))
-            .flatMap(function((securityGroupId, spaceId) -> associateSpace(this.cloudFoundryClient, spaceId, securityGroupId)
-                .then(Mono.just(Tuples.of(securityGroupId, spaceId)))))
+            .delayUntil(function((securityGroupId, spaceId) -> associateSpace(this.cloudFoundryClient, spaceId, securityGroupId)))
             .flatMapMany(function((securityGroupId, spaceId) -> PaginationUtils.
                 requestClientV2Resources(page -> this.cloudFoundryClient.securityGroups()
                     .listSpaces(ListSecurityGroupSpacesRequest.builder()

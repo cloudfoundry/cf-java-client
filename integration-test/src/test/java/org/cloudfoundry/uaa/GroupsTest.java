@@ -58,7 +58,6 @@ import java.util.Optional;
 import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.cloudfoundry.util.OperationUtils.thenKeep;
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
@@ -370,7 +369,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
         String displayName = this.nameFactory.getGroupName();
 
         createGroupId(this.uaaClient, displayName)
-            .as(thenKeep(groupId -> requestMapExternalGroupResponse(this.uaaClient, displayName, groupId)))
+            .delayUntil(groupId -> requestMapExternalGroupResponse(this.uaaClient, displayName, groupId))
             .flatMap(groupId -> this.uaaClient.groups()
                 .unmapExternalGroupByGroupId(UnmapExternalGroupByGroupIdRequest.builder()
                     .groupId(groupId)

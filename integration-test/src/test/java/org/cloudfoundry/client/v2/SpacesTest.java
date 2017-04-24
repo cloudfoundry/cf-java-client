@@ -103,7 +103,6 @@ import java.util.function.UnaryOperator;
 
 import static java.time.temporal.ChronoUnit.HOURS;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.cloudfoundry.util.OperationUtils.thenKeep;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public final class SpacesTest extends AbstractIntegrationTest {
@@ -147,11 +146,11 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
-            .as(thenKeep(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
+            .delayUntil(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
                 .associateAuditorByUsername(AssociateSpaceAuditorByUsernameRequest.builder()
                     .spaceId(spaceId)
                     .username(this.username)
-                    .build()))))
+                    .build())))
             .flatMapMany(function((userId, spaceId) -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.spaces()
                     .listAuditors(ListSpaceAuditorsRequest.builder()
@@ -193,11 +192,11 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
-            .as(thenKeep(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
+            .delayUntil(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
                 .associateDeveloperByUsername(AssociateSpaceDeveloperByUsernameRequest.builder()
                     .spaceId(spaceId)
                     .username(this.username)
-                    .build()))))
+                    .build())))
             .flatMapMany(function((userId, spaceId) -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.spaces()
                     .listDevelopers(ListSpaceDevelopersRequest.builder()
@@ -239,11 +238,11 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
-            .as(thenKeep(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
+            .delayUntil(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
                 .associateManagerByUsername(AssociateSpaceManagerByUsernameRequest.builder()
                     .spaceId(spaceId)
                     .username(this.username)
-                    .build()))))
+                    .build())))
             .flatMapMany(function((userId, spaceId) -> requestListSpaceManagers(this.cloudFoundryClient, spaceId)
                 .map(ResourceUtils::getEntity)
                 .map(UserEntity::getUsername)))
@@ -302,14 +301,13 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
         this.organizationId
             .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .flatMapMany(spaceId -> this.cloudFoundryClient.spaces()
+            .delayUntil(spaceId -> this.cloudFoundryClient.spaces()
                 .delete(DeleteSpaceRequest.builder()
                     .spaceId(spaceId)
                     .async(true)
                     .build())
-                .flatMap(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job))
-                .then(Mono.just(spaceId)))
-            .flatMap(spaceId -> requestListSpaces(this.cloudFoundryClient)
+                .flatMap(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job)))
+            .flatMapMany(spaceId -> requestListSpaces(this.cloudFoundryClient)
                 .map(ResourceUtils::getId)
                 .filter(spaceId::equals))
             .as(StepVerifier::create)
@@ -323,11 +321,11 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
         this.organizationId
             .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .as(thenKeep(spaceId -> this.cloudFoundryClient.spaces()
+            .delayUntil(spaceId -> this.cloudFoundryClient.spaces()
                 .delete(DeleteSpaceRequest.builder()
                     .spaceId(spaceId)
                     .async(false)
-                    .build())))
+                    .build()))
             .flatMapMany(spaceId -> requestListSpaces(this.cloudFoundryClient)
                 .map(ResourceUtils::getId)
                 .filter(spaceId::equals))
@@ -397,7 +395,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
         this.organizationId
             .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .as(thenKeep(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName)))
+            .delayUntil(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
             .flatMap(spaceId -> requestListSpaceApplications(this.cloudFoundryClient, spaceId)
                 .single())
             .map(ApplicationResource::getEntity)
@@ -415,7 +413,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
         this.organizationId
             .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .as(thenKeep(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName)))
+            .delayUntil(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
             .flatMap(spaceId -> requestListSpaceApplications(this.cloudFoundryClient, spaceId, builder -> builder.diego(true))
                 .single())
             .map(ApplicationResource::getEntity)
@@ -459,7 +457,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 Mono.just(organizationId),
                 createSpaceId(this.cloudFoundryClient, organizationId, spaceName)
             ))
-            .as(thenKeep(function((organizationId, spaceId) -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))))
+            .delayUntil(function((organizationId, spaceId) -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName)))
             .flatMapMany(function((organizationId, spaceId) -> requestListSpaceApplications(this.cloudFoundryClient, spaceId, builder -> builder.organizationId(organizationId))))
             .map(ResourceUtils::getEntity)
             .map(ApplicationEntity::getName)
@@ -476,7 +474,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
         this.organizationId
             .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .as(thenKeep(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName)))
+            .delayUntil(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
             .flatMap(spaceId -> Mono.when(
                 Mono.just(spaceId),
                 PaginationUtils
@@ -503,11 +501,11 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
-            .as(thenKeep(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
+            .delayUntil(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
                 .associateAuditor(AssociateSpaceAuditorRequest.builder()
                     .spaceId(spaceId)
                     .auditorId(userId)
-                    .build()))))
+                    .build())))
             .flatMapMany(function((userId, spaceId) -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.spaces()
                     .listAuditors(ListSpaceAuditorsRequest.builder()
@@ -528,11 +526,11 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
-            .as(thenKeep(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
+            .delayUntil(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
                 .associateDeveloper(AssociateSpaceDeveloperRequest.builder()
                     .spaceId(spaceId)
                     .developerId(userId)
-                    .build()))))
+                    .build())))
             .flatMapMany(function((userId, spaceId) -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.spaces()
                     .listDevelopers(ListSpaceDevelopersRequest.builder()
@@ -768,7 +766,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
-            .as(thenKeep(function((userId, spaceId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId))))
+            .delayUntil(function((userId, spaceId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId)))
             .flatMapMany(function((userId, spaceId) -> requestListSpaceManagers(this.cloudFoundryClient, spaceId)
                 .map(ResourceUtils::getEntity)
                 .map(UserEntity::getUsername)))
@@ -789,13 +787,13 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 createSpaceId(this.cloudFoundryClient, organizationId, spaceName),
                 Mono.just(organizationId)
             ))
-            .as(thenKeep(function((userId, spaceId, organizationId) -> Mono.when(
+            .delayUntil(function((userId, spaceId, organizationId) -> Mono.when(
                 requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId),
                 this.cloudFoundryClient.organizations()
                     .associateAuditor(AssociateOrganizationAuditorRequest.builder()
                         .organizationId(organizationId)
                         .auditorId(userId)
-                        .build())))))
+                        .build()))))
             .flatMapMany(function((userId, spaceId, organizationId) -> requestListSpaceManagers(this.cloudFoundryClient, spaceId, builder -> builder.auditedOrganizationId(organizationId))
                 .map(ResourceUtils::getEntity)
                 .map(UserEntity::getUsername)))
@@ -811,10 +809,10 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
-            .as(thenKeep(function((userId, spaceId) -> Mono.when(
+            .delayUntil(function((userId, spaceId) -> Mono.when(
                 requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId),
                 requestAssociateSpaceAuditor(this.cloudFoundryClient, spaceId, userId)
-            ))))
+            )))
             .flatMapMany(function((userId, spaceId) -> requestListSpaceManagers(this.cloudFoundryClient, spaceId, builder -> builder.auditedSpaceId(spaceId))
                 .map(ResourceUtils::getEntity)
                 .map(UserEntity::getUsername)))
@@ -835,14 +833,14 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 createSpaceId(this.cloudFoundryClient, organizationId, spaceName),
                 Mono.just(organizationId)
             ))
-            .as(thenKeep(function((userId, spaceId, organizationId) -> Mono.when(
+            .delayUntil(function((userId, spaceId, organizationId) -> Mono.when(
                 requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId),
                 this.cloudFoundryClient.organizations()
                     .associateBillingManager(AssociateOrganizationBillingManagerRequest.builder()
                         .organizationId(organizationId)
                         .billingManagerId(userId)
                         .build())
-            ))))
+            )))
             .flatMap(function((userId, spaceId, organizationId) -> Mono.when(
                 Mono.just(userId),
                 requestListSpaceManagers(this.cloudFoundryClient, spaceId, builder -> builder.billingManagedOrganizationId(organizationId))
@@ -866,14 +864,14 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 createSpaceId(this.cloudFoundryClient, organizationId, spaceName),
                 Mono.just(organizationId)
             ))
-            .as(thenKeep(function((userId, spaceId, organizationId) -> Mono.when(
+            .delayUntil(function((userId, spaceId, organizationId) -> Mono.when(
                 requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId),
                 this.cloudFoundryClient.organizations()
                     .associateManager(AssociateOrganizationManagerRequest.builder()
                         .organizationId(organizationId)
                         .managerId(userId)
                         .build())
-            ))))
+            )))
             .flatMap(function((userId, spaceId, organizationId) -> Mono.when(
                 Mono.just(userId),
                 requestListSpaceManagers(this.cloudFoundryClient, spaceId, builder -> builder.managedOrganizationId(organizationId))
@@ -892,7 +890,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
-            .as(thenKeep(function((userId, spaceId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId))))
+            .delayUntil(function((userId, spaceId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId)))
             .flatMapMany(function((userId, spaceId) -> requestListSpaceManagers(this.cloudFoundryClient, spaceId, builder -> builder.managedSpaceId(spaceId))
                 .map(ResourceUtils::getEntity)
                 .map(UserEntity::getUsername)))
@@ -913,7 +911,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 createSpaceId(this.cloudFoundryClient, organizationId, spaceName),
                 Mono.just(organizationId)
             ))
-            .as(thenKeep(function((userId, spaceId, organizationId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId))))
+            .delayUntil(function((userId, spaceId, organizationId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId)))
             .flatMap(function((userId, spaceId, organizationId) -> Mono.when(
                 Mono.just(userId),
                 requestListSpaceManagers(this.cloudFoundryClient, spaceId, builder -> builder.organizationId(organizationId))
@@ -1158,7 +1156,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
-            .as(thenKeep(function((userId, spaceId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId))))
+            .delayUntil(function((userId, spaceId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId)))
             .flatMapMany(function((userId, spaceId) -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.spaces()
                     .listUserRoles(ListSpaceUserRolesRequest.builder()
@@ -1181,12 +1179,12 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
-            .as(thenKeep(function((userId, spaceId) -> requestAssociateSpaceAuditor(this.cloudFoundryClient, spaceId, userId))))
-            .as(thenKeep(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
+            .delayUntil(function((userId, spaceId) -> requestAssociateSpaceAuditor(this.cloudFoundryClient, spaceId, userId)))
+            .delayUntil(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
                 .removeAuditor(RemoveSpaceAuditorRequest.builder()
                     .spaceId(spaceId)
                     .auditorId(userId)
-                    .build()))))
+                    .build())))
             .flatMapMany(function((userId, spaceId) -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.spaces()
                     .listAuditors(ListSpaceAuditorsRequest.builder()
@@ -1204,12 +1202,12 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
-            .as(thenKeep(function((userId, spaceId) -> requestAssociateSpaceAuditor(this.cloudFoundryClient, spaceId, userId))))
-            .as(thenKeep(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
+            .delayUntil(function((userId, spaceId) -> requestAssociateSpaceAuditor(this.cloudFoundryClient, spaceId, userId)))
+            .delayUntil(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
                 .removeAuditorByUsername(RemoveSpaceAuditorByUsernameRequest.builder()
                     .spaceId(spaceId)
                     .username(this.username)
-                    .build()))))
+                    .build())))
             .flatMapMany(function((userId, spaceId) -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.spaces()
                     .listAuditors(ListSpaceAuditorsRequest.builder()
@@ -1227,16 +1225,16 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
-            .as(thenKeep(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
+            .delayUntil(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
                 .associateDeveloper(AssociateSpaceDeveloperRequest.builder()
                     .spaceId(spaceId)
                     .developerId(userId)
-                    .build()))))
-            .as(thenKeep(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
+                    .build())))
+            .delayUntil(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
                 .removeDeveloper(RemoveSpaceDeveloperRequest.builder()
                     .spaceId(spaceId)
                     .developerId(userId)
-                    .build()))))
+                    .build())))
             .flatMapMany(function((userId, spaceId) -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.spaces()
                     .listDevelopers(ListSpaceDevelopersRequest.builder()
@@ -1254,16 +1252,16 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
-            .as(thenKeep(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
+            .delayUntil(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
                 .associateDeveloper(AssociateSpaceDeveloperRequest.builder()
                     .spaceId(spaceId)
                     .developerId(userId)
-                    .build()))))
-            .as(thenKeep(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
+                    .build())))
+            .delayUntil(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
                 .removeDeveloperByUsername(RemoveSpaceDeveloperByUsernameRequest.builder()
                     .spaceId(spaceId)
                     .username(this.username)
-                    .build()))))
+                    .build())))
             .flatMapMany(function((userId, spaceId) -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.spaces()
                     .listDevelopers(ListSpaceDevelopersRequest.builder()
@@ -1281,12 +1279,12 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
-            .as(thenKeep(function((userId, spaceId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId))))
-            .as(thenKeep(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
+            .delayUntil(function((userId, spaceId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId)))
+            .delayUntil(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
                 .removeManager(RemoveSpaceManagerRequest.builder()
                     .spaceId(spaceId)
                     .managerId(userId)
-                    .build()))))
+                    .build())))
             .flatMapMany(function((userId, spaceId) -> requestListSpaceManagers(this.cloudFoundryClient, spaceId)
                 .map(ResourceUtils::getEntity)
                 .map(UserEntity::getUsername)
@@ -1302,12 +1300,12 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
-            .as(thenKeep(function((userId, spaceId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId))))
-            .as(thenKeep(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
+            .delayUntil(function((userId, spaceId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId)))
+            .delayUntil(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
                 .removeManagerByUsername(RemoveSpaceManagerByUsernameRequest.builder()
                     .spaceId(spaceId)
                     .username(this.username)
-                    .build()))))
+                    .build())))
             .flatMapMany(function((userId, spaceId) -> requestListSpaceManagers(this.cloudFoundryClient, spaceId)
                 .map(ResourceUtils::getEntity)
                 .map(UserEntity::getUsername)))
@@ -1327,7 +1325,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     createSecurityGroupId(this.cloudFoundryClient, securityGroupName),
                     createSpaceId(this.cloudFoundryClient, organizationId, spaceName)
                 ))
-            .as(thenKeep(function((securityGroupId, spaceId) -> requestAssociateSpaceSecurityGroup(this.cloudFoundryClient, spaceId, securityGroupId))))
+            .delayUntil(function((securityGroupId, spaceId) -> requestAssociateSpaceSecurityGroup(this.cloudFoundryClient, spaceId, securityGroupId)))
             .flatMap(function((securityGroupId, spaceId) -> this.cloudFoundryClient.spaces()
                 .removeSecurityGroup(RemoveSpaceSecurityGroupRequest.builder()
                     .securityGroupId(securityGroupId)
@@ -1348,11 +1346,11 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
         this.organizationId
             .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .as(thenKeep(spaceId -> this.cloudFoundryClient.spaces()
+            .delayUntil(spaceId -> this.cloudFoundryClient.spaces()
                 .update(UpdateSpaceRequest.builder()
                     .spaceId(spaceId)
                     .name(spaceName2)
-                    .build())))
+                    .build()))
             .flatMap(spaceId -> this.cloudFoundryClient.spaces()
                 .getSummary(GetSpaceSummaryRequest.builder()
                     .spaceId(spaceId)
@@ -1370,12 +1368,12 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
-            .as(thenKeep(function((userId, spaceId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId))))
-            .as(thenKeep(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
+            .delayUntil(function((userId, spaceId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId)))
+            .delayUntil(function((userId, spaceId) -> this.cloudFoundryClient.spaces()
                 .update(UpdateSpaceRequest.builder()
                     .spaceId(spaceId)
                     .managerIds(Collections.emptyList())
-                    .build()))))
+                    .build())))
             .flatMapMany(function((userId, spaceId) -> requestListSpaceManagers(this.cloudFoundryClient, spaceId)
                 .map(ResourceUtils::getEntity)
                 .map(UserEntity::getUsername)

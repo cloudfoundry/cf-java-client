@@ -453,8 +453,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         this.spaceId
-            .flatMap(spaceId -> createServiceInstanceId(this.cloudFoundryClient, this.serviceBrokerId, serviceInstanceName, spaceId)
-                .then(Mono.just(spaceId)))
+            .delayUntil(spaceId -> createServiceInstanceId(this.cloudFoundryClient, this.serviceBrokerId, serviceInstanceName, spaceId))
             .flatMapMany(spaceId -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.serviceInstances()
                     .list(ListServiceInstancesRequest.builder()
@@ -480,8 +479,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
                     createApplicationId(this.cloudFoundryClient, spaceId, applicationName),
                     createServiceInstanceId(this.cloudFoundryClient, this.serviceBrokerId, serviceInstanceName, spaceId)
                 ))
-            .flatMap(function((applicationId, serviceInstanceId) -> createServiceBindingId(this.cloudFoundryClient, applicationId, serviceInstanceId)
-                .then(Mono.just(Tuples.of(applicationId, serviceInstanceId)))))
+            .delayUntil(function((applicationId, serviceInstanceId) -> createServiceBindingId(this.cloudFoundryClient, applicationId, serviceInstanceId)))
             .flatMapMany(function((applicationId, serviceInstanceId) -> Mono
                 .when(
                     Mono.just(applicationId),
@@ -511,8 +509,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
                     createApplicationId(this.cloudFoundryClient, spaceId, applicationName),
                     createServiceInstanceId(this.cloudFoundryClient, this.serviceBrokerId, serviceInstanceName, spaceId)
                 ))
-            .flatMap(function((applicationId, serviceInstanceId) -> createServiceBindingId(this.cloudFoundryClient, applicationId, serviceInstanceId)
-                .then(Mono.just(Tuples.of(applicationId, serviceInstanceId)))))
+            .delayUntil(function((applicationId, serviceInstanceId) -> createServiceBindingId(this.cloudFoundryClient, applicationId, serviceInstanceId)))
             .flatMapMany(function((applicationId, serviceInstanceId) -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.serviceInstances()
                     .listServiceBindings(ListServiceInstanceServiceBindingsRequest.builder()

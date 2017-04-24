@@ -40,7 +40,6 @@ import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.operations.util.OperationsLogging;
 import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.JobUtils;
-import org.cloudfoundry.util.OperationUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import reactor.core.publisher.Flux;
@@ -53,6 +52,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
@@ -257,7 +257,7 @@ public final class DefaultRoutes implements Routes {
 
     private static Flux<Resource<?>> getDomains(CloudFoundryClient cloudFoundryClient, String organizationId, String domain) {
         return requestPrivateDomains(cloudFoundryClient, organizationId, domain)
-            .map(OperationUtils.<PrivateDomainResource, Resource<?>>cast())
+            .map((Function<PrivateDomainResource, Resource<?>>) in -> in)
             .switchIfEmpty(requestSharedDomains(cloudFoundryClient, domain));
     }
 

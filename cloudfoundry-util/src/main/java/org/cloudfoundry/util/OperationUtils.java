@@ -33,17 +33,6 @@ public final class OperationUtils {
     }
 
     /**
-     * Casts an item from one type to another
-     *
-     * @param <IN>  the source type
-     * @param <OUT> the target type
-     * @return the same instance
-     */
-    public static <IN extends OUT, OUT> Function<IN, OUT> cast() {
-        return in -> in;
-    }
-
-    /**
      * Operation to collect a {@code Flux<byte[]>} into a contiguous single byte array, delivered as a single element of a {@code Mono<byte[]>}.
      *
      * @param bytes a Flux of 0 or more byte arrays
@@ -60,28 +49,6 @@ public final class OperationUtils {
                 return prev;
             })
             .map(ByteArrayOutputStream::toByteArray);
-    }
-
-    /**
-     * Produces a Mono transformer that preserves the type of the source {@code Mono<IN>}.
-     * <p>
-     * The Mono produced expects a single element from the source, passes this to the function (as in {@code .then}) and requests an element from the resulting {@code Mono<OUT>}. When successful, the
-     * result (if any) is discarded and the input value is signalled. </p>
-     * <p>
-     * <b>Summary:</b> does a {@code .then} on the new Mono but keeps the input to pass on unchanged. </p>
-     * <p>
-     * <b>Usage:</b> Can be used inline thus: {@code .as(thenKeep(in -> funcOf(in)))} </p>
-     *
-     * @param thenFunction from source input element to some {@code Mono<OUT>}
-     * @param <T>          the source element type
-     * @param <U>          the element type of the Mono produced by {@code thenFunction}
-     * @return a Mono transformer
-     */
-    public static <T, U> Function<Mono<T>, Mono<T>> thenKeep(Function<T, Mono<U>> thenFunction) {
-        return source -> source
-            .flatMap(in -> thenFunction
-                .apply(in)
-                .then(Mono.just(in)));
     }
 
 }

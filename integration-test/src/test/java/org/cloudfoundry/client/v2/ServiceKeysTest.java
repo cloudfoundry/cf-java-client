@@ -164,8 +164,7 @@ public final class ServiceKeysTest extends AbstractIntegrationTest {
 
         Mono.when(this.serviceBrokerId, this.spaceId)
             .flatMap(function((serviceBrokerId, spaceId) -> createServiceInstanceId(this.cloudFoundryClient, serviceBrokerId, serviceInstanceName, spaceId)))
-            .flatMap(serviceInstanceId -> createServiceKeyId(this.cloudFoundryClient, serviceInstanceId, serviceKeyName)
-                .then(Mono.just(serviceInstanceId)))
+            .delayUntil(serviceInstanceId -> createServiceKeyId(this.cloudFoundryClient, serviceInstanceId, serviceKeyName))
             .flatMapMany(serviceInstanceId -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.serviceKeys()
                     .list(ListServiceKeysRequest.builder()

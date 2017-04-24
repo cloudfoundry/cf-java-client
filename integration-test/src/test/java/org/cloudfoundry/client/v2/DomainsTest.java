@@ -57,7 +57,6 @@ import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.cloudfoundry.util.OperationUtils.thenKeep;
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
@@ -97,8 +96,8 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
         this.organizationId
             .flatMap(organizationId -> createDomainId(this.cloudFoundryClient, domainName, organizationId))
-            .as(thenKeep(domainId -> requestDeleteDomain(this.cloudFoundryClient, domainId)
-                .flatMap(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job))))
+            .delayUntil(domainId -> requestDeleteDomain(this.cloudFoundryClient, domainId)
+                .flatMap(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job)))
             .flatMap(domainId -> requestGetDomain(this.cloudFoundryClient, domainId))
             .as(StepVerifier::create)
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class).hasMessageMatching("CF-DomainNotFound\\([0-9]+\\): The domain could not be found: .*"))
@@ -111,7 +110,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
         this.organizationId
             .flatMap(organizationId -> createDomainId(this.cloudFoundryClient, domainName, organizationId))
-            .as(thenKeep(domainId -> requestDeleteDomainAsyncFalse(this.cloudFoundryClient, domainId)))
+            .delayUntil(domainId -> requestDeleteDomainAsyncFalse(this.cloudFoundryClient, domainId))
             .flatMap(domainId -> requestGetDomain(this.cloudFoundryClient, domainId))
             .as(StepVerifier::create)
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class).hasMessageMatching("CF-DomainNotFound\\([0-9]+\\): The domain could not be found: .*"))
@@ -195,8 +194,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 getApplicationId(this.cloudFoundryClient, applicationName, spaceId),
                 getRouteId(this.cloudFoundryClient, domainId, spaceId)
             )))
-            .as(thenKeep(function((domainId, spaceId, applicationId, routeId) -> requestAssociateRouteApplication(this.cloudFoundryClient, applicationId, routeId)
-            )))
+            .delayUntil(function((domainId, spaceId, applicationId, routeId) -> requestAssociateRouteApplication(this.cloudFoundryClient, applicationId, routeId)))
             .flatMap(function((domainId, spaceId, applicationId, routeId) -> Mono.when(
                 requestListDomainSpacesByApplicationId(this.cloudFoundryClient, applicationId, domainId)
                     .filter(resource -> spaceId.equals(ResourceUtils.getId(resource)))
@@ -221,7 +219,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 Mono.just(spaceId),
                 Mono.just(userId)
             )))
-            .as(thenKeep(function((domainId, response, spaceId, userId) -> requestAssociateSpaceDeveloper(this.cloudFoundryClient, spaceId, userId))))
+            .delayUntil(function((domainId, response, spaceId, userId) -> requestAssociateSpaceDeveloper(this.cloudFoundryClient, spaceId, userId)))
             .flatMap(function((domainId, response, spaceId, userId) -> requestListSpaceDevelopers(this.cloudFoundryClient, domainId, userId)
                 .filter(resource -> spaceId.equals(ResourceUtils.getId(resource)))
                 .single()

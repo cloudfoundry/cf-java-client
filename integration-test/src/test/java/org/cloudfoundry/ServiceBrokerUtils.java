@@ -72,8 +72,7 @@ public final class ServiceBrokerUtils {
         return getSharedDomain(cloudFoundryClient)
             .flatMap(domain -> pushServiceBrokerApplication(cloudFoundryClient, application, domain, nameFactory, planName, serviceName, spaceId))
             .flatMap(applicationMetadata -> requestCreateServiceBroker(cloudFoundryClient, applicationMetadata, serviceBrokerName, spaceScoped)
-                .flatMap(response -> makeServicePlanPubliclyVisible(cloudFoundryClient, serviceName, spaceScoped)
-                    .then(Mono.just(response)))
+                .delayUntil(response -> makeServicePlanPubliclyVisible(cloudFoundryClient, serviceName, spaceScoped))
                 .map(response -> new ServiceBrokerMetadata(applicationMetadata, ResourceUtils.getId(response))));
     }
 

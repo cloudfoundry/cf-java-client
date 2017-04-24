@@ -46,7 +46,6 @@ import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.cloudfoundry.util.OperationUtils.thenKeep;
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
@@ -138,11 +137,11 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
                 getCreateApplicationId(this.cloudFoundryClient, applicationName, spaceId),
                 getCreateUserProvidedServiceInstanceId(this.cloudFoundryClient, instanceName, spaceId)
             ))
-            .as(thenKeep(function((applicationId, instanceId) -> this.cloudFoundryClient.serviceBindingsV2()
+            .delayUntil(function((applicationId, instanceId) -> this.cloudFoundryClient.serviceBindingsV2()
                 .create(CreateServiceBindingRequest.builder()
                     .applicationId(applicationId)
                     .serviceInstanceId(instanceId)
-                    .build()))))
+                    .build())))
             .flatMap(function((applicationId, instanceId) -> Mono
                 .when(
                     Mono.just(applicationId),

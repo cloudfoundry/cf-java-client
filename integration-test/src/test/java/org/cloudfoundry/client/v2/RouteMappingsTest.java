@@ -42,7 +42,6 @@ import java.time.Duration;
 import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.cloudfoundry.util.OperationUtils.thenKeep;
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
@@ -96,11 +95,11 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
 
         this.spaceId
             .flatMap(spaceId -> getRouteMappingId(this.cloudFoundryClient, applicationName, domainName, hostName, spaceId))
-            .as(thenKeep(routeMappingId -> this.cloudFoundryClient.routeMappings()
+            .delayUntil(routeMappingId -> this.cloudFoundryClient.routeMappings()
                 .delete(DeleteRouteMappingRequest.builder()
                     .async(false)
                     .routeMappingId(routeMappingId)
-                    .build())))
+                    .build()))
             .flatMap(routeMappingId -> requestGetRouteMapping(this.cloudFoundryClient, routeMappingId))
             .as(StepVerifier::create)
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class).hasMessageMatching(".*\\([0-9]+\\): .*"))
@@ -115,12 +114,12 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
 
         this.spaceId
             .flatMap(spaceId -> getRouteMappingId(this.cloudFoundryClient, applicationName, domainName, hostName, spaceId))
-            .as(thenKeep(routeMappingId -> this.cloudFoundryClient.routeMappings()
+            .delayUntil(routeMappingId -> this.cloudFoundryClient.routeMappings()
                 .delete(DeleteRouteMappingRequest.builder()
                     .async(true)
                     .routeMappingId(routeMappingId)
                     .build())
-                .flatMap(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job))))
+                .flatMap(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job)))
             .flatMap(routeMappingId -> requestGetRouteMapping(this.cloudFoundryClient, routeMappingId))
             .as(StepVerifier::create)
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class).hasMessageMatching(".*\\([0-9]+\\): .*"))

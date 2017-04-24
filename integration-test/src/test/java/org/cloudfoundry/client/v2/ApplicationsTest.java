@@ -92,7 +92,6 @@ import java.util.zip.GZIPInputStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.client.ZipExpectations.zipEquality;
-import static org.cloudfoundry.util.OperationUtils.thenKeep;
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
@@ -122,7 +121,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 createRouteWithDomain(this.cloudFoundryClient, organizationId, spaceId, domainName, "test-host", "/test/path")
                     .map(ResourceUtils::getId)
             )))
-            .as(thenKeep(function((applicationId, routeId) -> requestAssociateRoute(this.cloudFoundryClient, applicationId, routeId))))
+            .delayUntil(function((applicationId, routeId) -> requestAssociateRoute(this.cloudFoundryClient, applicationId, routeId)))
             .flatMap(function((applicationId, routeId) -> Mono.when(
                 getSingleRouteId(this.cloudFoundryClient, applicationId),
                 Mono.just(routeId)
@@ -141,17 +140,17 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         this.spaceId
             .flatMap(spaceId -> Mono.when(
                 createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
-                    .as(thenKeep(applicationId -> uploadApplication(this.cloudFoundryClient, applicationId))),
+                    .delayUntil(applicationId -> uploadApplication(this.cloudFoundryClient, applicationId)),
                 requestCreateApplication(this.cloudFoundryClient, spaceId, copyApplicationName)
                     .map(ResourceUtils::getId)
             ))
-            .as(thenKeep(function((sourceId, targetId) -> this.cloudFoundryClient.applicationsV2()
+            .delayUntil(function((sourceId, targetId) -> this.cloudFoundryClient.applicationsV2()
                 .copy(CopyApplicationRequest.builder()
                     .applicationId(targetId)
                     .sourceApplicationId(sourceId)
                     .build())
                 .flatMap(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job))
-            )))
+            ))
             .flatMap(function((sourceId, targetId) -> Mono.when(
                 downloadApplication(this.cloudFoundryClient, sourceId),
                 downloadApplication(this.cloudFoundryClient, targetId)
@@ -187,10 +186,10 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
         this.spaceId
             .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .as(thenKeep(applicationId -> this.cloudFoundryClient.applicationsV2()
+            .delayUntil(applicationId -> this.cloudFoundryClient.applicationsV2()
                 .delete(DeleteApplicationRequest.builder()
                     .applicationId(applicationId)
-                    .build())))
+                    .build()))
             .flatMap(applicationId -> requestGetApplication(this.cloudFoundryClient, applicationId))
             .as(StepVerifier::create)
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class).hasMessageMatching("CF-AppNotFound\\([0-9]+\\): The app could not be found: .*"))
@@ -203,7 +202,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
         this.spaceId
             .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .as(thenKeep(applicationId -> uploadAndStartApplication(this.cloudFoundryClient, applicationId)))
+            .delayUntil(applicationId -> uploadAndStartApplication(this.cloudFoundryClient, applicationId))
             .flatMapMany(applicationId -> this.cloudFoundryClient.applicationsV2()
                 .downloadDroplet(DownloadApplicationDropletRequest.builder()
                     .applicationId(applicationId)
@@ -602,7 +601,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 createApplicationId(this.cloudFoundryClient, spaceId, applicationName),
                 createUserServiceInstanceId(this.cloudFoundryClient, spaceId, serviceInstanceName)
             ))
-            .as(thenKeep(function((applicationId, serviceInstanceId) -> createServiceBindingId(this.cloudFoundryClient, applicationId, serviceInstanceId))))
+            .delayUntil(function((applicationId, serviceInstanceId) -> createServiceBindingId(this.cloudFoundryClient, applicationId, serviceInstanceId)))
             .flatMap(function((applicationId, serviceInstanceId) -> Mono.when(
                 Mono.just(serviceInstanceId),
                 getSingleServiceBindingInstanceId(this.cloudFoundryClient, applicationId)
@@ -661,11 +660,11 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 Mono.just(applicationId),
                 createApplicationRoute(this.cloudFoundryClient, organizationId, spaceId, domainName, applicationId)
             )))
-            .as(thenKeep(function((applicationId, routeResponse) -> this.cloudFoundryClient.applicationsV2()
+            .delayUntil(function((applicationId, routeResponse) -> this.cloudFoundryClient.applicationsV2()
                 .removeRoute(RemoveApplicationRouteRequest.builder()
                     .applicationId(applicationId)
                     .routeId(ResourceUtils.getId(routeResponse))
-                    .build()))))
+                    .build())))
             .flatMapMany(function((applicationId, routeResponse) -> requestRoutes(this.cloudFoundryClient, applicationId)))
             .as(StepVerifier::create)
             .expectComplete()
@@ -686,11 +685,11 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 Mono.just(applicationId),
                 createServiceBindingId(this.cloudFoundryClient, applicationId, serviceInstanceId)
             )))
-            .as(thenKeep(function((applicationId, serviceBindingId) -> this.cloudFoundryClient.applicationsV2()
+            .delayUntil(function((applicationId, serviceBindingId) -> this.cloudFoundryClient.applicationsV2()
                 .removeServiceBinding(RemoveApplicationServiceBindingRequest.builder()
                     .applicationId(applicationId)
                     .serviceBindingId(serviceBindingId)
-                    .build()))))
+                    .build())))
             .flatMapMany(function((applicationId, serviceBindingId) -> requestServiceBindings(this.cloudFoundryClient, applicationId)))
             .as(StepVerifier::create)
             .expectComplete()
@@ -703,11 +702,11 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
         this.spaceId
             .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .as(thenKeep(applicationId -> uploadAndStartApplication(this.cloudFoundryClient, applicationId)))
-            .as(thenKeep(applicationId -> this.cloudFoundryClient.applicationsV2()
+            .delayUntil(applicationId -> uploadAndStartApplication(this.cloudFoundryClient, applicationId))
+            .delayUntil(applicationId -> this.cloudFoundryClient.applicationsV2()
                 .restage(RestageApplicationRequest.builder()
                     .applicationId(applicationId)
-                    .build())))
+                    .build()))
             .flatMap(applicationId -> waitForStagingApplication(this.cloudFoundryClient, applicationId))
             .map(resource -> ResourceUtils.getEntity(resource).getName())
             .as(StepVerifier::create)
@@ -722,7 +721,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
         this.spaceId
             .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .as(thenKeep(applicationId -> uploadAndStartApplication(this.cloudFoundryClient, applicationId)))
+            .delayUntil(applicationId -> uploadAndStartApplication(this.cloudFoundryClient, applicationId))
             .flatMap(applicationId -> this.cloudFoundryClient.applicationsV2()
                 .statistics(ApplicationStatisticsRequest.builder()
                     .applicationId(applicationId)
@@ -758,17 +757,17 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
         this.spaceId
             .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .as(thenKeep(applicationId -> uploadAndStartApplication(this.cloudFoundryClient, applicationId)))
+            .delayUntil(applicationId -> uploadAndStartApplication(this.cloudFoundryClient, applicationId))
             .flatMap(applicationId -> Mono.when(
                 Mono.just(applicationId),
                 getInstanceInfo(this.cloudFoundryClient, applicationId, "0")
                     .map(info -> Optional.ofNullable(info.getSince()))
             ))
-            .as(thenKeep(function((applicationId, optionalSince) -> this.cloudFoundryClient.applicationsV2()
+            .delayUntil(function((applicationId, optionalSince) -> this.cloudFoundryClient.applicationsV2()
                 .terminateInstance(TerminateApplicationInstanceRequest.builder()
                     .applicationId(applicationId)
                     .index("0")
-                    .build()))))
+                    .build())))
             .flatMap(function((applicationId, optionalSince) -> waitForInstanceRestart(this.cloudFoundryClient, applicationId, "0", optionalSince)))
             .as(StepVerifier::create)
             .expectNextCount(1)
@@ -823,7 +822,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
         this.spaceId
             .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .as(thenKeep(applicationId -> uploadApplication(this.cloudFoundryClient, applicationId)))
+            .delayUntil(applicationId -> uploadApplication(this.cloudFoundryClient, applicationId))
             .flatMap(applicationId -> Mono.when(
                 downloadApplication(this.cloudFoundryClient, applicationId),
                 getBytes("test-application.zip")
@@ -840,7 +839,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
         this.spaceId
             .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .as(thenKeep(applicationId -> uploadApplicationAsyncFalse(this.cloudFoundryClient, applicationId)))
+            .delayUntil(applicationId -> uploadApplicationAsyncFalse(this.cloudFoundryClient, applicationId))
             .flatMap(applicationId -> Mono.when(
                 downloadApplication(this.cloudFoundryClient, applicationId),
                 getBytes("test-application.zip")

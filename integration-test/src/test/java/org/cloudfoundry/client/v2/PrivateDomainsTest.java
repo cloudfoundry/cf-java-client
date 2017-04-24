@@ -91,9 +91,8 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
 
         this.organizationId
             .flatMap(organizationId -> requestCreatePrivateDomain(this.cloudFoundryClient, privateDomainName, organizationId))
-            .flatMap(privateDomainResource -> requestDeletePrivateDomain(this.cloudFoundryClient, ResourceUtils.getId(privateDomainResource))
-                .flatMap(jobResource -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), jobResource))
-                .then(Mono.just(privateDomainResource)))
+            .delayUntil(privateDomainResource -> requestDeletePrivateDomain(this.cloudFoundryClient, ResourceUtils.getId(privateDomainResource))
+                .flatMap(jobResource -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), jobResource)))
             .flatMap(privateDomainResource -> requestGetPrivateDomain(this.cloudFoundryClient, ResourceUtils.getId(privateDomainResource)))
             .as(StepVerifier::create)
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class).hasMessageMatching("CF-DomainNotFound\\([0-9]+\\): The domain could not be found: .*"))
