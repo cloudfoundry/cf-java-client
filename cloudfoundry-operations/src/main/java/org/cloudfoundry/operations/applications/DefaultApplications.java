@@ -570,6 +570,14 @@ public final class DefaultApplications implements Applications {
         return request.getMemoryLimit() != null || request.getDiskLimit() != null || request.getInstances() != null;
     }
 
+    private static Flux<String> associateDefaultDomain(CloudFoundryClient cloudFoundryClient, String applicationId, List<DomainSummary> availableDomains, ApplicationManifest manifest,
+                                                       String spaceId) {
+        return getDefaultDomainId(cloudFoundryClient)
+            .flatMapMany(domainId -> getPushRouteIdFromDomain(cloudFoundryClient, availableDomains, domainId, manifest, spaceId))
+            .flatMap(routeId -> requestAssociateRoute(cloudFoundryClient, applicationId, routeId))
+            .map(ResourceUtils::getId);
+    }
+
     private static Mono<Void> bindServices(CloudFoundryClient cloudFoundryClient, String applicationId, ApplicationManifest manifest, String spaceId) {
         if (manifest.getServices() == null || manifest.getServices().size() == 0) {
             return Mono.empty();
@@ -839,7 +847,7 @@ public final class DefaultApplications implements Applications {
             .onErrorResume(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Space %s not found", space));
     }
 
-    private static Flux<String> getPushRouteId(CloudFoundryClient cloudFoundryClient, List<DomainSummary> availableDomains, String domainId, ApplicationManifest manifest, String spaceId) {
+    private static Flux<String> getPushRouteIdFromDomain(CloudFoundryClient cloudFoundryClient, List<DomainSummary> availableDomains, String domainId, ApplicationManifest manifest, String spaceId) {
         if (isTcpDomain(availableDomains, domainId)) {
             return requestCreateTcpRoute(cloudFoundryClient, domainId, spaceId)
                 .map(ResourceUtils::getId)
@@ -861,7 +869,8 @@ public final class DefaultApplications implements Applications {
                     .map(ResourceUtils::getId)));
     }
 
-    private static Flux<String> getPushRouteIds(CloudFoundryClient cloudFoundryClient, List<DomainSummary> availableDomains, ApplicationManifest manifest, String spaceId, RandomWords randomWords) {
+    private static Flux<String> getPushRouteIdFromRoute(CloudFoundryClient cloudFoundryClient, List<DomainSummary> availableDomains, ApplicationManifest manifest, String spaceId, RandomWords
+        randomWords) {
         return Flux.fromIterable(manifest.getRoutes())
             .flatMap(route -> RouteUtils.decomposeRoute(availableDomains, route.getRoute()))
             .flatMap(decomposedRoute -> {
@@ -1004,18 +1013,19 @@ public final class DefaultApplications implements Applications {
 
         if (manifest.getRoutes() == null) {
             if (manifest.getDomains() == null) {
-                return getDefaultDomainId(cloudFoundryClient)
-                    .then(domainId -> getPushRouteId(cloudFoundryClient, availableDomains, domainId, manifest, spaceId)
-                        .flatMap(routeId -> requestAssociateRoute(cloudFoundryClient, applicationId, routeId))
-                        .then());
+                return requestApplicationRoutes(cloudFoundryClient, applicationId)
+                    .map(ResourceUtils::getId)
+                    //A route already exists for the application, do nothing
+                    .switchIfEmpty(associateDefaultDomain(cloudFoundryClient, applicationId, availableDomains, manifest, spaceId))
+                    .then();
             } else {
                 return Flux.fromIterable(manifest.getDomains())
-                    .flatMap(domain -> getPushRouteId(cloudFoundryClient, availableDomains, getDomainId(availableDomains, domain), manifest, spaceId)
+                    .flatMap(domain -> getPushRouteIdFromDomain(cloudFoundryClient, availableDomains, getDomainId(availableDomains, domain), manifest, spaceId)
                         .flatMap(routeId -> requestAssociateRoute(cloudFoundryClient, applicationId, routeId)))
                     .then();
             }
         } else {
-            return getPushRouteIds(cloudFoundryClient, availableDomains, manifest, spaceId, randomWords)
+            return getPushRouteIdFromRoute(cloudFoundryClient, availableDomains, manifest, spaceId, randomWords)
                 .flatMap(routeId -> requestAssociateRoute(cloudFoundryClient, applicationId, routeId))
                 .then();
         }
