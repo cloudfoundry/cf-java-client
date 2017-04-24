@@ -64,11 +64,11 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
-            .then(organizationId -> Mono.when(
+            .flatMap(organizationId -> Mono.when(
                 createSpaceId(this.cloudFoundryClient, organizationId, spaceName),
                 createSpaceQuotaDefinitionId(this.cloudFoundryClient, organizationId, quotaName)
             ))
-            .then(function((spaceId, quotaId) -> this.cloudFoundryClient.spaceQuotaDefinitions()
+            .flatMap(function((spaceId, quotaId) -> this.cloudFoundryClient.spaceQuotaDefinitions()
                 .associateSpace(AssociateSpaceQuotaDefinitionRequest.builder()
                     .spaceId(spaceId)
                     .spaceQuotaDefinitionId(quotaId)
@@ -86,7 +86,7 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
         String quotaName = this.nameFactory.getQuotaDefinitionName();
 
         this.organizationId
-            .then(organizationId -> this.cloudFoundryClient.spaceQuotaDefinitions()
+            .flatMap(organizationId -> this.cloudFoundryClient.spaceQuotaDefinitions()
                 .create(CreateSpaceQuotaDefinitionRequest.builder()
                     .memoryLimit(512)
                     .name(quotaName)
@@ -108,13 +108,13 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
         String quotaName = this.nameFactory.getQuotaDefinitionName();
 
         this.organizationId
-            .then(organizationId -> createSpaceQuotaDefinitionId(this.cloudFoundryClient, organizationId, quotaName))
-            .then(quotaId -> this.cloudFoundryClient.spaceQuotaDefinitions()
+            .flatMap(organizationId -> createSpaceQuotaDefinitionId(this.cloudFoundryClient, organizationId, quotaName))
+            .flatMap(quotaId -> this.cloudFoundryClient.spaceQuotaDefinitions()
                 .delete(DeleteSpaceQuotaDefinitionRequest.builder()
                     .async(true)
                     .spaceQuotaDefinitionId(quotaId)
                     .build())
-                .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job)))
+                .flatMap(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job)))
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
@@ -126,8 +126,8 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
         String quotaName = this.nameFactory.getQuotaDefinitionName();
 
         this.organizationId
-            .then(organizationId -> createSpaceQuotaDefinitionId(this.cloudFoundryClient, organizationId, quotaName))
-            .then(quotaId -> this.cloudFoundryClient.spaceQuotaDefinitions()
+            .flatMap(organizationId -> createSpaceQuotaDefinitionId(this.cloudFoundryClient, organizationId, quotaName))
+            .flatMap(quotaId -> this.cloudFoundryClient.spaceQuotaDefinitions()
                 .get(GetSpaceQuotaDefinitionRequest.builder()
                     .spaceQuotaDefinitionId(quotaId)
                     .build()))
@@ -144,7 +144,7 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
         String quotaName = this.nameFactory.getQuotaDefinitionName();
 
         this.organizationId
-            .then(organizationId -> createSpaceQuotaDefinitionId(this.cloudFoundryClient, organizationId, quotaName))
+            .flatMap(organizationId -> createSpaceQuotaDefinitionId(this.cloudFoundryClient, organizationId, quotaName))
             .thenMany(PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.spaceQuotaDefinitions()
                     .list(ListSpaceQuotaDefinitionsRequest.builder()
@@ -164,11 +164,11 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
-            .then(organizationId -> Mono.when(
+            .flatMap(organizationId -> Mono.when(
                 createSpaceId(this.cloudFoundryClient, organizationId, spaceName),
                 createSpaceQuotaDefinitionId(this.cloudFoundryClient, organizationId, quotaName)
             ))
-            .then(function((spaceId, quotaId) -> requestAssociateSpace(this.cloudFoundryClient, quotaId, spaceId)
+            .flatMap(function((spaceId, quotaId) -> requestAssociateSpace(this.cloudFoundryClient, quotaId, spaceId)
                 .then(Mono.just(quotaId))))
             .flatMapMany(quotaId -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.spaceQuotaDefinitions()
@@ -191,11 +191,11 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
-            .then(organizationId -> Mono.when(
+            .flatMap(organizationId -> Mono.when(
                 createSpaceQuotaDefinitionId(this.cloudFoundryClient, organizationId, quotaName),
                 createSpaceId(this.cloudFoundryClient, organizationId, spaceName)
             ))
-            .then(function((quotaId, spaceId) -> Mono.when(
+            .flatMap(function((quotaId, spaceId) -> Mono.when(
                 requestAssociateSpace(this.cloudFoundryClient, quotaId, spaceId)
                     .then(Mono.just(quotaId)),
                 createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
@@ -228,11 +228,11 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
-            .then(organizationId -> Mono.when(
+            .flatMap(organizationId -> Mono.when(
                 createSpaceId(this.cloudFoundryClient, organizationId, spaceName),
                 createSpaceQuotaDefinitionId(this.cloudFoundryClient, organizationId, quotaName)
             ))
-            .then(function((spaceId, quotaId) -> requestAssociateSpace(this.cloudFoundryClient, quotaId, spaceId)
+            .flatMap(function((spaceId, quotaId) -> requestAssociateSpace(this.cloudFoundryClient, quotaId, spaceId)
                 .then(Mono.just(quotaId))))
             .flatMapMany(quotaId -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.spaceQuotaDefinitions()
@@ -255,12 +255,12 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
-            .then(organizationId -> Mono.when(
+            .flatMap(organizationId -> Mono.when(
                 Mono.just(organizationId),
                 createSpaceId(this.cloudFoundryClient, organizationId, spaceName),
                 createSpaceQuotaDefinitionId(this.cloudFoundryClient, organizationId, quotaName)
             ))
-            .then(function((organizationId, spaceId, quotaId) -> requestAssociateSpace(this.cloudFoundryClient, quotaId, spaceId)
+            .flatMap(function((organizationId, spaceId, quotaId) -> requestAssociateSpace(this.cloudFoundryClient, quotaId, spaceId)
                 .then(Mono.just(Tuples.of(organizationId, quotaId)))))
             .flatMapMany(function((organizationId, quotaId) -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.spaceQuotaDefinitions()
@@ -282,7 +282,7 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
         String quotaName = this.nameFactory.getQuotaDefinitionName();
 
         this.organizationId
-            .then(organizationId -> createSpaceQuotaDefinitionId(this.cloudFoundryClient, organizationId, quotaName))
+            .flatMap(organizationId -> createSpaceQuotaDefinitionId(this.cloudFoundryClient, organizationId, quotaName))
             .flatMapMany(quotaId -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.spaceQuotaDefinitions()
                     .listSpaces(ListSpaceQuotaDefinitionSpacesRequest.builder()
@@ -299,11 +299,11 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
-            .then(organizationId -> Mono.when(
+            .flatMap(organizationId -> Mono.when(
                 createSpaceId(this.cloudFoundryClient, organizationId, spaceName),
                 createSpaceQuotaDefinitionId(this.cloudFoundryClient, organizationId, quotaName)
             ))
-            .then(function((spaceId, quotaId) -> requestAssociateSpace(this.cloudFoundryClient, quotaId, spaceId)
+            .flatMap(function((spaceId, quotaId) -> requestAssociateSpace(this.cloudFoundryClient, quotaId, spaceId)
                 .then(Mono.just(quotaId))))
             .flatMapMany(quotaId -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.spaceQuotaDefinitions()
@@ -325,11 +325,11 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
-            .then(organizationId -> Mono.when(
+            .flatMap(organizationId -> Mono.when(
                 createSpaceId(this.cloudFoundryClient, organizationId, spaceName),
                 createSpaceQuotaDefinitionId(this.cloudFoundryClient, organizationId, quotaName)
             ))
-            .then(function((spaceId, quotaId) -> requestAssociateSpace(this.cloudFoundryClient, quotaId, spaceId)
+            .flatMap(function((spaceId, quotaId) -> requestAssociateSpace(this.cloudFoundryClient, quotaId, spaceId)
                 .then(this.cloudFoundryClient.spaceQuotaDefinitions()
                     .removeSpace(RemoveSpaceQuotaDefinitionRequest.builder()
                         .spaceId(spaceId)
@@ -347,8 +347,8 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
         String quotaName2 = this.nameFactory.getQuotaDefinitionName();
 
         this.organizationId
-            .then(organizationId -> createSpaceQuotaDefinitionId(this.cloudFoundryClient, organizationId, quotaName1))
-            .then(quotaId -> this.cloudFoundryClient.spaceQuotaDefinitions()
+            .flatMap(organizationId -> createSpaceQuotaDefinitionId(this.cloudFoundryClient, organizationId, quotaName1))
+            .flatMap(quotaId -> this.cloudFoundryClient.spaceQuotaDefinitions()
                 .update(UpdateSpaceQuotaDefinitionRequest.builder()
                     .name(quotaName2)
                     .spaceQuotaDefinitionId(quotaId)

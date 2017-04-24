@@ -59,7 +59,7 @@ public final class IdentityProvidersTest extends AbstractIntegrationTest {
         String subdomainName = this.nameFactory.getDomainName();
 
         this.userId
-            .then(userId -> requestCreateIdentityZone(this.uaaClient, identityZoneName, subdomainName))
+            .flatMap(userId -> requestCreateIdentityZone(this.uaaClient, identityZoneName, subdomainName))
             .then(this.uaaClient.identityProviders()
                 .create(CreateIdentityProviderRequest.builder()
                     .active(true)
@@ -99,7 +99,7 @@ public final class IdentityProvidersTest extends AbstractIntegrationTest {
         String subdomainName = this.nameFactory.getDomainName();
 
         this.userId
-            .then(userId -> requestCreateIdentityZone(this.uaaClient, identityZoneName, subdomainName))
+            .flatMap(userId -> requestCreateIdentityZone(this.uaaClient, identityZoneName, subdomainName))
             .then(this.uaaClient.identityProviders()
                 .create(CreateIdentityProviderRequest.builder()
                     .active(true)
@@ -134,7 +134,7 @@ public final class IdentityProvidersTest extends AbstractIntegrationTest {
         String subdomainName = this.nameFactory.getDomainName();
 
         this.userId
-            .then(userId -> requestCreateIdentityZone(this.uaaClient, identityZoneName, subdomainName))
+            .flatMap(userId -> requestCreateIdentityZone(this.uaaClient, identityZoneName, subdomainName))
             .then(this.uaaClient.identityProviders()
                 .create(CreateIdentityProviderRequest.builder()
                     .active(true)
@@ -183,9 +183,9 @@ public final class IdentityProvidersTest extends AbstractIntegrationTest {
         String subdomainName = this.nameFactory.getDomainName();
 
         this.userId
-            .then(userId -> requestCreateIdentityZone(this.uaaClient, identityZoneName, subdomainName))
+            .flatMap(userId -> requestCreateIdentityZone(this.uaaClient, identityZoneName, subdomainName))
             .then(requestCreateIdentityProvider(this.uaaClient, identityZoneName, name))
-            .then(response -> this.uaaClient.identityProviders()
+            .flatMap(response -> this.uaaClient.identityProviders()
                 .delete(DeleteIdentityProviderRequest.builder()
                     .identityProviderId(response.getId())
                     .identityZoneId(response.getIdentityZoneId())
@@ -205,9 +205,9 @@ public final class IdentityProvidersTest extends AbstractIntegrationTest {
         String subdomainName = this.nameFactory.getDomainName();
 
         this.userId
-            .then(userId -> requestCreateIdentityZone(this.uaaClient, identityZoneName, subdomainName))
+            .flatMap(userId -> requestCreateIdentityZone(this.uaaClient, identityZoneName, subdomainName))
             .then(requestCreateIdentityProvider(this.uaaClient, identityZoneName, name))
-            .then(response -> this.uaaClient.identityProviders()
+            .flatMap(response -> this.uaaClient.identityProviders()
                 .get(GetIdentityProviderRequest.builder()
                     .identityProviderId(response.getId())
                     .identityZoneId(identityZoneName)
@@ -225,7 +225,7 @@ public final class IdentityProvidersTest extends AbstractIntegrationTest {
         String subdomainName = this.nameFactory.getDomainName();
 
         this.userId
-            .then(userId -> requestCreateIdentityZone(this.uaaClient, identityZoneName, subdomainName))
+            .flatMap(userId -> requestCreateIdentityZone(this.uaaClient, identityZoneName, subdomainName))
             .then(requestCreateIdentityProvider(this.uaaClient, identityZoneName, name))
             .then(this.uaaClient.identityProviders()
                 .list(ListIdentityProvidersRequest.builder()
@@ -247,9 +247,9 @@ public final class IdentityProvidersTest extends AbstractIntegrationTest {
         String subdomainName = this.nameFactory.getDomainName();
 
         this.userId
-            .then(userId -> requestCreateIdentityZone(this.uaaClient, identityZoneName, subdomainName))
+            .flatMap(userId -> requestCreateIdentityZone(this.uaaClient, identityZoneName, subdomainName))
             .then(requestCreateIdentityProvider(this.uaaClient, identityZoneName, oldName))
-            .then(response -> this.uaaClient.identityProviders()
+            .flatMap(response -> this.uaaClient.identityProviders()
                 .update(UpdateIdentityProviderRequest.builder()
                     .configuration(OAuth2Configuration.builder()
                         .addShadowUserOnLogin(true)

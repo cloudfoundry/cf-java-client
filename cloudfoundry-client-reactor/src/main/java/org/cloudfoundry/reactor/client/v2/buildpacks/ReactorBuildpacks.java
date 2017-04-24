@@ -94,10 +94,10 @@ public final class ReactorBuildpacks extends AbstractClientV2Operations implemen
     public Mono<UploadBuildpackResponse> upload(UploadBuildpackRequest request) {
         return put(request, UploadBuildpackResponse.class, builder -> builder.pathSegment("v2", "buildpacks", request.getBuildpackId(), "bits"),
             outbound -> outbound
-                .then(r -> {
+                .flatMap(r -> {
                     if (Files.isDirectory(request.getBuildpack())) {
                         return FileUtils.compress(request.getBuildpack())
-                            .then(buildpack -> upload(buildpack, r, request.getFilename() + ".zip")
+                            .flatMap(buildpack -> upload(buildpack, r, request.getFilename() + ".zip")
                                 .doOnTerminate((v, t) -> {
                                     try {
                                         Files.delete(buildpack);

@@ -26,7 +26,7 @@
     <parent>
         <groupId>org.cloudfoundry</groupId>
         <artifactId>cloudfoundry-java-client</artifactId>
-        <version>2.16.0.BUILD-SNAPSHOT</version>
+        <version>3.0.0.BUILD-SNAPSHOT</version>
     </parent>
 
     <artifactId>cloudfoundry-util</artifactId>
@@ -45,7 +45,7 @@
             <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>io.projectreactor.addons</groupId>
+            <groupId>io.projectreactor</groupId>
             <artifactId>reactor-test</artifactId>
             <scope>test</scope>
         </dependency>

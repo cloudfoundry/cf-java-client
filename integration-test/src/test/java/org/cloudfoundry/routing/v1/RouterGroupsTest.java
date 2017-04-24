@@ -55,7 +55,7 @@ public final class RouterGroupsTest extends AbstractIntegrationTest {
     @Test
     public void update() throws TimeoutException, InterruptedException {
         getRouterGroupId(this.routingClient, DEFAULT_ROUTER_GROUP)
-            .then(routerGroupId -> this.routingClient.routerGroups()
+            .flatMap(routerGroupId -> this.routingClient.routerGroups()
                 .update(UpdateRouterGroupRequest.builder()
                     .reservablePorts("61001-61099")
                     .routerGroupId(routerGroupId)

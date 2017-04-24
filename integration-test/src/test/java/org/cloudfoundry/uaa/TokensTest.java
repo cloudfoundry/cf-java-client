@@ -67,7 +67,7 @@ public final class TokensTest extends AbstractIntegrationTest {
     @Test
     public void checkTokenNotAuthorized() throws TimeoutException, InterruptedException {
         this.tokenProvider.getToken(this.connectionContext)
-            .then(token -> this.uaaClient.tokens()
+            .flatMap(token -> this.uaaClient.tokens()
                 .check(CheckTokenRequest.builder()
                     .token(token)
                     .clientId(this.clientId)
@@ -181,7 +181,7 @@ public final class TokensTest extends AbstractIntegrationTest {
         this.uaaClient.tokens()
             .getKey(GetTokenKeyRequest.builder()
                 .build())
-            .then(getKey -> Mono
+            .flatMap(getKey -> Mono
                 .when(
                     this.uaaClient.tokens()
                         .listKeys(ListTokenKeysRequest.builder()

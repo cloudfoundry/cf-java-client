@@ -53,7 +53,7 @@ public final class SharedDomainsTest extends AbstractIntegrationTest {
                 .name(domainName)
                 .build())
             .map(ResourceUtils::getId)
-            .then(sharedDomainId -> getSharedDomainResource(this.cloudFoundryClient, sharedDomainId))
+            .flatMap(sharedDomainId -> getSharedDomainResource(this.cloudFoundryClient, sharedDomainId))
             .map(resource -> ResourceUtils.getEntity(resource).getName())
             .as(StepVerifier::create)
             .expectNext(domainName)
@@ -66,7 +66,7 @@ public final class SharedDomainsTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
 
         getSharedDomainId(this.cloudFoundryClient, domainName)
-            .then(sharedDomainId -> this.cloudFoundryClient.sharedDomains()
+            .flatMap(sharedDomainId -> this.cloudFoundryClient.sharedDomains()
                 .delete(DeleteSharedDomainRequest.builder()
                     .async(false)
                     .sharedDomainId(sharedDomainId)
@@ -83,12 +83,12 @@ public final class SharedDomainsTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
 
         getSharedDomainId(this.cloudFoundryClient, domainName)
-            .then(sharedDomainId -> this.cloudFoundryClient.sharedDomains()
+            .flatMap(sharedDomainId -> this.cloudFoundryClient.sharedDomains()
                 .delete(DeleteSharedDomainRequest.builder()
                     .async(true)
                     .sharedDomainId(sharedDomainId)
                     .build())
-                .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job)))
+                .flatMap(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job)))
             .then(requestListSharedDomains(this.cloudFoundryClient, domainName)
                 .singleOrEmpty())
             .as(StepVerifier::create)
@@ -101,7 +101,7 @@ public final class SharedDomainsTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
 
         getSharedDomainId(this.cloudFoundryClient, domainName)
-            .then(sharedDomainId -> this.cloudFoundryClient.sharedDomains()
+            .flatMap(sharedDomainId -> this.cloudFoundryClient.sharedDomains()
                 .get(GetSharedDomainRequest.builder()
                     .sharedDomainId(sharedDomainId)
                     .build()))
@@ -118,7 +118,7 @@ public final class SharedDomainsTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
 
         getSharedDomainId(this.cloudFoundryClient, domainName)
-            .then(sharedDomainId -> requestListSharedDomains(this.cloudFoundryClient, null)
+            .flatMap(sharedDomainId -> requestListSharedDomains(this.cloudFoundryClient, null)
                 .filter(resource -> sharedDomainId.equals(ResourceUtils.getId(resource)))
                 .single())
             .map(resource -> ResourceUtils.getEntity(resource).getName())
@@ -133,7 +133,7 @@ public final class SharedDomainsTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
 
         getSharedDomainId(this.cloudFoundryClient, domainName)
-            .then(sharedDomainId -> Mono.when(
+            .flatMap(sharedDomainId -> Mono.when(
                 Mono.just(sharedDomainId),
                 requestListSharedDomains(this.cloudFoundryClient, domainName)
                     .single()

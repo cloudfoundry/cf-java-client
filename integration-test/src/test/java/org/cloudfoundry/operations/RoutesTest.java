@@ -253,7 +253,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
         requestCreateSharedDomain(this.cloudFoundryOperations, domainName, DEFAULT_ROUTER_GROUP)
             .then(requestCreateRoute(this.cloudFoundryOperations, this.spaceName, domainName, true))
-            .then(port -> this.cloudFoundryOperations.routes()
+            .flatMap(port -> this.cloudFoundryOperations.routes()
                 .delete(DeleteRouteRequest.builder()
                     .domain(domainName)
                     .port(port)
@@ -501,8 +501,8 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 createSharedDomainAndTcpRoute(this.cloudFoundryOperations, domainName, this.spaceName),
                 requestCreateApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, true)
             )
-            .then(function((port, ignore) -> requestMapRoute(this.cloudFoundryOperations, applicationName, domainName, port)))
-            .then(port -> this.cloudFoundryOperations.routes()
+            .flatMap(function((port, ignore) -> requestMapRoute(this.cloudFoundryOperations, applicationName, domainName, port)))
+            .flatMap(port -> this.cloudFoundryOperations.routes()
                 .unmap(UnmapRouteRequest.builder()
                     .applicationName(applicationName)
                     .domain(domainName)

@@ -57,7 +57,7 @@ public final class TcpRoutesTest extends AbstractIntegrationTest {
         Integer port = this.nameFactory.getPort();
 
         getRouterGroupId(this.routingClient, DEFAULT_ROUTER_GROUP)
-            .then(routerGroupId -> this.routingClient.tcpRoutes()
+            .flatMap(routerGroupId -> this.routingClient.tcpRoutes()
                 .create(CreateTcpRoutesRequest.builder()
                     .tcpRoute(TcpRouteConfiguration.builder()
                         .backendIp(backendIp)
@@ -85,9 +85,9 @@ public final class TcpRoutesTest extends AbstractIntegrationTest {
         Integer port = this.nameFactory.getPort();
 
         getRouterGroupId(this.routingClient, DEFAULT_ROUTER_GROUP)
-            .then(routerGroupId -> createTcpRoute(this.routingClient, backendIp, backendPort, port, routerGroupId)
+            .flatMap(routerGroupId -> createTcpRoute(this.routingClient, backendIp, backendPort, port, routerGroupId)
                 .then(Mono.just(routerGroupId)))
-            .then(routerGroupId -> this.routingClient.tcpRoutes()
+            .flatMap(routerGroupId -> this.routingClient.tcpRoutes()
                 .delete(DeleteTcpRoutesRequest.builder()
                     .tcpRoute(TcpRouteDeletion.builder()
                         .backendIp(backendIp)
@@ -135,7 +135,7 @@ public final class TcpRoutesTest extends AbstractIntegrationTest {
         Integer port = this.nameFactory.getPort();
 
         getRouterGroupId(this.routingClient, DEFAULT_ROUTER_GROUP)
-            .then(routerGroupId -> createTcpRoute(this.routingClient, backendIp, backendPort, port, routerGroupId))
+            .flatMap(routerGroupId -> createTcpRoute(this.routingClient, backendIp, backendPort, port, routerGroupId))
             .then(this.routingClient.tcpRoutes()
                 .list(ListTcpRoutesRequest.builder()
                     .build()))

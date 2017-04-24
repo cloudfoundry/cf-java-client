@@ -70,9 +70,9 @@ public final class ServiceBrokerUtils {
         }
 
         return getSharedDomain(cloudFoundryClient)
-            .then(domain -> pushServiceBrokerApplication(cloudFoundryClient, application, domain, nameFactory, planName, serviceName, spaceId))
-            .then(applicationMetadata -> requestCreateServiceBroker(cloudFoundryClient, applicationMetadata, serviceBrokerName, spaceScoped)
-                .then(response -> makeServicePlanPubliclyVisible(cloudFoundryClient, serviceName, spaceScoped)
+            .flatMap(domain -> pushServiceBrokerApplication(cloudFoundryClient, application, domain, nameFactory, planName, serviceName, spaceId))
+            .flatMap(applicationMetadata -> requestCreateServiceBroker(cloudFoundryClient, applicationMetadata, serviceBrokerName, spaceScoped)
+                .flatMap(response -> makeServicePlanPubliclyVisible(cloudFoundryClient, serviceName, spaceScoped)
                     .then(Mono.just(response)))
                 .map(response -> new ServiceBrokerMetadata(applicationMetadata, ResourceUtils.getId(response))));
     }
@@ -94,9 +94,9 @@ public final class ServiceBrokerUtils {
                 createApplicationId(cloudFoundryClient, spaceId, applicationName),
                 createRouteId(cloudFoundryClient, ResourceUtils.getId(domain), spaceId, hostName)
             )
-            .then(function((applicationId, routeId) -> requestAssociateApplicationRoute(cloudFoundryClient, applicationId, routeId)
+            .flatMap(function((applicationId, routeId) -> requestAssociateApplicationRoute(cloudFoundryClient, applicationId, routeId)
                 .then(Mono.just(applicationId))))
-            .then(applicationId -> createRunningServiceBrokerApplication(cloudFoundryClient, application, applicationId, planName, serviceName)
+            .flatMap(applicationId -> createRunningServiceBrokerApplication(cloudFoundryClient, application, applicationId, planName, serviceName)
                 .map(ignore -> new ApplicationMetadata(applicationId, spaceId, String.format("https://%s.%s", hostName, ResourceUtils.getEntity(domain).getName()))));
     }
 
@@ -112,7 +112,7 @@ public final class ServiceBrokerUtils {
 
     private static Mono<String> createRunningServiceBrokerApplication(CloudFoundryClient cloudFoundryClient, Path application, String applicationId, String planName, String serviceName) {
         return requestUploadApplication(cloudFoundryClient, applicationId, application)
-            .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, Duration.ofMinutes(5), job))
+            .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, Duration.ofMinutes(5), job))
             .then(requestUpdateApplication(cloudFoundryClient, applicationId, planName, serviceName, "STARTED"))
             .then(getApplicationPackageState(cloudFoundryClient, applicationId)
                 .filter(state -> "STAGED".equals(state) || "FAILED".equals(state))
@@ -158,8 +158,8 @@ public final class ServiceBrokerUtils {
         }
 
         return getServiceId(cloudFoundryClient, serviceName)
-            .then(serviceId -> getServicePlanId(cloudFoundryClient, serviceId))
-            .then(planId -> requestUpdateServicePlan(cloudFoundryClient, planId, true));
+            .flatMap(serviceId -> getServicePlanId(cloudFoundryClient, serviceId))
+            .flatMap(planId -> requestUpdateServicePlan(cloudFoundryClient, planId, true));
     }
 
     private static Mono<ApplicationInstancesResponse> requestApplicationInstances(CloudFoundryClient cloudFoundryClient, String applicationId) {

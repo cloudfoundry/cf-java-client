@@ -63,7 +63,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
         String instanceName = this.nameFactory.getServiceInstanceName();
 
         this.spaceId
-            .then(spaceId -> this.cloudFoundryClient.userProvidedServiceInstances()
+            .flatMap(spaceId -> this.cloudFoundryClient.userProvidedServiceInstances()
                 .create(CreateUserProvidedServiceInstanceRequest.builder()
                     .name(instanceName)
                     .spaceId(spaceId)
@@ -80,8 +80,8 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
         String instanceName = this.nameFactory.getServiceInstanceName();
 
         this.spaceId
-            .then(spaceId -> getCreateUserProvidedServiceInstanceId(this.cloudFoundryClient, instanceName, spaceId))
-            .then(instanceId -> this.cloudFoundryClient.userProvidedServiceInstances()
+            .flatMap(spaceId -> getCreateUserProvidedServiceInstanceId(this.cloudFoundryClient, instanceName, spaceId))
+            .flatMap(instanceId -> this.cloudFoundryClient.userProvidedServiceInstances()
                 .delete(DeleteUserProvidedServiceInstanceRequest.builder()
                     .userProvidedServiceInstanceId(instanceId)
                     .build()))
@@ -96,8 +96,8 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
         String instanceName = this.nameFactory.getServiceInstanceName();
 
         this.spaceId
-            .then(spaceId -> getCreateUserProvidedServiceInstanceId(this.cloudFoundryClient, instanceName, spaceId))
-            .then(instanceId -> this.cloudFoundryClient.userProvidedServiceInstances()
+            .flatMap(spaceId -> getCreateUserProvidedServiceInstanceId(this.cloudFoundryClient, instanceName, spaceId))
+            .flatMap(instanceId -> this.cloudFoundryClient.userProvidedServiceInstances()
                 .get(GetUserProvidedServiceInstanceRequest.builder()
                     .userProvidedServiceInstanceId(instanceId)
                     .build()))
@@ -113,7 +113,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
         String instanceName = this.nameFactory.getServiceInstanceName();
 
         this.spaceId
-            .then(spaceId -> requestCreateUserProvidedServiceInstance(this.cloudFoundryClient, instanceName, spaceId))
+            .flatMap(spaceId -> requestCreateUserProvidedServiceInstance(this.cloudFoundryClient, instanceName, spaceId))
             .thenMany(PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.userProvidedServiceInstances()
                     .list(ListUserProvidedServiceInstancesRequest.builder()
@@ -134,7 +134,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
         String instanceName = this.nameFactory.getServiceInstanceName();
 
         this.spaceId
-            .then(spaceId -> Mono.when(
+            .flatMap(spaceId -> Mono.when(
                 getCreateApplicationId(this.cloudFoundryClient, applicationName, spaceId),
                 getCreateUserProvidedServiceInstanceId(this.cloudFoundryClient, instanceName, spaceId)
             ))
@@ -143,7 +143,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
                     .applicationId(applicationId)
                     .serviceInstanceId(instanceId)
                     .build()))))
-            .then(function((applicationId, instanceId) -> Mono
+            .flatMap(function((applicationId, instanceId) -> Mono
                 .when(
                     Mono.just(applicationId),
                     Mono.just(instanceId),
@@ -167,8 +167,8 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
         String newInstanceName = this.nameFactory.getServiceInstanceName();
 
         this.spaceId
-            .then(spaceId -> getCreateUserProvidedServiceInstanceId(this.cloudFoundryClient, instanceName, spaceId))
-            .then(instanceId -> Mono
+            .flatMap(spaceId -> getCreateUserProvidedServiceInstanceId(this.cloudFoundryClient, instanceName, spaceId))
+            .flatMap(instanceId -> Mono
                 .when(
                     Mono.just(instanceId),
                     this.cloudFoundryClient.userProvidedServiceInstances()
@@ -179,7 +179,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
                             .build())
                         .map(UpdateUserProvidedServiceInstanceResponse::getEntity)
                 ))
-            .then(function((instanceId, entity1) -> Mono
+            .flatMap(function((instanceId, entity1) -> Mono
                 .when(
                     Mono.just(entity1),
                     this.cloudFoundryClient.userProvidedServiceInstances()

@@ -75,10 +75,10 @@ public final class RoutesTest extends AbstractIntegrationTest {
         Mono
             .when(
                 this.organizationId
-                    .then(organizationId -> createPrivateDomainId(this.cloudFoundryClient, domainName, organizationId)),
+                    .flatMap(organizationId -> createPrivateDomainId(this.cloudFoundryClient, domainName, organizationId)),
                 this.spaceId
             )
-            .then(function((domainId, spaceId) -> Mono.when(
+            .flatMap(function((domainId, spaceId) -> Mono.when(
                 createApplicationId(this.cloudFoundryClient, spaceId, applicationName, null),
                 createRouteId(this.cloudFoundryClient, domainId, spaceId)
             )))
@@ -102,10 +102,10 @@ public final class RoutesTest extends AbstractIntegrationTest {
         Mono
             .when(
                 this.organizationId
-                    .then(organizationId -> createPrivateDomainId(this.cloudFoundryClient, domainName, organizationId)),
+                    .flatMap(organizationId -> createPrivateDomainId(this.cloudFoundryClient, domainName, organizationId)),
                 this.spaceId
             )
-            .then(function((domainId, spaceId) -> Mono.when(
+            .flatMap(function((domainId, spaceId) -> Mono.when(
                 Mono.just(domainId),
                 Mono.just(spaceId),
                 this.cloudFoundryClient.routes()
@@ -128,17 +128,17 @@ public final class RoutesTest extends AbstractIntegrationTest {
         Mono
             .when(
                 this.organizationId
-                    .then(organizationId -> createPrivateDomainId(this.cloudFoundryClient, domainName, organizationId)),
+                    .flatMap(organizationId -> createPrivateDomainId(this.cloudFoundryClient, domainName, organizationId)),
                 this.spaceId
             )
-            .then(function((domainId, spaceId) -> createRouteId(this.cloudFoundryClient, domainId, spaceId)))
+            .flatMap(function((domainId, spaceId) -> createRouteId(this.cloudFoundryClient, domainId, spaceId)))
             .as(thenKeep(routeId -> this.cloudFoundryClient.routes()
                 .delete(DeleteRouteRequest.builder()
                     .async(true)
                     .routeId(routeId)
                     .build())
-                .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job))))
-            .then(routeId -> requestGetRoute(this.cloudFoundryClient, routeId))
+                .flatMap(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job))))
+            .flatMap(routeId -> requestGetRoute(this.cloudFoundryClient, routeId))
             .as(StepVerifier::create)
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class).hasMessageMatching("CF-RouteNotFound\\([0-9]+\\): The route could not be found: .*"))
             .verify(Duration.ofMinutes(5));
@@ -151,16 +151,16 @@ public final class RoutesTest extends AbstractIntegrationTest {
         Mono
             .when(
                 this.organizationId
-                    .then(organizationId -> createPrivateDomainId(this.cloudFoundryClient, domainName, organizationId)),
+                    .flatMap(organizationId -> createPrivateDomainId(this.cloudFoundryClient, domainName, organizationId)),
                 this.spaceId
             )
-            .then(function((domainId, spaceId) -> createRouteId(this.cloudFoundryClient, domainId, spaceId)))
+            .flatMap(function((domainId, spaceId) -> createRouteId(this.cloudFoundryClient, domainId, spaceId)))
             .as(thenKeep(routeId -> this.cloudFoundryClient.routes()
                 .delete(DeleteRouteRequest.builder()
                     .async(false)
                     .routeId(routeId)
                     .build())))
-            .then(routeId -> requestGetRoute(this.cloudFoundryClient, routeId))
+            .flatMap(routeId -> requestGetRoute(this.cloudFoundryClient, routeId))
             .as(StepVerifier::create)
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class).hasMessageMatching("CF-RouteNotFound\\([0-9]+\\): The route could not be found: .*"))
             .verify(Duration.ofMinutes(5));
@@ -174,7 +174,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
         Mono
             .when(
                 this.organizationId
-                    .then(organizationId -> createPrivateDomainId(this.cloudFoundryClient, domainName, organizationId)),
+                    .flatMap(organizationId -> createPrivateDomainId(this.cloudFoundryClient, domainName, organizationId)),
                 this.spaceId
             )
             .as(thenKeep(function((domainId, spaceId) -> this.cloudFoundryClient.routes()
@@ -183,7 +183,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     .host(hostName)
                     .spaceId(spaceId)
                     .build()))))
-            .then(function((domainId, spaceId) -> this.cloudFoundryClient.routes()
+            .flatMap(function((domainId, spaceId) -> this.cloudFoundryClient.routes()
                 .exists(RouteExistsRequest.builder()
                     .domainId(domainId)
                     .host(hostName)
@@ -203,7 +203,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
         Mono
             .when(
                 this.organizationId
-                    .then(organizationId -> createPrivateDomainId(this.cloudFoundryClient, domainName, organizationId)),
+                    .flatMap(organizationId -> createPrivateDomainId(this.cloudFoundryClient, domainName, organizationId)),
                 this.spaceId
             )
             .as(thenKeep(function((domainId, spaceId) -> this.cloudFoundryClient.routes()
@@ -212,7 +212,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     .host(hostName1)
                     .spaceId(spaceId)
                     .build()))))
-            .then(function((domainId, spaceId) -> this.cloudFoundryClient.routes()
+            .flatMap(function((domainId, spaceId) -> this.cloudFoundryClient.routes()
                 .exists(RouteExistsRequest.builder()
                     .domainId(domainId)
                     .host(hostName2)
@@ -230,16 +230,16 @@ public final class RoutesTest extends AbstractIntegrationTest {
         Mono
             .when(
                 this.organizationId
-                    .then(organizationId -> createPrivateDomainId(this.cloudFoundryClient, domainName, organizationId)),
+                    .flatMap(organizationId -> createPrivateDomainId(this.cloudFoundryClient, domainName, organizationId)),
                 this.spaceId
             )
-            .then(function((domainId, spaceId) -> Mono
+            .flatMap(function((domainId, spaceId) -> Mono
                 .when(
                     Mono.just(domainId),
                     Mono.just(spaceId),
                     createRouteId(this.cloudFoundryClient, domainId, spaceId))
             ))
-            .then(function((domainId, spaceId, routeId) -> Mono
+            .flatMap(function((domainId, spaceId, routeId) -> Mono
                 .when(
                     Mono.just(domainId),
                     Mono.just(spaceId),
@@ -263,10 +263,10 @@ public final class RoutesTest extends AbstractIntegrationTest {
         Mono
             .when(
                 this.organizationId
-                    .then(organizationId -> createPrivateDomainId(this.cloudFoundryClient, domainName, organizationId)),
+                    .flatMap(organizationId -> createPrivateDomainId(this.cloudFoundryClient, domainName, organizationId)),
                 this.spaceId
             )
-            .then(function((domainId, spaceId) -> Mono.when(
+            .flatMap(function((domainId, spaceId) -> Mono.when(
                 createApplicationId(this.cloudFoundryClient, spaceId, applicationName, null),
                 createRouteId(this.cloudFoundryClient, domainId, spaceId)
             )))
@@ -291,10 +291,10 @@ public final class RoutesTest extends AbstractIntegrationTest {
         Mono
             .when(
                 this.organizationId
-                    .then(organizationId -> createPrivateDomainId(this.cloudFoundryClient, domainName, organizationId)),
+                    .flatMap(organizationId -> createPrivateDomainId(this.cloudFoundryClient, domainName, organizationId)),
                 this.spaceId
             )
-            .then(function((domainId, spaceId) -> Mono.when(
+            .flatMap(function((domainId, spaceId) -> Mono.when(
                 createApplicationId(this.cloudFoundryClient, spaceId, applicationName, null),
                 createRouteId(this.cloudFoundryClient, domainId, spaceId)
             )))
@@ -320,10 +320,10 @@ public final class RoutesTest extends AbstractIntegrationTest {
         Mono
             .when(
                 this.organizationId
-                    .then(organizationId -> createPrivateDomainId(this.cloudFoundryClient, domainName, organizationId)),
+                    .flatMap(organizationId -> createPrivateDomainId(this.cloudFoundryClient, domainName, organizationId)),
                 this.spaceId
             )
-            .then(function((domainId, spaceId) -> Mono.when(
+            .flatMap(function((domainId, spaceId) -> Mono.when(
                 createApplicationId(this.cloudFoundryClient, spaceId, applicationName, null),
                 createRouteId(this.cloudFoundryClient, domainId, spaceId)
             )))
@@ -347,13 +347,13 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
-            .then(organizationId -> Mono
+            .flatMap(organizationId -> Mono
                 .when(
                     createPrivateDomainId(this.cloudFoundryClient, domainName, organizationId),
                     this.spaceId,
                     Mono.just(organizationId)
                 ))
-            .then(function((domainId, spaceId, organizationId) -> Mono
+            .flatMap(function((domainId, spaceId, organizationId) -> Mono
                 .when(
                     createApplicationId(this.cloudFoundryClient, spaceId, applicationName, null),
                     createRouteId(this.cloudFoundryClient, domainId, spaceId),
@@ -381,10 +381,10 @@ public final class RoutesTest extends AbstractIntegrationTest {
         Mono
             .when(
                 this.organizationId
-                    .then(organizationId -> createPrivateDomainId(this.cloudFoundryClient, domainName, organizationId)),
+                    .flatMap(organizationId -> createPrivateDomainId(this.cloudFoundryClient, domainName, organizationId)),
                 this.spaceId
             )
-            .then(function((domainId, spaceId) -> Mono.when(
+            .flatMap(function((domainId, spaceId) -> Mono.when(
                 createApplicationId(this.cloudFoundryClient, spaceId, applicationName, null),
                 createRouteId(this.cloudFoundryClient, domainId, spaceId),
                 Mono.just(spaceId)
@@ -411,11 +411,11 @@ public final class RoutesTest extends AbstractIntegrationTest {
         Mono
             .when(
                 this.organizationId
-                    .then(organizationId -> createPrivateDomainId(this.cloudFoundryClient, domainName, organizationId)),
+                    .flatMap(organizationId -> createPrivateDomainId(this.cloudFoundryClient, domainName, organizationId)),
                 this.spaceId,
                 this.stackId
             )
-            .then(function((domainId, spaceId, stackId) -> Mono
+            .flatMap(function((domainId, spaceId, stackId) -> Mono
                 .when(
                     createApplicationId(this.cloudFoundryClient, spaceId, applicationName, stackId),
                     createRouteId(this.cloudFoundryClient, domainId, spaceId),
@@ -443,7 +443,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
         Mono
             .when(
                 this.organizationId
-                    .then(organizationId -> createPrivateDomainId(this.cloudFoundryClient, domainName, organizationId)),
+                    .flatMap(organizationId -> createPrivateDomainId(this.cloudFoundryClient, domainName, organizationId)),
                 this.spaceId
             )
             .as(thenKeep(function((domainId, spaceId) -> requestCreateRoute(this.cloudFoundryClient, domainId, spaceId))))
@@ -467,10 +467,10 @@ public final class RoutesTest extends AbstractIntegrationTest {
         Mono
             .when(
                 this.organizationId
-                    .then(organizationId -> createPrivateDomainId(this.cloudFoundryClient, domainName, organizationId)),
+                    .flatMap(organizationId -> createPrivateDomainId(this.cloudFoundryClient, domainName, organizationId)),
                 this.spaceId
             )
-            .then(function((domainId, spaceId) -> this.cloudFoundryClient.routes()
+            .flatMap(function((domainId, spaceId) -> this.cloudFoundryClient.routes()
                 .create(CreateRouteRequest.builder()
                     .domainId(domainId)
                     .host(host)
@@ -493,7 +493,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
-            .then(organizationId -> Mono
+            .flatMap(organizationId -> Mono
                 .when(
                     createPrivateDomainId(this.cloudFoundryClient, domainName, organizationId),
                     this.spaceId,
@@ -521,10 +521,10 @@ public final class RoutesTest extends AbstractIntegrationTest {
         Mono
             .when(
                 this.organizationId
-                    .then(organizationId -> createPrivateDomainId(this.cloudFoundryClient, domainName, organizationId)),
+                    .flatMap(organizationId -> createPrivateDomainId(this.cloudFoundryClient, domainName, organizationId)),
                 this.spaceId
             )
-            .then(function((domainId, spaceId) -> this.cloudFoundryClient.routes()
+            .flatMap(function((domainId, spaceId) -> this.cloudFoundryClient.routes()
                 .create(CreateRouteRequest.builder()
                     .domainId(domainId)
                     .path(path)
@@ -550,10 +550,10 @@ public final class RoutesTest extends AbstractIntegrationTest {
         Mono
             .when(
                 this.organizationId
-                    .then(organizationId -> createPrivateDomainId(this.cloudFoundryClient, domainName, organizationId)),
+                    .flatMap(organizationId -> createPrivateDomainId(this.cloudFoundryClient, domainName, organizationId)),
                 this.spaceId
             )
-            .then(function((domainId, spaceId) -> Mono.when(
+            .flatMap(function((domainId, spaceId) -> Mono.when(
                 createApplicationId(this.cloudFoundryClient, spaceId, applicationName, null),
                 createRouteId(this.cloudFoundryClient, domainId, spaceId)
             )))
@@ -581,11 +581,11 @@ public final class RoutesTest extends AbstractIntegrationTest {
         Mono
             .when(
                 this.organizationId
-                    .then(organizationId -> createPrivateDomainId(this.cloudFoundryClient, domainName, organizationId)),
+                    .flatMap(organizationId -> createPrivateDomainId(this.cloudFoundryClient, domainName, organizationId)),
                 this.spaceId
             )
-            .then(function((domainId, spaceId) -> createRouteId(this.cloudFoundryClient, domainId, spaceId)))
-            .then(routeId -> this.cloudFoundryClient.routes()
+            .flatMap(function((domainId, spaceId) -> createRouteId(this.cloudFoundryClient, domainId, spaceId)))
+            .flatMap(routeId -> this.cloudFoundryClient.routes()
                 .update(UpdateRouteRequest.builder()
                     .host("test-host")
                     .routeId(routeId)

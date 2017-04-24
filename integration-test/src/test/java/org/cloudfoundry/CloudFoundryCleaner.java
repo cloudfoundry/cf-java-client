@@ -392,7 +392,7 @@ final class CloudFoundryCleaner {
                     .async(true)
                     .serviceInstanceId(ResourceUtils.getId(serviceInstance))
                     .build())
-                .then(response -> {
+                .flatMap(response -> {
                     Object entity = response.getEntity();
                     if (entity instanceof JobEntity) {
                         return JobUtils.waitForCompletion(cloudFoundryClient, Duration.ofMinutes(5), (JobEntity) response.getEntity());

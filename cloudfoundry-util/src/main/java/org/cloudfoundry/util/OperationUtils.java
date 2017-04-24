@@ -79,7 +79,7 @@ public final class OperationUtils {
      */
     public static <T, U> Function<Mono<T>, Mono<T>> thenKeep(Function<T, Mono<U>> thenFunction) {
         return source -> source
-            .then(in -> thenFunction
+            .flatMap(in -> thenFunction
                 .apply(in)
                 .then(Mono.just(in)));
     }

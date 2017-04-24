@@ -56,7 +56,7 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
     @Override
     public Mono<OrganizationQuota> createQuota(CreateQuotaRequest request) {
         return this.cloudFoundryClient
-            .then(cloudFoundryClient -> createOrganizationQuota(cloudFoundryClient, request))
+            .flatMap(cloudFoundryClient -> createOrganizationQuota(cloudFoundryClient, request))
             .map(DefaultOrganizationAdmin::toOrganizationQuota)
             .transform(OperationsLogging.log("Create Organization Quota"))
             .checkpoint();
@@ -65,12 +65,12 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
     @Override
     public Mono<Void> deleteQuota(DeleteQuotaRequest request) {
         return this.cloudFoundryClient
-            .then(cloudFoundryClient -> Mono.when(
+            .flatMap(cloudFoundryClient -> Mono.when(
                 Mono.just(cloudFoundryClient),
                 Mono.just(request.getCompletionTimeout()),
                 getOrganizationQuotaId(cloudFoundryClient, request.getName())
             ))
-            .then(function(DefaultOrganizationAdmin::deleteOrganizationQuota))
+            .flatMap(function(DefaultOrganizationAdmin::deleteOrganizationQuota))
             .transform(OperationsLogging.log("Delete Organization Quota"))
             .checkpoint();
     }
@@ -78,7 +78,7 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
     @Override
     public Mono<OrganizationQuota> getQuota(GetQuotaRequest request) {
         return this.cloudFoundryClient
-            .then(cloudFoundryClient -> getOrganizationQuota(cloudFoundryClient, request.getName()))
+            .flatMap(cloudFoundryClient -> getOrganizationQuota(cloudFoundryClient, request.getName()))
             .map(DefaultOrganizationAdmin::toOrganizationQuota)
             .transform(OperationsLogging.log("Get Organization Quota"))
             .checkpoint();
@@ -96,12 +96,12 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
     @Override
     public Mono<Void> setQuota(SetQuotaRequest request) {
         return this.cloudFoundryClient
-            .then(cloudFoundryClient -> Mono.when(
+            .flatMap(cloudFoundryClient -> Mono.when(
                 Mono.just(cloudFoundryClient),
                 getOrganizationId(cloudFoundryClient, request.getOrganizationName()),
                 getOrganizationQuotaId(cloudFoundryClient, request.getQuotaName())
             ))
-            .then(function((DefaultOrganizationAdmin::requestUpdateOrganization)))
+            .flatMap(function((DefaultOrganizationAdmin::requestUpdateOrganization)))
             .then()
             .transform(OperationsLogging.log("Set Organization Quota"))
             .checkpoint();
@@ -110,11 +110,11 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
     @Override
     public Mono<OrganizationQuota> updateQuota(UpdateQuotaRequest request) {
         return this.cloudFoundryClient
-            .then(cloudFoundryClient -> Mono.when(
+            .flatMap(cloudFoundryClient -> Mono.when(
                 Mono.just(cloudFoundryClient),
                 getOrganizationQuota(cloudFoundryClient, request.getName())
             ))
-            .then(function((cloudFoundryClient, exitingQuotaDefinition) -> updateOrganizationQuota(cloudFoundryClient, request, exitingQuotaDefinition)))
+            .flatMap(function((cloudFoundryClient, exitingQuotaDefinition) -> updateOrganizationQuota(cloudFoundryClient, request, exitingQuotaDefinition)))
             .map(DefaultOrganizationAdmin::toOrganizationQuota)
             .transform(OperationsLogging.log("Update Organization Quota"))
             .checkpoint();
@@ -133,7 +133,7 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
 
     private static Mono<Void> deleteOrganizationQuota(CloudFoundryClient cloudFoundryClient, Duration completionTimeout, String quotaId) {
         return requestDeleteOrganizationQuota(cloudFoundryClient, quotaId)
-            .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, completionTimeout, job));
+            .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, completionTimeout, job));
     }
 
     private static Mono<String> getOrganizationId(CloudFoundryClient cloudFoundryClient, String name) {

@@ -94,7 +94,7 @@ public final class FeatureFlagsTest extends AbstractIntegrationTest {
                 .get(GetFeatureFlagRequest.builder()
                     .name(flagName)
                     .build())
-                .then(getResponse -> Mono.when(
+                .flatMap(getResponse -> Mono.when(
                     Mono.just(getResponse),
                     this.cloudFoundryClient.featureFlags()
                         .set(SetFeatureFlagRequest.builder()
@@ -102,7 +102,7 @@ public final class FeatureFlagsTest extends AbstractIntegrationTest {
                             .enabled(!getResponse.getEnabled())
                             .build())
                 ))
-                .then(function((getResponse, setResponse) -> Mono
+                .flatMap(function((getResponse, setResponse) -> Mono
                     .when(
                         Mono.just(getResponse),
                         Mono.just(setResponse),

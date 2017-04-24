@@ -152,7 +152,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
             .flatMapIterable(BatchCreateClientsResponse::getClients)
             .map(Client::getClientId)
             .collectList()
-            .then(clientIds -> this.uaaClient.clients()
+            .flatMap(clientIds -> this.uaaClient.clients()
                 .batchDelete(BatchDeleteClientsRequest.builder()
                     .clientIds(clientIds)
                     .build()))

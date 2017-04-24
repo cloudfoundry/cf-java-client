@@ -81,7 +81,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
-            .then(organizationId -> Mono.when(
+            .flatMap(organizationId -> Mono.when(
                 createDomainEntity(this.cloudFoundryClient, organizationId, domainName),
                 Mono.just(organizationId)
             ))
@@ -96,10 +96,10 @@ public final class DomainsTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
-            .then(organizationId -> createDomainId(this.cloudFoundryClient, domainName, organizationId))
+            .flatMap(organizationId -> createDomainId(this.cloudFoundryClient, domainName, organizationId))
             .as(thenKeep(domainId -> requestDeleteDomain(this.cloudFoundryClient, domainId)
-                .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job))))
-            .then(domainId -> requestGetDomain(this.cloudFoundryClient, domainId))
+                .flatMap(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job))))
+            .flatMap(domainId -> requestGetDomain(this.cloudFoundryClient, domainId))
             .as(StepVerifier::create)
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class).hasMessageMatching("CF-DomainNotFound\\([0-9]+\\): The domain could not be found: .*"))
             .verify(Duration.ofMinutes(5));
@@ -110,9 +110,9 @@ public final class DomainsTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
-            .then(organizationId -> createDomainId(this.cloudFoundryClient, domainName, organizationId))
+            .flatMap(organizationId -> createDomainId(this.cloudFoundryClient, domainName, organizationId))
             .as(thenKeep(domainId -> requestDeleteDomainAsyncFalse(this.cloudFoundryClient, domainId)))
-            .then(domainId -> requestGetDomain(this.cloudFoundryClient, domainId))
+            .flatMap(domainId -> requestGetDomain(this.cloudFoundryClient, domainId))
             .as(StepVerifier::create)
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class).hasMessageMatching("CF-DomainNotFound\\([0-9]+\\): The domain could not be found: .*"))
             .verify(Duration.ofMinutes(5));
@@ -123,11 +123,11 @@ public final class DomainsTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
-            .then(organizationId -> Mono.when(
+            .flatMap(organizationId -> Mono.when(
                 Mono.just(organizationId),
                 createDomainId(this.cloudFoundryClient, domainName, organizationId)
             ))
-            .then(function((organizationId, domainId) -> Mono.when(
+            .flatMap(function((organizationId, domainId) -> Mono.when(
                 getDomainEntity(this.cloudFoundryClient, domainId),
                 Mono.just(organizationId)
             )))
@@ -142,11 +142,11 @@ public final class DomainsTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
-            .then(organizationId -> Mono.when(
+            .flatMap(organizationId -> Mono.when(
                 Mono.just(organizationId),
                 createDomainId(this.cloudFoundryClient, domainName, organizationId)
             ))
-            .then(function((organizationId, domainId) -> Mono.when(
+            .flatMap(function((organizationId, domainId) -> Mono.when(
                 requestListDomains(this.cloudFoundryClient)
                     .filter(resource -> domainId.equals(ResourceUtils.getId(resource)))
                     .single()
@@ -164,11 +164,11 @@ public final class DomainsTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
 
         Mono.when(this.organizationId, this.spaceId)
-            .then(function((organizationId, spaceId) -> Mono.when(
+            .flatMap(function((organizationId, spaceId) -> Mono.when(
                 createDomainId(this.cloudFoundryClient, domainName, organizationId),
                 Mono.just(spaceId)
             )))
-            .then(function((domainId, spaceId) -> Mono.when(
+            .flatMap(function((domainId, spaceId) -> Mono.when(
                 requestListDomainSpaces(this.cloudFoundryClient, domainId)
                     .filter(resource -> spaceId.equals(ResourceUtils.getId(resource)))
                     .single()
@@ -187,9 +187,9 @@ public final class DomainsTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
-            .then(organizationId -> createDomainId(this.cloudFoundryClient, domainName, organizationId))
+            .flatMap(organizationId -> createDomainId(this.cloudFoundryClient, domainName, organizationId))
             .and(this.spaceId)
-            .then(function((domainId, spaceId) -> Mono.when(
+            .flatMap(function((domainId, spaceId) -> Mono.when(
                 Mono.just(domainId),
                 Mono.just(spaceId),
                 getApplicationId(this.cloudFoundryClient, applicationName, spaceId),
@@ -197,7 +197,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
             )))
             .as(thenKeep(function((domainId, spaceId, applicationId, routeId) -> requestAssociateRouteApplication(this.cloudFoundryClient, applicationId, routeId)
             )))
-            .then(function((domainId, spaceId, applicationId, routeId) -> Mono.when(
+            .flatMap(function((domainId, spaceId, applicationId, routeId) -> Mono.when(
                 requestListDomainSpacesByApplicationId(this.cloudFoundryClient, applicationId, domainId)
                     .filter(resource -> spaceId.equals(ResourceUtils.getId(resource)))
                     .single()
@@ -215,14 +215,14 @@ public final class DomainsTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
 
         Mono.when(this.spaceId, this.organizationId, this.userId)
-            .then(function((spaceId, organizationId, userId) -> Mono.when(
+            .flatMap(function((spaceId, organizationId, userId) -> Mono.when(
                 createDomainId(this.cloudFoundryClient, domainName, organizationId),
                 requestAssociateOrganizationUser(this.cloudFoundryClient, organizationId, userId),
                 Mono.just(spaceId),
                 Mono.just(userId)
             )))
             .as(thenKeep(function((domainId, response, spaceId, userId) -> requestAssociateSpaceDeveloper(this.cloudFoundryClient, spaceId, userId))))
-            .then(function((domainId, response, spaceId, userId) -> requestListSpaceDevelopers(this.cloudFoundryClient, domainId, userId)
+            .flatMap(function((domainId, response, spaceId, userId) -> requestListSpaceDevelopers(this.cloudFoundryClient, domainId, userId)
                 .filter(resource -> spaceId.equals(ResourceUtils.getId(resource)))
                 .single()
                 .map(ResourceUtils::getId)
@@ -238,13 +238,13 @@ public final class DomainsTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
 
         Mono.when(this.organizationId, this.spaceId)
-            .then(function((organizationId, spaceId) ->
+            .flatMap(function((organizationId, spaceId) ->
                 Mono.when(
                     Mono.just(spaceId),
                     getSpaceName(this.cloudFoundryClient, spaceId),
                     createDomainId(this.cloudFoundryClient, domainName, organizationId)
                 )))
-            .then(function((spaceId, spaceName, domainId) -> Mono.when(
+            .flatMap(function((spaceId, spaceName, domainId) -> Mono.when(
                 requestListDomainSpacesBySpaceName(this.cloudFoundryClient, domainId, spaceName)
                     .filter(resource -> spaceId.equals(ResourceUtils.getId(resource)))
                     .single()
@@ -263,12 +263,12 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
         Mono
             .when(this.organizationId, this.spaceId)
-            .then(function((organizationId, spaceId) -> Mono.when(
+            .flatMap(function((organizationId, spaceId) -> Mono.when(
                 createDomainId(this.cloudFoundryClient, domainName, organizationId),
                 Mono.just(organizationId),
                 Mono.just(spaceId)
             )))
-            .then(function((domainId, organizationId, spaceId) -> Mono.when(
+            .flatMap(function((domainId, organizationId, spaceId) -> Mono.when(
                 requestListDomainSpacesByOrganizationId(this.cloudFoundryClient, domainId, organizationId)
                     .filter(resource -> spaceId.equals(ResourceUtils.getId(resource)))
                     .single()
@@ -286,11 +286,11 @@ public final class DomainsTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
-            .then(organizationId -> Mono.when(
+            .flatMap(organizationId -> Mono.when(
                 Mono.just(organizationId),
                 createDomainId(this.cloudFoundryClient, domainName, organizationId)
             ))
-            .then(function((organizationId, domainId) -> Mono.when(
+            .flatMap(function((organizationId, domainId) -> Mono.when(
                 requestListDomains(this.cloudFoundryClient, domainName)
                     .filter(resource -> domainId.equals(ResourceUtils.getId(resource)))
                     .single()
@@ -308,11 +308,11 @@ public final class DomainsTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
-            .then(organizationId -> Mono.when(
+            .flatMap(organizationId -> Mono.when(
                 Mono.just(organizationId),
                 createDomainId(this.cloudFoundryClient, domainName, organizationId)
             ))
-            .then(function((organizationId, domainId) -> Mono.when(
+            .flatMap(function((organizationId, domainId) -> Mono.when(
                 requestListDomainsByOwningOrganization(this.cloudFoundryClient, organizationId)
                     .filter(resource -> domainId.equals(ResourceUtils.getId(resource)))
                     .single()

@@ -90,12 +90,12 @@ public final class DefaultSpaces implements Spaces {
     public Mono<Void> allowSsh(AllowSpaceSshRequest request) {
         return Mono
             .when(this.cloudFoundryClient, this.organizationId)
-            .then(function((cloudFoundryClient, organizationId) -> Mono
+            .flatMap(function((cloudFoundryClient, organizationId) -> Mono
                 .when(
                     Mono.just(cloudFoundryClient),
                     getOrganizationSpaceIdWhere(cloudFoundryClient, organizationId, request.getName(), sshEnabled(false))
                 )))
-            .then(function((cloudFoundryClient, spaceId) -> requestUpdateSpaceSsh(cloudFoundryClient, spaceId, true)))
+            .flatMap(function((cloudFoundryClient, spaceId) -> requestUpdateSpaceSsh(cloudFoundryClient, spaceId, true)))
             .then()
             .transform(OperationsLogging.log("Allow Space SSH"))
             .checkpoint();
@@ -105,20 +105,20 @@ public final class DefaultSpaces implements Spaces {
     public Mono<Void> create(CreateSpaceRequest request) {
         return Mono
             .when(this.cloudFoundryClient, this.username)
-            .then(function((cloudFoundryClient, username) -> Mono
+            .flatMap(function((cloudFoundryClient, username) -> Mono
                 .when(
                     Mono.just(cloudFoundryClient),
                     Mono.just(username),
                     getOrganizationIdOrDefault(cloudFoundryClient, request.getOrganization(), this.organizationId)
                 )))
-            .then(function((cloudFoundryClient, username, organizationId) -> Mono
+            .flatMap(function((cloudFoundryClient, username, organizationId) -> Mono
                 .when(
                     Mono.just(cloudFoundryClient),
                     Mono.just(username),
                     Mono.just(organizationId),
                     getOptionalSpaceQuotaId(cloudFoundryClient, organizationId, request.getSpaceQuota())
                 )))
-            .then(function((cloudFoundryClient, username, organizationId, spaceQuotaId) -> Mono
+            .flatMap(function((cloudFoundryClient, username, organizationId, spaceQuotaId) -> Mono
                 .when(
                     Mono.just(cloudFoundryClient),
                     Mono.just(organizationId),
@@ -126,9 +126,9 @@ public final class DefaultSpaces implements Spaces {
                         .map(ResourceUtils::getId),
                     Mono.just(username)
                 )))
-            .then(function((cloudFoundryClient, organizationId, spaceId, username) -> requestAssociateOrganizationUserByUsername(cloudFoundryClient, organizationId, username)
+            .flatMap(function((cloudFoundryClient, organizationId, spaceId, username) -> requestAssociateOrganizationUserByUsername(cloudFoundryClient, organizationId, username)
                 .then(Mono.just(Tuples.of(cloudFoundryClient, organizationId, spaceId, username)))))
-            .then(function((cloudFoundryClient, organizationId, spaceId, username) -> Mono
+            .flatMap(function((cloudFoundryClient, organizationId, spaceId, username) -> Mono
                 .when(
                     requestAssociateSpaceManagerByUsername(cloudFoundryClient, spaceId, username),
                     requestAssociateSpaceDeveloperByUsername(cloudFoundryClient, spaceId, username)
@@ -142,13 +142,13 @@ public final class DefaultSpaces implements Spaces {
     public Mono<Void> delete(DeleteSpaceRequest request) {
         return Mono
             .when(this.cloudFoundryClient, this.organizationId)
-            .then(function((cloudFoundryClient, organizationId) -> Mono
+            .flatMap(function((cloudFoundryClient, organizationId) -> Mono
                 .when(
                     Mono.just(cloudFoundryClient),
                     Mono.just(request.getCompletionTimeout()),
                     getOrganizationSpaceId(cloudFoundryClient, organizationId, request.getName())
                 )))
-            .then(function(DefaultSpaces::deleteSpace))
+            .flatMap(function(DefaultSpaces::deleteSpace))
             .transform(OperationsLogging.log("Delete Space"))
             .checkpoint();
     }
@@ -157,12 +157,12 @@ public final class DefaultSpaces implements Spaces {
     public Mono<Void> disallowSsh(DisallowSpaceSshRequest request) {
         return Mono
             .when(this.cloudFoundryClient, this.organizationId)
-            .then(function((cloudFoundryClient, organizationId) -> Mono
+            .flatMap(function((cloudFoundryClient, organizationId) -> Mono
                 .when(
                     Mono.just(cloudFoundryClient),
                     getOrganizationSpaceIdWhere(cloudFoundryClient, organizationId, request.getName(), sshEnabled(true))
                 )))
-            .then(function((cloudFoundryClient, spaceId) -> requestUpdateSpaceSsh(cloudFoundryClient, spaceId, false)))
+            .flatMap(function((cloudFoundryClient, spaceId) -> requestUpdateSpaceSsh(cloudFoundryClient, spaceId, false)))
             .then()
             .transform(OperationsLogging.log("Disallow Space SSH"))
             .checkpoint();
@@ -172,12 +172,12 @@ public final class DefaultSpaces implements Spaces {
     public Mono<SpaceDetail> get(GetSpaceRequest request) {
         return Mono
             .when(this.cloudFoundryClient, this.organizationId)
-            .then(function((cloudFoundryClient, organizationId) -> Mono
+            .flatMap(function((cloudFoundryClient, organizationId) -> Mono
                 .when(
                     Mono.just(cloudFoundryClient),
                     getOrganizationSpace(cloudFoundryClient, organizationId, request.getName())
                 )))
-            .then(function((cloudFoundryClient, resource) -> getSpaceDetail(cloudFoundryClient, resource, request)))
+            .flatMap(function((cloudFoundryClient, resource) -> getSpaceDetail(cloudFoundryClient, resource, request)))
             .transform(OperationsLogging.log("Get Space"))
             .checkpoint();
     }
@@ -196,12 +196,12 @@ public final class DefaultSpaces implements Spaces {
     public Mono<Void> rename(RenameSpaceRequest request) {
         return Mono
             .when(this.cloudFoundryClient, this.organizationId)
-            .then(function((cloudFoundryClient, organizationId) -> Mono
+            .flatMap(function((cloudFoundryClient, organizationId) -> Mono
                 .when(
                     Mono.just(cloudFoundryClient),
                     getOrganizationSpaceId(cloudFoundryClient, organizationId, request.getName())
                 )))
-            .then(function((cloudFoundryClient, spaceId) -> requestUpdateSpace(cloudFoundryClient, spaceId, request.getNewName())))
+            .flatMap(function((cloudFoundryClient, spaceId) -> requestUpdateSpace(cloudFoundryClient, spaceId, request.getNewName())))
             .then()
             .transform(OperationsLogging.log("Rename Space"))
             .checkpoint();
@@ -211,7 +211,7 @@ public final class DefaultSpaces implements Spaces {
     public Mono<Boolean> sshAllowed(SpaceSshAllowedRequest request) {
         return Mono
             .when(this.cloudFoundryClient, this.organizationId)
-            .then(function((cloudFoundryClient, organizationId) -> getOrganizationSpace(cloudFoundryClient, organizationId, request.getName())))
+            .flatMap(function((cloudFoundryClient, organizationId) -> getOrganizationSpace(cloudFoundryClient, organizationId, request.getName())))
             .map(resource -> ResourceUtils.getEntity(resource).getAllowSsh())
             .transform(OperationsLogging.log("Is Space SSH Allowed"))
             .checkpoint();
@@ -219,7 +219,7 @@ public final class DefaultSpaces implements Spaces {
 
     private static Mono<Void> deleteSpace(CloudFoundryClient cloudFoundryClient, Duration completionTimeout, String spaceId) {
         return requestDeleteSpace(cloudFoundryClient, spaceId)
-            .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, completionTimeout, job));
+            .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, completionTimeout, job));
     }
 
     private static Mono<List<String>> getApplicationNames(CloudFoundryClient cloudFoundryClient, SpaceResource spaceResource) {

@@ -43,7 +43,7 @@ public final class StacksTest extends AbstractIntegrationTest {
     @Test
     public void get() throws TimeoutException, InterruptedException {
         getStackId(this.cloudFoundryClient, this.stackName)
-            .then(stackId -> this.cloudFoundryClient.stacks()
+            .flatMap(stackId -> this.cloudFoundryClient.stacks()
                 .get(GetStackRequest.builder()
                     .stackId(stackId)
                     .build()))

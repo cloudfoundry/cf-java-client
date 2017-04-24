@@ -75,7 +75,7 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
         String buildpackName = this.nameFactory.getBuildpackName();
 
         createBuildpackId(this.cloudFoundryClient, buildpackName)
-            .then(buildpackId -> this.cloudFoundryClient.buildpacks()
+            .flatMap(buildpackId -> this.cloudFoundryClient.buildpacks()
                 .delete(DeleteBuildpackRequest.builder()
                     .async(false)
                     .buildpackId(buildpackId)
@@ -91,12 +91,12 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
         String buildpackName = this.nameFactory.getBuildpackName();
 
         createBuildpackId(this.cloudFoundryClient, buildpackName)
-            .then(buildpackId -> this.cloudFoundryClient.buildpacks()
+            .flatMap(buildpackId -> this.cloudFoundryClient.buildpacks()
                 .delete(DeleteBuildpackRequest.builder()
                     .async(true)
                     .buildpackId(buildpackId)
                     .build()))
-            .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job))
+            .flatMap(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job))
             .then(getBuildpackEntity(this.cloudFoundryClient, buildpackName))
             .as(StepVerifier::create)
             .expectComplete()
@@ -108,7 +108,7 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
         String buildpackName = this.nameFactory.getBuildpackName();
 
         createBuildpackId(this.cloudFoundryClient, buildpackName)
-            .then(buildpackId -> this.cloudFoundryClient.buildpacks()
+            .flatMap(buildpackId -> this.cloudFoundryClient.buildpacks()
                 .get(GetBuildpackRequest.builder()
                     .buildpackId(buildpackId)
                     .build()))
@@ -173,7 +173,7 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
         String buildpackName = this.nameFactory.getBuildpackName();
 
         createBuildpackId(this.cloudFoundryClient, buildpackName)
-            .then(buildpackId -> this.cloudFoundryClient.buildpacks()
+            .flatMap(buildpackId -> this.cloudFoundryClient.buildpacks()
                 .update(UpdateBuildpackRequest.builder()
                     .buildpackId(buildpackId)
                     .enabled(true)
@@ -198,7 +198,7 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
         String buildpackName = this.nameFactory.getBuildpackName();
 
         createBuildpackId(this.cloudFoundryClient, buildpackName)
-            .then(buildpackId -> this.cloudFoundryClient.buildpacks()
+            .flatMap(buildpackId -> this.cloudFoundryClient.buildpacks()
                 .upload(UploadBuildpackRequest.builder()
                     .buildpack(buildpack)
                     .buildpackId(buildpackId)
@@ -224,7 +224,7 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
         String filename = buildpack.getFileName().toString();
 
         createBuildpackId(this.cloudFoundryClient, buildpackName)
-            .then(buildpackId -> this.cloudFoundryClient.buildpacks()
+            .flatMap(buildpackId -> this.cloudFoundryClient.buildpacks()
                 .upload(UploadBuildpackRequest.builder()
                     .buildpack(buildpack)
                     .buildpackId(buildpackId)

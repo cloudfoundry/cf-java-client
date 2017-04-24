@@ -207,7 +207,7 @@ abstract class _DefaultCloudFoundryOperations implements CloudFoundryOperations 
 
         if (hasText(getSpace())) {
             return getOrganizationId()
-                .then(organizationId -> getSpace(getCloudFoundryClientPublisher(), organizationId, space))
+                .flatMap(organizationId -> getSpace(getCloudFoundryClientPublisher(), organizationId, space))
                 .map(ResourceUtils::getId)
                 .cache();
         } else {
@@ -231,7 +231,7 @@ abstract class _DefaultCloudFoundryOperations implements CloudFoundryOperations 
     @Value.Derived
     Mono<String> getUsername() {
         return getUaaClientPublisher()
-            .then(UaaClient::getUsername);
+            .flatMap(UaaClient::getUsername);
     }
 
     private static Mono<OrganizationResource> getOrganization(Mono<CloudFoundryClient> cloudFoundryClient, String organization) {

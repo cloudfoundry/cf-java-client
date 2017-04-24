@@ -126,7 +126,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 createOrganizationId(this.cloudFoundryClient, organizationName),
                 this.userId
             )
-            .then(function((organizationId, userId) -> Mono.when(
+            .flatMap(function((organizationId, userId) -> Mono.when(
                 requestAssociateAuditor(this.cloudFoundryClient, organizationId, userId)
                     .map(ResourceUtils::getId),
                 Mono.just(organizationId)
@@ -142,7 +142,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         String organizationName = this.nameFactory.getOrganizationName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .then(organizationId -> Mono.when(
+            .flatMap(organizationId -> Mono.when(
                 Mono.just(organizationId),
                 this.cloudFoundryClient.organizations()
                     .associateAuditorByUsername(AssociateOrganizationAuditorByUsernameRequest.builder()
@@ -165,7 +165,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             createOrganizationId(this.cloudFoundryClient, organizationName),
             this.userId
         )
-            .then(function((organizationId, userId) -> Mono.when(
+            .flatMap(function((organizationId, userId) -> Mono.when(
                 Mono.just(organizationId),
                 this.cloudFoundryClient.organizations()
                     .associateBillingManager(AssociateOrganizationBillingManagerRequest.builder()
@@ -185,7 +185,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         String organizationName = this.nameFactory.getOrganizationName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .then(organizationId -> Mono.when(
+            .flatMap(organizationId -> Mono.when(
                 Mono.just(organizationId),
                 this.cloudFoundryClient.organizations()
                     .associateBillingManagerByUsername(AssociateOrganizationBillingManagerByUsernameRequest.builder()
@@ -208,7 +208,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             createOrganizationId(this.cloudFoundryClient, organizationName),
             this.userId
         )
-            .then(function((organizationId, userId) -> Mono.when(
+            .flatMap(function((organizationId, userId) -> Mono.when(
                 Mono.just(organizationId),
                 this.cloudFoundryClient.organizations()
                     .associateManager(AssociateOrganizationManagerRequest.builder()
@@ -228,7 +228,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         String organizationName = this.nameFactory.getOrganizationName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .then(organizationId -> Mono.when(
+            .flatMap(organizationId -> Mono.when(
                 Mono.just(organizationId),
                 this.cloudFoundryClient.organizations()
                     .associateManagerByUsername(AssociateOrganizationManagerByUsernameRequest.builder()
@@ -249,11 +249,11 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         String organizationName = this.nameFactory.getOrganizationName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .then(organizationId -> Mono.when(
+            .flatMap(organizationId -> Mono.when(
                 createPrivateDomainId(this.cloudFoundryClient, organizationId, domainName),
                 Mono.just(organizationId)
             ))
-            .then(function((privateDomainId, organizationId) -> Mono.when(
+            .flatMap(function((privateDomainId, organizationId) -> Mono.when(
                 Mono.just(organizationId),
                 this.cloudFoundryClient.organizations()
                     .associatePrivateDomain(AssociateOrganizationPrivateDomainRequest.builder()
@@ -276,7 +276,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             createOrganizationId(this.cloudFoundryClient, organizationName),
             this.userId
         )
-            .then(function((organizationId, userId) -> Mono.when(
+            .flatMap(function((organizationId, userId) -> Mono.when(
                 Mono.just(organizationId),
                 this.cloudFoundryClient.organizations()
                     .associateUser(AssociateOrganizationUserRequest.builder()
@@ -296,7 +296,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         String organizationName = this.nameFactory.getOrganizationName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .then(organizationId -> Mono.when(
+            .flatMap(organizationId -> Mono.when(
                 Mono.just(organizationId),
                 this.cloudFoundryClient.organizations()
                     .associateUserByUsername(AssociateOrganizationUserByUsernameRequest.builder()
@@ -337,8 +337,8 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .organizationId(organizationId)
                     .async(true)
                     .build())
-                .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job))))
-            .then(organizationId -> requestGetOrganization(this.cloudFoundryClient, organizationId))
+                .flatMap(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job))))
+            .flatMap(organizationId -> requestGetOrganization(this.cloudFoundryClient, organizationId))
             .as(StepVerifier::create)
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class).hasMessageMatching("CF-OrganizationNotFound\\([0-9]+\\): The organization could not be found: .*"))
             .verify(Duration.ofMinutes(5));
@@ -354,7 +354,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .organizationId(organizationId)
                     .async(false)
                     .build())))
-            .then(organizationId -> requestGetOrganization(this.cloudFoundryClient, organizationId))
+            .flatMap(organizationId -> requestGetOrganization(this.cloudFoundryClient, organizationId))
             .as(StepVerifier::create)
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class).hasMessageMatching("CF-OrganizationNotFound\\([0-9]+\\): The organization could not be found: .*"))
             .verify(Duration.ofMinutes(5));
@@ -365,7 +365,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         String organizationName = this.nameFactory.getOrganizationName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .then(organizationId -> this.cloudFoundryClient.organizations()
+            .flatMap(organizationId -> this.cloudFoundryClient.organizations()
                 .get(GetOrganizationRequest.builder()
                     .organizationId(organizationId)
                     .build()))
@@ -382,7 +382,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         String organizationName = this.nameFactory.getOrganizationName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .then(organizationId -> this.cloudFoundryClient.organizations()
+            .flatMap(organizationId -> this.cloudFoundryClient.organizations()
                 .getInstanceUsage(GetOrganizationInstanceUsageRequest.builder()
                     .organizationId(organizationId)
                     .build()))
@@ -398,7 +398,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         String organizationName = this.nameFactory.getOrganizationName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .then(organizationId -> this.cloudFoundryClient.organizations()
+            .flatMap(organizationId -> this.cloudFoundryClient.organizations()
                 .getMemoryUsage(GetOrganizationMemoryUsageRequest.builder()
                     .organizationId(organizationId)
                     .build()))
@@ -448,7 +448,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             this.userId
         )
             .as(thenKeep(function((organizationId, userId) -> requestAssociateAuditor(this.cloudFoundryClient, organizationId, userId))))
-            .then(function((organizationId, userId) -> Mono.when(
+            .flatMap(function((organizationId, userId) -> Mono.when(
                 Mono.just(userId),
                 requestListOrganizationAuditors(this.cloudFoundryClient, organizationId)
                     .single()
@@ -474,7 +474,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 requestAssociateAuditor(this.cloudFoundryClient, organizationId1, userId),
                 requestAssociateAuditor(this.cloudFoundryClient, organizationId2, userId)
             ))))
-            .then(function((organizationId1, organizationId2, userId) -> Mono.when(
+            .flatMap(function((organizationId1, organizationId2, userId) -> Mono.when(
                 Mono.just(userId),
                 requestListOrganizationAuditors(this.cloudFoundryClient, organizationId1, builder -> builder.auditedOrganizationId(organizationId2))
                     .single()
@@ -501,13 +501,13 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 requestAssociateAuditor(this.cloudFoundryClient, organizationId1, userId),
                 requestAssociateUser(this.cloudFoundryClient, organizationId2, userId)
             ))))
-            .then(function((organizationId1, organizationId2, userId) -> Mono.when(
+            .flatMap(function((organizationId1, organizationId2, userId) -> Mono.when(
                 Mono.just(organizationId1),
                 Mono.just(userId),
                 createSpaceId(this.cloudFoundryClient, organizationId2, spaceName)
             )))
             .as(thenKeep(function((organizationId, userId, spaceId) -> requestAssociateSpaceAuditor(this.cloudFoundryClient, spaceId, userId))))
-            .then(function((organizationId, userId, spaceId) -> Mono.when(
+            .flatMap(function((organizationId, userId, spaceId) -> Mono.when(
                 Mono.just(userId),
                 requestListOrganizationAuditors(this.cloudFoundryClient, organizationId, builder -> builder.auditedSpaceId(spaceId))
                     .single()
@@ -533,7 +533,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 requestAssociateAuditor(this.cloudFoundryClient, organizationId1, userId),
                 requestAssociateBillingManager(this.cloudFoundryClient, organizationId2, userId)
             ))))
-            .then(function((organizationId1, organizationId2, userId) -> Mono.when(
+            .flatMap(function((organizationId1, organizationId2, userId) -> Mono.when(
                 Mono.just(userId),
                 requestListOrganizationAuditors(this.cloudFoundryClient, organizationId1, builder -> builder.billingManagedOrganizationId(organizationId2))
                     .single()
@@ -559,7 +559,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 requestAssociateAuditor(this.cloudFoundryClient, organizationId1, userId),
                 requestAssociateManager(this.cloudFoundryClient, organizationId2, userId)
             ))))
-            .then(function((organizationId1, organizationId2, userId) -> Mono.when(
+            .flatMap(function((organizationId1, organizationId2, userId) -> Mono.when(
                 Mono.just(userId),
                 requestListOrganizationAuditors(this.cloudFoundryClient, organizationId1, builder -> builder.managedOrganizationId(organizationId2))
                     .single()
@@ -586,13 +586,13 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 requestAssociateAuditor(this.cloudFoundryClient, organizationId1, userId),
                 requestAssociateUser(this.cloudFoundryClient, organizationId2, userId)
             ))))
-            .then(function((organizationId1, organizationId2, userId) -> Mono.when(
+            .flatMap(function((organizationId1, organizationId2, userId) -> Mono.when(
                 Mono.just(organizationId1),
                 Mono.just(userId),
                 createSpaceId(this.cloudFoundryClient, organizationId2, spaceName)
             )))
             .as(thenKeep(function((organizationId, userId, spaceId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId))))
-            .then(function((organizationId, userId, spaceId) -> Mono.when(
+            .flatMap(function((organizationId, userId, spaceId) -> Mono.when(
                 Mono.just(userId),
                 requestListOrganizationAuditors(this.cloudFoundryClient, organizationId, builder -> builder.managedSpaceId(spaceId))
                     .single()
@@ -615,12 +615,12 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             this.userId
         )
             .as(thenKeep(function((organizationId, userId) -> requestAssociateAuditor(this.cloudFoundryClient, organizationId, userId))))
-            .then(function((organizationId, userId) -> Mono.when(
+            .flatMap(function((organizationId, userId) -> Mono.when(
                 Mono.just(organizationId),
                 Mono.just(userId),
                 getUserDefaultSpaceId(this.cloudFoundryClient, userId)
             )))
-            .then(function((organizationId, userId, spaceId) -> Mono.when(
+            .flatMap(function((organizationId, userId, spaceId) -> Mono.when(
                 Mono.just(userId),
                 requestListOrganizationAuditors(this.cloudFoundryClient, organizationId, builder -> builder.spaceId(spaceId))
                     .single()
@@ -641,7 +641,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             this.userId
         )
             .as(thenKeep(function((organizationId, userId) -> requestAssociateBillingManager(this.cloudFoundryClient, organizationId, userId))))
-            .then(function((organizationId, userId) -> Mono.when(
+            .flatMap(function((organizationId, userId) -> Mono.when(
                 Mono.just(userId),
                 requestListOrganizationBillingManagers(this.cloudFoundryClient, organizationId)
                     .single()
@@ -667,7 +667,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 requestAssociateBillingManager(this.cloudFoundryClient, organizationId1, userId),
                 requestAssociateAuditor(this.cloudFoundryClient, organizationId2, userId)
             ))))
-            .then(function((organizationId1, organizationId2, userId) -> Mono.when(
+            .flatMap(function((organizationId1, organizationId2, userId) -> Mono.when(
                 Mono.just(userId),
                 requestListOrganizationBillingManagers(this.cloudFoundryClient, organizationId1, builder -> builder.auditedOrganizationId(organizationId2))
                     .single()
@@ -694,13 +694,13 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 requestAssociateBillingManager(this.cloudFoundryClient, organizationId1, userId),
                 requestAssociateUser(this.cloudFoundryClient, organizationId2, userId)
             ))))
-            .then(function((organizationId1, organizationId2, userId) -> Mono.when(
+            .flatMap(function((organizationId1, organizationId2, userId) -> Mono.when(
                 Mono.just(organizationId1),
                 Mono.just(userId),
                 createSpaceId(this.cloudFoundryClient, organizationId2, spaceName)
             )))
             .as(thenKeep(function((organizationId, userId, spaceId) -> requestAssociateSpaceAuditor(this.cloudFoundryClient, spaceId, userId))))
-            .then(function((organizationId, userId, spaceId) -> Mono.when(
+            .flatMap(function((organizationId, userId, spaceId) -> Mono.when(
                 Mono.just(userId),
                 requestListOrganizationBillingManagers(this.cloudFoundryClient, organizationId, builder -> builder.auditedSpaceId(spaceId))
                     .single()
@@ -726,7 +726,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 requestAssociateBillingManager(this.cloudFoundryClient, organizationId1, userId),
                 requestAssociateBillingManager(this.cloudFoundryClient, organizationId2, userId)
             ))))
-            .then(function((organizationId1, organizationId2, userId) -> Mono.when(
+            .flatMap(function((organizationId1, organizationId2, userId) -> Mono.when(
                 Mono.just(userId),
                 requestListOrganizationBillingManagers(this.cloudFoundryClient, organizationId1, builder -> builder.billingManagedOrganizationId(organizationId2))
                     .single()
@@ -752,7 +752,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 requestAssociateBillingManager(this.cloudFoundryClient, organizationId1, userId),
                 requestAssociateManager(this.cloudFoundryClient, organizationId2, userId)
             ))))
-            .then(function((organizationId1, organizationId2, userId) -> Mono.when(
+            .flatMap(function((organizationId1, organizationId2, userId) -> Mono.when(
                 Mono.just(userId),
                 requestListOrganizationBillingManagers(this.cloudFoundryClient, organizationId1, builder -> builder.managedOrganizationId(organizationId2))
                     .single()
@@ -779,13 +779,13 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 requestAssociateBillingManager(this.cloudFoundryClient, organizationId1, userId),
                 requestAssociateUser(this.cloudFoundryClient, organizationId2, userId)
             ))))
-            .then(function((organizationId1, organizationId2, userId) -> Mono.when(
+            .flatMap(function((organizationId1, organizationId2, userId) -> Mono.when(
                 Mono.just(organizationId1),
                 Mono.just(userId),
                 createSpaceId(this.cloudFoundryClient, organizationId2, spaceName)
             )))
             .as(thenKeep(function((organizationId, userId, spaceId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId))))
-            .then(function((organizationId, userId, spaceId) -> Mono.when(
+            .flatMap(function((organizationId, userId, spaceId) -> Mono.when(
                 Mono.just(userId),
                 requestListOrganizationBillingManagers(this.cloudFoundryClient, organizationId, builder -> builder.managedSpaceId(spaceId))
                     .single()
@@ -826,7 +826,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         String privateDomainName = this.nameFactory.getDomainName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .then(organizationId -> createPrivateDomainId(this.cloudFoundryClient, organizationId, privateDomainName)
+            .flatMap(organizationId -> createPrivateDomainId(this.cloudFoundryClient, organizationId, privateDomainName)
                 .then(Mono.just(organizationId)))
             .flatMapMany(organizationId -> getDomainNames(this.cloudFoundryClient, organizationId))
             .filter(privateDomainName::equals)
@@ -925,11 +925,11 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .then(organizationId -> Mono.when(
+            .flatMap(organizationId -> Mono.when(
                 Mono.just(organizationId),
                 createSpaceId(this.cloudFoundryClient, organizationId, spaceName)
             ))
-            .then(function((organizationId, spaceId) -> Mono.when(
+            .flatMap(function((organizationId, spaceId) -> Mono.when(
                 Mono.just(organizationId),
                 requestListOrganizations(this.cloudFoundryClient, builder -> builder.spaceId(spaceId))
                     .single()
@@ -985,7 +985,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             this.userId
         )
             .as(thenKeep(function((organizationId, userId) -> requestAssociateManager(this.cloudFoundryClient, organizationId, userId))))
-            .then(function((organizationId, userId) -> Mono.when(
+            .flatMap(function((organizationId, userId) -> Mono.when(
                 Mono.just(userId),
                 requestListOrganizationManagers(this.cloudFoundryClient, organizationId)
                     .single()
@@ -1011,7 +1011,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 requestAssociateManager(this.cloudFoundryClient, organizationId1, userId),
                 requestAssociateAuditor(this.cloudFoundryClient, organizationId2, userId)
             ))))
-            .then(function((organizationId1, organizationId2, userId) -> Mono.when(
+            .flatMap(function((organizationId1, organizationId2, userId) -> Mono.when(
                 Mono.just(userId),
                 requestListOrganizationManagers(this.cloudFoundryClient, organizationId1, builder -> builder.auditedOrganizationId(organizationId2))
                     .single()
@@ -1038,13 +1038,13 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 requestAssociateManager(this.cloudFoundryClient, organizationId1, userId),
                 requestAssociateUser(this.cloudFoundryClient, organizationId2, userId)
             ))))
-            .then(function((organizationId1, organizationId2, userId) -> Mono.when(
+            .flatMap(function((organizationId1, organizationId2, userId) -> Mono.when(
                 Mono.just(organizationId1),
                 Mono.just(userId),
                 createSpaceId(this.cloudFoundryClient, organizationId2, spaceName)
             )))
             .as(thenKeep(function((organizationId, userId, spaceId) -> requestAssociateSpaceAuditor(this.cloudFoundryClient, spaceId, userId))))
-            .then(function((organizationId, userId, spaceId) -> Mono.when(
+            .flatMap(function((organizationId, userId, spaceId) -> Mono.when(
                 Mono.just(userId),
                 requestListOrganizationManagers(this.cloudFoundryClient, organizationId, builder -> builder.auditedSpaceId(spaceId))
                     .single()
@@ -1070,7 +1070,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 requestAssociateManager(this.cloudFoundryClient, organizationId1, userId),
                 requestAssociateBillingManager(this.cloudFoundryClient, organizationId2, userId)
             ))))
-            .then(function((organizationId1, organizationId2, userId) -> Mono.when(
+            .flatMap(function((organizationId1, organizationId2, userId) -> Mono.when(
                 Mono.just(userId),
                 requestListOrganizationManagers(this.cloudFoundryClient, organizationId1, builder -> builder.billingManagedOrganizationId(organizationId2))
                     .single()
@@ -1096,7 +1096,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 requestAssociateManager(this.cloudFoundryClient, organizationId1, userId),
                 requestAssociateManager(this.cloudFoundryClient, organizationId2, userId)
             ))))
-            .then(function((organizationId1, organizationId2, userId) -> Mono.when(
+            .flatMap(function((organizationId1, organizationId2, userId) -> Mono.when(
                 Mono.just(userId),
                 requestListOrganizationManagers(this.cloudFoundryClient, organizationId1, builder -> builder.managedOrganizationId(organizationId2))
                     .single()
@@ -1123,13 +1123,13 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 requestAssociateManager(this.cloudFoundryClient, organizationId1, userId),
                 requestAssociateUser(this.cloudFoundryClient, organizationId2, userId)
             ))))
-            .then(function((organizationId1, organizationId2, userId) -> Mono.when(
+            .flatMap(function((organizationId1, organizationId2, userId) -> Mono.when(
                 Mono.just(organizationId1),
                 Mono.just(userId),
                 createSpaceId(this.cloudFoundryClient, organizationId2, spaceName)
             )))
             .as(thenKeep(function((organizationId, userId, spaceId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId))))
-            .then(function((organizationId, userId, spaceId) -> Mono.when(
+            .flatMap(function((organizationId, userId, spaceId) -> Mono.when(
                 Mono.just(userId),
                 requestListOrganizationManagers(this.cloudFoundryClient, organizationId, builder -> builder.managedSpaceId(spaceId))
                     .single()
@@ -1152,12 +1152,12 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             this.userId
         )
             .as(thenKeep(function((organizationId, userId) -> requestAssociateManager(this.cloudFoundryClient, organizationId, userId))))
-            .then(function((organizationId, userId) -> Mono.when(
+            .flatMap(function((organizationId, userId) -> Mono.when(
                 Mono.just(organizationId),
                 Mono.just(userId),
                 getUserDefaultSpaceId(this.cloudFoundryClient, userId)
             )))
-            .then(function((organizationId, userId, spaceId) -> Mono.when(
+            .flatMap(function((organizationId, userId, spaceId) -> Mono.when(
                 Mono.just(userId),
                 requestListOrganizationManagers(this.cloudFoundryClient, organizationId, builder -> builder.spaceId(spaceId))
                     .single()
@@ -1179,12 +1179,12 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             createOrganizationId(this.cloudFoundryClient, defaultOrganizationName),
             createOrganizationId(this.cloudFoundryClient, organizationName)
         )
-            .then(function((defaultOrganizationId, organizationId) -> Mono.when(
+            .flatMap(function((defaultOrganizationId, organizationId) -> Mono.when(
                 Mono.just(organizationId),
                 createPrivateDomainId(this.cloudFoundryClient, defaultOrganizationId, domainName)
             )))
             .as(thenKeep(function((organizationId, privateDomainId) -> requestAssociatePrivateDomain(this.cloudFoundryClient, organizationId, privateDomainId))))
-            .then(function((organizationId, privateDomainId) -> Mono.when(
+            .flatMap(function((organizationId, privateDomainId) -> Mono.when(
                 Mono.just(privateDomainId),
                 requestListOrganizationPrivateDomains(this.cloudFoundryClient, organizationId)
                     .single()
@@ -1202,11 +1202,11 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         String privateDomainName = this.nameFactory.getDomainName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .then(organizationId -> Mono.when(
+            .flatMap(organizationId -> Mono.when(
                 Mono.just(organizationId),
                 createPrivateDomainId(this.cloudFoundryClient, organizationId, privateDomainName)
             ))
-            .then(function((organizationId, privateDomainId) -> Mono.when(
+            .flatMap(function((organizationId, privateDomainId) -> Mono.when(
                 Mono.just(privateDomainId),
                 requestListOrganizationPrivateDomains(this.cloudFoundryClient, organizationId, builder -> builder.name(privateDomainName))
                     .single()
@@ -1228,7 +1228,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             requestListServices(this.cloudFoundryClient)
                 .count(),
             createOrganizationId(this.cloudFoundryClient, organizationName)
-                .then(organizationId -> requestListOrganizationServices(this.cloudFoundryClient, organizationId)
+                .flatMap(organizationId -> requestListOrganizationServices(this.cloudFoundryClient, organizationId)
                     .count()))
             .as(StepVerifier::create)
             .consumeNextWith(tupleEquality())
@@ -1301,11 +1301,11 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .then(organizationId -> Mono.when(
+            .flatMap(organizationId -> Mono.when(
                 Mono.just(organizationId),
                 createSpaceId(this.cloudFoundryClient, organizationId, spaceName)
             ))
-            .then(function((organizationId, spaceId) -> Mono.when(
+            .flatMap(function((organizationId, spaceId) -> Mono.when(
                 Mono.just(organizationId),
                 Mono.just(spaceId),
                 createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
@@ -1332,7 +1332,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             this.userId
         )
             .as(thenKeep(function((organizationId, userId) -> requestAssociateUser(this.cloudFoundryClient, organizationId, userId))))
-            .then(function((organizationId, userId) -> Mono.when(
+            .flatMap(function((organizationId, userId) -> Mono.when(
                 Mono.just(organizationId),
                 createSpaceId(this.cloudFoundryClient, organizationId, spaceName),
                 Mono.just(userId)
@@ -1356,7 +1356,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .then(organizationId -> Mono.when(
+            .flatMap(organizationId -> Mono.when(
                 Mono.just(organizationId),
                 createSpaceId(this.cloudFoundryClient, organizationId, spaceName)
             ))
@@ -1381,7 +1381,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             this.userId
         )
             .as(thenKeep(function((organizationId, userId) -> requestAssociateUser(this.cloudFoundryClient, organizationId, userId))))
-            .then(function((organizationId, userId) -> Mono.when(
+            .flatMap(function((organizationId, userId) -> Mono.when(
                 Mono.just(userId),
                 requestListOrganizationUsers(this.cloudFoundryClient, organizationId)
                     .single()
@@ -1407,7 +1407,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 requestAssociateUser(this.cloudFoundryClient, organizationId1, userId),
                 requestAssociateAuditor(this.cloudFoundryClient, organizationId2, userId)
             ))))
-            .then(function((organizationId1, organizationId2, userId) -> Mono.when(
+            .flatMap(function((organizationId1, organizationId2, userId) -> Mono.when(
                 Mono.just(userId),
                 requestListOrganizationUsers(this.cloudFoundryClient, organizationId1, builder -> builder.auditedOrganizationId(organizationId2))
                     .single()
@@ -1434,13 +1434,13 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 requestAssociateUser(this.cloudFoundryClient, organizationId1, userId),
                 requestAssociateUser(this.cloudFoundryClient, organizationId2, userId)
             ))))
-            .then(function((organizationId1, organizationId2, userId) -> Mono.when(
+            .flatMap(function((organizationId1, organizationId2, userId) -> Mono.when(
                 Mono.just(organizationId1),
                 Mono.just(userId),
                 createSpaceId(this.cloudFoundryClient, organizationId2, spaceName)
             )))
             .as(thenKeep(function((organizationId, userId, spaceId) -> requestAssociateSpaceAuditor(this.cloudFoundryClient, spaceId, userId))))
-            .then(function((organizationId, userId, spaceId) -> Mono.when(
+            .flatMap(function((organizationId, userId, spaceId) -> Mono.when(
                 Mono.just(userId),
                 requestListOrganizationUsers(this.cloudFoundryClient, organizationId, builder -> builder.auditedSpaceId(spaceId))
                     .single()
@@ -1466,7 +1466,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 requestAssociateUser(this.cloudFoundryClient, organizationId1, userId),
                 requestAssociateBillingManager(this.cloudFoundryClient, organizationId2, userId)
             ))))
-            .then(function((organizationId1, organizationId2, userId) -> Mono.when(
+            .flatMap(function((organizationId1, organizationId2, userId) -> Mono.when(
                 Mono.just(userId),
                 requestListOrganizationUsers(this.cloudFoundryClient, organizationId1, builder -> builder.billingManagedOrganizationId(organizationId2))
                     .single()
@@ -1492,7 +1492,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 requestAssociateUser(this.cloudFoundryClient, organizationId1, userId),
                 requestAssociateManager(this.cloudFoundryClient, organizationId2, userId)
             ))))
-            .then(function((organizationId1, organizationId2, userId) -> Mono.when(
+            .flatMap(function((organizationId1, organizationId2, userId) -> Mono.when(
                 Mono.just(userId),
                 requestListOrganizationUsers(this.cloudFoundryClient, organizationId1, builder -> builder.managedOrganizationId(organizationId2))
                     .single()
@@ -1519,13 +1519,13 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 requestAssociateUser(this.cloudFoundryClient, organizationId1, userId),
                 requestAssociateUser(this.cloudFoundryClient, organizationId2, userId)
             ))))
-            .then(function((organizationId1, organizationId2, userId) -> Mono.when(
+            .flatMap(function((organizationId1, organizationId2, userId) -> Mono.when(
                 Mono.just(organizationId1),
                 Mono.just(userId),
                 createSpaceId(this.cloudFoundryClient, organizationId2, spaceName)
             )))
             .as(thenKeep(function((organizationId, userId, spaceId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId))))
-            .then(function((organizationId, userId, spaceId) -> Mono.when(
+            .flatMap(function((organizationId, userId, spaceId) -> Mono.when(
                 Mono.just(userId),
                 requestListOrganizationUsers(this.cloudFoundryClient, organizationId, builder -> builder.managedSpaceId(spaceId))
                     .single()
@@ -1548,12 +1548,12 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             this.userId
         )
             .as(thenKeep(function((organizationId, userId) -> requestAssociateAuditor(this.cloudFoundryClient, organizationId, userId))))
-            .then(function((organizationId, userId) -> Mono.when(
+            .flatMap(function((organizationId, userId) -> Mono.when(
                 Mono.just(organizationId),
                 Mono.just(userId),
                 getUserDefaultSpaceId(this.cloudFoundryClient, userId)
             )))
-            .then(function((organizationId, userId, spaceId) -> Mono.when(
+            .flatMap(function((organizationId, userId, spaceId) -> Mono.when(
                 Mono.just(userId),
                 requestListOrganizationAuditors(this.cloudFoundryClient, organizationId, builder -> builder.spaceId(spaceId))
                     .single()
@@ -1695,7 +1695,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             createOrganizationId(this.cloudFoundryClient, defaultOrganizationName),
             createOrganizationId(this.cloudFoundryClient, organizationName)
         )
-            .then(function((defaultOrganizationId, organizationId) -> Mono.when(
+            .flatMap(function((defaultOrganizationId, organizationId) -> Mono.when(
                 Mono.just(organizationId),
                 createPrivateDomainId(this.cloudFoundryClient, defaultOrganizationId, domainName)
             )))
@@ -1756,7 +1756,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         String organizationName = this.nameFactory.getOrganizationName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .then(organizationId -> this.cloudFoundryClient.organizations()
+            .flatMap(organizationId -> this.cloudFoundryClient.organizations()
                 .summary(SummaryOrganizationRequest.builder()
                     .organizationId(organizationId)
                     .build())
@@ -1778,7 +1778,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .organizationId(organizationId)
                     .name(organizationName2)
                     .build())))
-            .then(organizationId -> requestGetOrganization(this.cloudFoundryClient, organizationId))
+            .flatMap(organizationId -> requestGetOrganization(this.cloudFoundryClient, organizationId))
             .map(ResourceUtils::getEntity)
             .map(OrganizationEntity::getName)
             .as(StepVerifier::create)

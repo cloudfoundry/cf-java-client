@@ -71,12 +71,12 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
-            .then(organizationId ->
+            .flatMap(organizationId ->
                 Mono.when(
                     createSecurityGroupId(this.cloudFoundryClient, securityGroupName),
                     createSpaceId(this.cloudFoundryClient, organizationId, spaceName)
                 ))
-            .then(function((securityGroupId, spaceId) -> this.cloudFoundryClient.securityGroups()
+            .flatMap(function((securityGroupId, spaceId) -> this.cloudFoundryClient.securityGroups()
                 .associateSpace(AssociateSecurityGroupSpaceRequest.builder()
                     .securityGroupId(securityGroupId)
                     .spaceId(spaceId)
@@ -116,11 +116,11 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
         String securityGroupName = this.nameFactory.getSecurityGroupName();
 
         createSecurityGroupId(this.cloudFoundryClient, securityGroupName)
-            .then(securityGroupId -> this.cloudFoundryClient.securityGroups()
+            .flatMap(securityGroupId -> this.cloudFoundryClient.securityGroups()
                 .delete(DeleteSecurityGroupRequest.builder()
                     .securityGroupId(securityGroupId)
                     .build())
-                .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job)))
+                .flatMap(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job)))
             .thenMany(requestListSecurityGroups(this.cloudFoundryClient, securityGroupName))
             .as(StepVerifier::create)
             .expectComplete()
@@ -133,11 +133,11 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
-            .then(organizationId -> Mono.when(
+            .flatMap(organizationId -> Mono.when(
                 createSecurityGroupId(this.cloudFoundryClient, securityGroupName),
                 createSpaceId(this.cloudFoundryClient, organizationId, spaceName)
             ))
-            .then(function((securityGroupId, spaceId) -> associateSpace(this.cloudFoundryClient, spaceId, securityGroupId)
+            .flatMap(function((securityGroupId, spaceId) -> associateSpace(this.cloudFoundryClient, spaceId, securityGroupId)
                 .then(Mono.just(Tuples.of(securityGroupId, spaceId)))))
             .flatMapMany(function((securityGroupId, spaceId) -> this.cloudFoundryClient.securityGroups()
                 .removeSpace(RemoveSecurityGroupSpaceRequest.builder()
@@ -156,7 +156,7 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
         String securityGroupName = this.nameFactory.getSecurityGroupName();
 
         createSecurityGroupId(this.cloudFoundryClient, securityGroupName)
-            .then(securityGroupId -> this.cloudFoundryClient.securityGroups()
+            .flatMap(securityGroupId -> this.cloudFoundryClient.securityGroups()
                 .get(GetSecurityGroupRequest.builder()
                     .securityGroupId(securityGroupId)
                     .build())
@@ -193,9 +193,9 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
         String securityGroupName2 = this.nameFactory.getSecurityGroupName();
 
         createSecurityGroupId(this.cloudFoundryClient, securityGroupName1)
-            .then(securityGroupId -> requestSetRunningDefault(this.cloudFoundryClient, securityGroupId))
+            .flatMap(securityGroupId -> requestSetRunningDefault(this.cloudFoundryClient, securityGroupId))
             .then(createSecurityGroupId(this.cloudFoundryClient, securityGroupName2)
-                .then(securityGroupId -> requestSetRunningDefault(this.cloudFoundryClient, securityGroupId)))
+                .flatMap(securityGroupId -> requestSetRunningDefault(this.cloudFoundryClient, securityGroupId)))
             .thenMany(requestListRunningDefaults(this.cloudFoundryClient))
             .filter(response -> securityGroupName1.equals(response.getEntity().getName()) || securityGroupName2.equals(response.getEntity().getName()))
             .as(StepVerifier::create)
@@ -210,12 +210,12 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
-            .then(organizationId ->
+            .flatMap(organizationId ->
                 Mono.when(
                     createSecurityGroupId(this.cloudFoundryClient, securityGroupName),
                     createSpaceId(this.cloudFoundryClient, organizationId, spaceName)
                 ))
-            .then(function((securityGroupId, spaceId) -> associateSpace(this.cloudFoundryClient, spaceId, securityGroupId)
+            .flatMap(function((securityGroupId, spaceId) -> associateSpace(this.cloudFoundryClient, spaceId, securityGroupId)
                 .then(Mono.just(Tuples.of(securityGroupId, spaceId)))))
             .flatMapMany(function((securityGroupId, spaceId) -> PaginationUtils.
                 requestClientV2Resources(page -> this.cloudFoundryClient.securityGroups()
@@ -239,9 +239,9 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
         String securityGroupName2 = this.nameFactory.getSecurityGroupName();
 
         createSecurityGroupId(this.cloudFoundryClient, securityGroupName1)
-            .then(securityGroupId -> requestSetStagingDefault(this.cloudFoundryClient, securityGroupId))
+            .flatMap(securityGroupId -> requestSetStagingDefault(this.cloudFoundryClient, securityGroupId))
             .then(createSecurityGroupId(this.cloudFoundryClient, securityGroupName2)
-                .then(securityGroupId -> requestSetStagingDefault(this.cloudFoundryClient, securityGroupId)))
+                .flatMap(securityGroupId -> requestSetStagingDefault(this.cloudFoundryClient, securityGroupId)))
             .thenMany(requestListStagingDefaults(this.cloudFoundryClient))
             .filter(response -> securityGroupName1.equals(response.getEntity().getName()) || securityGroupName2.equals(response.getEntity().getName()))
             .as(StepVerifier::create)
@@ -255,7 +255,7 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
         String securityGroupName = this.nameFactory.getSecurityGroupName();
 
         createSecurityGroupId(this.cloudFoundryClient, securityGroupName)
-            .then(securityGroupId -> this.cloudFoundryClient.securityGroups()
+            .flatMap(securityGroupId -> this.cloudFoundryClient.securityGroups()
                 .setRunningDefault(SetSecurityGroupRunningDefaultRequest.builder()
                     .securityGroupId(securityGroupId)
                     .build()))
@@ -272,7 +272,7 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
         String securityGroupName = this.nameFactory.getSecurityGroupName();
 
         createSecurityGroupId(this.cloudFoundryClient, securityGroupName)
-            .then(securityGroupId -> this.cloudFoundryClient.securityGroups()
+            .flatMap(securityGroupId -> this.cloudFoundryClient.securityGroups()
                 .setStagingDefault(SetSecurityGroupStagingDefaultRequest.builder()
                     .securityGroupId(securityGroupId)
                     .build()))
@@ -289,7 +289,7 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
         String securityGroupName = this.nameFactory.getSecurityGroupName();
 
         createSecurityGroupId(this.cloudFoundryClient, securityGroupName)
-            .then(securityGroupId -> requestSetRunningDefault(this.cloudFoundryClient, securityGroupId)
+            .flatMap(securityGroupId -> requestSetRunningDefault(this.cloudFoundryClient, securityGroupId)
                 .then(this.cloudFoundryClient.securityGroups()
                     .removeRunningDefault(RemoveSecurityGroupRunningDefaultRequest.builder()
                         .securityGroupId(securityGroupId)
@@ -306,7 +306,7 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
         String securityGroupName = this.nameFactory.getSecurityGroupName();
 
         createSecurityGroupId(this.cloudFoundryClient, securityGroupName)
-            .then(securityGroupId -> requestSetStagingDefault(this.cloudFoundryClient, securityGroupId)
+            .flatMap(securityGroupId -> requestSetStagingDefault(this.cloudFoundryClient, securityGroupId)
                 .then(this.cloudFoundryClient.securityGroups()
                     .removeStagingDefault(RemoveSecurityGroupStagingDefaultRequest.builder()
                         .securityGroupId(securityGroupId)
@@ -324,7 +324,7 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
         String newSecurityGroupName = this.nameFactory.getSecurityGroupName();
 
         createSecurityGroupId(this.cloudFoundryClient, oldSecurityGroupName)
-            .then(securityGroupId -> this.cloudFoundryClient.securityGroups()
+            .flatMap(securityGroupId -> this.cloudFoundryClient.securityGroups()
                 .update(UpdateSecurityGroupRequest.builder()
                     .securityGroupId(securityGroupId)
                     .name(newSecurityGroupName)

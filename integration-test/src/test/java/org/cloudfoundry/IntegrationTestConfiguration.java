@@ -272,7 +272,7 @@ public class IntegrationTestConfiguration {
     @DependsOn("cloudFoundryCleaner")
     Mono<String> organizationId(CloudFoundryClient cloudFoundryClient, String organizationName, String organizationQuotaName, Mono<String> userId) throws InterruptedException {
         return userId
-            .then(userId1 -> cloudFoundryClient.organizationQuotaDefinitions()
+            .flatMap(userId1 -> cloudFoundryClient.organizationQuotaDefinitions()
                 .create(CreateOrganizationQuotaDefinitionRequest.builder()
                     .applicationInstanceLimit(-1)
                     .applicationTaskLimit(-1)
@@ -288,14 +288,14 @@ public class IntegrationTestConfiguration {
                     .build())
                 .map(ResourceUtils::getId)
                 .and(Mono.just(userId1)))
-            .then(function((quotaId, userId1) -> cloudFoundryClient.organizations()
+            .flatMap(function((quotaId, userId1) -> cloudFoundryClient.organizations()
                 .create(CreateOrganizationRequest.builder()
                     .name(organizationName)
                     .quotaDefinitionId(quotaId)
                     .build())
                 .map(ResourceUtils::getId)
                 .and(Mono.just(userId1))))
-            .then(function((organizationId, userId1) -> cloudFoundryClient.organizations()
+            .flatMap(function((organizationId, userId1) -> cloudFoundryClient.organizations()
                 .associateManager(AssociateOrganizationManagerRequest.builder()
                     .organizationId(organizationId)
                     .managerId(userId1)
@@ -344,7 +344,7 @@ public class IntegrationTestConfiguration {
     @DependsOn("cloudFoundryCleaner")
     Mono<String> serviceBrokerId(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory, String planName, String serviceBrokerName, String serviceName, Mono<String> spaceId) {
         return spaceId
-            .then(spaceId1 -> ServiceBrokerUtils.createServiceBroker(cloudFoundryClient, nameFactory, planName, serviceBrokerName, serviceName, spaceId1, false)
+            .flatMap(spaceId1 -> ServiceBrokerUtils.createServiceBroker(cloudFoundryClient, nameFactory, planName, serviceBrokerName, serviceName, spaceId1, false)
                 .map(response -> response.serviceBrokerId))
             .doOnSubscribe(s -> this.logger.debug(">> SERVICE BROKER ({} {}/{}) <<", serviceBrokerName, serviceName, planName))
             .doOnError(Throwable::printStackTrace)
@@ -366,7 +366,7 @@ public class IntegrationTestConfiguration {
     @DependsOn("cloudFoundryCleaner")
     Mono<String> spaceId(CloudFoundryClient cloudFoundryClient, Mono<String> organizationId, String spaceName) throws InterruptedException {
         return organizationId
-            .then(orgId -> cloudFoundryClient.spaces()
+            .flatMap(orgId -> cloudFoundryClient.spaces()
                 .create(CreateSpaceRequest.builder()
                     .name(spaceName)
                     .organizationId(orgId)
@@ -441,7 +441,7 @@ public class IntegrationTestConfiguration {
                 .userName(username)
                 .build())
             .map(CreateUserResponse::getId)
-            .then(userId -> Flux.fromIterable(GROUPS)
+            .flatMap(userId -> Flux.fromIterable(GROUPS)
                 .flatMap(group -> uaaClient.groups()
                     .list(ListGroupsRequest.builder()
                         .filter(String.format("displayName eq \"%s\"", group))
@@ -454,7 +454,7 @@ public class IntegrationTestConfiguration {
                             .displayName(group)
                             .build())
                         .map(CreateGroupResponse::getId))
-                    .then(groupId -> uaaClient.groups()
+                    .flatMap(groupId -> uaaClient.groups()
                         .addMember(AddMemberRequest.builder()
                             .groupId(groupId)
                             .memberId(userId)

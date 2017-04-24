@@ -71,7 +71,7 @@ public final class DefaultServiceAdmin implements ServiceAdmin {
     public Mono<Void> create(CreateServiceBrokerRequest request) {
         return Mono
             .when(this.cloudFoundryClient, this.spaceId)
-            .then(function((cloudFoundryClient, spaceId) -> requestCreateServiceBroker(cloudFoundryClient, request.getName(), request.getUrl(), request.getUsername(), request.getPassword(),
+            .flatMap(function((cloudFoundryClient, spaceId) -> requestCreateServiceBroker(cloudFoundryClient, request.getName(), request.getUrl(), request.getUsername(), request.getPassword(),
                 request.getSpaceScoped(), spaceId)))
             .then()
             .transform(OperationsLogging.log("Create Service Broker"))
@@ -81,11 +81,11 @@ public final class DefaultServiceAdmin implements ServiceAdmin {
     @Override
     public Mono<Void> delete(DeleteServiceBrokerRequest request) {
         return this.cloudFoundryClient
-            .then(cloudFoundryClient -> Mono.when(
+            .flatMap(cloudFoundryClient -> Mono.when(
                 Mono.just(cloudFoundryClient),
                 getServiceBrokerId(cloudFoundryClient, request.getName())
             ))
-            .then(function(DefaultServiceAdmin::requestDeleteServiceBroker))
+            .flatMap(function(DefaultServiceAdmin::requestDeleteServiceBroker))
             .transform(OperationsLogging.log("Delete Service Broker"))
             .checkpoint();
     }
@@ -93,16 +93,16 @@ public final class DefaultServiceAdmin implements ServiceAdmin {
     @Override
     public Mono<Void> disableServiceAccess(DisableServiceAccessRequest request) {
         return this.cloudFoundryClient
-            .then(cloudFoundryClient -> Mono
+            .flatMap(cloudFoundryClient -> Mono
                 .when(
                     Mono.just(cloudFoundryClient),
                     getServiceId(cloudFoundryClient, request.getServiceName())))
-            .then(function((cloudFoundryClient, serviceId) -> Mono
+            .flatMap(function((cloudFoundryClient, serviceId) -> Mono
                 .when(
                     Mono.just(cloudFoundryClient),
                     getServicePlans(cloudFoundryClient, serviceId)
                 )))
-            .then(function((cloudFoundryClient, servicePlans) -> Mono
+            .flatMap(function((cloudFoundryClient, servicePlans) -> Mono
                 .when(
                     updateServicePlanVisibilities(cloudFoundryClient, request, servicePlans),
                     updateServicePlansPublicStatus(cloudFoundryClient, request, servicePlans)
@@ -115,16 +115,16 @@ public final class DefaultServiceAdmin implements ServiceAdmin {
     @Override
     public Mono<Void> enableServiceAccess(EnableServiceAccessRequest request) {
         return this.cloudFoundryClient
-            .then(cloudFoundryClient -> Mono
+            .flatMap(cloudFoundryClient -> Mono
                 .when(
                     Mono.just(cloudFoundryClient),
                     getServiceId(cloudFoundryClient, request.getServiceName())))
-            .then(function((cloudFoundryClient, serviceId) -> Mono
+            .flatMap(function((cloudFoundryClient, serviceId) -> Mono
                 .when(
                     Mono.just(cloudFoundryClient),
                     getServicePlans(cloudFoundryClient, serviceId)
                 )))
-            .then(function((cloudFoundryClient, servicePlans) -> Mono
+            .flatMap(function((cloudFoundryClient, servicePlans) -> Mono
                 .when(
                     updateServicePlanVisibilities(cloudFoundryClient, request, servicePlans),
                     updateServicePlansPublicStatus(cloudFoundryClient, request, servicePlans)
@@ -146,7 +146,7 @@ public final class DefaultServiceAdmin implements ServiceAdmin {
     @Override
     public Flux<ServiceAccess> listServiceAccessSettings(ListServiceAccessSettingsRequest request) {
         return this.cloudFoundryClient
-            .then(cloudFoundryClient -> Mono
+            .flatMap(cloudFoundryClient -> Mono
                 .when(
                     Mono.just(cloudFoundryClient),
                     listServiceBrokers(cloudFoundryClient),
@@ -451,7 +451,7 @@ public final class DefaultServiceAdmin implements ServiceAdmin {
         } else {
             return listServicePlanVisibilityIds(cloudFoundryClient, servicePlanIds)
                 .flatMap(visibilityId -> requestDeleteServicePlanVisibility(cloudFoundryClient, visibilityId)
-                    .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, request.getCompletionTimeout(), job)))
+                    .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, request.getCompletionTimeout(), job)))
                 .then();
         }
     }
@@ -464,14 +464,14 @@ public final class DefaultServiceAdmin implements ServiceAdmin {
 
         if (request.getOrganizationName() != null && !request.getOrganizationName().isEmpty()) {
             return getOrganizationId(cloudFoundryClient, request.getOrganizationName())
-                .then(organizationId -> listServicePlanVisibilityIds(cloudFoundryClient, organizationId, servicePlanIds)
+                .flatMap(organizationId -> listServicePlanVisibilityIds(cloudFoundryClient, organizationId, servicePlanIds)
                     .flatMap(visibilityId -> requestDeleteServicePlanVisibility(cloudFoundryClient, visibilityId)
-                        .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, request.getCompletionTimeout(), job)))
+                        .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, request.getCompletionTimeout(), job)))
                     .then());
         } else {
             return listServicePlanVisibilityIds(cloudFoundryClient, servicePlanIds)
                 .flatMap(visibilityId -> requestDeleteServicePlanVisibility(cloudFoundryClient, visibilityId)
-                    .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, request.getCompletionTimeout(), job)))
+                    .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, request.getCompletionTimeout(), job)))
                 .then();
         }
     }

@@ -69,8 +69,8 @@ public final class ServiceAdminTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         ServiceBrokerUtils.ServiceBrokerMetadata serviceBrokerMetadata = this.organizationId
-            .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .then(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, false))
+            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .flatMap(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, false))
             .block(Duration.ofMinutes(5));
 
         resetToEnabled(this.cloudFoundryOperations, serviceName)
@@ -103,8 +103,8 @@ public final class ServiceAdminTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         ServiceBrokerUtils.ServiceBrokerMetadata serviceBrokerMetadata = this.organizationId
-            .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .then(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, false))
+            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .flatMap(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, false))
             .block(Duration.ofMinutes(5));
 
         resetToEnabled(this.cloudFoundryOperations, serviceName)
@@ -139,8 +139,8 @@ public final class ServiceAdminTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         ServiceBrokerUtils.ServiceBrokerMetadata serviceBrokerMetadata = this.organizationId
-            .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .then(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, false))
+            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .flatMap(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, false))
             .block(Duration.ofMinutes(5));
 
         resetToEnabled(this.cloudFoundryOperations, serviceName)
@@ -174,8 +174,8 @@ public final class ServiceAdminTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         ServiceBrokerUtils.ServiceBrokerMetadata serviceBrokerMetadata = this.organizationId
-            .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .then(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, false))
+            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .flatMap(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, false))
             .block(Duration.ofMinutes(5));
 
         resetToEnabled(this.cloudFoundryOperations, serviceName)
@@ -209,8 +209,8 @@ public final class ServiceAdminTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         ServiceBrokerUtils.ServiceBrokerMetadata serviceBrokerMetadata = this.organizationId
-            .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .then(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, false))
+            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .flatMap(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, false))
             .block(Duration.ofMinutes(5));
 
         resetToDisabled(this.cloudFoundryOperations, serviceName)
@@ -243,8 +243,8 @@ public final class ServiceAdminTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         ServiceBrokerUtils.ServiceBrokerMetadata serviceBrokerMetadata = this.organizationId
-            .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .then(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, false))
+            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .flatMap(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, false))
             .block(Duration.ofMinutes(5));
 
         resetToDisabled(this.cloudFoundryOperations, serviceName)
@@ -279,8 +279,8 @@ public final class ServiceAdminTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         ServiceBrokerUtils.ServiceBrokerMetadata serviceBrokerMetadata = this.organizationId
-            .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .then(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, false))
+            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .flatMap(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, false))
             .block(Duration.ofMinutes(5));
 
         resetToDisabled(this.cloudFoundryOperations, serviceName)
@@ -314,8 +314,8 @@ public final class ServiceAdminTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         ServiceBrokerUtils.ServiceBrokerMetadata serviceBrokerMetadata = this.organizationId
-            .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .then(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, false))
+            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .flatMap(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, false))
             .block(Duration.ofMinutes(5));
 
         resetToDisabled(this.cloudFoundryOperations, serviceName)
