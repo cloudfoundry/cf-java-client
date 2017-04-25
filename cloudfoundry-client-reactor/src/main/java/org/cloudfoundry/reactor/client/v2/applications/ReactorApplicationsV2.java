@@ -226,7 +226,6 @@ public final class ReactorApplicationsV2 extends AbstractClientV2Operations impl
 
     private Mono<Void> upload(Path application, HttpClientRequest r, UploadApplicationRequest request) {
         return r
-            .chunkedTransfer(false)
             .sendForm(form -> {
                 try (InputStream resources = new ByteArrayInputStream(this.connectionContext.getObjectMapper().writeValueAsBytes(request.getResources()))) {
                     form

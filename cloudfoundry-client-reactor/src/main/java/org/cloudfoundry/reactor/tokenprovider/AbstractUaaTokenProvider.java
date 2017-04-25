@@ -126,6 +126,10 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
             .header(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED);
     }
 
+    private static HttpClientRequest disableChunkedTransfer(HttpClientRequest request) {
+        return request.chunkedTransfer(false);
+    }
+
     private static HttpClientRequest disableFailOnError(HttpClientRequest request) {
         return request
             .failOnClientError(false)
@@ -230,6 +234,7 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
             .map(AbstractUaaTokenProvider::getTokenUri)
             .then(uri -> connectionContext.getHttpClient()
                 .post(uri, request -> Mono.just(request)
+                    .map(AbstractUaaTokenProvider::disableChunkedTransfer)
                     .map(AbstractUaaTokenProvider::disableFailOnError)
                     .map(this::addAuthorization)
                     .map(UserAgent::addUserAgent)
