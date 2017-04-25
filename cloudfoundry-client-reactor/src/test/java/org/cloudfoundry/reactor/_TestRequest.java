@@ -18,6 +18,7 @@ package org.cloudfoundry.reactor;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpMethod;
 import okhttp3.Headers;
 import okhttp3.mockwebserver.RecordedRequest;
@@ -57,6 +58,12 @@ abstract class _TestRequest {
     public void assertEquals(RecordedRequest request) {
         assertThat(getMethod()).hasToString(request.getMethod());
         assertThat(getPath()).isEqualTo(extractPath(request));
+
+        assertThat(request.getHeader(HttpHeaderNames.TRANSFER_ENCODING.toString())).isNull();
+
+        if (!HttpMethod.GET.toString().equals(request.getMethod())) {
+            assertThat(request.getHeader(HttpHeaderNames.CONTENT_LENGTH.toString())).isNotNull();
+        }
 
         getHeaders().forEach((key, value) -> {
             if (value == null) {

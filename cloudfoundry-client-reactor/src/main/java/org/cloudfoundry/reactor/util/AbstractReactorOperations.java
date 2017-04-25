@@ -111,6 +111,7 @@ public abstract class AbstractReactorOperations {
             .transform(transformUri(uriTransformer))
             .then(uri -> this.connectionContext.getHttpClient()
                 .patch(uri, request -> Mono.just(request)
+                    .map(AbstractReactorOperations::disableChunkedTransfer)
                     .map(AbstractReactorOperations::disableFailOnError)
                     .transform(this::addAuthorization)
                     .map(UserAgent::addUserAgent)
@@ -144,6 +145,7 @@ public abstract class AbstractReactorOperations {
             .transform(transformUri(uriTransformer))
             .then(uri -> this.connectionContext.getHttpClient()
                 .post(uri, request -> Mono.just(request)
+                    .map(AbstractReactorOperations::disableChunkedTransfer)
                     .map(AbstractReactorOperations::disableFailOnError)
                     .transform(this::addAuthorization)
                     .map(UserAgent::addUserAgent)
@@ -176,6 +178,7 @@ public abstract class AbstractReactorOperations {
             .transform(transformUri(uriTransformer))
             .then(uri -> this.connectionContext.getHttpClient()
                 .put(uri, request -> Mono.just(request)
+                    .map(AbstractReactorOperations::disableChunkedTransfer)
                     .map(AbstractReactorOperations::disableFailOnError)
                     .transform(this::addAuthorization)
                     .map(UserAgent::addUserAgent)
@@ -205,6 +208,10 @@ public abstract class AbstractReactorOperations {
             .transform(this::invalidateToken)
             .transform(responseTransformer)
             .transform(ErrorPayloadMapper.fallback());
+    }
+
+    private static HttpClientRequest disableChunkedTransfer(HttpClientRequest request) {
+        return request.chunkedTransfer(false);
     }
 
     private static HttpClientRequest disableFailOnError(HttpClientRequest request) {

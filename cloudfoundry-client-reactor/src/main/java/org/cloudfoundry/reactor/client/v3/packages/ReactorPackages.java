@@ -128,7 +128,6 @@ public final class ReactorPackages extends AbstractClientV3Operations implements
 
     private Mono<Void> upload(Path bits, HttpClientRequest r) {
         return r
-            .chunkedTransfer(false)
             .sendForm(form -> form
                 .multipart(true)
                 .file("bits", "application.zip", bits.toFile(), APPLICATION_ZIP))

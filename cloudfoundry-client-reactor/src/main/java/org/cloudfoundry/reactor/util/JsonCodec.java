@@ -54,10 +54,14 @@ public final class JsonCodec {
         }
 
         return outbound -> outbound
-            .map(request -> request.header(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON))
             .flatMapMany(request -> {
                 try {
-                    return request.sendByteArray(Mono.just(objectMapper.writeValueAsBytes(requestPayload)));
+                    byte[] bytes = objectMapper.writeValueAsBytes(requestPayload);
+
+                    return request
+                        .header(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON)
+                        .header(HttpHeaderNames.CONTENT_LENGTH, String.valueOf(bytes.length))
+                        .sendByteArray(Mono.just(bytes));
                 } catch (JsonProcessingException e) {
                     throw Exceptions.propagate(e);
                 }
