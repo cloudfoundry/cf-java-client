@@ -709,7 +709,7 @@ public final class DefaultApplications implements Applications {
             .singleOrEmpty()
             .then(application -> {
                 Map<String, Object> environmentJsons = new HashMap<>(ResourceUtils.getEntity(application).getEnvironmentJsons());
-                environmentJsons.putAll(manifest.getEnvironmentVariables());
+                Optional.ofNullable(manifest.getEnvironmentVariables()).ifPresent(environmentJsons::putAll);
 
                 return requestUpdateApplication(cloudFoundryClient, ResourceUtils.getId(application), environmentJsons, manifest, stackId)
                     .map(ResourceUtils::getId);

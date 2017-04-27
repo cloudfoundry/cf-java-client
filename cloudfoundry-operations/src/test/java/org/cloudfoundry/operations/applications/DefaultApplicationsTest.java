@@ -1170,6 +1170,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestApplications(this.cloudFoundryClient, "test-name", TEST_SPACE_ID, "test-application-id");
         requestUpdateApplication(this.cloudFoundryClient, "test-application-id", ApplicationManifest.builder()
             .path(testApplication)
+            .environmentVariable("test-var", "test-value")
             .domain("test-shared-domain")
             .name("test-name")
             .build(), null);
