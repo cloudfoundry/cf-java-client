@@ -118,7 +118,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
@@ -708,9 +707,13 @@ public final class DefaultApplications implements Applications {
     private static Mono<String> getApplicationId(CloudFoundryClient cloudFoundryClient, ApplicationManifest manifest, String spaceId, String stackId) {
         return requestApplications(cloudFoundryClient, manifest.getName(), spaceId)
             .singleOrEmpty()
-            .map(ResourceUtils::getId)
-            .then(applicationId -> requestUpdateApplication(cloudFoundryClient, applicationId, manifest, stackId)
-                .map(ResourceUtils::getId))
+            .then(application -> {
+                Map<String, Object> environmentJsons = new HashMap<>(ResourceUtils.getEntity(application).getEnvironmentJsons());
+                environmentJsons.putAll(manifest.getEnvironmentVariables());
+
+                return requestUpdateApplication(cloudFoundryClient, ResourceUtils.getId(application), environmentJsons, manifest, stackId)
+                    .map(ResourceUtils::getId);
+            })
             .switchIfEmpty(requestCreateApplication(cloudFoundryClient, manifest, spaceId, stackId)
                 .map(ResourceUtils::getId));
     }
@@ -1143,6 +1146,7 @@ public final class DefaultApplications implements Applications {
             .buildpack(manifest.getBuildpack())
             .command(manifest.getCommand())
             .diskQuota(manifest.getDisk())
+            .environmentJsons(manifest.getEnvironmentVariables())
             .healthCheckTimeout(manifest.getTimeout())
             .healthCheckType(Optional.ofNullable(manifest.getHealthCheckType()).map(ApplicationHealthCheck::getValue).orElse(null))
             .instances(manifest.getInstances())
@@ -1385,27 +1389,29 @@ public final class DefaultApplications implements Applications {
                 .build());
     }
 
-    private static Mono<AbstractApplicationResource> requestUpdateApplication(CloudFoundryClient cloudFoundryClient, String applicationId, ApplicationManifest manifest, String stackId) {
-        return requestUpdateApplication(cloudFoundryClient, applicationId,
-            builder -> {
-                builder
-                    .buildpack(manifest.getBuildpack())
-                    .command(manifest.getCommand())
-                    .diskQuota(manifest.getDisk())
-                    .healthCheckTimeout(manifest.getTimeout())
-                    .healthCheckType(Optional.ofNullable(manifest.getHealthCheckType()).map(ApplicationHealthCheck::getValue).orElse(null))
-                    .instances(manifest.getInstances())
-                    .memory(manifest.getMemory())
-                    .name(manifest.getName())
-                    .stackId(stackId);
+    private static Mono<AbstractApplicationResource> requestUpdateApplication(CloudFoundryClient cloudFoundryClient, String applicationId, Map<String, Object> environmentJsons,
+                                                                              ApplicationManifest manifest, String stackId) {
 
-                Optional.ofNullable(manifest.getDockerImage())
-                    .ifPresent(dockerImage -> builder
-                        .diego(true)
-                        .dockerImage(dockerImage));
+        return requestUpdateApplication(cloudFoundryClient, applicationId, builder -> {
+            builder
+                .buildpack(manifest.getBuildpack())
+                .command(manifest.getCommand())
+                .diskQuota(manifest.getDisk())
+                .environmentJsons(environmentJsons)
+                .healthCheckTimeout(manifest.getTimeout())
+                .healthCheckType(Optional.ofNullable(manifest.getHealthCheckType()).map(ApplicationHealthCheck::getValue).orElse(null))
+                .instances(manifest.getInstances())
+                .memory(manifest.getMemory())
+                .name(manifest.getName())
+                .stackId(stackId);
 
-                return builder;
-            });
+            Optional.ofNullable(manifest.getDockerImage())
+                .ifPresent(dockerImage -> builder
+                    .diego(true)
+                    .dockerImage(dockerImage));
+
+            return builder;
+        });
     }
 
     private static Mono<AbstractApplicationResource> requestUpdateApplication(CloudFoundryClient cloudFoundryClient, String applicationId, UnaryOperator<UpdateApplicationRequest.Builder> modifier) {
