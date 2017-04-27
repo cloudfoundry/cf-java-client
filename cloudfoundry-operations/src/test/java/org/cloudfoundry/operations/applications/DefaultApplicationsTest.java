@@ -1141,7 +1141,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
-        requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
+        requestCreateApplication(this.cloudFoundryClient, ApplicationManifest.builder()
             .path(testApplication)
             .domain("test-shared-domain")
             .name("test-name")
@@ -1168,7 +1168,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestApplications(this.cloudFoundryClient, "test-name", TEST_SPACE_ID, "test-application-id");
-        requestUpdateApplication(this.cloudFoundryClient, "test-application-id", PushApplicationRequest.builder()
+        requestUpdateApplication(this.cloudFoundryClient, "test-application-id", ApplicationManifest.builder()
             .path(testApplication)
             .domain("test-shared-domain")
             .name("test-name")
@@ -1200,11 +1200,52 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
+    public void pushExistingApplicationWithEnvironmentVariables() throws IOException {
+        Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
+
+        requestApplications(this.cloudFoundryClient, "test-name", TEST_SPACE_ID, "test-application-id", Collections.singletonMap("test-key-1", "test-value-1"));
+        requestUpdateApplication(this.cloudFoundryClient, "test-application-id", ApplicationManifest.builder()
+            .path(testApplication)
+            .domain("test-shared-domain")
+            .environmentVariable("test-key-1", "test-value-1")
+            .environmentVariable("test-key-2", "test-value-2")
+            .name("test-name")
+            .build(), null);
+        requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
+        requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
+        requestSharedDomains(this.cloudFoundryClient, "test-shared-domain", "test-shared-domain-id");
+        requestRoutesEmpty(this.cloudFoundryClient, "test-shared-domain-id", "test-name", null);
+        requestListMatchingResources(this.cloudFoundryClient, Arrays.asList(new ResourceMatchingUtils.ArtifactMetadata("da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "100644", 0),
+            new ResourceMatchingUtils.ArtifactMetadata("45044a6ddbfe11415a8f8a6219de68a2c66b496b", "index.html", "100644", 178)));
+        requestCreateRoute(this.cloudFoundryClient, "test-shared-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
+        requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
+        requestUpload(this.cloudFoundryClient, "test-application-id", testApplication, "test-job-id");
+        requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+        requestGetApplication(this.cloudFoundryClient, "test-application-id");
+        requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
+
+        this.applications
+            .pushManifest(PushApplicationManifestRequest.builder()
+                .manifest(ApplicationManifest.builder()
+                    .path(testApplication)
+                    .domain("test-shared-domain")
+                    .environmentVariable("test-key-2", "test-value-2")
+                    .name("test-name")
+                    .build())
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
     public void pushExistingRouteWithHost() throws IOException {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
-        requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
+        requestCreateApplication(this.cloudFoundryClient, ApplicationManifest.builder()
             .path(testApplication)
             .domain("test-shared-domain")
             .host("test-host")
@@ -1241,7 +1282,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
-        requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
+        requestCreateApplication(this.cloudFoundryClient, ApplicationManifest.builder()
             .path(testApplication)
             .domain("test-shared-domain")
             .noHostname(true)
@@ -1301,7 +1342,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
         requestSharedDomains(this.cloudFoundryClient, "test-shared-domain", "test-shared-domain-id");
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
-        requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
+        requestCreateApplication(this.cloudFoundryClient, ApplicationManifest.builder()
             .path(testApplication)
             .domain("test-shared-domain")
             .name("test-name")
@@ -1343,7 +1384,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
-        requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
+        requestCreateApplication(this.cloudFoundryClient, ApplicationManifest.builder()
             .path(testApplication)
             .domain("test-shared-domain")
             .name("test-name")
@@ -1375,11 +1416,51 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
+    public void pushNewApplicationWithEnvironmentVariables() throws IOException {
+        Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
+
+        requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
+        requestCreateApplication(this.cloudFoundryClient, ApplicationManifest.builder()
+            .path(testApplication)
+            .environmentVariable("test-key", "test-value")
+            .domain("test-shared-domain")
+            .name("test-name")
+            .build(), TEST_SPACE_ID, null, "test-application-id");
+        requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
+        requestListMatchingResources(this.cloudFoundryClient, Arrays.asList(new ResourceMatchingUtils.ArtifactMetadata("da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "100644", 0),
+            new ResourceMatchingUtils.ArtifactMetadata("45044a6ddbfe11415a8f8a6219de68a2c66b496b", "index.html", "100644", 178)));
+        requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
+        requestSharedDomains(this.cloudFoundryClient, "test-shared-domain", "test-shared-domain-id");
+        requestRoutesEmpty(this.cloudFoundryClient, "test-shared-domain-id", "test-name", null);
+        requestCreateRoute(this.cloudFoundryClient, "test-shared-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
+        requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
+        requestUpload(this.cloudFoundryClient, "test-application-id", testApplication, "test-job-id");
+        requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+        requestGetApplication(this.cloudFoundryClient, "test-application-id");
+        requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
+
+        this.applications
+            .pushManifest(PushApplicationManifestRequest.builder()
+                .manifest(ApplicationManifest.builder()
+                    .path(testApplication)
+                    .domain("test-shared-domain")
+                    .environmentVariable("test-key", "test-value")
+                    .name("test-name")
+                    .build())
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
     public void pushNewRouteWithHost() throws IOException {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
-        requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
+        requestCreateApplication(this.cloudFoundryClient, ApplicationManifest.builder()
             .path(testApplication)
             .domain("test-shared-domain")
             .host("test-host")
@@ -1417,7 +1498,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
-        requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
+        requestCreateApplication(this.cloudFoundryClient, ApplicationManifest.builder()
             .path(testApplication)
             .domain("test-shared-domain")
             .noHostname(true)
@@ -1455,7 +1536,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
-        requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
+        requestCreateApplication(this.cloudFoundryClient, ApplicationManifest.builder()
             .path(testApplication)
             .name("test-name")
             .build(), TEST_SPACE_ID, null, "test-application-id");
@@ -1481,7 +1562,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
-        requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
+        requestCreateApplication(this.cloudFoundryClient, ApplicationManifest.builder()
             .path(testApplication)
             .name("test-name")
             .build(), TEST_SPACE_ID, null, "test-application-id");
@@ -1507,7 +1588,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
-        requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
+        requestCreateApplication(this.cloudFoundryClient, ApplicationManifest.builder()
             .path(testApplication)
             .name("test-name")
             .build(), TEST_SPACE_ID, null, "test-application-id");
@@ -1545,7 +1626,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
         requestSharedDomains(this.cloudFoundryClient, "test-shared-domain", "test-shared-domain-id");
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
-        requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
+        requestCreateApplication(this.cloudFoundryClient, ApplicationManifest.builder()
             .path(testApplication)
             .domain("test-shared-domain")
             .name("test-name")
@@ -1581,7 +1662,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
-        requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
+        requestCreateApplication(this.cloudFoundryClient, ApplicationManifest.builder()
             .path(testApplication)
             .noRoute(true)
             .name("test-name")
@@ -1618,7 +1699,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
         requestSharedDomains(this.cloudFoundryClient, "test-shared-domain", "test-shared-domain-id");
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
-        requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
+        requestCreateApplication(this.cloudFoundryClient, ApplicationManifest.builder()
             .path(testApplication)
             .domain("test-shared-domain")
             .name("test-name")
@@ -1652,10 +1733,9 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
-        requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
+        requestCreateApplication(this.cloudFoundryClient, ApplicationManifest.builder()
             .path(testApplication)
             .name("test-name")
-            .noStart(true)
             .build(), TEST_SPACE_ID, null, "test-application-id");
         requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
         requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
@@ -1686,7 +1766,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
-        requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
+        requestCreateApplication(this.cloudFoundryClient, ApplicationManifest.builder()
             .path(testApplication)
             .domain("test-private-domain")
             .name("test-name")
@@ -1722,7 +1802,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
-        requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
+        requestCreateApplication(this.cloudFoundryClient, ApplicationManifest.builder()
             .path(testApplication)
             .domain("test-shared-domain")
             .name("test-name")
@@ -1761,7 +1841,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
-        requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
+        requestCreateApplication(this.cloudFoundryClient, ApplicationManifest.builder()
             .path(testApplication)
             .domain("test-shared-domain")
             .name("test-name")
@@ -1797,7 +1877,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
-        requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
+        requestCreateApplication(this.cloudFoundryClient, ApplicationManifest.builder()
             .path(testApplication)
             .domain("test-shared-domain")
             .name("test-name")
@@ -1833,7 +1913,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
-        requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
+        requestCreateApplication(this.cloudFoundryClient, ApplicationManifest.builder()
             .path(testApplication)
             .domain("test-shared-domain")
             .name("test-name")
@@ -1868,7 +1948,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
-        requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
+        requestCreateApplication(this.cloudFoundryClient, ApplicationManifest.builder()
             .path(testApplication)
             .domain("test-tcp-domain")
             .name("test-name")
@@ -1904,7 +1984,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
-        requestCreateApplication(this.cloudFoundryClient, PushApplicationRequest.builder()
+        requestCreateApplication(this.cloudFoundryClient, ApplicationManifest.builder()
             .path(testApplication)
             .domain("test-shared-domain")
             .name("test-name")
@@ -2883,17 +2963,18 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                     .build()));
     }
 
-    private static void requestCreateApplication(CloudFoundryClient cloudFoundryClient, PushApplicationRequest request, String spaceId, String stackId, String applicationId) {
+    private static void requestCreateApplication(CloudFoundryClient cloudFoundryClient, ApplicationManifest manifest, String spaceId, String stackId, String applicationId) {
         when(cloudFoundryClient.applicationsV2()
             .create(CreateApplicationRequest.builder()
-                .buildpack(request.getBuildpack())
-                .command(request.getCommand())
-                .diskQuota(request.getDiskQuota())
-                .healthCheckTimeout(request.getTimeout())
-                .healthCheckType(Optional.ofNullable(request.getHealthCheckType()).map(ApplicationHealthCheck::getValue).orElse(null))
-                .instances(request.getInstances())
-                .memory(request.getMemory())
-                .name(request.getName())
+                .buildpack(manifest.getBuildpack())
+                .command(manifest.getCommand())
+                .diskQuota(manifest.getDisk())
+                .environmentJsons(manifest.getEnvironmentVariables())
+                .healthCheckTimeout(manifest.getTimeout())
+                .healthCheckType(Optional.ofNullable(manifest.getHealthCheckType()).map(ApplicationHealthCheck::getValue).orElse(null))
+                .instances(manifest.getInstances())
+                .memory(manifest.getMemory())
+                .name(manifest.getName())
                 .spaceId(spaceId)
                 .stackId(stackId)
                 .build()))
@@ -3460,19 +3541,20 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
             thenReturn(Mono.empty());
     }
 
-    private static void requestUpdateApplication(CloudFoundryClient cloudFoundryClient, String applicationId, PushApplicationRequest request, String stackId) {
+    private static void requestUpdateApplication(CloudFoundryClient cloudFoundryClient, String applicationId, ApplicationManifest manifest, String stackId) {
         when(cloudFoundryClient.applicationsV2()
             .update(UpdateApplicationRequest.builder()
                 .applicationId(applicationId)
-                .buildpack(request.getBuildpack())
-                .command(request.getCommand())
-                .diskQuota(request.getDiskQuota())
-                .dockerImage(request.getDockerImage())
-                .healthCheckTimeout(request.getTimeout())
-                .healthCheckType(Optional.ofNullable(request.getHealthCheckType()).map(ApplicationHealthCheck::getValue).orElse(null))
-                .instances(request.getInstances())
-                .memory(request.getMemory())
-                .name(request.getName())
+                .buildpack(manifest.getBuildpack())
+                .command(manifest.getCommand())
+                .diskQuota(manifest.getDisk())
+                .dockerImage(manifest.getDockerImage())
+                .environmentJsons(manifest.getEnvironmentVariables())
+                .healthCheckTimeout(manifest.getTimeout())
+                .healthCheckType(Optional.ofNullable(manifest.getHealthCheckType()).map(ApplicationHealthCheck::getValue).orElse(null))
+                .instances(manifest.getInstances())
+                .memory(manifest.getMemory())
+                .name(manifest.getName())
                 .stackId(stackId)
                 .build()))
             .thenReturn(Mono
