@@ -118,6 +118,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
@@ -869,8 +870,8 @@ public final class DefaultApplications implements Applications {
                     .map(ResourceUtils::getId)));
     }
 
-    private static Flux<String> getPushRouteIdFromRoute(CloudFoundryClient cloudFoundryClient, List<DomainSummary> availableDomains, ApplicationManifest manifest, String spaceId, RandomWords
-        randomWords) {
+    private static Flux<String> getPushRouteIdFromRoute(CloudFoundryClient cloudFoundryClient, List<DomainSummary> availableDomains, ApplicationManifest manifest, String spaceId,
+                                                        RandomWords randomWords) {
         return Flux.fromIterable(manifest.getRoutes())
             .flatMap(route -> RouteUtils.decomposeRoute(availableDomains, route.getRoute()))
             .flatMap(decomposedRoute -> {
@@ -1026,7 +1027,7 @@ public final class DefaultApplications implements Applications {
             }
         } else {
             return getPushRouteIdFromRoute(cloudFoundryClient, availableDomains, manifest, spaceId, randomWords)
-                .flatMap(routeId -> requestAssociateRoute(cloudFoundryClient, applicationId, routeId))
+                .flatMapSequential(routeId -> requestAssociateRoute(cloudFoundryClient, applicationId, routeId), 1)
                 .then();
         }
     }
