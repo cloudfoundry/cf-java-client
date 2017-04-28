@@ -442,12 +442,15 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .buildpack("test-application-summary-buildpack")
                 .command("test-application-summary-command")
                 .disk(1)
-                .domain("test-domain-name")
                 .environmentVariables(Collections.emptyMap())
-                .host("test-route-host")
+                .healthCheckHttpEndpoint("test-application-summary-healthCheckHttpEndpoint")
+                .healthCheckType(ApplicationHealthCheck.PORT)
                 .instances(1)
                 .memory(1)
                 .name("test-application-summary-name")
+                .route(Route.builder()
+                    .route("test-route-host.test-domain-name/test-path")
+                    .build())
                 .service("test-service-instance-name")
                 .stack("test-stack-entity-name")
                 .timeout(1)
@@ -472,9 +475,44 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .command("test-application-summary-command")
                 .disk(1)
                 .environmentVariables(Collections.emptyMap())
+                .healthCheckHttpEndpoint("test-application-summary-healthCheckHttpEndpoint")
+                .healthCheckType(ApplicationHealthCheck.PORT)
                 .instances(1)
                 .memory(1)
                 .name("test-application-summary-name")
+                .noRoute(true)
+                .stack("test-stack-entity-name")
+                .timeout(1)
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void getApplicationManifestTcp() {
+        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
+        requestApplicationSummaryTcp(this.cloudFoundryClient, "test-metadata-id");
+        requestStack(this.cloudFoundryClient, "test-application-summary-stackId");
+
+        this.applications
+            .getApplicationManifest(GetApplicationManifestRequest.builder()
+                .name("test-app")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ApplicationManifest.builder()
+                .buildpack("test-application-summary-buildpack")
+                .command("test-application-summary-command")
+                .disk(1)
+                .environmentVariables(Collections.emptyMap())
+                .healthCheckHttpEndpoint("test-application-summary-healthCheckHttpEndpoint")
+                .healthCheckType(ApplicationHealthCheck.PORT)
+                .instances(1)
+                .memory(1)
+                .name("test-application-summary-name")
+                .route(Route.builder()
+                    .route("test-route-host.test-domain-name:999")
+                    .build())
+                .service("test-service-instance-name")
                 .stack("test-stack-entity-name")
                 .timeout(1)
                 .build())
@@ -2815,11 +2853,14 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .build()))
             .thenReturn(Mono
                 .just(fill(SummaryApplicationResponse.builder(), "application-summary-")
+                    .healthCheckType("port")
+                    .packageUpdatedAt(DateUtils.formatToIso8601(new Date(0)))
                     .route(fill(org.cloudfoundry.client.v2.routes.Route.builder(), "route-")
                         .domain(fill(org.cloudfoundry.client.v2.domains.Domain.builder(), "domain-").build())
+                        .path("/test-path")
+                        .port(null)
                         .build())
                     .service(fill(ServiceInstance.builder(), "service-instance-").build())
-                    .packageUpdatedAt(DateUtils.formatToIso8601(new Date(0)))
                     .build()));
     }
 
@@ -2863,7 +2904,25 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .build()))
             .thenReturn(Mono
                 .just(fill(SummaryApplicationResponse.builder(), "application-summary-")
+                    .healthCheckType("port")
                     .packageUpdatedAt(DateUtils.formatToIso8601(new Date(0)))
+                    .build()));
+    }
+
+    private static void requestApplicationSummaryTcp(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        when(cloudFoundryClient.applicationsV2()
+            .summary(SummaryApplicationRequest.builder()
+                .applicationId(applicationId)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(SummaryApplicationResponse.builder(), "application-summary-")
+                    .healthCheckType("port")
+                    .packageUpdatedAt(DateUtils.formatToIso8601(new Date(0)))
+                    .route(fill(org.cloudfoundry.client.v2.routes.Route.builder(), "route-")
+                        .domain(fill(org.cloudfoundry.client.v2.domains.Domain.builder(), "domain-").build())
+                        .port(999)
+                        .build())
+                    .service(fill(ServiceInstance.builder(), "service-instance-").build())
                     .build()));
     }
 
