@@ -46,7 +46,6 @@ import org.cloudfoundry.client.v2.applications.UpdateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.UploadApplicationRequest;
 import org.cloudfoundry.client.v2.applications.UploadApplicationResponse;
 import org.cloudfoundry.client.v2.applications.Usage;
-import org.cloudfoundry.client.v2.domains.Domain;
 import org.cloudfoundry.client.v2.events.EventEntity;
 import org.cloudfoundry.client.v2.events.EventResource;
 import org.cloudfoundry.client.v2.events.ListEventsRequest;
@@ -60,7 +59,6 @@ import org.cloudfoundry.client.v2.routes.CreateRouteResponse;
 import org.cloudfoundry.client.v2.routes.DeleteRouteRequest;
 import org.cloudfoundry.client.v2.routes.DeleteRouteResponse;
 import org.cloudfoundry.client.v2.routes.ListRoutesRequest;
-import org.cloudfoundry.client.v2.routes.Route;
 import org.cloudfoundry.client.v2.routes.RouteResource;
 import org.cloudfoundry.client.v2.servicebindings.CreateServiceBindingRequest;
 import org.cloudfoundry.client.v2.servicebindings.CreateServiceBindingResponse;
@@ -356,7 +354,7 @@ public final class DefaultApplications implements Applications {
                 .ifPresent(sb::append);
             Optional.ofNullable(request.getRoutePath())
                 .ifPresent(sb::append);
-            builder.route(org.cloudfoundry.operations.applications.Route.builder()
+            builder.route(Route.builder()
                 .route(sb.toString())
                 .build());
         }
@@ -631,11 +629,11 @@ public final class DefaultApplications implements Applications {
             .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, completionTimeout, job));
     }
 
-    private static Mono<Void> deleteRoutes(CloudFoundryClient cloudFoundryClient, Duration completionTimeout, Optional<List<Route>> routes) {
+    private static Mono<Void> deleteRoutes(CloudFoundryClient cloudFoundryClient, Duration completionTimeout, Optional<List<org.cloudfoundry.client.v2.routes.Route>> routes) {
         return routes
             .map(Flux::fromIterable)
             .orElse(Flux.empty())
-            .map(Route::getId)
+            .map(org.cloudfoundry.client.v2.routes.Route::getId)
             .flatMap(routeId -> deleteRoute(cloudFoundryClient, routeId, completionTimeout))
             .then();
     }
@@ -818,7 +816,7 @@ public final class DefaultApplications implements Applications {
         }
     }
 
-    private static Mono<Optional<List<Route>>> getOptionalRoutes(CloudFoundryClient cloudFoundryClient, boolean deleteRoutes, String applicationId) {
+    private static Mono<Optional<List<org.cloudfoundry.client.v2.routes.Route>>> getOptionalRoutes(CloudFoundryClient cloudFoundryClient, boolean deleteRoutes, String applicationId) {
         if (deleteRoutes) {
             return getRoutes(cloudFoundryClient, applicationId)
                 .map(Optional::of);
@@ -909,13 +907,13 @@ public final class DefaultApplications implements Applications {
                 .map(ResourceUtils::getId));
     }
 
-    private static Mono<List<Route>> getRoutes(CloudFoundryClient cloudFoundryClient, String applicationId) {
+    private static Mono<List<org.cloudfoundry.client.v2.routes.Route>> getRoutes(CloudFoundryClient cloudFoundryClient, String applicationId) {
         return requestApplicationSummary(cloudFoundryClient, applicationId)
             .map(SummaryApplicationResponse::getRoutes);
     }
 
-    private static Mono<Tuple2<Optional<List<Route>>, String>> getRoutesAndApplicationId(CloudFoundryClient cloudFoundryClient, DeleteApplicationRequest request, String spaceId,
-                                                                                         boolean deleteRoutes) {
+    private static Mono<Tuple2<Optional<List<org.cloudfoundry.client.v2.routes.Route>>, String>> getRoutesAndApplicationId(CloudFoundryClient cloudFoundryClient, DeleteApplicationRequest request,
+                                                                                                                           String spaceId, boolean deleteRoutes) {
         return getApplicationId(cloudFoundryClient, request.getName(), spaceId)
             .then(applicationId -> getOptionalRoutes(cloudFoundryClient, deleteRoutes, applicationId)
                 .and(Mono.just(applicationId)));
@@ -1534,15 +1532,35 @@ public final class DefaultApplications implements Applications {
             .command(response.getCommand())
             .disk(response.getDiskQuota())
             .environmentVariables(response.getEnvironmentJsons())
+            .healthCheckHttpEndpoint(response.getHealthCheckHttpEndpoint())
+            .healthCheckType(ApplicationHealthCheck.from(response.getHealthCheckType()))
             .instances(response.getInstances())
             .memory(response.getMemory())
             .name(response.getName())
             .stack(stackName)
             .timeout(response.getHealthCheckTimeout());
 
-        for (Route route : Optional.ofNullable(response.getRoutes()).orElse(Collections.emptyList())) {
-            Optional.ofNullable(route.getDomain()).map(Domain::getName).ifPresent(manifestBuilder::domain);
-            Optional.ofNullable(route.getHost()).ifPresent(manifestBuilder::host);
+        for (org.cloudfoundry.client.v2.routes.Route route : Optional.ofNullable(response.getRoutes()).orElse(Collections.emptyList())) {
+            StringBuilder sb = new StringBuilder();
+            Optional.ofNullable(route.getHost())
+                .ifPresent(host -> sb.append(host).append("."));
+            Optional.ofNullable(route.getDomain().getName())
+                .ifPresent(sb::append);
+
+            if (route.getPort() == null) {
+                Optional.ofNullable(route.getPath())
+                    .ifPresent(sb::append);
+            } else {
+                sb.append(":").append(route.getPort());
+            }
+
+            manifestBuilder.route(Route.builder()
+                .route(sb.toString())
+                .build());
+        }
+
+        if (Optional.ofNullable(response.getRoutes()).orElse(Collections.emptyList()).isEmpty()) {
+            manifestBuilder.noRoute(true);
         }
 
         for (ServiceInstance service : Optional.ofNullable(response.getServices()).orElse(Collections.emptyList())) {
@@ -1630,14 +1648,14 @@ public final class DefaultApplications implements Applications {
             .collectList();
     }
 
-    private static String toUrl(Route route) {
+    private static String toUrl(org.cloudfoundry.client.v2.routes.Route route) {
         String hostName = route.getHost();
         String domainName = route.getDomain().getName();
 
         return hostName.isEmpty() ? domainName : String.format("%s.%s", hostName, domainName);
     }
 
-    private static Mono<List<String>> toUrls(List<Route> routes) {
+    private static Mono<List<String>> toUrls(List<org.cloudfoundry.client.v2.routes.Route> routes) {
         return Flux
             .fromIterable(routes)
             .map(DefaultApplications::toUrl)
