@@ -35,10 +35,10 @@ public abstract class AbstractClientApiTest extends AbstractRestTest {
 
     protected static String extractBoundary(Headers headers) {
         String contentType = headers.get("Content-Type");
-        assertThat(contentType).isNotNull();
+        assertThat(contentType).as("Has Content-Type header").isNotNull();
 
         Matcher matcher = BOUNDARY.matcher(contentType);
-        assertThat(matcher.find()).isTrue();
+        assertThat(matcher.find()).as("Has Content-Type with boundary").isTrue();
         return matcher.group(1);
     }
 

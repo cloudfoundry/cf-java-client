@@ -16,11 +16,13 @@
 
 package org.cloudfoundry.reactor.client.v3;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.QueryBuilder;
 import org.cloudfoundry.reactor.util.AbstractReactorOperations;
 import org.cloudfoundry.reactor.util.ErrorPayloadMapper;
+import org.cloudfoundry.reactor.util.MultipartHttpClientRequest;
 import org.reactivestreams.Publisher;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
@@ -78,11 +80,12 @@ public abstract class AbstractClientV3Operations extends AbstractReactorOperatio
     }
 
     protected final <T> Mono<T> post(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
-                                     Function<Mono<HttpClientRequest>, Publisher<Void>> requestTransformer) {
+                                     Function<Mono<MultipartHttpClientRequest>, Publisher<Void>> requestTransformer) {
         return doPost(responseType,
             queryTransformer(requestPayload)
                 .andThen(uriTransformer),
             outbound -> outbound
+                .map(multipartRequest(this.connectionContext.getObjectMapper()))
                 .transform(requestTransformer),
             ErrorPayloadMapper.clientV3(this.connectionContext.getObjectMapper()));
     }
@@ -96,13 +99,18 @@ public abstract class AbstractClientV3Operations extends AbstractReactorOperatio
     }
 
     protected final <T> Mono<T> put(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
-                                    Function<Mono<HttpClientRequest>, Publisher<Void>> requestTransformer) {
+                                    Function<Mono<MultipartHttpClientRequest>, Publisher<Void>> requestTransformer) {
         return doPut(responseType,
             queryTransformer(requestPayload)
                 .andThen(uriTransformer),
             outbound -> outbound
+                .map(multipartRequest(this.connectionContext.getObjectMapper()))
                 .transform(requestTransformer),
             ErrorPayloadMapper.clientV3(this.connectionContext.getObjectMapper()));
+    }
+
+    private static Function<HttpClientRequest, MultipartHttpClientRequest> multipartRequest(ObjectMapper objectMapper) {
+        return request -> new MultipartHttpClientRequest(objectMapper, request);
     }
 
     private static Function<UriComponentsBuilder, UriComponentsBuilder> queryTransformer(Object requestPayload) {

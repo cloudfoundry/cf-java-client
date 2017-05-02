@@ -276,15 +276,14 @@ public final class ReactorBuildpacksTest extends AbstractClientApiTest {
                     String boundary = extractBoundary(headers);
 
                     assertThat(body.readString(Charset.defaultCharset()))
-                        .isEqualTo("--" + boundary + "\r\n" +
+                        .isEqualTo("\r\n--" + boundary + "\r\n" +
                             "content-disposition: form-data; name=\"buildpack\"; filename=\"test-filename\"\r\n" +
                             "content-length: 13\r\n" +
                             "content-type: application/zip\r\n" +
-                            "content-transfer-encoding: binary\r\n" +
                             "\r\n" +
                             "test-content\n" +
                             "\r\n" +
-                            "--" + boundary + "--\r\n");
+                            "--" + boundary + "--");
                 }))
                 .build())
             .response(TestResponse.builder()

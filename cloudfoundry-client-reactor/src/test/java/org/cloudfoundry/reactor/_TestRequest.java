@@ -59,15 +59,15 @@ abstract class _TestRequest {
         assertThat(getMethod()).hasToString(request.getMethod());
         assertThat(getPath()).isEqualTo(extractPath(request));
 
-        assertThat(request.getHeader(HttpHeaderNames.TRANSFER_ENCODING.toString())).isNull();
+        assertThat(request.getHeader(HttpHeaderNames.TRANSFER_ENCODING.toString())).as("Does not have Transfer-Encoding header").isNull();
 
         if (!HttpMethod.GET.toString().equals(request.getMethod())) {
-            assertThat(request.getHeader(HttpHeaderNames.CONTENT_LENGTH.toString())).isNotNull();
+            assertThat(request.getHeader(HttpHeaderNames.CONTENT_LENGTH.toString())).as("Has Content-Length header").isNotNull();
         }
 
         getHeaders().forEach((key, value) -> {
             if (value == null) {
-                assertThat(request.getHeader(key)).isNull();
+                assertThat(request.getHeader(key)).as("Does not have %s header", key).isNull();
             } else {
                 assertThat(value).isEqualTo(request.getHeader(key));
             }

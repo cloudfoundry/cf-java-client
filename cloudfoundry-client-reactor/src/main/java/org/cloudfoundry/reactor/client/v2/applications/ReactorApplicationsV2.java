@@ -54,24 +54,24 @@ import org.cloudfoundry.client.v2.applications.UploadApplicationResponse;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v2.AbstractClientV2Operations;
+import org.cloudfoundry.reactor.util.MultipartHttpClientRequest;
 import org.cloudfoundry.util.FileUtils;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.ipc.netty.http.client.HttpClientRequest;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+
+import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
+import static io.netty.handler.codec.http.HttpHeaderValues.APPLICATION_JSON;
 
 /**
  * The Reactor-based implementation of {@link ApplicationsV2}
  */
 public final class ReactorApplicationsV2 extends AbstractClientV2Operations implements ApplicationsV2 {
-
-    private final ConnectionContext connectionContext;
 
     /**
      * Creates an instance
@@ -82,7 +82,6 @@ public final class ReactorApplicationsV2 extends AbstractClientV2Operations impl
      */
     public ReactorApplicationsV2(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
         super(connectionContext, root, tokenProvider);
-        this.connectionContext = connectionContext;
     }
 
     @Override
@@ -224,19 +223,17 @@ public final class ReactorApplicationsV2 extends AbstractClientV2Operations impl
             .checkpoint();
     }
 
-    private Mono<Void> upload(Path application, HttpClientRequest r, UploadApplicationRequest request) {
+    private Mono<Void> upload(Path application, MultipartHttpClientRequest r, UploadApplicationRequest request) {
         return r
-            .sendForm(form -> {
-                try (InputStream resources = new ByteArrayInputStream(this.connectionContext.getObjectMapper().writeValueAsBytes(request.getResources()))) {
-                    form
-                        .multipart(true)
-                        .textFile("resources", resources, APPLICATION_JSON)
-                        .file("application", "application.zip", application.toFile(), APPLICATION_ZIP);
-                } catch (IOException e) {
-                    throw Exceptions.propagate(e);
-                }
-            })
-            .then();
+            .addPart(part -> part
+                .setContentDispositionFormData("resources")
+                .setHeader(CONTENT_TYPE, APPLICATION_JSON)
+                .send(request.getResources()))
+            .addPart(part -> part
+                .setContentDispositionFormData("application", "application.zip")
+                .setHeader(CONTENT_TYPE, APPLICATION_ZIP)
+                .sendFile(application))
+            .done();
     }
 
 }
