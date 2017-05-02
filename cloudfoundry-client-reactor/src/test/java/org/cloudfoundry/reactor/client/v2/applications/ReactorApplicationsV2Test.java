@@ -962,10 +962,10 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                     String boundary = extractBoundary(headers);
 
                     assertThat(body.readString(Charset.defaultCharset()))
-                        .isEqualTo("--" + boundary + "\r\n" +
+                        .isEqualTo("\r\n--" + boundary + "\r\n" +
                             "content-disposition: form-data; name=\"resources\"\r\n" +
                             "content-length: 178\r\n" +
-                            "content-type: application/json; charset=UTF-8\r\n" +
+                            "content-type: application/json\r\n" +
                             "\r\n" +
                             "[{\"sha1\":\"b907173290db6a155949ab4dc9b2d019dea0c901\",\"fn\":\"path/to/content.txt\",\"size\":123}," +
                             "{\"sha1\":\"ff84f89760317996b9dd180ab996b079f418396f\",\"fn\":\"path/to/code.jar\",\"size\":123}]" +
@@ -973,11 +973,10 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                             "content-disposition: form-data; name=\"application\"; filename=\"application.zip\"\r\n" +
                             "content-length: 13\r\n" +
                             "content-type: application/zip\r\n" +
-                            "content-transfer-encoding: binary\r\n" +
                             "\r\n" +
                             "test-content\n" +
                             "\r\n" +
-                            "--" + boundary + "--\r\n");
+                            "--" + boundary + "--");
                 }))
                 .build())
             .response(TestResponse.builder()

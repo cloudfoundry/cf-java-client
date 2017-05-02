@@ -34,6 +34,8 @@ import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v2.AbstractClientV2Operations;
 import reactor.core.publisher.Mono;
 
+import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
+
 /**
  * The Reactor-based implementation of {@link Buildpacks}
  */
@@ -85,12 +87,12 @@ public final class ReactorBuildpacks extends AbstractClientV2Operations implemen
     public Mono<UploadBuildpackResponse> upload(UploadBuildpackRequest request) {
         return put(request, UploadBuildpackResponse.class, builder -> builder.pathSegment("v2", "buildpacks", request.getBuildpackId(), "bits"),
             outbound -> outbound
-                .flatMapMany(r -> r
-                    .chunkedTransfer(false)
-                    .sendForm(form -> form
-                        .multipart(true)
-                        .file("buildpack", request.getFilename(), request.getBuildpack().toFile(), APPLICATION_ZIP)))
-                .then())
+                .then(r -> r
+                    .addPart(part -> part
+                        .setContentDispositionFormData("buildpack", request.getFilename())
+                        .setHeader(CONTENT_TYPE, APPLICATION_ZIP)
+                        .sendFile(request.getBuildpack()))
+                    .done()))
             .checkpoint();
     }
 

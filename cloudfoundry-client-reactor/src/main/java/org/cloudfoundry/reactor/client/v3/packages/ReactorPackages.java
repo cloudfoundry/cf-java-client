@@ -34,15 +34,17 @@ import org.cloudfoundry.client.v3.packages.UploadPackageResponse;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
+import org.cloudfoundry.reactor.util.MultipartHttpClientRequest;
 import org.cloudfoundry.util.FileUtils;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.ipc.netty.http.client.HttpClientRequest;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+
+import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
 
 /**
  * The Reactor-based implementation of {@link Packages}
@@ -107,7 +109,7 @@ public final class ReactorPackages extends AbstractClientV3Operations implements
     public Mono<UploadPackageResponse> upload(UploadPackageRequest request) {
         return post(request, UploadPackageResponse.class, builder -> builder.pathSegment("v3", "packages", request.getPackageId(), "upload"),
             outbound -> outbound
-                .flatMapMany(r -> {
+                .then(r -> {
                     if (Files.isDirectory(request.getBits())) {
                         return FileUtils.compress(request.getBits())
                             .then(bits -> upload(bits, r)
@@ -126,12 +128,13 @@ public final class ReactorPackages extends AbstractClientV3Operations implements
             .checkpoint();
     }
 
-    private Mono<Void> upload(Path bits, HttpClientRequest r) {
+    private Mono<Void> upload(Path bits, MultipartHttpClientRequest r) {
         return r
-            .sendForm(form -> form
-                .multipart(true)
-                .file("bits", "application.zip", bits.toFile(), APPLICATION_ZIP))
-            .then();
+            .addPart(part -> part
+                .setContentDispositionFormData("bits", "application.zip")
+                .setHeader(CONTENT_TYPE, APPLICATION_ZIP)
+                .sendFile(bits))
+            .done();
     }
 
 }
