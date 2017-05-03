@@ -18,13 +18,14 @@ package org.cloudfoundry.uaa.users;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.cloudfoundry.uaa.IdentityZoned;
 import org.immutables.value.Value;
 
 /**
  * The request payload for the change user password operation
  */
 @Value.Immutable
-abstract class _ChangeUserPasswordRequest {
+abstract class _ChangeUserPasswordRequest implements IdentityZoned {
 
     /**
      * The user's existing password

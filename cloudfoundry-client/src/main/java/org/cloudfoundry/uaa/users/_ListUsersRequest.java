@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.uaa.users;
 
+import org.cloudfoundry.uaa.IdentityZoned;
 import org.cloudfoundry.uaa.PaginatedAndSortedByRequest;
 import org.immutables.value.Value;
 
@@ -23,6 +24,6 @@ import org.immutables.value.Value;
  * The request payload for the list users operation
  */
 @Value.Immutable
-abstract class _ListUsersRequest extends PaginatedAndSortedByRequest {
+abstract class _ListUsersRequest extends PaginatedAndSortedByRequest implements IdentityZoned {
 
 }
