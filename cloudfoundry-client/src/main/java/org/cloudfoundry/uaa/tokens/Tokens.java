@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 public interface Tokens {
 
     /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#check-token">Check Token</a> request
+     * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#check-token">Check Token</a> request
      *
      * @param request the Check Token request
      * @return the Check Token response
@@ -32,7 +32,7 @@ public interface Tokens {
     Mono<CheckTokenResponse> check(CheckTokenRequest request);
 
     /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#authorization-code-grant12">Authorization Code Grant</a> request
+     * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#authorization-code-grant13">Authorization Code Grant</a> request
      *
      * @param request the Authorization Code request
      * @return the response from the Authorization Code request
@@ -40,7 +40,7 @@ public interface Tokens {
     Mono<GetTokenByAuthorizationCodeResponse> getByAuthorizationCode(GetTokenByAuthorizationCodeRequest request);
 
     /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#client-credentials-grant">Client Credentials Grant</a> request
+     * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#client-credentials-grant">Client Credentials Grant</a> request
      *
      * @param request the Client Credentials request
      * @return the response from the Client Credentials request
@@ -48,7 +48,7 @@ public interface Tokens {
     Mono<GetTokenByClientCredentialsResponse> getByClientCredentials(GetTokenByClientCredentialsRequest request);
 
     /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#one-time-passcode">One-time Passcode</a> request
+     * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#one-time-passcode">One-time Passcode</a> request
      *
      * @param request the One Time Passcode token request
      * @return the response from the One Time Passcode token request
@@ -56,7 +56,7 @@ public interface Tokens {
     Mono<GetTokenByOneTimePasscodeResponse> getByOneTimePasscode(GetTokenByOneTimePasscodeRequest request);
 
     /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#openid-connect">OpenID Connect</a> request
+     * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#openid-connect">OpenID Connect</a> request
      *
      * @param request the OpenId request
      * @return the response from the OpenId request
@@ -64,7 +64,7 @@ public interface Tokens {
     Mono<GetTokenByOpenIdResponse> getByOpenId(GetTokenByOpenIdRequest request);
 
     /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#password-grant">Password Grant</a> request
+     * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#password-grant">Password Grant</a> request
      *
      * @param request the Password token request
      * @return the response from the Password token request
@@ -72,7 +72,7 @@ public interface Tokens {
     Mono<GetTokenByPasswordResponse> getByPassword(GetTokenByPasswordRequest request);
 
     /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#token-key">Token Key</a> request
+     * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#token-key">Token Key</a> request
      *
      * @param request the Token Key request
      * @return the response from the Token Key request
@@ -80,7 +80,7 @@ public interface Tokens {
     Mono<GetTokenKeyResponse> getKey(GetTokenKeyRequest request);
 
     /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#token-keys">Token Keys</a> request
+     * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#token-keys">Token Keys</a> request
      *
      * @param request the Token Keys request
      * @return the Token Keys response
@@ -88,7 +88,7 @@ public interface Tokens {
     Mono<ListTokenKeysResponse> listKeys(ListTokenKeysRequest request);
 
     /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#refresh-token">Refresh Token</a> request
+     * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#refresh-token">Refresh Token</a> request
      *
      * @param request the refresh token request
      * @return the response from the refresh token request

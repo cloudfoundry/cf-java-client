@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 public interface Groups {
 
     /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#add-member">Add Member</a> request
+     * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#add-member">Add Member</a> request
      *
      * @param request the Add Member request
      * @return the response from the Add Member request
@@ -32,7 +32,7 @@ public interface Groups {
     Mono<AddMemberResponse> addMember(AddMemberRequest request);
 
     /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#check-membership">Check Membership</a> request
+     * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#check-membership">Check Membership</a> request
      *
      * @param request the Check Membership request
      * @return the response from the Check Membership request
@@ -40,7 +40,7 @@ public interface Groups {
     Mono<CheckMembershipResponse> checkMembership(CheckMembershipRequest request);
 
     /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#create58">Create Group</a> request
+     * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#create77">Create Group</a> request
      *
      * @param request the Create Group request
      * @return the response from the Create Group request
@@ -48,7 +48,7 @@ public interface Groups {
     Mono<CreateGroupResponse> create(CreateGroupRequest request);
 
     /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#delete61">Delete a Group</a> request
+     * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#delete81">Delete a Group</a> request
      *
      * @param request the Delete Group request
      * @return the response from the Delete Group request
@@ -56,7 +56,7 @@ public interface Groups {
     Mono<DeleteGroupResponse> delete(DeleteGroupRequest request);
 
     /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#retrieve59">Retrieve a Group</a> request
+     * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#retrieve78">Retrieve a Group</a> request
      *
      * @param request the Get Group request
      * @return the response from the Get Group request
@@ -64,7 +64,7 @@ public interface Groups {
     Mono<GetGroupResponse> get(GetGroupRequest request);
 
     /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#list62">List Groups</a> request
+     * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#list82">List Groups</a> request
      *
      * @param request the List Groups request
      * @return the response from the List Groups request
@@ -72,7 +72,7 @@ public interface Groups {
     Mono<ListGroupsResponse> list(ListGroupsRequest request);
 
     /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#list72">List External Group Mappings</a> request
+     * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#list92">List External Group Mappings</a> request
      *
      * @param request the List External Group Mappings request
      * @return the response from the List External Group Mappings request
@@ -80,7 +80,7 @@ public interface Groups {
     Mono<ListExternalGroupMappingsResponse> listExternalGroupMappings(ListExternalGroupMappingsRequest request);
 
     /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#list-members">List Members</a> request
+     * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#list-members">List Members</a> request
      *
      * @param request the List Members request
      * @return the response from the List Members request
@@ -88,7 +88,7 @@ public interface Groups {
     Mono<ListMembersResponse> listMembers(ListMembersRequest request);
 
     /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#map">Map External Group</a> request
+     * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#map">Map External Group</a> request
      *
      * @param request the Map External Group request
      * @return the response from the Map External Group request
@@ -96,7 +96,7 @@ public interface Groups {
     Mono<MapExternalGroupResponse> mapExternalGroup(MapExternalGroupRequest request);
 
     /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#remove-member">Remove Member</a> request
+     * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#remove-member">Remove Member</a> request
      *
      * @param request the Remove Member request
      * @return the response from the Remove Member request
@@ -104,7 +104,7 @@ public interface Groups {
     Mono<RemoveMemberResponse> removeMember(RemoveMemberRequest request);
 
     /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#by-group-display-name">Unmap External Group By Group Display Name</a> request
+     * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#by-group-display-name">Unmap External Group By Group Display Name</a> request
      *
      * @param request the Unmap External Group By Group Display Name request
      * @return the response from the Unmap External Group By Group Display Name request
@@ -112,7 +112,7 @@ public interface Groups {
     Mono<UnmapExternalGroupByGroupDisplayNameResponse> unmapExternalGroupByGroupDisplayName(UnmapExternalGroupByGroupDisplayNameRequest request);
 
     /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#by-group-id">Unmap External Group By Group Id</a> request
+     * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#by-group-id">Unmap External Group By Group Id</a> request
      *
      * @param request the Unmap External Group By Group Id request
      * @return the response from the Unmap External Group By Group Id request
@@ -120,7 +120,7 @@ public interface Groups {
     Mono<UnmapExternalGroupByGroupIdResponse> unmapExternalGroupByGroupId(UnmapExternalGroupByGroupIdRequest request);
 
     /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#update60">Update Group</a> request
+     * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#update79">Update Group</a> request
      *
      * @param request the Update Group request
      * @return the response from the Update Group request

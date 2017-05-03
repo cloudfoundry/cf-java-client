@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 public interface Users {
 
     /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#change-user-password">Change User Password</a> request
+     * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#change-user-password">Change User Password</a> request
      *
      * @param request the Change User Password request
      * @return the response from the Change User Password request
@@ -32,7 +32,7 @@ public interface Users {
     Mono<ChangeUserPasswordResponse> changePassword(ChangeUserPasswordRequest request);
 
     /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#create48">Create User</a> request
+     * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#create64">Create User</a> request
      *
      * @param request the Create User request
      * @return the response from the Create User request
@@ -40,7 +40,7 @@ public interface Users {
     Mono<CreateUserResponse> create(CreateUserRequest request);
 
     /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#delete50">Delete User</a> request
+     * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#delete67">Delete User</a> request
      *
      * @param request the Delete User request
      * @return the response from the Delete User request
@@ -48,7 +48,7 @@ public interface Users {
     Mono<DeleteUserResponse> delete(DeleteUserRequest request);
 
     /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#get-user-verification-link">Get User Verification Link</a> request
+     * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#get-user-verification-link">Get User Verification Link</a> request
      *
      * @param request the Get User Verification Link request
      * @return the response from the Get User Verification Link request
@@ -56,7 +56,7 @@ public interface Users {
     Mono<GetUserVerificationLinkResponse> getVerificationLink(GetUserVerificationLinkRequest request);
 
     /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#invite-users">Invite Users</a> request
+     * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#invite-users">Invite Users</a> request
      *
      * @param request the Invite Users request
      * @return the response from the Invite Users request
@@ -64,7 +64,7 @@ public interface Users {
     Mono<InviteUsersResponse> invite(InviteUsersRequest request);
 
     /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#list">List Users</a> request
+     * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#list63">List Users</a> request
      *
      * @param request the List Users request
      * @return the response from the List Users request
@@ -72,7 +72,7 @@ public interface Users {
     Mono<ListUsersResponse> list(ListUsersRequest request);
 
     /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#lookup-user-ids-usernames">Lookup User IDs/Usernames</a> request
+     * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#lookup-user-ids-usernames">Lookup User IDs/Usernames</a> request
      *
      * @param request the lookup userid and usernames request
      * @return the response from the lookup userid and usernames request
@@ -80,7 +80,7 @@ public interface Users {
     Mono<LookupUserIdsResponse> lookup(LookupUserIdsRequest request);
 
     /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#update49">Update User</a> request
+     * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#update49">Update User</a> request
      *
      * @param request the Update User request
      * @return the response from the Update User request
@@ -88,7 +88,7 @@ public interface Users {
     Mono<UpdateUserResponse> update(UpdateUserRequest request);
 
     /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#verify-user">Verify User</a> request
+     * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#verify-user">Verify User</a> request
      *
      * @param request the Verify User request
      * @return the response from the Verify User request
