@@ -545,7 +545,7 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
     public void unmapExternalGroupByGroupDisplayName() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/Groups/External/displayName/Group For Testing Deleting External Group Mapping By Name/externalGroup/external group/origin/ldap")
+                .method(DELETE).path("/Groups/External/displayName/Group%20For%20Testing%20Deleting%20External%20Group%20Mapping%20By%20Name/externalGroup/external%20group/origin/ldap")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -580,7 +580,7 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
     public void unmapExternalGroupByGroupId() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/Groups/External/groupId/d68167b4-81b3-490d-9838-94092d5c89f6/externalGroup/external group/origin/ldap")
+                .method(DELETE).path("/Groups/External/groupId/d68167b4-81b3-490d-9838-94092d5c89f6/externalGroup/external%20group/origin/ldap")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
