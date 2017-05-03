@@ -51,9 +51,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 public final class UsersTest extends AbstractIntegrationTest {
 
     @Autowired
-    private String password;
-
-    @Autowired
     private UaaClient uaaClient;
 
     @Test
@@ -239,13 +236,6 @@ public final class UsersTest extends AbstractIntegrationTest {
             .map(CreateUserResponse::getId);
     }
 
-    private static Mono<String> getUserIdByUsername(UaaClient uaaClient, String username) {
-        return requestLookupByUsername(uaaClient, username)
-            .flatMapIterable(LookupUserIdsResponse::getResources)
-            .map(UserId::getId)
-            .single();
-    }
-
     private static Mono<CreateUserResponse> requestCreateUser(UaaClient uaaClient, String userName) {
         return uaaClient.users()
             .create(CreateUserRequest.builder()
@@ -267,13 +257,6 @@ public final class UsersTest extends AbstractIntegrationTest {
         return uaaClient.users()
             .list(ListUsersRequest.builder()
                 .filter(String.format("id eq \"%s\"", userId))
-                .build());
-    }
-
-    private static Mono<LookupUserIdsResponse> requestLookupByUsername(UaaClient uaaClient, String username) {
-        return uaaClient.users()
-            .lookup(LookupUserIdsRequest.builder()
-                .filter(String.format("userName eq \"%s\"", username))
                 .build());
     }
 

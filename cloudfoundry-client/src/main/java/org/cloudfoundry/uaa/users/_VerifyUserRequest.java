@@ -17,6 +17,7 @@
 package org.cloudfoundry.uaa.users;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.cloudfoundry.uaa.IdentityZoned;
 import org.cloudfoundry.uaa.Versioned;
 import org.immutables.value.Value;
 
@@ -24,7 +25,7 @@ import org.immutables.value.Value;
  * The request payload for the verify user operation
  */
 @Value.Immutable
-abstract class _VerifyUserRequest implements Versioned {
+abstract class _VerifyUserRequest implements IdentityZoned, Versioned {
 
     /**
      * The user id

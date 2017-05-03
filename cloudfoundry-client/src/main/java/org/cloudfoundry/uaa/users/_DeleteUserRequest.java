@@ -17,6 +17,7 @@
 package org.cloudfoundry.uaa.users;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.cloudfoundry.uaa.IdentityZoned;
 import org.cloudfoundry.uaa.Versioned;
 import org.immutables.value.Value;
 
@@ -24,7 +25,7 @@ import org.immutables.value.Value;
  * The request payload for the delete user operation
  */
 @Value.Immutable
-abstract class _DeleteUserRequest implements Versioned {
+abstract class _DeleteUserRequest implements IdentityZoned, Versioned {
 
     /**
      * The user id

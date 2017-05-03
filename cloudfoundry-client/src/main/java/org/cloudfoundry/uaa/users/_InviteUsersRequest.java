@@ -19,6 +19,7 @@ package org.cloudfoundry.uaa.users;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.QueryParameter;
+import org.cloudfoundry.uaa.IdentityZoned;
 import org.immutables.value.Value;
 
 import java.util.List;
@@ -27,7 +28,7 @@ import java.util.List;
  * The request payload for the change user password operation
  */
 @Value.Immutable
-abstract class _InviteUsersRequest {
+abstract class _InviteUsersRequest implements IdentityZoned {
 
     @Value.Check
     void check() {

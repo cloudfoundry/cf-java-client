@@ -18,13 +18,14 @@ package org.cloudfoundry.uaa.users;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.cloudfoundry.QueryParameter;
+import org.cloudfoundry.uaa.IdentityZoned;
 import org.immutables.value.Value;
 
 /**
  * The request payload for the get user verification link operation
  */
 @Value.Immutable
-abstract class _GetUserVerificationLinkRequest {
+abstract class _GetUserVerificationLinkRequest implements IdentityZoned {
 
     /**
      * The redirect URI

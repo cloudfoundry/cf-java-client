@@ -19,6 +19,7 @@ package org.cloudfoundry.uaa.users;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.cloudfoundry.Nullable;
+import org.cloudfoundry.uaa.IdentityZoned;
 import org.cloudfoundry.uaa.Versioned;
 import org.immutables.value.Value;
 
@@ -28,7 +29,7 @@ import java.util.List;
  * The request payload for the update user operation
  */
 @Value.Immutable
-abstract class _UpdateUserRequest implements Versioned {
+abstract class _UpdateUserRequest implements IdentityZoned, Versioned {
 
     /**
      * The version
