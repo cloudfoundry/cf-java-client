@@ -1578,17 +1578,6 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
                     .build()));
     }
 
-    private static void requestListSpaceServiceBindingsEmpty(CloudFoundryClient cloudFoundryClient, String serviceInstanceId) {
-        when(cloudFoundryClient.serviceBindingsV2()
-            .list(ListServiceBindingsRequest.builder()
-                .page(1)
-                .serviceInstanceId(serviceInstanceId)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(ListServiceBindingsResponse.builder())
-                    .build()));
-    }
-
     private static void requestListSpaceServiceInstanceServiceKeys(CloudFoundryClient cloudFoundryClient, String serviceInstanceId, String serviceKey, String credentialKey, String credentialValue) {
         when(cloudFoundryClient.serviceInstances()
             .listServiceKeys(ListServiceInstanceServiceKeysRequest.builder()
@@ -1682,18 +1671,6 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
                     .build()));
     }
 
-    private static void requestListSpaceServiceInstancesEmpty(CloudFoundryClient cloudFoundryClient, String spaceId) {
-        when(cloudFoundryClient.spaces()
-            .listServiceInstances(ListSpaceServiceInstancesRequest.builder()
-                .page(1)
-                .returnUserProvidedServiceInstances(true)
-                .spaceId(spaceId)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(ListSpaceServiceInstancesResponse.builder())
-                    .build()));
-    }
-
     private static void requestListSpaceServiceInstancesEmpty(CloudFoundryClient cloudFoundryClient, String serviceName, String spaceId) {
         when(cloudFoundryClient.spaces()
             .listServiceInstances(ListSpaceServiceInstancesRequest.builder()
@@ -1738,49 +1715,6 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
                     .build()));
     }
 
-    private static void requestListSpaceServiceInstancesTwo(CloudFoundryClient cloudFoundryClient, String spaceId, String instanceName1, String instanceName2) {
-        when(cloudFoundryClient.spaces()
-            .listServiceInstances(ListSpaceServiceInstancesRequest.builder()
-                .page(1)
-                .spaceId(spaceId)
-                .returnUserProvidedServiceInstances(true)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(ListSpaceServiceInstancesResponse.builder())
-                    .resource(UnionServiceInstanceResource.builder()
-                        .metadata(fill(Metadata.builder())
-                            .id(instanceName1 + "-id")
-                            .build())
-                        .entity(fill(UnionServiceInstanceEntity.builder())
-                            .dashboardUrl(null)
-                            .lastOperation(null)
-                            .name(instanceName1)
-                            .servicePlanId(null)
-                            .tags(null)
-                            .type(ServiceInstanceType.USER_PROVIDED.toString())
-                            .build())
-                        .build())
-                    .resource(UnionServiceInstanceResource.builder()
-                        .metadata(fill(Metadata.builder())
-                            .id(instanceName2 + "-id")
-                            .build())
-                        .entity(fill(UnionServiceInstanceEntity.builder())
-                            .lastOperation(LastOperation.builder()
-                                .createdAt("test-startedAt")
-                                .description("test-message")
-                                .state("test-status")
-                                .type("test-type")
-                                .updatedAt("test-updatedAt")
-                                .build())
-                            .name(instanceName2)
-                            .servicePlanId(instanceName2 + "-plan-id")
-                            .tag("test-tag")
-                            .type(ServiceInstanceType.MANAGED.toString())
-                            .build())
-                        .build())
-                    .build()));
-    }
-
     private static void requestListSpaceServiceInstancesUserProvided(CloudFoundryClient cloudFoundryClient, String serviceName, String spaceId) {
         when(cloudFoundryClient.spaces()
             .listServiceInstances(ListSpaceServiceInstancesRequest.builder()
@@ -1800,19 +1734,6 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
                             .type(ServiceInstanceType.USER_PROVIDED.toString())
                             .build())
                         .build())
-                    .build()));
-    }
-
-    private static void requestListSpaceServiceInstancesUserProvidedEmpty(CloudFoundryClient cloudFoundryClient, String serviceName, String spaceId) {
-        when(cloudFoundryClient.spaces()
-            .listServiceInstances(ListSpaceServiceInstancesRequest.builder()
-                .page(1)
-                .spaceId(spaceId)
-                .returnUserProvidedServiceInstances(true)
-                .name(serviceName)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(ListSpaceServiceInstancesResponse.builder())
                     .build()));
     }
 

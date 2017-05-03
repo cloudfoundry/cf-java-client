@@ -38,13 +38,6 @@ abstract class _ListServiceServicePlansRequest extends PaginatedRequest {
     abstract Boolean getActive();
 
     /**
-     * The service broker ids
-     */
-    @FilterParameter("service_broker_guid")
-    @Nullable
-    abstract List<String> getServiceBrokerIds();
-
-    /**
      * The service id
      */
     @JsonIgnore
