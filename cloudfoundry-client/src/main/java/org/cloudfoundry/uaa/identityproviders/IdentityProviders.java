@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 public interface IdentityProviders {
 
     /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#create">Create Identity Provider</a> request
+     * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#create">Create Identity Provider</a> request
      *
      * @param request the Create Identity Provider request
      * @return the response from the Create Identity Provider request
@@ -32,7 +32,7 @@ public interface IdentityProviders {
     Mono<CreateIdentityProviderResponse> create(CreateIdentityProviderRequest request);
 
     /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#delete">Delete Identity Provider</a> request
+     * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#delete">Delete Identity Provider</a> request
      *
      * @param request the Delete Identity Provider request
      * @return the response from the Delete Identity Provider request
@@ -40,7 +40,7 @@ public interface IdentityProviders {
     Mono<DeleteIdentityProviderResponse> delete(DeleteIdentityProviderRequest request);
 
     /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#retrieve">Get Identity Provider</a> request
+     * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#retrieve">Get Identity Provider</a> request
      *
      * @param request the Get Identity Provider request
      * @return the response from the Get Identity Provider request
@@ -48,7 +48,7 @@ public interface IdentityProviders {
     Mono<GetIdentityProviderResponse> get(GetIdentityProviderRequest request);
 
     /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#retrieve-all">List Identity Providers</a> request
+     * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#retrieve-all">List Identity Providers</a> request
      *
      * @param request the List Identity Providers request
      * @return the response from the List Identitys Provider request
@@ -56,7 +56,7 @@ public interface IdentityProviders {
     Mono<ListIdentityProvidersResponse> list(ListIdentityProvidersRequest request);
 
     /**
-     * Makes the <a href="http://docs.cloudfoundry.com/uaa/#update">Update Identity Provider</a> request
+     * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#update">Update Identity Provider</a> request
      *
      * @param request the Update Identity Provider request
      * @return the response from the Update Identity Provider request
