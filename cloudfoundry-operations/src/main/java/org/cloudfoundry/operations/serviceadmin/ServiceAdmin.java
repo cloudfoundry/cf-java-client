@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.operations.serviceadmin;
 
-
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -47,5 +46,13 @@ public interface ServiceAdmin {
      * @return the service brokers
      */
     Flux<ServiceBroker> list();
+
+    /**
+     * Lists the service access settings
+     *
+     * @param request the List Service Access Settings request
+     * @return the service access settings
+     */
+    Flux<ServiceAccess> listServiceAccessSettings(ListServiceAccessSettingsRequest request);
 
 }
