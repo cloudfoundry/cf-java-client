@@ -208,7 +208,7 @@ public class IntegrationTestConfiguration {
         return new CloudFoundryCleaner(cloudFoundryClient, nameFactory, uaaClient);
     }
 
-    @Bean(initMethod = "checkCompatibility")
+    @Bean
     ReactorCloudFoundryClient cloudFoundryClient(ConnectionContext connectionContext, TokenProvider tokenProvider) {
         return ReactorCloudFoundryClient.builder()
             .connectionContext(connectionContext)

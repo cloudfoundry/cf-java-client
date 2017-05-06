@@ -37,6 +37,7 @@ import reactor.ipc.netty.options.ClientOptions;
 import reactor.ipc.netty.resources.LoopResources;
 import reactor.ipc.netty.resources.PoolResources;
 
+import javax.annotation.PreDestroy;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -68,6 +69,15 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
     private static final int UNDEFINED_PORT = -1;
 
     /**
+     * Disposes resources created to service this connection context
+     */
+    @PreDestroy
+    public final void dispose() {
+        getConnectionPool().ifPresent(PoolResources::dispose);
+        getThreadPool().dispose();
+    }
+
+    /**
      * The number of connections to use when processing requests and responses.  Setting this to `null` disables connection pooling.
      */
     @Nullable
@@ -81,12 +91,12 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
     public HttpClient getHttpClient() {
         return HttpClient.create(options -> {
             options
-                .loopResources(LoopResources.create("cloudfoundry-client", getThreadPoolSize(), true))
+                .loopResources(getThreadPool())
                 .option(SO_SNDBUF, SEND_BUFFER_SIZE)
                 .option(SO_RCVBUF, RECEIVE_BUFFER_SIZE)
                 .disablePool();
 
-            Optional.ofNullable(getConnectionPoolSize()).ifPresent(connectionPoolSize -> options.poolResources(PoolResources.fixed("cloudfoundry-client", connectionPoolSize)));
+            getConnectionPool().ifPresent(options::poolResources);
             getKeepAlive().ifPresent(keepAlive -> options.option(SO_KEEPALIVE, keepAlive));
             getProxyConfiguration().ifPresent(c -> options.proxy(ClientOptions.Proxy.HTTP, c.getHost(), c.getPort().orElse(null), c.getUsername().orElse(null), u -> c.getPassword().orElse(null)));
             getConnectTimeout().ifPresent(socketTimeout -> options.option(CONNECT_TIMEOUT_MILLIS, (int) socketTimeout.toMillis()));
@@ -115,15 +125,6 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
         return DEFAULT_PORT;
     }
 
-    @Override
-    public Mono<String> getRoot(String key) {
-        return getInfo()
-            .map(info -> normalize(UriComponentsBuilder.fromUriString(info.get(key)), getScheme()))
-            .doOnNext(components -> trust(components, getSslCertificateTruster()))
-            .map(UriComponents::toUriString)
-            .cache();
-    }
-
     @Value.Derived
     public Mono<String> getRoot() {
         Integer port = getPort();
@@ -136,6 +137,15 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
         trust(components, getSslCertificateTruster());
 
         return Mono.just(components.toUriString());
+    }
+
+    @Override
+    public Mono<String> getRoot(String key) {
+        return getInfo()
+            .map(info -> normalize(UriComponentsBuilder.fromUriString(info.get(key)), getScheme()))
+            .doOnNext(components -> trust(components, getSslCertificateTruster()))
+            .map(UriComponents::toUriString)
+            .cache();
     }
 
     /**
@@ -164,6 +174,12 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
      * The {@code CONNECT_TIMEOUT_MILLIS} value
      */
     abstract Optional<Duration> getConnectTimeout();
+
+    @Value.Derived
+    Optional<PoolResources> getConnectionPool() {
+        return Optional.ofNullable(getConnectionPoolSize())
+            .map(connectionPoolSize -> PoolResources.fixed("cloudfoundry-client", connectionPoolSize));
+    }
 
     @SuppressWarnings("unchecked")
     @Value.Derived
@@ -228,6 +244,11 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
      * The timeout for the SSL handshake negotiation
      */
     abstract Optional<Duration> getSslHandshakeTimeout();
+
+    @Value.Derived
+    LoopResources getThreadPool() {
+        return LoopResources.create("cloudfoundry-client", getThreadPoolSize(), true);
+    }
 
     private static void trust(UriComponents components, Optional<SslCertificateTruster> sslCertificateTruster) {
         sslCertificateTruster.ifPresent(t -> t.trust(components.getHost(), components.getPort(), Duration.ofSeconds(30)));
