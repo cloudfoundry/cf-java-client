@@ -95,6 +95,8 @@ import org.cloudfoundry.reactor.client.v3.tasks.ReactorTasks;
 import org.immutables.value.Value;
 import reactor.core.publisher.Mono;
 
+import javax.annotation.PostConstruct;
+
 /**
  * The Reactor-based implementation of {@link CloudFoundryClient}
  */
@@ -125,6 +127,7 @@ abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
         return new ReactorBuildpacks(getConnectionContext(), getRoot(), getTokenProvider());
     }
 
+    @PostConstruct
     public void checkCompatibility() {
         new CloudFoundryClientCompatibilityChecker(info()).check();
     }

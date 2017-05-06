@@ -39,7 +39,7 @@ import org.springframework.context.annotation.Lazy;
 @EnableAutoConfiguration
 public class ExampleConfiguration {
 
-    @Bean(initMethod = "checkCompatibility")
+    @Bean
     @Lazy
     ReactorCloudFoundryClient cloudFoundryClient(ConnectionContext connectionContext, TokenProvider tokenProvider) {
         return ReactorCloudFoundryClient.builder()
