@@ -35,6 +35,28 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 
+/**
+ * The ExampleConfiguration should typically be used like this:
+ *
+ * <pre>{@code
+ * @Component
+ * final class Example implements ApplicationRunner {
+ *
+ *     private final Logger logger = LoggerFactory.getLogger("example");
+ *
+ *     public static void main(String[] args) {
+ *         new SpringApplicationBuilder(Example.class, ExampleConfiguration.class)
+ *        .run(args);
+ *     }
+ *
+ *     @Override
+ *     public void run(ApplicationArguments args) throws Exception {
+ *     }
+ *
+ *     }
+ * }
+ * }</pre>
+ */
 @Configuration
 @EnableAutoConfiguration
 public class ExampleConfiguration {
