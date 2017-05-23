@@ -91,6 +91,7 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
     public HttpClient getHttpClient() {
         return HttpClient.create(options -> {
             options
+                .compression(true)
                 .loopResources(getThreadPool())
                 .option(SO_SNDBUF, SEND_BUFFER_SIZE)
                 .option(SO_RCVBUF, RECEIVE_BUFFER_SIZE)
