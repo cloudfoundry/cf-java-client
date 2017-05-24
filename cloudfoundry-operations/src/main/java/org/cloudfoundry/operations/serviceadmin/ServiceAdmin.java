@@ -41,9 +41,17 @@ public interface ServiceAdmin {
     Mono<Void> delete(DeleteServiceBrokerRequest request);
 
     /**
+     * Disable service access
+     *
+     * @param request the Disable Service Access request
+     * @return a completion indicator
+     */
+    Mono<Void> disableServiceAccess(DisableServiceAccessRequest request);
+
+    /**
      * Enable service access
      *
-     * @param request the EnableService Access request
+     * @param request the Enable Service Access request
      * @return a completion indicator
      */
     Mono<Void> enableServiceAccess(EnableServiceAccessRequest request);

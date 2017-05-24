@@ -91,6 +91,36 @@ public final class DefaultServiceAdmin implements ServiceAdmin {
     }
 
     @Override
+    public Mono<Void> disableServiceAccess(DisableServiceAccessRequest request) {
+        //services with name
+        //service plans with service id (and plan if you've got it?)
+
+        //org if doing org
+
+        //spv with plan ids (and org if you've got it) - think about this for enable!
+        //delete spv.
+
+        return this.cloudFoundryClient
+            .then(cloudFoundryClient -> Mono
+                .when(
+                    Mono.just(cloudFoundryClient),
+                    getServiceId(cloudFoundryClient, request.getServiceName())))
+            .then(function((cloudFoundryClient, serviceId) -> Mono
+                .when(
+                    Mono.just(cloudFoundryClient),
+                    getServicePlans(cloudFoundryClient, serviceId)
+                )))
+            .then(function((cloudFoundryClient, servicePlans) -> Mono
+                .when(
+                    updateServicePlanVisibilities(cloudFoundryClient, request, servicePlans), //TODO
+                    updateServicePlansPublicStatus(cloudFoundryClient, request, servicePlans) //TODO
+                )))
+            .then()
+            .transform(OperationsLogging.log("Disable Service Access"))
+            .checkpoint();
+    }
+
+    @Override
     public Mono<Void> enableServiceAccess(EnableServiceAccessRequest request) {
         return this.cloudFoundryClient
             .then(cloudFoundryClient -> Mono
@@ -105,7 +135,7 @@ public final class DefaultServiceAdmin implements ServiceAdmin {
             .then(function((cloudFoundryClient, servicePlans) -> Mono
                 .when(
                     updateServicePlanVisibilities(cloudFoundryClient, request, servicePlans),
-                    makeServicePlansPubliclyVisible(cloudFoundryClient, request, servicePlans)
+                    updateServicePlansPublicStatus(cloudFoundryClient, request, servicePlans)
                 )))
             .then()
             .transform(OperationsLogging.log("Enable Service Access"))
@@ -220,11 +250,11 @@ public final class DefaultServiceAdmin implements ServiceAdmin {
         }
     }
 
-    private static boolean isUpdateableServicePlan(EnableServiceAccessRequest request, ServicePlanResource servicePlan) {
-        if (request.getServicePlanName() == null || request.getServicePlanName().isEmpty()) {
+    private static boolean isUpdateableServicePlan(String servicePlanName, ServicePlanResource servicePlan) {
+        if (servicePlanName == null || servicePlanName.isEmpty()) {
             return true;
         } else {
-            return ResourceUtils.getEntity(servicePlan).getName().equals(request.getServicePlanName());
+            return servicePlanName.equals(ResourceUtils.getEntity(servicePlan).getName());
         }
     }
 
@@ -267,19 +297,9 @@ public final class DefaultServiceAdmin implements ServiceAdmin {
             .map(ResourceUtils::getId);
     }
 
-    private static Mono<Void> makeServicePlansPubliclyVisible(CloudFoundryClient cloudFoundryClient, EnableServiceAccessRequest request, List<ServicePlanResource> servicePlans) {
-        if (request.getOrganizationName() != null && !request.getOrganizationName().isEmpty()) {
-            return Mono.empty();
-        }
-
-        if (request.getServicePlanName() != null && !request.getServicePlanName().isEmpty()) {
-            return Mono.empty();
-        }
-
-        return Flux.fromIterable(servicePlans)
-            .filter(servicePlan -> !ResourceUtils.getEntity(servicePlan).getPubliclyVisible())
-            .flatMap(servicePlan -> requestUpdateServicePlanToPublic(cloudFoundryClient, ResourceUtils.getId(servicePlan)))
-            .then();
+    private static Flux<String> listServicePlanVisibilityIds(CloudFoundryClient cloudFoundryClient, String organizationId, List<String> servicePlanIds) {
+        return requestListServicePlanVisibilities(cloudFoundryClient, organizationId, servicePlanIds)
+            .map(ResourceUtils::getId);
     }
 
     private static Mono<CreateServiceBrokerResponse> requestCreateServiceBroker(CloudFoundryClient cloudFoundryClient, String name, String url, String username, String password, Boolean isSpaceScoped,
@@ -368,6 +388,16 @@ public final class DefaultServiceAdmin implements ServiceAdmin {
                     .build()));
     }
 
+    private static Flux<ServicePlanVisibilityResource> requestListServicePlanVisibilities(CloudFoundryClient cloudFoundryClient, String organizationId, List<String> servicePlanIds) {
+        return PaginationUtils
+            .requestClientV2Resources(page -> cloudFoundryClient.servicePlanVisibilities()
+                .list(ListServicePlanVisibilitiesRequest.builder()
+                    .organizationId(organizationId)
+                    .page(page)
+                    .servicePlanIds(servicePlanIds)
+                    .build()));
+    }
+
     private static Flux<ServicePlanResource> requestListServicePlans(CloudFoundryClient cloudFoundryClient, List<String> services) {
         return PaginationUtils.requestClientV2Resources(page -> cloudFoundryClient.servicePlans()
             .list(ListServicePlansRequest.builder()
@@ -394,10 +424,10 @@ public final class DefaultServiceAdmin implements ServiceAdmin {
                     .build()));
     }
 
-    private static Mono<UpdateServicePlanResponse> requestUpdateServicePlanToPublic(CloudFoundryClient cloudFoundryClient, String servicePlanId) {
+    private static Mono<UpdateServicePlanResponse> requestUpdateServicePlanPublicStatus(CloudFoundryClient cloudFoundryClient, boolean publiclyVisible, String servicePlanId) {
         return cloudFoundryClient.servicePlans()
             .update(UpdateServicePlanRequest.builder()
-                .publiclyVisible(true)
+                .publiclyVisible(publiclyVisible)
                 .servicePlanId(servicePlanId)
                 .build());
     }
@@ -436,7 +466,7 @@ public final class DefaultServiceAdmin implements ServiceAdmin {
 
     private static Mono<Void> updateServicePlanVisibilities(CloudFoundryClient cloudFoundryClient, EnableServiceAccessRequest request, List<ServicePlanResource> servicePlans) {
         List<String> servicePlanIds = servicePlans.stream()
-            .filter(servicePlan -> isUpdateableServicePlan(request, servicePlan))
+            .filter(servicePlan -> isUpdateableServicePlan(request.getServicePlanName(), servicePlan))
             .map(ResourceUtils::getId)
             .collect(Collectors.toList());
 
@@ -451,6 +481,56 @@ public final class DefaultServiceAdmin implements ServiceAdmin {
                     .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, request.getCompletionTimeout(), job)))
                 .then();
         }
+    }
+
+    private static Mono<Void> updateServicePlanVisibilities(CloudFoundryClient cloudFoundryClient, DisableServiceAccessRequest request, List<ServicePlanResource> servicePlans) {
+        List<String> servicePlanIds = servicePlans.stream()
+            .filter(servicePlan -> isUpdateableServicePlan(request.getServicePlanName(), servicePlan))
+            .map(ResourceUtils::getId)
+            .collect(Collectors.toList());
+
+        if (request.getOrganizationName() != null && !request.getOrganizationName().isEmpty()) {
+            return getOrganizationId(cloudFoundryClient, request.getOrganizationName())
+                .then(organizationId -> listServicePlanVisibilityIds(cloudFoundryClient, organizationId, servicePlanIds)
+                    .flatMap(visibilityId -> requestDeleteServicePlanVisibility(cloudFoundryClient, visibilityId)
+                        .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, request.getCompletionTimeout(), job)))
+                    .then());
+        } else {
+            return listServicePlanVisibilityIds(cloudFoundryClient, servicePlanIds) //TODO IS THIS TRUE?
+                .flatMap(visibilityId -> requestDeleteServicePlanVisibility(cloudFoundryClient, visibilityId)
+                    .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, request.getCompletionTimeout(), job)))
+                .then();
+        }
+    }
+
+    private static Mono<Void> updateServicePlansPublicStatus(CloudFoundryClient cloudFoundryClient, DisableServiceAccessRequest request, List<ServicePlanResource> servicePlans) {
+        if (request.getOrganizationName() != null && !request.getOrganizationName().isEmpty()) {
+            return Mono.empty();
+        }
+
+        if (request.getServicePlanName() != null && !request.getServicePlanName().isEmpty()) {
+            return Mono.empty();
+        }
+
+        return Flux.fromIterable(servicePlans)
+            .filter(servicePlan -> ResourceUtils.getEntity(servicePlan).getPubliclyVisible())
+            .flatMap(servicePlan -> requestUpdateServicePlanPublicStatus(cloudFoundryClient, false, ResourceUtils.getId(servicePlan)))
+            .then();
+    }
+
+    private static Mono<Void> updateServicePlansPublicStatus(CloudFoundryClient cloudFoundryClient, EnableServiceAccessRequest request, List<ServicePlanResource> servicePlans) {
+        if (request.getOrganizationName() != null && !request.getOrganizationName().isEmpty()) {
+            return Mono.empty();
+        }
+
+        if (request.getServicePlanName() != null && !request.getServicePlanName().isEmpty()) {
+            return Mono.empty();
+        }
+
+        return Flux.fromIterable(servicePlans)
+            .filter(servicePlan -> !ResourceUtils.getEntity(servicePlan).getPubliclyVisible())
+            .flatMap(servicePlan -> requestUpdateServicePlanPublicStatus(cloudFoundryClient, true, ResourceUtils.getId(servicePlan)))
+            .then();
     }
 
     private static Mono<Void> validateOrganization(CloudFoundryClient cloudFoundryClient, String organizationName) {
