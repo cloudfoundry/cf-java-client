@@ -32,6 +32,9 @@ import org.cloudfoundry.client.v2.serviceplans.ListServicePlansRequest;
 import org.cloudfoundry.client.v2.serviceplans.ListServicePlansResponse;
 import org.cloudfoundry.client.v2.serviceplans.ServicePlanEntity;
 import org.cloudfoundry.client.v2.serviceplans.ServicePlanResource;
+import org.cloudfoundry.client.v2.serviceplanvisibilities.CreateServicePlanVisibilityRequest;
+import org.cloudfoundry.client.v2.serviceplanvisibilities.CreateServicePlanVisibilityResponse;
+import org.cloudfoundry.client.v2.serviceplanvisibilities.DeleteServicePlanVisibilityRequest;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.ListServicePlanVisibilitiesRequest;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.ListServicePlanVisibilitiesResponse;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.ServicePlanVisibilityEntity;
@@ -117,10 +120,79 @@ public final class DefaultServiceAdminTest extends AbstractOperationsTest {
     }
 
     @Test
+    public void enableServiceAccess() {
+        requestListServicesWithName(this.cloudFoundryClient, "test-service-name");
+        requestListServicePlans(this.cloudFoundryClient, "test-service-id");
+        requestListServicePlanVisibilities(this.cloudFoundryClient, "test-service-plan-id");
+        requestDeleteServicePlanVisibility(this.cloudFoundryClient, "test-service-plan-visibility-id");
+
+        this.serviceAdmin
+            .enableServiceAccess(EnableServiceAccessRequest.builder()
+                .serviceName("test-service-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void enableServiceAccessSpecifyOrganization() {
+        requestListServicesWithName(this.cloudFoundryClient, "test-service-name");
+        requestListServicePlans(this.cloudFoundryClient, "test-service-id");
+        requestListServicePlanVisibilities(this.cloudFoundryClient, "test-service-plan-id");
+        requestListOrganizations(this.cloudFoundryClient, "test-organization-name");
+        requestCreateServicePlanVisibility(this.cloudFoundryClient, "test-organization-id", "test-service-plan-id");
+
+        this.serviceAdmin
+            .enableServiceAccess(EnableServiceAccessRequest.builder()
+                .organizationName("test-organization-name")
+                .serviceName("test-service-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void enableServiceAccessSpecifyServicePlan() {
+        requestListServicesWithName(this.cloudFoundryClient, "test-service-name");
+        requestListServicePlans(this.cloudFoundryClient, "test-service-id");
+        requestListServicePlanVisibilities(this.cloudFoundryClient, "test-service-plan-id");
+        requestDeleteServicePlanVisibility(this.cloudFoundryClient, "test-service-plan-visibility-id");
+
+        this.serviceAdmin
+            .enableServiceAccess(EnableServiceAccessRequest.builder()
+                .serviceName("test-service-name")
+                .servicePlanName("test-service-plan-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void enableServiceAccessSpecifyAll() {
+        requestListServicesWithName(this.cloudFoundryClient, "test-service-name");
+        requestListServicePlans(this.cloudFoundryClient, "test-service-id");
+        requestListOrganizations(this.cloudFoundryClient, "test-organization-name");
+        requestCreateServicePlanVisibility(this.cloudFoundryClient, "test-organization-id", "test-service-plan-id");
+
+        this.serviceAdmin
+            .enableServiceAccess(EnableServiceAccessRequest.builder()
+                .organizationName("test-organization-name")
+                .serviceName("test-service-name")
+                .servicePlanName("test-service-plan-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
     public void listServiceAccessSettings() {
         requestListServiceBrokers(this.cloudFoundryClient);
         requestListServicePlanVisibilitiesEmpty(this.cloudFoundryClient);
-        requestListServices(this.cloudFoundryClient, "test-service-broker-id");
+        requestListServicesWithBroker(this.cloudFoundryClient, "test-service-broker-id");
         requestListServicePlans(this.cloudFoundryClient, "test-service-id");
 
         this.serviceAdmin
@@ -155,7 +227,7 @@ public final class DefaultServiceAdminTest extends AbstractOperationsTest {
     public void listServiceAccessSettingsSpecifyBroker() {
         requestListServiceBrokers(this.cloudFoundryClient);
         requestListServicePlanVisibilitiesEmpty(this.cloudFoundryClient);
-        requestListServices(this.cloudFoundryClient, "test-service-broker-id");
+        requestListServicesWithBroker(this.cloudFoundryClient, "test-service-broker-id");
         requestListServicePlans(this.cloudFoundryClient, "test-service-id");
 
         this.serviceAdmin
@@ -193,7 +265,7 @@ public final class DefaultServiceAdminTest extends AbstractOperationsTest {
         requestListServiceBrokers(this.cloudFoundryClient);
         requestListServicePlanVisibilities(this.cloudFoundryClient);
         requestListOrganizations(this.cloudFoundryClient, "test-organization-name");
-        requestListServices(this.cloudFoundryClient, "test-service-broker-id");
+        requestListServicesWithBroker(this.cloudFoundryClient, "test-service-broker-id");
         requestListServicePlans(this.cloudFoundryClient, "test-service-id");
         requestGetOrganization(this.cloudFoundryClient, "test-organization-id");
 
@@ -230,9 +302,10 @@ public final class DefaultServiceAdminTest extends AbstractOperationsTest {
 
     @Test
     public void listServiceAccessSettingsSpecifyService() {
+        requestListServicesWithName(this.cloudFoundryClient, "test-service-name");
         requestListServiceBrokers(this.cloudFoundryClient);
         requestListServicePlanVisibilitiesEmpty(this.cloudFoundryClient);
-        requestListServices(this.cloudFoundryClient, "test-service-broker-id");
+        requestListServicesWithBroker(this.cloudFoundryClient, "test-service-broker-id");
         requestListServicePlans(this.cloudFoundryClient, "test-service-id");
 
         this.serviceAdmin
@@ -255,8 +328,7 @@ public final class DefaultServiceAdminTest extends AbstractOperationsTest {
     public void listServiceAccessSettingsSpecifyServiceNotFound() {
         requestListServiceBrokers(this.cloudFoundryClient);
         requestListServicePlanVisibilitiesEmpty(this.cloudFoundryClient);
-        requestListServicesEmpty(this.cloudFoundryClient, "test-service-broker-id");
-        requestListServicePlansEmpty(this.cloudFoundryClient);
+        requestListServicesWithNameEmpty(this.cloudFoundryClient, "bogus-service-name");
 
         this.serviceAdmin
             .listServiceAccessSettings(ListServiceAccessSettingsRequest.builder()
@@ -308,10 +380,30 @@ public final class DefaultServiceAdminTest extends AbstractOperationsTest {
                     .build()));
     }
 
+    private static void requestCreateServicePlanVisibility(CloudFoundryClient cloudFoundryClient, String organizationId, String servicePlanId) {
+        when(cloudFoundryClient.servicePlanVisibilities()
+            .create(CreateServicePlanVisibilityRequest.builder()
+                .organizationId(organizationId)
+                .servicePlanId(servicePlanId)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(CreateServicePlanVisibilityResponse.builder())
+                    .build()));
+    }
+
     private static void requestDeleteServiceBroker(CloudFoundryClient cloudFoundryClient, String serviceBrokerId) {
         when(cloudFoundryClient.serviceBrokers()
             .delete(org.cloudfoundry.client.v2.servicebrokers.DeleteServiceBrokerRequest.builder()
                 .serviceBrokerId(serviceBrokerId)
+                .build()))
+            .thenReturn(Mono.empty());
+    }
+
+    private static void requestDeleteServicePlanVisibility(CloudFoundryClient cloudFoundryClient, String servicePlanVisibilityId) {
+        when(cloudFoundryClient.servicePlanVisibilities()
+            .delete(DeleteServicePlanVisibilityRequest.builder()
+                .async(true)
+                .servicePlanVisibilityId(servicePlanVisibilityId)
                 .build()))
             .thenReturn(Mono.empty());
     }
@@ -419,6 +511,23 @@ public final class DefaultServiceAdminTest extends AbstractOperationsTest {
                     .build()));
     }
 
+    private static void requestListServicePlanVisibilities(CloudFoundryClient cloudFoundryClient, String servicePlanId) {
+        when(cloudFoundryClient.servicePlanVisibilities()
+            .list(ListServicePlanVisibilitiesRequest.builder()
+                .page(1)
+                .servicePlanId(servicePlanId)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(ListServicePlanVisibilitiesResponse.builder(), "service-plan-visibility-")
+                    .resource(fill(ServicePlanVisibilityResource.builder(), "service-plan-visibility-")
+                        .entity(fill(ServicePlanVisibilityEntity.builder())
+                            .organizationId("test-organization-id")
+                            .servicePlanId(servicePlanId)
+                            .build())
+                        .build())
+                    .build()));
+    }
+
     private static void requestListServicePlanVisibilitiesEmpty(CloudFoundryClient cloudFoundryClient) {
         when(cloudFoundryClient.servicePlanVisibilities()
             .list(ListServicePlanVisibilitiesRequest.builder()
@@ -445,18 +554,7 @@ public final class DefaultServiceAdminTest extends AbstractOperationsTest {
                     .build()));
     }
 
-    private static void requestListServicePlansEmpty(CloudFoundryClient cloudFoundryClient) {
-        when(cloudFoundryClient.servicePlans()
-            .list(ListServicePlansRequest.builder()
-                .page(1)
-                .serviceId()
-                .build()))
-            .thenReturn(Mono
-                .just(fill(ListServicePlansResponse.builder())
-                    .build()));
-    }
-
-    private static void requestListServices(CloudFoundryClient cloudFoundryClient, String serviceBrokerId) {
+    private static void requestListServicesWithBroker(CloudFoundryClient cloudFoundryClient, String serviceBrokerId) {
         when(cloudFoundryClient.services()
             .list(ListServicesRequest.builder()
                 .serviceBrokerId(serviceBrokerId)
@@ -473,10 +571,27 @@ public final class DefaultServiceAdminTest extends AbstractOperationsTest {
                     .build()));
     }
 
-    private static void requestListServicesEmpty(CloudFoundryClient cloudFoundryClient, String serviceBrokerId) {
+    private static void requestListServicesWithName(CloudFoundryClient cloudFoundryClient, String label) {
         when(cloudFoundryClient.services()
             .list(ListServicesRequest.builder()
-                .serviceBrokerId(serviceBrokerId)
+                .label(label)
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(ListServicesResponse.builder())
+                    .resource(fill(ServiceResource.builder(), "service-")
+                        .entity(fill(ServiceEntity.builder())
+                            .label("test-service-name")
+                            .serviceBrokerId("test-service-broker-id")
+                            .build())
+                        .build())
+                    .build()));
+    }
+
+    private static void requestListServicesWithNameEmpty(CloudFoundryClient cloudFoundryClient, String label) {
+        when(cloudFoundryClient.services()
+            .list(ListServicesRequest.builder()
+                .label(label)
                 .page(1)
                 .build()))
             .thenReturn(Mono

@@ -28,6 +28,24 @@ public final class ServiceAdminTest extends AbstractIntegrationTest {
 
     @Ignore
     @Test
+    public void enableServiceAccess() {
+        //
+    }
+
+    @Ignore
+    @Test
+    public void enableServiceAccessSpecifyOrganization() {
+        //
+    }
+
+    @Ignore
+    @Test
+    public void enableServiceAccessSpecifyServicePlan() {
+        //
+    }
+
+    @Ignore
+    @Test
     public void listServiceAccessSettings() {
         //
     }
