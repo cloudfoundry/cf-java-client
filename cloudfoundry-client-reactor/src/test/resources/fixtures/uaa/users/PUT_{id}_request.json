@@ -6,6 +6,11 @@
       "primary": false
     }
   ],
+  "phoneNumbers": [
+    {
+      "value": "5555555555"
+    }
+  ],
   "externalId": "test-user",
   "name": {
     "familyName": "family name",

@@ -20,32 +20,7 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.uaa.AbstractUaaApiTest;
-import org.cloudfoundry.uaa.users.Approval;
-import org.cloudfoundry.uaa.users.ChangeUserPasswordRequest;
-import org.cloudfoundry.uaa.users.ChangeUserPasswordResponse;
-import org.cloudfoundry.uaa.users.CreateUserRequest;
-import org.cloudfoundry.uaa.users.CreateUserResponse;
-import org.cloudfoundry.uaa.users.DeleteUserRequest;
-import org.cloudfoundry.uaa.users.DeleteUserResponse;
-import org.cloudfoundry.uaa.users.Email;
-import org.cloudfoundry.uaa.users.GetUserVerificationLinkRequest;
-import org.cloudfoundry.uaa.users.GetUserVerificationLinkResponse;
-import org.cloudfoundry.uaa.users.Group;
-import org.cloudfoundry.uaa.users.Invite;
-import org.cloudfoundry.uaa.users.InviteUsersRequest;
-import org.cloudfoundry.uaa.users.InviteUsersResponse;
-import org.cloudfoundry.uaa.users.ListUsersRequest;
-import org.cloudfoundry.uaa.users.ListUsersResponse;
-import org.cloudfoundry.uaa.users.LookupUserIdsRequest;
-import org.cloudfoundry.uaa.users.LookupUserIdsResponse;
-import org.cloudfoundry.uaa.users.Meta;
-import org.cloudfoundry.uaa.users.Name;
-import org.cloudfoundry.uaa.users.UpdateUserRequest;
-import org.cloudfoundry.uaa.users.UpdateUserResponse;
-import org.cloudfoundry.uaa.users.User;
-import org.cloudfoundry.uaa.users.UserId;
-import org.cloudfoundry.uaa.users.VerifyUserRequest;
-import org.cloudfoundry.uaa.users.VerifyUserResponse;
+import org.cloudfoundry.uaa.users.*;
 import org.junit.Test;
 import reactor.test.StepVerifier;
 
@@ -120,6 +95,9 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
                     .value("ZO6FEI@test.org")
                     .primary(true)
                     .build())
+                .phoneNumber(PhoneNumber.builder()
+                    .value("5555555555")
+                    .build())
                 .active(true)
                 .verified(true)
                 .origin("")
@@ -142,6 +120,9 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
                 .email(Email.builder()
                     .value("ZO6FEI@test.org")
                     .primary(false)
+                    .build())
+                .phoneNumber(PhoneNumber.builder()
+                    .value("5555555555")
                     .build())
                 .group(Group.builder()
                     .value("4622c5e1-ddfd-4e17-9e81-2ae3c03972be")
@@ -606,6 +587,9 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
                     .primary(false)
                     .value("oH4jON@test.org")
                     .build())
+                .phoneNumber(PhoneNumber.builder()
+                    .value("5555555555")
+                    .build())
                 .externalId("test-user")
                 .id(("test-user-id"))
                 .version("*")
@@ -639,6 +623,9 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
                 .email(Email.builder()
                     .primary(false)
                     .value("oH4jON@test.org")
+                    .build())
+                .phoneNumber(PhoneNumber.builder()
+                    .value("5555555555")
                     .build())
                 .externalId("test-user")
                 .group(Group.builder()
