@@ -35,6 +35,8 @@ import org.cloudfoundry.uaa.users.Name;
 import org.cloudfoundry.uaa.users.UpdateUserRequest;
 import org.cloudfoundry.uaa.users.User;
 import org.cloudfoundry.uaa.users.UserId;
+import org.cloudfoundry.uaa.users.UserInfoRequest;
+import org.cloudfoundry.uaa.users.UserInfoResponse;
 import org.cloudfoundry.uaa.users.VerifyUserRequest;
 import org.cloudfoundry.uaa.users.VerifyUserResponse;
 import org.junit.Test;
@@ -211,6 +213,18 @@ public final class UsersTest extends AbstractIntegrationTest {
                 .map(Email::getValue))
             .as(StepVerifier::create)
             .expectNext("test-email-2")
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void userInfo() throws TimeoutException, InterruptedException {
+        this.uaaClient.users()
+            .userInfo(UserInfoRequest.builder()
+                .build())
+            .map(UserInfoResponse::getName)
+            .as(StepVerifier::create)
+            .expectNext("Test User")
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }

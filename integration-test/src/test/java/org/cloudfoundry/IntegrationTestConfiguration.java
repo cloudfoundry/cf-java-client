@@ -131,6 +131,7 @@ public class IntegrationTestConfiguration {
         "cloud_controller.read",
         "cloud_controller.write",
         "idps.write",
+        "openid",
         "password.write",
         "routing.router_groups.read",
         "routing.router_groups.write",

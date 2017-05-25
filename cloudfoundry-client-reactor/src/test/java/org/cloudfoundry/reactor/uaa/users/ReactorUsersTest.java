@@ -44,6 +44,8 @@ import org.cloudfoundry.uaa.users.UpdateUserRequest;
 import org.cloudfoundry.uaa.users.UpdateUserResponse;
 import org.cloudfoundry.uaa.users.User;
 import org.cloudfoundry.uaa.users.UserId;
+import org.cloudfoundry.uaa.users.UserInfoRequest;
+import org.cloudfoundry.uaa.users.UserInfoResponse;
 import org.cloudfoundry.uaa.users.VerifyUserRequest;
 import org.cloudfoundry.uaa.users.VerifyUserResponse;
 import org.junit.Test;
@@ -672,6 +674,37 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
                 .userName("oH4jON@test.org")
                 .verified(true)
                 .zoneId("uaa")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void userInfo() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/userinfo")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/uaa/users/GET_userinfo_response.json")
+                .build())
+            .build());
+
+        this.users
+            .userInfo(UserInfoRequest.builder()
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(UserInfoResponse.builder()
+                .email("yH9Avc@test.org")
+                .familyName("PasswordResetUserLast")
+                .givenName("PasswordResetUserFirst")
+                .name("PasswordResetUserFirst PasswordResetUserLast")
+                .phoneNumber("+15558880000")
+                .previousLogonTime(null)
+                .sub("3587ef54-6361-44d2-b8a1-4937674aa2b5")
+                .userId("3587ef54-6361-44d2-b8a1-4937674aa2b5")
+                .userName("yH9Avc@test.org")
                 .build())
             .expectComplete()
             .verify(Duration.ofSeconds(5));
