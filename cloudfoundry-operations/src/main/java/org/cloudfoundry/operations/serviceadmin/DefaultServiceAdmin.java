@@ -243,39 +243,20 @@ public final class DefaultServiceAdmin implements ServiceAdmin {
     }
 
     private static boolean isUpdateableServicePlan(String servicePlanName, ServicePlanResource servicePlan) {
-        if (servicePlanName == null || servicePlanName.isEmpty()) {
-            return true;
-        } else {
-            return servicePlanName.equals(ResourceUtils.getEntity(servicePlan).getName());
-        }
+        return servicePlanName == null || servicePlanName.isEmpty() || servicePlanName.equals(ResourceUtils.getEntity(servicePlan).getName());
     }
 
     private static boolean isVisibleOrganization(List<String> organizationNames, String requiredOrganization, ServicePlanResource servicePlan) {
-        if (ResourceUtils.getEntity(servicePlan).getPubliclyVisible()) {
-            return true;
-        }
-
-        if (requiredOrganization == null || requiredOrganization.isEmpty()) {
-            return true;
-        }
-
-        if (organizationNames != null && organizationNames.contains(requiredOrganization)) {
-            return true;
-        }
-
-        return false;
+        return ResourceUtils.getEntity(servicePlan).getPubliclyVisible() ||
+            requiredOrganization == null ||
+            requiredOrganization.isEmpty() ||
+            organizationNames != null && organizationNames.contains(requiredOrganization);
     }
 
     private static boolean isVisibleService(ListServiceAccessSettingsRequest request, ServiceResource service) {
-        if (request.getServiceName() == null || request.getServiceName().isEmpty()) {
-            return true;
-        }
-
-        if (request.getServiceName().equals(ResourceUtils.getEntity(service).getLabel())) {
-            return true;
-        }
-
-        return false;
+        return request.getServiceName() == null ||
+            request.getServiceName().isEmpty() ||
+            request.getServiceName().equals(ResourceUtils.getEntity(service).getLabel());
     }
 
     private static Mono<List<ServiceBrokerResource>> listServiceBrokers(CloudFoundryClient cloudFoundryClient) {
