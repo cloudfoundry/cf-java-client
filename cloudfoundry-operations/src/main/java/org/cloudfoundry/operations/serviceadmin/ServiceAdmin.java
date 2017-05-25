@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.operations.serviceadmin;
 
-
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -42,10 +41,34 @@ public interface ServiceAdmin {
     Mono<Void> delete(DeleteServiceBrokerRequest request);
 
     /**
+     * Disable service access
+     *
+     * @param request the Disable Service Access request
+     * @return a completion indicator
+     */
+    Mono<Void> disableServiceAccess(DisableServiceAccessRequest request);
+
+    /**
+     * Enable service access
+     *
+     * @param request the Enable Service Access request
+     * @return a completion indicator
+     */
+    Mono<Void> enableServiceAccess(EnableServiceAccessRequest request);
+
+    /**
      * Lists the service brokers
      *
      * @return the service brokers
      */
     Flux<ServiceBroker> list();
+
+    /**
+     * Lists the service access settings
+     *
+     * @param request the List Service Access Settings request
+     * @return the service access settings
+     */
+    Flux<ServiceAccess> listServiceAccessSettings(ListServiceAccessSettingsRequest request);
 
 }

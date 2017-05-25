@@ -14,29 +14,26 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.operations.spaceadmin;
-
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+package org.cloudfoundry.operations.serviceadmin;
 
 /**
- * Main entry point to the Cloud Foundry Space Admin API
+ * Access level for a service
  */
-public interface SpaceAdmin {
+public enum Access {
 
     /**
-     * Gets a space quota
-     *
-     * @param request the Get Space Quota request
-     * @return the space quota
+     * Service is available to all
      */
-    Mono<SpaceQuota> get(GetSpaceQuotaRequest request);
+    ALL,
 
     /**
-     * Lists the space quotas
-     *
-     * @return the space quotas
+     * Service has limited availability
      */
-    Flux<SpaceQuota> listQuotas();
+    LIMITED,
+
+    /**
+     * Service is available to none
+     */
+    NONE
 
 }

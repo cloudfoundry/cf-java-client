@@ -14,29 +14,23 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.operations.spaceadmin;
+package org.cloudfoundry.operations.serviceadmin;
 
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+import org.junit.Test;
 
-/**
- * Main entry point to the Cloud Foundry Space Admin API
- */
-public interface SpaceAdmin {
+public final class DisableServiceAccessRequestTest {
 
-    /**
-     * Gets a space quota
-     *
-     * @param request the Get Space Quota request
-     * @return the space quota
-     */
-    Mono<SpaceQuota> get(GetSpaceQuotaRequest request);
+    @Test(expected = IllegalStateException.class)
+    public void noServiceName() {
+        DisableServiceAccessRequest.builder()
+            .build();
+    }
 
-    /**
-     * Lists the space quotas
-     *
-     * @return the space quotas
-     */
-    Flux<SpaceQuota> listQuotas();
+    @Test
+    public void valid() {
+        DisableServiceAccessRequest.builder()
+            .serviceName("test-service-name")
+            .build();
+    }
 
 }

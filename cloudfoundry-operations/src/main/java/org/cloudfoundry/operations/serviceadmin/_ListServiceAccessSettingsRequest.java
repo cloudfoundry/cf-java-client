@@ -14,29 +14,33 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.operations.spaceadmin;
+package org.cloudfoundry.operations.serviceadmin;
 
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+import org.cloudfoundry.Nullable;
+import org.immutables.value.Value;
 
 /**
- * Main entry point to the Cloud Foundry Space Admin API
+ * The request options for the list service access operation
  */
-public interface SpaceAdmin {
+@Value.Immutable
+abstract class _ListServiceAccessSettingsRequest {
 
     /**
-     * Gets a space quota
-     *
-     * @param request the Get Space Quota request
-     * @return the space quota
+     * Limit the list to this broker name
      */
-    Mono<SpaceQuota> get(GetSpaceQuotaRequest request);
+    @Nullable
+    abstract String getBrokerName();
 
     /**
-     * Lists the space quotas
-     *
-     * @return the space quotas
+     * Limit the list to this organization name
      */
-    Flux<SpaceQuota> listQuotas();
+    @Nullable
+    abstract String getOrganizationName();
+
+    /**
+     * Limit the list to this service name
+     */
+    @Nullable
+    abstract String getServiceName();
 
 }
