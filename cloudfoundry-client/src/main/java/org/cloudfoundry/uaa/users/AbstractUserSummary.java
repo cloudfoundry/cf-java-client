@@ -88,4 +88,10 @@ public abstract class AbstractUserSummary extends AbstractUserId {
     @JsonProperty("zoneId")
     public abstract String getZoneId();
 
+    /**
+     * The phone numbers for the user
+     */
+    @JsonProperty("phoneNumbers")
+    public abstract List<PhoneNumber> getPhoneNumbers();
+
 }

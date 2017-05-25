@@ -102,4 +102,10 @@ abstract class _UpdateUserRequest implements IdentityZoned, Versioned {
     @Nullable
     abstract Boolean getVerified();
 
+    /**
+     * The phone numbers for the user
+     */
+    @JsonProperty("phoneNumbers")
+    abstract List<PhoneNumber> getPhoneNumbers();
+
 }
