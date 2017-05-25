@@ -212,6 +212,35 @@ public final class DefaultServiceAdminTest extends AbstractOperationsTest {
     }
 
     @Test
+    public void enableServiceAccessOrganizationNotFound() {
+        requestListServicesWithName(this.cloudFoundryClient, "test-service-name");
+        requestListServicePlans(this.cloudFoundryClient, "test-service-id");
+        requestListOrganizationsEmpty(this.cloudFoundryClient, "bogus-organization-name");
+
+        this.serviceAdmin
+            .enableServiceAccess(EnableServiceAccessRequest.builder()
+                .organizationName("bogus-organization-name")
+                .serviceName("test-service-name")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Organization bogus-organization-name not found"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void enableServiceAccessServiceNotFound() {
+        requestListServicesWithNameEmpty(this.cloudFoundryClient, "bogus-service-name");
+
+        this.serviceAdmin
+            .enableServiceAccess(EnableServiceAccessRequest.builder()
+                .serviceName("bogus-service-name")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Service offering bogus-service-name not found"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
     public void enableServiceAccessSpecifyAll() {
         requestListServicesWithName(this.cloudFoundryClient, "test-service-name");
         requestListServicePlans(this.cloudFoundryClient, "test-service-id");

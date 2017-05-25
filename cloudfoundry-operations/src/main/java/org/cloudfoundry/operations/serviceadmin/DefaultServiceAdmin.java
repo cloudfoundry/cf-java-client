@@ -92,14 +92,6 @@ public final class DefaultServiceAdmin implements ServiceAdmin {
 
     @Override
     public Mono<Void> disableServiceAccess(DisableServiceAccessRequest request) {
-        //services with name
-        //service plans with service id (and plan if you've got it?)
-
-        //org if doing org
-
-        //spv with plan ids (and org if you've got it) - think about this for enable!
-        //delete spv.
-
         return this.cloudFoundryClient
             .then(cloudFoundryClient -> Mono
                 .when(
@@ -112,8 +104,8 @@ public final class DefaultServiceAdmin implements ServiceAdmin {
                 )))
             .then(function((cloudFoundryClient, servicePlans) -> Mono
                 .when(
-                    updateServicePlanVisibilities(cloudFoundryClient, request, servicePlans), //TODO
-                    updateServicePlansPublicStatus(cloudFoundryClient, request, servicePlans) //TODO
+                    updateServicePlanVisibilities(cloudFoundryClient, request, servicePlans),
+                    updateServicePlansPublicStatus(cloudFoundryClient, request, servicePlans)
                 )))
             .then()
             .transform(OperationsLogging.log("Disable Service Access"))
@@ -194,7 +186,7 @@ public final class DefaultServiceAdmin implements ServiceAdmin {
 
     private static Mono<String> getOrganizationId(CloudFoundryClient cloudFoundryClient, String organizationName) {
         return requestListOrganizations(cloudFoundryClient, organizationName)
-            .single()
+            .singleOrEmpty()
             .map(ResourceUtils::getId)
             .switchIfEmpty(ExceptionUtils.illegalArgument("Organization %s not found", organizationName));
     }
@@ -224,7 +216,7 @@ public final class DefaultServiceAdmin implements ServiceAdmin {
 
     private static Mono<String> getServiceId(CloudFoundryClient cloudFoundryClient, String serviceName) {
         return requestListServices(cloudFoundryClient, serviceName)
-            .single()
+            .singleOrEmpty()
             .map(ResourceUtils::getId)
             .switchIfEmpty(ExceptionUtils.illegalArgument("Service offering %s not found", serviceName));
     }
@@ -496,7 +488,7 @@ public final class DefaultServiceAdmin implements ServiceAdmin {
                         .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, request.getCompletionTimeout(), job)))
                     .then());
         } else {
-            return listServicePlanVisibilityIds(cloudFoundryClient, servicePlanIds) //TODO IS THIS TRUE?
+            return listServicePlanVisibilityIds(cloudFoundryClient, servicePlanIds)
                 .flatMap(visibilityId -> requestDeleteServicePlanVisibility(cloudFoundryClient, visibilityId)
                     .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, request.getCompletionTimeout(), job)))
                 .then();
@@ -520,10 +512,6 @@ public final class DefaultServiceAdmin implements ServiceAdmin {
 
     private static Mono<Void> updateServicePlansPublicStatus(CloudFoundryClient cloudFoundryClient, EnableServiceAccessRequest request, List<ServicePlanResource> servicePlans) {
         if (request.getOrganizationName() != null && !request.getOrganizationName().isEmpty()) {
-            return Mono.empty();
-        }
-
-        if (request.getServicePlanName() != null && !request.getServicePlanName().isEmpty()) {
             return Mono.empty();
         }
 
