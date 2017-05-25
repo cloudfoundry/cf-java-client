@@ -64,6 +64,12 @@ public abstract class AbstractUserSummary extends AbstractUserId {
     public abstract String getPasswordLastModified();
 
     /**
+     * The phone numbers for the user
+     */
+    @JsonProperty("phoneNumbers")
+    public abstract List<PhoneNumber> getPhoneNumbers();
+
+    /**
      * The unix epoch timestamp of when the user last authenticated
      */
     @JsonProperty("previousLogonTime")
@@ -87,11 +93,5 @@ public abstract class AbstractUserSummary extends AbstractUserId {
      */
     @JsonProperty("zoneId")
     public abstract String getZoneId();
-
-    /**
-     * The phone numbers for the user
-     */
-    @JsonProperty("phoneNumbers")
-    public abstract List<PhoneNumber> getPhoneNumbers();
 
 }

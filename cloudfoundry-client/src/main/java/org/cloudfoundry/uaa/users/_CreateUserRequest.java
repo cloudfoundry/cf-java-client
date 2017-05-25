@@ -93,7 +93,7 @@ abstract class _CreateUserRequest implements IdentityZoned {
     abstract Boolean getVerified();
 
     /**
-     * The phone number
+     * The phone numbers for the user
      */
     @JsonProperty("phoneNumbers")
     @Nullable

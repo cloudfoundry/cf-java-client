@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.immutables.value.Value;
 
 /**
- * The email addresses for a user
+ * A phone number for a user
  */
 @JsonDeserialize
 @Value.Immutable
