@@ -90,6 +90,12 @@ abstract class _UpdateUserRequest implements IdentityZoned, Versioned {
     abstract String getOrigin();
 
     /**
+     * The phone numbers for the user
+     */
+    @JsonProperty("phoneNumbers")
+    abstract List<PhoneNumber> getPhoneNumbers();
+
+    /**
      * The user name
      */
     @JsonProperty("userName")

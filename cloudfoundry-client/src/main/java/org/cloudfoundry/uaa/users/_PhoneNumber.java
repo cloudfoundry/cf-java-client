@@ -21,20 +21,14 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.immutables.value.Value;
 
 /**
- * An email address for a user
+ * A phone number for a user
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _Email {
+abstract class _PhoneNumber {
 
     /**
-     * Whether this email address is the primary
-     */
-    @JsonProperty("primary")
-    abstract Boolean getPrimary();
-
-    /**
-     * The email address
+     * The phone number
      */
     @JsonProperty("value")
     abstract String getValue();

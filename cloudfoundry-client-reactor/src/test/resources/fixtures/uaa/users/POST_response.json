@@ -17,6 +17,11 @@
       "primary": false
     }
   ],
+  "phoneNumbers": [
+    {
+      "value": "5555555555"
+    }
+  ],
   "groups": [
     {
       "value": "4622c5e1-ddfd-4e17-9e81-2ae3c03972be",

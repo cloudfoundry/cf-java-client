@@ -48,6 +48,7 @@ import org.cloudfoundry.uaa.users.UserInfoRequest;
 import org.cloudfoundry.uaa.users.UserInfoResponse;
 import org.cloudfoundry.uaa.users.VerifyUserRequest;
 import org.cloudfoundry.uaa.users.VerifyUserResponse;
+import org.cloudfoundry.uaa.users.PhoneNumber;
 import org.junit.Test;
 import reactor.test.StepVerifier;
 
@@ -122,6 +123,9 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
                     .value("ZO6FEI@test.org")
                     .primary(true)
                     .build())
+                .phoneNumber(PhoneNumber.builder()
+                    .value("5555555555")
+                    .build())
                 .active(true)
                 .verified(true)
                 .origin("")
@@ -144,6 +148,9 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
                 .email(Email.builder()
                     .value("ZO6FEI@test.org")
                     .primary(false)
+                    .build())
+                .phoneNumber(PhoneNumber.builder()
+                    .value("5555555555")
                     .build())
                 .group(Group.builder()
                     .value("4622c5e1-ddfd-4e17-9e81-2ae3c03972be")
@@ -608,6 +615,9 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
                     .primary(false)
                     .value("oH4jON@test.org")
                     .build())
+                .phoneNumber(PhoneNumber.builder()
+                    .value("5555555555")
+                    .build())
                 .externalId("test-user")
                 .id(("test-user-id"))
                 .version("*")
@@ -641,6 +651,9 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
                 .email(Email.builder()
                     .primary(false)
                     .value("oH4jON@test.org")
+                    .build())
+                .phoneNumber(PhoneNumber.builder()
+                    .value("5555555555")
                     .build())
                 .externalId("test-user")
                 .group(Group.builder()

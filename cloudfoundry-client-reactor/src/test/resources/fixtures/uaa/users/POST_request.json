@@ -11,6 +11,11 @@
       "primary": true
     }
   ],
+  "phoneNumbers": [
+    {
+      "value": "5555555555"
+    }
+  ],
   "active": true,
   "verified": true,
   "origin": "",
