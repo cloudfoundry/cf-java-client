@@ -70,6 +70,7 @@ abstract class _UserInfoResponse {
      * The user sub
      */
     @JsonProperty("sub")
+    @Nullable
     abstract String getSub();
 
     /**
