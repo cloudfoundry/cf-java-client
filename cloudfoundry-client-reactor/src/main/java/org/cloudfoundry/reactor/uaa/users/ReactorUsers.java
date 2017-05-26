@@ -35,6 +35,8 @@ import org.cloudfoundry.uaa.users.LookupUserIdsRequest;
 import org.cloudfoundry.uaa.users.LookupUserIdsResponse;
 import org.cloudfoundry.uaa.users.UpdateUserRequest;
 import org.cloudfoundry.uaa.users.UpdateUserResponse;
+import org.cloudfoundry.uaa.users.UserInfoRequest;
+import org.cloudfoundry.uaa.users.UserInfoResponse;
 import org.cloudfoundry.uaa.users.Users;
 import org.cloudfoundry.uaa.users.VerifyUserRequest;
 import org.cloudfoundry.uaa.users.VerifyUserResponse;
@@ -101,6 +103,12 @@ public final class ReactorUsers extends AbstractUaaOperations implements Users {
     @Override
     public Mono<UpdateUserResponse> update(UpdateUserRequest request) {
         return put(request, UpdateUserResponse.class, builder -> builder.pathSegment("Users", request.getId()))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<UserInfoResponse> userInfo(UserInfoRequest request) {
+        return get(request, UserInfoResponse.class, builder -> builder.pathSegment("userinfo"))
             .checkpoint();
     }
 

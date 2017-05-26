@@ -88,6 +88,14 @@ public interface Users {
     Mono<UpdateUserResponse> update(UpdateUserRequest request);
 
     /**
+     * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#user-info">Retrieve User Info</a> request
+     *
+     * @param request the User Info request
+     * @return the response from the User Info request
+     */
+    Mono<UserInfoResponse> userInfo(UserInfoRequest request);
+
+    /**
      * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#verify-user">Verify User</a> request
      *
      * @param request the Verify User request
