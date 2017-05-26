@@ -113,6 +113,8 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
         this.accessTokens.put(connectionContext, token(connectionContext));
     }
 
+    abstract Optional<String> identityZoneId();
+
     /**
      * Transforms a {@code Mono} in order to make a request to negotiate an access token
      *
@@ -152,8 +154,12 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
         return String.format("%s %s", payload.get(TOKEN_TYPE), accessToken);
     }
 
-    private static String getTokenUri(String root) {
-        return UriComponentsBuilder.fromUriString(root)
+    private static String getTokenUri(String root, Optional<String> identityZoneId) {
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(root);
+
+        identityZoneId.ifPresent(id -> builder.host(String.format("%s.%s", id, builder.build().getHost())));
+
+        return builder
             .pathSegment("oauth", "token")
             .build().encode().toUriString();
     }
@@ -231,7 +237,7 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
     private Mono<HttpClientResponse> requestToken(ConnectionContext connectionContext, Function<Mono<HttpClientRequest>, Mono<Void>> tokenRequestTransformer) {
         return connectionContext
             .getRoot(AUTHORIZATION_ENDPOINT)
-            .map(AbstractUaaTokenProvider::getTokenUri)
+            .map(root -> getTokenUri(root, identityZoneId()))
             .then(uri -> connectionContext.getHttpClient()
                 .post(uri, request -> Mono.just(request)
                     .map(AbstractUaaTokenProvider::disableChunkedTransfer)

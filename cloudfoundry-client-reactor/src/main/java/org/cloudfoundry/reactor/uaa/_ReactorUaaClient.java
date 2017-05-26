@@ -35,7 +35,10 @@ import org.cloudfoundry.uaa.identityzones.IdentityZones;
 import org.cloudfoundry.uaa.tokens.Tokens;
 import org.cloudfoundry.uaa.users.Users;
 import org.immutables.value.Value;
+import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
+
+import java.util.function.Function;
 
 /**
  * The Reactor-based implementation of {@link UaaClient}
@@ -91,12 +94,13 @@ abstract class _ReactorUaaClient implements UaaClient {
         return new ReactorUsers(getConnectionContext(), getRoot(), getTokenProvider());
     }
 
-    @Nullable
     abstract ConnectionContext getConnectionContext();
 
     @Value.Default
     Mono<String> getRoot() {
-        return getConnectionContext().getRoot("token_endpoint");
+        return getConnectionContext().getRoot("token_endpoint")
+            .map(getIdentityZoneEndpoint(identityZoneId()))
+            .cache();
     }
 
     abstract TokenProvider getTokenProvider();
@@ -104,6 +108,21 @@ abstract class _ReactorUaaClient implements UaaClient {
     @Value.Default
     UsernameProvider getUsernameProvider() {
         return new UsernameProvider(getConnectionContext(), getTokenProvider(), tokens());
+    }
+
+    @Nullable
+    abstract String identityZoneId();
+
+    private static Function<String, String> getIdentityZoneEndpoint(String identityZoneId) {
+        return raw -> {
+            if (identityZoneId == null) {
+                return raw;
+            }
+
+            UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(raw);
+            builder.host(String.format("%s.%s", identityZoneId, builder.build().getHost()));
+            return builder.build().encode().toUriString();
+        };
     }
 
 }

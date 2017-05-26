@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.reactor.routing;
 
-import org.cloudfoundry.Nullable;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.routing.v1.routergroups.ReactorRouterGroups;
@@ -46,7 +45,6 @@ abstract class _ReactorRoutingClient implements RoutingClient {
         return new ReactorTcpRoutes(getConnectionContext(), getRoot(), getTokenProvider());
     }
 
-    @Nullable
     abstract ConnectionContext getConnectionContext();
 
     @Value.Default

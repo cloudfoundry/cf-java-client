@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.reactor.doppler;
 
-import org.cloudfoundry.Nullable;
 import org.cloudfoundry.doppler.ContainerMetricsRequest;
 import org.cloudfoundry.doppler.DopplerClient;
 import org.cloudfoundry.doppler.Envelope;
@@ -55,7 +54,6 @@ abstract class _ReactorDopplerClient implements DopplerClient {
         return getDopplerEndpoints().stream(request);
     }
 
-    @Nullable
     abstract ConnectionContext getConnectionContext();
 
     @Value.Derived

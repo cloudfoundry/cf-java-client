@@ -37,13 +37,13 @@ public final class VersionBuilderTest {
 
     @Test
     public void augmentNotVersioned() {
-        IdentityZoneBuilder.augment(this.outbound, new Object());
+        VersionBuilder.augment(this.outbound, new Object());
         verifyZeroInteractions(this.outbound);
     }
 
     @Test
     public void augmentNullVersion() {
-        IdentityZoneBuilder.augment(this.outbound, new StubVersioned(null));
+        VersionBuilder.augment(this.outbound, new StubVersioned(null));
         verifyZeroInteractions(this.outbound);
     }
 

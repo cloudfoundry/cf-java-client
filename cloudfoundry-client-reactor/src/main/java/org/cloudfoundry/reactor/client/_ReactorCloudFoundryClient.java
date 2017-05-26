@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.reactor.client;
 
-import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.applications.ApplicationsV2;
 import org.cloudfoundry.client.v2.applicationusageevents.ApplicationUsageEvents;
@@ -324,7 +323,6 @@ abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
         return new ReactorUsers(getConnectionContext(), getRoot(), getTokenProvider());
     }
 
-    @Nullable
     abstract ConnectionContext getConnectionContext();
 
     @Value.Default
