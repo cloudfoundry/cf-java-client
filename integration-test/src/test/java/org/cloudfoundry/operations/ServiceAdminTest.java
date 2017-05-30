@@ -17,11 +17,16 @@
 package org.cloudfoundry.operations;
 
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.ServiceBrokerUtils;
+import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
+import org.cloudfoundry.client.v2.spaces.CreateSpaceResponse;
 import org.cloudfoundry.operations.serviceadmin.Access;
 import org.cloudfoundry.operations.serviceadmin.DisableServiceAccessRequest;
 import org.cloudfoundry.operations.serviceadmin.EnableServiceAccessRequest;
 import org.cloudfoundry.operations.serviceadmin.ListServiceAccessSettingsRequest;
 import org.cloudfoundry.operations.serviceadmin.ServiceAccess;
+import org.cloudfoundry.util.ResourceUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
@@ -30,10 +35,19 @@ import reactor.test.StepVerifier;
 
 import java.time.Duration;
 
+import static org.cloudfoundry.ServiceBrokerUtils.createServiceBroker;
+import static org.cloudfoundry.ServiceBrokerUtils.deleteServiceBroker;
+
 public final class ServiceAdminTest extends AbstractIntegrationTest {
 
     @Autowired
+    private CloudFoundryClient cloudFoundryClient;
+
+    @Autowired
     private CloudFoundryOperations cloudFoundryOperations;
+
+    @Autowired
+    private Mono<String> organizationId;
 
     @Autowired
     private String organizationName;
@@ -49,178 +63,282 @@ public final class ServiceAdminTest extends AbstractIntegrationTest {
 
     @Test
     public void disableServiceAccess() {
-        resetToEnabled(this.cloudFoundryOperations, this.serviceName)
+        String planName = this.nameFactory.getPlanName();
+        String serviceBrokerName = this.nameFactory.getServiceBrokerName();
+        String serviceName = this.nameFactory.getServiceName();
+        String spaceName = this.nameFactory.getSpaceName();
+
+        ServiceBrokerUtils.ServiceBrokerMetadata serviceBrokerMetadata = this.organizationId
+            .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .then(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, false))
+            .block(Duration.ofMinutes(5));
+
+        resetToEnabled(this.cloudFoundryOperations, serviceName)
             .then(this.cloudFoundryOperations.serviceAdmin()
                 .disableServiceAccess(DisableServiceAccessRequest.builder()
-                    .serviceName(this.serviceName)
+                    .serviceName(serviceName)
                     .build()))
-            .thenMany(requestListServiceAccessSettings(this.cloudFoundryOperations, this.serviceName))
-            .filter(response -> this.serviceName.equals(response.getServiceName()))
+            .thenMany(requestListServiceAccessSettings(this.cloudFoundryOperations, serviceName))
+            .filter(response -> serviceName.equals(response.getServiceName()))
             .as(StepVerifier::create)
             .expectNext(ServiceAccess.builder()
                 .access(Access.NONE)
-                .brokerName(this.serviceBrokerName)
+                .brokerName(serviceBrokerName)
                 .organizationName()
-                .planName(this.planName)
-                .serviceName(this.serviceName)
+                .planName(planName)
+                .serviceName(serviceName)
                 .build())
             .expectComplete()
             .verify(Duration.ofMinutes(5));
+
+        deleteServiceBroker(this.cloudFoundryClient, serviceBrokerMetadata.applicationMetadata.applicationId)
+            .block(Duration.ofMinutes(5));
     }
 
     @Test
     public void disableServiceAccessSpecifyAll() {
-        resetToEnabled(this.cloudFoundryOperations, this.serviceName)
+        String planName = this.nameFactory.getPlanName();
+        String serviceBrokerName = this.nameFactory.getServiceBrokerName();
+        String serviceName = this.nameFactory.getServiceName();
+        String spaceName = this.nameFactory.getSpaceName();
+
+        ServiceBrokerUtils.ServiceBrokerMetadata serviceBrokerMetadata = this.organizationId
+            .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .then(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, false))
+            .block(Duration.ofMinutes(5));
+
+        resetToEnabled(this.cloudFoundryOperations, serviceName)
             .then(this.cloudFoundryOperations.serviceAdmin()
                 .disableServiceAccess(DisableServiceAccessRequest.builder()
                     .organizationName(this.organizationName)
-                    .servicePlanName(this.planName)
-                    .serviceName(this.serviceName)
+                    .servicePlanName(planName)
+                    .serviceName(serviceName)
                     .build()))
-            .thenMany(requestListServiceAccessSettings(this.cloudFoundryOperations, this.serviceName))
-            .filter(response -> this.serviceName.equals(response.getServiceName()))
+            .thenMany(requestListServiceAccessSettings(this.cloudFoundryOperations, serviceName))
+            .filter(response -> serviceName.equals(response.getServiceName()))
             .as(StepVerifier::create)
             .expectNext(ServiceAccess.builder()
                 .access(Access.ALL)
-                .brokerName(this.serviceBrokerName)
+                .brokerName(serviceBrokerName)
                 .organizationName()
-                .planName(this.planName)
-                .serviceName(this.serviceName)
+                .planName(planName)
+                .serviceName(serviceName)
                 .build())
             .expectComplete()
             .verify(Duration.ofMinutes(5));
+
+        deleteServiceBroker(this.cloudFoundryClient, serviceBrokerMetadata.applicationMetadata.applicationId)
+            .block(Duration.ofMinutes(5));
     }
 
     @Test
     public void disableServiceAccessSpecifyOrganization() {
-        resetToEnabled(this.cloudFoundryOperations, this.serviceName)
+        String planName = this.nameFactory.getPlanName();
+        String serviceBrokerName = this.nameFactory.getServiceBrokerName();
+        String serviceName = this.nameFactory.getServiceName();
+        String spaceName = this.nameFactory.getSpaceName();
+
+        ServiceBrokerUtils.ServiceBrokerMetadata serviceBrokerMetadata = this.organizationId
+            .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .then(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, false))
+            .block(Duration.ofMinutes(5));
+
+        resetToEnabled(this.cloudFoundryOperations, serviceName)
             .then(this.cloudFoundryOperations.serviceAdmin()
                 .disableServiceAccess(DisableServiceAccessRequest.builder()
                     .organizationName(this.organizationName)
-                    .serviceName(this.serviceName)
+                    .serviceName(serviceName)
                     .build()))
-            .thenMany(requestListServiceAccessSettings(this.cloudFoundryOperations, this.serviceName))
-            .filter(response -> this.serviceName.equals(response.getServiceName()))
+            .thenMany(requestListServiceAccessSettings(this.cloudFoundryOperations, serviceName))
+            .filter(response -> serviceName.equals(response.getServiceName()))
             .as(StepVerifier::create)
             .expectNext(ServiceAccess.builder()
                 .access(Access.ALL)
-                .brokerName(this.serviceBrokerName)
+                .brokerName(serviceBrokerName)
                 .organizationName()
-                .planName(this.planName)
-                .serviceName(this.serviceName)
+                .planName(planName)
+                .serviceName(serviceName)
                 .build())
             .expectComplete()
             .verify(Duration.ofMinutes(5));
+
+        deleteServiceBroker(this.cloudFoundryClient, serviceBrokerMetadata.applicationMetadata.applicationId)
+            .block(Duration.ofMinutes(5));
     }
 
     @Test
     public void disableServiceAccessSpecifyServicePlan() {
-        resetToEnabled(this.cloudFoundryOperations, this.serviceName)
+        String planName = this.nameFactory.getPlanName();
+        String serviceBrokerName = this.nameFactory.getServiceBrokerName();
+        String serviceName = this.nameFactory.getServiceName();
+        String spaceName = this.nameFactory.getSpaceName();
+
+        ServiceBrokerUtils.ServiceBrokerMetadata serviceBrokerMetadata = this.organizationId
+            .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .then(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, false))
+            .block(Duration.ofMinutes(5));
+
+        resetToEnabled(this.cloudFoundryOperations, serviceName)
             .then(this.cloudFoundryOperations.serviceAdmin()
                 .disableServiceAccess(DisableServiceAccessRequest.builder()
-                    .servicePlanName(this.planName)
-                    .serviceName(this.serviceName)
+                    .servicePlanName(planName)
+                    .serviceName(serviceName)
                     .build()))
-            .thenMany(requestListServiceAccessSettings(this.cloudFoundryOperations, this.serviceName))
-            .filter(response -> this.serviceName.equals(response.getServiceName()))
+            .thenMany(requestListServiceAccessSettings(this.cloudFoundryOperations, serviceName))
+            .filter(response -> serviceName.equals(response.getServiceName()))
             .as(StepVerifier::create)
             .expectNext(ServiceAccess.builder()
                 .access(Access.ALL)
-                .brokerName(this.serviceBrokerName)
+                .brokerName(serviceBrokerName)
                 .organizationName()
-                .planName(this.planName)
-                .serviceName(this.serviceName)
+                .planName(planName)
+                .serviceName(serviceName)
                 .build())
             .expectComplete()
             .verify(Duration.ofMinutes(5));
+
+        deleteServiceBroker(this.cloudFoundryClient, serviceBrokerMetadata.applicationMetadata.applicationId)
+            .block(Duration.ofMinutes(5));
     }
 
     @Test
     public void enableServiceAccess() {
-        resetToDisabled(this.cloudFoundryOperations, this.serviceName)
+        String planName = this.nameFactory.getPlanName();
+        String serviceBrokerName = this.nameFactory.getServiceBrokerName();
+        String serviceName = this.nameFactory.getServiceName();
+        String spaceName = this.nameFactory.getSpaceName();
+
+        ServiceBrokerUtils.ServiceBrokerMetadata serviceBrokerMetadata = this.organizationId
+            .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .then(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, false))
+            .block(Duration.ofMinutes(5));
+
+        resetToDisabled(this.cloudFoundryOperations, serviceName)
             .then(this.cloudFoundryOperations.serviceAdmin()
                 .enableServiceAccess(EnableServiceAccessRequest.builder()
-                    .serviceName(this.serviceName)
+                    .serviceName(serviceName)
                     .build()))
-            .thenMany(requestListServiceAccessSettings(this.cloudFoundryOperations, this.serviceName))
-            .filter(response -> this.serviceName.equals(response.getServiceName()))
+            .thenMany(requestListServiceAccessSettings(this.cloudFoundryOperations, serviceName))
+            .filter(response -> serviceName.equals(response.getServiceName()))
             .as(StepVerifier::create)
             .expectNext(ServiceAccess.builder()
                 .access(Access.ALL)
-                .brokerName(this.serviceBrokerName)
+                .brokerName(serviceBrokerName)
                 .organizationName()
-                .planName(this.planName)
-                .serviceName(this.serviceName)
+                .planName(planName)
+                .serviceName(serviceName)
                 .build())
             .expectComplete()
             .verify(Duration.ofMinutes(5));
+
+        deleteServiceBroker(this.cloudFoundryClient, serviceBrokerMetadata.applicationMetadata.applicationId)
+            .block(Duration.ofMinutes(5));
     }
 
     @Test
     public void enableServiceAccessSpecifyAll() {
-        resetToDisabled(this.cloudFoundryOperations, this.serviceName)
+        String planName = this.nameFactory.getPlanName();
+        String serviceBrokerName = this.nameFactory.getServiceBrokerName();
+        String serviceName = this.nameFactory.getServiceName();
+        String spaceName = this.nameFactory.getSpaceName();
+
+        ServiceBrokerUtils.ServiceBrokerMetadata serviceBrokerMetadata = this.organizationId
+            .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .then(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, false))
+            .block(Duration.ofMinutes(5));
+
+        resetToDisabled(this.cloudFoundryOperations, serviceName)
             .then(this.cloudFoundryOperations.serviceAdmin()
                 .enableServiceAccess(EnableServiceAccessRequest.builder()
                     .organizationName(this.organizationName)
-                    .servicePlanName(this.planName)
-                    .serviceName(this.serviceName)
+                    .servicePlanName(planName)
+                    .serviceName(serviceName)
                     .build()))
-            .thenMany(requestListServiceAccessSettings(this.cloudFoundryOperations, this.serviceName))
-            .filter(response -> this.serviceName.equals(response.getServiceName()))
+            .thenMany(requestListServiceAccessSettings(this.cloudFoundryOperations, serviceName))
+            .filter(response -> serviceName.equals(response.getServiceName()))
             .as(StepVerifier::create)
             .expectNext(ServiceAccess.builder()
                 .access(Access.LIMITED)
-                .brokerName(this.serviceBrokerName)
+                .brokerName(serviceBrokerName)
                 .organizationName(this.organizationName)
-                .planName(this.planName)
-                .serviceName(this.serviceName)
+                .planName(planName)
+                .serviceName(serviceName)
                 .build())
             .expectComplete()
             .verify(Duration.ofMinutes(5));
+
+        deleteServiceBroker(this.cloudFoundryClient, serviceBrokerMetadata.applicationMetadata.applicationId)
+            .block(Duration.ofMinutes(5));
     }
 
     @Test
     public void enableServiceAccessSpecifyOrganization() {
-        resetToDisabled(this.cloudFoundryOperations, this.serviceName)
+        String planName = this.nameFactory.getPlanName();
+        String serviceBrokerName = this.nameFactory.getServiceBrokerName();
+        String serviceName = this.nameFactory.getServiceName();
+        String spaceName = this.nameFactory.getSpaceName();
+
+        ServiceBrokerUtils.ServiceBrokerMetadata serviceBrokerMetadata = this.organizationId
+            .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .then(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, false))
+            .block(Duration.ofMinutes(5));
+
+        resetToDisabled(this.cloudFoundryOperations, serviceName)
             .then(this.cloudFoundryOperations.serviceAdmin()
                 .enableServiceAccess(EnableServiceAccessRequest.builder()
                     .organizationName(this.organizationName)
-                    .serviceName(this.serviceName)
+                    .serviceName(serviceName)
                     .build()))
-            .thenMany(requestListServiceAccessSettings(this.cloudFoundryOperations, this.serviceName))
-            .filter(response -> this.serviceName.equals(response.getServiceName()))
+            .thenMany(requestListServiceAccessSettings(this.cloudFoundryOperations, serviceName))
+            .filter(response -> serviceName.equals(response.getServiceName()))
             .as(StepVerifier::create)
             .expectNext(ServiceAccess.builder()
                 .access(Access.LIMITED)
-                .brokerName(this.serviceBrokerName)
+                .brokerName(serviceBrokerName)
                 .organizationName(this.organizationName)
-                .planName(this.planName)
-                .serviceName(this.serviceName)
+                .planName(planName)
+                .serviceName(serviceName)
                 .build())
             .expectComplete()
             .verify(Duration.ofMinutes(5));
+
+        deleteServiceBroker(this.cloudFoundryClient, serviceBrokerMetadata.applicationMetadata.applicationId)
+            .block(Duration.ofMinutes(5));
     }
 
     @Test
     public void enableServiceAccessSpecifyServicePlan() {
-        resetToDisabled(this.cloudFoundryOperations, this.serviceName)
+        String planName = this.nameFactory.getPlanName();
+        String serviceBrokerName = this.nameFactory.getServiceBrokerName();
+        String serviceName = this.nameFactory.getServiceName();
+        String spaceName = this.nameFactory.getSpaceName();
+
+        ServiceBrokerUtils.ServiceBrokerMetadata serviceBrokerMetadata = this.organizationId
+            .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .then(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, false))
+            .block(Duration.ofMinutes(5));
+
+        resetToDisabled(this.cloudFoundryOperations, serviceName)
             .then(this.cloudFoundryOperations.serviceAdmin()
                 .enableServiceAccess(EnableServiceAccessRequest.builder()
-                    .servicePlanName(this.planName)
-                    .serviceName(this.serviceName)
+                    .servicePlanName(planName)
+                    .serviceName(serviceName)
                     .build()))
-            .thenMany(requestListServiceAccessSettings(this.cloudFoundryOperations, this.serviceName))
-            .filter(response -> this.serviceName.equals(response.getServiceName()))
+            .thenMany(requestListServiceAccessSettings(this.cloudFoundryOperations, serviceName))
+            .filter(response -> serviceName.equals(response.getServiceName()))
             .as(StepVerifier::create)
             .expectNext(ServiceAccess.builder()
                 .access(Access.ALL)
-                .brokerName(this.serviceBrokerName)
+                .brokerName(serviceBrokerName)
                 .organizationName()
-                .planName(this.planName)
-                .serviceName(this.serviceName)
+                .planName(planName)
+                .serviceName(serviceName)
                 .build())
             .expectComplete()
             .verify(Duration.ofMinutes(5));
+
+        deleteServiceBroker(this.cloudFoundryClient, serviceBrokerMetadata.applicationMetadata.applicationId)
+            .block(Duration.ofMinutes(5));
     }
 
     @Test
@@ -300,6 +418,19 @@ public final class ServiceAdminTest extends AbstractIntegrationTest {
                 .build())
             .expectComplete()
             .verify(Duration.ofMinutes(5));
+    }
+
+    private static Mono<String> createSpaceId(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceName) {
+        return requestCreateSpace(cloudFoundryClient, organizationId, spaceName)
+            .map(ResourceUtils::getId);
+    }
+
+    private static Mono<CreateSpaceResponse> requestCreateSpace(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceName) {
+        return cloudFoundryClient.spaces()
+            .create(CreateSpaceRequest.builder()
+                .name(spaceName)
+                .organizationId(organizationId)
+                .build());
     }
 
     private static Flux<ServiceAccess> requestListServiceAccessSettings(CloudFoundryOperations cloudFoundryOperations, String serviceName) {

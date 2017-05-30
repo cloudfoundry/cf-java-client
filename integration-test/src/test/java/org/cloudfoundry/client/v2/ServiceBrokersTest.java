@@ -17,23 +17,8 @@
 package org.cloudfoundry.client.v2;
 
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.ServiceBrokerUtils;
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v2.applications.ApplicationInstanceInfo;
-import org.cloudfoundry.client.v2.applications.ApplicationInstancesRequest;
-import org.cloudfoundry.client.v2.applications.ApplicationInstancesResponse;
-import org.cloudfoundry.client.v2.applications.AssociateApplicationRouteRequest;
-import org.cloudfoundry.client.v2.applications.AssociateApplicationRouteResponse;
-import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
-import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
-import org.cloudfoundry.client.v2.applications.DeleteApplicationRequest;
-import org.cloudfoundry.client.v2.applications.GetApplicationRequest;
-import org.cloudfoundry.client.v2.applications.GetApplicationResponse;
-import org.cloudfoundry.client.v2.applications.UpdateApplicationRequest;
-import org.cloudfoundry.client.v2.applications.UpdateApplicationResponse;
-import org.cloudfoundry.client.v2.applications.UploadApplicationRequest;
-import org.cloudfoundry.client.v2.applications.UploadApplicationResponse;
-import org.cloudfoundry.client.v2.routes.CreateRouteRequest;
-import org.cloudfoundry.client.v2.routes.CreateRouteResponse;
 import org.cloudfoundry.client.v2.servicebrokers.CreateServiceBrokerRequest;
 import org.cloudfoundry.client.v2.servicebrokers.DeleteServiceBrokerRequest;
 import org.cloudfoundry.client.v2.servicebrokers.GetServiceBrokerRequest;
@@ -43,12 +28,12 @@ import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomainResource;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceResponse;
-import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -58,12 +43,11 @@ import java.nio.file.Path;
 import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.cloudfoundry.util.DelayUtils.exponentialBackOff;
+import static org.cloudfoundry.ServiceBrokerUtils.createServiceBroker;
+import static org.cloudfoundry.ServiceBrokerUtils.deleteServiceBroker;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public final class ServiceBrokersTest extends AbstractIntegrationTest {
-
-    private final Path application = new ClassPathResource("test-service-broker.jar").getFile().toPath();
 
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
@@ -77,17 +61,27 @@ public final class ServiceBrokersTest extends AbstractIntegrationTest {
     @Autowired
     private String serviceBrokerName;
 
-    public ServiceBrokersTest() throws IOException {
-    }
-
     @Test
     public void create() {
+        String planName = this.nameFactory.getPlanName();
         String serviceBrokerName = this.nameFactory.getServiceBrokerName();
         String serviceName = this.nameFactory.getServiceName();
-        String planName = this.nameFactory.getPlanName();
+        String spaceName = this.nameFactory.getSpaceName();
 
-        ApplicationMetadata applicationMetadata = this.organizationId
-            .then(organizationId -> pushServiceBroker(this.cloudFoundryClient, organizationId, serviceName, planName))
+        Path application;
+        try {
+            application = new ClassPathResource("test-service-broker.jar").getFile().toPath();
+        } catch (IOException e) {
+            throw Exceptions.propagate(e);
+        }
+
+        ServiceBrokerUtils.ApplicationMetadata applicationMetadata = this.organizationId
+            .then(organizationId -> Mono
+                .when(
+                    createSpaceId(this.cloudFoundryClient, organizationId, spaceName),
+                    getSharedDomain(this.cloudFoundryClient)
+                ))
+            .then(function((spaceId, domain) -> ServiceBrokerUtils.pushServiceBrokerApplication(this.cloudFoundryClient, application, domain, this.nameFactory, planName, serviceName, spaceId)))
             .block(Duration.ofMinutes(5));
 
         this.cloudFoundryClient.serviceBrokers()
@@ -115,12 +109,14 @@ public final class ServiceBrokersTest extends AbstractIntegrationTest {
 
     @Test
     public void delete() {
+        String planName = this.nameFactory.getPlanName();
         String serviceBrokerName = this.nameFactory.getServiceBrokerName();
         String serviceName = this.nameFactory.getServiceName();
-        String planName = this.nameFactory.getPlanName();
+        String spaceName = this.nameFactory.getSpaceName();
 
-        ServiceBrokerMetadata serviceBrokerMetadata = this.organizationId
-            .then(organizationId -> createServiceBroker(this.cloudFoundryClient, organizationId, serviceBrokerName, serviceName, planName))
+        ServiceBrokerUtils.ServiceBrokerMetadata serviceBrokerMetadata = this.organizationId
+            .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .then(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, true))
             .block(Duration.ofMinutes(5));
 
         this.cloudFoundryClient.serviceBrokers()
@@ -170,13 +166,15 @@ public final class ServiceBrokersTest extends AbstractIntegrationTest {
 
     @Test
     public void update() {
+        String planName = this.nameFactory.getPlanName();
         String serviceBrokerName1 = this.nameFactory.getServiceBrokerName();
         String serviceBrokerName2 = this.nameFactory.getServiceBrokerName();
         String serviceName = this.nameFactory.getServiceName();
-        String planName = this.nameFactory.getPlanName();
+        String spaceName = this.nameFactory.getSpaceName();
 
-        ServiceBrokerMetadata serviceBrokerMetadata = this.organizationId
-            .then(organizationId -> createServiceBroker(this.cloudFoundryClient, organizationId, serviceBrokerName1, serviceName, planName))
+        ServiceBrokerUtils.ServiceBrokerMetadata serviceBrokerMetadata = this.organizationId
+            .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .then(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName1, serviceName, spaceId, true))
             .block(Duration.ofMinutes(5));
 
         this.cloudFoundryClient.serviceBrokers()
@@ -199,45 +197,14 @@ public final class ServiceBrokersTest extends AbstractIntegrationTest {
             .block(Duration.ofMinutes(5));
     }
 
-    private static Mono<Void> deleteServiceBroker(CloudFoundryClient cloudFoundryClient, String applicationId) {
-        return cloudFoundryClient.applicationsV2()
-            .delete(DeleteApplicationRequest.builder()
-                .applicationId(applicationId)
-                .build());
+    private static Mono<String> createSpaceId(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceName) {
+        return requestCreateSpace(cloudFoundryClient, organizationId, spaceName)
+            .map(ResourceUtils::getId);
     }
 
-    private static Mono<ApplicationInstancesResponse> requestApplicationInstances(CloudFoundryClient cloudFoundryClient, String applicationId) {
-        return cloudFoundryClient.applicationsV2()
-            .instances(ApplicationInstancesRequest.builder()
-                .applicationId(applicationId)
-                .build());
-    }
-
-    private static Mono<AssociateApplicationRouteResponse> requestAssociateApplicationRoute(CloudFoundryClient cloudFoundryClient, String applicationId, String routeId) {
-        return cloudFoundryClient.applicationsV2()
-            .associateRoute(AssociateApplicationRouteRequest.builder()
-                .applicationId(applicationId)
-                .routeId(routeId)
-                .build());
-    }
-
-    private static Mono<CreateApplicationResponse> requestCreateApplication(CloudFoundryClient cloudFoundryClient, String spaceId, String applicationName) {
-        return cloudFoundryClient.applicationsV2()
-            .create(CreateApplicationRequest.builder()
-                .buildpack("https://github.com/cloudfoundry/java-buildpack.git")
-                .memory(768)
-                .name(applicationName)
-                .spaceId(spaceId)
-                .build());
-    }
-
-    private static Mono<CreateRouteResponse> requestCreateRoute(CloudFoundryClient cloudFoundryClient, String domainId, String spaceId, String hostName) {
-        return cloudFoundryClient.routes()
-            .create(CreateRouteRequest.builder()
-                .domainId(domainId)
-                .host(hostName)
-                .spaceId(spaceId)
-                .build());
+    private static Mono<SharedDomainResource> getSharedDomain(CloudFoundryClient cloudFoundryClient) {
+        return requestListSharedDomains(cloudFoundryClient)
+            .next();
     }
 
     private static Mono<CreateSpaceResponse> requestCreateSpace(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceName) {
@@ -248,122 +215,12 @@ public final class ServiceBrokersTest extends AbstractIntegrationTest {
                 .build());
     }
 
-    private static Mono<GetApplicationResponse> requestGetApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
-        return cloudFoundryClient.applicationsV2()
-            .get(GetApplicationRequest.builder()
-                .applicationId(applicationId)
-                .build());
-    }
-
     private static Flux<SharedDomainResource> requestListSharedDomains(CloudFoundryClient cloudFoundryClient) {
         return PaginationUtils
             .requestClientV2Resources(page -> cloudFoundryClient.sharedDomains()
                 .list(ListSharedDomainsRequest.builder()
                     .page(page)
                     .build()));
-    }
-
-    private static Mono<UpdateApplicationResponse> requestUpdateApplication(CloudFoundryClient cloudFoundryClient, String applicationId, String state, String serviceName, String planName) {
-        return cloudFoundryClient.applicationsV2()
-            .update(UpdateApplicationRequest.builder()
-                .applicationId(applicationId)
-                .environmentJson("SERVICE_NAME", serviceName)
-                .environmentJson("PLAN_NAME", planName)
-                .state(state)
-                .build());
-    }
-
-    private static Mono<UploadApplicationResponse> requestUploadApplication(CloudFoundryClient cloudFoundryClient, String applicationId, Path application) {
-        return cloudFoundryClient.applicationsV2()
-            .upload(UploadApplicationRequest.builder()
-                .application(application)
-                .applicationId(applicationId)
-                .async(true)
-                .build());
-    }
-
-    private Mono<ServiceBrokerMetadata> createServiceBroker(CloudFoundryClient cloudFoundryClient, String organizationId, String serviceBrokerName, String serviceName, String planName) {
-        return pushServiceBroker(cloudFoundryClient, organizationId, serviceName, planName)
-            .then(applicationMetadata -> this.cloudFoundryClient.serviceBrokers()
-                .create(CreateServiceBrokerRequest.builder()
-                    .authenticationPassword("test-authentication-password")
-                    .authenticationUsername("test-authentication-username")
-                    .brokerUrl(applicationMetadata.uri)
-                    .name(serviceBrokerName)
-                    .spaceId(applicationMetadata.spaceId)
-                    .build())
-                .map(response -> new ServiceBrokerMetadata(applicationMetadata, ResourceUtils.getId(response))));
-    }
-
-    private Mono<ApplicationMetadata> pushServiceBroker(CloudFoundryClient cloudFoundryClient, String organizationId, String serviceName, String planName) {
-        String applicationName = this.nameFactory.getApplicationName();
-        String hostName = this.nameFactory.getHostName();
-        String spaceName = this.nameFactory.getSpaceName();
-
-        return Mono
-            .when(
-                requestCreateSpace(cloudFoundryClient, organizationId, spaceName)
-                    .map(ResourceUtils::getId),
-                requestListSharedDomains(cloudFoundryClient)
-                    .next()
-            )
-            .then(function((spaceId, domain) -> Mono
-                .when(
-                    requestCreateApplication(cloudFoundryClient, spaceId, applicationName)
-                        .map(ResourceUtils::getId),
-                    Mono.just(ResourceUtils.getId(domain))
-                        .then(domainId -> requestCreateRoute(cloudFoundryClient, domainId, spaceId, hostName))
-                        .map(ResourceUtils::getId)
-                )
-                .then(function((applicationId, routeId) -> requestAssociateApplicationRoute(cloudFoundryClient, applicationId, routeId)
-                    .then(Mono.just(applicationId))))
-                .then(applicationId -> requestUploadApplication(cloudFoundryClient, applicationId, this.application)
-                    .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, Duration.ofMinutes(5), job))
-                    .then(Mono.just(applicationId)))
-                .then(applicationId -> requestUpdateApplication(cloudFoundryClient, applicationId, "STARTED", serviceName, planName)
-                    .then(Mono.just(applicationId)))
-                .then(applicationId -> requestGetApplication(cloudFoundryClient, applicationId)
-                    .map(response -> ResourceUtils.getEntity(response).getPackageState())
-                    .filter(state -> "STAGED".equals(state) || "FAILED".equals(state))
-                    .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)))
-                    .then(Mono.just(applicationId)))
-                .then(applicationId -> requestApplicationInstances(cloudFoundryClient, applicationId)
-                    .flatMapMany(response -> Flux.fromIterable(response.getInstances().values()))
-                    .single()
-                    .map(ApplicationInstanceInfo::getState)
-                    .filter("RUNNING"::equals)
-                    .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)))
-                    .map(status -> new ApplicationMetadata(applicationId, spaceId, String.format("https://%s.%s", hostName, ResourceUtils.getEntity(domain).getName()))))
-            ));
-    }
-
-    private static final class ApplicationMetadata {
-
-        private final String applicationId;
-
-        private final String spaceId;
-
-        private final String uri;
-
-        private ApplicationMetadata(String applicationId, String spaceId, String uri) {
-            this.applicationId = applicationId;
-            this.spaceId = spaceId;
-            this.uri = uri;
-        }
-
-    }
-
-    private static final class ServiceBrokerMetadata {
-
-        private final ApplicationMetadata applicationMetadata;
-
-        private final String serviceBrokerId;
-
-        private ServiceBrokerMetadata(ApplicationMetadata applicationMetadata, String serviceBrokerId) {
-            this.applicationMetadata = applicationMetadata;
-            this.serviceBrokerId = serviceBrokerId;
-        }
-
     }
 
 }

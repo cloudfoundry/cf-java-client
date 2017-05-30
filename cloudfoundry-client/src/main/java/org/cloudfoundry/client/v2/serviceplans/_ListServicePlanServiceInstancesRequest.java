@@ -40,7 +40,7 @@ abstract class _ListServicePlanServiceInstancesRequest extends PaginatedRequest 
     /**
      * The names of the service instances
      */
-    @FilterParameter("names")
+    @FilterParameter("name")
     @Nullable
     abstract List<String> getNames();
 

@@ -116,8 +116,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
-        Mono.empty()
-            .then(createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, false))
+        createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, false)
             .then(bindServiceToApplication(this.cloudFoundryOperations, applicationName, serviceInstanceName))
             .then(this.cloudFoundryOperations.applications()
                 .delete(DeleteApplicationRequest.builder()
