@@ -19,6 +19,7 @@ package org.cloudfoundry.reactor.tokenprovider;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.netty.util.AsciiString;
+import org.cloudfoundry.Nullable;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.util.ErrorPayloadMapper;
@@ -78,7 +79,7 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
     private final ConcurrentMap<ConnectionContext, Mono<String>> refreshTokens = new ConcurrentHashMap<>(1);
 
     /**
-     * The client id.  Defaults to {@code cf}.
+     * The client id. Defaults to {@code cf}.
      */
     @Value.Default
     public String getClientId() {
@@ -86,7 +87,7 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
     }
 
     /**
-     * The client secret Defaults to {@code ""}.
+     * The client secret. Defaults to {@code ""}.
      */
     @Value.Default
     public String getClientSecret() {
@@ -113,7 +114,11 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
         this.accessTokens.put(connectionContext, token(connectionContext));
     }
 
-    abstract Optional<String> identityZoneId();
+    /**
+     * The identity zone id
+     */
+    @Nullable
+    abstract String identityZoneId();
 
     /**
      * Transforms a {@code Mono} in order to make a request to negotiate an access token
@@ -154,10 +159,12 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
         return String.format("%s %s", payload.get(TOKEN_TYPE), accessToken);
     }
 
-    private static String getTokenUri(String root, Optional<String> identityZoneId) {
+    private static String getTokenUri(String root, String identityZoneId) {
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(root);
 
-        identityZoneId.ifPresent(id -> builder.host(String.format("%s.%s", id, builder.build().getHost())));
+        if (identityZoneId != null) {
+            builder.host(String.format("%s.%s", identityZoneId, builder.build().getHost()));
+        }
 
         return builder
             .pathSegment("oauth", "token")

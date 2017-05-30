@@ -45,6 +45,9 @@ abstract class _ReactorRoutingClient implements RoutingClient {
         return new ReactorTcpRoutes(getConnectionContext(), getRoot(), getTokenProvider());
     }
 
+    /**
+     * The connection context
+     */
     abstract ConnectionContext getConnectionContext();
 
     @Value.Default
@@ -52,6 +55,9 @@ abstract class _ReactorRoutingClient implements RoutingClient {
         return getConnectionContext().getRoot("routing_endpoint");
     }
 
+    /**
+     * The token provider
+     */
     abstract TokenProvider getTokenProvider();
 
 }

@@ -120,6 +120,9 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
         return objectMapper;
     }
 
+    /**
+     * The port for the Cloud Foundry instance
+     */
     @Value.Default
     public Integer getPort() {
         return DEFAULT_PORT;

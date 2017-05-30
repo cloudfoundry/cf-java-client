@@ -323,6 +323,9 @@ abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
         return new ReactorUsers(getConnectionContext(), getRoot(), getTokenProvider());
     }
 
+    /**
+     * The connection context
+     */
     abstract ConnectionContext getConnectionContext();
 
     @Value.Default
@@ -330,6 +333,9 @@ abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
         return getConnectionContext().getRoot();
     }
 
+    /**
+     * The token provider
+     */
     abstract TokenProvider getTokenProvider();
 
 }

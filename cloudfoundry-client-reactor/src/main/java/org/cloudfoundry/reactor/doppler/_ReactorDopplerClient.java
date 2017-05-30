@@ -54,6 +54,9 @@ abstract class _ReactorDopplerClient implements DopplerClient {
         return getDopplerEndpoints().stream(request);
     }
 
+    /**
+     * The connection context
+     */
     abstract ConnectionContext getConnectionContext();
 
     @Value.Derived
@@ -66,6 +69,9 @@ abstract class _ReactorDopplerClient implements DopplerClient {
         return getConnectionContext().getRoot("doppler_logging_endpoint");
     }
 
+    /**
+     * The token provider
+     */
     abstract TokenProvider getTokenProvider();
 
 
