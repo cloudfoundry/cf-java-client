@@ -94,6 +94,9 @@ abstract class _ReactorUaaClient implements UaaClient {
         return new ReactorUsers(getConnectionContext(), getRoot(), getTokenProvider());
     }
 
+    /**
+     * The connection context
+     */
     abstract ConnectionContext getConnectionContext();
 
     @Value.Default
@@ -103,6 +106,9 @@ abstract class _ReactorUaaClient implements UaaClient {
             .cache();
     }
 
+    /**
+     * The token provider
+     */
     abstract TokenProvider getTokenProvider();
 
     @Value.Default

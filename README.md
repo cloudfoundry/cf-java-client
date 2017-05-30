@@ -277,7 +277,7 @@ Name | Description
 `TEST_ADMIN_CLIENTSECRET` | Client secret for a client with permissions for a Client Credentials grant
 `TEST_ADMIN_PASSWORD` | Password for a user with admin permissions
 `TEST_ADMIN_USERNAME` | Username for a user with admin permissions
-`TEST_APIHOST` | The host of Cloud Foundry instance.  Typically something like `api.local.pcfdev.io`.
+`TEST_APIHOST` | The host of a Cloud Foundry instance.  Typically something like `api.local.pcfdev.io`.
 `TEST_PROXY_HOST` | _(Optional)_ The host of a proxy to route all requests through
 `TEST_PROXY_PASSWORD` | _(Optional)_ The password for a proxy to route all requests through
 `TEST_PROXY_PORT` | _(Optional)_ The port of a proxy to route all requests through. Defaults to `8080`.

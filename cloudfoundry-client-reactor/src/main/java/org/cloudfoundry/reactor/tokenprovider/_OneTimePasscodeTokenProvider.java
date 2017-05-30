@@ -27,7 +27,6 @@ import reactor.ipc.netty.http.client.HttpClientRequest;
 @Value.Immutable
 abstract class _OneTimePasscodeTokenProvider extends AbstractUaaTokenProvider {
 
-
     /**
      * The passcode
      */
