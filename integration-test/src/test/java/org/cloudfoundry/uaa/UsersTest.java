@@ -23,6 +23,8 @@ import org.cloudfoundry.uaa.users.CreateUserResponse;
 import org.cloudfoundry.uaa.users.DeleteUserRequest;
 import org.cloudfoundry.uaa.users.DeleteUserResponse;
 import org.cloudfoundry.uaa.users.Email;
+import org.cloudfoundry.uaa.users.ExpirePasswordRequest;
+import org.cloudfoundry.uaa.users.ExpirePasswordResponse;
 import org.cloudfoundry.uaa.users.GetUserVerificationLinkRequest;
 import org.cloudfoundry.uaa.users.GetUserVerificationLinkResponse;
 import org.cloudfoundry.uaa.users.InviteUsersRequest;
@@ -117,6 +119,24 @@ public final class UsersTest extends AbstractIntegrationTest {
             .map(ListUsersResponse::getTotalResults)
             .as(StepVerifier::create)
             .expectNext(0)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void expirePassword() throws TimeoutException, InterruptedException {
+        String userName = this.nameFactory.getUserName();
+
+        createUserId(this.uaaClient, userName)
+            .then(userId -> this.uaaClient.users()
+                .expirePassword(ExpirePasswordRequest.builder()
+                    .passwordChangeRequired(true)
+                    .userId(userId)
+                    .build()))
+            .as(StepVerifier::create)
+            .expectNext(ExpirePasswordResponse.builder()
+                .passwordChangeRequired(true)
+                .build())
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }

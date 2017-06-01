@@ -48,10 +48,8 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static io.netty.handler.codec.http.HttpHeaderNames.ACCEPT;
 import static io.netty.handler.codec.http.HttpHeaderNames.AUTHORIZATION;
 import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
-import static io.netty.handler.codec.http.HttpHeaderValues.APPLICATION_JSON;
 import static io.netty.handler.codec.http.HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED;
 import static io.netty.handler.codec.http.HttpResponseStatus.UNAUTHORIZED;
 
@@ -127,9 +125,8 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
      */
     abstract Mono<Void> tokenRequestTransformer(Mono<HttpClientRequest> outbound);
 
-    private static HttpClientRequest addContentTypes(HttpClientRequest request) {
+    private static HttpClientRequest addContentType(HttpClientRequest request) {
         return request
-            .header(ACCEPT, APPLICATION_JSON)
             .header(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED);
     }
 
@@ -251,7 +248,8 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
                     .map(AbstractUaaTokenProvider::disableFailOnError)
                     .map(this::addAuthorization)
                     .map(UserAgent::addUserAgent)
-                    .map(AbstractUaaTokenProvider::addContentTypes)
+                    .map(AbstractUaaTokenProvider::addContentType)
+                    .map(JsonCodec::addDecodeHeaders)
                     .transform(tokenRequestTransformer))
                 .doOnSubscribe(NetworkLogging.post(uri))
                 .transform(NetworkLogging.response(uri)))
