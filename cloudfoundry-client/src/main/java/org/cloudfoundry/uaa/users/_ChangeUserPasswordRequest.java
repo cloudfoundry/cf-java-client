@@ -18,6 +18,7 @@ package org.cloudfoundry.uaa.users;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.cloudfoundry.Nullable;
 import org.cloudfoundry.uaa.IdentityZoned;
 import org.immutables.value.Value;
 
@@ -31,6 +32,7 @@ abstract class _ChangeUserPasswordRequest implements IdentityZoned {
      * The user's existing password
      */
     @JsonProperty("oldPassword")
+    @Nullable
     abstract String getOldPassword();
 
     /**
