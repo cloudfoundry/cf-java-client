@@ -19,6 +19,7 @@ package org.cloudfoundry.uaa.users;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
@@ -29,9 +30,17 @@ import org.immutables.value.Value;
 abstract class _ExpirePasswordResponse {
 
     /**
+     * Whether the account is locked
+     */
+    @JsonProperty("locked")
+    @Nullable
+    abstract Boolean getLocked();
+
+    /**
      * Whether user's password will be expired
      */
     @JsonProperty("passwordChangeRequired")
+    @Nullable
     abstract Boolean getPasswordChangeRequired();
 
 }

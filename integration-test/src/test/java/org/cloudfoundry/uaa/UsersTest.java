@@ -17,6 +17,7 @@
 package org.cloudfoundry.uaa;
 
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.IfCloudFoundryVersion;
 import org.cloudfoundry.uaa.users.ChangeUserPasswordRequest;
 import org.cloudfoundry.uaa.users.CreateUserRequest;
 import org.cloudfoundry.uaa.users.CreateUserResponse;
@@ -123,6 +124,7 @@ public final class UsersTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = IfCloudFoundryVersion.CloudFoundryVersion.PCF_1_9)
     @Test
     public void expirePassword() throws TimeoutException, InterruptedException {
         String userName = this.nameFactory.getUserName();
