@@ -33,6 +33,7 @@ public final class IdentityZoneBuilderTest {
         IdentityZoneBuilder.augment(this.outbound, new StubIdentityZoned());
 
         verify(this.outbound).header("X-Identity-Zone-Id", "test-identity-zone-id");
+        verify(this.outbound).header("X-Identity-Zone-Subdomain", "test-identity-zone-subdomain");
     }
 
     @Test
@@ -49,6 +50,10 @@ public final class IdentityZoneBuilderTest {
             return "test-identity-zone-id";
         }
 
+        @Override
+        public String getIdentityZoneSubdomain() {
+            return "test-identity-zone-subdomain";
+        }
     }
 
 }

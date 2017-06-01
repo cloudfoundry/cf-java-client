@@ -33,4 +33,13 @@ public interface IdentityZoned {
     @Nullable
     String getIdentityZoneId();
 
+    /**
+     * Returns the identity zone subdomain
+     *
+     * @return the identity zone subdomain
+     */
+    @JsonIgnore
+    @Nullable
+    String getIdentityZoneSubdomain();
+
 }
