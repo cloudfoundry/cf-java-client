@@ -124,7 +124,7 @@ public final class UsersTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    @IfCloudFoundryVersion(greaterThanOrEqualTo = IfCloudFoundryVersion.CloudFoundryVersion.PCF_1_9)
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = IfCloudFoundryVersion.CloudFoundryVersion.PCF_1_10)
     @Test
     public void expirePassword() throws TimeoutException, InterruptedException {
         String userName = this.nameFactory.getUserName();
@@ -138,6 +138,24 @@ public final class UsersTest extends AbstractIntegrationTest {
             .as(StepVerifier::create)
             .expectNext(ExpirePasswordResponse.builder()
                 .passwordChangeRequired(true)
+                .build())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @IfCloudFoundryVersion(equalTo = IfCloudFoundryVersion.CloudFoundryVersion.PCF_1_9)
+    @Test
+    public void expirePassword19() throws TimeoutException, InterruptedException {
+        String userName = this.nameFactory.getUserName();
+
+        createUserId(this.uaaClient, userName)
+            .then(userId -> this.uaaClient.users()
+                .expirePassword(ExpirePasswordRequest.builder()
+                    .passwordChangeRequired(true)
+                    .userId(userId)
+                    .build()))
+            .as(StepVerifier::create)
+            .expectNext(ExpirePasswordResponse.builder()
                 .build())
             .expectComplete()
             .verify(Duration.ofMinutes(5));
