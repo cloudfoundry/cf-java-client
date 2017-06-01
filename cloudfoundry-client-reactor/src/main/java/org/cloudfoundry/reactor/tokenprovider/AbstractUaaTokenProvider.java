@@ -113,10 +113,10 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
     }
 
     /**
-     * The identity zone id
+     * The identity zone subdomain
      */
     @Nullable
-    abstract String identityZoneId();
+    abstract String getIdentityZoneSubdomain();
 
     /**
      * Transforms a {@code Mono} in order to make a request to negotiate an access token
@@ -241,7 +241,7 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
     private Mono<HttpClientResponse> requestToken(ConnectionContext connectionContext, Function<Mono<HttpClientRequest>, Mono<Void>> tokenRequestTransformer) {
         return connectionContext
             .getRoot(AUTHORIZATION_ENDPOINT)
-            .map(root -> getTokenUri(root, identityZoneId()))
+            .map(root -> getTokenUri(root, getIdentityZoneSubdomain()))
             .then(uri -> connectionContext.getHttpClient()
                 .post(uri, request -> Mono.just(request)
                     .map(AbstractUaaTokenProvider::disableChunkedTransfer)

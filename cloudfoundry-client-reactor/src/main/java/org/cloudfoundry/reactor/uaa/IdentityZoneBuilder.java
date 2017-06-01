@@ -30,6 +30,7 @@ final class IdentityZoneBuilder {
         if (request instanceof IdentityZoned) {
             IdentityZoned identityZoned = (IdentityZoned) request;
             Optional.ofNullable(identityZoned.getIdentityZoneId()).ifPresent(identityZoneId -> outbound.header("X-Identity-Zone-Id", identityZoneId));
+            Optional.ofNullable(identityZoned.getIdentityZoneSubdomain()).ifPresent(identityZoneSubdomain -> outbound.header("X-Identity-Zone-Subdomain", identityZoneSubdomain));
         }
     }
 

@@ -102,7 +102,7 @@ abstract class _ReactorUaaClient implements UaaClient {
     @Value.Default
     Mono<String> getRoot() {
         return getConnectionContext().getRoot("token_endpoint")
-            .map(getIdentityZoneEndpoint(identityZoneId()))
+            .map(getIdentityZoneEndpoint(getIdentityZoneSubdomain()))
             .cache();
     }
 
@@ -116,8 +116,11 @@ abstract class _ReactorUaaClient implements UaaClient {
         return new UsernameProvider(getConnectionContext(), getTokenProvider(), tokens());
     }
 
+    /**
+     * The identity zone subdomain
+     */
     @Nullable
-    abstract String identityZoneId();
+    abstract String getIdentityZoneSubdomain();
 
     private static Function<String, String> getIdentityZoneEndpoint(String identityZoneId) {
         return raw -> {
