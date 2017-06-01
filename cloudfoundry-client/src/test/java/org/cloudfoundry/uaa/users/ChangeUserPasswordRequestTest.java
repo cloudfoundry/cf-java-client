@@ -21,17 +21,8 @@ import org.junit.Test;
 public final class ChangeUserPasswordRequestTest {
 
     @Test(expected = IllegalStateException.class)
-    public void noOldPassword() {
-        ChangeUserPasswordRequest.builder()
-            .password("test-password")
-            .userId("test-user-id")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
     public void noPassword() {
         ChangeUserPasswordRequest.builder()
-            .oldPassword("test-old-password")
             .userId("test-user-id")
             .build();
     }
@@ -39,7 +30,6 @@ public final class ChangeUserPasswordRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noUserId() {
         ChangeUserPasswordRequest.builder()
-            .oldPassword("test-old-password")
             .password("test-password")
             .build();
     }
@@ -47,7 +37,6 @@ public final class ChangeUserPasswordRequestTest {
     @Test
     public void valid() {
         ChangeUserPasswordRequest.builder()
-            .oldPassword("test-old-password")
             .password("test-password")
             .userId("test-user-id")
             .build();
