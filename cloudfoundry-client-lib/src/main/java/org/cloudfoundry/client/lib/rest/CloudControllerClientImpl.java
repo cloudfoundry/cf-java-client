@@ -2283,11 +2283,9 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 
 	private List<CloudServiceOffering> getServiceOfferings(String label) {
 		Assert.notNull(label, "Service label must not be null");
-		List<Map<String, Object>> resourceList = getAllResources("/v2/services?inline-relations-depth=1", null);
+		List<CloudServiceOffering> allOfferings = getServiceOfferings();
 		List<CloudServiceOffering> results = new ArrayList<CloudServiceOffering>();
-		for (Map<String, Object> resource : resourceList) {
-			CloudServiceOffering cloudServiceOffering =
-					resourceMapper.mapResource(resource, CloudServiceOffering.class);
+		for (CloudServiceOffering cloudServiceOffering : allOfferings) {
 			if (cloudServiceOffering.getLabel() != null && label.equals(cloudServiceOffering.getLabel())) {
 				results.add(cloudServiceOffering);
 			}
