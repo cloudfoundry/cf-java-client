@@ -48,6 +48,14 @@ public interface Users {
     Mono<DeleteUserResponse> delete(DeleteUserRequest request);
 
     /**
+     * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#force-user-password-to-expire">Force User Password to Expire</a> request
+     *
+     * @param request the Expire Password request
+     * @return the response from the Expire Password request
+     */
+    Mono<ExpirePasswordResponse> expirePassword(ExpirePasswordRequest request);
+
+    /**
      * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#get-user-verification-link">Get User Verification Link</a> request
      *
      * @param request the Get User Verification Link request

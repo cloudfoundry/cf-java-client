@@ -25,6 +25,8 @@ import org.cloudfoundry.uaa.users.CreateUserRequest;
 import org.cloudfoundry.uaa.users.CreateUserResponse;
 import org.cloudfoundry.uaa.users.DeleteUserRequest;
 import org.cloudfoundry.uaa.users.DeleteUserResponse;
+import org.cloudfoundry.uaa.users.ExpirePasswordRequest;
+import org.cloudfoundry.uaa.users.ExpirePasswordResponse;
 import org.cloudfoundry.uaa.users.GetUserVerificationLinkRequest;
 import org.cloudfoundry.uaa.users.GetUserVerificationLinkResponse;
 import org.cloudfoundry.uaa.users.InviteUsersRequest;
@@ -73,6 +75,12 @@ public final class ReactorUsers extends AbstractUaaOperations implements Users {
     @Override
     public Mono<DeleteUserResponse> delete(DeleteUserRequest request) {
         return delete(request, DeleteUserResponse.class, builder -> builder.pathSegment("Users", request.getUserId()))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<ExpirePasswordResponse> expirePassword(ExpirePasswordRequest request) {
+        return patch(request, ExpirePasswordResponse.class, builder -> builder.pathSegment("Users", request.getUserId(), "status"))
             .checkpoint();
     }
 

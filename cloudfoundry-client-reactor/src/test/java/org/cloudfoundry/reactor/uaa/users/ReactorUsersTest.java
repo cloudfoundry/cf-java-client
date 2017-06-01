@@ -28,6 +28,8 @@ import org.cloudfoundry.uaa.users.CreateUserResponse;
 import org.cloudfoundry.uaa.users.DeleteUserRequest;
 import org.cloudfoundry.uaa.users.DeleteUserResponse;
 import org.cloudfoundry.uaa.users.Email;
+import org.cloudfoundry.uaa.users.ExpirePasswordRequest;
+import org.cloudfoundry.uaa.users.ExpirePasswordResponse;
 import org.cloudfoundry.uaa.users.GetUserVerificationLinkRequest;
 import org.cloudfoundry.uaa.users.GetUserVerificationLinkResponse;
 import org.cloudfoundry.uaa.users.Group;
@@ -40,6 +42,7 @@ import org.cloudfoundry.uaa.users.LookupUserIdsRequest;
 import org.cloudfoundry.uaa.users.LookupUserIdsResponse;
 import org.cloudfoundry.uaa.users.Meta;
 import org.cloudfoundry.uaa.users.Name;
+import org.cloudfoundry.uaa.users.PhoneNumber;
 import org.cloudfoundry.uaa.users.UpdateUserRequest;
 import org.cloudfoundry.uaa.users.UpdateUserResponse;
 import org.cloudfoundry.uaa.users.User;
@@ -48,7 +51,6 @@ import org.cloudfoundry.uaa.users.UserInfoRequest;
 import org.cloudfoundry.uaa.users.UserInfoResponse;
 import org.cloudfoundry.uaa.users.VerifyUserRequest;
 import org.cloudfoundry.uaa.users.VerifyUserResponse;
-import org.cloudfoundry.uaa.users.PhoneNumber;
 import org.junit.Test;
 import reactor.test.StepVerifier;
 
@@ -57,6 +59,7 @@ import java.util.Collections;
 
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.PATCH;
 import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpMethod.PUT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
@@ -351,6 +354,32 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
                 .zoneId("uaa")
                 .passwordLastModified("2016-05-18T18:25:23.000Z")
                 .schemas(Collections.singletonList("urn:scim:schemas:core:1.0"))
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void expirePassword() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(PATCH).path("/Users/9022f2cf-2663-479e-82e6-d2ccc348a1e4/status")
+                .payload("fixtures/uaa/users/PATCH_{id}_status_request.json")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/uaa/users/PATCH_{id}_status_response.json")
+                .build())
+            .build());
+
+        this.users
+            .expirePassword(ExpirePasswordRequest.builder()
+                .passwordChangeRequired(true)
+                .userId("9022f2cf-2663-479e-82e6-d2ccc348a1e4")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ExpirePasswordResponse.builder()
+                .passwordChangeRequired(true)
                 .build())
             .expectComplete()
             .verify(Duration.ofSeconds(5));

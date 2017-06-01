@@ -48,7 +48,6 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
 
     protected final <T> Mono<T> delete(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
                                        Function<Mono<HttpClientRequest>, Mono<HttpClientRequest>> requestTransformer) {
-
         return doDelete(requestPayload, responseType,
             queryTransformer(requestPayload)
                 .andThen(uriTransformer),
@@ -68,7 +67,6 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
 
     protected final Mono<HttpClientResponse> get(Object requestPayload, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
                                                  Function<Mono<HttpClientRequest>, Mono<HttpClientRequest>> requestTransformer) {
-
         return doGet(queryTransformer(requestPayload)
                 .andThen(uriTransformer),
             outbound -> outbound
@@ -94,6 +92,15 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
             outbound -> outbound
                 .transform(headerTransformer(requestPayload))
                 .transform(requestTransformer),
+            ErrorPayloadMapper.uaa(this.connectionContext.getObjectMapper()));
+    }
+
+    protected final <T> Mono<T> patch(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+        return doPatch(requestPayload, responseType,
+            queryTransformer(requestPayload)
+                .andThen(uriTransformer),
+            outbound -> outbound
+                .transform(headerTransformer(requestPayload)),
             ErrorPayloadMapper.uaa(this.connectionContext.getObjectMapper()));
     }
 

@@ -35,6 +35,11 @@ public final class JsonCodec {
 
     private static final int MAX_PAYLOAD_SIZE = 100 * 1024 * 1024;
 
+    public static HttpClientRequest addDecodeHeaders(HttpClientRequest request) {
+        return request
+            .header(HttpHeaderNames.ACCEPT, HttpHeaderValues.APPLICATION_JSON);
+    }
+
     public static <T> Function<Mono<HttpClientResponse>, Flux<T>> decode(ObjectMapper objectMapper, Class<T> responseType) {
         return inbound -> inbound
             .flatMapMany(response -> response.addHandler(new JsonObjectDecoder(MAX_PAYLOAD_SIZE)).receive().asByteArray())

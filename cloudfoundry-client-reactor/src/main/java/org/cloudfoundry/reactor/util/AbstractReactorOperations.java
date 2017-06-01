@@ -59,6 +59,7 @@ public abstract class AbstractReactorOperations {
                     .map(AbstractReactorOperations::disableFailOnError)
                     .transform(this::addAuthorization)
                     .map(UserAgent::addUserAgent)
+                    .map(JsonCodec::addDecodeHeaders)
                     .transform(requestTransformer)
                     .transform(serializedRequest(requestPayload)))
                 .doOnSubscribe(NetworkLogging.delete(uri))
@@ -74,7 +75,10 @@ public abstract class AbstractReactorOperations {
                                       Function<Mono<HttpClientRequest>, Mono<HttpClientRequest>> requestTransformer,
                                       Function<Mono<HttpClientResponse>, Mono<HttpClientResponse>> responseTransformer) {
 
-        return doGet(uriTransformer, requestTransformer,
+        return doGet(uriTransformer,
+            outbound -> outbound
+                .map(JsonCodec::addDecodeHeaders)
+                .transform(requestTransformer),
             inbound -> inbound
                 .transform(responseTransformer))
             .transform(deserializedResponse(responseType));
@@ -103,6 +107,18 @@ public abstract class AbstractReactorOperations {
                                         Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
                                         Function<Mono<HttpClientRequest>, Mono<HttpClientRequest>> requestTransformer,
                                         Function<Mono<HttpClientResponse>, Mono<HttpClientResponse>> responseTransformer) {
+
+        return doPatch(responseType, uriTransformer,
+            outbound -> outbound
+                .transform(requestTransformer)
+                .transform(serializedRequest(requestPayload)),
+            responseTransformer);
+    }
+
+    protected final <T> Mono<T> doPatch(Class<T> responseType,
+                                        Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
+                                        Function<Mono<HttpClientRequest>, Publisher<Void>> requestTransformer,
+                                        Function<Mono<HttpClientResponse>, Mono<HttpClientResponse>> responseTransformer) {
         return this.root
             .transform(transformUri(uriTransformer))
             .then(uri -> this.connectionContext.getHttpClient()
@@ -111,8 +127,8 @@ public abstract class AbstractReactorOperations {
                     .map(AbstractReactorOperations::disableFailOnError)
                     .transform(this::addAuthorization)
                     .map(UserAgent::addUserAgent)
-                    .transform(requestTransformer)
-                    .transform(serializedRequest(requestPayload)))
+                    .map(JsonCodec::addDecodeHeaders)
+                    .transform(requestTransformer))
                 .doOnSubscribe(NetworkLogging.patch(uri))
                 .transform(NetworkLogging.response(uri)))
             .transform(this::invalidateToken)
@@ -145,6 +161,7 @@ public abstract class AbstractReactorOperations {
                     .map(AbstractReactorOperations::disableFailOnError)
                     .transform(this::addAuthorization)
                     .map(UserAgent::addUserAgent)
+                    .map(JsonCodec::addDecodeHeaders)
                     .transform(requestTransformer))
                 .doOnSubscribe(NetworkLogging.post(uri))
                 .transform(NetworkLogging.response(uri)))
@@ -178,6 +195,7 @@ public abstract class AbstractReactorOperations {
                     .map(AbstractReactorOperations::disableFailOnError)
                     .transform(this::addAuthorization)
                     .map(UserAgent::addUserAgent)
+                    .map(JsonCodec::addDecodeHeaders)
                     .transform(requestTransformer))
                 .doOnSubscribe(NetworkLogging.put(uri))
                 .transform(NetworkLogging.response(uri)))
