@@ -42,4 +42,12 @@ public final class ChangeUserPasswordRequestTest {
             .build();
     }
 
+    @Test
+    public void noOldPasswordAlsoValid() {
+        ChangeUserPasswordRequest.builder()
+            .password("test-password")
+            .userId("test-user-id")
+            .build();
+    }
+
 }
