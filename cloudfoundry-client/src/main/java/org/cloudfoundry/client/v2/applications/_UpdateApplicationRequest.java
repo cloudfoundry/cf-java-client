@@ -111,6 +111,13 @@ abstract class _UpdateApplicationRequest {
     abstract Map<String, Object> getEnvironmentJsons();
 
     /**
+     * The HTTP endpoint to check for health
+     */
+    @JsonProperty("health_check_http_endpoint")
+    @Nullable
+    abstract String getHealthCheckHttpEndpoint();
+
+    /**
      * Timeout for health checking of an staged application when starting up
      */
     @JsonProperty("health_check_timeout")
