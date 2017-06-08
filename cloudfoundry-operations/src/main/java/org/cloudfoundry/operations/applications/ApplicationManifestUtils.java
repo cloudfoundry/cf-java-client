@@ -67,7 +67,7 @@ public final class ApplicationManifestUtils {
      * @return the resolved manifests
      */
     public static List<ApplicationManifest> read(Path path) {
-        return doRead(path)
+        return doRead(path.toAbsolutePath())
             .values().stream()
             .map(ApplicationManifest.Builder::build)
             .collect(Collectors.toList());
