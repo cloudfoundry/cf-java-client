@@ -90,6 +90,14 @@ public interface ApplicationsV2 {
     Mono<GetApplicationResponse> get(GetApplicationRequest request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/apps/retrieving_permissions_on_a_app.html">Retrieve Permissions on a Particular App</a> request
+     *
+     * @param request the Get Application Permissions request
+     * @return the response from the Get Application Permissions request
+     */
+    Mono<GetApplicationPermissionsResponse> getPermissions(GetApplicationPermissionsRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/apps/get_the_instance_information_for_a_started_app.html">Get the instance information for a STARTED App</a> request
      *
      * @param request the Get Instance Information request

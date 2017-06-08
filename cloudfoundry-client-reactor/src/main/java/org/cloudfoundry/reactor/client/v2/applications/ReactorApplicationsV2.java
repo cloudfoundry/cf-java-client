@@ -32,6 +32,8 @@ import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
 import org.cloudfoundry.client.v2.applications.DeleteApplicationRequest;
 import org.cloudfoundry.client.v2.applications.DownloadApplicationDropletRequest;
 import org.cloudfoundry.client.v2.applications.DownloadApplicationRequest;
+import org.cloudfoundry.client.v2.applications.GetApplicationPermissionsRequest;
+import org.cloudfoundry.client.v2.applications.GetApplicationPermissionsResponse;
 import org.cloudfoundry.client.v2.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v2.applications.GetApplicationResponse;
 import org.cloudfoundry.client.v2.applications.ListApplicationRoutesRequest;
@@ -131,6 +133,12 @@ public final class ReactorApplicationsV2 extends AbstractClientV2Operations impl
     @Override
     public Mono<GetApplicationResponse> get(GetApplicationRequest request) {
         return get(request, GetApplicationResponse.class, builder -> builder.pathSegment("v2", "apps", request.getApplicationId()))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<GetApplicationPermissionsResponse> getPermissions(GetApplicationPermissionsRequest request) {
+        return get(request, GetApplicationPermissionsResponse.class, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "permissions"))
             .checkpoint();
     }
 
