@@ -258,14 +258,14 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         this.spaceId
             .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
             .then(applicationId -> this.cloudFoundryClient.applicationsV2()
-            .getPermissions(GetApplicationPermissionsRequest.builder()
-                .applicationId(applicationId)
-            .build()))
+                .getPermissions(GetApplicationPermissionsRequest.builder()
+                    .applicationId(applicationId)
+                    .build()))
             .as(StepVerifier::create)
             .expectNext(GetApplicationPermissionsResponse.builder()
                 .readBasicData(true)
                 .readSensitiveData(true)
-            .build())
+                .build())
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
