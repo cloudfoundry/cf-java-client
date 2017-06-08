@@ -19,6 +19,7 @@ package org.cloudfoundry.client.v2;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.IfCloudFoundryVersion;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.applications.AbstractApplicationResource;
 import org.cloudfoundry.client.v2.applications.ApplicationEnvironmentRequest;
@@ -249,6 +250,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = IfCloudFoundryVersion.CloudFoundryVersion.PCF_1_9)
     @Test
     public void getPermissions() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
