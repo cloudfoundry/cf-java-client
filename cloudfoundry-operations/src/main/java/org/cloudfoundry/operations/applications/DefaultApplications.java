@@ -1615,10 +1615,14 @@ public final class DefaultApplications implements Applications {
     private static ApplicationHealthCheck toHealthCheck(AbstractApplicationResource resource) {
         String type = resource.getEntity().getHealthCheckType();
 
-        if (ApplicationHealthCheck.NONE.getValue().equals(type)) {
+        if (ApplicationHealthCheck.HTTP.getValue().equals(type)) {
+            return ApplicationHealthCheck.HTTP;
+        } else if (ApplicationHealthCheck.NONE.getValue().equals(type)) {
             return ApplicationHealthCheck.NONE;
         } else if (ApplicationHealthCheck.PORT.getValue().equals(type)) {
             return ApplicationHealthCheck.PORT;
+        } else if (ApplicationHealthCheck.PROCESS.getValue().equals(type)) {
+            return ApplicationHealthCheck.PROCESS;
         } else {
             return null;
         }
