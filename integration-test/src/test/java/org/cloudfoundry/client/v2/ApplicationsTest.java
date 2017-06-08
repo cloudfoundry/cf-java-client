@@ -34,6 +34,8 @@ import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
 import org.cloudfoundry.client.v2.applications.DeleteApplicationRequest;
 import org.cloudfoundry.client.v2.applications.DownloadApplicationDropletRequest;
 import org.cloudfoundry.client.v2.applications.DownloadApplicationRequest;
+import org.cloudfoundry.client.v2.applications.GetApplicationPermissionsRequest;
+import org.cloudfoundry.client.v2.applications.GetApplicationPermissionsResponse;
 import org.cloudfoundry.client.v2.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v2.applications.ListApplicationRoutesRequest;
 import org.cloudfoundry.client.v2.applications.ListApplicationServiceBindingsRequest;
@@ -243,6 +245,25 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             ))
             .as(StepVerifier::create)
             .consumeNextWith(applicationIdAndNameEquality(applicationName))
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void getPermissions() throws TimeoutException, InterruptedException {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        this.spaceId
+            .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
+            .then(applicationId -> this.cloudFoundryClient.applicationsV2()
+            .getPermissions(GetApplicationPermissionsRequest.builder()
+                .applicationId(applicationId)
+            .build()))
+            .as(StepVerifier::create)
+            .expectNext(GetApplicationPermissionsResponse.builder()
+                .readBasicData(true)
+                .readSensitiveData(true)
+            .build())
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }

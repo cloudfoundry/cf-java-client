@@ -35,6 +35,8 @@ import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
 import org.cloudfoundry.client.v2.applications.DeleteApplicationRequest;
 import org.cloudfoundry.client.v2.applications.DownloadApplicationDropletRequest;
 import org.cloudfoundry.client.v2.applications.DownloadApplicationRequest;
+import org.cloudfoundry.client.v2.applications.GetApplicationPermissionsRequest;
+import org.cloudfoundry.client.v2.applications.GetApplicationPermissionsResponse;
 import org.cloudfoundry.client.v2.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v2.applications.GetApplicationResponse;
 import org.cloudfoundry.client.v2.applications.InstanceStatistics;
@@ -410,6 +412,31 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                     .state("STOPPED")
                     .version("2b0d7e20-ce57-44b4-b0ec-7ca6d1d50e20")
                     .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void getPermissions() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/v2/apps/6fd65993-fbd8-447c-8c04-6e4fe3ac561c/permissions")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/apps/GET_{id}_permissions_response.json")
+                .build())
+            .build());
+
+        this.applications
+            .getPermissions(GetApplicationPermissionsRequest.builder()
+                .applicationId("6fd65993-fbd8-447c-8c04-6e4fe3ac561c")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(GetApplicationPermissionsResponse.builder()
+                .readBasicData(true)
+                .readSensitiveData(true)
                 .build())
             .expectComplete()
             .verify(Duration.ofSeconds(5));
