@@ -25,9 +25,19 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum ApplicationHealthCheck {
 
     /**
+     * HTTP health check
+     */
+    HTTP("http"),
+
+    /**
      * No health check
      */
     NONE("none"),
+
+    /**
+     * Process health check
+     */
+    PROCESS("process"),
 
     /**
      * Port health check
@@ -43,10 +53,14 @@ public enum ApplicationHealthCheck {
     @JsonCreator
     public static ApplicationHealthCheck from(String s) {
         switch (s.toLowerCase()) {
+            case "http":
+                return HTTP;
             case "none":
                 return NONE;
             case "port":
                 return PORT;
+            case "process":
+                return PROCESS;
             default:
                 throw new IllegalArgumentException(String.format("Unknown application health check: %s", s));
         }
