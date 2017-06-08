@@ -193,4 +193,12 @@ public interface ApplicationsV2 {
      */
     Mono<UploadApplicationResponse> upload(UploadApplicationRequest request);
 
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/apps/uploads_the_droplet_for_an_app.html">Upload the droplet for an App</a> request
+     *
+     * @param request the Upload Droplet request
+     * @return the response from the Upload Droplet request
+     */
+    Mono<UploadApplicationDropletResponse> uploadDroplet(UploadApplicationDropletRequest request);
+
 }
