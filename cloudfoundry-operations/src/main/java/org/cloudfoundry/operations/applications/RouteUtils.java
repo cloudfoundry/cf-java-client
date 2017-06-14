@@ -29,7 +29,7 @@ final class RouteUtils {
     private RouteUtils() {
     }
 
-    static Mono<DecomposedRoute> decomposeRoute(List<DomainSummary> availableDomains, String route) {
+    static Mono<DecomposedRoute> decomposeRoute(List<DomainSummary> availableDomains, String route, String routePath) {
         String domain = null;
         String host = null;
         String path = null;
@@ -46,7 +46,7 @@ final class RouteUtils {
 
         if (route.contains("/")) {
             int index = route.indexOf("/");
-            path = route.substring(index);
+            path = routePath != null ? routePath : route.substring(index);
             routeWithoutPath = route.substring(0, index);
         } else if (hasPort(route)) {
             port = getPort(route);

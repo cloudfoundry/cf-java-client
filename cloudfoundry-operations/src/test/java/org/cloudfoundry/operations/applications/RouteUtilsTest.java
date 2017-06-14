@@ -44,7 +44,7 @@ public class RouteUtilsTest {
             .domain("test.test.com")
             .build();
 
-        RouteUtils.decomposeRoute(availableDomains, "test.test.com")
+        RouteUtils.decomposeRoute(availableDomains, "test.test.com", null)
             .as(StepVerifier::create)
             .expectNext(expected)
             .expectComplete()
@@ -68,7 +68,7 @@ public class RouteUtilsTest {
             .path("/path")
             .build();
 
-        RouteUtils.decomposeRoute(availableDomains, "test.test.com/path")
+        RouteUtils.decomposeRoute(availableDomains, "test.test.com/path", null)
             .as(StepVerifier::create)
             .expectNext(expected)
             .expectComplete()
@@ -79,7 +79,7 @@ public class RouteUtilsTest {
     public void empty() {
         List<DomainSummary> availableDomains = Collections.emptyList();
 
-        RouteUtils.decomposeRoute(availableDomains, "test.test.com")
+        RouteUtils.decomposeRoute(availableDomains, "test.test.com", null)
             .as(StepVerifier::create)
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("The route test.test.com did not match any existing domains"))
             .verify(Duration.ofSeconds(5));
@@ -97,7 +97,7 @@ public class RouteUtilsTest {
             .name("test.test.com")
             .build());
 
-        RouteUtils.decomposeRoute(availableDomains, "est.com")
+        RouteUtils.decomposeRoute(availableDomains, "est.com", null)
             .as(StepVerifier::create)
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("The route est.com did not match any existing domains"))
             .verify(Duration.ofSeconds(5));
@@ -115,7 +115,7 @@ public class RouteUtilsTest {
             .name("test.test.com")
             .build());
 
-        RouteUtils.decomposeRoute(availableDomains, "miss.com/path")
+        RouteUtils.decomposeRoute(availableDomains, "miss.com/path", null)
             .as(StepVerifier::create)
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("The route miss.com/path did not match any existing domains"))
             .verify(Duration.ofSeconds(5));
@@ -138,7 +138,7 @@ public class RouteUtilsTest {
             .path("/path")
             .build();
 
-        RouteUtils.decomposeRoute(availableDomains, "test.com/path")
+        RouteUtils.decomposeRoute(availableDomains, "test.com/path", null)
             .as(StepVerifier::create)
             .expectNext(expected)
             .expectComplete()
@@ -161,7 +161,7 @@ public class RouteUtilsTest {
             .domain("test.com")
             .build();
 
-        RouteUtils.decomposeRoute(availableDomains, "test.com")
+        RouteUtils.decomposeRoute(availableDomains, "test.com", null)
             .as(StepVerifier::create)
             .expectNext(expected)
             .expectComplete()
@@ -185,7 +185,7 @@ public class RouteUtilsTest {
             .host("host")
             .build();
 
-        RouteUtils.decomposeRoute(availableDomains, "host.test.com")
+        RouteUtils.decomposeRoute(availableDomains, "host.test.com", null)
             .as(StepVerifier::create)
             .expectNext(expected)
             .expectComplete()
@@ -210,7 +210,7 @@ public class RouteUtilsTest {
             .path("/path")
             .build();
 
-        RouteUtils.decomposeRoute(availableDomains, "host.test.com/path")
+        RouteUtils.decomposeRoute(availableDomains, "host.test.com/path", null)
             .as(StepVerifier::create)
             .expectNext(expected)
             .expectComplete()
@@ -229,9 +229,34 @@ public class RouteUtilsTest {
             .name("test.test.com")
             .build());
 
-        RouteUtils.decomposeRoute(availableDomains, "miss.com")
+        RouteUtils.decomposeRoute(availableDomains, "miss.com", null)
             .as(StepVerifier::create)
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("The route miss.com did not match any existing domains"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void simplePathOverride() {
+        List<DomainSummary> availableDomains = new ArrayList<>();
+        availableDomains.add(DomainSummary.builder()
+            .id("1")
+            .name("test.com")
+            .build());
+        availableDomains.add(DomainSummary.builder()
+            .id("2")
+            .name("test.test.com")
+            .build());
+
+        DecomposedRoute expected = DecomposedRoute.builder()
+            .domain("test.com")
+            .host("host")
+            .path("/override-path")
+            .build();
+
+        RouteUtils.decomposeRoute(availableDomains, "host.test.com/path", "/override-path")
+            .as(StepVerifier::create)
+            .expectNext(expected)
+            .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
 

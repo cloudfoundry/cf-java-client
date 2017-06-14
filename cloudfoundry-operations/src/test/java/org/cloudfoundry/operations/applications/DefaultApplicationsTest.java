@@ -141,7 +141,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     private RandomWords randomWords = mock(RandomWords.class, RETURNS_SMART_NULLS);
 
-    private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), Mono.just(TEST_SPACE_ID), this.randomWords);
+    private final DefaultApplications applications = new DefaultApplications(Mono.just(this.cloudFoundryClient), Mono.just(this.dopplerClient), this.randomWords, Mono.just(TEST_SPACE_ID));
 
     @Test
     public void copySourceNoRestartOrgSpace() {
@@ -1178,11 +1178,11 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     public void pushDomainNotFound() throws IOException {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
-        requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
+        requestApplicationsEmpty(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
         requestCreateApplication(this.cloudFoundryClient, ApplicationManifest.builder()
             .path(testApplication)
             .domain("test-shared-domain")
-            .name("test-name")
+            .name("test-application-name")
             .build(), TEST_SPACE_ID, null, "test-application-id");
         requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
         requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
@@ -1194,10 +1194,10 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
             .push(PushApplicationRequest.builder()
                 .path(testApplication)
                 .domain("test-shared-domain")
-                .name("test-name")
+                .name("test-application-name")
                 .build())
             .as(StepVerifier::create)
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("The route test-shared-domain did not match any existing domains"))
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Domain test-shared-domain not found"))
             .verify(Duration.ofSeconds(5));
     }
 
@@ -1330,7 +1330,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
         requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
         requestSharedDomains(this.cloudFoundryClient, "test-shared-domain", "test-shared-domain-id");
-        requestRoutes(this.cloudFoundryClient, "test-shared-domain-id", "test-name", null, "test-route-id");
+        requestRoutes(this.cloudFoundryClient, "test-shared-domain-id", "", null, "test-route-id");
         requestListMatchingResources(this.cloudFoundryClient, Arrays.asList(new ResourceMatchingUtils.ArtifactMetadata("da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "100644", 0),
             new ResourceMatchingUtils.ArtifactMetadata("45044a6ddbfe11415a8f8a6219de68a2c66b496b", "index.html", "100644", 178)));
         requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
@@ -1546,10 +1546,10 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
         requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
         requestSharedDomains(this.cloudFoundryClient, "test-shared-domain", "test-shared-domain-id");
-        requestRoutesEmpty(this.cloudFoundryClient, "test-shared-domain-id", "test-name", null);
+        requestRoutesEmpty(this.cloudFoundryClient, "test-shared-domain-id", "", null);
         requestListMatchingResources(this.cloudFoundryClient, Arrays.asList(new ResourceMatchingUtils.ArtifactMetadata("da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "100644", 0),
             new ResourceMatchingUtils.ArtifactMetadata("45044a6ddbfe11415a8f8a6219de68a2c66b496b", "index.html", "100644", 178)));
-        requestCreateRoute(this.cloudFoundryClient, "test-shared-domain-id", "test-name", null, TEST_SPACE_ID, "test-route-id");
+        requestCreateRoute(this.cloudFoundryClient, "test-shared-domain-id", "", null, TEST_SPACE_ID, "test-route-id");
         requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
         requestUpload(this.cloudFoundryClient, "test-application-id", testApplication, "test-job-id");
         requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
@@ -1673,8 +1673,8 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestListMatchingResources(this.cloudFoundryClient, Arrays.asList(new ResourceMatchingUtils.ArtifactMetadata("da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "100644", 0),
             new ResourceMatchingUtils.ArtifactMetadata("45044a6ddbfe11415a8f8a6219de68a2c66b496b", "index.html", "100644", 178)));
         requestApplicationRoutesEmpty(this.cloudFoundryClient, "test-application-id");
-        requestRoutesEmpty(this.cloudFoundryClient, "test-shared-domain-id", null, null);
-        requestCreateRoute(this.cloudFoundryClient, "test-shared-domain-id", null, null, TEST_SPACE_ID, "test-route-id");
+        requestRoutesEmpty(this.cloudFoundryClient, "test-shared-domain-id", "", null);
+        requestCreateRoute(this.cloudFoundryClient, "test-shared-domain-id", "", null, TEST_SPACE_ID, "test-route-id");
         requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
         requestUpload(this.cloudFoundryClient, "test-application-id", testApplication, "test-job-id");
         requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
@@ -1840,21 +1840,22 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     public void pushRandomRoute() throws IOException {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
-        requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
+        requestApplicationsEmpty(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
         requestCreateApplication(this.cloudFoundryClient, ApplicationManifest.builder()
             .path(testApplication)
             .domain("test-shared-domain")
-            .name("test-name")
+            .name("test-application-name")
             .randomRoute(true)
             .build(), TEST_SPACE_ID, null, "test-application-id");
         requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
         requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
         requestSharedDomains(this.cloudFoundryClient, "test-shared-domain", "test-shared-domain-id");
         provideRandomWords(this.randomWords);
-        requestRoutesEmpty(this.cloudFoundryClient, "test-shared-domain-id", "test-name-test-adjective-test-noun", null);
-        requestListMatchingResources(this.cloudFoundryClient, Arrays.asList(new ResourceMatchingUtils.ArtifactMetadata("da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "100644", 0),
+        requestRoutesEmpty(this.cloudFoundryClient, "test-shared-domain-id", "test-application-name-test-adjective-test-noun", null);
+        requestListMatchingResources(this.cloudFoundryClient, Arrays.asList(
+            new ResourceMatchingUtils.ArtifactMetadata("da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "100644", 0),
             new ResourceMatchingUtils.ArtifactMetadata("45044a6ddbfe11415a8f8a6219de68a2c66b496b", "index.html", "100644", 178)));
-        requestCreateRoute(this.cloudFoundryClient, "test-shared-domain-id", "test-name-test-adjective-test-noun", null, TEST_SPACE_ID, "test-route-id");
+        requestCreateRoute(this.cloudFoundryClient, "test-shared-domain-id", "test-application-name-test-adjective-test-noun", null, TEST_SPACE_ID, "test-route-id");
         requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
         requestUpload(this.cloudFoundryClient, "test-application-id", testApplication, "test-job-id");
         requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
@@ -1867,7 +1868,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
             .push(PushApplicationRequest.builder()
                 .path(testApplication)
                 .domain("test-shared-domain")
-                .name("test-name")
+                .name("test-application-name")
                 .randomRoute(true)
                 .build())
             .as(StepVerifier::create)
@@ -1998,7 +1999,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
         requestTcpDomains(this.cloudFoundryClient, "test-tcp-domain", "test-tcp-domain-id");
         requestRoutesEmpty(this.cloudFoundryClient, "test-tcp-domain-id", null, null);
-        requestCreateRoute(this.cloudFoundryClient, "test-tcp-domain-id", null, null, TEST_SPACE_ID, "test-route-id");
+        requestCreateRoute(this.cloudFoundryClient, "test-tcp-domain-id", true, TEST_SPACE_ID, "test-route-id");
         requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
         requestUpload(this.cloudFoundryClient, "test-application-id", testApplication, "test-job-id");
         requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
@@ -3076,6 +3077,23 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .domainId(domainId)
                 .host(host)
                 .path(path)
+                .spaceId(spaceId)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(CreateRouteResponse.builder())
+                    .metadata(fill(Metadata.builder())
+                        .id(routeId)
+                        .build())
+                    .entity(fill(RouteEntity.builder())
+                        .build())
+                    .build()));
+    }
+
+    private static void requestCreateRoute(CloudFoundryClient cloudFoundryClient, String domainId, boolean generatePort, String spaceId, String routeId) {
+        when(cloudFoundryClient.routes()
+            .create(CreateRouteRequest.builder()
+                .domainId(domainId)
+                .generatePort(generatePort)
                 .spaceId(spaceId)
                 .build()))
             .thenReturn(Mono

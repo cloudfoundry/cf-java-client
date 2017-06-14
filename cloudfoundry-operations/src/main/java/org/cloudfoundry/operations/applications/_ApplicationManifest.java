@@ -167,6 +167,13 @@ abstract class _ApplicationManifest {
     abstract Boolean getRandomRoute();
 
     /**
+     * The route path for all applications
+     */
+    @JsonProperty("route-path")
+    @Nullable
+    abstract String getRoutePath();
+
+    /**
      * The collection of routes bound to the application
      */
     @JsonProperty("routes")
