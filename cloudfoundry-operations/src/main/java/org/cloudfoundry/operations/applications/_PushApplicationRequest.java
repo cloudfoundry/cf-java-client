@@ -43,9 +43,9 @@ abstract class _PushApplicationRequest {
     /**
      * The path to the application
      *
-     * @deprecated in favor of variants of {@code path}
      * @see #getPath()
      * @see PushApplicationRequest.Builder#path(Path)
+     * @deprecated in favor of variants of {@code path}
      */
     @Deprecated
     @Nullable

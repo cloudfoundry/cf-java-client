@@ -22,6 +22,7 @@ import org.cloudfoundry.operations.applications.ApplicationEnvironments;
 import org.cloudfoundry.operations.applications.ApplicationEvent;
 import org.cloudfoundry.operations.applications.ApplicationHealthCheck;
 import org.cloudfoundry.operations.applications.ApplicationManifest;
+import org.cloudfoundry.operations.applications.ApplicationSummary;
 import org.cloudfoundry.operations.applications.DeleteApplicationRequest;
 import org.cloudfoundry.operations.applications.GetApplicationEnvironmentsRequest;
 import org.cloudfoundry.operations.applications.GetApplicationEventsRequest;
@@ -82,6 +83,8 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .delete(DeleteApplicationRequest.builder()
                     .name(applicationName)
                     .build()))
+            .thenMany(requestListApplications(this.cloudFoundryOperations))
+            .filter(response -> applicationName.equals(response.getName()))
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
@@ -97,6 +100,9 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .name(applicationName)
                     .deleteRoutes(true)
                     .build()))
+            .thenMany(requestListRoutes(this.cloudFoundryOperations))
+            .map(org.cloudfoundry.operations.routes.Route::getApplications)
+            .filter(applicationName::equals)
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
@@ -239,6 +245,37 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
+    public void pushDomainHostPathRoute() throws TimeoutException, InterruptedException, IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+        String domainName = this.nameFactory.getDomainName();
+        String routePath = this.nameFactory.getPath();
+
+        createDomain(this.cloudFoundryOperations, domainName, this.organizationName)
+            .then(this.cloudFoundryOperations.applications()
+                .push(PushApplicationRequest.builder()
+                    .path(new ClassPathResource("test-application.zip").getFile().toPath())
+                    .buildpack("staticfile_buildpack")
+                    .diskQuota(512)
+                    .domain(domainName)
+                    .healthCheckType(ApplicationHealthCheck.PORT)
+                    .host("test-host")
+                    .memory(64)
+                    .name(applicationName)
+                    .noStart(false)
+                    .routePath(routePath)
+                    .build()))
+            .thenMany(this.cloudFoundryOperations.routes()
+                .list(ListRoutesRequest.builder()
+                    .build()))
+            .filter(response -> domainName.equals(response.getDomain()))
+            .map(org.cloudfoundry.operations.routes.Route::getPath)
+            .as(StepVerifier::create)
+            .expectNext(routePath)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
     public void pushDomainNotFound() throws TimeoutException, InterruptedException, IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
@@ -253,7 +290,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .name(applicationName)
                 .build())
             .as(StepVerifier::create)
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("The route %s did not match any existing domains", domainName))
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Domain %s not found", domainName))
             .verify(Duration.ofMinutes(5));
     }
 
@@ -331,6 +368,35 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
+    public void pushNoHostName() throws TimeoutException, InterruptedException, IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+        String domainName = this.nameFactory.getDomainName();
+
+        requestCreateDomain(this.cloudFoundryOperations, domainName, this.organizationName)
+            .then(this.cloudFoundryOperations.applications()
+                .push(PushApplicationRequest.builder()
+                    .path(new ClassPathResource("test-application.zip").getFile().toPath())
+                    .buildpack("staticfile_buildpack")
+                    .diskQuota(512)
+                    .domain(domainName)
+                    .healthCheckType(ApplicationHealthCheck.PORT)
+                    .memory(64)
+                    .name(applicationName)
+                    .noHostname(true)
+                    .noStart(false)
+                    .build()))
+            .thenMany(this.cloudFoundryOperations.routes()
+                .list(ListRoutesRequest.builder()
+                    .build()))
+            .filter(response -> domainName.equals(response.getDomain()))
+            .map(org.cloudfoundry.operations.routes.Route::getHost)
+            .as(StepVerifier::create)
+            .expectNext("")
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
     public void pushNoRoute() throws TimeoutException, InterruptedException, IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
@@ -356,7 +422,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .noRoute(true)
                     .noStart(true)
                     .build()))
-            .thenMany(listRoutes(this.cloudFoundryOperations))
+            .thenMany(requestListRoutes(this.cloudFoundryOperations))
             .flatMapIterable(org.cloudfoundry.operations.routes.Route::getApplications)
             .filter(applicationName::equals)
             .as(StepVerifier::create)
@@ -380,6 +446,63 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .name(applicationName)
                     .build()))
             .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void pushRouteAndRoutePath() throws TimeoutException, InterruptedException, IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+        String domainName = this.nameFactory.getDomainName();
+        String routePath1 = this.nameFactory.getPath();
+        String routePath2 = this.nameFactory.getPath();
+
+        requestCreateDomain(this.cloudFoundryOperations, domainName, this.organizationName)
+            .then(this.cloudFoundryOperations.applications()
+                .pushManifest(PushApplicationManifestRequest.builder()
+                    .manifest(ApplicationManifest.builder()
+                        .path(new ClassPathResource("test-application.zip").getFile().toPath())
+                        .buildpack("staticfile_buildpack")
+                        .disk(512)
+                        .healthCheckType(ApplicationHealthCheck.PORT)
+                        .memory(64)
+                        .name(applicationName)
+                        .route(Route.builder()
+                            .route(String.format("test.%s.com%s", domainName, routePath1))
+                            .build())
+                        .routePath(routePath2)
+                        .build())
+                    .noStart(false)
+                    .build()))
+            .thenMany(requestListRoutes(this.cloudFoundryOperations))
+            .map(org.cloudfoundry.operations.routes.Route::getPath)
+            .filter(routePath2::equals)
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void pushRoutePath() throws TimeoutException, InterruptedException, IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+        String routePath = this.nameFactory.getPath();
+
+        this.cloudFoundryOperations.applications()
+            .push(PushApplicationRequest.builder()
+                .path(new ClassPathResource("test-application.zip").getFile().toPath())
+                .buildpack("staticfile_buildpack")
+                .diskQuota(512)
+                .healthCheckType(ApplicationHealthCheck.PORT)
+                .memory(64)
+                .name(applicationName)
+                .noStart(false)
+                .routePath(routePath)
+                .build())
+            .thenMany(requestListRoutes(this.cloudFoundryOperations))
+            .filter(route -> routePath.equals(route.getPath()))
+            .as(StepVerifier::create)
+            .expectNextCount(1)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -686,17 +809,22 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .build());
     }
 
-    private static Flux<org.cloudfoundry.operations.routes.Route> listRoutes(CloudFoundryOperations cloudFoundryOperations) {
-        return cloudFoundryOperations.routes()
-            .list(ListRoutesRequest.builder()
-                .build());
-    }
-
     private static Mono<Void> requestCreateDomain(CloudFoundryOperations cloudFoundryOperations, String domainName, String organizationName) {
         return cloudFoundryOperations.domains()
             .create(CreateDomainRequest.builder()
                 .domain(domainName)
                 .organization(organizationName)
+                .build());
+    }
+
+    private static Flux<ApplicationSummary> requestListApplications(CloudFoundryOperations cloudFoundryOperations) {
+        return cloudFoundryOperations.applications()
+            .list();
+    }
+
+    private static Flux<org.cloudfoundry.operations.routes.Route> requestListRoutes(CloudFoundryOperations cloudFoundryOperations) {
+        return cloudFoundryOperations.routes()
+            .list(ListRoutesRequest.builder()
                 .build());
     }
 

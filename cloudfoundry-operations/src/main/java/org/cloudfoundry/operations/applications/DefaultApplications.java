@@ -158,14 +158,14 @@ public final class DefaultApplications implements Applications {
     private final Mono<String> spaceId;
 
     public DefaultApplications(Mono<CloudFoundryClient> cloudFoundryClient, Mono<DopplerClient> dopplerClient, Mono<String> spaceId) {
-        this(cloudFoundryClient, dopplerClient, spaceId, new WordListRandomWords());
+        this(cloudFoundryClient, dopplerClient, new WordListRandomWords(), spaceId);
     }
 
-    DefaultApplications(Mono<CloudFoundryClient> cloudFoundryClient, Mono<DopplerClient> dopplerClient, Mono<String> spaceId, RandomWords randomWords) {
+    DefaultApplications(Mono<CloudFoundryClient> cloudFoundryClient, Mono<DopplerClient> dopplerClient, RandomWords randomWords, Mono<String> spaceId) {
         this.cloudFoundryClient = cloudFoundryClient;
         this.dopplerClient = dopplerClient;
-        this.spaceId = spaceId;
         this.randomWords = randomWords;
+        this.spaceId = spaceId;
     }
 
     @Override
@@ -336,27 +336,20 @@ public final class DefaultApplications implements Applications {
             .instances(request.getInstances())
             .memory(request.getMemory())
             .name(request.getName())
+            .noHostname(request.getNoHostname())
             .noRoute(request.getNoRoute())
             .path(Optional.ofNullable(request.getPath()).orElse(request.getApplication()))
             .randomRoute(request.getRandomRoute())
+            .routePath(request.getRoutePath())
             .stack(request.getStack())
             .timeout(request.getTimeout());
 
-        if (request.getDomain() == null) {
-            if (request.getHost() != null) {
-                builder.host(request.getHost());
-            }
-        } else {
-            StringBuilder sb = new StringBuilder();
-            Optional.ofNullable(request.getHost())
-                .ifPresent(host -> sb.append(host).append("."));
-            Optional.ofNullable(request.getDomain())
-                .ifPresent(sb::append);
-            Optional.ofNullable(request.getRoutePath())
-                .ifPresent(sb::append);
-            builder.route(Route.builder()
-                .route(sb.toString())
-                .build());
+        if (request.getDomain() != null) {
+            builder.domain(request.getDomain());
+        }
+
+        if (request.getHost() != null) {
+            builder.host(request.getHost());
         }
 
         return pushManifest(PushApplicationManifestRequest.builder()
@@ -569,9 +562,9 @@ public final class DefaultApplications implements Applications {
     }
 
     private static Flux<String> associateDefaultDomain(CloudFoundryClient cloudFoundryClient, String applicationId, List<DomainSummary> availableDomains, ApplicationManifest manifest,
-                                                       String spaceId) {
+                                                       RandomWords randomWords, String spaceId) {
         return getDefaultDomainId(cloudFoundryClient)
-            .flatMapMany(domainId -> getPushRouteIdFromDomain(cloudFoundryClient, availableDomains, domainId, manifest, spaceId))
+            .flatMapMany(domainId -> getPushRouteIdFromDomain(cloudFoundryClient, availableDomains, domainId, manifest, randomWords, spaceId))
             .flatMap(routeId -> requestAssociateRoute(cloudFoundryClient, applicationId, routeId))
             .map(ResourceUtils::getId);
     }
@@ -849,38 +842,41 @@ public final class DefaultApplications implements Applications {
             .onErrorResume(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Space %s not found", space));
     }
 
-    private static Flux<String> getPushRouteIdFromDomain(CloudFoundryClient cloudFoundryClient, List<DomainSummary> availableDomains, String domainId, ApplicationManifest manifest, String spaceId) {
+    private static Flux<String> getPushRouteIdFromDomain(CloudFoundryClient cloudFoundryClient, List<DomainSummary> availableDomains, String domainId, ApplicationManifest manifest,
+                                                         RandomWords randomWords, String spaceId) {
         if (isTcpDomain(availableDomains, domainId)) {
             return requestCreateTcpRoute(cloudFoundryClient, domainId, spaceId)
                 .map(ResourceUtils::getId)
                 .flux();
         }
 
-        if (manifest.getNoHostname() != null && manifest.getNoHostname()) {
-            return getRouteId(cloudFoundryClient, domainId, null, null)
-                .switchIfEmpty(requestCreateRoute(cloudFoundryClient, domainId, null, null, spaceId)
-                    .map(ResourceUtils::getId))
-                .flux();
+        List<String> hosts;
+        if (Optional.ofNullable(manifest.getNoHostname()).orElse(false)) {
+            hosts = Collections.singletonList("");
+        } else if (Optional.ofNullable(manifest.getRandomRoute()).orElse(false) && manifest.getHosts() == null) {
+            hosts = Collections.singletonList(String.join("-", manifest.getName(), randomWords.getAdjective(), randomWords.getNoun()));
+        } else if (manifest.getHosts() == null || manifest.getHosts().isEmpty()) {
+            hosts = Collections.singletonList(manifest.getName());
+        } else {
+            hosts = manifest.getHosts();
         }
 
-        List<String> hosts = manifest.getHosts() == null ? Collections.singletonList(manifest.getName()) : manifest.getHosts();
-
         return Flux.fromIterable(hosts)
-            .flatMap(host -> getRouteId(cloudFoundryClient, domainId, host, null)
-                .switchIfEmpty(requestCreateRoute(cloudFoundryClient, domainId, host, null, spaceId)
+            .flatMap(host -> getRouteId(cloudFoundryClient, domainId, host, manifest.getRoutePath())
+                .switchIfEmpty(requestCreateRoute(cloudFoundryClient, domainId, host, manifest.getRoutePath(), spaceId)
                     .map(ResourceUtils::getId)));
     }
 
-    private static Flux<String> getPushRouteIdFromRoute(CloudFoundryClient cloudFoundryClient, List<DomainSummary> availableDomains, ApplicationManifest manifest, String spaceId,
-                                                        RandomWords randomWords) {
+    private static Flux<String> getPushRouteIdFromRoute(CloudFoundryClient cloudFoundryClient, List<DomainSummary> availableDomains, ApplicationManifest manifest, RandomWords randomWords,
+                                                        String spaceId) {
         return Flux.fromIterable(manifest.getRoutes())
-            .flatMap(route -> RouteUtils.decomposeRoute(availableDomains, route.getRoute()))
+            .flatMap(route -> RouteUtils.decomposeRoute(availableDomains, route.getRoute(), manifest.getRoutePath()))
             .flatMap(decomposedRoute -> {
                 String domainId = getDomainId(availableDomains, decomposedRoute.getDomain());
                 if (isTcpDomain(availableDomains, domainId)) {
                     return getRouteIdForTcpRoute(cloudFoundryClient, decomposedRoute, domainId, spaceId);
                 } else {
-                    return getRouteIdForHttpRoute(cloudFoundryClient, decomposedRoute, domainId, manifest, spaceId, randomWords);
+                    return getRouteIdForHttpRoute(cloudFoundryClient, decomposedRoute, domainId, manifest, randomWords, spaceId);
                 }
             });
     }
@@ -893,8 +889,8 @@ public final class DefaultApplications implements Applications {
             .map(ResourceUtils::getId);
     }
 
-    private static Mono<String> getRouteIdForHttpRoute(CloudFoundryClient cloudFoundryClient, DecomposedRoute decomposedRoute, String domainId, ApplicationManifest manifest, String spaceId,
-                                                       RandomWords randomWords) {
+    private static Mono<String> getRouteIdForHttpRoute(CloudFoundryClient cloudFoundryClient, DecomposedRoute decomposedRoute, String domainId, ApplicationManifest manifest, RandomWords randomWords,
+                                                       String spaceId) {
         String derivedHost = deriveHostname(decomposedRoute.getHost(), manifest, randomWords);
         return getRouteId(cloudFoundryClient, domainId, derivedHost, decomposedRoute.getPath())
             .switchIfEmpty(requestCreateRoute(cloudFoundryClient, domainId, derivedHost, decomposedRoute.getPath(), spaceId)
@@ -1004,8 +1000,8 @@ public final class DefaultApplications implements Applications {
             .collectList();
     }
 
-    private static Mono<Void> prepareDomainsAndRoutes(CloudFoundryClient cloudFoundryClient, String applicationId, List<DomainSummary> availableDomains, ApplicationManifest manifest, String spaceId,
-                                                      RandomWords randomWords) {
+    private static Mono<Void> prepareDomainsAndRoutes(CloudFoundryClient cloudFoundryClient, String applicationId, List<DomainSummary> availableDomains, ApplicationManifest manifest,
+                                                      RandomWords randomWords, String spaceId) {
         if (Optional.ofNullable(manifest.getNoRoute()).orElse(false)) {
             return requestApplicationRoutes(cloudFoundryClient, applicationId)
                 .map(ResourceUtils::getId)
@@ -1018,16 +1014,16 @@ public final class DefaultApplications implements Applications {
                 return requestApplicationRoutes(cloudFoundryClient, applicationId)
                     .map(ResourceUtils::getId)
                     //A route already exists for the application, do nothing
-                    .switchIfEmpty(associateDefaultDomain(cloudFoundryClient, applicationId, availableDomains, manifest, spaceId))
+                    .switchIfEmpty(associateDefaultDomain(cloudFoundryClient, applicationId, availableDomains, manifest, randomWords, spaceId))
                     .then();
             } else {
                 return Flux.fromIterable(manifest.getDomains())
-                    .flatMap(domain -> getPushRouteIdFromDomain(cloudFoundryClient, availableDomains, getDomainId(availableDomains, domain), manifest, spaceId)
+                    .flatMap(domain -> getPushRouteIdFromDomain(cloudFoundryClient, availableDomains, getDomainId(availableDomains, domain), manifest, randomWords, spaceId)
                         .flatMap(routeId -> requestAssociateRoute(cloudFoundryClient, applicationId, routeId)))
                     .then();
             }
         } else {
-            return getPushRouteIdFromRoute(cloudFoundryClient, availableDomains, manifest, spaceId, randomWords)
+            return getPushRouteIdFromRoute(cloudFoundryClient, availableDomains, manifest, randomWords, spaceId)
                 .flatMapSequential(routeId -> requestAssociateRoute(cloudFoundryClient, applicationId, routeId), 1)
                 .then();
         }
@@ -1040,7 +1036,7 @@ public final class DefaultApplications implements Applications {
                 getApplicationId(cloudFoundryClient, manifest, spaceId, stackId.orElse(null)),
                 ResourceMatchingUtils.getMatchedResources(cloudFoundryClient, manifest.getPath())
             ))
-            .flatMap(function((applicationId, matchedResources) -> prepareDomainsAndRoutes(cloudFoundryClient, applicationId, availableDomains, manifest, spaceId, randomWords)
+            .flatMap(function((applicationId, matchedResources) -> prepareDomainsAndRoutes(cloudFoundryClient, applicationId, availableDomains, manifest, randomWords, spaceId)
                 .then(Mono.just(Tuples.of(applicationId, matchedResources)))))
             .flatMap(function((applicationId, matchedResources) -> Mono
                 .when(
@@ -1055,7 +1051,7 @@ public final class DefaultApplications implements Applications {
                                          PushApplicationManifestRequest request, String spaceId) {
         return getOptionalStackId(cloudFoundryClient, manifest.getStack())
             .flatMapMany(stackId -> getApplicationId(cloudFoundryClient, manifest, spaceId, stackId.orElse(null)))
-            .flatMap(applicationId -> prepareDomainsAndRoutes(cloudFoundryClient, applicationId, availableDomains, manifest, spaceId, randomWords)
+            .flatMap(applicationId -> prepareDomainsAndRoutes(cloudFoundryClient, applicationId, availableDomains, manifest, randomWords, spaceId)
                 .then(Mono.just(applicationId)))
             .flatMap(applicationId -> bindServices(cloudFoundryClient, applicationId, manifest, spaceId)
                 .then(Mono.just(applicationId)))
