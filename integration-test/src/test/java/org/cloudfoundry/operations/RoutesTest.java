@@ -558,11 +558,11 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .build());
     }
 
-    private static Mono<Void> requestCreateSharedDomain(CloudFoundryOperations cloudFoundryOperations, String domainName, String routerGroupId) {
+    private static Mono<Void> requestCreateSharedDomain(CloudFoundryOperations cloudFoundryOperations, String domainName, String routerGroup) {
         return cloudFoundryOperations.domains()
             .createShared(CreateSharedDomainRequest.builder()
                 .domain(domainName)
-                .routerGroup(routerGroupId)
+                .routerGroup(routerGroup)
                 .build());
     }
 

@@ -874,7 +874,7 @@ public final class DefaultApplications implements Applications {
             .flatMap(decomposedRoute -> {
                 String domainId = getDomainId(availableDomains, decomposedRoute.getDomain());
                 if (isTcpDomain(availableDomains, domainId)) {
-                    return getRouteIdForTcpRoute(cloudFoundryClient, decomposedRoute, domainId, spaceId);
+                    return getRouteIdForTcpRoute(cloudFoundryClient, decomposedRoute, domainId, manifest, spaceId);
                 } else {
                     return getRouteIdForHttpRoute(cloudFoundryClient, decomposedRoute, domainId, manifest, randomWords, spaceId);
                 }
@@ -897,7 +897,12 @@ public final class DefaultApplications implements Applications {
                 .map(ResourceUtils::getId));
     }
 
-    private static Mono<String> getRouteIdForTcpRoute(CloudFoundryClient cloudFoundryClient, DecomposedRoute decomposedRoute, String domainId, String spaceId) {
+    private static Mono<String> getRouteIdForTcpRoute(CloudFoundryClient cloudFoundryClient, DecomposedRoute decomposedRoute, String domainId, ApplicationManifest manifest, String spaceId) {
+        if (Optional.ofNullable(manifest.getRandomRoute()).orElse(false)) {
+            return requestCreateTcpRoute(cloudFoundryClient, domainId, spaceId)
+                .map(ResourceUtils::getId);
+        }
+
         return getTcpRouteId(cloudFoundryClient, domainId, decomposedRoute.getPort())
             .switchIfEmpty(requestCreateTcpRoute(cloudFoundryClient, domainId, decomposedRoute.getPort(), spaceId)
                 .map(ResourceUtils::getId));

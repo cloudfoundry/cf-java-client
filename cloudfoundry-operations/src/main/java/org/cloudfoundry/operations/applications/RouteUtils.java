@@ -34,7 +34,7 @@ final class RouteUtils {
         String host = null;
         String path = null;
         Integer port = null;
-        String routeWithoutPath = route;
+        String routeWithoutSuffix = route;
 
         if (availableDomains.size() == 0) {
             throw new IllegalArgumentException(String.format("The route %s did not match any existing domains", route));
@@ -47,16 +47,17 @@ final class RouteUtils {
         if (route.contains("/")) {
             int index = route.indexOf("/");
             path = routePath != null ? routePath : route.substring(index);
-            routeWithoutPath = route.substring(0, index);
+            routeWithoutSuffix = route.substring(0, index);
         } else if (hasPort(route)) {
             port = getPort(route);
+            routeWithoutSuffix = route.substring(0, route.indexOf(":"));
         }
 
         for (DomainSummary item : sortedDomains) {
-            if (routeWithoutPath.contains(item.getName())) {
+            if (routeWithoutSuffix.contains(item.getName())) {
                 domain = item.getName();
-                if (domain.length() < routeWithoutPath.length()) {
-                    host = routeWithoutPath.substring(0, routeWithoutPath.lastIndexOf(domain) - 1);
+                if (domain.length() < routeWithoutSuffix.length()) {
+                    host = routeWithoutSuffix.substring(0, routeWithoutSuffix.lastIndexOf(domain) - 1);
                 }
                 break;
             }
@@ -81,12 +82,15 @@ final class RouteUtils {
     private static Integer getPort(String route) {
         Pattern pattern = Pattern.compile(":\\d+$");
         Matcher matcher = pattern.matcher(route);
+
+        matcher.find();
         return Integer.valueOf(route.substring(matcher.start() + 1, matcher.end()));
     }
 
     private static Boolean hasPort(String route) {
-        Pattern pattern = Pattern.compile(":\\d+$");
+        Pattern pattern = Pattern.compile("^.+?:\\d+$");
         Matcher matcher = pattern.matcher(route);
+
         return matcher.matches();
     }
 
