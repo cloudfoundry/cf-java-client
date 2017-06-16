@@ -37,6 +37,7 @@ import org.cloudfoundry.operations.applications.SetEnvironmentVariableApplicatio
 import org.cloudfoundry.operations.applications.StartApplicationRequest;
 import org.cloudfoundry.operations.applications.UnsetEnvironmentVariableApplicationRequest;
 import org.cloudfoundry.operations.domains.CreateDomainRequest;
+import org.cloudfoundry.operations.domains.CreateSharedDomainRequest;
 import org.cloudfoundry.operations.routes.ListRoutesRequest;
 import org.cloudfoundry.operations.services.BindServiceInstanceRequest;
 import org.cloudfoundry.operations.services.CreateServiceInstanceRequest;
@@ -61,6 +62,8 @@ import java.util.concurrent.TimeoutException;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public final class ApplicationsTest extends AbstractIntegrationTest {
+
+    private static final String DEFAULT_ROUTER_GROUP = "default-tcp";
 
     @Autowired
     private CloudFoundryOperations cloudFoundryOperations;
@@ -328,10 +331,10 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                         .memory(64)
                         .name(applicationName)
                         .route(Route.builder()
-                            .route(String.format("test1.%s.com", domainName))
+                            .route(String.format("test1.%s", domainName))
                             .build())
                         .route(Route.builder()
-                            .route(String.format("test2.%s.com", domainName))
+                            .route(String.format("test2.%s", domainName))
                             .build())
                         .build())
                     .noStart(false)
@@ -468,7 +471,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                         .memory(64)
                         .name(applicationName)
                         .route(Route.builder()
-                            .route(String.format("test.%s.com%s", domainName, routePath1))
+                            .route(String.format("test.%s%s", domainName, routePath1))
                             .build())
                         .routePath(routePath2)
                         .build())
@@ -508,6 +511,36 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
+    public void pushTcpRoute() throws TimeoutException, InterruptedException, IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+        String domainName = this.nameFactory.getDomainName();
+
+        requestCreateTcpDomain(this.cloudFoundryOperations, domainName, DEFAULT_ROUTER_GROUP)
+            .then(this.cloudFoundryOperations.applications()
+                .pushManifest(PushApplicationManifestRequest.builder()
+                    .manifest(ApplicationManifest.builder()
+                        .path(new ClassPathResource("test-application.zip").getFile().toPath())
+                        .buildpack("staticfile_buildpack")
+                        .disk(512)
+                        .healthCheckType(ApplicationHealthCheck.PROCESS)
+                        .memory(64)
+                        .name(applicationName)
+                        .randomRoute(true)
+                        .route(Route.builder()
+                            .route(domainName)
+                            .build())
+                        .build())
+                    .noStart(true)
+                    .build()))
+            .thenMany(requestListRoutes(this.cloudFoundryOperations))
+            .filter(route -> domainName.equals(route.getDomain()))
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
     public void pushUpdateRoute() throws TimeoutException, InterruptedException, IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
@@ -523,7 +556,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                         .memory(64)
                         .name(applicationName)
                         .route(Route.builder()
-                            .route(String.format("test.%s.com", domainName))
+                            .route(String.format("test.%s", domainName))
                             .build())
                         .build())
                     .noStart(true)
@@ -814,6 +847,14 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .create(CreateDomainRequest.builder()
                 .domain(domainName)
                 .organization(organizationName)
+                .build());
+    }
+
+    private static Mono<Void> requestCreateTcpDomain(CloudFoundryOperations cloudFoundryOperations, String domainName, String routerGroup) {
+        return cloudFoundryOperations.domains()
+            .createShared(CreateSharedDomainRequest.builder()
+                .domain(domainName)
+                .routerGroup(routerGroup)
                 .build());
     }
 
