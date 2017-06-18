@@ -21,12 +21,25 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
+import java.util.Map;
+
 /**
  * The payload for the identity zone saml configuration
  */
 @JsonDeserialize
 @Value.Immutable
 abstract class _SamlConfiguration {
+
+    /**
+     * The active key id
+     */
+    @Nullable
+    @JsonProperty("activeKeyId")
+    abstract String getActiveKeyId();
+
+    @Nullable
+    @JsonProperty("keys")
+    abstract Map<String, Key> getKeys();
 
     /**
      * If true, the SAML provider will sign all assertions.
