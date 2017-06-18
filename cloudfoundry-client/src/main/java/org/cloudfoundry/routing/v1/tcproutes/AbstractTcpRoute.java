@@ -17,6 +17,7 @@
 package org.cloudfoundry.routing.v1.tcproutes;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.cloudfoundry.Nullable;
 import org.cloudfoundry.routing.v1.ModificationTag;
 
 abstract class AbstractTcpRoute {
@@ -32,6 +33,13 @@ abstract class AbstractTcpRoute {
      */
     @JsonProperty("backend_port")
     abstract Integer getBackendPort();
+
+    /**
+     * The isolation segment
+     */
+    @JsonProperty("isolation_segment")
+    @Nullable
+    abstract String getIsolationSegment();
 
     /**
      * Modification Tag for the route.

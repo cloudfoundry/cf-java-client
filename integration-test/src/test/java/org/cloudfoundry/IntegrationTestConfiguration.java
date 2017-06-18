@@ -185,7 +185,7 @@ public class IntegrationTestConfiguration {
                 .autoApprove(String.valueOf(true))
                 .clientId(clientId)
                 .clientSecret(clientSecret)
-                .redirectUriPattern("/login")
+                .redirectUriPattern("https://test.com/login")
                 .scopes(SCOPES)
                 .build())
             .then(Mono.just(Tuples.of(clientId, clientSecret)))

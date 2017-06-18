@@ -178,6 +178,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
                             .clientId(clientId1)
                             .name("test-name")
                             .scope("client.read", "client.write")
+                            .redirectUriPattern("https://test.com/*")
                             .tokenSalt("test-token-salt")
                             .build(),
                         UpdateClient.builder()

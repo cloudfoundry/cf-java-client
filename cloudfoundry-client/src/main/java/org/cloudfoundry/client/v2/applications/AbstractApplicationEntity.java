@@ -79,6 +79,13 @@ public abstract class AbstractApplicationEntity {
     public abstract Integer getDiskQuota();
 
     /**
+     * The docker credentials
+     */
+    @JsonProperty("docker_credentials")
+    @Nullable
+    public abstract DockerCredentials getDockerCredentials();
+
+    /**
      * The docker credentials JSONs
      */
     @AllowNulls

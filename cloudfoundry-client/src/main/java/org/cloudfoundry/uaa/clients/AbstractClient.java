@@ -115,6 +115,13 @@ abstract class AbstractClient {
     abstract Long getRefreshTokenValidity();
 
     /**
+     * The required user groups
+     */
+    @JsonProperty("required_user_groups")
+    @Nullable
+    abstract List<String> getRequiredUserGroups();
+
+    /**
      * Resources the client is allowed access to
      */
     @JsonProperty("resource_ids")

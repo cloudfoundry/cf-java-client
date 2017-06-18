@@ -56,6 +56,7 @@ abstract class AbstractAuthenticationConfiguration extends AbstractExternalIdent
      * The client secret of the relying party at the external OAuth provider
      */
     @JsonProperty("relyingPartySecret")
+    @Nullable
     abstract String getRelyingPartySecret();
 
     /**
