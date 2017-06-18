@@ -25,7 +25,6 @@ public final class OpenIdConnectConfigurationTest {
         OpenIdConnectConfiguration.builder()
             .tokenUrl("test-token-url")
             .relyingPartyId("test-relying-party-id")
-            .relyingPartySecret("test-relying-party-secret")
             .build();
     }
 
@@ -34,16 +33,6 @@ public final class OpenIdConnectConfigurationTest {
         OpenIdConnectConfiguration.builder()
             .authUrl("test-auth-url")
             .tokenUrl("test-token-url")
-            .relyingPartySecret("test-relying-party-secret")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noRelyingPartySecret() {
-        OpenIdConnectConfiguration.builder()
-            .authUrl("test-auth-url")
-            .tokenUrl("test-token-url")
-            .relyingPartyId("test-relying-party-id")
             .build();
     }
 
@@ -52,7 +41,6 @@ public final class OpenIdConnectConfigurationTest {
         OpenIdConnectConfiguration.builder()
             .authUrl("test-auth-url")
             .relyingPartyId("test-relying-party-id")
-            .relyingPartySecret("test-relying-party-secret")
             .build();
     }
 
@@ -62,7 +50,6 @@ public final class OpenIdConnectConfigurationTest {
             .authUrl("test-auth-url")
             .tokenUrl("test-token-url")
             .relyingPartyId("test-relying-party-id")
-            .relyingPartySecret("test-relying-party-secret")
             .build();
     }
 
