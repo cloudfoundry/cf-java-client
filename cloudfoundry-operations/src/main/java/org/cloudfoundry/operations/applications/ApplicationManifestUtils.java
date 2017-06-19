@@ -91,6 +91,30 @@ public final class ApplicationManifestUtils {
      */
     public static void write(Path path, List<ApplicationManifest> applicationManifests) {
         try (OutputStream out = Files.newOutputStream(path, StandardOpenOption.CREATE, StandardOpenOption.WRITE)) {
+            write(out, applicationManifests);
+        } catch (IOException e) {
+            throw Exceptions.propagate(e);
+        }
+    }
+
+    /**
+     * Write {@link ApplicationManifest}s to an {@link OutputStream}
+     *
+     * @param out                  the {@link OutputStream} to write to
+     * @param applicationManifests the manifests to write
+     */
+    public static void write(OutputStream out, ApplicationManifest... applicationManifests) {
+        write(out, Arrays.asList(applicationManifests));
+    }
+
+    /**
+     * Write {@link ApplicationManifest}s to an {@link OutputStream}
+     *
+     * @param out                  the {@link OutputStream} to write to
+     * @param applicationManifests the manifests to write
+     */
+    public static void write(OutputStream out, List<ApplicationManifest> applicationManifests) {
+        try {
             OBJECT_MAPPER.writeValue(out, Collections.singletonMap("applications", applicationManifests));
         } catch (IOException e) {
             throw Exceptions.propagate(e);
