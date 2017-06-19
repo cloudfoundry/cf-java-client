@@ -27,7 +27,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.cloudfoundry.operations.applications.ApplicationHealthCheck.*;
+import static org.cloudfoundry.operations.applications.ApplicationHealthCheck.NONE;
+import static org.cloudfoundry.operations.applications.ApplicationHealthCheck.PORT;
 
 public final class ApplicationManifestUtilsTest {
 
