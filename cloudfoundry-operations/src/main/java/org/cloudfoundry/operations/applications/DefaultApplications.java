@@ -729,6 +729,11 @@ public final class DefaultApplications implements Applications {
                 t -> Mono.just(ApplicationInstancesResponse.builder().build()));
     }
 
+    private static Mono<List<RouteResource>> getApplicationRoutes(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        return requestApplicationRoutes(cloudFoundryClient, applicationId)
+            .collectList();
+    }
+
     private static Mono<ApplicationStatisticsResponse> getApplicationStatistics(CloudFoundryClient cloudFoundryClient, String applicationId) {
         return requestApplicationStatistics(cloudFoundryClient, applicationId)
             .onErrorResume(ExceptionUtils.statusCode(CF_APP_STOPPED_STATS_ERROR), t -> Mono.just(ApplicationStatisticsResponse.builder().build()));
@@ -1006,9 +1011,9 @@ public final class DefaultApplications implements Applications {
     }
 
     private static Mono<Void> prepareDomainsAndRoutes(CloudFoundryClient cloudFoundryClient, String applicationId, List<DomainSummary> availableDomains, ApplicationManifest manifest,
-                                                      RandomWords randomWords, String spaceId) {
+                                                      List<RouteResource> existingRoutes, RandomWords randomWords, String spaceId) {
         if (Optional.ofNullable(manifest.getNoRoute()).orElse(false)) {
-            return requestApplicationRoutes(cloudFoundryClient, applicationId)
+            return Flux.fromIterable(existingRoutes)
                 .map(ResourceUtils::getId)
                 .flatMap(routeId -> requestRemoveRouteFromApplication(cloudFoundryClient, applicationId, routeId))
                 .then();
@@ -1016,32 +1021,39 @@ public final class DefaultApplications implements Applications {
 
         if (manifest.getRoutes() == null) {
             if (manifest.getDomains() == null) {
-                return requestApplicationRoutes(cloudFoundryClient, applicationId)
-                    .map(ResourceUtils::getId)
-                    //A route already exists for the application, do nothing
-                    .switchIfEmpty(associateDefaultDomain(cloudFoundryClient, applicationId, availableDomains, manifest, randomWords, spaceId))
-                    .then();
-            } else {
-                return Flux.fromIterable(manifest.getDomains())
-                    .flatMap(domain -> getPushRouteIdFromDomain(cloudFoundryClient, availableDomains, getDomainId(availableDomains, domain), manifest, randomWords, spaceId)
-                        .flatMap(routeId -> requestAssociateRoute(cloudFoundryClient, applicationId, routeId)))
-                    .then();
+                if (existingRoutes.isEmpty()) {
+                    return associateDefaultDomain(cloudFoundryClient, applicationId, availableDomains, manifest, randomWords, spaceId)
+                        .then();
+                }
+                return Mono.empty(); // A route already exists for the application, do nothing
             }
-        } else {
-            return getPushRouteIdFromRoute(cloudFoundryClient, availableDomains, manifest, randomWords, spaceId)
-                .flatMapSequential(routeId -> requestAssociateRoute(cloudFoundryClient, applicationId, routeId), 1)
+            return Flux.fromIterable(manifest.getDomains())
+                .flatMap(domain -> getPushRouteIdFromDomain(cloudFoundryClient, availableDomains, getDomainId(availableDomains, domain), manifest, randomWords, spaceId)
+                    .flatMap(routeId -> requestAssociateRoute(cloudFoundryClient, applicationId, routeId)))
                 .then();
         }
+
+        List<String> existingRouteIds = existingRoutes.stream()
+            .map(ResourceUtils::getId)
+            .collect(Collectors.toList());
+
+        return getPushRouteIdFromRoute(cloudFoundryClient, availableDomains, manifest, randomWords, spaceId)
+            .filter(routeId -> !existingRouteIds.contains(routeId))
+            .flatMapSequential(routeId -> requestAssociateRoute(cloudFoundryClient, applicationId, routeId), 1)
+            .then();
     }
 
     private static Flux<Void> pushApplication(CloudFoundryClient cloudFoundryClient, List<DomainSummary> availableDomains, ApplicationManifest manifest, RandomWords randomWords,
                                               PushApplicationManifestRequest request, String spaceId) {
         return getOptionalStackId(cloudFoundryClient, manifest.getStack())
-            .flatMapMany(stackId -> Mono.when(
-                getApplicationId(cloudFoundryClient, manifest, spaceId, stackId.orElse(null)),
+            .flatMapMany(stackId -> getApplicationId(cloudFoundryClient, manifest, spaceId, stackId.orElse(null)))
+            .flatMap(applicationId -> Mono.when(
+                Mono.just(applicationId),
+                getApplicationRoutes(cloudFoundryClient, applicationId),
                 ResourceMatchingUtils.getMatchedResources(cloudFoundryClient, manifest.getPath())
             ))
-            .flatMap(function((applicationId, matchedResources) -> prepareDomainsAndRoutes(cloudFoundryClient, applicationId, availableDomains, manifest, randomWords, spaceId)
+            .flatMap(function((applicationId, existingRoutes, matchedResources) -> prepareDomainsAndRoutes(cloudFoundryClient, applicationId, availableDomains, manifest, existingRoutes,
+                randomWords, spaceId)
                 .then(Mono.just(Tuples.of(applicationId, matchedResources)))))
             .flatMap(function((applicationId, matchedResources) -> Mono
                 .when(
@@ -1056,8 +1068,12 @@ public final class DefaultApplications implements Applications {
                                          PushApplicationManifestRequest request, String spaceId) {
         return getOptionalStackId(cloudFoundryClient, manifest.getStack())
             .flatMapMany(stackId -> getApplicationId(cloudFoundryClient, manifest, spaceId, stackId.orElse(null)))
-            .flatMap(applicationId -> prepareDomainsAndRoutes(cloudFoundryClient, applicationId, availableDomains, manifest, randomWords, spaceId)
-                .then(Mono.just(applicationId)))
+            .flatMap(applicationId -> Mono.when(
+                Mono.just(applicationId),
+                getApplicationRoutes(cloudFoundryClient, applicationId)
+            ))
+            .flatMap(function((applicationId, existingRoutes) -> prepareDomainsAndRoutes(cloudFoundryClient, applicationId, availableDomains, manifest, existingRoutes, randomWords, spaceId)
+                .then(Mono.just(applicationId))))
             .flatMap(applicationId -> bindServices(cloudFoundryClient, applicationId, manifest, spaceId)
                 .then(Mono.just(applicationId)))
             .flatMap(applicationId -> stopAndStartApplication(cloudFoundryClient, applicationId, manifest.getName(), request));
