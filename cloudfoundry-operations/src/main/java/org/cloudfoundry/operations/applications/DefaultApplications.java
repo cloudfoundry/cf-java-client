@@ -1545,8 +1545,9 @@ public final class DefaultApplications implements Applications {
 
         for (org.cloudfoundry.client.v2.routes.Route route : Optional.ofNullable(response.getRoutes()).orElse(Collections.emptyList())) {
             StringBuilder sb = new StringBuilder();
-            Optional.ofNullable(route.getHost())
-                .ifPresent(host -> sb.append(host).append("."));
+            if (route.getHost() != null && !route.getHost().isEmpty()) {
+                sb.append(route.getHost()).append(".");
+            }
             Optional.ofNullable(route.getDomain().getName())
                 .ifPresent(sb::append);
 
