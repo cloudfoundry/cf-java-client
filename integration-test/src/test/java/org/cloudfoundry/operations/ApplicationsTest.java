@@ -235,7 +235,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .get(GetApplicationRequest.builder()
                     .name(applicationName)
                     .build()))
-                .map(applicationDetail -> applicationDetail.getUrls().get(0))
+            .map(applicationDetail -> applicationDetail.getUrls().get(0))
             .as(StepVerifier::create)
             .consumeNextWith(route -> assertThat(route).matches(domainName + "+?:\\d+$"))
             .expectComplete()
@@ -622,6 +622,59 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .filter(applicationName::equals)
             .as(StepVerifier::create)
             .expectNextCount(2)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void pushUpdateTcpRoute() throws TimeoutException, InterruptedException, IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+        String domainName = this.nameFactory.getDomainName();
+
+        requestCreateTcpDomain(this.cloudFoundryOperations, domainName, DEFAULT_ROUTER_GROUP)
+            .then(this.cloudFoundryOperations.applications()
+                .pushManifest(PushApplicationManifestRequest.builder()
+                    .manifest(ApplicationManifest.builder()
+                        .path(new ClassPathResource("test-application.zip").getFile().toPath())
+                        .buildpack("staticfile_buildpack")
+                        .disk(512)
+                        .healthCheckType(ApplicationHealthCheck.PROCESS)
+                        .memory(64)
+                        .name(applicationName)
+                        .randomRoute(true)
+                        .route(Route.builder()
+                            .route(domainName)
+                            .build())
+                        .build())
+                    .noStart(true)
+                    .build()))
+            .then(this.cloudFoundryOperations.applications()
+                .pushManifest(PushApplicationManifestRequest.builder()
+                    .manifest(ApplicationManifest.builder()
+                        .path(new ClassPathResource("test-application.zip").getFile().toPath())
+                        .buildpack("staticfile_buildpack")
+                        .disk(512)
+                        .healthCheckType(ApplicationHealthCheck.PROCESS)
+                        .memory(64)
+                        .name(applicationName)
+                        .randomRoute(true)
+                        .route(Route.builder()
+                            .route(domainName)
+                            .build())
+                        .build())
+                    .noStart(true)
+                    .build()))
+            .then(this.cloudFoundryOperations.applications()
+                .get(GetApplicationRequest.builder()
+                    .name(applicationName)
+                    .build()))
+            .map(ApplicationDetail::getUrls)
+            .as(StepVerifier::create)
+            .consumeNextWith(routes -> {
+                assertThat(routes.get(0).matches(domainName + "+?:\\d+$"));
+                assertThat(routes.get(1).matches(domainName + "+?:\\d+$"));
+                assertThat(!routes.get(0).matches(routes.get(1)));
+            })
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }

@@ -269,6 +269,11 @@ public final class DefaultRoutes implements Routes {
 
     private static Mono<AbstractRouteResource> getOrCreateRoute(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceId, String domain, String host, String path, Integer port,
                                                                 Boolean randomPort) {
+        if (randomPort != null) {
+            return getDomainId(cloudFoundryClient, organizationId, domain)
+                .then(domainId -> requestCreateRoute(cloudFoundryClient, domainId, host, path, port, randomPort, spaceId));
+        }
+
         return getDomainId(cloudFoundryClient, organizationId, domain)
             .then(domainId -> getRoute(cloudFoundryClient, domainId, host, path, port)
                 .cast(AbstractRouteResource.class)

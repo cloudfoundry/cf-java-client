@@ -408,6 +408,36 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
+    public void mapTcpRouteTwice() throws TimeoutException, InterruptedException, IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+        String domainName = this.nameFactory.getDomainName();
+
+        Mono
+            .when(
+                requestCreateSharedDomain(this.cloudFoundryOperations, domainName, DEFAULT_ROUTER_GROUP),
+                requestCreateApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, true)
+            )
+            .then(this.cloudFoundryOperations.routes()
+                .map(MapRouteRequest.builder()
+                    .applicationName(applicationName)
+                    .domain(domainName)
+                    .randomPort(true)
+                    .build()))
+            .then(this.cloudFoundryOperations.routes()
+                .map(MapRouteRequest.builder()
+                    .applicationName(applicationName)
+                    .domain(domainName)
+                    .randomPort(true)
+                    .build()))
+            .thenMany(requestListRoutes(this.cloudFoundryOperations))
+            .filter(response -> domainName.equals(response.getDomain()))
+            .as(StepVerifier::create)
+            .expectNextCount(2)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
     public void unmap() throws TimeoutException, InterruptedException, IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
