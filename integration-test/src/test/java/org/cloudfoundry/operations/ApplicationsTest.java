@@ -532,10 +532,13 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                         .build())
                     .noStart(true)
                     .build()))
-            .thenMany(requestListRoutes(this.cloudFoundryOperations))
-            .filter(route -> domainName.equals(route.getDomain()))
+            .then(this.cloudFoundryOperations.applications()
+                .getApplicationManifest(GetApplicationManifestRequest.builder()
+                    .name(applicationName)
+                    .build()))
+            .map(manifest -> manifest.getRoutes().get(0).getRoute())
             .as(StepVerifier::create)
-            .expectNextCount(1)
+            .consumeNextWith(route -> assertThat(route).startsWith(domainName))
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
