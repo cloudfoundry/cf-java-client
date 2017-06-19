@@ -421,7 +421,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .name("test-application-summary-name")
                 .requestedState("test-application-summary-state")
                 .stack("test-stack-entity-name")
-                .url("test-route-host.test-domain-name")
+                .url("test-route-host.test-domain-name/test-path")
                 .build())
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -540,7 +540,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .name("test-application-summary-name")
                 .requestedState("test-application-summary-state")
                 .stack("test-stack-entity-name")
-                .url("test-route-host.test-domain-name")
+                .url("test-route-host.test-domain-name/test-path")
                 .build())
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -571,7 +571,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .name("test-application-summary-name")
                 .requestedState("test-application-summary-state")
                 .stack("test-stack-entity-name")
-                .url("test-route-host.test-domain-name")
+                .url("test-route-host.test-domain-name:1")
                 .build())
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -817,7 +817,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .name("test-application-summary-name")
                 .requestedState("test-application-summary-state")
                 .stack("test-stack-entity-name")
-                .url("test-route-host.test-domain-name")
+                .url("test-route-host.test-domain-name/test-path")
                 .build())
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -848,7 +848,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .name("test-application-summary-name")
                 .requestedState("test-application-summary-state")
                 .stack("test-stack-entity-name")
-                .url("test-route-host.test-domain-name")
+                .url("test-route-host.test-domain-name:1")
                 .build())
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -874,7 +874,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .name("test-application-summary-name")
                 .requestedState("test-application-summary-state")
                 .stack("test-stack-entity-name")
-                .url("test-route-host.test-domain-name")
+                .url("test-route-host.test-domain-name/test-path")
                 .build())
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -905,7 +905,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .name("test-application-summary-name")
                 .requestedState("test-application-summary-state")
                 .stack("test-stack-entity-name")
-                .url("test-route-host.test-domain-name")
+                .url("test-route-host.test-domain-name/test-path")
                 .build())
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -936,7 +936,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .name("test-application-summary-name")
                 .requestedState("test-application-summary-state")
                 .stack("test-stack-entity-name")
-                .url("test-route-host.test-domain-name")
+                .url("test-route-host.test-domain-name/test-path")
                 .build())
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -967,7 +967,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .name("test-application-summary-name")
                 .requestedState("test-application-summary-state")
                 .stack("test-stack-entity-name")
-                .url("test-route-host.test-domain-name")
+                .url("test-route-host.test-domain-name/test-path")
                 .build())
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -993,7 +993,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .name("test-application-summary-name")
                 .requestedState("test-application-summary-state")
                 .stack("test-stack-entity-name")
-                .url("test-route-host.test-domain-name")
+                .url("test-route-host.test-domain-name/test-path")
                 .build())
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -1024,7 +1024,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .name("test-application-summary-name")
                 .requestedState("test-application-summary-state")
                 .stack("test-stack-entity-name")
-                .url("test-route-host.test-domain-name")
+                .url("test-route-host.test-domain-name/test-path")
                 .build())
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -1057,7 +1057,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .name("test-application-summary-name")
                 .requestedState("test-application-summary-state")
                 .stack("test-stack-entity-name")
-                .url("test-route-host.test-domain-name")
+                .url("test-route-host.test-domain-name/test-path")
                 .build())
             .expectComplete()
             .verify(Duration.ofSeconds(5));

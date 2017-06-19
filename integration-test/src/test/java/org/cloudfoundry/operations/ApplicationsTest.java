@@ -193,6 +193,22 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
+    public void getManifestForTcpRoute() throws TimeoutException, InterruptedException, IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, true)
+            .then(this.cloudFoundryOperations.applications()
+                .getApplicationManifest(GetApplicationManifestRequest.builder()
+                    .name(applicationName)
+                    .build()))
+            .map(ApplicationManifest::getName)
+            .as(StepVerifier::create)
+            .expectNext(applicationName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
     public void getStopped() throws TimeoutException, InterruptedException, IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
@@ -204,6 +220,24 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .map(ApplicationDetail::getName)
             .as(StepVerifier::create)
             .expectNext(applicationName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void getTcp() throws TimeoutException, InterruptedException, IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+        String domainName = this.nameFactory.getDomainName();
+
+        requestCreateTcpDomain(this.cloudFoundryOperations, domainName, DEFAULT_ROUTER_GROUP)
+            .then(createApplicationTcp(this.cloudFoundryOperations, applicationName, domainName))
+            .thenMany(this.cloudFoundryOperations.applications()
+                .get(GetApplicationRequest.builder()
+                    .name(applicationName)
+                    .build()))
+                .map(applicationDetail -> applicationDetail.getUrls().get(0))
+            .as(StepVerifier::create)
+            .consumeNextWith(route -> assertThat(route).matches(domainName + "+?:\\d+$"))
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -538,7 +572,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .build()))
             .map(manifest -> manifest.getRoutes().get(0).getRoute())
             .as(StepVerifier::create)
-            .consumeNextWith(route -> assertThat(route).startsWith(domainName))
+            .consumeNextWith(route -> assertThat(route).matches(domainName + "+?:\\d+$"))
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -811,6 +845,25 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .memory(64)
                 .name(name)
                 .noStart(noStart)
+                .build());
+    }
+
+    private static Mono<Void> createApplicationTcp(CloudFoundryOperations cloudFoundryOperations, String applicationName, String domainName) throws IOException {
+        return cloudFoundryOperations.applications()
+            .pushManifest(PushApplicationManifestRequest.builder()
+                .manifest(ApplicationManifest.builder()
+                    .path(new ClassPathResource("test-application.zip").getFile().toPath())
+                    .buildpack("staticfile_buildpack")
+                    .disk(512)
+                    .healthCheckType(ApplicationHealthCheck.PROCESS)
+                    .memory(64)
+                    .name(applicationName)
+                    .randomRoute(true)
+                    .route(Route.builder()
+                        .route(domainName)
+                        .build())
+                    .build())
+                .noStart(true)
                 .build());
     }
 
