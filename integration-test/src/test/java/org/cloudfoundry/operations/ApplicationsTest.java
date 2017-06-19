@@ -547,6 +547,8 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     public void pushUpdateRoute() throws TimeoutException, InterruptedException, IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
+        String originalHostName = this.nameFactory.getHostName();
+        String newHostName = this.nameFactory.getHostName();
 
         requestCreateDomain(this.cloudFoundryOperations, domainName, this.organizationName)
             .then(this.cloudFoundryOperations.applications()
@@ -559,7 +561,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                         .memory(64)
                         .name(applicationName)
                         .route(Route.builder()
-                            .route(String.format("test.%s", domainName))
+                            .route(String.format("%s.%s", originalHostName, domainName))
                             .build())
                         .build())
                     .noStart(true)
@@ -573,6 +575,9 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                         .healthCheckType(ApplicationHealthCheck.PROCESS)
                         .memory(64)
                         .name(applicationName)
+                        .route(Route.builder()
+                            .route(String.format("%s.%s", newHostName, domainName))
+                            .build())
                         .build())
                     .noStart(true)
                     .build()))
@@ -582,7 +587,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .flatMapIterable(org.cloudfoundry.operations.routes.Route::getApplications)
             .filter(applicationName::equals)
             .as(StepVerifier::create)
-            .expectNextCount(1)
+            .expectNextCount(2)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
