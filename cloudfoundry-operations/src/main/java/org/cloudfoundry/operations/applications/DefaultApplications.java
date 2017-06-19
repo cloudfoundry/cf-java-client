@@ -1560,22 +1560,8 @@ public final class DefaultApplications implements Applications {
             .timeout(response.getHealthCheckTimeout());
 
         for (org.cloudfoundry.client.v2.routes.Route route : Optional.ofNullable(response.getRoutes()).orElse(Collections.emptyList())) {
-            StringBuilder sb = new StringBuilder();
-            if (route.getHost() != null && !route.getHost().isEmpty()) {
-                sb.append(route.getHost()).append(".");
-            }
-            Optional.ofNullable(route.getDomain().getName())
-                .ifPresent(sb::append);
-
-            if (route.getPort() == null) {
-                Optional.ofNullable(route.getPath())
-                    .ifPresent(sb::append);
-            } else {
-                sb.append(":").append(route.getPort());
-            }
-
             manifestBuilder.route(Route.builder()
-                .route(sb.toString())
+                .route(toUrl(route))
                 .build());
         }
 
@@ -1673,10 +1659,21 @@ public final class DefaultApplications implements Applications {
     }
 
     private static String toUrl(org.cloudfoundry.client.v2.routes.Route route) {
-        String hostName = route.getHost();
-        String domainName = route.getDomain().getName();
+        StringBuilder sb = new StringBuilder();
+        if (route.getHost() != null && !route.getHost().isEmpty()) {
+            sb.append(route.getHost()).append(".");
+        }
+        Optional.ofNullable(route.getDomain().getName())
+            .ifPresent(sb::append);
 
-        return hostName.isEmpty() ? domainName : String.format("%s.%s", hostName, domainName);
+        if (route.getPort() == null) {
+            Optional.ofNullable(route.getPath())
+                .ifPresent(sb::append);
+        } else {
+            sb.append(":").append(route.getPort());
+        }
+
+        return sb.toString();
     }
 
     private static Mono<List<String>> toUrls(List<org.cloudfoundry.client.v2.routes.Route> routes) {
