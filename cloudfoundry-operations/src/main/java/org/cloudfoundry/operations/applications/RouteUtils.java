@@ -54,7 +54,7 @@ final class RouteUtils {
         }
 
         for (DomainSummary item : sortedDomains) {
-            if (routeWithoutSuffix.contains(item.getName())) {
+            if (isDomainMatch(routeWithoutSuffix, item.getName())) {
                 domain = item.getName();
                 if (domain.length() < routeWithoutSuffix.length()) {
                     host = routeWithoutSuffix.substring(0, routeWithoutSuffix.lastIndexOf(domain) - 1);
@@ -92,6 +92,10 @@ final class RouteUtils {
         Matcher matcher = pattern.matcher(route);
 
         return matcher.matches();
+    }
+
+    private static boolean isDomainMatch(String route, String domain) {
+        return route.equals(domain) || route.endsWith(domain) && route.charAt(route.length() - domain.length() - 1) == '.';
     }
 
 }

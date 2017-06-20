@@ -86,6 +86,28 @@ public class RouteUtilsTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
+    public void partialMatchMiss() {
+        List<DomainSummary> availableDomains = new ArrayList<>();
+        availableDomains.add(DomainSummary.builder()
+            .id("1")
+            .name("test.something.com")
+            .build());
+        availableDomains.add(DomainSummary.builder()
+            .id("2")
+            .name("something.com")
+            .build());
+        availableDomains.add(DomainSummary.builder()
+            .id("3")
+            .name("hing.com")
+            .build());
+
+        RouteUtils.decomposeRoute(availableDomains, "thing.com", null)
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("The route thing.com did not match any existing domains"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
     public void partialMiss() {
         List<DomainSummary> availableDomains = new ArrayList<>();
         availableDomains.add(DomainSummary.builder()

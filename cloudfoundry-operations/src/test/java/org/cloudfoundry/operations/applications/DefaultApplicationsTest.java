@@ -1393,9 +1393,9 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
             .domain("test-shared-domain")
             .name("test-name")
             .build(), TEST_SPACE_ID, null, "test-application-id");
+        requestApplicationRoutes(this.cloudFoundryClient, "test-application-id", "test-route-id");
         requestListMatchingResources(this.cloudFoundryClient, Arrays.asList(new ResourceMatchingUtils.ArtifactMetadata("da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "100644", 0),
             new ResourceMatchingUtils.ArtifactMetadata("45044a6ddbfe11415a8f8a6219de68a2c66b496b", "index.html", "100644", 178)));
-        requestApplicationRoutes(this.cloudFoundryClient, "test-application-id", "test-route-id");
         requestRoutesEmpty(this.cloudFoundryClient, "test-shared-domain-id", "test1", null, null);
         requestCreateRoute(this.cloudFoundryClient, "test-shared-domain-id", "test1", null, null, TEST_SPACE_ID, "test-route-id");
         requestRoutesEmpty(this.cloudFoundryClient, "test-shared-domain-id", "test2", null, null);
@@ -1414,10 +1414,10 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                     .path(testApplication)
                     .name("test-name")
                     .route(Route.builder()
-                        .route("test1.test-shared-domain-id")
+                        .route("test1.test-shared-domain")
                         .build())
                     .route(Route.builder()
-                        .route("test2.test-shared-domain-id")
+                        .route("test2.test-shared-domain")
                         .build())
                     .build())
                 .build())
