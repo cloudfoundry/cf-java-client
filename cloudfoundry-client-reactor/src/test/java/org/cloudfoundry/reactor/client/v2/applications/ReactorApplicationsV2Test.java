@@ -57,6 +57,8 @@ import org.cloudfoundry.client.v2.applications.SummaryApplicationResponse;
 import org.cloudfoundry.client.v2.applications.TerminateApplicationInstanceRequest;
 import org.cloudfoundry.client.v2.applications.UpdateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.UpdateApplicationResponse;
+import org.cloudfoundry.client.v2.applications.UploadApplicationDropletRequest;
+import org.cloudfoundry.client.v2.applications.UploadApplicationDropletResponse;
 import org.cloudfoundry.client.v2.applications.UploadApplicationRequest;
 import org.cloudfoundry.client.v2.applications.UploadApplicationResponse;
 import org.cloudfoundry.client.v2.applications.Usage;
@@ -1037,6 +1039,51 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                     .createdAt("2015-07-27T22:43:33Z")
                     .id("eff6a47e-67a1-4e3b-99a5-4f9bcab7620a")
                     .url("/v2/jobs/eff6a47e-67a1-4e3b-99a5-4f9bcab7620a")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void uploadDroplet() throws IOException {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(PUT).path("/v2/apps/test-application-id/droplet/upload")
+                .contents(consumer((headers, body) -> {
+                    String boundary = extractBoundary(headers);
+
+                    assertThat(body.readString(Charset.defaultCharset()))
+                        .isEqualTo("\r\n" + "--" + boundary + "\r\n" +
+                            "content-disposition: form-data; name=\"droplet\"; filename=\"test-droplet.tgz\"\r\n" +
+                            "content-length: 13\r\n" +
+                            "\r\n" +
+                            "test-content\n" +
+                            "\r\n" +
+                            "--" + boundary + "--");
+                }))
+                .build())
+            .response(TestResponse.builder()
+                .status(CREATED)
+                .payload("fixtures/client/v2/apps/PUT_{id}_droplet_upload_response.json")
+                .build())
+            .build());
+
+        this.applications
+            .uploadDroplet(UploadApplicationDropletRequest.builder()
+                .droplet(new ClassPathResource("fixtures/client/v2/apps/test-droplet.tgz").getFile().toPath())
+                .applicationId("test-application-id")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(UploadApplicationDropletResponse.builder()
+                .entity(JobEntity.builder()
+                    .id("8d321cee-8633-42e9-a021-78876d0d389c")
+                    .status("queued")
+                    .build())
+                .metadata(Metadata.builder()
+                    .createdAt("2016-06-08T16:41:21Z")
+                    .id("8d321cee-8633-42e9-a021-78876d0d389c")
+                    .url("/v2/jobs/8d321cee-8633-42e9-a021-78876d0d389c")
                     .build())
                 .build())
             .expectComplete()

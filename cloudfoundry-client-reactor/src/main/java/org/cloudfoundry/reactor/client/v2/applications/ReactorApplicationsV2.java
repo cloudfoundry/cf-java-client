@@ -51,6 +51,8 @@ import org.cloudfoundry.client.v2.applications.SummaryApplicationResponse;
 import org.cloudfoundry.client.v2.applications.TerminateApplicationInstanceRequest;
 import org.cloudfoundry.client.v2.applications.UpdateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.UpdateApplicationResponse;
+import org.cloudfoundry.client.v2.applications.UploadApplicationDropletRequest;
+import org.cloudfoundry.client.v2.applications.UploadApplicationDropletResponse;
 import org.cloudfoundry.client.v2.applications.UploadApplicationRequest;
 import org.cloudfoundry.client.v2.applications.UploadApplicationResponse;
 import org.cloudfoundry.reactor.ConnectionContext;
@@ -231,6 +233,14 @@ public final class ReactorApplicationsV2 extends AbstractClientV2Operations impl
             .checkpoint();
     }
 
+    @Override
+    public Mono<UploadApplicationDropletResponse> uploadDroplet(UploadApplicationDropletRequest request) {
+        return put(request, UploadApplicationDropletResponse.class, builder -> builder.pathSegment("v2", "apps", request.getApplicationId(), "droplet", "upload"),
+            outbound -> outbound
+                .then(r -> upload(r, request)))
+            .checkpoint();
+    }
+
     private Mono<Void> upload(Path application, MultipartHttpClientRequest r, UploadApplicationRequest request) {
         return r
             .addPart(part -> part
@@ -241,6 +251,14 @@ public final class ReactorApplicationsV2 extends AbstractClientV2Operations impl
                 .setContentDispositionFormData("application", "application.zip")
                 .setHeader(CONTENT_TYPE, APPLICATION_ZIP)
                 .sendFile(application))
+            .done();
+    }
+
+    private Mono<Void> upload(MultipartHttpClientRequest r, UploadApplicationDropletRequest request) {
+        return r
+            .addPart(part -> part
+                .setContentDispositionFormData("droplet", request.getDroplet().getFileName().toString())
+                .sendFile(request.getDroplet()))
             .done();
     }
 

@@ -49,6 +49,7 @@ import org.cloudfoundry.client.v2.applications.SummaryApplicationResponse;
 import org.cloudfoundry.client.v2.applications.TerminateApplicationInstanceRequest;
 import org.cloudfoundry.client.v2.applications.UpdateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.UpdateApplicationResponse;
+import org.cloudfoundry.client.v2.applications.UploadApplicationDropletRequest;
 import org.cloudfoundry.client.v2.applications.UploadApplicationRequest;
 import org.cloudfoundry.client.v2.applications.UploadApplicationResponse;
 import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainRequest;
@@ -863,6 +864,29 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                             .application(new ClassPathResource("test-application").getFile().toPath())
                             .async(true)
                             .applicationId(applicationId)
+                            .build())
+                        .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            })
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void uploadDroplet() throws TimeoutException, InterruptedException {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        this.spaceId
+            .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
+            .then(applicationId -> {
+                try {
+                    return this.cloudFoundryClient.applicationsV2()
+                        .uploadDroplet(UploadApplicationDropletRequest.builder()
+                            .applicationId(applicationId)
+                            .droplet(new ClassPathResource("test-droplet.tgz").getFile().toPath())
                             .build())
                         .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job));
                 } catch (IOException e) {
