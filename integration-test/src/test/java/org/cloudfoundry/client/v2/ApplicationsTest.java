@@ -875,6 +875,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = IfCloudFoundryVersion.CloudFoundryVersion.PCF_1_9)
     @Test
     public void uploadDroplet() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
