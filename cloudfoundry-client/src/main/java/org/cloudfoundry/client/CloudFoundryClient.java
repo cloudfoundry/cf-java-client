@@ -18,6 +18,7 @@ package org.cloudfoundry.client;
 
 import org.cloudfoundry.client.v2.applications.ApplicationsV2;
 import org.cloudfoundry.client.v2.applicationusageevents.ApplicationUsageEvents;
+import org.cloudfoundry.client.v2.blobstores.Blobstores;
 import org.cloudfoundry.client.v2.buildpacks.Buildpacks;
 import org.cloudfoundry.client.v2.domains.Domains;
 import org.cloudfoundry.client.v2.environmentvariablegroups.EnvironmentVariableGroups;
@@ -77,6 +78,11 @@ public interface CloudFoundryClient {
      * Main entry point to the Cloud Foundry Applications V3 Client API
      */
     ApplicationsV3 applicationsV3();
+
+    /**
+     * Main entry point to the Cloud Foundry Blobstores V2 Client API
+     */
+    Blobstores blobstores();
 
     /**
      * Main entry point to the Cloud Foundry Buildpacks V2 Client API

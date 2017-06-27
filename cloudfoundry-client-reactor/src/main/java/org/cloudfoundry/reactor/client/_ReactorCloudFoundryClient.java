@@ -19,6 +19,7 @@ package org.cloudfoundry.reactor.client;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.applications.ApplicationsV2;
 import org.cloudfoundry.client.v2.applicationusageevents.ApplicationUsageEvents;
+import org.cloudfoundry.client.v2.blobstores.Blobstores;
 import org.cloudfoundry.client.v2.buildpacks.Buildpacks;
 import org.cloudfoundry.client.v2.domains.Domains;
 import org.cloudfoundry.client.v2.environmentvariablegroups.EnvironmentVariableGroups;
@@ -57,6 +58,7 @@ import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v2.applications.ReactorApplicationsV2;
 import org.cloudfoundry.reactor.client.v2.applicationusageevents.ReactorApplicationUsageEvents;
+import org.cloudfoundry.reactor.client.v2.blobstores.ReactorBlobstores;
 import org.cloudfoundry.reactor.client.v2.buildpacks.ReactorBuildpacks;
 import org.cloudfoundry.reactor.client.v2.domains.ReactorDomains;
 import org.cloudfoundry.reactor.client.v2.environmentvariablegroups.ReactorEnvironmentVariableGroups;
@@ -118,6 +120,12 @@ abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
     @Value.Derived
     public ApplicationsV3 applicationsV3() {
         return new ReactorApplicationsV3(getConnectionContext(), getRoot(), getTokenProvider());
+    }
+
+    @Override
+    @Value.Derived
+    public Blobstores blobstores() {
+        return new ReactorBlobstores(getConnectionContext(), getRoot(), getTokenProvider());
     }
 
     @Override
