@@ -344,6 +344,7 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
             .as(StepVerifier::create)
             .expectNext(GetServiceInstancePermissionsResponse.builder()
                 .manage(true)
+                .read(true)
                 .build())
             .expectComplete()
             .verify(Duration.ofSeconds(5));

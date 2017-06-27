@@ -35,4 +35,11 @@ abstract class _GetServiceInstancePermissionsResponse {
     @Nullable
     abstract Boolean getManage();
 
+    /**
+     * The read flag
+     */
+    @JsonProperty("read")
+    @Nullable
+    abstract Boolean getRead();
+
 }

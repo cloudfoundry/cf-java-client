@@ -1,3 +1,4 @@
 {
-  "manage": true
+  "manage": true,
+  "read": true
 }
