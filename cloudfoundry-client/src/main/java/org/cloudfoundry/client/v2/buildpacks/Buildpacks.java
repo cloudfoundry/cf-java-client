@@ -56,7 +56,9 @@ public interface Buildpacks {
     Mono<ListBuildpacksResponse> list(ListBuildpacksRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/buildpacks/enable_or_disable_a_buildpack.html">Update Buildpack</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/buildpacks/change_the_position_of_a_buildpack.html">Change the position of a Buildpack</a>,
+     * <a href="http://apidocs.cloudfoundry.org/latest-release/buildpacks/enable_or_disable_a_buildpack.html">Enable or disable a Buildpack</a>, and
+     * <a href="http://apidocs.cloudfoundry.org/latest-release/buildpacks/lock_or_unlock_a_buildpack.html">Lock or unlock a Buildpack</a> requests
      *
      * @param request the Update Buildpack request
      * @return the response from the Update Buildpack request
