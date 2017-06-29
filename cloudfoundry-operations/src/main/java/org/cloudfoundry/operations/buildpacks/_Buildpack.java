@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.operations.buildpacks;
 
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
@@ -32,6 +33,7 @@ abstract class _Buildpack {
     /**
      * The filename
      */
+    @Nullable
     abstract String getFilename();
 
     /**
