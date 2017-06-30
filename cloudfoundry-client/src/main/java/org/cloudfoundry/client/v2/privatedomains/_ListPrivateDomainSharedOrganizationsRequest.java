@@ -1,0 +1,88 @@
+/*
+ * Copyright 2013-2017 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.cloudfoundry.client.v2.privatedomains;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.cloudfoundry.Nullable;
+import org.cloudfoundry.client.v2.FilterParameter;
+import org.cloudfoundry.client.v2.PaginatedRequest;
+import org.immutables.value.Value;
+
+import java.util.List;
+
+/**
+ * The request payload for the List Private Domain Shared Organizations operation
+ */
+@Value.Immutable
+abstract class _ListPrivateDomainSharedOrganizationsRequest extends PaginatedRequest {
+
+    /**
+     * The auditor ids
+     */
+    @FilterParameter("auditor_guid")
+    @Nullable
+    abstract List<String> getAuditorIds();
+
+    /**
+     * The billing manager ids
+     */
+    @FilterParameter("billing_manager_guid")
+    @Nullable
+    abstract List<String> getBillingManagerIds();
+
+    /**
+     * The manager ids
+     */
+    @FilterParameter("manager_guid")
+    @Nullable
+    abstract List<String> getManagerIds();
+
+    /**
+     * The names
+     */
+    @FilterParameter("name")
+    @Nullable
+    abstract List<String> getNames();
+
+    /**
+     * The private domain id
+     */
+    @JsonIgnore
+    abstract String getPrivateDomainId();
+
+    /**
+     * The space ids
+     */
+    @FilterParameter("space_guid")
+    @Nullable
+    abstract List<String> getSpaceIds();
+
+    /**
+     * The statuses
+     */
+    @FilterParameter("status")
+    @Nullable
+    abstract List<String> getStatuses();
+
+    /**
+     * The user ids
+     */
+    @FilterParameter("user_guid")
+    @Nullable
+    abstract List<String> getUserIds();
+
+}

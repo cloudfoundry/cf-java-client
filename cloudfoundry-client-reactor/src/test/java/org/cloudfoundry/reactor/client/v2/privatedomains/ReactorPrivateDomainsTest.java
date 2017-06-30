@@ -18,12 +18,16 @@ package org.cloudfoundry.reactor.client.v2.privatedomains;
 
 import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.jobs.JobEntity;
+import org.cloudfoundry.client.v2.organizations.OrganizationEntity;
+import org.cloudfoundry.client.v2.organizations.OrganizationResource;
 import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainRequest;
 import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainResponse;
 import org.cloudfoundry.client.v2.privatedomains.DeletePrivateDomainRequest;
 import org.cloudfoundry.client.v2.privatedomains.DeletePrivateDomainResponse;
 import org.cloudfoundry.client.v2.privatedomains.GetPrivateDomainRequest;
 import org.cloudfoundry.client.v2.privatedomains.GetPrivateDomainResponse;
+import org.cloudfoundry.client.v2.privatedomains.ListPrivateDomainSharedOrganizationsRequest;
+import org.cloudfoundry.client.v2.privatedomains.ListPrivateDomainSharedOrganizationsResponse;
 import org.cloudfoundry.client.v2.privatedomains.ListPrivateDomainsRequest;
 import org.cloudfoundry.client.v2.privatedomains.ListPrivateDomainsResponse;
 import org.cloudfoundry.client.v2.privatedomains.PrivateDomainEntity;
@@ -203,6 +207,55 @@ public final class ReactorPrivateDomainsTest extends AbstractClientApiTest {
                         .owningOrganizationId("2f70efed-abb2-4b7a-9f31-d4fe4d849932")
                         .owningOrganizationUrl("/v2/organizations/2f70efed-abb2-4b7a-9f31-d4fe4d849932")
                         .sharedOrganizationsUrl("/v2/private_domains/3de9db5f-8e3b-4d10-a8c9-8137caafe43d/shared_organizations")
+                        .build())
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void listSharedOrganizations() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/v2/private_domains/b2a35f0c-d5ad-4a59-bea7-461711d96b0d/shared_organizations")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/private_domains/GET_{id}_shared_organizations_response.json")
+                .build())
+            .build());
+
+        this.privateDomains
+            .listSharedOrganizations(ListPrivateDomainSharedOrganizationsRequest.builder()
+                .privateDomainId("b2a35f0c-d5ad-4a59-bea7-461711d96b0d")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ListPrivateDomainSharedOrganizationsResponse.builder()
+                .totalResults(1)
+                .totalPages(1)
+                .resource(OrganizationResource.builder()
+                    .metadata(Metadata.builder()
+                        .id("420bb3ef-6064-42ed-9131-c1fe980bf9c6")
+                        .createdAt("2016-06-08T16:41:39Z")
+                        .updatedAt("2016-06-08T16:41:26Z")
+                        .url("/v2/organizations/420bb3ef-6064-42ed-9131-c1fe980bf9c6")
+                        .build())
+                    .entity(OrganizationEntity.builder()
+                        .name("name-2005")
+                        .billingEnabled(false)
+                        .quotaDefinitionId("2e863ad3-7bb9-4c5c-928c-cde2caec341b")
+                        .status("active")
+                        .quotaDefinitionUrl("/v2/quota_definitions/2e863ad3-7bb9-4c5c-928c-cde2caec341b")
+                        .spacesUrl("/v2/organizations/420bb3ef-6064-42ed-9131-c1fe980bf9c6/spaces")
+                        .domainsUrl("/v2/organizations/420bb3ef-6064-42ed-9131-c1fe980bf9c6/domains")
+                        .privateDomainsUrl("/v2/organizations/420bb3ef-6064-42ed-9131-c1fe980bf9c6/private_domains")
+                        .usersUrl("/v2/organizations/420bb3ef-6064-42ed-9131-c1fe980bf9c6/users")
+                        .managersUrl("/v2/organizations/420bb3ef-6064-42ed-9131-c1fe980bf9c6/managers")
+                        .billingManagersUrl("/v2/organizations/420bb3ef-6064-42ed-9131-c1fe980bf9c6/billing_managers")
+                        .auditorsUrl("/v2/organizations/420bb3ef-6064-42ed-9131-c1fe980bf9c6/auditors")
+                        .applicationEventsUrl("/v2/organizations/420bb3ef-6064-42ed-9131-c1fe980bf9c6/app_events")
+                        .spaceQuotaDefinitionsUrl("/v2/organizations/420bb3ef-6064-42ed-9131-c1fe980bf9c6/space_quota_definitions")
                         .build())
                     .build())
                 .build())

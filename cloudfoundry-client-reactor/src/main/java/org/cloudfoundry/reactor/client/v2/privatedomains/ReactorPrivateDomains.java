@@ -22,6 +22,8 @@ import org.cloudfoundry.client.v2.privatedomains.DeletePrivateDomainRequest;
 import org.cloudfoundry.client.v2.privatedomains.DeletePrivateDomainResponse;
 import org.cloudfoundry.client.v2.privatedomains.GetPrivateDomainRequest;
 import org.cloudfoundry.client.v2.privatedomains.GetPrivateDomainResponse;
+import org.cloudfoundry.client.v2.privatedomains.ListPrivateDomainSharedOrganizationsRequest;
+import org.cloudfoundry.client.v2.privatedomains.ListPrivateDomainSharedOrganizationsResponse;
 import org.cloudfoundry.client.v2.privatedomains.ListPrivateDomainsRequest;
 import org.cloudfoundry.client.v2.privatedomains.ListPrivateDomainsResponse;
 import org.cloudfoundry.client.v2.privatedomains.PrivateDomains;
@@ -67,6 +69,12 @@ public final class ReactorPrivateDomains extends AbstractClientV2Operations impl
     @Override
     public Mono<ListPrivateDomainsResponse> list(ListPrivateDomainsRequest request) {
         return get(request, ListPrivateDomainsResponse.class, builder -> builder.pathSegment("v2", "private_domains"))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<ListPrivateDomainSharedOrganizationsResponse> listSharedOrganizations(ListPrivateDomainSharedOrganizationsRequest request) {
+        return get(request, ListPrivateDomainSharedOrganizationsResponse.class, builder -> builder.pathSegment("v2", "private_domains", request.getPrivateDomainId(), "shared_organizations"))
             .checkpoint();
     }
 

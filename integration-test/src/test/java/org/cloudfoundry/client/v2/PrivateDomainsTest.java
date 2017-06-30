@@ -18,6 +18,18 @@ package org.cloudfoundry.client.v2;
 
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorResponse;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationBillingManagerRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationBillingManagerResponse;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerResponse;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationPrivateDomainRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationPrivateDomainResponse;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserResponse;
+import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
+import org.cloudfoundry.client.v2.organizations.CreateOrganizationResponse;
 import org.cloudfoundry.client.v2.privatedomains.AbstractPrivateDomainResource;
 import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainRequest;
 import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainResponse;
@@ -25,8 +37,10 @@ import org.cloudfoundry.client.v2.privatedomains.DeletePrivateDomainRequest;
 import org.cloudfoundry.client.v2.privatedomains.DeletePrivateDomainResponse;
 import org.cloudfoundry.client.v2.privatedomains.GetPrivateDomainRequest;
 import org.cloudfoundry.client.v2.privatedomains.GetPrivateDomainResponse;
+import org.cloudfoundry.client.v2.privatedomains.ListPrivateDomainSharedOrganizationsRequest;
 import org.cloudfoundry.client.v2.privatedomains.ListPrivateDomainsRequest;
 import org.cloudfoundry.client.v2.privatedomains.PrivateDomainResource;
+import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
@@ -53,13 +67,16 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
     @Autowired
     private Mono<String> organizationId;
 
+    @Autowired
+    private Mono<String> userId;
+
     @Test
     public void create() throws TimeoutException, InterruptedException {
         String privateDomainName = this.nameFactory.getDomainName();
 
         this.organizationId
             .then(organizationId -> Mono.when(
-                requestCreatePrivateDomain(this.cloudFoundryClient, organizationId, privateDomainName),
+                requestCreatePrivateDomain(this.cloudFoundryClient, privateDomainName, organizationId),
                 Mono.just(organizationId)
             ))
             .as(StepVerifier::create)
@@ -73,7 +90,7 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
         String privateDomainName = this.nameFactory.getDomainName();
 
         this.organizationId
-            .then(organizationId -> requestCreatePrivateDomain(this.cloudFoundryClient, organizationId, privateDomainName))
+            .then(organizationId -> requestCreatePrivateDomain(this.cloudFoundryClient, privateDomainName, organizationId))
             .then(privateDomainResource -> requestDeletePrivateDomain(this.cloudFoundryClient, ResourceUtils.getId(privateDomainResource))
                 .then(jobResource -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), jobResource))
                 .then(Mono.just(privateDomainResource)))
@@ -90,7 +107,7 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
         this.organizationId
             .then(organizationId -> Mono.when(
                 Mono.just(organizationId),
-                requestCreatePrivateDomain(this.cloudFoundryClient, organizationId, privateDomainName)
+                requestCreatePrivateDomain(this.cloudFoundryClient, privateDomainName, organizationId)
             ))
             .then(function((organizationId, privateDomainResource) -> Mono.when(
                 requestGetPrivateDomain(this.cloudFoundryClient, ResourceUtils.getId(privateDomainResource)),
@@ -109,7 +126,7 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
         this.organizationId
             .then(organizationId -> Mono.when(
                 Mono.just(organizationId),
-                requestCreatePrivateDomain(this.cloudFoundryClient, organizationId, privateDomainName)
+                requestCreatePrivateDomain(this.cloudFoundryClient, privateDomainName, organizationId)
             ))
             .then(function((organizationId, privateDomainResource) -> Mono.when(
                 listPrivateDomains(this.cloudFoundryClient)
@@ -130,7 +147,7 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
         this.organizationId
             .then(organizationId -> Mono.when(
                 Mono.just(organizationId),
-                requestCreatePrivateDomain(this.cloudFoundryClient, organizationId, privateDomainName)
+                requestCreatePrivateDomain(this.cloudFoundryClient, privateDomainName, organizationId)
             ))
             .then(function((organizationId, privateDomainResource) -> Mono.when(
                 listPrivateDomains(this.cloudFoundryClient, privateDomainName)
@@ -144,11 +161,283 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    @Test
+    public void listSharedOrganizations() throws TimeoutException, InterruptedException {
+        String sharedOrganizationName = this.nameFactory.getOrganizationName();
+        String privateDomainName = this.nameFactory.getDomainName();
+
+        this.organizationId
+            .then(organizationId -> Mono
+                .when(
+                    createPrivateDomainId(this.cloudFoundryClient, privateDomainName, organizationId),
+                    createOrganizationId(this.cloudFoundryClient, sharedOrganizationName)
+                ))
+            .then(function((domainId, organizationId) -> requestAssociateOrganizationPrivateDomain(this.cloudFoundryClient, domainId, organizationId)
+                .then(Mono.just(domainId))))
+            .flatMapMany(domainId -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.privateDomains()
+                    .listSharedOrganizations(ListPrivateDomainSharedOrganizationsRequest.builder()
+                        .page(page)
+                        .privateDomainId(domainId)
+                        .build())))
+            .map(resource -> ResourceUtils.getEntity(resource).getName())
+            .filter(sharedOrganizationName::equals)
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void listSharedOrganizationsFilterByAuditorId() throws TimeoutException, InterruptedException {
+        String sharedOrganizationName = this.nameFactory.getOrganizationName();
+        String privateDomainName = this.nameFactory.getDomainName();
+
+        this.organizationId
+            .then(organizationId -> Mono
+                .when(
+                    createPrivateDomainId(this.cloudFoundryClient, privateDomainName, organizationId),
+                    createOrganizationId(this.cloudFoundryClient, sharedOrganizationName),
+                    this.userId
+                ))
+            .then(function((domainId, organizationId, userId) -> Mono
+                .when(
+                    requestAssociateOrganizationPrivateDomain(this.cloudFoundryClient, domainId, organizationId)
+                        .then(Mono.just(domainId)),
+                    requestAssociateOrganizationAuditor(this.cloudFoundryClient, organizationId, userId)
+                        .then(Mono.just(userId))
+                )))
+            .flatMapMany(function((domainId, userId) -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.privateDomains()
+                    .listSharedOrganizations(ListPrivateDomainSharedOrganizationsRequest.builder()
+                        .auditorId(userId)
+                        .page(page)
+                        .privateDomainId(domainId)
+                        .build()))))
+            .map(resource -> ResourceUtils.getEntity(resource).getName())
+            .as(StepVerifier::create)
+            .expectNext(sharedOrganizationName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void listSharedOrganizationsFilterByBillingManagerId() throws TimeoutException, InterruptedException {
+        String sharedOrganizationName = this.nameFactory.getOrganizationName();
+        String privateDomainName = this.nameFactory.getDomainName();
+
+        this.organizationId
+            .then(organizationId -> Mono
+                .when(
+                    createPrivateDomainId(this.cloudFoundryClient, privateDomainName, organizationId),
+                    createOrganizationId(this.cloudFoundryClient, sharedOrganizationName),
+                    this.userId
+                ))
+            .then(function((domainId, organizationId, userId) -> Mono
+                .when(
+                    requestAssociateOrganizationPrivateDomain(this.cloudFoundryClient, domainId, organizationId)
+                        .then(Mono.just(domainId)),
+                    requestAssociateOrganizationBillingManager(this.cloudFoundryClient, organizationId, userId)
+                        .then(Mono.just(userId))
+                )))
+            .flatMapMany(function((domainId, userId) -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.privateDomains()
+                    .listSharedOrganizations(ListPrivateDomainSharedOrganizationsRequest.builder()
+                        .billingManagerId(userId)
+                        .page(page)
+                        .privateDomainId(domainId)
+                        .build()))))
+            .map(resource -> ResourceUtils.getEntity(resource).getName())
+            .as(StepVerifier::create)
+            .expectNext(sharedOrganizationName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void listSharedOrganizationsFilterByManagerId() throws TimeoutException, InterruptedException {
+        String sharedOrganizationName = this.nameFactory.getOrganizationName();
+        String privateDomainName = this.nameFactory.getDomainName();
+
+        this.organizationId
+            .then(organizationId -> Mono
+                .when(
+                    createPrivateDomainId(this.cloudFoundryClient, privateDomainName, organizationId),
+                    createOrganizationId(this.cloudFoundryClient, sharedOrganizationName),
+                    this.userId
+                ))
+            .then(function((domainId, organizationId, userId) -> Mono
+                .when(
+                    requestAssociateOrganizationPrivateDomain(this.cloudFoundryClient, domainId, organizationId)
+                        .then(Mono.just(domainId)),
+                    requestAssociateOrganizationManager(this.cloudFoundryClient, organizationId, userId)
+                        .then(Mono.just(userId))
+                )))
+            .flatMapMany(function((domainId, userId) -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.privateDomains()
+                    .listSharedOrganizations(ListPrivateDomainSharedOrganizationsRequest.builder()
+                        .managerId(userId)
+                        .page(page)
+                        .privateDomainId(domainId)
+                        .build()))))
+            .map(resource -> ResourceUtils.getEntity(resource).getName())
+            .as(StepVerifier::create)
+            .expectNext(sharedOrganizationName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void listSharedOrganizationsFilterByName() throws TimeoutException, InterruptedException {
+        String sharedOrganizationName = this.nameFactory.getOrganizationName();
+        String privateDomainName = this.nameFactory.getDomainName();
+
+        this.organizationId
+            .then(organizationId -> Mono
+                .when(
+                    createPrivateDomainId(this.cloudFoundryClient, privateDomainName, organizationId),
+                    createOrganizationId(this.cloudFoundryClient, sharedOrganizationName)
+                ))
+            .then(function((domainId, organizationId) -> requestAssociateOrganizationPrivateDomain(this.cloudFoundryClient, domainId, organizationId)
+                .then(Mono.just(domainId))))
+            .flatMapMany(domainId -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.privateDomains()
+                    .listSharedOrganizations(ListPrivateDomainSharedOrganizationsRequest.builder()
+                        .name(sharedOrganizationName)
+                        .page(page)
+                        .privateDomainId(domainId)
+                        .build())))
+            .map(resource -> ResourceUtils.getEntity(resource).getName())
+            .as(StepVerifier::create)
+            .expectNext(sharedOrganizationName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void listSharedOrganizationsFilterBySpaceId() throws TimeoutException, InterruptedException {
+        String sharedOrganizationName = this.nameFactory.getOrganizationName();
+        String privateDomainName = this.nameFactory.getDomainName();
+        String spaceName = this.nameFactory.getSpaceName();
+
+        this.organizationId
+            .then(organizationId -> Mono
+                .when(
+                    createPrivateDomainId(this.cloudFoundryClient, privateDomainName, organizationId),
+                    createOrganizationId(this.cloudFoundryClient, sharedOrganizationName)
+                ))
+            .then(function((domainId, organizationId) -> Mono
+                .when(
+                    requestAssociateOrganizationPrivateDomain(this.cloudFoundryClient, domainId, organizationId)
+                        .then(Mono.just(domainId)),
+                    createSpaceId(this.cloudFoundryClient, organizationId, spaceName)
+                )))
+            .flatMapMany(function((domainId, spaceId) -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.privateDomains()
+                    .listSharedOrganizations(ListPrivateDomainSharedOrganizationsRequest.builder()
+                        .page(page)
+                        .privateDomainId(domainId)
+                        .spaceId(spaceId)
+                        .build()))))
+            .map(resource -> ResourceUtils.getEntity(resource).getName())
+            .as(StepVerifier::create)
+            .expectNext(sharedOrganizationName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void listSharedOrganizationsFilterByStatus() throws TimeoutException, InterruptedException {
+        String sharedOrganizationName = this.nameFactory.getOrganizationName();
+        String privateDomainName = this.nameFactory.getDomainName();
+
+        this.organizationId
+            .then(organizationId -> Mono
+                .when(
+                    createPrivateDomainId(this.cloudFoundryClient, privateDomainName, organizationId),
+                    createOrganizationId(this.cloudFoundryClient, sharedOrganizationName)
+                ))
+            .then(function((domainId, organizationId) -> requestAssociateOrganizationPrivateDomain(this.cloudFoundryClient, domainId, organizationId)
+                .then(Mono.just(domainId))))
+            .flatMapMany(domainId -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.privateDomains()
+                    .listSharedOrganizations(ListPrivateDomainSharedOrganizationsRequest.builder()
+                        .page(page)
+                        .privateDomainId(domainId)
+                        .status("active")
+                        .build())))
+            .map(resource -> ResourceUtils.getEntity(resource).getName())
+            .as(StepVerifier::create)
+            .expectNext(sharedOrganizationName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void listSharedOrganizationsFilterByUserId() throws TimeoutException, InterruptedException {
+        String sharedOrganizationName = this.nameFactory.getOrganizationName();
+        String privateDomainName = this.nameFactory.getDomainName();
+
+        this.organizationId
+            .then(organizationId -> Mono
+                .when(
+                    createPrivateDomainId(this.cloudFoundryClient, privateDomainName, organizationId),
+                    createOrganizationId(this.cloudFoundryClient, sharedOrganizationName),
+                    this.userId
+                ))
+            .then(function((domainId, organizationId, userId) -> Mono
+                .when(
+                    requestAssociateOrganizationPrivateDomain(this.cloudFoundryClient, domainId, organizationId)
+                        .then(Mono.just(domainId)),
+                    requestAssociateOrganizationUser(this.cloudFoundryClient, organizationId, userId)
+                        .then(Mono.just(userId))
+                )))
+            .flatMapMany(function((domainId, userId) -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.privateDomains()
+                    .listSharedOrganizations(ListPrivateDomainSharedOrganizationsRequest.builder()
+                        .page(page)
+                        .privateDomainId(domainId)
+                        .userId(userId)
+                        .build()))))
+            .map(resource -> ResourceUtils.getEntity(resource).getName())
+            .as(StepVerifier::create)
+            .expectNext(sharedOrganizationName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    private static Mono<String> createOrganizationId(CloudFoundryClient cloudFoundryClient, String organizationName) {
+        return requestCreateOrganization(cloudFoundryClient, organizationName)
+            .map(ResourceUtils::getId);
+    }
+
+    private static Mono<String> createPrivateDomainId(CloudFoundryClient cloudFoundryClient, String domainName, String organizationId) {
+        return requestCreatePrivateDomain(cloudFoundryClient, domainName, organizationId)
+            .map(ResourceUtils::getId);
+    }
+
+    private static Mono<String> createSpaceId(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceName) {
+        return cloudFoundryClient.spaces()
+            .create(CreateSpaceRequest.builder()
+                .organizationId(organizationId)
+                .name(spaceName)
+                .build())
+            .map(ResourceUtils::getId);
+    }
+
     private static <R extends AbstractPrivateDomainResource> Consumer<Tuple2<R, String>> domainNameAndOrganizationIdEquality(String domainName) {
         return consumer((resource, organizationId) -> {
             assertThat(ResourceUtils.getEntity(resource).getName()).isEqualTo(domainName);
             assertThat(ResourceUtils.getEntity(resource).getOwningOrganizationId()).isEqualTo(organizationId);
         });
+    }
+
+    private static Flux<PrivateDomainResource> listPrivateDomains(CloudFoundryClient cloudFoundryClient) {
+        return PaginationUtils
+            .requestClientV2Resources(page -> cloudFoundryClient.privateDomains()
+                .list(ListPrivateDomainsRequest.builder()
+                    .page(page)
+                    .build()));
     }
 
     private static Flux<PrivateDomainResource> listPrivateDomains(CloudFoundryClient cloudFoundryClient, String privateDomainName) {
@@ -160,15 +449,55 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
                     .build()));
     }
 
-    private static Flux<PrivateDomainResource> listPrivateDomains(CloudFoundryClient cloudFoundryClient) {
-        return PaginationUtils
-            .requestClientV2Resources(page -> cloudFoundryClient.privateDomains()
-                .list(ListPrivateDomainsRequest.builder()
-                    .page(page)
-                    .build()));
+    private static Mono<AssociateOrganizationAuditorResponse> requestAssociateOrganizationAuditor(CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
+        return cloudFoundryClient.organizations()
+            .associateAuditor(AssociateOrganizationAuditorRequest.builder()
+                .auditorId(userId)
+                .organizationId(organizationId)
+                .build());
     }
 
-    private static Mono<CreatePrivateDomainResponse> requestCreatePrivateDomain(CloudFoundryClient cloudFoundryClient, String organizationId, String domainName) {
+    private static Mono<AssociateOrganizationBillingManagerResponse> requestAssociateOrganizationBillingManager(CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
+        return cloudFoundryClient.organizations()
+            .associateBillingManager(AssociateOrganizationBillingManagerRequest.builder()
+                .billingManagerId(userId)
+                .organizationId(organizationId)
+                .build());
+    }
+
+    private static Mono<AssociateOrganizationManagerResponse> requestAssociateOrganizationManager(CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
+        return cloudFoundryClient.organizations()
+            .associateManager(AssociateOrganizationManagerRequest.builder()
+                .managerId(userId)
+                .organizationId(organizationId)
+                .build());
+    }
+
+    private static Mono<AssociateOrganizationPrivateDomainResponse> requestAssociateOrganizationPrivateDomain(CloudFoundryClient cloudFoundryClient, String domainId, String organizationId) {
+        return cloudFoundryClient.organizations()
+            .associatePrivateDomain(AssociateOrganizationPrivateDomainRequest.builder()
+                .organizationId(organizationId)
+                .privateDomainId(domainId)
+                .build());
+    }
+
+    private static Mono<AssociateOrganizationUserResponse> requestAssociateOrganizationUser(CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
+        return cloudFoundryClient.organizations()
+            .associateUser(AssociateOrganizationUserRequest.builder()
+                .organizationId(organizationId)
+                .userId(userId)
+                .build());
+    }
+
+    private static Mono<CreateOrganizationResponse> requestCreateOrganization(CloudFoundryClient cloudFoundryClient, String organizationName) {
+        return cloudFoundryClient.organizations()
+            .create(CreateOrganizationRequest.builder()
+                .name(organizationName)
+                .status("active")
+                .build());
+    }
+
+    private static Mono<CreatePrivateDomainResponse> requestCreatePrivateDomain(CloudFoundryClient cloudFoundryClient, String domainName, String organizationId) {
         return cloudFoundryClient.privateDomains()
             .create(CreatePrivateDomainRequest.builder()
                 .name(domainName)

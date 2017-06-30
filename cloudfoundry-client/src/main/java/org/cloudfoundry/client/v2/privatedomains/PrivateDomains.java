@@ -55,4 +55,14 @@ public interface PrivateDomains {
      * @return the response from the List Private Domains request
      */
     Mono<ListPrivateDomainsResponse> list(ListPrivateDomainsRequest request);
+
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/private_domains/list_all_shared_organizations_for_the_private_domain.html">List all Shared Organizations for the Private
+     * Domain</a> request
+     *
+     * @param request the List Private Domain Shared Organizations request
+     * @return the response from the List Private Domains Shared Organizations request
+     */
+    Mono<ListPrivateDomainSharedOrganizationsResponse> listSharedOrganizations(ListPrivateDomainSharedOrganizationsRequest request);
+
 }
