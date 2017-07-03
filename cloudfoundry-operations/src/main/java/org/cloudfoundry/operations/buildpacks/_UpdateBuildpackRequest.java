@@ -16,35 +16,44 @@
 
 package org.cloudfoundry.operations.buildpacks;
 
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+import org.cloudfoundry.Nullable;
+import org.immutables.value.Value;
+
+import java.nio.file.Path;
 
 /**
- * Main entry point to the Cloud Foundry Buildpacks Operations API
+ * The request options for the update buildpack operation
  */
-public interface Buildpacks {
+@Value.Immutable
+abstract class _UpdateBuildpackRequest {
 
     /**
-     * Create a new Buildpack
-     *
-     * @param request The Create Buildpack request
-     * @return a completion indicator
+     * The path to the buildpack
      */
-    Mono<Void> create(CreateBuildpackRequest request);
+    @Nullable
+    abstract Path getBuildpack();
 
     /**
-     * Update a Buildpack
-     *
-     * @param request The Update Buildpack request
-     * @return a completion indicator
+     * Enables the buildpack to be used for staging
      */
-    Mono<Void> update(UpdateBuildpackRequest request);
+    @Nullable
+    abstract Boolean getEnable();
 
     /**
-     * Lists the buildpacks
-     *
-     * @return the buildpacks
+     * Locks the buildpack to prevent changes
      */
-    Flux<Buildpack> list();
+    @Nullable
+    abstract Boolean getLock();
+
+    /**
+     * The buildpack name
+     */
+    abstract String getName();
+
+    /**
+     * The buildpack position
+     */
+    @Nullable
+    abstract Integer getPosition();
 
 }
