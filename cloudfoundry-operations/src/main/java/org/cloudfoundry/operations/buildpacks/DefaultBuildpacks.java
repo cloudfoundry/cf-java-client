@@ -67,6 +67,19 @@ public final class DefaultBuildpacks implements Buildpacks {
     }
 
     @Override
+    public Mono<Void> rename(RenameBuildpackRequest request) {
+        return this.cloudFoundryClient
+            .then(cloudFoundryClient -> Mono.when(
+                getBuildPackId(cloudFoundryClient, request.getName()),
+                Mono.just(cloudFoundryClient)
+            ))
+            .then(function((buildpackId, cloudFoundryClient) -> requestUpdateBuildpack(cloudFoundryClient, buildpackId, request.getNewName())))
+            .then()
+            .transform(OperationsLogging.log("Rename Buildpack"))
+            .checkpoint();
+    }
+
+    @Override
     public Mono<Void> update(UpdateBuildpackRequest request) {
         return this.cloudFoundryClient
             .then(cloudFoundryClient -> Mono.when(
@@ -123,6 +136,14 @@ public final class DefaultBuildpacks implements Buildpacks {
                 .enabled(request.getEnable())
                 .locked(request.getLock())
                 .position(request.getPosition())
+                .build());
+    }
+
+    private static Mono<UpdateBuildpackResponse> requestUpdateBuildpack(CloudFoundryClient cloudFoundryClient, String buildpackId, String name) {
+        return cloudFoundryClient.buildpacks()
+            .update(org.cloudfoundry.client.v2.buildpacks.UpdateBuildpackRequest.builder()
+                .buildpackId(buildpackId)
+                .name(name)
                 .build());
     }
 

@@ -33,18 +33,26 @@ public interface Buildpacks {
     Mono<Void> create(CreateBuildpackRequest request);
 
     /**
+     * Lists the buildpacks
+     *
+     * @return the buildpacks
+     */
+    Flux<Buildpack> list();
+
+    /**
+     * Rename a Buildpack
+     *
+     * @param request The Rename Buildpack request
+     * @return a completion indicator
+     */
+    Mono<Void> rename(RenameBuildpackRequest request);
+
+    /**
      * Update a Buildpack
      *
      * @param request The Update Buildpack request
      * @return a completion indicator
      */
     Mono<Void> update(UpdateBuildpackRequest request);
-
-    /**
-     * Lists the buildpacks
-     *
-     * @return the buildpacks
-     */
-    Flux<Buildpack> list();
 
 }
