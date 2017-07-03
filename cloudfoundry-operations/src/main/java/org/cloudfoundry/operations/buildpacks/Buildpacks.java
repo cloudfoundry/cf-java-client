@@ -33,6 +33,14 @@ public interface Buildpacks {
     Mono<Void> create(CreateBuildpackRequest request);
 
     /**
+     * Delete a Buildpack
+     *
+     * @param request The Delete Buildpack request
+     * @return a completion indicator
+     */
+    Mono<Void> delete(DeleteBuildpackRequest request);
+
+    /**
      * Lists the buildpacks
      *
      * @return the buildpacks
