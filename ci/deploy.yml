@@ -13,6 +13,9 @@ inputs:
 outputs:
 - name: build-info
 
+caches:
+- path: m2
+
 run:
   path: cf-java-client/ci/deploy.sh
 

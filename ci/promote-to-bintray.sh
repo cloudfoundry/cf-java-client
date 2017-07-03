@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-set -e
+set -e -u
 
 NAME=$(jq -r .name build-info/build-info.json)
 NUMBER=$(jq -r .number build-info/build-info.json)

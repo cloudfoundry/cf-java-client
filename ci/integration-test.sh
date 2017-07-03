@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-set -e
+set -e -u
 
 cd cf-java-client
-./mvnw -q -P integration-test test
+./mvnw -q -Dmaven.repo.local=../m2/repository -Dmaven.user.home=../m2 -P integration-test test

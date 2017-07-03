@@ -10,5 +10,8 @@ image_resource:
 inputs:
 - name: cf-java-client
 
+caches:
+- path: m2
+
 run:
   path: cf-java-client/ci/unit-test.sh
