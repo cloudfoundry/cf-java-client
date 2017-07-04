@@ -80,7 +80,7 @@ public final class FileUtils {
         return Mono
             .defer(() -> {
                 try {
-                    Path staging = Files.createTempFile(String.format("resource-matched-%s-", candidate.getFileName()), ".zip");
+                    Path staging = Files.createTempFile(String.format("compressed-%s-", candidate.getFileName()), ".zip");
 
                     try (ZipArchiveOutputStream out = new ZipArchiveOutputStream(staging.toFile())) {
                         if (Files.isDirectory(candidate)) {

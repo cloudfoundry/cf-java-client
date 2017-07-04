@@ -25,16 +25,6 @@ public class CreateBuildpackRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noBuildpack() {
         CreateBuildpackRequest.builder()
-            .fileName("test-file-name")
-            .name("test-name")
-            .position(0)
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noFilename() {
-        CreateBuildpackRequest.builder()
-            .buildpack(Paths.get("test-buildpack"))
             .name("test-name")
             .position(0)
             .build();
@@ -44,7 +34,6 @@ public class CreateBuildpackRequestTest {
     public void noName() {
         CreateBuildpackRequest.builder()
             .buildpack(Paths.get("test-buildpack"))
-            .fileName("test-file-name")
             .position(0)
             .build();
     }
@@ -53,7 +42,6 @@ public class CreateBuildpackRequestTest {
     public void noPosition() {
         CreateBuildpackRequest.builder()
             .buildpack(Paths.get("test-buildpack"))
-            .fileName("test-file-name")
             .name("test-name")
             .build();
     }
@@ -62,7 +50,6 @@ public class CreateBuildpackRequestTest {
     public void valid() {
         CreateBuildpackRequest.builder()
             .buildpack(Paths.get("test-buildpack"))
-            .fileName("test-file-name")
             .name("test-name")
             .position(0)
             .build();

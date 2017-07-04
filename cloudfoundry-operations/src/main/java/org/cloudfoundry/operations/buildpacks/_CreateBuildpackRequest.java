@@ -39,11 +39,6 @@ abstract class _CreateBuildpackRequest {
     abstract Boolean getEnable();
 
     /**
-     * The buildpack file name
-     */
-    abstract String getFileName();
-
-    /**
      * The buildpack name
      */
     abstract String getName();

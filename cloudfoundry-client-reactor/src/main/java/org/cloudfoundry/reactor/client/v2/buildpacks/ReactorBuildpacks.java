@@ -32,7 +32,14 @@ import org.cloudfoundry.client.v2.buildpacks.UploadBuildpackResponse;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v2.AbstractClientV2Operations;
+import org.cloudfoundry.reactor.util.MultipartHttpClientRequest;
+import org.cloudfoundry.util.FileUtils;
+import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
 
@@ -87,13 +94,31 @@ public final class ReactorBuildpacks extends AbstractClientV2Operations implemen
     public Mono<UploadBuildpackResponse> upload(UploadBuildpackRequest request) {
         return put(request, UploadBuildpackResponse.class, builder -> builder.pathSegment("v2", "buildpacks", request.getBuildpackId(), "bits"),
             outbound -> outbound
-                .then(r -> r
-                    .addPart(part -> part
-                        .setContentDispositionFormData("buildpack", request.getFilename())
-                        .setHeader(CONTENT_TYPE, APPLICATION_ZIP)
-                        .sendFile(request.getBuildpack()))
-                    .done()))
+                .then(r -> {
+                    if (Files.isDirectory(request.getBuildpack())) {
+                        return FileUtils.compress(request.getBuildpack())
+                            .then(buildpack -> upload(buildpack, r, request.getFilename() + ".zip")
+                                .doOnTerminate((v, t) -> {
+                                    try {
+                                        Files.delete(buildpack);
+                                    } catch (IOException e) {
+                                        throw Exceptions.propagate(e);
+                                    }
+                                }));
+                    } else {
+                        return upload(request.getBuildpack(), r, request.getFilename());
+                    }
+                }))
             .checkpoint();
+    }
+
+    private Mono<Void> upload(Path buildpack, MultipartHttpClientRequest r, String filename) {
+        return r
+            .addPart(part -> part
+                .setContentDispositionFormData("buildpack", filename)
+                .setHeader(CONTENT_TYPE, APPLICATION_ZIP)
+                .sendFile(buildpack))
+            .done();
     }
 
 }

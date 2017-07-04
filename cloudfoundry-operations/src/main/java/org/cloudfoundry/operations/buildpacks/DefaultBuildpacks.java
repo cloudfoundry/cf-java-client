@@ -54,7 +54,7 @@ public final class DefaultBuildpacks implements Buildpacks {
                 Mono.just(cloudFoundryClient),
                 requestCreateBuildpack(cloudFoundryClient, request.getName(), request.getPosition(), request.getEnable())
             ))
-            .then(function((cloudFoundryClient, response) -> requestUploadBuildpackBits(cloudFoundryClient, ResourceUtils.getId(response), request.getFileName(), request.getBuildpack())))
+            .then(function((cloudFoundryClient, response) -> requestUploadBuildpackBits(cloudFoundryClient, ResourceUtils.getId(response), request.getBuildpack())))
             .then()
             .transform(OperationsLogging.log("Create Buildpack"))
             .checkpoint();
@@ -118,7 +118,7 @@ public final class DefaultBuildpacks implements Buildpacks {
 
     private static Mono<String> getBuildPackId(CloudFoundryClient cloudFoundryClient, String name) {
         return requestBuildpacks(cloudFoundryClient, name)
-            .single()
+            .singleOrEmpty()
             .map(ResourceUtils::getId)
             .switchIfEmpty(ExceptionUtils.illegalArgument("Buildpack %s not found", name));
     }
@@ -176,11 +176,11 @@ public final class DefaultBuildpacks implements Buildpacks {
                 .build());
     }
 
-    private static Mono<UploadBuildpackResponse> requestUploadBuildpackBits(CloudFoundryClient cloudFoundryClient, String buildpackId, String filename, Path buildpack) {
+    private static Mono<UploadBuildpackResponse> requestUploadBuildpackBits(CloudFoundryClient cloudFoundryClient, String buildpackId, Path buildpack) {
         return cloudFoundryClient.buildpacks()
             .upload(UploadBuildpackRequest.builder()
                 .buildpackId(buildpackId)
-                .filename(filename)
+                .filename(buildpack.getFileName().toString())
                 .buildpack(buildpack)
                 .build());
     }
@@ -200,7 +200,7 @@ public final class DefaultBuildpacks implements Buildpacks {
 
     private static Mono<UploadBuildpackResponse> uploadBuildpackBits(CloudFoundryClient cloudFoundryClient, String buildpackId, UpdateBuildpackRequest request) {
         if (request.getBuildpack() != null) {
-            requestUploadBuildpackBits(cloudFoundryClient, buildpackId, request.getBuildpack().getFileName().toString(), request.getBuildpack());
+            requestUploadBuildpackBits(cloudFoundryClient, buildpackId, request.getBuildpack());
         }
 
         return Mono.empty();
