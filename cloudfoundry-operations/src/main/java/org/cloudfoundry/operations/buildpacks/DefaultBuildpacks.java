@@ -20,16 +20,21 @@ import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.buildpacks.BuildpackEntity;
 import org.cloudfoundry.client.v2.buildpacks.BuildpackResource;
 import org.cloudfoundry.client.v2.buildpacks.CreateBuildpackResponse;
+import org.cloudfoundry.client.v2.buildpacks.DeleteBuildpackResponse;
 import org.cloudfoundry.client.v2.buildpacks.ListBuildpacksRequest;
+import org.cloudfoundry.client.v2.buildpacks.UpdateBuildpackResponse;
 import org.cloudfoundry.client.v2.buildpacks.UploadBuildpackRequest;
 import org.cloudfoundry.client.v2.buildpacks.UploadBuildpackResponse;
 import org.cloudfoundry.operations.util.OperationsLogging;
+import org.cloudfoundry.util.ExceptionUtils;
+import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.Optional;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
@@ -49,9 +54,22 @@ public final class DefaultBuildpacks implements Buildpacks {
                 Mono.just(cloudFoundryClient),
                 requestCreateBuildpack(cloudFoundryClient, request.getName(), request.getPosition(), request.getEnable())
             ))
-            .then(function((cloudFoundryClient, response) -> requestUploadBuildpackBits(cloudFoundryClient, ResourceUtils.getId(response), request.getFileName(), request.getBuildpack())))
+            .then(function((cloudFoundryClient, response) -> requestUploadBuildpackBits(cloudFoundryClient, ResourceUtils.getId(response), request.getBuildpack())))
             .then()
             .transform(OperationsLogging.log("Create Buildpack"))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<Void> delete(DeleteBuildpackRequest request) {
+        return this.cloudFoundryClient
+            .then(cloudFoundryClient -> Mono.when(
+                getBuildPackId(cloudFoundryClient, request.getName()),
+                Mono.just(cloudFoundryClient)
+            ))
+            .then(function((buildpackId, cloudFoundryClient) -> deleteBuildpack(cloudFoundryClient, buildpackId, request.getCompletionTimeout())))
+            .then()
+            .transform(OperationsLogging.log("Delete Buildpack"))
             .checkpoint();
     }
 
@@ -64,10 +82,60 @@ public final class DefaultBuildpacks implements Buildpacks {
             .checkpoint();
     }
 
+    @Override
+    public Mono<Void> rename(RenameBuildpackRequest request) {
+        return this.cloudFoundryClient
+            .then(cloudFoundryClient -> Mono.when(
+                getBuildPackId(cloudFoundryClient, request.getName()),
+                Mono.just(cloudFoundryClient)
+            ))
+            .then(function((buildpackId, cloudFoundryClient) -> requestUpdateBuildpack(cloudFoundryClient, buildpackId, request.getNewName())))
+            .then()
+            .transform(OperationsLogging.log("Rename Buildpack"))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<Void> update(UpdateBuildpackRequest request) {
+        return this.cloudFoundryClient
+            .then(cloudFoundryClient -> Mono.when(
+                getBuildPackId(cloudFoundryClient, request.getName()),
+                Mono.just(cloudFoundryClient)
+            ))
+            .then(function((buildpackId, cloudFoundryClient) -> Mono.when(
+                requestUpdateBuildpack(cloudFoundryClient, buildpackId, request),
+                uploadBuildpackBits(cloudFoundryClient, buildpackId, request)
+            )))
+            .then()
+            .transform(OperationsLogging.log("Update Buildpack"))
+            .checkpoint();
+    }
+
+    private static Mono<Void> deleteBuildpack(CloudFoundryClient cloudFoundryClient, String buildpackId, Duration timeout) {
+        return requestDeleteBuildpack(cloudFoundryClient, buildpackId)
+            .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, timeout, job));
+    }
+
+    private static Mono<String> getBuildPackId(CloudFoundryClient cloudFoundryClient, String name) {
+        return requestBuildpacks(cloudFoundryClient, name)
+            .singleOrEmpty()
+            .map(ResourceUtils::getId)
+            .switchIfEmpty(ExceptionUtils.illegalArgument("Buildpack %s not found", name));
+    }
+
     private static Flux<BuildpackResource> requestBuildpacks(CloudFoundryClient cloudFoundryClient) {
         return PaginationUtils
             .requestClientV2Resources(page -> cloudFoundryClient.buildpacks()
                 .list(ListBuildpacksRequest.builder()
+                    .page(page)
+                    .build()));
+    }
+
+    private static Flux<BuildpackResource> requestBuildpacks(CloudFoundryClient cloudFoundryClient, String name) {
+        return PaginationUtils
+            .requestClientV2Resources(page -> cloudFoundryClient.buildpacks()
+                .list(ListBuildpacksRequest.builder()
+                    .name(name)
                     .page(page)
                     .build()));
     }
@@ -82,11 +150,37 @@ public final class DefaultBuildpacks implements Buildpacks {
                 .build());
     }
 
-    private static Mono<UploadBuildpackResponse> requestUploadBuildpackBits(CloudFoundryClient cloudFoundryClient, String buildpackId, String filename, Path buildpack) {
+    private static Mono<DeleteBuildpackResponse> requestDeleteBuildpack(CloudFoundryClient cloudFoundryClient, String buildpackId) {
+        return cloudFoundryClient.buildpacks()
+            .delete(org.cloudfoundry.client.v2.buildpacks.DeleteBuildpackRequest.builder()
+                .async(true)
+                .buildpackId(buildpackId)
+                .build());
+    }
+
+    private static Mono<UpdateBuildpackResponse> requestUpdateBuildpack(CloudFoundryClient cloudFoundryClient, String buildpackId, UpdateBuildpackRequest request) {
+        return cloudFoundryClient.buildpacks()
+            .update(org.cloudfoundry.client.v2.buildpacks.UpdateBuildpackRequest.builder()
+                .buildpackId(buildpackId)
+                .enabled(request.getEnable())
+                .locked(request.getLock())
+                .position(request.getPosition())
+                .build());
+    }
+
+    private static Mono<UpdateBuildpackResponse> requestUpdateBuildpack(CloudFoundryClient cloudFoundryClient, String buildpackId, String name) {
+        return cloudFoundryClient.buildpacks()
+            .update(org.cloudfoundry.client.v2.buildpacks.UpdateBuildpackRequest.builder()
+                .buildpackId(buildpackId)
+                .name(name)
+                .build());
+    }
+
+    private static Mono<UploadBuildpackResponse> requestUploadBuildpackBits(CloudFoundryClient cloudFoundryClient, String buildpackId, Path buildpack) {
         return cloudFoundryClient.buildpacks()
             .upload(UploadBuildpackRequest.builder()
                 .buildpackId(buildpackId)
-                .filename(filename)
+                .filename(buildpack.getFileName().toString())
                 .buildpack(buildpack)
                 .build());
     }
@@ -102,6 +196,14 @@ public final class DefaultBuildpacks implements Buildpacks {
             .name(entity.getName())
             .position(entity.getPosition())
             .build();
+    }
+
+    private static Mono<UploadBuildpackResponse> uploadBuildpackBits(CloudFoundryClient cloudFoundryClient, String buildpackId, UpdateBuildpackRequest request) {
+        if (request.getBuildpack() != null) {
+            requestUploadBuildpackBits(cloudFoundryClient, buildpackId, request.getBuildpack());
+        }
+
+        return Mono.empty();
     }
 
 }

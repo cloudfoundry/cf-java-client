@@ -217,6 +217,32 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    @Test
+    public void uploadDirectory() throws TimeoutException, InterruptedException, IOException {
+        Path buildpack = new ClassPathResource("test-buildpack").getFile().toPath();
+        String buildpackName = this.nameFactory.getBuildpackName();
+        String filename = buildpack.getFileName().toString();
+
+        createBuildpackId(this.cloudFoundryClient, buildpackName)
+            .then(buildpackId -> this.cloudFoundryClient.buildpacks()
+                .upload(UploadBuildpackRequest.builder()
+                    .buildpack(buildpack)
+                    .buildpackId(buildpackId)
+                    .filename(filename)
+                    .build()))
+            .map(ResourceUtils::getEntity)
+            .as(StepVerifier::create)
+            .expectNext(BuildpackEntity.builder()
+                .enabled(false)
+                .filename(filename + ".zip")
+                .locked(false)
+                .name(buildpackName)
+                .position(3)
+                .build())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
     private static Mono<String> createBuildpackId(CloudFoundryClient cloudFoundryClient, String buildpackName) {
         return requestCreateBuildpack(cloudFoundryClient, buildpackName)
             .map(ResourceUtils::getId);

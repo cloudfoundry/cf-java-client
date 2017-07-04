@@ -16,27 +16,13 @@
 
 package org.cloudfoundry.operations.buildpacks;
 
-import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
-import java.nio.file.Path;
-
 /**
- * The request options for the create buildpack operation
+ * The request options for the rename buildpack operation
  */
 @Value.Immutable
-abstract class _CreateBuildpackRequest {
-
-    /**
-     * The path to the buildpack
-     */
-    abstract Path getBuildpack();
-
-    /**
-     * Enables the buildpack to be used for staging
-     */
-    @Nullable
-    abstract Boolean getEnable();
+abstract class _RenameBuildpackRequest {
 
     /**
      * The buildpack name
@@ -44,8 +30,7 @@ abstract class _CreateBuildpackRequest {
     abstract String getName();
 
     /**
-     * The buildpack position
+     * The new buildpack name
      */
-    abstract Integer getPosition();
-
+    abstract String getNewName();
 }

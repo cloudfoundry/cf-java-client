@@ -16,36 +16,27 @@
 
 package org.cloudfoundry.operations.buildpacks;
 
-import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
-import java.nio.file.Path;
+import java.time.Duration;
 
 /**
- * The request options for the create buildpack operation
+ * The request options for the delete buildpack operation
  */
 @Value.Immutable
-abstract class _CreateBuildpackRequest {
+abstract class _DeleteBuildpackRequest {
 
     /**
-     * The path to the buildpack
+     * How long to wait for deletion
      */
-    abstract Path getBuildpack();
-
-    /**
-     * Enables the buildpack to be used for staging
-     */
-    @Nullable
-    abstract Boolean getEnable();
+    @Value.Default
+    Duration getCompletionTimeout() {
+        return Duration.ofMinutes(5);
+    }
 
     /**
      * The buildpack name
      */
     abstract String getName();
-
-    /**
-     * The buildpack position
-     */
-    abstract Integer getPosition();
 
 }

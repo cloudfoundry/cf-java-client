@@ -16,36 +16,30 @@
 
 package org.cloudfoundry.operations.buildpacks;
 
-import org.cloudfoundry.Nullable;
-import org.immutables.value.Value;
+import org.junit.Test;
 
-import java.nio.file.Path;
+public class RenameBuildpackRequestTest {
 
-/**
- * The request options for the create buildpack operation
- */
-@Value.Immutable
-abstract class _CreateBuildpackRequest {
+    @Test(expected = IllegalStateException.class)
+    public void noName() {
+        RenameBuildpackRequest.builder()
+            .newName("test-buildpack-new-name")
+            .build();
+    }
 
-    /**
-     * The path to the buildpack
-     */
-    abstract Path getBuildpack();
+    @Test(expected = IllegalStateException.class)
+    public void noNewName() {
+        RenameBuildpackRequest.builder()
+            .name("test-buildpack-name")
+            .build();
+    }
 
-    /**
-     * Enables the buildpack to be used for staging
-     */
-    @Nullable
-    abstract Boolean getEnable();
-
-    /**
-     * The buildpack name
-     */
-    abstract String getName();
-
-    /**
-     * The buildpack position
-     */
-    abstract Integer getPosition();
+    @Test
+    public void valid() {
+        RenameBuildpackRequest.builder()
+            .name("test-buildpack-name")
+            .newName("test-buildpack-new-name")
+            .build();
+    }
 
 }

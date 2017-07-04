@@ -22,14 +22,15 @@ import org.immutables.value.Value;
 import java.nio.file.Path;
 
 /**
- * The request options for the create buildpack operation
+ * The request options for the update buildpack operation
  */
 @Value.Immutable
-abstract class _CreateBuildpackRequest {
+abstract class _UpdateBuildpackRequest {
 
     /**
      * The path to the buildpack
      */
+    @Nullable
     abstract Path getBuildpack();
 
     /**
@@ -39,6 +40,12 @@ abstract class _CreateBuildpackRequest {
     abstract Boolean getEnable();
 
     /**
+     * Locks the buildpack to prevent changes
+     */
+    @Nullable
+    abstract Boolean getLock();
+
+    /**
      * The buildpack name
      */
     abstract String getName();
@@ -46,6 +53,7 @@ abstract class _CreateBuildpackRequest {
     /**
      * The buildpack position
      */
+    @Nullable
     abstract Integer getPosition();
 
 }
