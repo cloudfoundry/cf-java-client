@@ -11,7 +11,7 @@ inputs:
 - name: cf-java-client
 
 caches:
-- path: m2
+- path: maven
 
 run:
   path: cf-java-client/ci/integration-test.sh

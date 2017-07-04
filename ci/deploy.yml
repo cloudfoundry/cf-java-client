@@ -14,7 +14,7 @@ outputs:
 - name: build-info
 
 caches:
-- path: m2
+- path: maven
 
 run:
   path: cf-java-client/ci/deploy.sh

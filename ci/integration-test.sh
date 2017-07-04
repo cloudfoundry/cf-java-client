@@ -2,5 +2,7 @@
 
 set -e -u
 
+ln -fs $PWD/maven $HOME/.m2
+
 cd cf-java-client
-./mvnw -q -Dmaven.repo.local=../m2/repository -Dmaven.user.home=../m2 -P integration-test test
+./mvnw -q -P integration-test test
