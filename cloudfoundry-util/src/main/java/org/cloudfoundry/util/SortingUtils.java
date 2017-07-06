@@ -26,7 +26,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.function.Function;
@@ -59,18 +58,15 @@ public final class SortingUtils {
             Disposable disposable = source
                 .timestamp()
                 .subscribe(item -> {
-                    Optional.ofNullable(item)
-                        .ifPresent(i -> {
-                            synchronized (monitor) {
-                                accumulator.add(i);
-                            }
-                        });
+                    synchronized (monitor) {
+                        accumulator.add(item);
+                    }
                 }, d::onError, d::onComplete);
 
             return Flux
                 .interval(timespan)
                 .takeUntilOther(d)
-                .flatMap(n -> getItems(accumulator, comparator, timespan), null, () -> getItems(accumulator, comparator, Duration.ZERO))
+                .flatMap(n -> getItems(accumulator, monitor, timespan), null, () -> getItems(accumulator, monitor, Duration.ZERO))
                 .doOnCancel(disposable::dispose);
         };
     }
