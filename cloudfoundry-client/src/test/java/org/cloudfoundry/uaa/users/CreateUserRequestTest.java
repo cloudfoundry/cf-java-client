@@ -23,29 +23,20 @@ public final class CreateUserRequestTest {
     @Test(expected = IllegalStateException.class)
     public void incompleteName() {
         CreateUserRequest.builder()
-            .name(Name.builder()
-                .familyName("test-familyName")
+            .email(Email.builder()
+                .primary(true)
+                .value("test-email")
                 .build())
-            .password("test-password")
+            .name(Name.builder()
+                .familyName("test-family-name")
+                .build())
             .userName("test-userName")
             .build();
     }
 
     @Test(expected = IllegalStateException.class)
-    public void noName() {
+    public void noEmail() {
         CreateUserRequest.builder()
-            .password("test-password")
-            .userName("test-userName")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noPassword() {
-        CreateUserRequest.builder()
-            .name(Name.builder()
-                .familyName("test-familyName")
-                .givenName("test-givenName")
-                .build())
             .userName("test-userName")
             .build();
     }
@@ -53,22 +44,20 @@ public final class CreateUserRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noUserName() {
         CreateUserRequest.builder()
-            .name(Name.builder()
-                .familyName("test-familyName")
-                .givenName("test-givenName")
+            .email(Email.builder()
+                .primary(true)
+                .value("test-email")
                 .build())
-            .password("test-password")
             .build();
     }
 
     @Test
     public void valid() {
         CreateUserRequest.builder()
-            .name(Name.builder()
-                .familyName("test-familyName")
-                .givenName("test-givenName")
+            .email(Email.builder()
+                .primary(true)
+                .value("test-email")
                 .build())
-            .password("test-password")
             .userName("test-userName")
             .build();
     }

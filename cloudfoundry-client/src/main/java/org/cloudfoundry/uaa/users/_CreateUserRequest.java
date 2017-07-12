@@ -31,12 +31,16 @@ abstract class _CreateUserRequest implements IdentityZoned {
 
     @Value.Check
     void check() {
-        if (getName().getFamilyName() == null || getName().getFamilyName().isEmpty()) {
+        if (getName() != null && (getName().getFamilyName() == null || getName().getFamilyName().isEmpty())) {
             throw new IllegalStateException("Cannot build CreateUserRequest, required attribute familyName is not set, or is empty");
         }
 
-        if (getName().getGivenName() == null || getName().getGivenName().isEmpty()) {
+        if (getName() != null && (getName().getGivenName() == null || getName().getGivenName().isEmpty())) {
             throw new IllegalStateException("Cannot build CreateUserRequest, required attribute givenName is not set, or is empty");
+        }
+
+        if (getEmail().isEmpty()) {
+            throw new IllegalStateException("Cannot build CreateUserRequest, at least one email address is required");
         }
     }
 
@@ -64,6 +68,7 @@ abstract class _CreateUserRequest implements IdentityZoned {
      * The user's name
      */
     @JsonProperty("name")
+    @Nullable
     abstract Name getName();
 
     /**
@@ -77,7 +82,15 @@ abstract class _CreateUserRequest implements IdentityZoned {
      * The password
      */
     @JsonProperty("password")
+    @Nullable
     abstract String getPassword();
+
+    /**
+     * The phone numbers for the user
+     */
+    @JsonProperty("phoneNumbers")
+    @Nullable
+    abstract List<PhoneNumber> getPhoneNumbers();
 
     /**
      * The user name
@@ -91,12 +104,5 @@ abstract class _CreateUserRequest implements IdentityZoned {
     @JsonProperty("verified")
     @Nullable
     abstract Boolean getVerified();
-
-    /**
-     * The phone numbers for the user
-     */
-    @JsonProperty("phoneNumbers")
-    @Nullable
-    abstract List<PhoneNumber> getPhoneNumbers();
 
 }
