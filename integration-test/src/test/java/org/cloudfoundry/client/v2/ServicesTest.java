@@ -260,10 +260,7 @@ public final class ServicesTest extends AbstractIntegrationTest {
                         .serviceId(serviceId)
                         .page(page)
                         .build())))
-            .map(response -> {
-                System.out.println("***: " + response); //TODO: Remove!!!
-                return response.getEntity().getName();
-            })
+            .map(response -> response.getEntity().getName())
             .as(StepVerifier::create)
             .expectNext(this.planName)
             .expectComplete()
