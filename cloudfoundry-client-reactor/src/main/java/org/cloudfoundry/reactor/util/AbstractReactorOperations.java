@@ -24,6 +24,7 @@ import org.cloudfoundry.reactor.TokenProvider;
 import org.reactivestreams.Publisher;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
+import reactor.ipc.netty.http.client.HttpClientException;
 import reactor.ipc.netty.http.client.HttpClientRequest;
 import reactor.ipc.netty.http.client.HttpClientResponse;
 
@@ -234,6 +235,14 @@ public abstract class AbstractReactorOperations {
             .failOnServerError(false);
     }
 
+    private static boolean isUnauthorized(Throwable t) {
+        return t instanceof HttpClientException && ((HttpClientException) t).status() == HttpResponseStatus.UNAUTHORIZED;
+    }
+
+    private static boolean isUnauthorized(HttpClientResponse response) {
+        return response.status() == HttpResponseStatus.UNAUTHORIZED;
+    }
+
     private static Function<Mono<String>, Mono<String>> transformUri(Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return uri -> uri
             .map(UriComponentsBuilder::fromUriString)
@@ -254,8 +263,17 @@ public abstract class AbstractReactorOperations {
 
     private Mono<HttpClientResponse> invalidateToken(Mono<HttpClientResponse> inbound) {
         return inbound
+            .onErrorResume(t -> {  // TODO: Remove pending https://github.com/reactor/reactor-netty/issues/113
+                if (isUnauthorized(t)) {
+                    this.tokenProvider.invalidate(this.connectionContext);
+                    return inbound
+                        .transform(this::invalidateToken);
+                } else {
+                    return Mono.error(t);
+                }
+            })
             .then(response -> {
-                if (response.status() == HttpResponseStatus.UNAUTHORIZED) {
+                if (isUnauthorized(response)) {
                     this.tokenProvider.invalidate(this.connectionContext);
                     return inbound
                         .transform(this::invalidateToken);
