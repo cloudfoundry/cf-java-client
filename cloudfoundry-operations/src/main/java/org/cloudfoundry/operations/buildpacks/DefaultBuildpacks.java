@@ -50,11 +50,11 @@ public final class DefaultBuildpacks implements Buildpacks {
     @Override
     public Mono<Void> create(CreateBuildpackRequest request) {
         return this.cloudFoundryClient
-            .then(cloudFoundryClient -> Mono.when(
+            .flatMap(cloudFoundryClient -> Mono.when(
                 Mono.just(cloudFoundryClient),
                 requestCreateBuildpack(cloudFoundryClient, request.getName(), request.getPosition(), request.getEnable())
             ))
-            .then(function((cloudFoundryClient, response) -> requestUploadBuildpackBits(cloudFoundryClient, ResourceUtils.getId(response), request.getBuildpack())))
+            .flatMap(function((cloudFoundryClient, response) -> requestUploadBuildpackBits(cloudFoundryClient, ResourceUtils.getId(response), request.getBuildpack())))
             .then()
             .transform(OperationsLogging.log("Create Buildpack"))
             .checkpoint();
@@ -63,11 +63,11 @@ public final class DefaultBuildpacks implements Buildpacks {
     @Override
     public Mono<Void> delete(DeleteBuildpackRequest request) {
         return this.cloudFoundryClient
-            .then(cloudFoundryClient -> Mono.when(
+            .flatMap(cloudFoundryClient -> Mono.when(
                 getBuildPackId(cloudFoundryClient, request.getName()),
                 Mono.just(cloudFoundryClient)
             ))
-            .then(function((buildpackId, cloudFoundryClient) -> deleteBuildpack(cloudFoundryClient, buildpackId, request.getCompletionTimeout())))
+            .flatMap(function((buildpackId, cloudFoundryClient) -> deleteBuildpack(cloudFoundryClient, buildpackId, request.getCompletionTimeout())))
             .then()
             .transform(OperationsLogging.log("Delete Buildpack"))
             .checkpoint();
@@ -85,11 +85,11 @@ public final class DefaultBuildpacks implements Buildpacks {
     @Override
     public Mono<Void> rename(RenameBuildpackRequest request) {
         return this.cloudFoundryClient
-            .then(cloudFoundryClient -> Mono.when(
+            .flatMap(cloudFoundryClient -> Mono.when(
                 getBuildPackId(cloudFoundryClient, request.getName()),
                 Mono.just(cloudFoundryClient)
             ))
-            .then(function((buildpackId, cloudFoundryClient) -> requestUpdateBuildpack(cloudFoundryClient, buildpackId, request.getNewName())))
+            .flatMap(function((buildpackId, cloudFoundryClient) -> requestUpdateBuildpack(cloudFoundryClient, buildpackId, request.getNewName())))
             .then()
             .transform(OperationsLogging.log("Rename Buildpack"))
             .checkpoint();
@@ -98,11 +98,11 @@ public final class DefaultBuildpacks implements Buildpacks {
     @Override
     public Mono<Void> update(UpdateBuildpackRequest request) {
         return this.cloudFoundryClient
-            .then(cloudFoundryClient -> Mono.when(
+            .flatMap(cloudFoundryClient -> Mono.when(
                 getBuildPackId(cloudFoundryClient, request.getName()),
                 Mono.just(cloudFoundryClient)
             ))
-            .then(function((buildpackId, cloudFoundryClient) -> Mono.when(
+            .flatMap(function((buildpackId, cloudFoundryClient) -> Mono.when(
                 requestUpdateBuildpack(cloudFoundryClient, buildpackId, request),
                 uploadBuildpackBits(cloudFoundryClient, buildpackId, request)
             )))
@@ -113,7 +113,7 @@ public final class DefaultBuildpacks implements Buildpacks {
 
     private static Mono<Void> deleteBuildpack(CloudFoundryClient cloudFoundryClient, String buildpackId, Duration timeout) {
         return requestDeleteBuildpack(cloudFoundryClient, buildpackId)
-            .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, timeout, job));
+            .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, timeout, job));
     }
 
     private static Mono<String> getBuildPackId(CloudFoundryClient cloudFoundryClient, String name) {

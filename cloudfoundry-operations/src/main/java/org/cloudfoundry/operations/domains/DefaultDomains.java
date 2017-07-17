@@ -58,12 +58,12 @@ public final class DefaultDomains implements Domains {
     @Override
     public Mono<Void> create(CreateDomainRequest request) {
         return this.cloudFoundryClient
-            .then(cloudFoundryClient -> Mono
+            .flatMap(cloudFoundryClient -> Mono
                 .when(
                     Mono.just(cloudFoundryClient),
                     getOrganizationId(cloudFoundryClient, request.getOrganization())
                 ))
-            .then(function((cloudFoundryClient, organizationId) -> requestCreateDomain(cloudFoundryClient, request.getDomain(), organizationId)))
+            .flatMap(function((cloudFoundryClient, organizationId) -> requestCreateDomain(cloudFoundryClient, request.getDomain(), organizationId)))
             .then()
             .transform(OperationsLogging.log("Create Domain"))
             .checkpoint();
@@ -73,18 +73,18 @@ public final class DefaultDomains implements Domains {
     public Mono<Void> createShared(CreateSharedDomainRequest request) {
         if (request.getRouterGroup() == null) {
             return this.cloudFoundryClient
-                .then(cloudFoundryClient -> requestCreateSharedDomain(cloudFoundryClient, request.getDomain(), null))
+                .flatMap(cloudFoundryClient -> requestCreateSharedDomain(cloudFoundryClient, request.getDomain(), null))
                 .then()
                 .transform(OperationsLogging.log("Create Shared Domain"))
                 .checkpoint();
         } else {
             return Mono.when(this.cloudFoundryClient, this.routingClient)
-                .then(function((cloudFoundryClient, routingClient) -> Mono
+                .flatMap(function((cloudFoundryClient, routingClient) -> Mono
                     .when(
                         Mono.just(cloudFoundryClient),
                         getRouterGroupId(routingClient, request.getRouterGroup())
                     )))
-                .then(function((cloudFoundryClient, routerGroupId) -> requestCreateSharedDomain(cloudFoundryClient, request.getDomain(), routerGroupId)))
+                .flatMap(function((cloudFoundryClient, routerGroupId) -> requestCreateSharedDomain(cloudFoundryClient, request.getDomain(), routerGroupId)))
                 .then()
                 .transform(OperationsLogging.log("Create Shared Domain"))
                 .checkpoint();
@@ -115,12 +115,12 @@ public final class DefaultDomains implements Domains {
     @Override
     public Mono<Void> share(ShareDomainRequest request) {
         return this.cloudFoundryClient
-            .then(cloudFoundryClient -> Mono.when(
+            .flatMap(cloudFoundryClient -> Mono.when(
                 Mono.just(cloudFoundryClient),
                 getPrivateDomainId(cloudFoundryClient, request.getDomain()),
                 getOrganizationId(cloudFoundryClient, request.getOrganization())
             ))
-            .then(function(DefaultDomains::requestAssociateOrganizationPrivateDomainRequest))
+            .flatMap(function(DefaultDomains::requestAssociateOrganizationPrivateDomainRequest))
             .then()
             .transform(OperationsLogging.log("Share Domain"))
             .checkpoint();
@@ -129,12 +129,12 @@ public final class DefaultDomains implements Domains {
     @Override
     public Mono<Void> unshare(UnshareDomainRequest request) {
         return this.cloudFoundryClient
-            .then(cloudFoundryClient -> Mono.when(
+            .flatMap(cloudFoundryClient -> Mono.when(
                 Mono.just(cloudFoundryClient),
                 getPrivateDomainId(cloudFoundryClient, request.getDomain()),
                 getOrganizationId(cloudFoundryClient, request.getOrganization())
             ))
-            .then(function(DefaultDomains::requestRemoveOrganizationPrivateDomainRequest))
+            .flatMap(function(DefaultDomains::requestRemoveOrganizationPrivateDomainRequest))
             .transform(OperationsLogging.log("Unshare Domain"))
             .checkpoint();
     }

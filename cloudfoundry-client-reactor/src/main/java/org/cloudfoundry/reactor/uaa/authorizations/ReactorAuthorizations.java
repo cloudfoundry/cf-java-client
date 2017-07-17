@@ -60,7 +60,7 @@ public final class ReactorAuthorizations extends AbstractUaaOperations implement
     public Mono<String> authorizationCodeGrantApi(AuthorizeByAuthorizationCodeGrantApiRequest request) {
         return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.CODE))
             .map(inbound -> inbound.responseHeaders().get(LOCATION))
-            .then(location -> {
+            .flatMap(location -> {
                 String candidate = UriComponentsBuilder.fromUriString(location).build().getQueryParams().getFirst("code");
 
                 return Optional.ofNullable(candidate)

@@ -63,7 +63,7 @@ public final class IdentityZonesTest extends AbstractIntegrationTest {
         String subdomainName = this.nameFactory.getDomainName();
 
         getIdentityZoneId(this.uaaClient, identityZoneName, subdomainName)
-            .then(identityZoneId -> this.uaaClient.identityZones()
+            .flatMap(identityZoneId -> this.uaaClient.identityZones()
                 .delete(DeleteIdentityZoneRequest.builder()
                     .identityZoneId(identityZoneId)
                     .build()))
@@ -81,7 +81,7 @@ public final class IdentityZonesTest extends AbstractIntegrationTest {
         String subdomainName = this.nameFactory.getDomainName();
 
         getIdentityZoneId(this.uaaClient, identityZoneName, subdomainName)
-            .then(identityZoneId -> this.uaaClient.identityZones()
+            .flatMap(identityZoneId -> this.uaaClient.identityZones()
                 .get(GetIdentityZoneRequest.builder()
                     .identityZoneId(identityZoneId)
                     .build()))
@@ -116,7 +116,7 @@ public final class IdentityZonesTest extends AbstractIntegrationTest {
         String newSubdomainName = this.nameFactory.getDomainName();
 
         getIdentityZoneId(this.uaaClient, identityZoneName, baseSubdomainName)
-            .then(identityZoneId -> this.uaaClient.identityZones()
+            .flatMap(identityZoneId -> this.uaaClient.identityZones()
                 .update(UpdateIdentityZoneRequest.builder()
                     .identityZoneId(identityZoneId)
                     .name(identityZoneName)

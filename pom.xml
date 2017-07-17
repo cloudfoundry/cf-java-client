@@ -32,7 +32,7 @@
     <groupId>org.cloudfoundry</groupId>
     <artifactId>cloudfoundry-java-client</artifactId>
     <name>Cloud Foundry Java Client Parent</name>
-    <version>2.16.0.BUILD-SNAPSHOT</version>
+    <version>3.0.0.BUILD-SNAPSHOT</version>
     <packaging>pom</packaging>
     <url>https://github.com/cloudfoundry/cf-java-client</url>
 
@@ -50,9 +50,8 @@
         <java-semver.version>0.9.0</java-semver.version>
         <jjwt.version>0.7.0</jjwt.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <reactor-addons.version>3.0.7.RELEASE</reactor-addons.version>
-        <reactor-core.version>3.0.7.RELEASE</reactor-core.version>
-        <reactor-netty.version>0.6.4.RELEASE</reactor-netty.version>
+        <reactor-core.version>3.1.0.BUILD-SNAPSHOT</reactor-core.version>
+        <reactor-netty.version>0.7.0.BUILD-SNAPSHOT</reactor-netty.version>
         <wire.version>2.2.0</wire.version>
     </properties>
 
@@ -84,9 +83,9 @@
                 <version>${reactor-core.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.projectreactor.addons</groupId>
+                <groupId>io.projectreactor</groupId>
                 <artifactId>reactor-test</artifactId>
-                <version>${reactor-addons.version}</version>
+                <version>${reactor-core.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.projectreactor.ipc</groupId>

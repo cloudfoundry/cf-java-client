@@ -26,7 +26,6 @@ import org.cloudfoundry.client.v2.jobs.JobEntity;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
-import java.util.Optional;
 
 import static org.cloudfoundry.util.DelayUtils.exponentialBackOff;
 
@@ -73,7 +72,7 @@ public final class JobUtils {
 
         return job
             .filter(entity -> "failed".equals(entity.getStatus()))
-            .then(JobUtils::getError);
+            .flatMap(JobUtils::getError);
     }
 
     private static Mono<Void> getError(JobEntity entity) {

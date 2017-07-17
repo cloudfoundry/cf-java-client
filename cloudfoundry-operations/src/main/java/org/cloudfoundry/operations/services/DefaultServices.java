@@ -121,13 +121,13 @@ public final class DefaultServices implements Services {
     public Mono<Void> bind(BindServiceInstanceRequest request) {
         return Mono
             .when(this.cloudFoundryClient, this.spaceId)
-            .then(function((cloudFoundryClient, spaceId) -> Mono
+            .flatMap(function((cloudFoundryClient, spaceId) -> Mono
                 .when(
                     Mono.just(cloudFoundryClient),
                     getApplicationId(cloudFoundryClient, request.getApplicationName(), spaceId),
                     getSpaceServiceInstanceId(cloudFoundryClient, request.getServiceInstanceName(), spaceId)
                 )))
-            .then(function((cloudFoundryClient, applicationId, serviceInstanceId) -> createServiceBinding(cloudFoundryClient, applicationId, serviceInstanceId, request.getParameters())))
+            .flatMap(function((cloudFoundryClient, applicationId, serviceInstanceId) -> createServiceBinding(cloudFoundryClient, applicationId, serviceInstanceId, request.getParameters())))
             .then()
             .transform(OperationsLogging.log("Bind Service Instance"))
             .checkpoint();
@@ -137,19 +137,19 @@ public final class DefaultServices implements Services {
     public Mono<Void> bindRoute(BindRouteServiceInstanceRequest request) {
         return Mono
             .when(this.cloudFoundryClient, this.organizationId, this.spaceId)
-            .then(function((cloudFoundryClient, organizationId, spaceId) -> Mono
+            .flatMap(function((cloudFoundryClient, organizationId, spaceId) -> Mono
                 .when(
                     Mono.just(cloudFoundryClient),
                     getDomainId(cloudFoundryClient, request.getDomainName(), organizationId),
                     Mono.just(spaceId)
                 )))
-            .then(function((cloudFoundryClient, domainId, spaceId) -> Mono
+            .flatMap(function((cloudFoundryClient, domainId, spaceId) -> Mono
                 .when(
                     Mono.just(cloudFoundryClient),
                     getRouteId(cloudFoundryClient, request.getDomainName(), domainId, request.getHostname(), request.getPath()),
                     getSpaceServiceInstanceId(cloudFoundryClient, request.getServiceInstanceName(), spaceId)
                 )))
-            .then(function((cloudFoundryClient, routeId, userProvidedServiceInstanceId) -> createRouteBinding(cloudFoundryClient, routeId, userProvidedServiceInstanceId, request.getParameters())))
+            .flatMap(function((cloudFoundryClient, routeId, userProvidedServiceInstanceId) -> createRouteBinding(cloudFoundryClient, routeId, userProvidedServiceInstanceId, request.getParameters())))
             .then()
             .transform(OperationsLogging.log("Bind Route to Service Instance"))
             .checkpoint();
@@ -159,25 +159,25 @@ public final class DefaultServices implements Services {
     public Mono<Void> createInstance(CreateServiceInstanceRequest request) {
         return Mono
             .when(this.cloudFoundryClient, this.spaceId)
-            .then(function((cloudFoundryClient, spaceId) -> Mono
+            .flatMap(function((cloudFoundryClient, spaceId) -> Mono
                 .when(
                     Mono.just(cloudFoundryClient),
                     Mono.just(spaceId),
                     getServiceIdByName(cloudFoundryClient, spaceId, request.getServiceName())
                 )))
-            .then(function((cloudFoundryClient, spaceId, serviceId) -> Mono
+            .flatMap(function((cloudFoundryClient, spaceId, serviceId) -> Mono
                 .when(
                     Mono.just(cloudFoundryClient),
                     Mono.just(spaceId),
                     getServicePlanIdByName(cloudFoundryClient, serviceId, request.getPlanName())
                 )))
-            .then(function((cloudFoundryClient, spaceId, planId) -> Mono
+            .flatMap(function((cloudFoundryClient, spaceId, planId) -> Mono
                 .when(
                     Mono.just(cloudFoundryClient),
                     Mono.just(request.getCompletionTimeout()),
                     createServiceInstance(cloudFoundryClient, spaceId, planId, request)
                 )))
-            .then(function(DefaultServices::waitForCreateInstance))
+            .flatMap(function(DefaultServices::waitForCreateInstance))
             .transform(OperationsLogging.log("Create Service Instance"))
             .checkpoint();
     }
@@ -186,12 +186,12 @@ public final class DefaultServices implements Services {
     public Mono<Void> createServiceKey(CreateServiceKeyRequest request) {
         return Mono
             .when(this.cloudFoundryClient, this.spaceId)
-            .then(function((cloudFoundryClient, spaceId) -> Mono
+            .flatMap(function((cloudFoundryClient, spaceId) -> Mono
                 .when(
                     Mono.just(cloudFoundryClient),
                     getSpaceServiceInstanceId(cloudFoundryClient, request.getServiceInstanceName(), spaceId)
                 )))
-            .then(function((cloudFoundryClient, serviceInstanceId) -> requestCreateServiceKey(cloudFoundryClient, serviceInstanceId, request.getServiceKeyName(), request.getParameters())))
+            .flatMap(function((cloudFoundryClient, serviceInstanceId) -> requestCreateServiceKey(cloudFoundryClient, serviceInstanceId, request.getServiceKeyName(), request.getParameters())))
             .then()
             .transform(OperationsLogging.log("Create Service Key"))
             .checkpoint();
@@ -201,7 +201,7 @@ public final class DefaultServices implements Services {
     public Mono<Void> createUserProvidedInstance(CreateUserProvidedServiceInstanceRequest request) {
         return Mono
             .when(this.cloudFoundryClient, this.spaceId)
-            .then(function((cloudFoundryClient, spaceId) -> requestCreateUserProvidedServiceInstance(cloudFoundryClient, request.getName(), request.getCredentials(), request.getRouteServiceUrl(),
+            .flatMap(function((cloudFoundryClient, spaceId) -> requestCreateUserProvidedServiceInstance(cloudFoundryClient, request.getName(), request.getCredentials(), request.getRouteServiceUrl(),
                 spaceId, request.getSyslogDrainUrl())))
             .then()
             .transform(OperationsLogging.log("Create User Provided Service Instance"))
@@ -212,13 +212,13 @@ public final class DefaultServices implements Services {
     public Mono<Void> deleteInstance(DeleteServiceInstanceRequest request) {
         return Mono
             .when(this.cloudFoundryClient, this.spaceId)
-            .then(function((cloudFoundryClient, spaceId) -> Mono
+            .flatMap(function((cloudFoundryClient, spaceId) -> Mono
                 .when(
                     Mono.just(cloudFoundryClient),
                     Mono.just(request.getCompletionTimeout()),
                     getSpaceServiceInstance(cloudFoundryClient, request.getName(), spaceId)
                 )))
-            .then(function(DefaultServices::deleteServiceInstance))
+            .flatMap(function(DefaultServices::deleteServiceInstance))
             .transform(OperationsLogging.log("Delete Service Instance"))
             .checkpoint();
     }
@@ -227,18 +227,18 @@ public final class DefaultServices implements Services {
     public Mono<Void> deleteServiceKey(DeleteServiceKeyRequest request) {
         return Mono
             .when(this.cloudFoundryClient, this.spaceId)
-            .then(function((cloudFoundryClient, spaceId) -> Mono
+            .flatMap(function((cloudFoundryClient, spaceId) -> Mono
                 .when(
                     Mono.just(cloudFoundryClient),
                     getSpaceServiceInstanceId(cloudFoundryClient, request.getServiceInstanceName(), spaceId)
                 )))
-            .then(function((cloudFoundryClient, serviceInstanceId) -> Mono
+            .flatMap(function((cloudFoundryClient, serviceInstanceId) -> Mono
                 .when(
                     Mono.just(cloudFoundryClient),
                     getServiceKey(cloudFoundryClient, serviceInstanceId, request.getServiceKeyName())
                         .map(ResourceUtils::getId)
                 )))
-            .then(function(DefaultServices::requestDeleteServiceKey))
+            .flatMap(function(DefaultServices::requestDeleteServiceKey))
             .transform(OperationsLogging.log("Delete Service Key"))
             .checkpoint();
     }
@@ -247,18 +247,18 @@ public final class DefaultServices implements Services {
     public Mono<ServiceInstance> getInstance(GetServiceInstanceRequest request) {
         return Mono
             .when(this.cloudFoundryClient, this.spaceId)
-            .then(function((cloudFoundryClient, spaceId) -> Mono
+            .flatMap(function((cloudFoundryClient, spaceId) -> Mono
                 .when(
                     Mono.just(cloudFoundryClient),
                     getSpaceServiceInstance(cloudFoundryClient, request.getName(), spaceId)
                 )))
-            .then(function((cloudFoundryClient, resource) -> Mono
+            .flatMap(function((cloudFoundryClient, resource) -> Mono
                 .when(
                     Mono.just(cloudFoundryClient),
                     Mono.just(resource),
                     getServicePlanEntity(cloudFoundryClient, ResourceUtils.getEntity(resource).getServicePlanId())
                 )))
-            .then(function((cloudFoundryClient, resource, servicePlanEntity) -> Mono
+            .flatMap(function((cloudFoundryClient, resource, servicePlanEntity) -> Mono
                 .when(
                     Mono.just(resource),
                     Mono.just(Optional.ofNullable(servicePlanEntity.getName())),
@@ -274,12 +274,12 @@ public final class DefaultServices implements Services {
     public Mono<ServiceKey> getServiceKey(GetServiceKeyRequest request) {
         return Mono
             .when(this.cloudFoundryClient, this.spaceId)
-            .then(function((cloudFoundryClient, spaceId) -> Mono
+            .flatMap(function((cloudFoundryClient, spaceId) -> Mono
                 .when(
                     Mono.just(cloudFoundryClient),
                     getSpaceServiceInstanceId(cloudFoundryClient, request.getServiceInstanceName(), spaceId)
                 )))
-            .then(function((cloudFoundryClient, serviceInstanceId) -> getServiceKey(cloudFoundryClient, serviceInstanceId, request.getServiceKeyName())))
+            .flatMap(function((cloudFoundryClient, serviceInstanceId) -> getServiceKey(cloudFoundryClient, serviceInstanceId, request.getServiceKeyName())))
             .map(DefaultServices::toServiceKey)
             .transform(OperationsLogging.log("Get Service Key"))
             .checkpoint();
@@ -289,7 +289,7 @@ public final class DefaultServices implements Services {
     public Flux<ServiceInstanceSummary> listInstances() {
         return Mono
             .when(this.cloudFoundryClient, this.spaceId)
-            .then(function((cloudFoundryClient, spaceId) -> cloudFoundryClient.spaces()
+            .flatMap(function((cloudFoundryClient, spaceId) -> cloudFoundryClient.spaces()
                 .getSummary(GetSpaceSummaryRequest.builder()
                     .spaceId(spaceId)
                     .build())))
@@ -302,7 +302,7 @@ public final class DefaultServices implements Services {
     public Flux<ServiceKey> listServiceKeys(ListServiceKeysRequest request) {
         return Mono
             .when(this.cloudFoundryClient, this.spaceId)
-            .then(function((cloudFoundryClient, spaceId) -> Mono
+            .flatMap(function((cloudFoundryClient, spaceId) -> Mono
                 .when(
                     Mono.just(cloudFoundryClient),
                     getSpaceServiceInstanceId(cloudFoundryClient, request.getServiceInstanceName(), spaceId)
@@ -337,12 +337,12 @@ public final class DefaultServices implements Services {
     public Mono<Void> renameInstance(RenameServiceInstanceRequest request) {
         return Mono
             .when(this.cloudFoundryClient, this.spaceId)
-            .then(function((cloudFoundryClient, spaceId) -> Mono
+            .flatMap(function((cloudFoundryClient, spaceId) -> Mono
                 .when(
                     Mono.just(cloudFoundryClient),
                     getSpaceServiceInstance(cloudFoundryClient, request.getName(), spaceId)
                 )))
-            .then(function((cloudFoundryClient, serviceInstance) -> renameServiceInstance(cloudFoundryClient, serviceInstance, request.getNewName())))
+            .flatMap(function((cloudFoundryClient, serviceInstance) -> renameServiceInstance(cloudFoundryClient, serviceInstance, request.getNewName())))
             .then()
             .transform(OperationsLogging.log("Rename Service Instance"))
             .checkpoint();
@@ -352,19 +352,19 @@ public final class DefaultServices implements Services {
     public Mono<Void> unbind(UnbindServiceInstanceRequest request) {
         return Mono
             .when(this.cloudFoundryClient, this.spaceId)
-            .then(function((cloudFoundryClient, spaceId) -> Mono
+            .flatMap(function((cloudFoundryClient, spaceId) -> Mono
                 .when(
                     Mono.just(cloudFoundryClient),
                     getApplicationId(cloudFoundryClient, request.getApplicationName(), spaceId),
                     getSpaceServiceInstanceId(cloudFoundryClient, request.getServiceInstanceName(), spaceId)
                 )))
-            .then(function((cloudFoundryClient, applicationId, serviceInstanceId) -> Mono
+            .flatMap(function((cloudFoundryClient, applicationId, serviceInstanceId) -> Mono
                 .when(
                     Mono.just(cloudFoundryClient),
                     Mono.just(request.getCompletionTimeout()),
                     getServiceBindingId(cloudFoundryClient, applicationId, serviceInstanceId, request.getServiceInstanceName())
                 )))
-            .then(function(DefaultServices::deleteServiceBinding))
+            .flatMap(function(DefaultServices::deleteServiceBinding))
             .then()
             .transform(OperationsLogging.log("Unbind Service Instance"))
             .checkpoint();
@@ -374,19 +374,19 @@ public final class DefaultServices implements Services {
     public Mono<Void> unbindRoute(UnbindRouteServiceInstanceRequest request) {
         return Mono
             .when(this.cloudFoundryClient, this.organizationId, this.spaceId)
-            .then(function((cloudFoundryClient, organizationId, spaceId) -> Mono
+            .flatMap(function((cloudFoundryClient, organizationId, spaceId) -> Mono
                 .when(
                     Mono.just(cloudFoundryClient),
                     getDomainId(cloudFoundryClient, request.getDomainName(), organizationId),
                     Mono.just(spaceId)
                 )))
-            .then(function((cloudFoundryClient, domainId, spaceId) -> Mono
+            .flatMap(function((cloudFoundryClient, domainId, spaceId) -> Mono
                 .when(
                     Mono.just(cloudFoundryClient),
                     getRouteId(cloudFoundryClient, request.getDomainName(), domainId, request.getHostname(), request.getPath()),
                     getSpaceServiceInstanceId(cloudFoundryClient, request.getServiceInstanceName(), spaceId)
                 )))
-            .then(function(DefaultServices::requestRemoveRoute))
+            .flatMap(function(DefaultServices::requestRemoveRoute))
             .then()
             .transform(OperationsLogging.log("Unbind Route from Service Instance"))
             .checkpoint();
@@ -396,19 +396,19 @@ public final class DefaultServices implements Services {
     public Mono<Void> updateInstance(UpdateServiceInstanceRequest request) {
         return Mono
             .when(this.cloudFoundryClient, this.organizationId, this.spaceId)
-            .then(function((cloudFoundryClient, organizationId, spaceId) -> Mono
+            .flatMap(function((cloudFoundryClient, organizationId, spaceId) -> Mono
                 .when(
                     Mono.just(cloudFoundryClient),
                     Mono.just(organizationId),
                     getSpaceServiceInstance(cloudFoundryClient, request.getServiceInstanceName(), spaceId)
                 )))
-            .then(function((cloudFoundryClient, organizationId, serviceInstance) -> Mono
+            .flatMap(function((cloudFoundryClient, organizationId, serviceInstance) -> Mono
                 .when(
                     Mono.just(cloudFoundryClient),
                     Mono.just(ResourceUtils.getId(serviceInstance)),
                     getOptionalValidatedServicePlanId(cloudFoundryClient, request.getPlanName(), serviceInstance, organizationId)
                 )))
-            .then(function((cloudFoundryClient, serviceInstanceId, servicePlanId) -> updateServiceInstance(cloudFoundryClient, request, serviceInstanceId, servicePlanId.orElse(null))))
+            .flatMap(function((cloudFoundryClient, serviceInstanceId, servicePlanId) -> updateServiceInstance(cloudFoundryClient, request, serviceInstanceId, servicePlanId.orElse(null))))
             .then()
             .transform(OperationsLogging.log("Update Service Instance"))
             .checkpoint();
@@ -418,12 +418,12 @@ public final class DefaultServices implements Services {
     public Mono<Void> updateUserProvidedInstance(UpdateUserProvidedServiceInstanceRequest request) {
         return Mono
             .when(this.cloudFoundryClient, this.spaceId)
-            .then(function((cloudFoundryClient, spaceId) -> Mono
+            .flatMap(function((cloudFoundryClient, spaceId) -> Mono
                 .when(
                     Mono.just(cloudFoundryClient),
                     getSpaceUserProvidedServiceInstanceId(cloudFoundryClient, request.getUserProvidedServiceInstanceName(), spaceId)
                 )))
-            .then(function((cloudFoundryClient, userProvidedServiceInstanceId) -> updateUserProvidedServiceInstance(cloudFoundryClient, request, userProvidedServiceInstanceId)))
+            .flatMap(function((cloudFoundryClient, userProvidedServiceInstanceId) -> updateUserProvidedServiceInstance(cloudFoundryClient, request, userProvidedServiceInstanceId)))
             .then()
             .transform(OperationsLogging.log("Update User Provided Service Instance"))
             .checkpoint();
@@ -460,7 +460,7 @@ public final class DefaultServices implements Services {
 
     private static Mono<Void> deleteServiceBinding(CloudFoundryClient cloudFoundryClient, Duration completionTimeout, String serviceBindingId) {
         return requestDeleteServiceBinding(cloudFoundryClient, serviceBindingId)
-            .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, completionTimeout, job));
+            .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, completionTimeout, job));
     }
 
     private static Mono<Void> deleteServiceInstance(CloudFoundryClient cloudFoundryClient, Duration completionTimeout, UnionServiceInstanceResource serviceInstance) {
@@ -468,7 +468,7 @@ public final class DefaultServices implements Services {
             return requestDeleteUserProvidedServiceInstance(cloudFoundryClient, ResourceUtils.getId(serviceInstance));
         } else {
             return requestDeleteServiceInstance(cloudFoundryClient, ResourceUtils.getId(serviceInstance))
-                .then(response -> {
+                .flatMap(response -> {
                     Object entity = response.getEntity();
                     if (entity instanceof JobEntity) {
                         return JobUtils.waitForCompletion(cloudFoundryClient, completionTimeout, (JobEntity) response.getEntity());
@@ -533,14 +533,14 @@ public final class DefaultServices implements Services {
         }
 
         return getServiceId(cloudFoundryClient, servicePlanId)
-            .then(serviceId -> requestGetService(cloudFoundryClient, serviceId))
+            .flatMap(serviceId -> requestGetService(cloudFoundryClient, serviceId))
             .filter(DefaultServices::isPlanUpdateable)
             .switchIfEmpty(ExceptionUtils.illegalArgument("Plan for the %s service cannot be updated", serviceInstance.getEntity().getName()))
             .flatMapMany(response -> requestListServicePlans(cloudFoundryClient, ResourceUtils.getId(response)))
             .filter(resource -> planName.equals(resource.getEntity().getName()))
             .singleOrEmpty()
             .switchIfEmpty(ExceptionUtils.illegalArgument("New service plan %s not found", planName))
-            .then(resource -> checkVisibility(cloudFoundryClient, organizationId, resource));
+            .flatMap(resource -> checkVisibility(cloudFoundryClient, organizationId, resource));
     }
 
     private static Mono<String> getPrivateDomainId(CloudFoundryClient cloudFoundryClient, String domain, String organizationId) {
@@ -576,7 +576,7 @@ public final class DefaultServices implements Services {
     private static Mono<ServiceEntity> getServiceEntity(CloudFoundryClient cloudFoundryClient, Optional<String> serviceId) {
         return Mono
             .justOrEmpty(serviceId)
-            .then(serviceId1 -> requestGetService(cloudFoundryClient, serviceId1))
+            .flatMap(serviceId1 -> requestGetService(cloudFoundryClient, serviceId1))
             .map(ResourceUtils::getEntity)
             .switchIfEmpty(Mono.just(ServiceEntity.builder().build()));
     }
@@ -600,7 +600,7 @@ public final class DefaultServices implements Services {
     private static Mono<ServicePlanEntity> getServicePlanEntity(CloudFoundryClient cloudFoundryClient, String servicePlanId) {
         return Mono
             .justOrEmpty(servicePlanId)
-            .then(servicePlanId1 -> requestGetServicePlan(cloudFoundryClient, servicePlanId1))
+            .flatMap(servicePlanId1 -> requestGetServicePlan(cloudFoundryClient, servicePlanId1))
             .map(ResourceUtils::getEntity)
             .switchIfEmpty(Mono.just(ServicePlanEntity.builder().build()));
     }

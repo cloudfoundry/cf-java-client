@@ -35,7 +35,7 @@ abstract class _OneTimePasscodeTokenProvider extends AbstractUaaTokenProvider {
     @Override
     Mono<Void> tokenRequestTransformer(Mono<HttpClientRequest> outbound) {
         return outbound
-            .then(request -> request
+            .flatMap(request -> request
                 .sendForm(form -> form
                     .multipart(false)
                     .attr("client_id", getClientId())

@@ -38,7 +38,6 @@ import java.time.Duration;
 import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.cloudfoundry.util.OperationUtils.thenKeep;
 
 public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationTest {
 
@@ -85,13 +84,13 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
 
         requestCreateOrganizationQuotaDefinition(this.cloudFoundryClient, quotaDefinitionName)
             .map(ResourceUtils::getId)
-            .as(thenKeep(organizationQuotaDefinitionId -> this.cloudFoundryClient.organizationQuotaDefinitions()
+            .delayUntil(organizationQuotaDefinitionId -> this.cloudFoundryClient.organizationQuotaDefinitions()
                 .delete(DeleteOrganizationQuotaDefinitionRequest.builder()
                     .async(true)
                     .organizationQuotaDefinitionId(organizationQuotaDefinitionId)
                     .build())
-                .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job))))
-            .then(organizationQuotaDefinitionId -> requestGetOrganizationQuotaDefinition(this.cloudFoundryClient, organizationQuotaDefinitionId))
+                .flatMap(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job)))
+            .flatMap(organizationQuotaDefinitionId -> requestGetOrganizationQuotaDefinition(this.cloudFoundryClient, organizationQuotaDefinitionId))
             .as(StepVerifier::create)
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class).hasMessageMatching("CF-QuotaDefinitionNotFound\\([0-9]+\\): Quota Definition could not be found: .*"))
             .verify(Duration.ofMinutes(5));
@@ -104,7 +103,7 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
 
         requestCreateOrganizationQuotaDefinition(this.cloudFoundryClient, quotaDefinitionName)
             .map(ResourceUtils::getId)
-            .then(organizationQuotaDefinitionId -> this.cloudFoundryClient.organizationQuotaDefinitions()
+            .flatMap(organizationQuotaDefinitionId -> this.cloudFoundryClient.organizationQuotaDefinitions()
                 .get(GetOrganizationQuotaDefinitionRequest.builder()
                     .organizationQuotaDefinitionId(organizationQuotaDefinitionId)
                     .build()))
@@ -134,7 +133,7 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
 
         requestCreateOrganizationQuotaDefinition(this.cloudFoundryClient, quotaDefinitionName)
             .map(ResourceUtils::getId)
-            .then(organizationQuotaDefinitionId -> PaginationUtils
+            .flatMap(organizationQuotaDefinitionId -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.organizationQuotaDefinitions()
                     .list(ListOrganizationQuotaDefinitionsRequest.builder()
                         .page(page)
@@ -156,13 +155,13 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
 
         requestCreateOrganizationQuotaDefinition(this.cloudFoundryClient, quotaDefinitionName)
             .map(ResourceUtils::getId)
-            .as(thenKeep(organizationQuotaDefinitionId -> this.cloudFoundryClient.organizationQuotaDefinitions()
+            .delayUntil(organizationQuotaDefinitionId -> this.cloudFoundryClient.organizationQuotaDefinitions()
                 .update(UpdateOrganizationQuotaDefinitionRequest.builder()
                     .organizationQuotaDefinitionId(organizationQuotaDefinitionId)
                     .totalServices(10)
                     .memoryLimit(1000)
-                    .build())))
-            .then(organizationQuotaDefinitionId -> this.cloudFoundryClient.organizationQuotaDefinitions()
+                    .build()))
+            .flatMap(organizationQuotaDefinitionId -> this.cloudFoundryClient.organizationQuotaDefinitions()
                 .get(GetOrganizationQuotaDefinitionRequest.builder()
                     .organizationQuotaDefinitionId(organizationQuotaDefinitionId)
                     .build()))

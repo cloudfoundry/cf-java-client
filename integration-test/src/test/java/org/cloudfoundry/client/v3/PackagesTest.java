@@ -57,7 +57,7 @@ public final class PackagesTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
-            .then(spaceId -> this.cloudFoundryClient.applicationsV3()
+            .flatMap(spaceId -> this.cloudFoundryClient.applicationsV3()
                 .create(CreateApplicationRequest.builder()
                     .name(applicationName)
                     .relationships(Relationships.builder()
@@ -67,13 +67,13 @@ public final class PackagesTest extends AbstractIntegrationTest {
                         .build())
                     .build()))
             .map(Application::getId)
-            .then(applicationId -> this.cloudFoundryClient.packages()
+            .flatMap(applicationId -> this.cloudFoundryClient.packages()
                 .create(CreatePackageRequest.builder()
                     .applicationId(applicationId)
                     .type(PackageType.BITS)
                     .build()))
             .map(Package::getId)
-            .then(packageId -> {
+            .flatMap(packageId -> {
                 try {
                     return this.cloudFoundryClient.packages()
                         .upload(UploadPackageRequest.builder()
@@ -85,7 +85,7 @@ public final class PackagesTest extends AbstractIntegrationTest {
                 }
             })
             .map(Package::getId)
-            .then(packageId -> this.cloudFoundryClient.packages()
+            .flatMap(packageId -> this.cloudFoundryClient.packages()
                 .get(GetPackageRequest.builder()
                     .packageId(packageId)
                     .build()))

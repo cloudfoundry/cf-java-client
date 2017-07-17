@@ -37,7 +37,7 @@ public final class BlobstoresTest extends AbstractIntegrationTest {
         this.cloudFoundryClient.blobstores()
             .deleteBuildpackCaches(DeleteBlobstoreBuildpackCachesRequest.builder()
                 .build())
-            .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job))
+            .flatMap(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job))
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofMinutes(5));

@@ -75,14 +75,14 @@ public final class DefaultOrganizations implements Organizations {
     public Mono<Void> create(CreateOrganizationRequest request) {
         return Mono
             .when(this.cloudFoundryClient, this.username)
-            .then(function((cloudFoundryClient, username) -> Mono.when(
+            .flatMap(function((cloudFoundryClient, username) -> Mono.when(
                 Mono.just(cloudFoundryClient),
                 createOrganization(cloudFoundryClient, request),
                 getFeatureFlagEnabled(cloudFoundryClient, SET_ROLES_BY_USERNAME_FEATURE_FLAG),
                 Mono.just(username)
             )))
             .filter(predicate((cloudFoundryClient, organizationId, setRolesByUsernameEnabled, username) -> setRolesByUsernameEnabled))
-            .then(function((cloudFoundryClient, organizationId, setRolesByUsernameEnabled, username) -> setOrganizationManager(cloudFoundryClient, organizationId, username)))
+            .flatMap(function((cloudFoundryClient, organizationId, setRolesByUsernameEnabled, username) -> setOrganizationManager(cloudFoundryClient, organizationId, username)))
             .transform(OperationsLogging.log("Create Organization"))
             .checkpoint();
     }
@@ -90,12 +90,12 @@ public final class DefaultOrganizations implements Organizations {
     @Override
     public Mono<Void> delete(DeleteOrganizationRequest request) {
         return this.cloudFoundryClient
-            .then(cloudFoundryClient -> Mono.when(
+            .flatMap(cloudFoundryClient -> Mono.when(
                 Mono.just(cloudFoundryClient),
                 Mono.just(request.getCompletionTimeout()),
                 getOrganizationId(cloudFoundryClient, request.getName())
             ))
-            .then(function(DefaultOrganizations::deleteOrganization))
+            .flatMap(function(DefaultOrganizations::deleteOrganization))
             .transform(OperationsLogging.log("Delete Organization"))
             .checkpoint();
     }
@@ -103,11 +103,11 @@ public final class DefaultOrganizations implements Organizations {
     @Override
     public Mono<OrganizationDetail> get(OrganizationInfoRequest request) {
         return this.cloudFoundryClient
-            .then(cloudFoundryClient -> Mono.when(
+            .flatMap(cloudFoundryClient -> Mono.when(
                 Mono.just(cloudFoundryClient),
                 getOrganization(cloudFoundryClient, request.getName())
             ))
-            .then(function((cloudFoundryClient, organizationResource) -> getAuxiliaryContent(cloudFoundryClient, organizationResource)
+            .flatMap(function((cloudFoundryClient, organizationResource) -> getAuxiliaryContent(cloudFoundryClient, organizationResource)
                 .map(function((domains, organizationQuota, spacesQuotas, spaces) -> toOrganizationDetail(domains, organizationQuota, spacesQuotas, spaces, organizationResource, request)))))
             .transform(OperationsLogging.log("Get Organization"))
             .checkpoint();
@@ -125,11 +125,11 @@ public final class DefaultOrganizations implements Organizations {
     @Override
     public Mono<Void> rename(RenameOrganizationRequest request) {
         return this.cloudFoundryClient
-            .then(cloudFoundryClient -> Mono.when(
+            .flatMap(cloudFoundryClient -> Mono.when(
                 Mono.just(cloudFoundryClient),
                 getOrganizationId(cloudFoundryClient, request.getName())
             ))
-            .then(function((cloudFoundryClient, organizationId) -> requestUpdateOrganization(cloudFoundryClient, organizationId, request.getNewName())))
+            .flatMap(function((cloudFoundryClient, organizationId) -> requestUpdateOrganization(cloudFoundryClient, organizationId, request.getNewName())))
             .then()
             .transform(OperationsLogging.log("Rename Organization"))
             .checkpoint();
@@ -138,14 +138,14 @@ public final class DefaultOrganizations implements Organizations {
     private static Mono<String> createOrganization(CloudFoundryClient cloudFoundryClient, CreateOrganizationRequest request) {
         return Mono
             .justOrEmpty(request.getQuotaDefinitionName())
-            .then(quotaDefinitionName -> getOrganizationQuotaDefinitionId(cloudFoundryClient, quotaDefinitionName))
-            .then(organizationQuotaDefinitionId -> getCreateOrganizationId(cloudFoundryClient, request.getOrganizationName(), organizationQuotaDefinitionId))
+            .flatMap(quotaDefinitionName -> getOrganizationQuotaDefinitionId(cloudFoundryClient, quotaDefinitionName))
+            .flatMap(organizationQuotaDefinitionId -> getCreateOrganizationId(cloudFoundryClient, request.getOrganizationName(), organizationQuotaDefinitionId))
             .switchIfEmpty(getCreateOrganizationId(cloudFoundryClient, request.getOrganizationName(), null));
     }
 
     private static Mono<Void> deleteOrganization(CloudFoundryClient cloudFoundryClient, Duration completionTimeout, String organizationId) {
         return requestDeleteOrganization(cloudFoundryClient, organizationId)
-            .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, completionTimeout, job));
+            .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, completionTimeout, job));
     }
 
     private static Mono<Tuple4<List<String>, OrganizationQuota, List<SpaceQuota>, List<String>>> getAuxiliaryContent(CloudFoundryClient cloudFoundryClient, OrganizationResource organizationResource) {

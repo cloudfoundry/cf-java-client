@@ -58,7 +58,6 @@ import java.util.Optional;
 import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.cloudfoundry.util.OperationUtils.thenKeep;
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
@@ -78,7 +77,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
                 createGroupId(this.uaaClient, baseDisplayName),
                 createGroupId(this.uaaClient, memberDisplayName)
             )
-            .then(function((baseGroupId, memberGroupId) -> Mono.when(
+            .flatMap(function((baseGroupId, memberGroupId) -> Mono.when(
                 this.uaaClient.groups()
                     .addMember(AddMemberRequest.builder()
                         .groupId(baseGroupId)
@@ -108,7 +107,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
                 createGroupId(this.uaaClient, displayName),
                 createUserId(this.uaaClient, userName)
             )
-            .then(function((groupId, userId) -> Mono.when(
+            .flatMap(function((groupId, userId) -> Mono.when(
                 this.uaaClient.groups()
                     .addMember(AddMemberRequest.builder()
                         .groupId(groupId)
@@ -134,11 +133,11 @@ public final class GroupsTest extends AbstractIntegrationTest {
         String userName = this.nameFactory.getUserName();
 
         createUserId(this.uaaClient, userName)
-            .then(userId -> Mono.when(
+            .flatMap(userId -> Mono.when(
                 createGroupIdWithMember(this.uaaClient, displayName, userId),
                 Mono.just(userId)
             ))
-            .then(function((groupId, userId) -> Mono.when(
+            .flatMap(function((groupId, userId) -> Mono.when(
                 this.uaaClient.groups()
                     .checkMembership(CheckMembershipRequest.builder()
                         .groupId(groupId)
@@ -162,7 +161,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
         String userName = this.nameFactory.getUserName();
 
         createUserId(this.uaaClient, userName)
-            .then(userId -> this.uaaClient.groups()
+            .flatMap(userId -> this.uaaClient.groups()
                 .create(CreateGroupRequest.builder()
                     .displayName(displayName)
                     .member(MemberSummary.builder()
@@ -183,7 +182,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
         String displayName = this.nameFactory.getGroupName();
 
         createGroupId(this.uaaClient, displayName)
-            .then(groupId -> this.uaaClient.groups()
+            .flatMap(groupId -> this.uaaClient.groups()
                 .delete(DeleteGroupRequest.builder()
                     .groupId(groupId)
                     .build()))
@@ -199,7 +198,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
         String displayName = this.nameFactory.getGroupName();
 
         createGroupId(this.uaaClient, displayName)
-            .then(groupId -> this.uaaClient.groups()
+            .flatMap(groupId -> this.uaaClient.groups()
                 .get(GetGroupRequest.builder()
                     .groupId(groupId)
                     .build())
@@ -215,7 +214,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
         String displayName = this.nameFactory.getGroupName();
 
         createGroupId(this.uaaClient, displayName)
-            .then(groupId -> PaginationUtils
+            .flatMap(groupId -> PaginationUtils
                 .requestUaaResources(startIndex -> this.uaaClient.groups()
                     .list(ListGroupsRequest.builder()
                         .filter(String.format("id eq \"%s\"", groupId))
@@ -234,7 +233,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
         String displayName = this.nameFactory.getGroupName();
 
         createGroupId(this.uaaClient, displayName)
-            .then(groupId -> requestMapExternalGroupResponse(this.uaaClient, displayName, groupId))
+            .flatMap(groupId -> requestMapExternalGroupResponse(this.uaaClient, displayName, groupId))
             .thenMany(PaginationUtils
                 .requestUaaResources(startIndex -> this.uaaClient.groups()
                     .listExternalGroupMappings(ListExternalGroupMappingsRequest.builder()
@@ -254,11 +253,11 @@ public final class GroupsTest extends AbstractIntegrationTest {
         String userName = this.nameFactory.getUserName();
 
         createUserId(this.uaaClient, userName)
-            .then(userId -> Mono.when(
+            .flatMap(userId -> Mono.when(
                 createGroupIdWithMember(this.uaaClient, displayName, userId),
                 Mono.just(userId)
             ))
-            .then(function((groupId, userId) -> Mono.when(
+            .flatMap(function((groupId, userId) -> Mono.when(
                 this.uaaClient.groups()
                     .listMembers(ListMembersRequest.builder()
                         .groupId(groupId)
@@ -281,7 +280,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
         String userName = this.nameFactory.getUserName();
 
         createUserId(this.uaaClient, userName)
-            .then(userId -> createGroupIdWithMember(this.uaaClient, displayName, userId))
+            .flatMap(userId -> createGroupIdWithMember(this.uaaClient, displayName, userId))
             .flatMapMany(groupId -> this.uaaClient.groups()
                 .listMembers(ListMembersRequest.builder()
                     .groupId(groupId)
@@ -304,7 +303,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
         String displayName = this.nameFactory.getGroupName();
 
         createGroupId(this.uaaClient, displayName)
-            .then(groupId -> this.uaaClient.groups()
+            .flatMap(groupId -> this.uaaClient.groups()
                 .mapExternalGroup(MapExternalGroupRequest.builder()
                     .externalGroup(displayName + "-external-group")
                     .groupId(groupId)
@@ -327,11 +326,11 @@ public final class GroupsTest extends AbstractIntegrationTest {
         String userName = this.nameFactory.getUserName();
 
         createUserId(this.uaaClient, userName)
-            .then(userId -> Mono.when(
+            .flatMap(userId -> Mono.when(
                 createGroupIdWithMember(this.uaaClient, displayName, userId),
                 Mono.just(userId)
             ))
-            .then(function((groupId, userId) -> Mono.when(
+            .flatMap(function((groupId, userId) -> Mono.when(
                 this.uaaClient.groups()
                     .removeMember(RemoveMemberRequest.builder()
                         .groupId(groupId)
@@ -351,7 +350,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
         String displayName = this.nameFactory.getGroupName();
 
         createGroupId(this.uaaClient, displayName)
-            .then(groupId -> requestMapExternalGroupResponse(this.uaaClient, displayName, groupId))
+            .flatMap(groupId -> requestMapExternalGroupResponse(this.uaaClient, displayName, groupId))
             .then(this.uaaClient.groups()
                 .unmapExternalGroupByGroupDisplayName(UnmapExternalGroupByGroupDisplayNameRequest.builder()
                     .groupDisplayName(displayName)
@@ -370,8 +369,8 @@ public final class GroupsTest extends AbstractIntegrationTest {
         String displayName = this.nameFactory.getGroupName();
 
         createGroupId(this.uaaClient, displayName)
-            .as(thenKeep(groupId -> requestMapExternalGroupResponse(this.uaaClient, displayName, groupId)))
-            .then(groupId -> this.uaaClient.groups()
+            .delayUntil(groupId -> requestMapExternalGroupResponse(this.uaaClient, displayName, groupId))
+            .flatMap(groupId -> this.uaaClient.groups()
                 .unmapExternalGroupByGroupId(UnmapExternalGroupByGroupIdRequest.builder()
                     .groupId(groupId)
                     .externalGroup(displayName + "-external-group")
@@ -390,7 +389,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
         String newDisplayName = this.nameFactory.getGroupName();
 
         createGroupId(this.uaaClient, baseDisplayName)
-            .then(groupId -> this.uaaClient.groups()
+            .flatMap(groupId -> this.uaaClient.groups()
                 .update(UpdateGroupRequest.builder()
                     .displayName(newDisplayName)
                     .groupId(groupId)

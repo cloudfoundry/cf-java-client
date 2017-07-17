@@ -38,7 +38,7 @@ public final class ErrorPayloadMapper {
     @SuppressWarnings("unchecked")
     public static Function<Mono<HttpClientResponse>, Mono<HttpClientResponse>> clientV2(ObjectMapper objectMapper) {
         return inbound -> inbound
-            .then(mapToError((statusCode, payload) -> {
+            .flatMap(mapToError((statusCode, payload) -> {
                 Map<String, Object> map = objectMapper.readValue(payload, Map.class);
                 Integer code = (Integer) map.get("code");
                 String description = (String) map.get("description");
@@ -51,7 +51,7 @@ public final class ErrorPayloadMapper {
     @SuppressWarnings("unchecked")
     public static Function<Mono<HttpClientResponse>, Mono<HttpClientResponse>> clientV3(ObjectMapper objectMapper) {
         return inbound -> inbound
-            .then(mapToError((statusCode, payload) -> {
+            .flatMap(mapToError((statusCode, payload) -> {
                 List<ClientV3Exception.Error> errors = ((Map<String, List<Map<String, Object>>>) objectMapper.readValue(payload, Map.class)).get("errors").stream()
                     .map(map -> {
                         Integer code = (Integer) map.get("code");
@@ -68,20 +68,20 @@ public final class ErrorPayloadMapper {
 
     public static Function<Mono<HttpClientResponse>, Mono<HttpClientResponse>> fallback() {
         return inbound -> inbound
-            .then(response -> {
+            .flatMap(response -> {
                 if (!isError(response)) {
                     return Mono.just(response);
                 }
 
                 return response.receive().aggregate().asString()
-                    .then(payload -> Mono.error(new UnknownCloudFoundryException(response.status().code(), payload)));
+                    .flatMap(payload -> Mono.error(new UnknownCloudFoundryException(response.status().code(), payload)));
             });
     }
 
     @SuppressWarnings("unchecked")
     public static Function<Mono<HttpClientResponse>, Mono<HttpClientResponse>> uaa(ObjectMapper objectMapper) {
         return inbound -> inbound
-            .then(mapToError((statusCode, payload) -> {
+            .flatMap(mapToError((statusCode, payload) -> {
                 Map<String, Object> map = objectMapper.readValue(payload, Map.class);
                 String error = (String) map.get("error");
                 String errorDescription = (String) map.get("error_description");
@@ -103,7 +103,7 @@ public final class ErrorPayloadMapper {
 
             return response.receive().aggregate().asString()
                 .switchIfEmpty(Mono.error(new UnknownCloudFoundryException(response.status().code())))
-                .then(payload -> {
+                .flatMap(payload -> {
                     try {
                         return Mono.error(exceptionGenerator.apply(response.status().code(), payload));
                     } catch (Exception e) {

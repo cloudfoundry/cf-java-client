@@ -123,7 +123,7 @@ public final class ServicesTest extends AbstractIntegrationTest {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         this.serviceBrokerId
-            .then(serviceBrokerId -> requestCreateServiceInstance(this.cloudFoundryOperations, this.planName, serviceInstanceName, this.serviceName))
+            .flatMap(serviceBrokerId -> requestCreateServiceInstance(this.cloudFoundryOperations, this.planName, serviceInstanceName, this.serviceName))
             .then(this.cloudFoundryOperations.services()
                 .deleteInstance(DeleteServiceInstanceRequest.builder()
                     .name(serviceInstanceName)

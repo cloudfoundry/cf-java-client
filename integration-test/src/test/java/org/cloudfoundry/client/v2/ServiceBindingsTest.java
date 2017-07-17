@@ -48,7 +48,6 @@ import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.cloudfoundry.util.OperationUtils.thenKeep;
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
@@ -66,7 +65,7 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         createServiceInstanceAndApplicationIds(this.spaceId, this.cloudFoundryClient, serviceInstanceName, applicationName)
-            .then(function((serviceInstanceId, applicationId) -> Mono
+            .flatMap(function((serviceInstanceId, applicationId) -> Mono
                 .when(
                     Mono.just(serviceInstanceId),
                     Mono.just(applicationId),
@@ -84,14 +83,14 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         createServiceInstanceAndApplicationIds(this.spaceId, this.cloudFoundryClient, serviceInstanceName, applicationName)
-            .then(function((serviceInstanceId, applicationId) -> Mono
+            .flatMap(function((serviceInstanceId, applicationId) -> Mono
                 .when(
                     Mono.just(serviceInstanceId),
                     Mono.just(applicationId),
                     createServiceBindingId(this.cloudFoundryClient, applicationId, serviceInstanceId)
                 )))
-            .as(thenKeep(function((serviceInstanceId, applicationId, serviceBindingId) -> deleteServiceBinding(this.cloudFoundryClient, serviceBindingId))))
-            .then(function((serviceInstanceId, applicationId, serviceBindingId) -> requestGetServiceBinding(this.cloudFoundryClient, serviceBindingId)))
+            .delayUntil(function((serviceInstanceId, applicationId, serviceBindingId) -> deleteServiceBinding(this.cloudFoundryClient, serviceBindingId)))
+            .flatMap(function((serviceInstanceId, applicationId, serviceBindingId) -> requestGetServiceBinding(this.cloudFoundryClient, serviceBindingId)))
             .as(StepVerifier::create)
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class).hasMessageMatching("CF-ServiceBindingNotFound\\([0-9]+\\): The service binding could not be found: .*"))
             .verify(Duration.ofMinutes(5));
@@ -103,13 +102,13 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         createServiceInstanceAndApplicationIds(this.spaceId, this.cloudFoundryClient, serviceInstanceName, applicationName)
-            .then(function((serviceInstanceId, applicationId) -> Mono
+            .flatMap(function((serviceInstanceId, applicationId) -> Mono
                 .when(
                     Mono.just(serviceInstanceId),
                     Mono.just(applicationId),
                     createServiceBindingId(this.cloudFoundryClient, applicationId, serviceInstanceId)
                 )))
-            .then(function((serviceInstanceId, applicationId, serviceBindingId) -> Mono
+            .flatMap(function((serviceInstanceId, applicationId, serviceBindingId) -> Mono
                 .when(
                     Mono.just(serviceInstanceId),
                     Mono.just(applicationId),
@@ -127,13 +126,13 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         createServiceInstanceAndApplicationIds(this.spaceId, this.cloudFoundryClient, serviceInstanceName, applicationName)
-            .then(function((serviceInstanceId, applicationId) -> Mono
+            .flatMap(function((serviceInstanceId, applicationId) -> Mono
                 .when(
                     Mono.just(serviceInstanceId),
                     Mono.just(applicationId),
                     createServiceBindingId(this.cloudFoundryClient, applicationId, serviceInstanceId)
                 )))
-            .then(function((serviceInstanceId, applicationId, serviceBindingId) -> Mono
+            .flatMap(function((serviceInstanceId, applicationId, serviceBindingId) -> Mono
                 .when(
                     Mono.just(serviceInstanceId),
                     Mono.just(applicationId),
@@ -153,13 +152,13 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         createServiceInstanceAndApplicationIds(this.spaceId, this.cloudFoundryClient, serviceInstanceName, applicationName)
-            .then(function((serviceInstanceId, applicationId) -> Mono
+            .flatMap(function((serviceInstanceId, applicationId) -> Mono
                 .when(
                     Mono.just(serviceInstanceId),
                     Mono.just(applicationId),
                     createServiceBindingId(this.cloudFoundryClient, applicationId, serviceInstanceId)
                 )))
-            .then(function((serviceInstanceId, applicationId, serviceBindingId) -> Mono
+            .flatMap(function((serviceInstanceId, applicationId, serviceBindingId) -> Mono
                 .when(
                     Mono.just(serviceInstanceId),
                     Mono.just(applicationId),
@@ -179,13 +178,13 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         createServiceInstanceAndApplicationIds(this.spaceId, this.cloudFoundryClient, serviceInstanceName, applicationName)
-            .then(function((serviceInstanceId, applicationId) -> Mono
+            .flatMap(function((serviceInstanceId, applicationId) -> Mono
                 .when(
                     Mono.just(serviceInstanceId),
                     Mono.just(applicationId),
                     createServiceBindingId(this.cloudFoundryClient, applicationId, serviceInstanceId)
                 )))
-            .then(function((serviceInstanceId, applicationId, serviceBindingId) -> Mono
+            .flatMap(function((serviceInstanceId, applicationId, serviceBindingId) -> Mono
                 .when(
                     Mono.just(serviceInstanceId),
                     Mono.just(applicationId),
@@ -211,7 +210,7 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
 
     private static Mono<Tuple2<String, String>> createServiceInstanceAndApplicationIds(Mono<String> spaceId, CloudFoundryClient cloudFoundryClient, String serviceInstance, String application) {
         return spaceId
-            .then(spaceId1 -> Mono.when(
+            .flatMap(spaceId1 -> Mono.when(
                 createUserServiceInstanceId(cloudFoundryClient, spaceId1, serviceInstance),
                 createApplicationId(cloudFoundryClient, spaceId1, application)
             ));
@@ -224,7 +223,7 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
 
     private static Mono<Void> deleteServiceBinding(CloudFoundryClient cloudFoundryClient, String serviceBindingId) {
         return requestDeleteServiceBinding(cloudFoundryClient, serviceBindingId)
-            .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, Duration.ofMinutes(5), job));
+            .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, Duration.ofMinutes(5), job));
     }
 
     private static Mono<CreateApplicationResponse> requestCreateApplication(CloudFoundryClient cloudFoundryClient, String spaceId, String applicationName, String buildpack, Boolean diego, Integer

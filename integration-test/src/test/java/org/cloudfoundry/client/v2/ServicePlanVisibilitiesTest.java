@@ -64,8 +64,8 @@ public final class ServicePlanVisibilitiesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         ServiceBrokerUtils.ServiceBrokerMetadata serviceBrokerMetadata = this.organizationId
-            .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .then(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, false))
+            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .flatMap(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, false))
             .block(Duration.ofMinutes(5));
 
         Mono
@@ -73,15 +73,14 @@ public final class ServicePlanVisibilitiesTest extends AbstractIntegrationTest {
                 this.organizationId,
                 getServicePlanId(this.cloudFoundryClient, serviceBrokerMetadata.serviceBrokerId)
             )
-            .then(function((organizationId, servicePlanId) -> this.cloudFoundryClient.servicePlanVisibilities()
+            .delayUntil(function((organizationId, servicePlanId) -> this.cloudFoundryClient.servicePlanVisibilities()
                 .create(CreateServicePlanVisibilityRequest.builder()
                     .organizationId(organizationId)
                     .servicePlanId(servicePlanId)
-                    .build())
-                .then(Mono.just(Tuples.of(organizationId, servicePlanId)))))
+                    .build())))
             .flatMapMany(function((organizationId, servicePlanId) -> requestListServicePlanVisibilities(this.cloudFoundryClient, servicePlanId)
                 .single()
-                .then(response -> Mono.just(Tuples.of(ResourceUtils.getEntity(response).getOrganizationId(), organizationId)))))
+                .flatMap(response -> Mono.just(Tuples.of(ResourceUtils.getEntity(response).getOrganizationId(), organizationId)))))
             .as(StepVerifier::create)
             .consumeNextWith(tupleEquality())
             .expectComplete()
@@ -99,8 +98,8 @@ public final class ServicePlanVisibilitiesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         ServiceBrokerUtils.ServiceBrokerMetadata serviceBrokerMetadata = this.organizationId
-            .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .then(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, false))
+            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .flatMap(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, false))
             .block(Duration.ofMinutes(5));
 
         Mono
@@ -108,17 +107,17 @@ public final class ServicePlanVisibilitiesTest extends AbstractIntegrationTest {
                 this.organizationId,
                 getServicePlanId(this.cloudFoundryClient, serviceBrokerMetadata.serviceBrokerId)
             )
-            .then(function((organizationId, servicePlanId) -> Mono
+            .flatMap(function((organizationId, servicePlanId) -> Mono
                 .when(
                     Mono.just(servicePlanId),
                     createServicePlanVisibilityId(this.cloudFoundryClient, organizationId, servicePlanId)
                 )))
-            .then(function((servicePlanId, servicePlanIdVisibilityId) -> this.cloudFoundryClient.servicePlanVisibilities()
+            .flatMap(function((servicePlanId, servicePlanIdVisibilityId) -> this.cloudFoundryClient.servicePlanVisibilities()
                 .delete(DeleteServicePlanVisibilityRequest.builder()
                     .async(true)
                     .servicePlanVisibilityId(servicePlanIdVisibilityId)
                     .build())
-                .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job))
+                .flatMap(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job))
                 .then(Mono.just(servicePlanId))))
             .flatMapMany(servicePlanId -> requestListServicePlanVisibilities(this.cloudFoundryClient, servicePlanId))
             .as(StepVerifier::create)
@@ -137,8 +136,8 @@ public final class ServicePlanVisibilitiesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         ServiceBrokerUtils.ServiceBrokerMetadata serviceBrokerMetadata = this.organizationId
-            .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .then(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, false))
+            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .flatMap(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, false))
             .block(Duration.ofMinutes(5));
 
         Mono
@@ -146,12 +145,12 @@ public final class ServicePlanVisibilitiesTest extends AbstractIntegrationTest {
                 this.organizationId,
                 getServicePlanId(this.cloudFoundryClient, serviceBrokerMetadata.serviceBrokerId)
             )
-            .then(function((organizationId, servicePlanId) -> Mono
+            .flatMap(function((organizationId, servicePlanId) -> Mono
                 .when(
                     Mono.just(servicePlanId),
                     createServicePlanVisibilityId(this.cloudFoundryClient, organizationId, servicePlanId)
                 )))
-            .then(function((servicePlanId, servicePlanIdVisibilityId) -> this.cloudFoundryClient.servicePlanVisibilities()
+            .flatMap(function((servicePlanId, servicePlanIdVisibilityId) -> this.cloudFoundryClient.servicePlanVisibilities()
                 .delete(DeleteServicePlanVisibilityRequest.builder()
                     .async(false)
                     .servicePlanVisibilityId(servicePlanIdVisibilityId)
@@ -174,8 +173,8 @@ public final class ServicePlanVisibilitiesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         ServiceBrokerUtils.ServiceBrokerMetadata serviceBrokerMetadata = this.organizationId
-            .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .then(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, false))
+            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .flatMap(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, false))
             .block(Duration.ofMinutes(5));
 
         Mono
@@ -183,12 +182,12 @@ public final class ServicePlanVisibilitiesTest extends AbstractIntegrationTest {
                 this.organizationId,
                 getServicePlanId(this.cloudFoundryClient, serviceBrokerMetadata.serviceBrokerId)
             )
-            .then(function((organizationId, servicePlanId) -> Mono
+            .flatMap(function((organizationId, servicePlanId) -> Mono
                 .when(
                     Mono.just(organizationId),
                     createServicePlanVisibilityId(this.cloudFoundryClient, organizationId, servicePlanId)
                 )))
-            .then(function((organizationId, servicePlanVisibilityId) -> Mono
+            .flatMap(function((organizationId, servicePlanVisibilityId) -> Mono
                 .when(
                     Mono.just(organizationId),
                     this.cloudFoundryClient.servicePlanVisibilities()
@@ -214,8 +213,8 @@ public final class ServicePlanVisibilitiesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         ServiceBrokerUtils.ServiceBrokerMetadata serviceBrokerMetadata = this.organizationId
-            .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .then(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, false))
+            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .flatMap(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, false))
             .block(Duration.ofMinutes(5));
 
         Mono
@@ -223,7 +222,7 @@ public final class ServicePlanVisibilitiesTest extends AbstractIntegrationTest {
                 this.organizationId,
                 getServicePlanId(this.cloudFoundryClient, serviceBrokerMetadata.serviceBrokerId)
             )
-            .then(function((organizationId, servicePlanId) -> Mono
+            .flatMap(function((organizationId, servicePlanId) -> Mono
                 .when(
                     Mono.just(organizationId),
                     createServicePlanVisibilityId(this.cloudFoundryClient, organizationId, servicePlanId)
@@ -257,8 +256,8 @@ public final class ServicePlanVisibilitiesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         ServiceBrokerUtils.ServiceBrokerMetadata serviceBrokerMetadata = this.organizationId
-            .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .then(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, false))
+            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .flatMap(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, false))
             .block(Duration.ofMinutes(5));
 
         Mono
@@ -266,7 +265,7 @@ public final class ServicePlanVisibilitiesTest extends AbstractIntegrationTest {
                 this.organizationId,
                 getServicePlanId(this.cloudFoundryClient, serviceBrokerMetadata.serviceBrokerId)
             )
-            .then(function((organizationId, servicePlanId) -> Mono
+            .flatMap(function((organizationId, servicePlanId) -> Mono
                 .when(
                     Mono.just(organizationId),
                     createServicePlanVisibilityId(this.cloudFoundryClient, organizationId, servicePlanId)
@@ -301,8 +300,8 @@ public final class ServicePlanVisibilitiesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         ServiceBrokerUtils.ServiceBrokerMetadata serviceBrokerMetadata = this.organizationId
-            .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .then(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, false))
+            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .flatMap(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, false))
             .block(Duration.ofMinutes(5));
 
         Mono
@@ -310,7 +309,7 @@ public final class ServicePlanVisibilitiesTest extends AbstractIntegrationTest {
                 this.organizationId,
                 getServicePlanId(this.cloudFoundryClient, serviceBrokerMetadata.serviceBrokerId)
             )
-            .then(function((organizationId, servicePlanId) -> Mono
+            .flatMap(function((organizationId, servicePlanId) -> Mono
                 .when(
                     Mono.just(servicePlanId),
                     createServicePlanVisibilityId(this.cloudFoundryClient, organizationId, servicePlanId)
@@ -345,8 +344,8 @@ public final class ServicePlanVisibilitiesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         ServiceBrokerUtils.ServiceBrokerMetadata serviceBrokerMetadata = this.organizationId
-            .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .then(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, false))
+            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .flatMap(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, false))
             .block(Duration.ofMinutes(5));
 
         Mono
@@ -354,13 +353,13 @@ public final class ServicePlanVisibilitiesTest extends AbstractIntegrationTest {
                 this.organizationId,
                 getServicePlanId(this.cloudFoundryClient, serviceBrokerMetadata.serviceBrokerId)
             )
-            .then(function((organizationId, servicePlanId) -> Mono
+            .flatMap(function((organizationId, servicePlanId) -> Mono
                 .when(
                     createOrganizationId(this.cloudFoundryClient, organizationName),
                     Mono.just(servicePlanId),
                     createServicePlanVisibilityId(this.cloudFoundryClient, organizationId, servicePlanId)
                 )))
-            .then(function((newOrganizationId, servicePlanId, servicePlanIdVisibilityId) -> this.cloudFoundryClient.servicePlanVisibilities()
+            .flatMap(function((newOrganizationId, servicePlanId, servicePlanIdVisibilityId) -> this.cloudFoundryClient.servicePlanVisibilities()
                 .update(UpdateServicePlanVisibilityRequest.builder()
                     .organizationId(newOrganizationId)
                     .servicePlanId(servicePlanId)

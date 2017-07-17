@@ -39,7 +39,7 @@ public final class EventsTest extends AbstractIntegrationTest {
     @Test
     public void get() throws TimeoutException, InterruptedException {
         getFirstEvent(this.cloudFoundryClient)
-            .then(resource -> Mono.when(
+            .flatMap(resource -> Mono.when(
                 Mono.just(resource)
                     .map(ResourceUtils::getId),
                 this.cloudFoundryClient.events()
@@ -57,7 +57,7 @@ public final class EventsTest extends AbstractIntegrationTest {
     @Test
     public void list() throws TimeoutException, InterruptedException {
         getFirstEvent(this.cloudFoundryClient)
-            .then(resource -> Mono.when(
+            .flatMap(resource -> Mono.when(
                 Mono.just(resource),
                 this.cloudFoundryClient.events()
                     .list(ListEventsRequest.builder()
@@ -74,7 +74,7 @@ public final class EventsTest extends AbstractIntegrationTest {
     @Test
     public void listFilterByActee() throws TimeoutException, InterruptedException {
         getFirstEvent(this.cloudFoundryClient)
-            .then(resource -> Mono.when(
+            .flatMap(resource -> Mono.when(
                 Mono.just(resource),
                 this.cloudFoundryClient.events()
                     .list(ListEventsRequest.builder()
@@ -92,7 +92,7 @@ public final class EventsTest extends AbstractIntegrationTest {
     @Test
     public void listFilterByTimestamp() throws TimeoutException, InterruptedException {
         getFirstEvent(this.cloudFoundryClient)
-            .then(resource -> Mono.when(
+            .flatMap(resource -> Mono.when(
                 Mono.just(resource),
                 this.cloudFoundryClient.events()
                     .list(ListEventsRequest.builder()
@@ -110,7 +110,7 @@ public final class EventsTest extends AbstractIntegrationTest {
     @Test
     public void listFilterByType() throws TimeoutException, InterruptedException {
         getFirstEvent(this.cloudFoundryClient)
-            .then(resource -> Mono.when(
+            .flatMap(resource -> Mono.when(
                 Mono.just(resource),
                 this.cloudFoundryClient.events()
                     .list(ListEventsRequest.builder()

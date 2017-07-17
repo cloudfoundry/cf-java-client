@@ -75,8 +75,8 @@ public final class ServicesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         ServiceBrokerUtils.ServiceBrokerMetadata serviceBrokerMetadata = this.organizationId
-            .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .then(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, true))
+            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .flatMap(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, true))
             .block(Duration.ofMinutes(5));
 
         getServiceId(this.cloudFoundryClient, serviceBrokerMetadata.serviceBrokerId)
@@ -105,8 +105,8 @@ public final class ServicesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         ServiceBrokerUtils.ServiceBrokerMetadata serviceBrokerMetadata = this.organizationId
-            .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .then(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, true))
+            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .flatMap(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, true))
             .block(Duration.ofMinutes(5));
 
         getServiceId(this.cloudFoundryClient, serviceBrokerMetadata.serviceBrokerId)
@@ -135,18 +135,18 @@ public final class ServicesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         ServiceBrokerUtils.ServiceBrokerMetadata serviceBrokerMetadata = this.organizationId
-            .then(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .then(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, true))
+            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .flatMap(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, true))
             .block(Duration.ofMinutes(5));
 
         getServiceId(this.cloudFoundryClient, serviceBrokerMetadata.serviceBrokerId)
-            .then(serviceId -> this.cloudFoundryClient.services()
+            .flatMap(serviceId -> this.cloudFoundryClient.services()
                 .delete(DeleteServiceRequest.builder()
                     .async(true)
                     .purge(true)
                     .serviceId(serviceId)
                     .build()))
-            .then(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job))
+            .flatMap(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job))
             .thenMany(requestListServices(this.cloudFoundryClient, serviceBrokerMetadata.serviceBrokerId))
             .as(StepVerifier::create)
             .expectComplete()
@@ -159,8 +159,8 @@ public final class ServicesTest extends AbstractIntegrationTest {
     @Test
     public void get() {
         this.serviceBrokerId
-            .then(serviceBrokerId -> getServiceId(this.cloudFoundryClient, serviceBrokerId))
-            .then(serviceId -> this.cloudFoundryClient.services()
+            .flatMap(serviceBrokerId -> getServiceId(this.cloudFoundryClient, serviceBrokerId))
+            .flatMap(serviceId -> this.cloudFoundryClient.services()
                 .get(GetServiceRequest.builder()
                     .serviceId(serviceId)
                     .build()))
@@ -253,7 +253,7 @@ public final class ServicesTest extends AbstractIntegrationTest {
     @Test
     public void listServicePlans() {
         this.serviceBrokerId
-            .then(serviceBrokerId -> getServiceId(this.cloudFoundryClient, serviceBrokerId))
+            .flatMap(serviceBrokerId -> getServiceId(this.cloudFoundryClient, serviceBrokerId))
             .flatMapMany(serviceId -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.services()
                     .listServicePlans(ListServiceServicePlansRequest.builder()
@@ -270,7 +270,7 @@ public final class ServicesTest extends AbstractIntegrationTest {
     @Test
     public void listServicePlansFilterByActive() {
         this.serviceBrokerId
-            .then(serviceBrokerId -> getServiceId(this.cloudFoundryClient, serviceBrokerId))
+            .flatMap(serviceBrokerId -> getServiceId(this.cloudFoundryClient, serviceBrokerId))
             .flatMapMany(serviceId -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.services()
                     .listServicePlans(ListServiceServicePlansRequest.builder()
@@ -290,12 +290,12 @@ public final class ServicesTest extends AbstractIntegrationTest {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         this.serviceBrokerId
-            .then(serviceBrokerId -> Mono
+            .flatMap(serviceBrokerId -> Mono
                 .when(
                     getServiceId(this.cloudFoundryClient, serviceBrokerId),
                     this.spaceId
                 ))
-            .then(function((serviceId, spaceId) -> Mono
+            .flatMap(function((serviceId, spaceId) -> Mono
                 .when(
                     Mono.just(serviceId),
                     createServiceInstanceId(this.cloudFoundryClient, serviceInstanceName, serviceId, spaceId)
@@ -317,7 +317,7 @@ public final class ServicesTest extends AbstractIntegrationTest {
     @Test
     public void listServicePlansNoneFound() {
         this.serviceBrokerId
-            .then(serviceBrokerId -> getServiceId(this.cloudFoundryClient, serviceBrokerId))
+            .flatMap(serviceBrokerId -> getServiceId(this.cloudFoundryClient, serviceBrokerId))
             .flatMapMany(serviceId -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.services()
                     .listServicePlans(ListServiceServicePlansRequest.builder()
@@ -409,7 +409,7 @@ public final class ServicesTest extends AbstractIntegrationTest {
         return requestListServicePlans(cloudFoundryClient, serviceId)
             .single()
             .map(ResourceUtils::getId)
-            .then(servicePlanId -> requestCreateServiceInstance(cloudFoundryClient, name, servicePlanId, spaceId)
+            .flatMap(servicePlanId -> requestCreateServiceInstance(cloudFoundryClient, name, servicePlanId, spaceId)
                 .map(ResourceUtils::getId));
     }
 

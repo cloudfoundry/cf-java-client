@@ -46,7 +46,7 @@ public final class DefaultSpaceAdmin implements SpaceAdmin {
     public Mono<SpaceQuota> get(GetSpaceQuotaRequest request) {
         return Mono
             .when(this.cloudFoundryClient, this.organizationId)
-            .then(function((cloudFoundryClient, organizationId) -> getSpaceQuotaDefinition(cloudFoundryClient, organizationId, request.getName())))
+            .flatMap(function((cloudFoundryClient, organizationId) -> getSpaceQuotaDefinition(cloudFoundryClient, organizationId, request.getName())))
             .map(DefaultSpaceAdmin::toSpaceQuota)
             .transform(OperationsLogging.log("Get Space Quota"))
             .checkpoint();

@@ -109,10 +109,10 @@ public final class ReactorPackages extends AbstractClientV3Operations implements
     public Mono<UploadPackageResponse> upload(UploadPackageRequest request) {
         return post(request, UploadPackageResponse.class, builder -> builder.pathSegment("v3", "packages", request.getPackageId(), "upload"),
             outbound -> outbound
-                .then(r -> {
+                .flatMap(r -> {
                     if (Files.isDirectory(request.getBits())) {
                         return FileUtils.compress(request.getBits())
-                            .then(bits -> upload(bits, r)
+                            .flatMap(bits -> upload(bits, r)
                                 .doOnTerminate((v, t) -> {
                                     try {
                                         Files.delete(bits);
