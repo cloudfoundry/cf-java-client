@@ -53,6 +53,7 @@ abstract class _ListOrganizationServicesRequest extends PaginatedRequest {
     /**
      * The providers
      */
+    @Deprecated
     @FilterParameter("provider")
     @Nullable
     abstract List<String> getProviders();
