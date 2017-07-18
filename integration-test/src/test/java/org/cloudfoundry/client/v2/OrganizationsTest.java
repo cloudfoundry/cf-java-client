@@ -46,6 +46,7 @@ import org.cloudfoundry.client.v2.organizations.GetOrganizationResponse;
 import org.cloudfoundry.client.v2.organizations.GetOrganizationUserRolesRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationAuditorsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationBillingManagersRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationDomainsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationManagersRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationPrivateDomainsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationServicesRequest;
@@ -72,10 +73,6 @@ import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainResponse;
 import org.cloudfoundry.client.v2.privatedomains.PrivateDomainResource;
 import org.cloudfoundry.client.v2.services.ListServicesRequest;
 import org.cloudfoundry.client.v2.services.ServiceResource;
-import org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainRequest;
-import org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainResponse;
-import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
-import org.cloudfoundry.client.v2.shareddomains.SharedDomainResource;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorRequest;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorResponse;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceDeveloperRequest;
@@ -86,12 +83,10 @@ import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
-import org.cloudfoundry.client.v2.users.UserEntity;
 import org.cloudfoundry.client.v2.users.UserResource;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
@@ -111,6 +106,15 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     private CloudFoundryClient cloudFoundryClient;
 
     @Autowired
+    private Mono<String> organizationId;
+
+    @Autowired
+    private Mono<String> serviceBrokerId;
+
+    @Autowired
+    private String serviceName;
+
+    @Autowired
     private Mono<String> userId;
 
     @Autowired
@@ -126,9 +130,13 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 this.userId
             )
             .flatMap(function((organizationId, userId) -> Mono.when(
-                requestAssociateAuditor(this.cloudFoundryClient, organizationId, userId)
-                    .map(ResourceUtils::getId),
-                Mono.just(organizationId)
+                Mono.just(organizationId),
+                this.cloudFoundryClient.organizations()
+                    .associateAuditor(AssociateOrganizationAuditorRequest.builder()
+                        .auditorId(userId)
+                        .organizationId(organizationId)
+                        .build())
+                    .map(ResourceUtils::getId)
             )))
             .as(StepVerifier::create)
             .consumeNextWith(tupleEquality())
@@ -415,14 +423,21 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     public void getUserRoles() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
 
-        createOrganizationId(this.cloudFoundryClient, organizationName)
+        Mono.when(
+            createOrganizationId(this.cloudFoundryClient, organizationName),
+            this.userId
+        )
+            .flatMap(function((organizationId, userId) -> requestAssociateUser(this.cloudFoundryClient, organizationId, userId)
+                .then(Mono.just(organizationId))))
             .flatMapMany(organizationId -> PaginationUtils.
                 requestClientV2Resources(page -> this.cloudFoundryClient.organizations()
                     .getUserRoles(GetOrganizationUserRolesRequest.builder()
                         .organizationId(organizationId)
                         .page(page)
-                        .build())))
+                        .build()))
+                .map(response -> ResourceUtils.getEntity(response).getUsername()))
             .as(StepVerifier::create)
+            .expectNext(this.username)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -508,11 +523,11 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             )))
             .flatMap(function((organizationId1, organizationId2, userId) -> Mono.when(
                 Mono.just(organizationId1),
-                Mono.just(userId),
-                createSpaceId(this.cloudFoundryClient, organizationId2, spaceName)
+                createSpaceId(this.cloudFoundryClient, organizationId2, spaceName),
+                Mono.just(userId)
             )))
-            .delayUntil(function((organizationId, userId, spaceId) -> requestAssociateSpaceAuditor(this.cloudFoundryClient, spaceId, userId)))
-            .flatMap(function((organizationId, userId, spaceId) -> Mono.when(
+            .delayUntil(function((organizationId, spaceId, userId) -> requestAssociateSpaceAuditor(this.cloudFoundryClient, spaceId, userId)))
+            .flatMap(function((organizationId, spaceId, userId) -> Mono.when(
                 Mono.just(userId),
                 requestListOrganizationAuditors(this.cloudFoundryClient, organizationId, builder -> builder.auditedSpaceId(spaceId))
                     .single()
@@ -596,11 +611,11 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             )))
             .flatMap(function((organizationId1, organizationId2, userId) -> Mono.when(
                 Mono.just(organizationId1),
-                Mono.just(userId),
-                createSpaceId(this.cloudFoundryClient, organizationId2, spaceName)
+                createSpaceId(this.cloudFoundryClient, organizationId2, spaceName),
+                Mono.just(userId)
             )))
-            .delayUntil(function((organizationId, userId, spaceId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId)))
-            .flatMap(function((organizationId, userId, spaceId) -> Mono.when(
+            .delayUntil(function((organizationId, spaceId, userId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId)))
+            .flatMap(function((organizationId, spaceId, userId) -> Mono.when(
                 Mono.just(userId),
                 requestListOrganizationAuditors(this.cloudFoundryClient, organizationId, builder -> builder.managedSpaceId(spaceId))
                     .single()
@@ -612,24 +627,28 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: https://github.com/cloudfoundry/cf-java-client/issues/617
-    @Ignore("https://github.com/cloudfoundry/cf-java-client/issues/617")
     @Test
     public void listAuditorsFilterBySpaceId() throws TimeoutException, InterruptedException {
-        String organizationName = this.nameFactory.getOrganizationName();
+        String organizationName1 = this.nameFactory.getOrganizationName();
+        String organizationName2 = this.nameFactory.getOrganizationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
-        Mono
-            .when(
-                createOrganizationId(this.cloudFoundryClient, organizationName),
-                this.userId
-            )
-            .delayUntil(function((organizationId, userId) -> requestAssociateAuditor(this.cloudFoundryClient, organizationId, userId)))
-            .flatMap(function((organizationId, userId) -> Mono.when(
-                Mono.just(organizationId),
-                Mono.just(userId),
-                getUserDefaultSpaceId(this.cloudFoundryClient, userId)
+        Mono.when(
+            createOrganizationId(this.cloudFoundryClient, organizationName1),
+            createOrganizationId(this.cloudFoundryClient, organizationName2),
+            this.userId
+        )
+            .delayUntil(function((organizationId1, organizationId2, userId) -> Mono.when(
+                requestAssociateAuditor(this.cloudFoundryClient, organizationId1, userId),
+                requestAssociateUser(this.cloudFoundryClient, organizationId2, userId)
             )))
-            .flatMap(function((organizationId, userId, spaceId) -> Mono.when(
+            .flatMap(function((organizationId1, organizationId2, userId) -> Mono.when(
+                Mono.just(organizationId1),
+                createSpaceId(this.cloudFoundryClient, organizationId2, spaceName),
+                Mono.just(userId)
+            )))
+            .delayUntil(function((organizationId, spaceId, userId) -> requestAssociateSpaceDeveloper(this.cloudFoundryClient, spaceId, userId)))
+            .flatMap(function((organizationId, spaceId, userId) -> Mono.when(
                 Mono.just(userId),
                 requestListOrganizationAuditors(this.cloudFoundryClient, organizationId, builder -> builder.spaceId(spaceId))
                     .single()
@@ -708,11 +727,11 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             )))
             .flatMap(function((organizationId1, organizationId2, userId) -> Mono.when(
                 Mono.just(organizationId1),
-                Mono.just(userId),
-                createSpaceId(this.cloudFoundryClient, organizationId2, spaceName)
+                createSpaceId(this.cloudFoundryClient, organizationId2, spaceName),
+                Mono.just(userId)
             )))
-            .delayUntil(function((organizationId, userId, spaceId) -> requestAssociateSpaceAuditor(this.cloudFoundryClient, spaceId, userId)))
-            .flatMap(function((organizationId, userId, spaceId) -> Mono.when(
+            .delayUntil(function((organizationId, spaceId, userId) -> requestAssociateSpaceAuditor(this.cloudFoundryClient, spaceId, userId)))
+            .flatMap(function((organizationId, spaceId, userId) -> Mono.when(
                 Mono.just(userId),
                 requestListOrganizationBillingManagers(this.cloudFoundryClient, organizationId, builder -> builder.auditedSpaceId(spaceId))
                     .single()
@@ -796,11 +815,11 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             )))
             .flatMap(function((organizationId1, organizationId2, userId) -> Mono.when(
                 Mono.just(organizationId1),
-                Mono.just(userId),
-                createSpaceId(this.cloudFoundryClient, organizationId2, spaceName)
+                createSpaceId(this.cloudFoundryClient, organizationId2, spaceName),
+                Mono.just(userId)
             )))
-            .delayUntil(function((organizationId, userId, spaceId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId)))
-            .flatMap(function((organizationId, userId, spaceId) -> Mono.when(
+            .delayUntil(function((organizationId, spaceId, userId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId)))
+            .flatMap(function((organizationId, spaceId, userId) -> Mono.when(
                 Mono.just(userId),
                 requestListOrganizationBillingManagers(this.cloudFoundryClient, organizationId, builder -> builder.managedSpaceId(spaceId))
                     .single()
@@ -812,59 +831,79 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: https://github.com/cloudfoundry/cf-java-client/issues/617
-    @Ignore("https://github.com/cloudfoundry/cf-java-client/issues/617")
     @Test
     public void listBillingManagersFilterBySpaceId() {
+        String organizationName1 = this.nameFactory.getOrganizationName();
+        String organizationName2 = this.nameFactory.getOrganizationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
-    }
-
-    @Test
-    public void listDomainsFilterByName() throws TimeoutException, InterruptedException {
-        String organizationName = this.nameFactory.getOrganizationName();
-        String sharedDomainName = this.nameFactory.getDomainName();
-
-        Mono
-            .when(
-                createOrganizationId(this.cloudFoundryClient, organizationName),
-                createSharedDomainId(this.cloudFoundryClient, sharedDomainName)
-            )
-            .flatMapMany(function((organizationId, sharedDomainId) -> getDomainNames(this.cloudFoundryClient, organizationId, builder -> builder.name(sharedDomainName))))
+        Mono.when(
+            createOrganizationId(this.cloudFoundryClient, organizationName1),
+            createOrganizationId(this.cloudFoundryClient, organizationName2),
+            this.userId
+        )
+            .delayUntil(function((organizationId1, organizationId2, userId) -> Mono.when(
+                requestAssociateBillingManager(this.cloudFoundryClient, organizationId1, userId),
+                requestAssociateUser(this.cloudFoundryClient, organizationId2, userId)
+            )))
+            .flatMap(function((organizationId1, organizationId2, userId) -> Mono.when(
+                Mono.just(organizationId1),
+                createSpaceId(this.cloudFoundryClient, organizationId2, spaceName),
+                Mono.just(userId)
+            )))
+            .delayUntil(function((organizationId, spaceId, userId) -> requestAssociateSpaceDeveloper(this.cloudFoundryClient, spaceId, userId)))
+            .flatMap(function((organizationId, spaceId, userId) -> Mono.when(
+                Mono.just(userId),
+                requestListOrganizationBillingManagers(this.cloudFoundryClient, organizationId, builder -> builder.spaceId(spaceId))
+                    .single()
+                    .map(ResourceUtils::getId)
+            )))
             .as(StepVerifier::create)
-            .expectNextCount(1)
+            .consumeNextWith(tupleEquality())
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
 
+    @SuppressWarnings("deprecation")
     @Test
-    public void listDomainsPrivate() throws TimeoutException, InterruptedException {
+    public void listDomains() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String privateDomainName = this.nameFactory.getDomainName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .delayUntil(organizationId -> createPrivateDomainId(this.cloudFoundryClient, organizationId, privateDomainName))
-            .flatMapMany(organizationId -> getDomainNames(this.cloudFoundryClient, organizationId))
+            .flatMapMany(organizationId -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.organizations()
+                    .listDomains(ListOrganizationDomainsRequest.builder()
+                        .organizationId(organizationId)
+                        .page(page)
+                        .build()))
+                .map(response -> ResourceUtils.getEntity(response).getName()))
             .filter(privateDomainName::equals)
             .as(StepVerifier::create)
-            .expectNextCount(1)
+            .expectNext(privateDomainName)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
 
+    @SuppressWarnings("deprecation")
     @Test
-    public void listDomainsShared() throws TimeoutException, InterruptedException {
+    public void listDomainsFilterByName() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
-        String sharedDomainName = this.nameFactory.getDomainName();
+        String privateDomainName = this.nameFactory.getDomainName();
 
-        Mono
-            .when(
-                createOrganizationId(this.cloudFoundryClient, organizationName),
-                createSharedDomainId(this.cloudFoundryClient, sharedDomainName)
-            )
-            .flatMapMany(function((organizationId, sharedDomainId) -> getDomainNames(this.cloudFoundryClient, organizationId)))
-            .filter(sharedDomainName::equals)
+        createOrganizationId(this.cloudFoundryClient, organizationName)
+            .delayUntil(organizationId -> createPrivateDomainId(this.cloudFoundryClient, organizationId, privateDomainName))
+            .flatMapMany(organizationId -> PaginationUtils
+                .requestClientV2Resources(page -> this.cloudFoundryClient.organizations()
+                    .listDomains(ListOrganizationDomainsRequest.builder()
+                        .name(privateDomainName)
+                        .organizationId(organizationId)
+                        .page(page)
+                        .build()))
+                .map(response -> ResourceUtils.getEntity(response).getName()))
             .as(StepVerifier::create)
-            .expectNextCount(1)
+            .expectNext(privateDomainName)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -1063,11 +1102,11 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             )))
             .flatMap(function((organizationId1, organizationId2, userId) -> Mono.when(
                 Mono.just(organizationId1),
-                Mono.just(userId),
-                createSpaceId(this.cloudFoundryClient, organizationId2, spaceName)
+                createSpaceId(this.cloudFoundryClient, organizationId2, spaceName),
+                Mono.just(userId)
             )))
-            .delayUntil(function((organizationId, userId, spaceId) -> requestAssociateSpaceAuditor(this.cloudFoundryClient, spaceId, userId)))
-            .flatMap(function((organizationId, userId, spaceId) -> Mono.when(
+            .delayUntil(function((organizationId, spaceId, userId) -> requestAssociateSpaceAuditor(this.cloudFoundryClient, spaceId, userId)))
+            .flatMap(function((organizationId, spaceId, userId) -> Mono.when(
                 Mono.just(userId),
                 requestListOrganizationManagers(this.cloudFoundryClient, organizationId, builder -> builder.auditedSpaceId(spaceId))
                     .single()
@@ -1151,11 +1190,11 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             )))
             .flatMap(function((organizationId1, organizationId2, userId) -> Mono.when(
                 Mono.just(organizationId1),
-                Mono.just(userId),
-                createSpaceId(this.cloudFoundryClient, organizationId2, spaceName)
+                createSpaceId(this.cloudFoundryClient, organizationId2, spaceName),
+                Mono.just(userId)
             )))
-            .delayUntil(function((organizationId, userId, spaceId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId)))
-            .flatMap(function((organizationId, userId, spaceId) -> Mono.when(
+            .delayUntil(function((organizationId, spaceId, userId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId)))
+            .flatMap(function((organizationId, spaceId, userId) -> Mono.when(
                 Mono.just(userId),
                 requestListOrganizationManagers(this.cloudFoundryClient, organizationId, builder -> builder.managedSpaceId(spaceId))
                     .single()
@@ -1167,24 +1206,28 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: https://github.com/cloudfoundry/cf-java-client/issues/617
-    @Ignore("https://github.com/cloudfoundry/cf-java-client/issues/617")
     @Test
     public void listManagersFilterBySpaceId() throws TimeoutException, InterruptedException {
-        String organizationName = this.nameFactory.getOrganizationName();
+        String organizationName1 = this.nameFactory.getOrganizationName();
+        String organizationName2 = this.nameFactory.getOrganizationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
-        Mono
-            .when(
-                createOrganizationId(this.cloudFoundryClient, organizationName),
-                this.userId
-            )
-            .delayUntil(function((organizationId, userId) -> requestAssociateManager(this.cloudFoundryClient, organizationId, userId)))
-            .flatMap(function((organizationId, userId) -> Mono.when(
-                Mono.just(organizationId),
-                Mono.just(userId),
-                getUserDefaultSpaceId(this.cloudFoundryClient, userId)
+        Mono.when(
+            createOrganizationId(this.cloudFoundryClient, organizationName1),
+            createOrganizationId(this.cloudFoundryClient, organizationName2),
+            this.userId
+        )
+            .delayUntil(function((organizationId1, organizationId2, userId) -> Mono.when(
+                requestAssociateManager(this.cloudFoundryClient, organizationId1, userId),
+                requestAssociateUser(this.cloudFoundryClient, organizationId2, userId)
             )))
-            .flatMap(function((organizationId, userId, spaceId) -> Mono.when(
+            .flatMap(function((organizationId1, organizationId2, userId) -> Mono.when(
+                Mono.just(organizationId1),
+                createSpaceId(this.cloudFoundryClient, organizationId2, spaceName),
+                Mono.just(userId)
+            )))
+            .delayUntil(function((organizationId, spaceId, userId) -> requestAssociateSpaceDeveloper(this.cloudFoundryClient, spaceId, userId)))
+            .flatMap(function((organizationId, spaceId, userId) -> Mono.when(
                 Mono.just(userId),
                 requestListOrganizationManagers(this.cloudFoundryClient, organizationId, builder -> builder.spaceId(spaceId))
                     .single()
@@ -1246,51 +1289,52 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/619
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/619")
     @Test
     public void listServices() throws TimeoutException, InterruptedException {
-        String organizationName = this.nameFactory.getOrganizationName();
-
-        Mono
-            .when(
-                requestListServices(this.cloudFoundryClient)
-                    .count(),
-                createOrganizationId(this.cloudFoundryClient, organizationName)
-                    .flatMap(organizationId -> requestListOrganizationServices(this.cloudFoundryClient, organizationId)
-                        .count()))
+        Mono.when(this.organizationId, this.serviceBrokerId)
+            .flatMapMany(function((organizationId, serviceBrokerId) -> requestListOrganizationServices(this.cloudFoundryClient, organizationId)
+                .filter(resource -> serviceBrokerId.equals(ResourceUtils.getEntity(resource).getServiceBrokerId()))))
+            .map(response -> response.getEntity().getLabel())
             .as(StepVerifier::create)
-            .consumeNextWith(tupleEquality())
+            .expectNext(this.serviceName)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/619
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/619")
     @Test
     public void listServicesFilterByActive() {
-        //
+        Mono.when(this.organizationId, this.serviceBrokerId)
+            .flatMapMany(function((organizationId, serviceBrokerId) -> requestListOrganizationServices(this.cloudFoundryClient, organizationId, builder -> builder.active(true))
+                .filter(resource -> serviceBrokerId.equals(ResourceUtils.getEntity(resource).getServiceBrokerId()))))
+            .map(response -> response.getEntity().getLabel())
+            .as(StepVerifier::create)
+            .expectNext(this.serviceName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/619
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/619")
     @Test
     public void listServicesFilterByLabel() {
-        //
+        Mono.when(this.organizationId, this.serviceBrokerId)
+            .flatMapMany(function((organizationId, serviceBrokerId) -> requestListOrganizationServices(this.cloudFoundryClient, organizationId, builder -> builder.label(this.serviceName))
+                .filter(resource -> serviceBrokerId.equals(ResourceUtils.getEntity(resource).getServiceBrokerId()))))
+            .map(response -> response.getEntity().getLabel())
+            .as(StepVerifier::create)
+            .expectNext(this.serviceName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/619
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/619")
-    @Test
-    public void listServicesFilterByProvider() {
-        //
-    }
-
-    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/619
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/619")
     @Test
     public void listServicesFilterByServiceBrokerId() {
-        //
+        Mono.when(this.organizationId, this.serviceBrokerId)
+            .flatMapMany(function((organizationId, serviceBrokerId) -> requestListOrganizationServices(this.cloudFoundryClient, organizationId, builder -> builder.serviceBrokerId(serviceBrokerId))
+                .filter(resource -> serviceBrokerId.equals(ResourceUtils.getEntity(resource).getServiceBrokerId()))))
+            .map(response -> response.getEntity().getLabel())
+            .as(StepVerifier::create)
+            .expectNext(this.serviceName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -1469,11 +1513,11 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             )))
             .flatMap(function((organizationId1, organizationId2, userId) -> Mono.when(
                 Mono.just(organizationId1),
-                Mono.just(userId),
-                createSpaceId(this.cloudFoundryClient, organizationId2, spaceName)
+                createSpaceId(this.cloudFoundryClient, organizationId2, spaceName),
+                Mono.just(userId)
             )))
-            .delayUntil(function((organizationId, userId, spaceId) -> requestAssociateSpaceAuditor(this.cloudFoundryClient, spaceId, userId)))
-            .flatMap(function((organizationId, userId, spaceId) -> Mono.when(
+            .delayUntil(function((organizationId, spaceId, userId) -> requestAssociateSpaceAuditor(this.cloudFoundryClient, spaceId, userId)))
+            .flatMap(function((organizationId, spaceId, userId) -> Mono.when(
                 Mono.just(userId),
                 requestListOrganizationUsers(this.cloudFoundryClient, organizationId, builder -> builder.auditedSpaceId(spaceId))
                     .single()
@@ -1557,11 +1601,11 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             )))
             .flatMap(function((organizationId1, organizationId2, userId) -> Mono.when(
                 Mono.just(organizationId1),
-                Mono.just(userId),
-                createSpaceId(this.cloudFoundryClient, organizationId2, spaceName)
+                createSpaceId(this.cloudFoundryClient, organizationId2, spaceName),
+                Mono.just(userId)
             )))
-            .delayUntil(function((organizationId, userId, spaceId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId)))
-            .flatMap(function((organizationId, userId, spaceId) -> Mono.when(
+            .delayUntil(function((organizationId, spaceId, userId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId)))
+            .flatMap(function((organizationId, spaceId, userId) -> Mono.when(
                 Mono.just(userId),
                 requestListOrganizationUsers(this.cloudFoundryClient, organizationId, builder -> builder.managedSpaceId(spaceId))
                     .single()
@@ -1573,26 +1617,30 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: https://github.com/cloudfoundry/cf-java-client/issues/617
-    @Ignore("https://github.com/cloudfoundry/cf-java-client/issues/617")
     @Test
     public void listUsersFilterBySpaceId() throws TimeoutException, InterruptedException {
-        String organizationName = this.nameFactory.getOrganizationName();
+        String organizationName1 = this.nameFactory.getOrganizationName();
+        String organizationName2 = this.nameFactory.getOrganizationName();
+        String spaceName = this.nameFactory.getSpaceName();
 
-        Mono
-            .when(
-                createOrganizationId(this.cloudFoundryClient, organizationName),
-                this.userId
-            )
-            .delayUntil(function((organizationId, userId) -> requestAssociateAuditor(this.cloudFoundryClient, organizationId, userId)))
-            .flatMap(function((organizationId, userId) -> Mono.when(
-                Mono.just(organizationId),
-                Mono.just(userId),
-                getUserDefaultSpaceId(this.cloudFoundryClient, userId)
+        Mono.when(
+            createOrganizationId(this.cloudFoundryClient, organizationName1),
+            createOrganizationId(this.cloudFoundryClient, organizationName2),
+            this.userId
+        )
+            .delayUntil(function((organizationId1, organizationId2, userId) -> Mono.when(
+                requestAssociateUser(this.cloudFoundryClient, organizationId1, userId),
+                requestAssociateUser(this.cloudFoundryClient, organizationId2, userId)
             )))
-            .flatMap(function((organizationId, userId, spaceId) -> Mono.when(
+            .flatMap(function((organizationId1, organizationId2, userId) -> Mono.when(
+                Mono.just(organizationId1),
+                createSpaceId(this.cloudFoundryClient, organizationId2, spaceName),
+                Mono.just(userId)
+            )))
+            .delayUntil(function((organizationId, spaceId, userId) -> requestAssociateSpaceDeveloper(this.cloudFoundryClient, spaceId, userId)))
+            .flatMap(function((organizationId, spaceId, userId) -> Mono.when(
                 Mono.just(userId),
-                requestListOrganizationAuditors(this.cloudFoundryClient, organizationId, builder -> builder.spaceId(spaceId))
+                requestListOrganizationUsers(this.cloudFoundryClient, organizationId, builder -> builder.spaceId(spaceId))
                     .single()
                     .map(ResourceUtils::getId)
             )))
@@ -1848,33 +1896,16 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             .map(ResourceUtils::getId);
     }
 
-    private static Mono<String> createSharedDomainId(CloudFoundryClient cloudFoundryClient, String sharedDomainName) {
-        return requestCreateSharedDomain(cloudFoundryClient, sharedDomainName)
-            .map(ResourceUtils::getId);
-    }
-
     private static Mono<String> createSpaceId(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceName) {
         return requestCreateSpace(cloudFoundryClient, organizationId, spaceName)
             .map(ResourceUtils::getId);
-    }
-
-    private static Flux<String> getDomainNames(CloudFoundryClient cloudFoundryClient, String organizationId) {
-        return getDomainNames(cloudFoundryClient, organizationId, UnaryOperator.identity());
-    }
-
-    private static Flux<String> getDomainNames(CloudFoundryClient cloudFoundryClient, String organizationId, UnaryOperator<ListSharedDomainsRequest.Builder> transformer) {
-        return requestListPrivateDomains(cloudFoundryClient, organizationId)
-            .map(resource -> ResourceUtils.getEntity(resource).getName())
-            .mergeWith(requestListSharedDomains(cloudFoundryClient, transformer)
-                .map(resource -> ResourceUtils.getEntity(resource).getName()));
     }
 
     private static Mono<String> getUserDefaultSpaceId(CloudFoundryClient cloudFoundryClient, String userId) {
         return requestListUsers(cloudFoundryClient)
             .filter(resource -> userId.equals(ResourceUtils.getId(resource)))
             .single()
-            .map(ResourceUtils::getEntity)
-            .map(UserEntity::getDefaultSpaceId);
+            .map(resource -> ResourceUtils.getEntity(resource).getDefaultSpaceId());
     }
 
     private static Mono<AssociateOrganizationAuditorResponse> requestAssociateAuditor(CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
@@ -1966,13 +1997,6 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             .create(CreatePrivateDomainRequest.builder()
                 .name(domainName)
                 .owningOrganizationId(organizationId)
-                .build());
-    }
-
-    private static Mono<CreateSharedDomainResponse> requestCreateSharedDomain(CloudFoundryClient cloudFoundryClient, String sharedDomainName) {
-        return cloudFoundryClient.sharedDomains()
-            .create(CreateSharedDomainRequest.builder()
-                .name(sharedDomainName)
                 .build());
     }
 
@@ -2099,27 +2123,10 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .build()));
     }
 
-    private static Flux<PrivateDomainResource> requestListPrivateDomains(CloudFoundryClient cloudFoundryClient, String organizationId) {
-        return PaginationUtils
-            .requestClientV2Resources(page -> cloudFoundryClient.organizations()
-                .listPrivateDomains(ListOrganizationPrivateDomainsRequest.builder()
-                    .organizationId(organizationId)
-                    .page(page)
-                    .build()));
-    }
-
     private static Flux<ServiceResource> requestListServices(CloudFoundryClient cloudFoundryClient) {
         return PaginationUtils.
             requestClientV2Resources(page -> cloudFoundryClient.services()
                 .list(ListServicesRequest.builder()
-                    .build()));
-    }
-
-    private static Flux<SharedDomainResource> requestListSharedDomains(CloudFoundryClient cloudFoundryClient, UnaryOperator<ListSharedDomainsRequest.Builder> transformer) {
-        return PaginationUtils
-            .requestClientV2Resources(page -> cloudFoundryClient.sharedDomains()
-                .list(transformer.apply(ListSharedDomainsRequest.builder())
-                    .page(page)
                     .build()));
     }
 
