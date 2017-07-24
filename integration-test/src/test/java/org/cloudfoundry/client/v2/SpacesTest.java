@@ -26,7 +26,6 @@ import org.cloudfoundry.client.v2.events.EventResource;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationBillingManagerRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerRequest;
-import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserResponse;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
@@ -89,9 +88,13 @@ import org.cloudfoundry.client.v2.spaces.RemoveSpaceSecurityGroupRequest;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.client.v2.spaces.UpdateSpaceRequest;
 import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
-import org.cloudfoundry.client.v2.users.ListUsersRequest;
+import org.cloudfoundry.client.v2.users.CreateUserRequest;
 import org.cloudfoundry.client.v2.users.UserEntity;
 import org.cloudfoundry.client.v2.users.UserResource;
+import org.cloudfoundry.uaa.UaaClient;
+import org.cloudfoundry.uaa.users.CreateUserResponse;
+import org.cloudfoundry.uaa.users.Email;
+import org.cloudfoundry.uaa.users.Name;
 import org.cloudfoundry.util.DateUtils;
 import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.JobUtils;
@@ -140,17 +143,15 @@ public final class SpacesTest extends AbstractIntegrationTest {
     private String stackName;
 
     @Autowired
-    private Mono<String> userId;
-
-    @Autowired
-    private String username;
+    private UaaClient uaaClient;
 
     @Test
     public void associateAuditor() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+        String userName = this.nameFactory.getUserName();
 
-        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
+        createSpaceIdAndUserId(this.cloudFoundryClient, this.uaaClient, organizationName, spaceName, userName)
             .then(function((spaceId, userId) -> Mono.when(
                 Mono.just(spaceId),
                 this.cloudFoundryClient.spaces()
@@ -170,18 +171,19 @@ public final class SpacesTest extends AbstractIntegrationTest {
     public void associateAuditorByUsername() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+        String userName = this.nameFactory.getUserName();
 
-        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
+        createSpaceIdAndUserId(this.cloudFoundryClient, this.uaaClient, organizationName, spaceName, userName)
             .as(thenKeep(function((spaceId, userId) -> this.cloudFoundryClient.spaces()
                 .associateAuditorByUsername(AssociateSpaceAuditorByUsernameRequest.builder()
                     .spaceId(spaceId)
-                    .username(this.username)
+                    .username(userName)
                     .build()))))
             .flatMapMany(function((spaceId, userId) -> requestListSpaceAuditors(this.cloudFoundryClient, spaceId)
                 .map(ResourceUtils::getEntity)
                 .map(UserEntity::getUsername)))
             .as(StepVerifier::create)
-            .expectNext(this.username)
+            .expectNext(userName)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -190,8 +192,9 @@ public final class SpacesTest extends AbstractIntegrationTest {
     public void associateDeveloper() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+        String userName = this.nameFactory.getUserName();
 
-        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
+        createSpaceIdAndUserId(this.cloudFoundryClient, this.uaaClient, organizationName, spaceName, userName)
             .then(function((spaceId, userId) -> Mono.when(
                 Mono.just(spaceId),
                 this.cloudFoundryClient.spaces()
@@ -211,17 +214,18 @@ public final class SpacesTest extends AbstractIntegrationTest {
     public void associateDeveloperByUsername() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+        String userName = this.nameFactory.getUserName();
 
-        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
+        createSpaceIdAndUserId(this.cloudFoundryClient, this.uaaClient, organizationName, spaceName, userName)
             .as(thenKeep(function((spaceId, userId) -> this.cloudFoundryClient.spaces()
                 .associateDeveloperByUsername(AssociateSpaceDeveloperByUsernameRequest.builder()
                     .spaceId(spaceId)
-                    .username(this.username)
+                    .username(userName)
                     .build()))))
             .flatMapMany(function((spaceId, userId) -> requestListSpaceDevelopers(this.cloudFoundryClient, spaceId)
                 .map(response -> ResourceUtils.getEntity(response).getUsername())))
             .as(StepVerifier::create)
-            .expectNext(this.username)
+            .expectNext(userName)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -230,8 +234,9 @@ public final class SpacesTest extends AbstractIntegrationTest {
     public void associateManager() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+        String userName = this.nameFactory.getUserName();
 
-        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
+        createSpaceIdAndUserId(this.cloudFoundryClient, this.uaaClient, organizationName, spaceName, userName)
             .then(function((spaceId, userId) -> Mono.when(
                 Mono.just(spaceId),
                 this.cloudFoundryClient.spaces()
@@ -251,17 +256,18 @@ public final class SpacesTest extends AbstractIntegrationTest {
     public void associateManagerByUsername() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+        String userName = this.nameFactory.getUserName();
 
-        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
+        createSpaceIdAndUserId(this.cloudFoundryClient, this.uaaClient, organizationName, spaceName, userName)
             .as(thenKeep(function((spaceId, userId) -> this.cloudFoundryClient.spaces()
                 .associateManagerByUsername(AssociateSpaceManagerByUsernameRequest.builder()
                     .spaceId(spaceId)
-                    .username(this.username)
+                    .username(userName)
                     .build()))))
             .flatMapMany(function((spaceId, userId) -> requestListSpaceManagers(this.cloudFoundryClient, spaceId)
                 .map(response -> ResourceUtils.getEntity(response).getUsername())))
             .as(StepVerifier::create)
-            .expectNext(this.username)
+            .expectNext(userName)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -509,8 +515,9 @@ public final class SpacesTest extends AbstractIntegrationTest {
     public void listAuditors() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+        String userName = this.nameFactory.getUserName();
 
-        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
+        createSpaceIdAndUserId(this.cloudFoundryClient, this.uaaClient, organizationName, spaceName, userName)
             .as(thenKeep(function((spaceId, userId) -> this.cloudFoundryClient.spaces()
                 .associateAuditor(AssociateSpaceAuditorRequest.builder()
                     .spaceId(spaceId)
@@ -524,7 +531,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                         .build()))))
             .map(response -> ResourceUtils.getEntity(response).getUsername())
             .as(StepVerifier::create)
-            .expectNext(this.username)
+            .expectNext(userName)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -533,8 +540,9 @@ public final class SpacesTest extends AbstractIntegrationTest {
     public void listDevelopers() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+        String userName = this.nameFactory.getUserName();
 
-        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
+        createSpaceIdAndUserId(this.cloudFoundryClient, this.uaaClient, organizationName, spaceName, userName)
             .as(thenKeep(function((spaceId, userId) -> this.cloudFoundryClient.spaces()
                 .associateDeveloper(AssociateSpaceDeveloperRequest.builder()
                     .spaceId(spaceId)
@@ -548,7 +556,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                         .build()))))
             .map(response -> ResourceUtils.getEntity(response).getUsername())
             .as(StepVerifier::create)
-            .expectNext(this.username)
+            .expectNext(userName)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -671,17 +679,13 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void listFilterByDeveloperId() {
+        String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+        String userName = this.nameFactory.getUserName();
 
-        Mono.when(this.organizationId, this.userId)
-            .then(function((organizationId, userId) -> Mono
-                .when(
-                    requestAssociateUser(this.cloudFoundryClient, organizationId, userId),
-                    createSpaceId(this.cloudFoundryClient, organizationId, spaceName),
-                    this.userId
-                )))
-            .as(thenKeep(function((ignore, spaceId, userId) -> requestAssociateSpaceDeveloper(this.cloudFoundryClient, userId, spaceId))))
-            .then(function((ignore, spaceId, userId) -> Mono.when(
+        createSpaceIdAndUserId(this.cloudFoundryClient, this.uaaClient, organizationName, spaceName, userName)
+            .as(thenKeep(function((spaceId, userId) -> requestAssociateSpaceDeveloper(this.cloudFoundryClient, userId, spaceId))))
+            .then(function((spaceId, userId) -> Mono.when(
                 Mono.just(spaceId),
                 requestListSpaces(this.cloudFoundryClient, builder -> builder.developerId(userId))
                     .single()
@@ -733,13 +737,14 @@ public final class SpacesTest extends AbstractIntegrationTest {
     public void listManagers() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+        String userName = this.nameFactory.getUserName();
 
-        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
+        createSpaceIdAndUserId(this.cloudFoundryClient, this.uaaClient, organizationName, spaceName, userName)
             .as(thenKeep(function((spaceId, userId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId))))
             .flatMapMany(function((spaceId, userId) -> requestListSpaceManagers(this.cloudFoundryClient, spaceId)
                 .map(response -> ResourceUtils.getEntity(response).getUsername())))
             .as(StepVerifier::create)
-            .expectNext(this.username)
+            .expectNext(userName)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -748,10 +753,11 @@ public final class SpacesTest extends AbstractIntegrationTest {
     public void listManagersFilterByAuditedOrganizationId() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+        String userName = this.nameFactory.getUserName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .then(organizationId -> Mono.when(
-                createUserId(this.cloudFoundryClient, organizationId, this.username),
+                createUserId(this.cloudFoundryClient, this.uaaClient, organizationId, userName),
                 createSpaceId(this.cloudFoundryClient, organizationId, spaceName),
                 Mono.just(organizationId)
             ))
@@ -765,7 +771,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .flatMapMany(function((userId, spaceId, organizationId) -> requestListSpaceManagers(this.cloudFoundryClient, spaceId, builder -> builder.auditedOrganizationId(organizationId))
                 .map(response -> ResourceUtils.getEntity(response).getUsername())))
             .as(StepVerifier::create)
-            .expectNext(this.username)
+            .expectNext(userName)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -774,8 +780,9 @@ public final class SpacesTest extends AbstractIntegrationTest {
     public void listManagersFilterByAuditedSpaceId() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+        String userName = this.nameFactory.getUserName();
 
-        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
+        createSpaceIdAndUserId(this.cloudFoundryClient, this.uaaClient, organizationName, spaceName, userName)
             .as(thenKeep(function((spaceId, userId) -> Mono.when(
                 requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId),
                 requestAssociateSpaceAuditor(this.cloudFoundryClient, spaceId, userId)
@@ -783,7 +790,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .flatMapMany(function((spaceId, userId) -> requestListSpaceManagers(this.cloudFoundryClient, spaceId, builder -> builder.auditedSpaceId(spaceId))
                 .map(response -> ResourceUtils.getEntity(response).getUsername())))
             .as(StepVerifier::create)
-            .expectNext(this.username)
+            .expectNext(userName)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -792,10 +799,11 @@ public final class SpacesTest extends AbstractIntegrationTest {
     public void listManagersFilterByBillingManagedOrganizationId() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+        String userName = this.nameFactory.getUserName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .then(organizationId -> Mono.when(
-                createUserId(this.cloudFoundryClient, organizationId, this.username),
+                createUserId(this.cloudFoundryClient, this.uaaClient, organizationId, userName),
                 createSpaceId(this.cloudFoundryClient, organizationId, spaceName),
                 Mono.just(organizationId)
             ))
@@ -823,10 +831,11 @@ public final class SpacesTest extends AbstractIntegrationTest {
     public void listManagersFilterByManagedOrganizationId() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+        String userName = this.nameFactory.getUserName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .then(organizationId -> Mono.when(
-                createUserId(this.cloudFoundryClient, organizationId, this.username),
+                createUserId(this.cloudFoundryClient, this.uaaClient, organizationId, userName),
                 createSpaceId(this.cloudFoundryClient, organizationId, spaceName),
                 Mono.just(organizationId)
             ))
@@ -854,13 +863,14 @@ public final class SpacesTest extends AbstractIntegrationTest {
     public void listManagersFilterByManagedSpaceId() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+        String userName = this.nameFactory.getUserName();
 
-        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
+        createSpaceIdAndUserId(this.cloudFoundryClient, this.uaaClient, organizationName, spaceName, userName)
             .as(thenKeep(function((spaceId, userId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId))))
             .flatMapMany(function((spaceId, userId) -> requestListSpaceManagers(this.cloudFoundryClient, spaceId, builder -> builder.managedSpaceId(spaceId))
                 .map(response -> ResourceUtils.getEntity(response).getUsername())))
             .as(StepVerifier::create)
-            .expectNext(this.username)
+            .expectNext(userName)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -869,10 +879,11 @@ public final class SpacesTest extends AbstractIntegrationTest {
     public void listManagersFilterByOrganizationId() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+        String userName = this.nameFactory.getUserName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .then(organizationId -> Mono.when(
-                createUserId(this.cloudFoundryClient, organizationId, this.username),
+                createUserId(this.cloudFoundryClient, this.uaaClient, organizationId, userName),
                 createSpaceId(this.cloudFoundryClient, organizationId, spaceName),
                 Mono.just(organizationId)
             ))
@@ -1261,8 +1272,9 @@ public final class SpacesTest extends AbstractIntegrationTest {
     public void listUserRoles() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+        String userName = this.nameFactory.getUserName();
 
-        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
+        createSpaceIdAndUserId(this.cloudFoundryClient, this.uaaClient, organizationName, spaceName, userName)
             .as(thenKeep(function((spaceId, userId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId))))
             .flatMapMany(function((spaceId, userId) -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.spaces()
@@ -1273,7 +1285,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 .map(ResourceUtils::getEntity)))
             .as(StepVerifier::create)
             .consumeNextWith(entity -> {
-                assertThat(entity.getUsername()).isEqualTo(this.username);
+                assertThat(entity.getUsername()).isEqualTo(userName);
                 assertThat(entity.getSpaceRoles()).containsExactly("space_manager");
             })
             .expectComplete()
@@ -1284,8 +1296,9 @@ public final class SpacesTest extends AbstractIntegrationTest {
     public void removeAuditor() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+        String userName = this.nameFactory.getUserName();
 
-        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
+        createSpaceIdAndUserId(this.cloudFoundryClient, this.uaaClient, organizationName, spaceName, userName)
             .as(thenKeep(function((spaceId, userId) -> requestAssociateSpaceAuditor(this.cloudFoundryClient, spaceId, userId))))
             .as(thenKeep(function((spaceId, userId) -> this.cloudFoundryClient.spaces()
                 .removeAuditor(RemoveSpaceAuditorRequest.builder()
@@ -1302,13 +1315,14 @@ public final class SpacesTest extends AbstractIntegrationTest {
     public void removeAuditorByUsername() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+        String userName = this.nameFactory.getUserName();
 
-        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
+        createSpaceIdAndUserId(this.cloudFoundryClient, this.uaaClient, organizationName, spaceName, userName)
             .as(thenKeep(function((spaceId, userId) -> requestAssociateSpaceAuditor(this.cloudFoundryClient, spaceId, userId))))
             .as(thenKeep(function((spaceId, userId) -> this.cloudFoundryClient.spaces()
                 .removeAuditorByUsername(RemoveSpaceAuditorByUsernameRequest.builder()
                     .spaceId(spaceId)
-                    .username(this.username)
+                    .username(userName)
                     .build()))))
             .flatMapMany(function((spaceId, userId) -> requestListSpaceAuditors(this.cloudFoundryClient, spaceId)))
             .as(StepVerifier::create)
@@ -1320,8 +1334,9 @@ public final class SpacesTest extends AbstractIntegrationTest {
     public void removeDeveloper() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+        String userName = this.nameFactory.getUserName();
 
-        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
+        createSpaceIdAndUserId(this.cloudFoundryClient, this.uaaClient, organizationName, spaceName, userName)
             .as(thenKeep(function((spaceId, userId) -> requestAssociateSpaceDeveloper(this.cloudFoundryClient, userId, spaceId))))
             .as(thenKeep(function((spaceId, userId) -> this.cloudFoundryClient.spaces()
                 .removeDeveloper(RemoveSpaceDeveloperRequest.builder()
@@ -1338,13 +1353,14 @@ public final class SpacesTest extends AbstractIntegrationTest {
     public void removeDeveloperByUsername() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+        String userName = this.nameFactory.getUserName();
 
-        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
+        createSpaceIdAndUserId(this.cloudFoundryClient, this.uaaClient, organizationName, spaceName, userName)
             .as(thenKeep(function((spaceId, userId) -> requestAssociateSpaceDeveloper(this.cloudFoundryClient, userId, spaceId))))
             .as(thenKeep(function((spaceId, userId) -> this.cloudFoundryClient.spaces()
                 .removeDeveloperByUsername(RemoveSpaceDeveloperByUsernameRequest.builder()
                     .spaceId(spaceId)
-                    .username(this.username)
+                    .username(userName)
                     .build()))))
             .flatMapMany(function((spaceId, userId) -> requestListSpaceDevelopers(this.cloudFoundryClient, spaceId)))
             .as(StepVerifier::create)
@@ -1356,8 +1372,9 @@ public final class SpacesTest extends AbstractIntegrationTest {
     public void removeManager() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+        String userName = this.nameFactory.getUserName();
 
-        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
+        createSpaceIdAndUserId(this.cloudFoundryClient, this.uaaClient, organizationName, spaceName, userName)
             .as(thenKeep(function((spaceId, userId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId))))
             .as(thenKeep(function((spaceId, userId) -> this.cloudFoundryClient.spaces()
                 .removeManager(RemoveSpaceManagerRequest.builder()
@@ -1374,13 +1391,14 @@ public final class SpacesTest extends AbstractIntegrationTest {
     public void removeManagerByUsername() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+        String userName = this.nameFactory.getUserName();
 
-        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
+        createSpaceIdAndUserId(this.cloudFoundryClient, this.uaaClient, organizationName, spaceName, userName)
             .as(thenKeep(function((spaceId, userId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId))))
             .as(thenKeep(function((spaceId, userId) -> this.cloudFoundryClient.spaces()
                 .removeManagerByUsername(RemoveSpaceManagerByUsernameRequest.builder()
                     .spaceId(spaceId)
-                    .username(this.username)
+                    .username(userName)
                     .build()))))
             .flatMapMany(function((spaceId, userId) -> requestListSpaceManagers(this.cloudFoundryClient, spaceId)))
             .as(StepVerifier::create)
@@ -1440,8 +1458,9 @@ public final class SpacesTest extends AbstractIntegrationTest {
     public void updateEmptyManagers() throws TimeoutException, InterruptedException {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
+        String userName = this.nameFactory.getUserName();
 
-        createUserIdAndSpaceId(this.cloudFoundryClient, organizationName, spaceName, this.username)
+        createSpaceIdAndUserId(this.cloudFoundryClient, this.uaaClient, organizationName, spaceName, userName)
             .as(thenKeep(function((spaceId, userId) -> requestAssociateSpaceManager(this.cloudFoundryClient, spaceId, userId))))
             .as(thenKeep(function((spaceId, userId) -> this.cloudFoundryClient.spaces()
                 .update(UpdateSpaceRequest.builder()
@@ -1508,6 +1527,14 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .map(ResourceUtils::getId);
     }
 
+    private static Mono<Tuple2<String, String>> createSpaceIdAndUserId(CloudFoundryClient cloudFoundryClient, UaaClient uaaClient, String organizationName, String spaceName, String userName) {
+        return createOrganizationId(cloudFoundryClient, organizationName)
+            .then(organizationId -> Mono.when(
+                createSpaceId(cloudFoundryClient, organizationId, spaceName),
+                createUserId(cloudFoundryClient, uaaClient, organizationId, userName)
+            ));
+    }
+
     private static Mono<String> createSpaceIdWithDomain(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceName, String domainName) {
         return cloudFoundryClient.sharedDomains()
             .create(CreateSharedDomainRequest.builder()
@@ -1523,30 +1550,32 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .map(ResourceUtils::getId);
     }
 
-    // TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/643 to really create a new user
-    private static Mono<String> createUserId(CloudFoundryClient cloudFoundryClient, String organizationId, String username) {
-        return cloudFoundryClient.organizations()
-            .associateUserByUsername(AssociateOrganizationUserByUsernameRequest.builder()
-                .organizationId(organizationId)
-                .username(username)
+    private static Mono<String> createUserId(CloudFoundryClient cloudFoundryClient, UaaClient uaaClient, String organizationId, String username) {
+        return uaaClient.users()
+            .create(org.cloudfoundry.uaa.users.CreateUserRequest.builder()
+                .email(Email.builder()
+                    .primary(true)
+                    .value(String.format("%s@%s.com", username, username))
+                    .build())
+                .name(Name.builder()
+                    .givenName("Test")
+                    .familyName("User")
+                    .build())
+                .password("test-password")
+                .userName(username)
                 .build())
-            .then(PaginationUtils
-                .requestClientV2Resources(page -> cloudFoundryClient.users()
-                    .list(ListUsersRequest.builder()
-                        .organizationId(organizationId)
-                        .page(page)
-                        .build()))
-                .filter(resource -> ResourceUtils.getEntity(resource).getUsername().equals(username))
-                .single()
-                .map(ResourceUtils::getId));
-    }
-
-    private static Mono<Tuple2<String, String>> createUserIdAndSpaceId(CloudFoundryClient cloudFoundryClient, String organizationName, String spaceName, String userName) {
-        return createOrganizationId(cloudFoundryClient, organizationName)
-            .then(organizationId -> Mono.when(
-                createSpaceId(cloudFoundryClient, organizationId, spaceName),
-                createUserId(cloudFoundryClient, organizationId, userName)
-            ));
+            .map(CreateUserResponse::getId)
+            .then(uaaId -> cloudFoundryClient.users()
+                .create(CreateUserRequest.builder()
+                    .uaaId(uaaId)
+                    .build())
+                .map(ResourceUtils::getId))
+            .then(userId -> cloudFoundryClient.organizations()
+                .associateUser(AssociateOrganizationUserRequest.builder()
+                    .organizationId(organizationId)
+                    .userId(userId)
+                    .build())
+                .then(Mono.just(userId)));
     }
 
     private static String getPastTimestamp() {
