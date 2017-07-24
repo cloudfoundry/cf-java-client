@@ -20,6 +20,8 @@ import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.jobs.JobEntity;
+import org.cloudfoundry.client.v2.routemappings.RouteMappingEntity;
+import org.cloudfoundry.client.v2.routemappings.RouteMappingResource;
 import org.cloudfoundry.client.v2.routes.AssociateRouteApplicationRequest;
 import org.cloudfoundry.client.v2.routes.AssociateRouteApplicationResponse;
 import org.cloudfoundry.client.v2.routes.CreateRouteRequest;
@@ -30,6 +32,8 @@ import org.cloudfoundry.client.v2.routes.GetRouteRequest;
 import org.cloudfoundry.client.v2.routes.GetRouteResponse;
 import org.cloudfoundry.client.v2.routes.ListRouteApplicationsRequest;
 import org.cloudfoundry.client.v2.routes.ListRouteApplicationsResponse;
+import org.cloudfoundry.client.v2.routes.ListRouteMappingsRequest;
+import org.cloudfoundry.client.v2.routes.ListRouteMappingsResponse;
 import org.cloudfoundry.client.v2.routes.ListRoutesRequest;
 import org.cloudfoundry.client.v2.routes.ListRoutesResponse;
 import org.cloudfoundry.client.v2.routes.RemoveRouteApplicationRequest;
@@ -357,6 +361,45 @@ public final class ReactorRoutesTest extends AbstractClientApiTest {
                         .stackUrl("/v2/stacks/0459956d-e777-412d-af7e-d45f8d172edc")
                         .state("STOPPED")
                         .version("51207851-f39e-428e-9a16-1372f4d6d4f6")
+                        .build())
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void listMappings() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/v2/routes/521c375d-a7e2-4f87-9527-7fd1db1b2010/route_mappings")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/routes/GET_{id}_route_mappings_response.json")
+                .build())
+            .build());
+
+        this.routes
+            .listMappings(ListRouteMappingsRequest.builder()
+                .routeId("521c375d-a7e2-4f87-9527-7fd1db1b2010")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ListRouteMappingsResponse.builder()
+                .totalResults(1)
+                .totalPages(1)
+                .resource(RouteMappingResource.builder()
+                    .metadata(Metadata.builder()
+                        .createdAt("2016-06-08T16:41:28Z")
+                        .id("9feb9667-9249-44b7-9e4e-92157a2aaefb")
+                        .updatedAt("2016-06-08T16:41:26Z")
+                        .url("/v2/route_mappings/9feb9667-9249-44b7-9e4e-92157a2aaefb")
+                        .build())
+                    .entity(RouteMappingEntity.builder()
+                        .applicationId("bf65b03d-5416-4603-9de2-ef74491d29b6")
+                        .applicationUrl("/v2/apps/bf65b03d-5416-4603-9de2-ef74491d29b6")
+                        .routeId("521c375d-a7e2-4f87-9527-7fd1db1b2010")
+                        .routeUrl("/v2/routes/521c375d-a7e2-4f87-9527-7fd1db1b2010")
                         .build())
                     .build())
                 .build())

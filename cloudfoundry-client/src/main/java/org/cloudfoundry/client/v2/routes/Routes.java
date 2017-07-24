@@ -80,6 +80,14 @@ public interface Routes {
     Mono<ListRouteApplicationsResponse> listApplications(ListRouteApplicationsRequest request);
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/routes/list_all_route_mappings_for_the_route.html">List all Route Mappings for the Route</a> request
+     *
+     * @param request the List all Route Mappings for the Route request
+     * @return the response from the List all Route Mappings for the Route request
+     */
+    Mono<ListRouteMappingsResponse> listMappings(ListRouteMappingsRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/routes/remove_app_from_the_route.html">Remove Application from the Route</a> request
      *
      * @param request the Remove Application from the Route request
