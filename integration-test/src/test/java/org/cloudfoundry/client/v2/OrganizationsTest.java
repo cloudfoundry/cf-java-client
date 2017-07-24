@@ -1328,8 +1328,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     @Test
     public void listServicesFilterByServiceBrokerId() {
         Mono.when(this.organizationId, this.serviceBrokerId)
-            .flatMapMany(function((organizationId, serviceBrokerId) -> requestListOrganizationServices(this.cloudFoundryClient, organizationId, builder -> builder.serviceBrokerId(serviceBrokerId))
-                .filter(resource -> serviceBrokerId.equals(ResourceUtils.getEntity(resource).getServiceBrokerId()))))
+            .flatMapMany(function((organizationId, serviceBrokerId) -> requestListOrganizationServices(this.cloudFoundryClient, organizationId, builder -> builder.serviceBrokerId(serviceBrokerId))))
             .map(response -> response.getEntity().getLabel())
             .as(StepVerifier::create)
             .expectNext(this.serviceName)
