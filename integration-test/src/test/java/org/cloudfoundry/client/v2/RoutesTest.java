@@ -22,6 +22,8 @@ import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
 import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainRequest;
 import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainResponse;
+import org.cloudfoundry.client.v2.routemappings.CreateRouteMappingRequest;
+import org.cloudfoundry.client.v2.routemappings.CreateRouteMappingResponse;
 import org.cloudfoundry.client.v2.routes.AssociateRouteApplicationRequest;
 import org.cloudfoundry.client.v2.routes.AssociateRouteApplicationResponse;
 import org.cloudfoundry.client.v2.routes.CreateRouteRequest;
@@ -30,6 +32,7 @@ import org.cloudfoundry.client.v2.routes.DeleteRouteRequest;
 import org.cloudfoundry.client.v2.routes.GetRouteRequest;
 import org.cloudfoundry.client.v2.routes.GetRouteResponse;
 import org.cloudfoundry.client.v2.routes.ListRouteApplicationsRequest;
+import org.cloudfoundry.client.v2.routes.ListRouteMappingsRequest;
 import org.cloudfoundry.client.v2.routes.ListRoutesRequest;
 import org.cloudfoundry.client.v2.routes.RemoveRouteApplicationRequest;
 import org.cloudfoundry.client.v2.routes.RouteEntity;
@@ -177,12 +180,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     .then(organizationId -> createPrivateDomainId(this.cloudFoundryClient, domainName, organizationId)),
                 this.spaceId
             )
-            .as(thenKeep(function((domainId, spaceId) -> this.cloudFoundryClient.routes()
-                .create(CreateRouteRequest.builder()
-                    .domainId(domainId)
-                    .host(hostName)
-                    .spaceId(spaceId)
-                    .build()))))
+            .as(thenKeep(function((domainId, spaceId) -> requestCreateRoute(this.cloudFoundryClient, domainId, hostName, spaceId))))
             .then(function((domainId, spaceId) -> this.cloudFoundryClient.routes()
                 .exists(RouteExistsRequest.builder()
                     .domainId(domainId)
@@ -470,12 +468,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                     .then(organizationId -> createPrivateDomainId(this.cloudFoundryClient, domainName, organizationId)),
                 this.spaceId
             )
-            .then(function((domainId, spaceId) -> this.cloudFoundryClient.routes()
-                .create(CreateRouteRequest.builder()
-                    .domainId(domainId)
-                    .host(host)
-                    .spaceId(spaceId)
-                    .build())))
+            .then(function((domainId, spaceId) -> requestCreateRoute(this.cloudFoundryClient, domainId, host, spaceId)))
             .flatMapMany(response -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.routes()
                     .list(ListRoutesRequest.builder()
@@ -538,6 +531,71 @@ public final class RoutesTest extends AbstractIntegrationTest {
                         .build())))
             .as(StepVerifier::create)
             .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void listMappings() throws TimeoutException, InterruptedException {
+        String applicationName = this.nameFactory.getApplicationName();
+        String domainName = this.nameFactory.getDomainName();
+
+        Mono
+            .when(
+                this.organizationId
+                    .then(organizationId -> createPrivateDomainId(this.cloudFoundryClient, domainName, organizationId)),
+                this.spaceId
+            )
+            .then(function((domainId, spaceId) -> Mono.when(
+                createApplicationId(this.cloudFoundryClient, spaceId, applicationName, null),
+                createRouteId(this.cloudFoundryClient, domainId, spaceId)
+            )))
+            .as(thenKeep(function((applicationId, routeId) -> requestCreateRouteMapping(this.cloudFoundryClient, applicationId, routeId))))
+            .flatMapMany(function((applicationId, routeId) -> Mono.when(
+                Mono.just(applicationId),
+                PaginationUtils
+                    .requestClientV2Resources(page -> this.cloudFoundryClient.routes()
+                        .listMappings(ListRouteMappingsRequest.builder()
+                            .page(page)
+                            .routeId(routeId)
+                            .build()))
+                    .single()
+                    .map(response -> ResourceUtils.getEntity(response).getApplicationId()))))
+            .as(StepVerifier::create)
+            .consumeNextWith(tupleEquality())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void listMappingsFilterByApplicationId() throws TimeoutException, InterruptedException {
+        String applicationName = this.nameFactory.getApplicationName();
+        String domainName = this.nameFactory.getDomainName();
+
+        Mono
+            .when(
+                this.organizationId
+                    .then(organizationId -> createPrivateDomainId(this.cloudFoundryClient, domainName, organizationId)),
+                this.spaceId
+            )
+            .then(function((domainId, spaceId) -> Mono.when(
+                createApplicationId(this.cloudFoundryClient, spaceId, applicationName, null),
+                createRouteId(this.cloudFoundryClient, domainId, spaceId)
+            )))
+            .as(thenKeep(function((applicationId, routeId) -> requestCreateRouteMapping(this.cloudFoundryClient, applicationId, routeId))))
+            .flatMapMany(function((applicationId, routeId) -> Mono.when(
+                Mono.just(applicationId),
+                PaginationUtils
+                    .requestClientV2Resources(page -> this.cloudFoundryClient.routes()
+                        .listMappings(ListRouteMappingsRequest.builder()
+                            .applicationId(applicationId)
+                            .page(page)
+                            .routeId(routeId)
+                            .build()))
+                    .single()
+                    .map(response -> ResourceUtils.getEntity(response).getApplicationId()))))
+            .as(StepVerifier::create)
+            .consumeNextWith(tupleEquality())
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -651,6 +709,23 @@ public final class RoutesTest extends AbstractIntegrationTest {
             .create(CreateRouteRequest.builder()
                 .domainId(domainId)
                 .spaceId(spaceId)
+                .build());
+    }
+
+    private static Mono<CreateRouteResponse> requestCreateRoute(CloudFoundryClient cloudFoundryClient, String domainId, String host, String spaceId) {
+        return cloudFoundryClient.routes()
+            .create(CreateRouteRequest.builder()
+                .domainId(domainId)
+                .host(host)
+                .spaceId(spaceId)
+                .build());
+    }
+
+    private static Mono<CreateRouteMappingResponse> requestCreateRouteMapping(CloudFoundryClient cloudFoundryClient, String applicationId, String routeId) {
+        return cloudFoundryClient.routeMappings()
+            .create(CreateRouteMappingRequest.builder()
+                .applicationId(applicationId)
+                .routeId(routeId)
                 .build());
     }
 

@@ -26,6 +26,8 @@ import org.cloudfoundry.client.v2.routes.GetRouteRequest;
 import org.cloudfoundry.client.v2.routes.GetRouteResponse;
 import org.cloudfoundry.client.v2.routes.ListRouteApplicationsRequest;
 import org.cloudfoundry.client.v2.routes.ListRouteApplicationsResponse;
+import org.cloudfoundry.client.v2.routes.ListRouteMappingsRequest;
+import org.cloudfoundry.client.v2.routes.ListRouteMappingsResponse;
 import org.cloudfoundry.client.v2.routes.ListRoutesRequest;
 import org.cloudfoundry.client.v2.routes.ListRoutesResponse;
 import org.cloudfoundry.client.v2.routes.RemoveRouteApplicationRequest;
@@ -105,6 +107,12 @@ public final class ReactorRoutes extends AbstractClientV2Operations implements R
     @Override
     public Mono<ListRouteApplicationsResponse> listApplications(ListRouteApplicationsRequest request) {
         return get(request, ListRouteApplicationsResponse.class, builder -> builder.pathSegment("v2", "routes", request.getRouteId(), "apps"))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<ListRouteMappingsResponse> listMappings(ListRouteMappingsRequest request) {
+        return get(request, ListRouteMappingsResponse.class, builder -> builder.pathSegment("v2", "routes", request.getRouteId(), "route_mappings"))
             .checkpoint();
     }
 
