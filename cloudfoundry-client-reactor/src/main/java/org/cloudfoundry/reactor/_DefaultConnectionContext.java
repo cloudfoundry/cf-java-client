@@ -41,7 +41,6 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -103,15 +102,7 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
             getConnectTimeout().ifPresent(socketTimeout -> options.option(CONNECT_TIMEOUT_MILLIS, (int) socketTimeout.toMillis()));
             getKeepAlive().ifPresent(keepAlive -> options.option(SO_KEEPALIVE, keepAlive));
             getSslHandshakeTimeout().ifPresent(options::sslHandshakeTimeout);
-
-            getProxyConfiguration()
-                .ifPresent(c -> options.proxy(proxyOptions -> {
-                    proxyOptions.host(c.getHost());
-
-                    c.getPort().ifPresent(proxyOptions::port);
-                    c.getUsername().ifPresent(proxyOptions::username);
-                    c.getPassword().map(password -> (Function<String, String>) s -> password).ifPresent(proxyOptions::password);
-                }));
+            getProxyConfiguration().ifPresent(c -> c.configure(options));
         });
     }
 

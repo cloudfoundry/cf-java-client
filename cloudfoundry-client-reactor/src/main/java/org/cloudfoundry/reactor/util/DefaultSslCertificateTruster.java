@@ -38,7 +38,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
 
 public final class DefaultSslCertificateTruster implements SslCertificateTruster {
 
@@ -118,14 +117,7 @@ public final class DefaultSslCertificateTruster implements SslCertificateTruster
                 .disablePool()
                 .sslSupport(ssl -> ssl.trustManager(new StaticTrustManagerFactory(collector)));
 
-            proxyConfiguration
-                .ifPresent(c -> options.proxy(proxyOptions -> {
-                    proxyOptions.host(c.getHost());
-
-                    c.getPort().ifPresent(proxyOptions::port);
-                    c.getUsername().ifPresent(proxyOptions::username);
-                    c.getPassword().map(password -> (Function<String, String>) s -> password).ifPresent(proxyOptions::password);
-                }));
+            proxyConfiguration.ifPresent(c -> c.configure(options));
         });
     }
 
