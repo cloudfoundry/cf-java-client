@@ -29,7 +29,7 @@ final class EventStreamCodec {
 
     static Flux<ServerSentEvent> decode(HttpClientResponse response) {
         return response.addHandler(createDecoder()).receive().asString()
-            .windowWhile(s -> !s.isEmpty(), Integer.MAX_VALUE) // TODO: Remove Prefetch with reactor-core 3.0.6
+            .windowWhile(s -> !s.isEmpty())
             .concatMap(window -> window
                 .reduce(ServerSentEvent.builder(), EventStreamCodec::parseLine))
             .map(ServerSentEvent.Builder::build)
