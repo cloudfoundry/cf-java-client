@@ -17,63 +17,230 @@
 package org.cloudfoundry.client.v2;
 
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.NameFactory;
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.junit.Ignore;
+import org.cloudfoundry.client.v2.serviceinstances.CreateServiceInstanceRequest;
+import org.cloudfoundry.client.v2.serviceinstances.CreateServiceInstanceResponse;
+import org.cloudfoundry.client.v2.serviceplans.ListServicePlansRequest;
+import org.cloudfoundry.client.v2.serviceplans.ServicePlanResource;
+import org.cloudfoundry.client.v2.services.ListServicesRequest;
+import org.cloudfoundry.client.v2.services.ServiceResource;
+import org.cloudfoundry.client.v2.serviceusageevents.GetServiceUsageEventRequest;
+import org.cloudfoundry.client.v2.serviceusageevents.ListServiceUsageEventsRequest;
+import org.cloudfoundry.client.v2.serviceusageevents.PurgeAndReseedServiceUsageEventsRequest;
+import org.cloudfoundry.client.v2.serviceusageevents.ServiceUsageEventResource;
+import org.cloudfoundry.util.PaginationUtils;
+import org.cloudfoundry.util.ResourceUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
+
+import java.time.Duration;
+import java.util.concurrent.TimeoutException;
+
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public final class ServiceUsageEventsTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
 
-    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/619
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/619")
+    @Autowired
+    private Mono<String> serviceBrokerId;
+
+    @Autowired
+    private Mono<String> spaceId;
+
     @Test
-    public void get() {
-        //
+    public void get() throws TimeoutException, InterruptedException {
+        Mono.when(this.serviceBrokerId, this.spaceId)
+            .then(function((serviceBrokerId, spaceId) -> seedEvents(this.cloudFoundryClient, this.nameFactory, serviceBrokerId, spaceId)))
+            .then(getFirstEvent(this.cloudFoundryClient))
+            .then(resource -> Mono.when(
+                Mono.just(resource)
+                    .map(ResourceUtils::getId),
+                this.cloudFoundryClient.serviceUsageEvents()
+                    .get(GetServiceUsageEventRequest.builder()
+                        .serviceUsageEventId(ResourceUtils.getId(resource))
+                        .build())
+                    .map(ResourceUtils::getId)
+            ))
+            .as(StepVerifier::create)
+            .consumeNextWith(tupleEquality())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/619
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/619")
     @Test
-    public void list() {
-        //
+    public void list() throws TimeoutException, InterruptedException {
+        Mono.when(this.serviceBrokerId, this.spaceId)
+            .then(function((serviceBrokerId, spaceId) -> seedEvents(this.cloudFoundryClient, this.nameFactory, serviceBrokerId, spaceId)))
+            .then(getFirstEvent(this.cloudFoundryClient))
+            .then(resource -> Mono.when(
+                Mono.just(resource),
+                this.cloudFoundryClient.serviceUsageEvents()
+                    .list(ListServiceUsageEventsRequest.builder()
+                        .build())
+                    .flatMapMany(ResourceUtils::getResources)
+                    .next()
+            ))
+            .as(StepVerifier::create)
+            .consumeNextWith(tupleEquality())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/619
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/619")
     @Test
     public void listAfterServiceUsageEventId() {
-        //
+        Mono.when(this.serviceBrokerId, this.spaceId)
+            .then(function((serviceBrokerId, spaceId) -> seedEvents(this.cloudFoundryClient, this.nameFactory, serviceBrokerId, spaceId)))
+            .then(getFirstEvent(this.cloudFoundryClient))
+            .then(resource -> Mono.when(
+                getSecondEvent(this.cloudFoundryClient),
+                this.cloudFoundryClient.serviceUsageEvents()
+                    .list(ListServiceUsageEventsRequest.builder()
+                        .afterServiceUsageEventId(ResourceUtils.getId(resource))
+                        .build())
+                    .flatMapMany(ResourceUtils::getResources)
+                    .next()
+            ))
+            .as(StepVerifier::create)
+            .consumeNextWith(tupleEquality())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/619
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/619")
     @Test
     public void listFilterByServiceId() {
-        //
+        Mono.when(this.serviceBrokerId, this.spaceId)
+            .then(function((serviceBrokerId, spaceId) -> seedEvents(this.cloudFoundryClient, this.nameFactory, serviceBrokerId, spaceId)))
+            .then(getFirstEvent(this.cloudFoundryClient))
+            .then(resource -> Mono.when(
+                Mono.just(resource),
+                this.cloudFoundryClient.serviceUsageEvents()
+                    .list(ListServiceUsageEventsRequest.builder()
+                        .serviceId(ResourceUtils.getEntity(resource).getServiceId())
+                        .build())
+                    .flatMapMany(ResourceUtils::getResources)
+                    .next()
+            ))
+            .as(StepVerifier::create)
+            .consumeNextWith(tupleEquality())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/619
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/619")
     @Test
     public void listFilterByServiceInstanceType() {
-        //
+        Mono.when(this.serviceBrokerId, this.spaceId)
+            .then(function((serviceBrokerId, spaceId) -> seedEvents(this.cloudFoundryClient, this.nameFactory, serviceBrokerId, spaceId)))
+            .then(getFirstEvent(this.cloudFoundryClient))
+            .then(resource -> Mono.when(
+                Mono.just(resource),
+                this.cloudFoundryClient.serviceUsageEvents()
+                    .list(ListServiceUsageEventsRequest.builder()
+                        .serviceInstanceType(ResourceUtils.getEntity(resource).getServiceInstanceType())
+                        .build())
+                    .flatMapMany(ResourceUtils::getResources)
+                    .next()
+            ))
+            .as(StepVerifier::create)
+            .consumeNextWith(tupleEquality())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/619
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/619")
     @Test
     public void listNoneFound() {
-        //
+        this.cloudFoundryClient.serviceUsageEvents()
+            .list(ListServiceUsageEventsRequest.builder()
+                .serviceId("test-service-id")
+                .build())
+            .flatMapMany(ResourceUtils::getResources)
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/619
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/619")
     @Test
     public void purgeAndReseed() {
-        //
+        this.cloudFoundryClient.serviceUsageEvents()
+            .purgeAndReseed(PurgeAndReseedServiceUsageEventsRequest.builder()
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    private static Mono<ServiceUsageEventResource> getFirstEvent(CloudFoundryClient cloudFoundryClient) {
+        return listServiceUsageEvents(cloudFoundryClient)
+            .next();
+    }
+
+    private static Mono<String> getPlanId(CloudFoundryClient cloudFoundryClient, String serviceBrokerId) {
+        return requestListServices(cloudFoundryClient, serviceBrokerId)
+            .single()
+            .map(ResourceUtils::getId)
+            .flatMapMany(serviceId -> requestListServicePlans(cloudFoundryClient, serviceId))
+            .single()
+            .map(ResourceUtils::getId);
+    }
+
+    private static Mono<ServiceUsageEventResource> getSecondEvent(CloudFoundryClient cloudFoundryClient) {
+        return listServiceUsageEvents(cloudFoundryClient)
+            .skip(1)
+            .next();
+    }
+
+    private static Flux<ServiceUsageEventResource> listServiceUsageEvents(CloudFoundryClient cloudFoundryClient) {
+        return cloudFoundryClient.serviceUsageEvents()
+            .list(ListServiceUsageEventsRequest.builder()
+                .build())
+            .flatMapMany(ResourceUtils::getResources)
+            .filter(resource -> ResourceUtils.getEntity(resource).getServiceId() != null);
+    }
+
+    private static Mono<CreateServiceInstanceResponse> requestCreateServiceInstance(CloudFoundryClient cloudFoundryClient, String planId, String serviceInstanceName, String spaceId) {
+        return cloudFoundryClient.serviceInstances()
+            .create(CreateServiceInstanceRequest.builder()
+                .name(serviceInstanceName)
+                .parameter("test-key", "test-value")
+                .servicePlanId(planId)
+                .spaceId(spaceId)
+                .build());
+    }
+
+    private static Flux<ServicePlanResource> requestListServicePlans(CloudFoundryClient cloudFoundryClient, String serviceId) {
+        return PaginationUtils
+            .requestClientV2Resources(page -> cloudFoundryClient.servicePlans()
+                .list(ListServicePlansRequest.builder()
+                    .page(page)
+                    .serviceId(serviceId)
+                    .build()));
+    }
+
+    private static Flux<ServiceResource> requestListServices(CloudFoundryClient cloudFoundryClient, String serviceBrokerId) {
+        return PaginationUtils
+            .requestClientV2Resources(page -> cloudFoundryClient.services()
+                .list(ListServicesRequest.builder()
+                    .page(page)
+                    .serviceBrokerId(serviceBrokerId)
+                    .build()));
+    }
+
+    private static Mono<Void> seedEvents(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory, String serviceBrokerId, String spaceId) {
+        String serviceInstanceName1 = nameFactory.getServiceInstanceName();
+        String serviceInstanceName2 = nameFactory.getServiceInstanceName();
+
+        return getPlanId(cloudFoundryClient, serviceBrokerId)
+            .then(planId -> Mono
+                .when(
+                    requestCreateServiceInstance(cloudFoundryClient, planId, serviceInstanceName1, spaceId),
+                    requestCreateServiceInstance(cloudFoundryClient, planId, serviceInstanceName2, spaceId)
+                ))
+            .then();
     }
 
 }
