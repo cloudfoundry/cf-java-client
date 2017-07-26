@@ -56,9 +56,9 @@ public final class ServiceUsageEventsTest extends AbstractIntegrationTest {
     @Test
     public void get() throws TimeoutException, InterruptedException {
         Mono.when(this.serviceBrokerId, this.spaceId)
-            .then(function((serviceBrokerId, spaceId) -> seedEvents(this.cloudFoundryClient, this.nameFactory, serviceBrokerId, spaceId)))
+            .flatMap(function((serviceBrokerId, spaceId) -> seedEvents(this.cloudFoundryClient, this.nameFactory, serviceBrokerId, spaceId)))
             .then(getFirstEvent(this.cloudFoundryClient))
-            .then(resource -> Mono.when(
+            .flatMap(resource -> Mono.when(
                 Mono.just(resource)
                     .map(ResourceUtils::getId),
                 this.cloudFoundryClient.serviceUsageEvents()
@@ -76,9 +76,9 @@ public final class ServiceUsageEventsTest extends AbstractIntegrationTest {
     @Test
     public void list() throws TimeoutException, InterruptedException {
         Mono.when(this.serviceBrokerId, this.spaceId)
-            .then(function((serviceBrokerId, spaceId) -> seedEvents(this.cloudFoundryClient, this.nameFactory, serviceBrokerId, spaceId)))
+            .flatMap(function((serviceBrokerId, spaceId) -> seedEvents(this.cloudFoundryClient, this.nameFactory, serviceBrokerId, spaceId)))
             .then(getFirstEvent(this.cloudFoundryClient))
-            .then(resource -> Mono.when(
+            .flatMap(resource -> Mono.when(
                 Mono.just(resource),
                 this.cloudFoundryClient.serviceUsageEvents()
                     .list(ListServiceUsageEventsRequest.builder()
@@ -95,9 +95,9 @@ public final class ServiceUsageEventsTest extends AbstractIntegrationTest {
     @Test
     public void listAfterServiceUsageEventId() {
         Mono.when(this.serviceBrokerId, this.spaceId)
-            .then(function((serviceBrokerId, spaceId) -> seedEvents(this.cloudFoundryClient, this.nameFactory, serviceBrokerId, spaceId)))
+            .flatMap(function((serviceBrokerId, spaceId) -> seedEvents(this.cloudFoundryClient, this.nameFactory, serviceBrokerId, spaceId)))
             .then(getFirstEvent(this.cloudFoundryClient))
-            .then(resource -> Mono.when(
+            .flatMap(resource -> Mono.when(
                 getSecondEvent(this.cloudFoundryClient),
                 this.cloudFoundryClient.serviceUsageEvents()
                     .list(ListServiceUsageEventsRequest.builder()
@@ -115,9 +115,9 @@ public final class ServiceUsageEventsTest extends AbstractIntegrationTest {
     @Test
     public void listFilterByServiceId() {
         Mono.when(this.serviceBrokerId, this.spaceId)
-            .then(function((serviceBrokerId, spaceId) -> seedEvents(this.cloudFoundryClient, this.nameFactory, serviceBrokerId, spaceId)))
+            .flatMap(function((serviceBrokerId, spaceId) -> seedEvents(this.cloudFoundryClient, this.nameFactory, serviceBrokerId, spaceId)))
             .then(getFirstEvent(this.cloudFoundryClient))
-            .then(resource -> Mono.when(
+            .flatMap(resource -> Mono.when(
                 Mono.just(resource),
                 this.cloudFoundryClient.serviceUsageEvents()
                     .list(ListServiceUsageEventsRequest.builder()
@@ -135,9 +135,9 @@ public final class ServiceUsageEventsTest extends AbstractIntegrationTest {
     @Test
     public void listFilterByServiceInstanceType() {
         Mono.when(this.serviceBrokerId, this.spaceId)
-            .then(function((serviceBrokerId, spaceId) -> seedEvents(this.cloudFoundryClient, this.nameFactory, serviceBrokerId, spaceId)))
+            .flatMap(function((serviceBrokerId, spaceId) -> seedEvents(this.cloudFoundryClient, this.nameFactory, serviceBrokerId, spaceId)))
             .then(getFirstEvent(this.cloudFoundryClient))
-            .then(resource -> Mono.when(
+            .flatMap(resource -> Mono.when(
                 Mono.just(resource),
                 this.cloudFoundryClient.serviceUsageEvents()
                     .list(ListServiceUsageEventsRequest.builder()
@@ -235,7 +235,7 @@ public final class ServiceUsageEventsTest extends AbstractIntegrationTest {
         String serviceInstanceName2 = nameFactory.getServiceInstanceName();
 
         return getPlanId(cloudFoundryClient, serviceBrokerId)
-            .then(planId -> Mono
+            .flatMap(planId -> Mono
                 .when(
                     requestCreateServiceInstance(cloudFoundryClient, planId, serviceInstanceName1, spaceId),
                     requestCreateServiceInstance(cloudFoundryClient, planId, serviceInstanceName2, spaceId)
