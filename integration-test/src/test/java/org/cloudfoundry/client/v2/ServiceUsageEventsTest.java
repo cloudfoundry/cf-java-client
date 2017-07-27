@@ -116,7 +116,7 @@ public final class ServiceUsageEventsTest extends AbstractIntegrationTest {
     public void listFilterByServiceId() {
         Mono.when(this.serviceBrokerId, this.spaceId)
             .then(function((serviceBrokerId, spaceId) -> seedEvents(this.cloudFoundryClient, this.nameFactory, serviceBrokerId, spaceId)))
-            .then(getFirstEvent(this.cloudFoundryClient))
+            .then(getFirstEventWithServiceId(this.cloudFoundryClient))
             .then(resource -> Mono.when(
                 Mono.just(resource),
                 this.cloudFoundryClient.serviceUsageEvents()
@@ -179,6 +179,12 @@ public final class ServiceUsageEventsTest extends AbstractIntegrationTest {
             .next();
     }
 
+    private static Mono<ServiceUsageEventResource> getFirstEventWithServiceId(CloudFoundryClient cloudFoundryClient) {
+        return listServiceUsageEvents(cloudFoundryClient)
+            .filter(resource -> ResourceUtils.getEntity(resource).getServiceId() != null)
+            .next();
+    }
+
     private static Mono<String> getPlanId(CloudFoundryClient cloudFoundryClient, String serviceBrokerId) {
         return requestListServices(cloudFoundryClient, serviceBrokerId)
             .single()
@@ -198,8 +204,7 @@ public final class ServiceUsageEventsTest extends AbstractIntegrationTest {
         return cloudFoundryClient.serviceUsageEvents()
             .list(ListServiceUsageEventsRequest.builder()
                 .build())
-            .flatMapMany(ResourceUtils::getResources)
-            .filter(resource -> ResourceUtils.getEntity(resource).getServiceId() != null);
+            .flatMapMany(ResourceUtils::getResources);
     }
 
     private static Mono<CreateServiceInstanceResponse> requestCreateServiceInstance(CloudFoundryClient cloudFoundryClient, String planId, String serviceInstanceName, String spaceId) {
@@ -235,11 +240,8 @@ public final class ServiceUsageEventsTest extends AbstractIntegrationTest {
         String serviceInstanceName2 = nameFactory.getServiceInstanceName();
 
         return getPlanId(cloudFoundryClient, serviceBrokerId)
-            .then(planId -> Mono
-                .when(
-                    requestCreateServiceInstance(cloudFoundryClient, planId, serviceInstanceName1, spaceId),
-                    requestCreateServiceInstance(cloudFoundryClient, planId, serviceInstanceName2, spaceId)
-                ))
+            .then(planId -> requestCreateServiceInstance(cloudFoundryClient, planId, serviceInstanceName1, spaceId)
+                .then(requestCreateServiceInstance(cloudFoundryClient, planId, serviceInstanceName2, spaceId)))
             .then();
     }
 
