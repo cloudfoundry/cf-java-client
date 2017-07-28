@@ -17,6 +17,7 @@
 package org.cloudfoundry.client.v2.stacks;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
@@ -29,6 +30,7 @@ abstract class _CreateStackRequest {
      * The stack description
      */
     @JsonProperty("description")
+    @Nullable
     abstract String getDescription();
 
     /**

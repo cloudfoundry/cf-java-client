@@ -61,6 +61,8 @@ public interface NameFactory {
 
     String SPACE_PREFIX = "test-space-";
 
+    String STACK_PREFIX = "test-stack-";
+
     String USER_ID_PREFIX = "test-user-id-";
 
     String USER_PREFIX = "test-user-";
@@ -269,6 +271,15 @@ public interface NameFactory {
      */
     default String getSpaceName() {
         return getName(SPACE_PREFIX);
+    }
+
+    /**
+     * Creates a stack name
+     *
+     * @return the stack name
+     */
+    default String getStackName() {
+        return getName(STACK_PREFIX);
     }
 
     /**
@@ -530,6 +541,16 @@ public interface NameFactory {
      */
     default boolean isSpaceName(String candidate) {
         return isName(SPACE_PREFIX, candidate);
+    }
+
+    /**
+     * Tests a name to determine if it is a stack name
+     *
+     * @param candidate the candidate name
+     * @return {@code true} if the name is a stack name, {@code false} otherwise
+     */
+    default boolean isStackName(String candidate) {
+        return isName(STACK_PREFIX, candidate);
     }
 
     /**

@@ -21,16 +21,8 @@ import org.junit.Test;
 public final class CreateStackRequestTest {
 
     @Test(expected = IllegalStateException.class)
-    public void noDescription() {
-        CreateStackRequest.builder()
-            .description("test-stack-description")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
     public void noName() {
         CreateStackRequest.builder()
-            .name("test-stack-name")
             .build();
     }
 
