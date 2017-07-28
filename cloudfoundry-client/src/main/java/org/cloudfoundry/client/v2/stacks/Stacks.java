@@ -21,6 +21,22 @@ import reactor.core.publisher.Mono;
 public interface Stacks {
 
     /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/stacks/create_a_stack.html">Create a Stack</a> request
+     *
+     * @param request the Create a Stack request
+     * @return the response from the Create a Stack Request
+     */
+    Mono<CreateStackResponse> create(CreateStackRequest request);
+
+    /**
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/stacks/delete_a_particular_stack.html">Delete a Stack</a> request
+     *
+     * @param request the Delete a Stack request
+     * @return the response from the Delete a Stack Request
+     */
+    Mono<DeleteStackResponse> delete(DeleteStackRequest request);
+
+    /**
      * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/stacks/retrieve_a_particular_stack.html">Get Stack</a> request
      *
      * @param request the Get Stack request

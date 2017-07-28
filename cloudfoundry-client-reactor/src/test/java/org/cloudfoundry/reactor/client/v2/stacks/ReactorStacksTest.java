@@ -17,6 +17,11 @@
 package org.cloudfoundry.reactor.client.v2.stacks;
 
 import org.cloudfoundry.client.v2.Metadata;
+import org.cloudfoundry.client.v2.jobs.JobEntity;
+import org.cloudfoundry.client.v2.stacks.CreateStackRequest;
+import org.cloudfoundry.client.v2.stacks.CreateStackResponse;
+import org.cloudfoundry.client.v2.stacks.DeleteStackRequest;
+import org.cloudfoundry.client.v2.stacks.DeleteStackResponse;
 import org.cloudfoundry.client.v2.stacks.GetStackRequest;
 import org.cloudfoundry.client.v2.stacks.GetStackResponse;
 import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
@@ -32,12 +37,103 @@ import reactor.test.StepVerifier;
 
 import java.time.Duration;
 
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorStacksTest extends AbstractClientApiTest {
 
     private final ReactorStacks stacks = new ReactorStacks(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+
+    @Test
+    public void create() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(POST).path("/v2/stacks")
+                .payload("fixtures/client/v2/stacks/POST_request.json")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/stacks/POST_response.json")
+                .build())
+            .build());
+
+        this.stacks
+            .create(CreateStackRequest.builder()
+                .description("Description for the example stack")
+                .name("example_stack")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(CreateStackResponse.builder()
+                .metadata(Metadata.builder()
+                    .createdAt("2016-06-08T16:41:23Z")
+                    .id("c7d0b591-2572-4d23-bf7c-9dac95074a9e")
+                    .updatedAt("2016-06-08T16:41:26Z")
+                    .url("/v2/stacks/c7d0b591-2572-4d23-bf7c-9dac95074a9e")
+                    .build())
+                .entity(StackEntity.builder()
+                    .description("Description for the example stack")
+                    .name("example_stack")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void delete() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(DELETE).path("/v2/stacks/test-stack-id")
+                .build())
+            .response(TestResponse.builder()
+                .status(NO_CONTENT)
+                .build())
+            .build());
+
+        this.stacks
+            .delete(DeleteStackRequest.builder()
+                .stackId("test-stack-id")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void deleteAsync() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(DELETE).path("/v2/stacks/test-stack-id?async=true")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/stacks/DELETE_{id}_async_response.json")
+                .build())
+            .build());
+
+        this.stacks
+            .delete(DeleteStackRequest.builder()
+                .async(true)
+                .stackId("test-stack-id")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(DeleteStackResponse.builder()
+                .metadata(Metadata.builder()
+                    .createdAt("2016-02-02T17:16:31Z")
+                    .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                    .url("/v2/jobs/2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                    .build())
+                .entity(JobEntity.builder()
+                    .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                    .status("queued")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
 
     @Test
     public void get() {
