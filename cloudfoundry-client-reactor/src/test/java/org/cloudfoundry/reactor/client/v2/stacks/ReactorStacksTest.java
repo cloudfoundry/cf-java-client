@@ -17,8 +17,11 @@
 package org.cloudfoundry.reactor.client.v2.stacks;
 
 import org.cloudfoundry.client.v2.Metadata;
+import org.cloudfoundry.client.v2.jobs.JobEntity;
 import org.cloudfoundry.client.v2.stacks.CreateStackRequest;
 import org.cloudfoundry.client.v2.stacks.CreateStackResponse;
+import org.cloudfoundry.client.v2.stacks.DeleteStackRequest;
+import org.cloudfoundry.client.v2.stacks.DeleteStackResponse;
 import org.cloudfoundry.client.v2.stacks.GetStackRequest;
 import org.cloudfoundry.client.v2.stacks.GetStackResponse;
 import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
@@ -34,8 +37,10 @@ import reactor.test.StepVerifier;
 
 import java.time.Duration;
 
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorStacksTest extends AbstractClientApiTest {
@@ -71,6 +76,59 @@ public final class ReactorStacksTest extends AbstractClientApiTest {
                 .entity(StackEntity.builder()
                     .description("Description for the example stack")
                     .name("example_stack")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void delete() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(DELETE).path("/v2/stacks/test-stack-id")
+                .build())
+            .response(TestResponse.builder()
+                .status(NO_CONTENT)
+                .build())
+            .build());
+
+        this.stacks
+            .delete(DeleteStackRequest.builder()
+                .stackId("test-stack-id")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void deleteAsync() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(DELETE).path("/v2/stacks/test-stack-id?async=true")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/stacks/DELETE_{id}_async_response.json")
+                .build())
+            .build());
+
+        this.stacks
+            .delete(DeleteStackRequest.builder()
+                .async(true)
+                .stackId("test-stack-id")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(DeleteStackResponse.builder()
+                .metadata(Metadata.builder()
+                    .createdAt("2016-02-02T17:16:31Z")
+                    .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                    .url("/v2/jobs/2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                    .build())
+                .entity(JobEntity.builder()
+                    .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                    .status("queued")
                     .build())
                 .build())
             .expectComplete()
