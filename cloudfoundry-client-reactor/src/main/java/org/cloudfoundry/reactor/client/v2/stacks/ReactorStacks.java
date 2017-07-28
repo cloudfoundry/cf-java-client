@@ -16,6 +16,8 @@
 
 package org.cloudfoundry.reactor.client.v2.stacks;
 
+import org.cloudfoundry.client.v2.stacks.CreateStackRequest;
+import org.cloudfoundry.client.v2.stacks.CreateStackResponse;
 import org.cloudfoundry.client.v2.stacks.GetStackRequest;
 import org.cloudfoundry.client.v2.stacks.GetStackResponse;
 import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
@@ -40,6 +42,12 @@ public final class ReactorStacks extends AbstractClientV2Operations implements S
      */
     public ReactorStacks(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
         super(connectionContext, root, tokenProvider);
+    }
+
+    @Override
+    public Mono<CreateStackResponse> create(CreateStackRequest request) {
+        return post(request, CreateStackResponse.class, builder -> builder.pathSegment("v2", "stacks"))
+            .checkpoint();
     }
 
     @Override

@@ -17,6 +17,8 @@
 package org.cloudfoundry.reactor.client.v2.stacks;
 
 import org.cloudfoundry.client.v2.Metadata;
+import org.cloudfoundry.client.v2.stacks.CreateStackRequest;
+import org.cloudfoundry.client.v2.stacks.CreateStackResponse;
 import org.cloudfoundry.client.v2.stacks.GetStackRequest;
 import org.cloudfoundry.client.v2.stacks.GetStackResponse;
 import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
@@ -33,11 +35,47 @@ import reactor.test.StepVerifier;
 import java.time.Duration;
 
 import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorStacksTest extends AbstractClientApiTest {
 
     private final ReactorStacks stacks = new ReactorStacks(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+
+    @Test
+    public void create() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(POST).path("/v2/stacks")
+                .payload("fixtures/client/v2/stacks/POST_request.json")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/stacks/POST_response.json")
+                .build())
+            .build());
+
+        this.stacks
+            .create(CreateStackRequest.builder()
+                .description("Description for the example stack")
+                .name("example_stack")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(CreateStackResponse.builder()
+                .metadata(Metadata.builder()
+                    .createdAt("2016-06-08T16:41:23Z")
+                    .id("c7d0b591-2572-4d23-bf7c-9dac95074a9e")
+                    .updatedAt("2016-06-08T16:41:26Z")
+                    .url("/v2/stacks/c7d0b591-2572-4d23-bf7c-9dac95074a9e")
+                    .build())
+                .entity(StackEntity.builder()
+                    .description("Description for the example stack")
+                    .name("example_stack")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
 
     @Test
     public void get() {

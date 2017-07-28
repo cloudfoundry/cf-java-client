@@ -1,0 +1,12 @@
+{
+  "metadata": {
+    "guid": "c7d0b591-2572-4d23-bf7c-9dac95074a9e",
+    "url": "/v2/stacks/c7d0b591-2572-4d23-bf7c-9dac95074a9e",
+    "created_at": "2016-06-08T16:41:23Z",
+    "updated_at": "2016-06-08T16:41:26Z"
+  },
+  "entity": {
+    "name": "example_stack",
+    "description": "Description for the example stack"
+  }
+}
