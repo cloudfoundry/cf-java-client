@@ -56,6 +56,8 @@ import org.cloudfoundry.client.v2.spacequotadefinitions.DeleteSpaceQuotaDefiniti
 import org.cloudfoundry.client.v2.spacequotadefinitions.ListSpaceQuotaDefinitionsRequest;
 import org.cloudfoundry.client.v2.spaces.DeleteSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
+import org.cloudfoundry.client.v2.stacks.DeleteStackRequest;
+import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.DeleteUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstanceServiceBindingsRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstancesRequest;
@@ -139,6 +141,7 @@ final class CloudFoundryCleaner {
                 cleanSecurityGroups(this.cloudFoundryClient, this.nameFactory),
                 cleanServiceBrokers(this.cloudFoundryClient, this.nameFactory),
                 cleanSpaceQuotaDefinitions(this.cloudFoundryClient, this.nameFactory),
+                cleanStacks(this.cloudFoundryClient, this.nameFactory),
                 cleanUsers(this.cloudFoundryClient, this.nameFactory),
                 cleanUsers(this.uaaClient, this.nameFactory)
             ))
@@ -454,6 +457,22 @@ final class CloudFoundryCleaner {
                     .build())
                 .flatMapMany(job -> JobUtils.waitForCompletion(cloudFoundryClient, Duration.ofMinutes(5), job))
                 .doOnError(t -> LOGGER.error("Unable to delete space {}", ResourceUtils.getEntity(space).getName(), t)));
+    }
+
+    private static Flux<Void> cleanStacks(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
+        return PaginationUtils
+            .requestClientV2Resources(page -> cloudFoundryClient.stacks()
+                .list(ListStacksRequest.builder()
+                    .page(page)
+                    .build()))
+            .filter(stack -> nameFactory.isStackName(ResourceUtils.getEntity(stack).getName()))
+            .flatMap(stack -> cloudFoundryClient.stacks()
+                .delete((DeleteStackRequest.builder()
+                    .async(true)
+                    .stackId(ResourceUtils.getId(stack))
+                    .build()))
+                .flatMapMany(job -> JobUtils.waitForCompletion(cloudFoundryClient, Duration.ofMinutes(5), job))
+                .doOnError(t -> LOGGER.error("Unable to delete stak {}", ResourceUtils.getEntity(stack).getName(), t)));
     }
 
     private static Flux<Void> cleanUserProvidedServiceInstances(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
