@@ -372,6 +372,23 @@ public final class ApplicationManifestUtilsTest {
     }
 
     @Test
+    public void readNoApplications() throws IOException {
+        List<ApplicationManifest> actual = ApplicationManifestUtils.read(new ClassPathResource("fixtures/manifest-hotel.yml").getFile().toPath());
+
+        assertThat(actual).isEmpty();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void readNoName() throws IOException {
+        ApplicationManifestUtils.read(new ClassPathResource("fixtures/manifest-foxtrot.yml").getFile().toPath());
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void readNoRoute() throws IOException {
+        ApplicationManifestUtils.read(new ClassPathResource("fixtures/manifest-golf.yml").getFile().toPath());
+    }
+
+    @Test
     public void write() throws IOException {
         Path out = Files.createTempFile("test-manifest-", ".yml");
 
