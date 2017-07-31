@@ -204,7 +204,7 @@ public final class ApplicationManifestUtils {
             .map(ApplicationManifestUtils::streamOf)
             .ifPresent(applications -> applications
                 .forEach(application -> {
-                    String name = application.get("name").asText();
+                    String name = getName(application);
                     ApplicationManifest.Builder builder = getBuilder(applicationManifests, template, name);
 
                     applicationManifests.put(name, toApplicationManifest(application, builder, path));
@@ -219,6 +219,15 @@ public final class ApplicationManifestUtils {
             builder = ApplicationManifest.builder().from(template);
         }
         return builder;
+    }
+
+    private static String getName(JsonNode raw) {
+        return Optional.ofNullable(raw.get("name")).map(JsonNode::asText).orElseThrow(() -> new IllegalStateException("Application does not contain required 'name' value"));
+    }
+
+    private static Route getRoute(JsonNode raw) {
+        String route = Optional.ofNullable(raw.get("route")).map(JsonNode::asText).orElseThrow(() -> new IllegalStateException("Route does not contain required 'route' value"));
+        return Route.builder().route(route).build();
     }
 
     private static ApplicationManifest getTemplate(Path path, JsonNode root) {
@@ -253,7 +262,7 @@ public final class ApplicationManifestUtils {
         asBoolean(application, "no-route", builder::noRoute);
         asString(application, "path", path -> builder.path(root.getParent().resolve(path)));
         asBoolean(application, "random-route", builder::randomRoute);
-        asList(application, "routes", route -> Route.builder().route(route.get("route").asText()).build(), builder::route);
+        asList(application, "routes", ApplicationManifestUtils::getRoute, builder::route);
         asListOfString(application, "services", builder::service);
         asString(application, "stack", builder::stack);
         asInteger(application, "timeout", builder::timeout);

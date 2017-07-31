@@ -1,0 +1,3 @@
+---
+applications:
+- buildpack: foxtrot-buildpack
