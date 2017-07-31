@@ -1,0 +1,5 @@
+---
+applications:
+- name: golf-application
+  routes:
+  - {}
