@@ -44,8 +44,8 @@ public final class DefaultConnectionContextTest extends AbstractRestTest {
                 .build())
             .build());
 
-        this.connectionContext
-            .getRoot("token_endpoint")
+        this.connectionContext.getRootProvider()
+            .getRoot("token_endpoint", this.connectionContext)
             .as(StepVerifier::create)
             .expectNext("http://localhost:8080/uaa")
             .expectComplete()

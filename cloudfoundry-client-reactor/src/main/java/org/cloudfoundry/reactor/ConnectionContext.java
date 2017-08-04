@@ -17,7 +17,6 @@
 package org.cloudfoundry.reactor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import reactor.core.publisher.Mono;
 import reactor.ipc.netty.http.client.HttpClient;
 
 /**
@@ -36,15 +35,16 @@ public interface ConnectionContext {
     ObjectMapper getObjectMapper();
 
     /**
-     * The normalized API root
+     * The {@link RootProvider} to use
      */
-    Mono<String> getRoot();
+    RootProvider getRootProvider();
 
     /**
-     * The normalized root for a given key
+     * Attempt to explicitly trust the TLS certificate of an endpoint.  Implementations can choose whether any actual trusting will happen.
      *
-     * @param key the key to look up root from
+     * @param host the host of the endpoint to trust
+     * @param port the port of the endpoint to trust
      */
-    Mono<String> getRoot(String key);
+    void trust(String host, int port);
 
 }

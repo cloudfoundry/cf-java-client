@@ -22,27 +22,17 @@ import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.reactor.util.DefaultSslCertificateTruster;
-import org.cloudfoundry.reactor.util.JsonCodec;
-import org.cloudfoundry.reactor.util.NetworkLogging;
 import org.cloudfoundry.reactor.util.SslCertificateTruster;
 import org.cloudfoundry.reactor.util.StaticTrustManagerFactory;
-import org.cloudfoundry.reactor.util.UserAgent;
 import org.immutables.value.Value;
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
-import reactor.core.publisher.Mono;
 import reactor.ipc.netty.http.client.HttpClient;
-import reactor.ipc.netty.http.client.HttpClientRequest;
 import reactor.ipc.netty.resources.LoopResources;
 import reactor.ipc.netty.resources.PoolResources;
 
 import javax.annotation.PreDestroy;
 import java.time.Duration;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
@@ -57,15 +47,9 @@ import static io.netty.channel.ChannelOption.SO_SNDBUF;
 @Value.Immutable
 abstract class _DefaultConnectionContext implements ConnectionContext {
 
-    private static final int DEFAULT_PORT = 443;
-
-    private static final Pattern HOSTNAME_PATTERN = Pattern.compile("^[a-zA-Z0-9-.]+$");
-
     private static final int RECEIVE_BUFFER_SIZE = 10 * 1024 * 1024;
 
     private static final int SEND_BUFFER_SIZE = 10 * 1024 * 1024;
-
-    private static final int UNDEFINED_PORT = -1;
 
     /**
      * Disposes resources created to service this connection context
@@ -120,35 +104,15 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
         return objectMapper;
     }
 
-    /**
-     * The port for the Cloud Foundry instance
-     */
-    @Value.Default
-    public Integer getPort() {
-        return DEFAULT_PORT;
-    }
-
-    @Value.Derived
-    public Mono<String> getRoot() {
-        Integer port = getPort();
-        UriComponentsBuilder builder = UriComponentsBuilder.newInstance().scheme("https").host(getApiHost());
-        if (port != null) {
-            builder.port(port);
-        }
-
-        UriComponents components = normalize(builder, getScheme());
-        trust(components, getSslCertificateTruster());
-
-        return Mono.just(components.toUriString());
-    }
-
     @Override
-    public Mono<String> getRoot(String key) {
-        return getInfo()
-            .map(info -> normalize(UriComponentsBuilder.fromUriString(info.get(key)), getScheme()))
-            .doOnNext(components -> trust(components, getSslCertificateTruster()))
-            .map(UriComponents::toUriString)
-            .cache();
+    @Value.Default
+    public RootProvider getRootProvider() {
+        return InfoPayloadRootProvider.builder()
+            .apiHost(getApiHost())
+            .objectMapper(getObjectMapper())
+            .port(getPort())
+            .secure(getSecure())
+            .build();
     }
 
     /**
@@ -159,18 +123,15 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
         return LoopResources.DEFAULT_IO_WORKER_COUNT;
     }
 
-    @Value.Check
-    void checkForValidApiHost() {
-        Matcher matcher = HOSTNAME_PATTERN.matcher(getApiHost());
-
-        if (!matcher.matches()) {
-            throw new IllegalArgumentException(String.format("API hostname %s is not correctly formatted (e.g. 'api.local.pcfdev.io')", getApiHost()));
-        }
+    @Override
+    public void trust(String host, int port) {
+        getSslCertificateTruster().ifPresent(t -> t.trust(host, port, Duration.ofSeconds(30)));
     }
 
     /**
      * The hostname of the API root.  Typically something like {@code api.run.pivotal.io}.
      */
+    @Nullable
     abstract String getApiHost();
 
     /**
@@ -178,33 +139,15 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
      */
     abstract Optional<Duration> getConnectTimeout();
 
-    @Value.Derived
-    Optional<PoolResources> getConnectionPool() {
-        return Optional.ofNullable(getConnectionPoolSize())
-            .map(connectionPoolSize -> PoolResources.fixed("cloudfoundry-client", connectionPoolSize));
-    }
-
-    @SuppressWarnings("unchecked")
-    @Value.Derived
-    Mono<Map<String, String>> getInfo() {
-        return getRoot()
-            .map(uri -> UriComponentsBuilder.fromUriString(uri).pathSegment("v2", "info").build().encode().toUriString())
-            .flatMap(uri -> getHttpClient()
-                .get(uri, request -> Mono.just(request)
-                    .map(UserAgent::addUserAgent)
-                    .map(JsonCodec::addDecodeHeaders)
-                    .flatMapMany(HttpClientRequest::send))
-                .doOnSubscribe(NetworkLogging.get(uri))
-                .transform(NetworkLogging.response(uri)))
-            .transform(JsonCodec.decode(getObjectMapper(), Map.class))
-            .map(m -> (Map<String, String>) m)
-            .cache();
-    }
-
     /**
      * The {@code SO_KEEPALIVE} value
      */
     abstract Optional<Boolean> getKeepAlive();
+
+    /**
+     * The port for the Cloud Foundry instance. Defaults to {@code 443}.
+     */
+    abstract Optional<Integer> getPort();
 
     /**
      * Jackson deserialization problem handlers.  Typically only used for testing.
@@ -216,17 +159,8 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
      */
     abstract Optional<ProxyConfiguration> getProxyConfiguration();
 
-    @Value.Derived
-    String getScheme() {
-        if (getSecure().orElse(true)) {
-            return "https";
-        } else {
-            return "http";
-        }
-    }
-
     /**
-     * Whether the connection to the root API should be secure (i.e. using HTTPS).
+     * Whether the connection to the root API should be secure (i.e. using HTTPS).  Defaults to {@code true}.
      */
     abstract Optional<Boolean> getSecure();
 
@@ -249,25 +183,13 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
      */
     abstract Optional<Duration> getSslHandshakeTimeout();
 
-    @Value.Derived
-    LoopResources getThreadPool() {
+    private Optional<PoolResources> getConnectionPool() {
+        return Optional.ofNullable(getConnectionPoolSize())
+            .map(connectionPoolSize -> PoolResources.fixed("cloudfoundry-client", connectionPoolSize));
+    }
+
+    private LoopResources getThreadPool() {
         return LoopResources.create("cloudfoundry-client", getThreadPoolSize(), true);
-    }
-
-    private static void trust(UriComponents components, Optional<SslCertificateTruster> sslCertificateTruster) {
-        sslCertificateTruster.ifPresent(t -> t.trust(components.getHost(), components.getPort(), Duration.ofSeconds(30)));
-    }
-
-    private UriComponents normalize(UriComponentsBuilder builder, String scheme) {
-        UriComponents components = builder.build();
-
-        builder.scheme(scheme);
-
-        if (UNDEFINED_PORT == components.getPort()) {
-            builder.port(getPort());
-        }
-
-        return builder.build().encode();
     }
 
 }
