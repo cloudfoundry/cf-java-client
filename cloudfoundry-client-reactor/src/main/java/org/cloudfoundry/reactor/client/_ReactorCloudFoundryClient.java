@@ -338,7 +338,7 @@ abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
 
     @Value.Default
     Mono<String> getRoot() {
-        return getConnectionContext().getRoot();
+        return getConnectionContext().getRootProvider().getRoot(getConnectionContext());
     }
 
     /**
