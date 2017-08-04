@@ -57,6 +57,13 @@ abstract class _ApplicationInstanceInfo {
     abstract Integer getDebugPort();
 
     /**
+     * The details
+     */
+    @JsonProperty("details")
+    @Nullable
+    abstract String getDetails();
+
+    /**
      * The since
      */
     @JsonProperty("since")
