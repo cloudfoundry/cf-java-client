@@ -239,8 +239,8 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
     }
 
     private Mono<HttpClientResponse> requestToken(ConnectionContext connectionContext, Function<Mono<HttpClientRequest>, Mono<Void>> tokenRequestTransformer) {
-        return connectionContext
-            .getRoot(AUTHORIZATION_ENDPOINT)
+        return connectionContext.getRootProvider()
+            .getRoot(AUTHORIZATION_ENDPOINT, connectionContext)
             .map(root -> getTokenUri(root, getIdentityZoneSubdomain()))
             .then(uri -> connectionContext.getHttpClient()
                 .post(uri, request -> Mono.just(request)

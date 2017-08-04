@@ -99,9 +99,15 @@ abstract class _ReactorUaaClient implements UaaClient {
      */
     abstract ConnectionContext getConnectionContext();
 
+    /**
+     * The identity zone subdomain
+     */
+    @Nullable
+    abstract String getIdentityZoneSubdomain();
+
     @Value.Default
     Mono<String> getRoot() {
-        return getConnectionContext().getRoot("token_endpoint")
+        return getConnectionContext().getRootProvider().getRoot("token_endpoint", getConnectionContext())
             .map(getIdentityZoneEndpoint(getIdentityZoneSubdomain()))
             .cache();
     }
@@ -115,12 +121,6 @@ abstract class _ReactorUaaClient implements UaaClient {
     UsernameProvider getUsernameProvider() {
         return new UsernameProvider(getConnectionContext(), getTokenProvider(), tokens());
     }
-
-    /**
-     * The identity zone subdomain
-     */
-    @Nullable
-    abstract String getIdentityZoneSubdomain();
 
     private static Function<String, String> getIdentityZoneEndpoint(String identityZoneId) {
         return raw -> {
