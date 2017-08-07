@@ -21,6 +21,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
+import java.util.List;
+
 /**
  * The payload for the saml identity provider configuration
  */
@@ -41,6 +43,13 @@ abstract class _SamlConfiguration extends AbstractExternalIdentityProviderConfig
     @JsonProperty("assertionConsumerIndex")
     @Nullable
     abstract Integer getAssertionConsumerIndex();
+
+    /**
+     * A list of AuthnContextClassRef to include in the SAML request
+     */
+    @JsonProperty("authnContext")
+    @Nullable
+    abstract List<String> getAuthnContext();
 
     /**
      * Either EXPLICITLY_MAPPED in order to map external groups to OAuth scopes using the group mappings, or AS_SCOPES to use SAML group names as scopes.
