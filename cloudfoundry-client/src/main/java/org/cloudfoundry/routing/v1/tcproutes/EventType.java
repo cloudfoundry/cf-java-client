@@ -17,6 +17,7 @@
 package org.cloudfoundry.routing.v1.tcproutes;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
  * The event type
@@ -26,12 +27,18 @@ public enum EventType {
     /**
      * The delete event type
      */
-    DELETE,
+    DELETE("DELETE"),
 
     /**
      * The upsert event type
      */
-    UPSERT;
+    UPSERT("UPSERT");
+
+    private final String value;
+
+    EventType(String value) {
+        this.value = value;
+    }
 
     @JsonCreator
     public static EventType from(String s) {
@@ -41,8 +48,18 @@ public enum EventType {
             case "upsert":
                 return UPSERT;
             default:
-                throw new IllegalArgumentException(String.format("Unknown key type: %s", s));
+                throw new IllegalArgumentException(String.format("Unknown event type: %s", s));
         }
+    }
+
+    @JsonValue
+    public String getValue() {
+        return this.value;
+    }
+
+    @Override
+    public String toString() {
+        return getValue();
     }
 
 }
