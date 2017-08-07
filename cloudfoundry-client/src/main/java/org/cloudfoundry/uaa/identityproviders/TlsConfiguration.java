@@ -36,16 +36,6 @@ public enum TlsConfiguration {
         this.value = value;
     }
 
-    @JsonValue
-    public String getValue() {
-        return this.value;
-    }
-
-    @Override
-    public String toString() {
-        return getValue();
-    }
-
     @JsonCreator
     public static TlsConfiguration from(String s) {
         switch (s.toLowerCase()) {
@@ -58,6 +48,16 @@ public enum TlsConfiguration {
             default:
                 throw new IllegalArgumentException(String.format("Unknown TLS Configuration type: %s", s));
         }
+    }
+
+    @JsonValue
+    public String getValue() {
+        return this.value;
+    }
+
+    @Override
+    public String toString() {
+        return getValue();
     }
 
 }

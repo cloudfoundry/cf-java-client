@@ -36,16 +36,6 @@ public enum LdapGroupFile {
         this.value = value;
     }
 
-    @JsonValue
-    public String getValue() {
-        return this.value;
-    }
-
-    @Override
-    public String toString() {
-        return getValue();
-    }
-
     @JsonCreator
     public static LdapGroupFile from(String s) {
         switch (s.toLowerCase()) {
@@ -58,6 +48,16 @@ public enum LdapGroupFile {
             default:
                 throw new IllegalArgumentException(String.format("Unknown ldap group file: %s", s));
         }
+    }
+
+    @JsonValue
+    public String getValue() {
+        return this.value;
+    }
+
+    @Override
+    public String toString() {
+        return getValue();
     }
 
 }

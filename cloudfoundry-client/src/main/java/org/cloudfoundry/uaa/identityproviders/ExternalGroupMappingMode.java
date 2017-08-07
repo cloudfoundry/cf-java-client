@@ -17,6 +17,7 @@
 package org.cloudfoundry.uaa.identityproviders;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
  * The mapping mode for a {@link SamlConfiguration}
@@ -26,12 +27,18 @@ public enum ExternalGroupMappingMode {
     /**
      * The explicitly mapped type
      */
-    EXPLICITLY_MAPPED,
+    EXPLICITLY_MAPPED("EXPLICITLY_MAPPED"),
 
     /**
      * The as scopes type
      */
-    AS_SCOPES;
+    AS_SCOPES("AS_SCOPES");
+
+    private final String value;
+
+    ExternalGroupMappingMode(String value) {
+        this.value = value;
+    }
 
     @JsonCreator
     public static ExternalGroupMappingMode from(String s) {
@@ -43,6 +50,16 @@ public enum ExternalGroupMappingMode {
             default:
                 throw new IllegalArgumentException(String.format("Unknown external group mapping mode: %s", s));
         }
+    }
+
+    @JsonValue
+    public String getValue() {
+        return this.value;
+    }
+
+    @Override
+    public String toString() {
+        return getValue();
     }
 
 }
