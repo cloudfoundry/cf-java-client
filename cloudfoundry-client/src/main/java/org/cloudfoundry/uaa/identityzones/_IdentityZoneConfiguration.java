@@ -93,4 +93,11 @@ abstract class _IdentityZoneConfiguration {
     @Nullable
     abstract TokenPolicy getTokenPolicy();
 
+    /**
+     * The user configuration
+     */
+    @JsonProperty("userConfig")
+    @Nullable
+    abstract UserConfig getUserConfig();
+
 }
