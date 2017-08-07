@@ -20,6 +20,8 @@ import org.cloudfoundry.client.v3.spaces.AssignSpaceIsolationSegmentRequest;
 import org.cloudfoundry.client.v3.spaces.AssignSpaceIsolationSegmentResponse;
 import org.cloudfoundry.client.v3.spaces.GetSpaceIsolationSegmentRequest;
 import org.cloudfoundry.client.v3.spaces.GetSpaceIsolationSegmentResponse;
+import org.cloudfoundry.client.v3.spaces.GetSpaceRequest;
+import org.cloudfoundry.client.v3.spaces.GetSpaceResponse;
 import org.cloudfoundry.client.v3.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v3.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v3.spaces.SpacesV3;
@@ -53,6 +55,12 @@ public final class ReactorSpacesV3 extends AbstractClientV3Operations implements
     @Override
     public Mono<GetSpaceIsolationSegmentResponse> getIsolationSegment(GetSpaceIsolationSegmentRequest request) {
         return get(request, GetSpaceIsolationSegmentResponse.class, builder -> builder.pathSegment("v3", "spaces", request.getSpaceId(), "relationships", "isolation_segment"))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<GetSpaceResponse> list(GetSpaceRequest request) {
+        return get(request, GetSpaceResponse.class, builder -> builder.pathSegment("v3", "spaces", request.getSpaceId()))
             .checkpoint();
     }
 

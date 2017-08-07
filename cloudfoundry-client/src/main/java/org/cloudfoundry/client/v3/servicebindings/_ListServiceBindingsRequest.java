@@ -18,7 +18,7 @@ package org.cloudfoundry.client.v3.servicebindings;
 
 
 import org.cloudfoundry.client.v3.FilterParameter;
-import org.cloudfoundry.client.v3.PaginatedAndSortedRequest;
+import org.cloudfoundry.client.v3.PaginatedRequest;
 import org.immutables.value.Value;
 
 import java.util.List;
@@ -27,7 +27,7 @@ import java.util.List;
  * The request payload for the List Service Bindings operation.
  */
 @Value.Immutable
-abstract class _ListServiceBindingsRequest extends PaginatedAndSortedRequest {
+abstract class _ListServiceBindingsRequest extends PaginatedRequest {
 
     /**
      * The application ids

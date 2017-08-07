@@ -17,23 +17,23 @@
 package org.cloudfoundry.reactor.client.v3.applications;
 
 import org.cloudfoundry.client.v3.applications.ApplicationsV3;
-import org.cloudfoundry.client.v3.applications.AssignApplicationDropletRequest;
-import org.cloudfoundry.client.v3.applications.AssignApplicationDropletResponse;
-import org.cloudfoundry.client.v3.applications.CancelApplicationTaskRequest;
-import org.cloudfoundry.client.v3.applications.CancelApplicationTaskResponse;
 import org.cloudfoundry.client.v3.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.CreateApplicationResponse;
 import org.cloudfoundry.client.v3.applications.DeleteApplicationRequest;
+import org.cloudfoundry.client.v3.applications.GetApplicationCurrentDropletRelationshipRequest;
+import org.cloudfoundry.client.v3.applications.GetApplicationCurrentDropletRelationshipResponse;
+import org.cloudfoundry.client.v3.applications.GetApplicationCurrentDropletRequest;
+import org.cloudfoundry.client.v3.applications.GetApplicationCurrentDropletResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentResponse;
+import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentVariablesRequest;
+import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentVariablesResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationProcessRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationProcessResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationProcessStatisticsRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationProcessStatisticsResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationResponse;
-import org.cloudfoundry.client.v3.applications.GetApplicationTaskRequest;
-import org.cloudfoundry.client.v3.applications.GetApplicationTaskResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationDropletsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationDropletsResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationPackagesRequest;
@@ -46,11 +46,15 @@ import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsResponse;
 import org.cloudfoundry.client.v3.applications.ScaleApplicationRequest;
 import org.cloudfoundry.client.v3.applications.ScaleApplicationResponse;
+import org.cloudfoundry.client.v3.applications.SetApplicationCurrentDropletRequest;
+import org.cloudfoundry.client.v3.applications.SetApplicationCurrentDropletResponse;
 import org.cloudfoundry.client.v3.applications.StartApplicationRequest;
 import org.cloudfoundry.client.v3.applications.StartApplicationResponse;
 import org.cloudfoundry.client.v3.applications.StopApplicationRequest;
 import org.cloudfoundry.client.v3.applications.StopApplicationResponse;
 import org.cloudfoundry.client.v3.applications.TerminateApplicationInstanceRequest;
+import org.cloudfoundry.client.v3.applications.UpdateApplicationEnvironmentVariablesRequest;
+import org.cloudfoundry.client.v3.applications.UpdateApplicationEnvironmentVariablesResponse;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationResponse;
 import org.cloudfoundry.reactor.ConnectionContext;
@@ -75,18 +79,6 @@ public final class ReactorApplicationsV3 extends AbstractClientV3Operations impl
     }
 
     @Override
-    public Mono<AssignApplicationDropletResponse> assignDroplet(AssignApplicationDropletRequest request) {
-        return put(request, AssignApplicationDropletResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "current_droplet"))
-            .checkpoint();
-    }
-
-    @Override
-    public Mono<CancelApplicationTaskResponse> cancelTask(CancelApplicationTaskRequest request) {
-        return put(request, CancelApplicationTaskResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "tasks", request.getTaskId(), "cancel"))
-            .checkpoint();
-    }
-
-    @Override
     public Mono<CreateApplicationResponse> create(CreateApplicationRequest request) {
         return post(request, CreateApplicationResponse.class, builder -> builder.pathSegment("v3", "apps"))
             .checkpoint();
@@ -105,8 +97,26 @@ public final class ReactorApplicationsV3 extends AbstractClientV3Operations impl
     }
 
     @Override
+    public Mono<GetApplicationCurrentDropletResponse> getCurrentDroplet(GetApplicationCurrentDropletRequest request) {
+        return get(request, GetApplicationCurrentDropletResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "droplets", "current"))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<GetApplicationCurrentDropletRelationshipResponse> getCurrentDropletRelationship(GetApplicationCurrentDropletRelationshipRequest request) {
+        return get(request, GetApplicationCurrentDropletRelationshipResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "relationships", "current_droplet"))
+            .checkpoint();
+    }
+
+    @Override
     public Mono<GetApplicationEnvironmentResponse> getEnvironment(GetApplicationEnvironmentRequest request) {
         return get(request, GetApplicationEnvironmentResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "env"))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<GetApplicationEnvironmentVariablesResponse> getEnvironmentVariables(GetApplicationEnvironmentVariablesRequest request) {
+        return get(request, GetApplicationEnvironmentVariablesResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "environment_variables"))
             .checkpoint();
     }
 
@@ -119,12 +129,6 @@ public final class ReactorApplicationsV3 extends AbstractClientV3Operations impl
     @Override
     public Mono<GetApplicationProcessStatisticsResponse> getProcessStatistics(GetApplicationProcessStatisticsRequest request) {
         return get(request, GetApplicationProcessStatisticsResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "processes", request.getType(), "stats"))
-            .checkpoint();
-    }
-
-    @Override
-    public Mono<GetApplicationTaskResponse> getTask(GetApplicationTaskRequest request) {
-        return get(request, GetApplicationTaskResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "tasks", request.getTaskId()))
             .checkpoint();
     }
 
@@ -160,19 +164,25 @@ public final class ReactorApplicationsV3 extends AbstractClientV3Operations impl
 
     @Override
     public Mono<ScaleApplicationResponse> scale(ScaleApplicationRequest request) {
-        return put(request, ScaleApplicationResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "processes", request.getType(), "scale"))
+        return put(request, ScaleApplicationResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "processes", request.getType(), "actions", "scale"))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<SetApplicationCurrentDropletResponse> setCurrentDroplet(SetApplicationCurrentDropletRequest request) {
+        return patch(request, SetApplicationCurrentDropletResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "relationships", "current_droplet"))
             .checkpoint();
     }
 
     @Override
     public Mono<StartApplicationResponse> start(StartApplicationRequest request) {
-        return put(request, StartApplicationResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "start"))
+        return post(request, StartApplicationResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "actions", "start"))
             .checkpoint();
     }
 
     @Override
     public Mono<StopApplicationResponse> stop(StopApplicationRequest request) {
-        return put(request, StopApplicationResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "stop"))
+        return post(request, StopApplicationResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "actions", "stop"))
             .checkpoint();
     }
 
@@ -185,6 +195,12 @@ public final class ReactorApplicationsV3 extends AbstractClientV3Operations impl
     @Override
     public Mono<UpdateApplicationResponse> update(UpdateApplicationRequest request) {
         return patch(request, UpdateApplicationResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId()))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<UpdateApplicationEnvironmentVariablesResponse> updateEnvironmentVariables(UpdateApplicationEnvironmentVariablesRequest request) {
+        return patch(request, UpdateApplicationEnvironmentVariablesResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "environment_variables"))
             .checkpoint();
     }
 

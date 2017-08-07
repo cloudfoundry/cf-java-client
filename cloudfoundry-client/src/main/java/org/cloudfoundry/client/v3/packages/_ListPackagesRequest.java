@@ -16,13 +16,52 @@
 
 package org.cloudfoundry.client.v3.packages;
 
+import org.cloudfoundry.client.v3.FilterParameter;
 import org.cloudfoundry.client.v3.PaginatedRequest;
 import org.immutables.value.Value;
+
+import java.util.List;
 
 /**
  * The request payload for the List Applications operation
  */
 @Value.Immutable
 abstract class _ListPackagesRequest extends PaginatedRequest {
+
+    /**
+     * List of application ids to filter by
+     */
+    @FilterParameter("application_guids")
+    abstract List<String> getApplicationIds();
+
+    /**
+     * List of organization ids to filter by
+     */
+    @FilterParameter("organization_guids")
+    abstract List<String> getOrganizationIds();
+
+    /**
+     * List of package ids to filter by
+     */
+    @FilterParameter("guids")
+    abstract List<String> getPackageIds();
+
+    /**
+     * List of space ids to filter by
+     */
+    @FilterParameter("space_guids")
+    abstract List<String> getSpaceIds();
+
+    /**
+     * List of package states to filter by
+     */
+    @FilterParameter("states")
+    abstract List<PackageState> getStates();
+
+    /**
+     * List of package types to filter by
+     */
+    @FilterParameter("types")
+    abstract List<PackageType> getTypes();
 
 }

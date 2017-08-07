@@ -17,81 +17,30 @@
 package org.cloudfoundry.client.v3.applications;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.cloudfoundry.AllowNulls;
-import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.Lifecycle;
-import org.cloudfoundry.client.v3.Link;
-
-import java.util.Map;
+import org.cloudfoundry.client.v3.Resource;
 
 /**
  * Base class for responses that are applications
  */
-public abstract class Application {
-
-    /**
-     * When the application was created
-     */
-    @JsonProperty("created_at")
-    @Nullable
-    public abstract String getCreatedAt();
-
-    /**
-     * The desired state
-     */
-    @JsonProperty("desired_state")
-    @Nullable
-    public abstract String getDesiredState();
-
-    /**
-     * The environment variables\
-     */
-    @AllowNulls
-    @JsonProperty("environment_variables")
-    @Nullable
-    public abstract Map<String, String> getEnvironmentVariables();
-
-    /**
-     * The id
-     */
-    @JsonProperty("guid")
-    @Nullable
-    public abstract String getId();
+public abstract class Application extends Resource {
 
     /**
      * The lifecycle
      */
     @JsonProperty("lifecycle")
-    @Nullable
     public abstract Lifecycle getLifecycle();
-
-    /**
-     * The links
-     */
-    @AllowNulls
-    @JsonProperty("links")
-    @Nullable
-    public abstract Map<String, Link> getLinks();
 
     /**
      * The name
      */
     @JsonProperty("name")
-    @Nullable
     public abstract String getName();
 
     /**
-     * The total desired instances
+     * The state
      */
-    @JsonProperty("total_desired_instances")
-    @Nullable
-    public abstract Integer getTotalDesiredInstances();
-
-    /**
-     * When the application was updated
-     */
-    @JsonProperty("updated_at")
-    @Nullable
-    public abstract String getUpdatedAt();
+    @JsonProperty("state")
+    public abstract ApplicationState getState();
 
 }

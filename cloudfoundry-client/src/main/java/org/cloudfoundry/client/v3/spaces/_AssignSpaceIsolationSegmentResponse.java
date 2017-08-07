@@ -16,36 +16,15 @@
 
 package org.cloudfoundry.client.v3.spaces;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.AllowNulls;
-import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v3.Link;
-import org.cloudfoundry.client.v3.Relationship;
+import org.cloudfoundry.client.v3.RelationshipResponse;
 import org.immutables.value.Value;
-
-import java.util.Map;
 
 /**
  * The response payload for the Assign Isolation Segment operation
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _AssignSpaceIsolationSegmentResponse {
-
-    /**
-     * The isolation segment
-     */
-    @JsonProperty("data")
-    @Nullable
-    abstract Relationship getData();
-
-    /**
-     * The links
-     */
-    @AllowNulls
-    @JsonProperty("links")
-    @Nullable
-    abstract Map<String, Link> getLinks();
+abstract class _AssignSpaceIsolationSegmentResponse extends RelationshipResponse {
 
 }

@@ -29,9 +29,15 @@ import java.util.List;
 abstract class _ListSpacesRequest extends PaginatedRequest {
 
     /**
-     * The names
+     * List of space names to filter by
      */
     @FilterParameter("names")
     abstract List<String> getNames();
+
+    /**
+     * List of organization ids to filter by
+     */
+    @FilterParameter("organization_guids")
+    abstract List<String> getOrganizationIds();
 
 }

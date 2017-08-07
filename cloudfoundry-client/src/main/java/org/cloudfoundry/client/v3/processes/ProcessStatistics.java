@@ -30,70 +30,61 @@ public abstract class ProcessStatistics {
      * The disk quota
      */
     @JsonProperty("disk_quota")
-    @Nullable
-    public abstract Long getDiskQuota();
+    public abstract Integer getDiskQuota();
 
     /**
-     * The file desriptor quota
+     * The file descriptor quota
      */
     @JsonProperty("fds_quota")
-    @Nullable
-    public abstract Long getFdsQuota();
+    public abstract Integer getFileDescriptorQuota();
 
     /**
      * The host
      */
     @JsonProperty("host")
-    @Nullable
     public abstract String getHost();
 
     /**
      * The index
      */
     @JsonProperty("index")
-    @Nullable
     public abstract Integer getIndex();
 
     /**
      * The instance port mappings
      */
     @JsonProperty("instance_ports")
-    @Nullable
     public abstract List<PortMapping> getInstancePorts();
 
     /**
      * The memory quota
      */
     @JsonProperty("mem_quota")
-    @Nullable
-    public abstract Long getMemoryQuota();
+    public abstract Integer getMemoryQuota();
 
     /**
      * The state
      */
     @JsonProperty("state")
     @Nullable
-    public abstract String getState();
+    public abstract ProcessState getState();
 
     /**
      * The type
      */
     @JsonProperty("type")
-    @Nullable
     public abstract String getType();
 
     /**
      * The uptime
      */
     @JsonProperty("uptime")
-    @Nullable
-    public abstract Long getUptime();
+    public abstract Integer getUptime();
 
     /**
      * The usage
      */
     @JsonProperty("usage")
-    @Nullable
     public abstract ProcessUsage getUsage();
 
 }

@@ -32,7 +32,7 @@ public final class CreateServiceBindingRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noType() {
         CreateServiceBindingRequest.builder()
-            .relationships(Relationships.builder()
+            .relationships(ServiceBindingRelationships.builder()
                 .application(Relationship.builder()
                     .id("test-id")
                     .build())
@@ -46,7 +46,7 @@ public final class CreateServiceBindingRequestTest {
     @Test
     public void valid() {
         CreateServiceBindingRequest.builder()
-            .relationships(Relationships.builder()
+            .relationships(ServiceBindingRelationships.builder()
                 .application(Relationship.builder()
                     .id("test-id")
                     .build())

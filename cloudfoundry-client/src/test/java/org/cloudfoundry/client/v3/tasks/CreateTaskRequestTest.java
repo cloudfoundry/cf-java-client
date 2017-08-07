@@ -24,7 +24,6 @@ public final class CreateTaskRequestTest {
     public void noApplicationId() {
         CreateTaskRequest.builder()
             .command("test-command")
-            .name("test-name")
             .build();
     }
 
@@ -32,15 +31,6 @@ public final class CreateTaskRequestTest {
     public void noCommand() {
         CreateTaskRequest.builder()
             .applicationId("test-application-id")
-            .name("test-name")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        CreateTaskRequest.builder()
-            .applicationId("test-application-id")
-            .command("test-command")
             .build();
     }
 
@@ -49,7 +39,6 @@ public final class CreateTaskRequestTest {
         CreateTaskRequest.builder()
             .applicationId("test-application-id")
             .command("test-command")
-            .name("test-name")
             .build();
     }
 

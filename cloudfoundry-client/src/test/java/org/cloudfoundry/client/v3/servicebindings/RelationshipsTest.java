@@ -23,7 +23,7 @@ public final class RelationshipsTest {
 
     @Test(expected = IllegalStateException.class)
     public void noApplication() {
-        Relationships.builder()
+        ServiceBindingRelationships.builder()
             .application(Relationship.builder()
                 .id("test-id")
                 .build())
@@ -32,7 +32,7 @@ public final class RelationshipsTest {
 
     @Test(expected = IllegalStateException.class)
     public void noServiceInstance() {
-        Relationships.builder()
+        ServiceBindingRelationships.builder()
             .serviceInstance(Relationship.builder()
                 .id("test-id")
                 .build())
@@ -41,7 +41,7 @@ public final class RelationshipsTest {
 
     @Test
     public void valid() {
-        Relationships.builder()
+        ServiceBindingRelationships.builder()
             .application(Relationship.builder()
                 .id("test-id")
                 .build())

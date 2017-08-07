@@ -16,13 +16,52 @@
 
 package org.cloudfoundry.client.v3.tasks;
 
+import org.cloudfoundry.client.v3.FilterParameter;
 import org.cloudfoundry.client.v3.PaginatedRequest;
 import org.immutables.value.Value;
+
+import java.util.List;
 
 /**
  * The request payload for the List Applications operation
  */
 @Value.Immutable
 abstract class _ListTasksRequest extends PaginatedRequest {
+
+    /**
+     * The application ids
+     */
+    @FilterParameter("app_guids")
+    abstract List<String> getApplicationIds();
+
+    /**
+     * The names
+     */
+    @FilterParameter("names")
+    abstract List<String> getNames();
+
+    /**
+     * The organization ids
+     */
+    @FilterParameter("organization_guids")
+    abstract List<String> getOrganizationIds();
+
+    /**
+     * The space ids
+     */
+    @FilterParameter("space_guids")
+    abstract List<String> getSpaceIds();
+
+    /**
+     * The states
+     */
+    @FilterParameter("guids")
+    abstract List<TaskState> getStates();
+
+    /**
+     * The ids
+     */
+    @FilterParameter("guids")
+    abstract List<String> getTaskIds();
 
 }

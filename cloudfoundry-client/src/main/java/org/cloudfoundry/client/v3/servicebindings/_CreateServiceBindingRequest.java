@@ -38,7 +38,7 @@ abstract class _CreateServiceBindingRequest {
      * The relationships
      */
     @JsonProperty("relationships")
-    abstract Relationships getRelationships();
+    abstract ServiceBindingRelationships getRelationships();
 
     /**
      * The type

@@ -16,13 +16,46 @@
 
 package org.cloudfoundry.client.v3.processes;
 
+import org.cloudfoundry.client.v3.FilterParameter;
 import org.cloudfoundry.client.v3.PaginatedRequest;
 import org.immutables.value.Value;
+
+import java.util.List;
 
 /**
  * The request payload for the List Processes operation
  */
 @Value.Immutable
 abstract class _ListProcessesRequest extends PaginatedRequest {
+
+    /**
+     * List of application ids to filter by
+     */
+    @FilterParameter("app_guids")
+    abstract List<String> getApplicationIds();
+
+    /**
+     * List of organization ids to filter by
+     */
+    @FilterParameter("organization_guids")
+    abstract List<String> getOrganizationIds();
+
+    /**
+     * List of process ids to filter by
+     */
+    @FilterParameter("guids")
+    abstract List<String> getProcessIds();
+
+    /**
+     * List of space ids to filter by
+     */
+    @FilterParameter("space_guids")
+    abstract List<String> getSpaceIds();
+
+    /**
+     * List of process types to filter by
+     */
+    @FilterParameter("types")
+    abstract List<String> getTypes();
 
 }

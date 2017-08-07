@@ -21,6 +21,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
+/**
+ * Pagination information
+ */
 @JsonDeserialize
 @Value.Immutable
 abstract class _Pagination {

@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 public interface OrganizationsV3 {
 
     /**
-     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#assign-default-isolation-segment">Assign Default Isolation Segment</a> request
+     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#assign-default-isolation-segment">Assign Default Isolation Segment</a> request
      *
      * @param request the Assign Default Isolation Segment request
      * @return the response from the Assign Default Isolation Segment request
@@ -32,7 +32,7 @@ public interface OrganizationsV3 {
     Mono<AssignOrganizationDefaultIsolationSegmentResponse> assignDefaultIsolationSegment(AssignOrganizationDefaultIsolationSegmentRequest request);
 
     /**
-     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#get-default-isolation-segment">Get Default Isolation Segment</a> request
+     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#get-default-isolation-segment">Get Default Isolation Segment</a> request
      *
      * @param request the Get Default Isolation Segment request
      * @return the response from the Get Default Isolation Segment request
@@ -40,7 +40,7 @@ public interface OrganizationsV3 {
     Mono<GetOrganizationDefaultIsolationSegmentResponse> getDefaultIsolationSegment(GetOrganizationDefaultIsolationSegmentRequest request);
 
     /**
-     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#list-organizations">List Organizations</a> request
+     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#list-organizations">List Organizations</a> request
      *
      * @param request the List Organizations request
      * @return the response from the List Organizations request

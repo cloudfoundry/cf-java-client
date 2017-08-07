@@ -21,8 +21,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
-import java.util.List;
-
 /**
  * The request payload for the Update Process operation
  */
@@ -33,6 +31,7 @@ abstract class _UpdateProcessRequest {
      * The command
      */
     @JsonProperty("command")
+    @Nullable
     abstract String getCommand();
 
     /**
@@ -41,13 +40,6 @@ abstract class _UpdateProcessRequest {
     @JsonProperty("health_check")
     @Nullable
     abstract HealthCheck getHealthCheck();
-
-    /**
-     * The ports
-     */
-    @JsonProperty("ports")
-    @Nullable
-    abstract List<Integer> getPorts();
 
     /**
      * The process id

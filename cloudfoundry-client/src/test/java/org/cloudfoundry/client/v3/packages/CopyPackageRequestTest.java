@@ -16,12 +16,14 @@
 
 package org.cloudfoundry.client.v3.packages;
 
+import org.cloudfoundry.client.v3.Relationship;
+import org.cloudfoundry.client.v3.ToOneRelationship;
 import org.junit.Test;
 
 public final class CopyPackageRequestTest {
 
     @Test(expected = IllegalStateException.class)
-    public void noApplicationId() {
+    public void noRelationships() {
         CopyPackageRequest.builder()
             .sourcePackageId("test-source-package-id")
             .build();
@@ -30,14 +32,26 @@ public final class CopyPackageRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noSourcePackageId() {
         CopyPackageRequest.builder()
-            .applicationId("test-application-id")
+            .relationships(PackageRelationships.builder()
+                .application(ToOneRelationship.builder()
+                    .data(Relationship.builder()
+                        .id("test-id")
+                        .build())
+                    .build())
+                .build())
             .build();
     }
 
     @Test
     public void valid() {
         CopyPackageRequest.builder()
-            .applicationId("test-application-id")
+            .relationships(PackageRelationships.builder()
+                .application(ToOneRelationship.builder()
+                    .data(Relationship.builder()
+                        .id("test-id")
+                        .build())
+                    .build())
+                .build())
             .sourcePackageId("test-source-package-id")
             .build();
     }

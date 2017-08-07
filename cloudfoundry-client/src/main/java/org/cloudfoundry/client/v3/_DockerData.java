@@ -16,23 +16,14 @@
 
 package org.cloudfoundry.client.v3;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
- * The data for a docker lifecycle
+ * Data type for the Docker
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _DockerData implements Data {
-
-    /**
-     * The image
-     */
-    @JsonProperty("image")
-    @Nullable
-    abstract String getImage();
+abstract class _DockerData implements LifecycleData {
 
 }

@@ -23,9 +23,12 @@ import org.immutables.value.Value;
 
 import java.util.List;
 
+/**
+ * Data type for the Buildpack
+ */
 @JsonDeserialize
 @Value.Immutable
-abstract class _BuildpackData implements Data {
+abstract class _BuildpackData implements LifecycleData {
 
     /**
      * The buildpack

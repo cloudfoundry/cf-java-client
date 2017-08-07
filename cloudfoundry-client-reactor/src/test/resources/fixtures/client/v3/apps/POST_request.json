@@ -1,20 +1,10 @@
 {
   "name": "my_app",
-  "environment_variables": {
-    "open": "source"
-  },
-  "lifecycle": {
-    "type": "buildpack",
-    "data": {
-      "buildpacks": [
-        "name-2443"
-      ],
-      "stack": "name-2444"
-    }
-  },
   "relationships": {
     "space": {
-      "guid": "48989e6d-bb23-480d-94da-dae7c20e7af3"
+      "data": {
+        "guid": "2f35885d-0c9d-4423-83ad-fd05066f8576"
+      }
     }
   }
 }

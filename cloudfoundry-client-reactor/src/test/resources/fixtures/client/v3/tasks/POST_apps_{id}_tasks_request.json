@@ -1,5 +1,3 @@
 {
-  "name": "my-task",
-  "command": "echo 'hello world'",
-  "memory_in_mb": 512
+  "command": "rake db:migrate"
 }
