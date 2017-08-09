@@ -161,15 +161,15 @@ public final class ApplicationManifestUtils {
             if (raw.isNumber()) {
                 return raw.asInt();
             } else if (raw.isTextual()) {
-                String text = raw.asText();
+                String text = raw.asText().toUpperCase();
 
-                if (text.toUpperCase().endsWith("G")) {
+                if (text.tendsWith("G")) {
                     return Integer.parseInt(text.substring(0, text.length() - 1)) * GIBI;
-                } else if (text.toUpperCase().endsWith("GB")) {
+                } else if (text.endsWith("GB")) {
                     return Integer.parseInt(text.substring(0, text.length() - 2)) * GIBI;
-                } else if (text.toUpperCase().endsWith("M")) {
+                } else if (text.endsWith("M")) {
                     return Integer.parseInt(text.substring(0, text.length() - 1));
-                } else if (text.toUpperCase().endsWith("MB")) {
+                } else if (text.endsWith("MB")) {
                     return Integer.parseInt(text.substring(0, text.length() - 2));
                 } else {
                     return 0;
