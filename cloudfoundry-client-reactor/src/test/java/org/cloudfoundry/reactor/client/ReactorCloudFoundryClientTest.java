@@ -50,6 +50,11 @@ public final class ReactorCloudFoundryClientTest extends AbstractRestTest {
     }
 
     @Test
+    public void builds() {
+        assertThat(this.client.builds()).isNotNull();
+    }
+
+    @Test
     public void domains() {
         assertThat(this.client.domains()).isNotNull();
     }

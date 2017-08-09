@@ -48,6 +48,7 @@ import org.cloudfoundry.client.v2.stacks.Stacks;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstances;
 import org.cloudfoundry.client.v2.users.Users;
 import org.cloudfoundry.client.v3.applications.ApplicationsV3;
+import org.cloudfoundry.client.v3.builds.Builds;
 import org.cloudfoundry.client.v3.droplets.Droplets;
 import org.cloudfoundry.client.v3.packages.Packages;
 import org.cloudfoundry.client.v3.processes.Processes;
@@ -88,6 +89,11 @@ public interface CloudFoundryClient {
      * Main entry point to the Cloud Foundry Buildpacks V2 Client API
      */
     Buildpacks buildpacks();
+
+    /**
+     * Main entry point to the Cloud Foundry Builds Client API
+     */
+    Builds builds();
 
     /**
      * Main entry point to the Cloud Foundry Domains Client API
