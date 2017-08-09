@@ -49,6 +49,7 @@ import org.cloudfoundry.client.v2.stacks.Stacks;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstances;
 import org.cloudfoundry.client.v2.users.Users;
 import org.cloudfoundry.client.v3.applications.ApplicationsV3;
+import org.cloudfoundry.client.v3.builds.Builds;
 import org.cloudfoundry.client.v3.droplets.Droplets;
 import org.cloudfoundry.client.v3.packages.Packages;
 import org.cloudfoundry.client.v3.processes.Processes;
@@ -88,6 +89,7 @@ import org.cloudfoundry.reactor.client.v2.stacks.ReactorStacks;
 import org.cloudfoundry.reactor.client.v2.userprovidedserviceinstances.ReactorUserProvidedServiceInstances;
 import org.cloudfoundry.reactor.client.v2.users.ReactorUsers;
 import org.cloudfoundry.reactor.client.v3.applications.ReactorApplicationsV3;
+import org.cloudfoundry.reactor.client.v3.builds.ReactorBuilds;
 import org.cloudfoundry.reactor.client.v3.droplets.ReactorDroplets;
 import org.cloudfoundry.reactor.client.v3.packages.ReactorPackages;
 import org.cloudfoundry.reactor.client.v3.processes.ReactorProcesses;
@@ -132,6 +134,12 @@ abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
     @Value.Derived
     public Buildpacks buildpacks() {
         return new ReactorBuildpacks(getConnectionContext(), getRoot(), getTokenProvider());
+    }
+
+    @Override
+    @Value.Derived
+    public Builds builds() {
+        return new ReactorBuilds(getConnectionContext(), getRoot(), getTokenProvider());
     }
 
     @PostConstruct

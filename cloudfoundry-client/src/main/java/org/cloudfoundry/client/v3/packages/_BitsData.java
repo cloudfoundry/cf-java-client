@@ -22,6 +22,9 @@ import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.Checksum;
 import org.immutables.value.Value;
 
+/**
+ * Data type for bits packages
+ */
 @JsonDeserialize
 @Value.Immutable
 abstract class _BitsData implements PackageData {
