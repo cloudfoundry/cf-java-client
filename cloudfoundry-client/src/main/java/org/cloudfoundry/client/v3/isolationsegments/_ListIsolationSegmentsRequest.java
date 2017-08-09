@@ -32,7 +32,7 @@ abstract class _ListIsolationSegmentsRequest extends PaginatedRequest {
      * The ids
      */
     @FilterParameter("guids")
-    abstract List<String> getIds();
+    abstract List<String> getIsolationSegmentIds();
 
     /**
      * The names

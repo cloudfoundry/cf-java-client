@@ -29,13 +29,6 @@ import java.util.List;
 @Value.Immutable
 abstract class _AddIsolationSegmentOrganizationEntitlementRequest {
 
-    @Value.Check
-    void checkData() {
-        if (getData().isEmpty()) {
-            throw new IllegalStateException("Cannot build AddIsolationSegmentOrganizationEntitlementRequest, required attribute data is not set");
-        }
-    }
-
     /**
      * The organizations to add entitlement to
      */

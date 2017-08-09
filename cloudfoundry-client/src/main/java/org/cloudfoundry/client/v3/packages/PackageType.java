@@ -16,20 +16,21 @@
 
 package org.cloudfoundry.client.v3.packages;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * The package type of the {@link CreatePackageRequest}
+ * The type of a {@link Package}
  */
 public enum PackageType {
 
     /**
-     * Indicates that package type should be bits
+     * The bits type
      */
     BITS("bits"),
 
     /**
-     * Indicates that package type should be docker
+     * The docker type
      */
     DOCKER("docker");
 
@@ -37,6 +38,18 @@ public enum PackageType {
 
     PackageType(String value) {
         this.value = value;
+    }
+
+    @JsonCreator
+    public static PackageType from(String s) {
+        switch (s.toLowerCase()) {
+            case "bits":
+                return BITS;
+            case "docker":
+                return DOCKER;
+            default:
+                throw new IllegalArgumentException(String.format("Unknown package type: %s", s));
+        }
     }
 
     @JsonValue

@@ -63,4 +63,12 @@ abstract class _GetApplicationEnvironmentResponse {
     @Nullable
     abstract Map<String, Object> getStagingEnvironmentVariables();
 
+    /**
+     * The application environment variables
+     */
+    @AllowNulls
+    @JsonProperty("system_env_json")
+    @Nullable
+    abstract Map<String, Object> getSystemEnvironmentVariables();
+
 }

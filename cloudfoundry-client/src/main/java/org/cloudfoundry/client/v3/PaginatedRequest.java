@@ -26,6 +26,13 @@ import org.immutables.value.Value;
 public abstract class PaginatedRequest {
 
     /**
+     * The order by
+     */
+    @Nullable
+    @QueryParameter("order_by")
+    public abstract String getOrderBy();
+
+    /**
      * The page
      */
     @Nullable

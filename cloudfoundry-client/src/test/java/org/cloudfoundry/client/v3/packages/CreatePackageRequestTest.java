@@ -16,6 +16,8 @@
 
 package org.cloudfoundry.client.v3.packages;
 
+import org.cloudfoundry.client.v3.Relationship;
+import org.cloudfoundry.client.v3.ToOneRelationship;
 import org.junit.Test;
 
 import static org.cloudfoundry.client.v3.packages.PackageType.BITS;
@@ -23,8 +25,10 @@ import static org.cloudfoundry.client.v3.packages.PackageType.BITS;
 public final class CreatePackageRequestTest {
 
     @Test(expected = IllegalStateException.class)
-    public void noApplicationId() {
+    public void noRelationships() {
         CreatePackageRequest.builder()
+            .data(BitsData.builder()
+                .build())
             .type(BITS)
             .build();
     }
@@ -32,14 +36,30 @@ public final class CreatePackageRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noType() {
         CreatePackageRequest.builder()
-            .applicationId("test-application-id")
+            .data(BitsData.builder()
+                .build())
+            .relationships(PackageRelationships.builder()
+                .application(ToOneRelationship.builder()
+                    .data(Relationship.builder()
+                        .id("test-id")
+                        .build())
+                    .build())
+                .build())
             .build();
     }
 
     @Test
     public void valid() {
         CreatePackageRequest.builder()
-            .applicationId("test-application-id")
+            .data(BitsData.builder()
+                .build())
+            .relationships(PackageRelationships.builder()
+                .application(ToOneRelationship.builder()
+                    .data(Relationship.builder()
+                        .id("test-id")
+                        .build())
+                    .build())
+                .build())
             .type(BITS)
             .build();
     }

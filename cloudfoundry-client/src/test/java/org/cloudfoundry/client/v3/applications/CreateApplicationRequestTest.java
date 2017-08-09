@@ -17,6 +17,7 @@
 package org.cloudfoundry.client.v3.applications;
 
 import org.cloudfoundry.client.v3.Relationship;
+import org.cloudfoundry.client.v3.ToOneRelationship;
 import org.junit.Test;
 
 public final class CreateApplicationRequestTest {
@@ -24,9 +25,11 @@ public final class CreateApplicationRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noName() {
         CreateApplicationRequest.builder()
-            .relationships(Relationships.builder()
-                .space(Relationship.builder()
-                    .id("test-id")
+            .relationships(ApplicationRelationships.builder()
+                .space(ToOneRelationship.builder()
+                    .data(Relationship.builder()
+                        .id("test-id")
+                        .build())
                     .build())
                 .build())
             .build();
@@ -43,9 +46,11 @@ public final class CreateApplicationRequestTest {
     public void valid() {
         CreateApplicationRequest.builder()
             .name("test-name")
-            .relationships(Relationships.builder()
-                .space(Relationship.builder()
-                    .id("test-id")
+            .relationships(ApplicationRelationships.builder()
+                .space(ToOneRelationship.builder()
+                    .data(Relationship.builder()
+                        .id("test-id")
+                        .build())
                     .build())
                 .build())
             .build();

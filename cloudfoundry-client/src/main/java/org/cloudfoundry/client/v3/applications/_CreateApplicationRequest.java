@@ -55,6 +55,6 @@ abstract class _CreateApplicationRequest {
      * The relationships
      */
     @JsonProperty("relationships")
-    abstract Relationships getRelationships();
+    abstract ApplicationRelationships getRelationships();
 
 }

@@ -16,6 +16,8 @@
 
 package org.cloudfoundry.reactor.client.v3.droplets;
 
+import org.cloudfoundry.client.v3.droplets.CopyDropletRequest;
+import org.cloudfoundry.client.v3.droplets.CopyDropletResponse;
 import org.cloudfoundry.client.v3.droplets.DeleteDropletRequest;
 import org.cloudfoundry.client.v3.droplets.Droplets;
 import org.cloudfoundry.client.v3.droplets.GetDropletRequest;
@@ -41,6 +43,11 @@ public final class ReactorDroplets extends AbstractClientV3Operations implements
      */
     public ReactorDroplets(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
         super(connectionContext, root, tokenProvider);
+    }
+
+    @Override
+    public Mono<CopyDropletResponse> copy(CopyDropletRequest request) {
+        return post(request, CopyDropletResponse.class, builder -> builder.pathSegment("v3", "droplets"));
     }
 
     @Override

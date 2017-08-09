@@ -17,51 +17,17 @@
 package org.cloudfoundry.client.v3.organizations;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.cloudfoundry.AllowNulls;
-import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v3.Link;
-
-import java.util.Map;
+import org.cloudfoundry.client.v3.Resource;
 
 /**
  * Base class for responses that are organizations
  */
-public abstract class Organization {
-
-    /**
-     * The created at
-     */
-    @JsonProperty("created_at")
-    @Nullable
-    public abstract String getCreatedAt();
-
-    /**
-     * The organization id
-     */
-    @JsonProperty("guid")
-    @Nullable
-    public abstract String getId();
-
-    /**
-     * The links
-     */
-    @AllowNulls
-    @JsonProperty("links")
-    @Nullable
-    public abstract Map<String, Link> getLinks();
+public abstract class Organization extends Resource {
 
     /**
      * The name
      */
     @JsonProperty("name")
-    @Nullable
     public abstract String getName();
-
-    /**
-     * The updated at
-     */
-    @JsonProperty("updated_at")
-    @Nullable
-    public abstract String getUpdatedAt();
 
 }

@@ -1,0 +1,9 @@
+{
+  "relationships": {
+    "app": {
+      "data": {
+        "guid": "[destination-app-guid]"
+      }
+    }
+  }
+}

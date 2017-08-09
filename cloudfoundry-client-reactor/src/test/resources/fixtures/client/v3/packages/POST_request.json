@@ -1,0 +1,10 @@
+{
+  "type": "bits",
+  "relationships": {
+    "app": {
+      "data": {
+        "guid": "[guid]"
+      }
+    }
+  }
+}

@@ -21,16 +21,8 @@ import org.junit.Test;
 public final class UpdateProcessRequestTest {
 
     @Test(expected = IllegalStateException.class)
-    public void noCommand() {
-        UpdateProcessRequest.builder()
-            .processId("test-process-id")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
     public void noProcessId() {
         UpdateProcessRequest.builder()
-            .command("test-command")
             .build();
     }
 
@@ -38,7 +30,6 @@ public final class UpdateProcessRequestTest {
     public void valid() {
         UpdateProcessRequest.builder()
             .processId("test-process-id")
-            .command("test-command")
             .build();
     }
 

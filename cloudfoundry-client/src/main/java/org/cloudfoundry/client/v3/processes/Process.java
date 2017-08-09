@@ -17,94 +17,47 @@
 package org.cloudfoundry.client.v3.processes;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.cloudfoundry.AllowNulls;
-import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v3.Link;
-
-import java.util.List;
-import java.util.Map;
+import org.cloudfoundry.client.v3.Resource;
 
 /**
  * Base class for responses that are processes
  */
-public abstract class Process {
+public abstract class Process extends Resource {
+
+    /**
+     * The type
+     */
+    @JsonProperty("type")
+    public abstract String getType();
 
     /**
      * The command
      */
     @JsonProperty("command")
-    @Nullable
     public abstract String getCommand();
 
     /**
-     * The created at
+     * The instances
      */
-    @JsonProperty("created_at")
-    @Nullable
-    public abstract String getCreatedAt();
+    @JsonProperty("instances")
+    public abstract Integer getInstances();
+
+    /**
+     * The memory in megabytes
+     */
+    @JsonProperty("memory_in_mb")
+    public abstract Integer getMemoryInMb();
 
     /**
      * The disk in megabytes
      */
     @JsonProperty("disk_in_mb")
-    @Nullable
     public abstract Integer getDiskInMb();
 
     /**
      * The health check
      */
     @JsonProperty("health_check")
-    @Nullable
     public abstract HealthCheck getHealthCheck();
-
-    /**
-     * The id
-     */
-    @JsonProperty("guid")
-    @Nullable
-    public abstract String getId();
-
-    /**
-     * The instances
-     */
-    @JsonProperty("instances")
-    @Nullable
-    public abstract Integer getInstances();
-
-    /**
-     * The links
-     */
-    @AllowNulls
-    @JsonProperty("links")
-    @Nullable
-    public abstract Map<String, Link> getLinks();
-
-    /**
-     * The memory in megabytes
-     */
-    @JsonProperty("memory_in_mb")
-    @Nullable
-    public abstract Integer getMemoryInMb();
-
-    /**
-     * The ports opened to the application
-     */
-    @JsonProperty("ports")
-    @Nullable
-    public abstract List<Integer> getPorts();
-
-    /**
-     * The type
-     */
-    @JsonProperty("type")
-    @Nullable
-    public abstract String getType();
-
-    /**
-     * The updated at
-     */
-    @JsonProperty("updated_at")
-    @Nullable
-    public abstract String getUpdatedAt();
 
 }

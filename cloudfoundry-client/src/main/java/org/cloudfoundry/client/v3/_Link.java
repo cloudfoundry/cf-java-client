@@ -22,7 +22,7 @@ import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
- * A link payload. By default it uses {@code GET} for the {@code method}
+ * A link payload
  */
 @JsonDeserialize
 @Value.Immutable
@@ -32,7 +32,6 @@ abstract class _Link {
      * The href
      */
     @JsonProperty("href")
-    @Nullable
     abstract String getHref();
 
     /**

@@ -1,0 +1,13 @@
+{
+  "data": {
+    "guid": "9d8e007c-ce52-4ea7-8a57-f2825d2c6b39"
+  },
+  "links": {
+    "self": {
+      "href": "https://api.example.org/v3/apps/d4c91047-7b29-4fda-b7f9-04033e5c9c9f/relationships/current_droplet"
+    },
+    "related": {
+      "href": "https://api.example.org/v3/apps/d4c91047-7b29-4fda-b7f9-04033e5c9c9f/droplets/current"
+    }
+  }
+}

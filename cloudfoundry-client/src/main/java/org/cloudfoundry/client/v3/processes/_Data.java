@@ -26,6 +26,13 @@ import org.immutables.value.Value;
 abstract class _Data {
 
     /**
+     * The endpoint
+     */
+    @JsonProperty("endpoint")
+    @Nullable
+    abstract String getEndpoint();
+
+    /**
      * The timeout
      */
     @JsonProperty("timeout")

@@ -17,21 +17,24 @@
 package org.cloudfoundry.client.v3.applications;
 
 import org.cloudfoundry.client.v3.Relationship;
+import org.cloudfoundry.client.v3.ToOneRelationship;
 import org.junit.Test;
 
 public final class RelationshipsTest {
 
     @Test(expected = IllegalStateException.class)
     public void noSpace() {
-        Relationships.builder()
+        ApplicationRelationships.builder()
             .build();
     }
 
     @Test
     public void valid() {
-        Relationships.builder()
-            .space(Relationship.builder()
-                .id("test-id")
+        ApplicationRelationships.builder()
+            .space(ToOneRelationship.builder()
+                .data(Relationship.builder()
+                    .id("test-id")
+                    .build())
                 .build())
             .build();
     }

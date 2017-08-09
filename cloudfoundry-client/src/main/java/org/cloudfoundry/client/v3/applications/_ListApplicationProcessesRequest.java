@@ -17,8 +17,11 @@
 package org.cloudfoundry.client.v3.applications;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.cloudfoundry.client.v3.FilterParameter;
 import org.cloudfoundry.client.v3.PaginatedRequest;
 import org.immutables.value.Value;
+
+import java.util.List;
 
 /**
  * The request payload for the List Application Processes operation
@@ -31,5 +34,17 @@ abstract class _ListApplicationProcessesRequest extends PaginatedRequest {
      */
     @JsonIgnore
     abstract String getApplicationId();
+
+    /**
+     * List of process ids to filter by
+     */
+    @FilterParameter("guids")
+    abstract List<String> getProcessId();
+
+    /**
+     * List of process types to filter by
+     */
+    @FilterParameter("types")
+    abstract List<String> getTypes();
 
 }

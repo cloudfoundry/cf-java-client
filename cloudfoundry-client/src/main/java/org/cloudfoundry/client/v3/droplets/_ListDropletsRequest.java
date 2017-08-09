@@ -17,7 +17,7 @@
 package org.cloudfoundry.client.v3.droplets;
 
 import org.cloudfoundry.client.v3.FilterParameter;
-import org.cloudfoundry.client.v3.PaginatedAndSortedRequest;
+import org.cloudfoundry.client.v3.PaginatedRequest;
 import org.immutables.value.Value;
 
 import java.util.List;
@@ -26,7 +26,7 @@ import java.util.List;
  * The request payload for the List Applications operation
  */
 @Value.Immutable
-abstract class _ListDropletsRequest extends PaginatedAndSortedRequest {
+abstract class _ListDropletsRequest extends PaginatedRequest {
 
     /**
      * The application ids
@@ -35,9 +35,27 @@ abstract class _ListDropletsRequest extends PaginatedAndSortedRequest {
     abstract List<String> getApplicationIds();
 
     /**
+     * The droplet ids
+     */
+    @FilterParameter("guids")
+    abstract List<String> getDropletIds();
+
+    /**
+     * The organization ids
+     */
+    @FilterParameter("organization_guids")
+    abstract List<String> getOrganizationIds();
+
+    /**
+     * The space ids
+     */
+    @FilterParameter("space_guids")
+    abstract List<String> getSpaceIds();
+
+    /**
      * The states
      */
     @FilterParameter("states")
-    abstract List<String> getStates();
+    abstract List<DropletState> getStates();
 
 }
