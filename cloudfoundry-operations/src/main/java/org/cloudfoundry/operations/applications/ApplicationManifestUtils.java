@@ -163,10 +163,14 @@ public final class ApplicationManifestUtils {
             } else if (raw.isTextual()) {
                 String text = raw.asText();
 
-                if (text.endsWith("G")) {
+                if (text.toUpperCase().endsWith("G")) {
                     return Integer.parseInt(text.substring(0, text.length() - 1)) * GIBI;
-                } else if (text.endsWith("M")) {
+                } else if (text.toUpperCase().endsWith("GB")) {
+                    return Integer.parseInt(text.substring(0, text.length() - 2)) * GIBI;
+                } else if (text.toUpperCase().endsWith("M")) {
                     return Integer.parseInt(text.substring(0, text.length() - 1));
+                } else if (text.toUpperCase().endsWith("MB")) {
+                    return Integer.parseInt(text.substring(0, text.length() - 2));
                 } else {
                     return 0;
                 }
@@ -247,7 +251,7 @@ public final class ApplicationManifestUtils {
     private static ApplicationManifest.Builder toApplicationManifest(JsonNode application, ApplicationManifest.Builder builder, Path root) {
         asString(application, "buildpack", builder::buildpack);
         asString(application, "command", builder::command);
-        asInteger(application, "disk_quota", builder::disk);
+        asMemoryInteger(application, "disk_quota", builder::disk);
         asString(application, "domain", builder::domain);
         asListOfString(application, "domains", builder::domain);
         asMapOfStringString(application, "env", builder::environmentVariable);

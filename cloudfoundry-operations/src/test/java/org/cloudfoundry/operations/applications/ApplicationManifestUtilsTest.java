@@ -449,4 +449,58 @@ public final class ApplicationManifestUtilsTest {
         assertThat(actual).isEqualTo(expected);
     }
 
+    @Test
+    public void testDiskQuotaAndMemoryParsing() throws Exception {
+        List<ApplicationManifest> expected = Arrays.asList(
+            ApplicationManifest.builder()
+                .name("quota-test-1")
+                .memory(1)
+                .disk(2)
+                .build(),
+            ApplicationManifest.builder()
+                .name("quota-test-2")
+                .memory(3)
+                .disk(4)
+                .build(),
+            ApplicationManifest.builder()
+                .name("quota-test-3")
+                .memory(5)
+                .disk(6)
+                .build(),
+            ApplicationManifest.builder()
+                .name("quota-test-4")
+                .memory(7)
+                .disk(8)
+                .build(),
+            ApplicationManifest.builder()
+                .name("quota-test-5")
+                .memory(1024)
+                .disk(2048)
+                .build(),
+            ApplicationManifest.builder()
+                .name("quota-test-6")
+                .memory(3072)
+                .disk(4096)
+                .build(),
+            ApplicationManifest.builder()
+                .name("quota-test-7")
+                .memory(5120)
+                .disk(6144)
+                .build(),
+            ApplicationManifest.builder()
+                .name("quota-test-8")
+                .memory(7168)
+                .disk(8192)
+                .build(),
+            ApplicationManifest.builder()
+              .name("quota-test-9")
+              .memory(1234)
+              .disk(5678)
+              .build()
+        );
+
+        List<ApplicationManifest> actual = ApplicationManifestUtils.read(new ClassPathResource("fixtures/manifest-quota.yml").getFile().toPath());
+
+        assertThat(actual).isEqualTo(expected);
+    }
 }
