@@ -132,13 +132,13 @@ public final class ErrorPayloadMapperTest {
             .consumeErrorWith(t -> {
                 assertThat(t)
                     .isInstanceOf(ClientV3Exception.class)
-                    .hasMessage("CF-UnprocessableEntity(10008): The request is semantically invalid: something went wrong")
+                    .hasMessage("CF-UnprocessableEntity(10008): something went wrong")
                     .extracting("statusCode")
                     .containsExactly(BAD_REQUEST.code());
 
                 assertThat(((ClientV3Exception) t).getErrors())
-                    .flatExtracting(ClientV3Exception.Error::getCode, ClientV3Exception.Error::getDetail, ClientV3Exception.Error::getTitle)
-                    .containsExactly(10008, "The request is semantically invalid: something went wrong", "CF-UnprocessableEntity");
+                    .flatExtracting(org.cloudfoundry.client.v3.Error::getCode, org.cloudfoundry.client.v3.Error::getDetail, org.cloudfoundry.client.v3.Error::getTitle)
+                    .containsExactly(10008, "something went wrong", "CF-UnprocessableEntity");
             })
             .verify(Duration.ofSeconds(1));
     }
@@ -166,13 +166,13 @@ public final class ErrorPayloadMapperTest {
             .consumeErrorWith(t -> {
                 assertThat(t)
                     .isInstanceOf(ClientV3Exception.class)
-                    .hasMessage("CF-UnprocessableEntity(10008): The request is semantically invalid: something went wrong")
+                    .hasMessage("CF-UnprocessableEntity(10008): something went wrong")
                     .extracting("statusCode")
                     .containsExactly(INTERNAL_SERVER_ERROR.code());
 
                 assertThat(((ClientV3Exception) t).getErrors())
-                    .flatExtracting(ClientV3Exception.Error::getCode, ClientV3Exception.Error::getDetail, ClientV3Exception.Error::getTitle)
-                    .containsExactly(10008, "The request is semantically invalid: something went wrong", "CF-UnprocessableEntity");
+                    .flatExtracting(org.cloudfoundry.client.v3.Error::getCode, org.cloudfoundry.client.v3.Error::getDetail, org.cloudfoundry.client.v3.Error::getTitle)
+                    .containsExactly(10008, "something went wrong", "CF-UnprocessableEntity");
             })
             .verify(Duration.ofSeconds(1));
     }
