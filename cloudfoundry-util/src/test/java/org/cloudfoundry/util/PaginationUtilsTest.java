@@ -22,9 +22,12 @@ import org.cloudfoundry.client.v2.spaces.SpaceEntity;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.client.v2.spaces.Spaces;
 import org.cloudfoundry.client.v3.Pagination;
+import org.cloudfoundry.client.v3.packages.BitsData;
 import org.cloudfoundry.client.v3.packages.ListPackagesRequest;
 import org.cloudfoundry.client.v3.packages.ListPackagesResponse;
 import org.cloudfoundry.client.v3.packages.PackageResource;
+import org.cloudfoundry.client.v3.packages.PackageState;
+import org.cloudfoundry.client.v3.packages.PackageType;
 import org.cloudfoundry.client.v3.packages.Packages;
 import org.cloudfoundry.uaa.users.ListUsersRequest;
 import org.cloudfoundry.uaa.users.ListUsersResponse;
@@ -160,6 +163,12 @@ public final class PaginationUtilsTest {
                 .just(ListPackagesResponse.builder()
                     .resource(PackageResource.builder()
                         .id(page.toString())
+                        .createdAt("test-created-at")
+                        .updatedAt("test-updated-at")
+                        .type(PackageType.BITS)
+                        .data(BitsData.builder()
+                            .build())
+                        .state(PackageState.READY)
                         .build())
                     .pagination(Pagination.builder()
                         .totalPages(totalPages)
