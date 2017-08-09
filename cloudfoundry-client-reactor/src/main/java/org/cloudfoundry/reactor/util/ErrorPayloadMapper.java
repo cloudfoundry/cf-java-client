@@ -21,14 +21,13 @@ import io.netty.handler.codec.http.HttpStatusClass;
 import org.cloudfoundry.UnknownCloudFoundryException;
 import org.cloudfoundry.client.v2.ClientV2Exception;
 import org.cloudfoundry.client.v3.ClientV3Exception;
+import org.cloudfoundry.client.v3.Errors;
 import org.cloudfoundry.uaa.UaaException;
 import reactor.core.publisher.Mono;
 import reactor.ipc.netty.http.client.HttpClientResponse;
 
-import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static io.netty.handler.codec.http.HttpStatusClass.CLIENT_ERROR;
 import static io.netty.handler.codec.http.HttpStatusClass.SERVER_ERROR;
@@ -52,17 +51,8 @@ public final class ErrorPayloadMapper {
     public static Function<Mono<HttpClientResponse>, Mono<HttpClientResponse>> clientV3(ObjectMapper objectMapper) {
         return inbound -> inbound
             .flatMap(mapToError((statusCode, payload) -> {
-                List<ClientV3Exception.Error> errors = ((Map<String, List<Map<String, Object>>>) objectMapper.readValue(payload, Map.class)).get("errors").stream()
-                    .map(map -> {
-                        Integer code = (Integer) map.get("code");
-                        String detail = (String) map.get("detail");
-                        String title = (String) map.get("title");
-
-                        return new ClientV3Exception.Error(code, detail, title);
-                    })
-                    .collect(Collectors.toList());
-
-                return new ClientV3Exception(statusCode, errors);
+                Errors errors = objectMapper.readValue(payload, Errors.class);
+                return new ClientV3Exception(statusCode, errors.getErrors());
             }));
     }
 

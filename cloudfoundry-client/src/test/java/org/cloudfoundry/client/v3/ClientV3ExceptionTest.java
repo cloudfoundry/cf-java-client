@@ -26,8 +26,18 @@ public final class ClientV3ExceptionTest {
 
     @Test
     public void test() {
-        ClientV3Exception exception = new ClientV3Exception(-1, Arrays.asList(new ClientV3Exception.Error(-2, "test-detail-1", "test-title-1"),
-            new ClientV3Exception.Error(-3, "test-detail-2", "test-title-2")));
+        ClientV3Exception exception = new ClientV3Exception(-1,
+            Arrays.asList(
+                Error.builder()
+                    .code(-2)
+                    .detail("test-detail-1")
+                    .title("test-title-1")
+                    .build(),
+                Error.builder()
+                    .code(-3)
+                    .detail("test-detail-2")
+                    .title("test-title-2")
+                    .build()));
 
         assertThat(exception)
             .hasNoCause()
@@ -35,7 +45,7 @@ public final class ClientV3ExceptionTest {
             .extracting("statusCode").containsExactly(-1);
 
         assertThat(exception.getErrors())
-            .flatExtracting(ClientV3Exception.Error::getCode, ClientV3Exception.Error::getDetail, ClientV3Exception.Error::getTitle)
+            .flatExtracting(Error::getCode, Error::getDetail, Error::getTitle)
             .contains(-2, "test-detail-1", "test-title-1", -3, "test-detail-2", "test-title-2");
     }
 

@@ -3,7 +3,7 @@
     {
       "code": 10008,
       "title": "CF-UnprocessableEntity",
-      "detail": "The request is semantically invalid: something went wrong"
+      "detail": "something went wrong"
     }
   ]
 }

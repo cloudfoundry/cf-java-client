@@ -1,0 +1,22 @@
+{
+  "guid": "b19ae525-cbd3-4155-b156-dc0c2a431b4c",
+  "created_at": "2016-10-19T20:25:04Z",
+  "updated_at": "2016-11-08T16:41:26Z",
+  "operation": "app.delete",
+  "state": "FAILED",
+  "links": {
+    "self": {
+      "href": "https://api.example.org/v3/jobs/b19ae525-cbd3-4155-b156-dc0c2a431b4c"
+    },
+    "app": {
+      "href": "https://api.example.org/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058396"
+    }
+  },
+  "errors": [
+    {
+      "code": 10008,
+      "title": "CF-UnprocessableEntity",
+      "detail": "something went wrong"
+    }
+  ]
+}

@@ -37,7 +37,7 @@ public final class ClientV3Exception extends AbstractCloudFoundryException {
      * @param errors     the errors
      */
     public ClientV3Exception(Integer statusCode, List<Error> errors) {
-        super(statusCode, errors.stream().map(Error::toString).collect(Collectors.joining(", ")));
+        super(statusCode, errors.stream().map(ClientV3Exception::toErrorString).collect(Collectors.joining(", ")));
         this.errors = errors;
     }
 
@@ -48,56 +48,8 @@ public final class ClientV3Exception extends AbstractCloudFoundryException {
         return this.errors;
     }
 
-    /**
-     * An error object encapsulating details about an error
-     */
-    public static final class Error {
-
-        private final Integer code;
-
-        private final String detail;
-
-        private final String title;
-
-        /**
-         * Creates a new instance
-         *
-         * @param code   the code
-         * @param detail the detail
-         * @param title  the title
-         */
-        public Error(Integer code, String detail, String title) {
-            this.code = code;
-            this.detail = detail;
-            this.title = title;
-        }
-
-        /**
-         * Returns the code
-         */
-        public Integer getCode() {
-            return this.code;
-        }
-
-        /**
-         * Returns the detail
-         */
-        public String getDetail() {
-            return this.detail;
-        }
-
-        /**
-         * Returns the title
-         */
-        public String getTitle() {
-            return this.title;
-        }
-
-        @Override
-        public String toString() {
-            return String.format("%s(%d): %s", this.title, this.code, this.detail);
-        }
-
+    private static String toErrorString(Error error) {
+        return String.format("%s(%d): %s", error.getTitle(), error.getCode(), error.getDetail());
     }
 
 }
