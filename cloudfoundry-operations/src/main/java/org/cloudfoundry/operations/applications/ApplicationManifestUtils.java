@@ -163,7 +163,7 @@ public final class ApplicationManifestUtils {
             } else if (raw.isTextual()) {
                 String text = raw.asText().toUpperCase();
 
-                if (text.tendsWith("G")) {
+                if (text.endsWith("G")) {
                     return Integer.parseInt(text.substring(0, text.length() - 1)) * GIBI;
                 } else if (text.endsWith("GB")) {
                     return Integer.parseInt(text.substring(0, text.length() - 2)) * GIBI;
