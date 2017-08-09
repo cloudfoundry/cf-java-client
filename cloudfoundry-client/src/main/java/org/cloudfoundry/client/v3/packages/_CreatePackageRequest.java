@@ -16,10 +16,8 @@
 
 package org.cloudfoundry.client.v3.packages;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v3.Data;
 import org.immutables.value.Value;
 
 /**
@@ -29,22 +27,23 @@ import org.immutables.value.Value;
 abstract class _CreatePackageRequest {
 
     /**
-     * The application id
-     */
-    @JsonIgnore
-    abstract String getApplicationId();
-
-    /**
      * The datas
      */
     @JsonProperty("data")
     @Nullable
-    abstract Data getData();
+    abstract PackageData getData();
+
+    /**
+     * The relationships
+     */
+    @JsonProperty("relationships")
+    abstract PackageRelationships getRelationships();
 
     /**
      * The type
      */
     @JsonProperty("type")
     abstract PackageType getType();
+
 
 }

@@ -18,11 +18,8 @@ package org.cloudfoundry.client.v3.tasks;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
-
-import java.util.Map;
 
 /**
  * The request payload for the Create Task endpoint
@@ -36,38 +33,39 @@ abstract class _CreateTaskRequest {
     @JsonIgnore
     abstract String getApplicationId();
 
+
     /**
-     * The command
+     * The command that will be executed
      */
     @JsonProperty("command")
     abstract String getCommand();
 
     /**
-     * The droplet id
+     * Amount of disk to allocate for the task in MB
+     */
+    @JsonProperty("disk_in_mb")
+    @Nullable
+    abstract String getDiskInMb();
+
+    /**
+     * The id of the droplet that will be used to run the command
      */
     @JsonProperty("droplet_guid")
     @Nullable
     abstract String getDropletId();
 
     /**
-     * The environment variables
-     */
-    @AllowNulls
-    @JsonProperty("environment_variables")
-    @Nullable
-    abstract Map<String, String> getEnvironmentVariables();
-
-    /**
-     * The memoryInMb
+     * The amount of memory to allocate for the task in MB
      */
     @JsonProperty("memory_in_mb")
     @Nullable
     abstract Integer getMemoryInMb();
 
     /**
-     * The name
+     * The name of the task
      */
     @JsonProperty("name")
+    @Nullable
     abstract String getName();
 
 }

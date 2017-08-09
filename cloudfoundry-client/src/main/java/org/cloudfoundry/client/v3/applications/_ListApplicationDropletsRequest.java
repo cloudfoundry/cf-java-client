@@ -17,8 +17,10 @@
 package org.cloudfoundry.client.v3.applications;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.FilterParameter;
-import org.cloudfoundry.client.v3.PaginatedAndSortedRequest;
+import org.cloudfoundry.client.v3.PaginatedRequest;
+import org.cloudfoundry.client.v3.droplets.DropletState;
 import org.immutables.value.Value;
 
 import java.util.List;
@@ -27,7 +29,7 @@ import java.util.List;
  * The request payload for the List Application Droplets operation
  */
 @Value.Immutable
-abstract class _ListApplicationDropletsRequest extends PaginatedAndSortedRequest {
+abstract class _ListApplicationDropletsRequest extends PaginatedRequest {
 
     /**
      * The application id
@@ -36,9 +38,22 @@ abstract class _ListApplicationDropletsRequest extends PaginatedAndSortedRequest
     abstract String getApplicationId();
 
     /**
+     * Whether to only include the droplet current assigned to the app
+     */
+    @FilterParameter("current")
+    @Nullable
+    abstract Boolean getCurrent();
+
+    /**
+     * The droplet ids
+     */
+    @FilterParameter("guids")
+    abstract List<String> getDropletIds();
+
+    /**
      * The states
      */
-    @FilterParameter("state")
-    abstract List<String> getStates();
+    @FilterParameter("states")
+    abstract List<DropletState> getStates();
 
 }

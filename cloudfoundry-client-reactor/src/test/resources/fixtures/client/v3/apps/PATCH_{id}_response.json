@@ -1,53 +1,53 @@
 {
-  "guid": "guid-003fabe4-542f-487d-b9b7-8b1bffdd0ca9",
-  "name": "new_name",
-  "desired_state": "STOPPED",
-  "total_desired_instances": 0,
-  "created_at": "2016-01-26T22:20:34Z",
-  "updated_at": "2016-01-26T22:20:35Z",
+  "guid": "1cb006ee-fb05-47e1-b541-c34179ddc446",
+  "name": "my_app",
+  "state": "STARTED",
+  "created_at": "2016-03-17T21:41:30Z",
+  "updated_at": "2016-03-18T11:32:30Z",
   "lifecycle": {
     "type": "buildpack",
     "data": {
       "buildpacks": [
-        "http://gitwheel.org/my-app"
+        "java_buildpack"
       ],
-      "stack": "redhat"
+      "stack": "cflinuxfs2"
     }
-  },
-  "environment_variables": {
-    "MY_ENV_VAR": "foobar",
-    "FOOBAR": "MY_ENV_VAR"
   },
   "links": {
     "self": {
-      "href": "/v3/apps/guid-003fabe4-542f-487d-b9b7-8b1bffdd0ca9"
+      "href": "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446"
     },
     "space": {
-      "href": "/v2/spaces/5441b385-8398-49fd-afb0-cdb5d69a89ce"
+      "href": "https://api.example.org/v3/spaces/2f35885d-0c9d-4423-83ad-fd05066f8576"
     },
     "processes": {
-      "href": "/v3/apps/guid-003fabe4-542f-487d-b9b7-8b1bffdd0ca9/processes"
+      "href": "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/processes"
     },
-    "routes": {
-      "href": "/v3/apps/guid-003fabe4-542f-487d-b9b7-8b1bffdd0ca9/routes"
+    "route_mappings": {
+      "href": "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/route_mappings"
     },
     "packages": {
-      "href": "/v3/apps/guid-003fabe4-542f-487d-b9b7-8b1bffdd0ca9/packages"
+      "href": "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/packages"
+    },
+    "environment_variables": {
+      "href": "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/environment_variables"
+    },
+    "current_droplet": {
+      "href": "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/droplets/current"
     },
     "droplets": {
-      "href": "/v3/apps/guid-003fabe4-542f-487d-b9b7-8b1bffdd0ca9/droplets"
+      "href": "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/droplets"
+    },
+    "tasks": {
+      "href": "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/tasks"
     },
     "start": {
-      "href": "/v3/apps/guid-003fabe4-542f-487d-b9b7-8b1bffdd0ca9/start",
-      "method": "PUT"
+      "href": "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/actions/start",
+      "method": "POST"
     },
     "stop": {
-      "href": "/v3/apps/guid-003fabe4-542f-487d-b9b7-8b1bffdd0ca9/stop",
-      "method": "PUT"
-    },
-    "assign_current_droplet": {
-      "href": "/v3/apps/guid-003fabe4-542f-487d-b9b7-8b1bffdd0ca9/current_droplet",
-      "method": "PUT"
+      "href": "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/actions/stop",
+      "method": "POST"
     }
   }
 }

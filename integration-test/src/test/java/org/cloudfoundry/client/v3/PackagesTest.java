@@ -17,11 +17,10 @@
 package org.cloudfoundry.client.v3;
 
 import org.cloudfoundry.AbstractIntegrationTest;
-import org.cloudfoundry.IfCloudFoundryVersion;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v3.applications.Application;
 import org.cloudfoundry.client.v3.applications.CreateApplicationRequest;
-import org.cloudfoundry.client.v3.applications.Relationships;
+import org.cloudfoundry.client.v3.applications.ApplicationRelationships;
 import org.cloudfoundry.client.v3.packages.CreatePackageRequest;
 import org.cloudfoundry.client.v3.packages.GetPackageRequest;
 import org.cloudfoundry.client.v3.packages.Package;
@@ -40,8 +39,8 @@ import java.time.Duration;
 import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.cloudfoundry.client.v3.packages.State.PROCESSING_UPLOAD;
-import static org.cloudfoundry.client.v3.packages.State.READY;
+import static org.cloudfoundry.client.v3.packages.PackageState.PROCESSING_UPLOAD;
+import static org.cloudfoundry.client.v3.packages.PackageState.READY;
 
 @Ignore("Until Packages are no longer experimental")
 public final class PackagesTest extends AbstractIntegrationTest {
@@ -60,16 +59,17 @@ public final class PackagesTest extends AbstractIntegrationTest {
             .then(spaceId -> this.cloudFoundryClient.applicationsV3()
                 .create(CreateApplicationRequest.builder()
                     .name(applicationName)
-                    .relationships(Relationships.builder()
-                        .space(Relationship.builder()
-                            .id(spaceId)
+                    .relationships(ApplicationRelationships.builder()
+                        .space(ToOneRelationship.builder()
+                            .data(Relationship.builder()
+                                .id(spaceId)
+                                .build())
                             .build())
                         .build())
                     .build()))
             .map(Application::getId)
             .then(applicationId -> this.cloudFoundryClient.packages()
                 .create(CreatePackageRequest.builder()
-                    .applicationId(applicationId)
                     .type(PackageType.BITS)
                     .build()))
             .map(Package::getId)

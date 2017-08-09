@@ -17,8 +17,12 @@
 package org.cloudfoundry.client.v3.applications;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.cloudfoundry.client.v3.FilterParameter;
 import org.cloudfoundry.client.v3.PaginatedRequest;
+import org.cloudfoundry.client.v3.packages.PackageState;
 import org.immutables.value.Value;
+
+import java.util.List;
 
 /**
  * The request payload for the List Application Tasks operation
@@ -31,5 +35,29 @@ abstract class _ListApplicationTasksRequest extends PaginatedRequest {
      */
     @JsonIgnore
     abstract String getApplicationId();
+
+    /**
+     * List of names to filter by
+     */
+    @FilterParameter("names")
+    abstract List<String> getNames();
+
+    /**
+     * List of sequence ids to filter by
+     */
+    @FilterParameter("sequence_ids")
+    abstract List<String> getSequenceIds();
+
+    /**
+     * List of states to filter by
+     */
+    @FilterParameter("states")
+    abstract List<PackageState> getStates();
+
+    /**
+     * List of task ids to filter by
+     */
+    @FilterParameter("guids")
+    abstract List<String> getTaskIds();
 
 }

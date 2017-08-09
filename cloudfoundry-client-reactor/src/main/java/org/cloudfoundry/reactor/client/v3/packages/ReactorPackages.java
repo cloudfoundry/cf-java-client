@@ -24,11 +24,11 @@ import org.cloudfoundry.client.v3.packages.DeletePackageRequest;
 import org.cloudfoundry.client.v3.packages.DownloadPackageRequest;
 import org.cloudfoundry.client.v3.packages.GetPackageRequest;
 import org.cloudfoundry.client.v3.packages.GetPackageResponse;
+import org.cloudfoundry.client.v3.packages.ListPackageDropletsRequest;
+import org.cloudfoundry.client.v3.packages.ListPackageDropletsResponse;
 import org.cloudfoundry.client.v3.packages.ListPackagesRequest;
 import org.cloudfoundry.client.v3.packages.ListPackagesResponse;
 import org.cloudfoundry.client.v3.packages.Packages;
-import org.cloudfoundry.client.v3.packages.StagePackageRequest;
-import org.cloudfoundry.client.v3.packages.StagePackageResponse;
 import org.cloudfoundry.client.v3.packages.UploadPackageRequest;
 import org.cloudfoundry.client.v3.packages.UploadPackageResponse;
 import org.cloudfoundry.reactor.ConnectionContext;
@@ -64,13 +64,13 @@ public final class ReactorPackages extends AbstractClientV3Operations implements
 
     @Override
     public Mono<CopyPackageResponse> copy(CopyPackageRequest request) {
-        return post(request, CopyPackageResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "packages"))
+        return post(request, CopyPackageResponse.class, builder -> builder.pathSegment("v3", "packages"))
             .checkpoint();
     }
 
     @Override
     public Mono<CreatePackageResponse> create(CreatePackageRequest request) {
-        return post(request, CreatePackageResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "packages"))
+        return post(request, CreatePackageResponse.class, builder -> builder.pathSegment("v3", "packages"))
             .checkpoint();
     }
 
@@ -100,8 +100,8 @@ public final class ReactorPackages extends AbstractClientV3Operations implements
     }
 
     @Override
-    public Mono<StagePackageResponse> stage(StagePackageRequest request) {
-        return post(request, StagePackageResponse.class, builder -> builder.pathSegment("v3", "packages", request.getPackageId(), "droplets"))
+    public Mono<ListPackageDropletsResponse> listDroplets(ListPackageDropletsRequest request) {
+        return get(request, ListPackageDropletsResponse.class, builder -> builder.pathSegment("v3", "packages", request.getPackageId(), "droplets"))
             .checkpoint();
     }
 

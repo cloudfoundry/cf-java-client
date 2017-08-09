@@ -1,0 +1,14 @@
+{
+  "guid": "b19f6525-cbd3-4155-b156-dc0c2a431b4c",
+  "name": "an_isolation_segment",
+  "created_at": "2016-10-19T20:25:04Z",
+  "updated_at": "2016-11-08T16:41:26Z",
+  "links": {
+    "self": {
+      "href": "https://api.example.org/v3/isolation_segments/b19f6525-cbd3-4155-b156-dc0c2a431b4c"
+    },
+    "organizations": {
+      "href": "https://api.example.org/v3/isolation_segments/b19f6525-cbd3-4155-b156-dc0c2a431b4c/organizations"
+    }
+  }
+}

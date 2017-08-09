@@ -20,18 +20,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
- * Represents the lifecycle of an application
+ * The lifecycle type
  */
 @JsonDeserialize
 @Value.Immutable
 abstract class _Lifecycle {
 
     /**
-     * The datas
+     * The data for the lifecycle
      */
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "type")
     @JsonSubTypes({
@@ -39,14 +38,12 @@ abstract class _Lifecycle {
         @JsonSubTypes.Type(name = "docker", value = DockerData.class)
     })
     @JsonProperty("data")
-    @Nullable
-    abstract Data getData();
+    abstract LifecycleData getData();
 
     /**
      * The type
      */
     @JsonProperty("type")
-    @Nullable
-    abstract Type getType();
+    abstract LifecycleType getType();
 
 }

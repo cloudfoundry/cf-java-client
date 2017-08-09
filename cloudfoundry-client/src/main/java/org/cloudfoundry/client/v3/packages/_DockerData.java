@@ -18,33 +18,28 @@ package org.cloudfoundry.client.v3.packages;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v3.Hash;
 import org.immutables.value.Value;
 
 @JsonDeserialize
 @Value.Immutable
-abstract class _DockerData implements Data {
-
-    /**
-     * The error for the package
-     */
-    @JsonProperty("error")
-    @Nullable
-    abstract String getError();
-
-    /**
-     * The hash of the package
-     */
-    @JsonProperty("hash")
-    @Nullable
-    abstract Hash getHash();
+abstract class _DockerData implements PackageData {
 
     /**
      * The Docker image
      */
     @JsonProperty("image")
-    @Nullable
     abstract String getImage();
+
+    /**
+     * The password for the image's registry
+     */
+    @JsonProperty("password")
+    abstract String getPassword();
+
+    /**
+     * The username for the image's registry
+     */
+    @JsonProperty("username")
+    abstract String getUsername();
 
 }

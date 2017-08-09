@@ -17,8 +17,13 @@
 package org.cloudfoundry.client.v3.applications;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.cloudfoundry.client.v3.FilterParameter;
 import org.cloudfoundry.client.v3.PaginatedRequest;
+import org.cloudfoundry.client.v3.packages.PackageState;
+import org.cloudfoundry.client.v3.packages.PackageType;
 import org.immutables.value.Value;
+
+import java.util.List;
 
 /**
  * The request payload for the List Application Packages operation
@@ -31,5 +36,23 @@ abstract class _ListApplicationPackagesRequest extends PaginatedRequest {
      */
     @JsonIgnore
     abstract String getApplicationId();
+
+    /**
+     * Package ids to filter by
+     */
+    @FilterParameter("guids")
+    abstract List<String> getPackageIds();
+
+    /**
+     * Package states to filter by
+     */
+    @FilterParameter("states")
+    abstract List<PackageState> getStates();
+
+    /**
+     * Package types to filter by
+     */
+    @FilterParameter("types")
+    abstract List<PackageType> getTypes();
 
 }

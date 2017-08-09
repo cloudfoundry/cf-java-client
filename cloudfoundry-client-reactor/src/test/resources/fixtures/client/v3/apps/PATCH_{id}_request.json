@@ -1,16 +1,11 @@
 {
-  "name": "new_name",
-  "environment_variables": {
-    "MY_ENV_VAR": "foobar",
-    "FOOBAR": "MY_ENV_VAR"
-  },
+  "name": "my_app",
   "lifecycle": {
     "type": "buildpack",
     "data": {
       "buildpacks": [
-        "http://gitwheel.org/my-app"
-      ],
-      "stack": "redhat"
+        "java_buildpack"
+      ]
     }
   }
 }

@@ -17,51 +17,17 @@
 package org.cloudfoundry.client.v3.isolationsegments;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.cloudfoundry.AllowNulls;
-import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v3.Link;
-
-import java.util.Map;
+import org.cloudfoundry.client.v3.Resource;
 
 /**
  * Base class for responses that are isolation segments
  */
-public abstract class IsolationSegment {
-
-    /**
-     * The created at
-     */
-    @JsonProperty("created_at")
-    @Nullable
-    public abstract String getCreatedAt();
-
-    /**
-     * The id
-     */
-    @JsonProperty("guid")
-    @Nullable
-    public abstract String getId();
-
-    /**
-     * The links
-     */
-    @AllowNulls
-    @JsonProperty("links")
-    @Nullable
-    public abstract Map<String, Link> getLinks();
+public abstract class IsolationSegment extends Resource {
 
     /**
      * The name
      */
     @JsonProperty("name")
-    @Nullable
     public abstract String getName();
-
-    /**
-     * The updated at
-     */
-    @JsonProperty("updated_at")
-    @Nullable
-    public abstract String getUpdatedAt();
 
 }

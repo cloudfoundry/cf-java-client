@@ -19,25 +19,25 @@ package org.cloudfoundry.client.v3.packages;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v3.Hash;
+import org.cloudfoundry.client.v3.Checksum;
 import org.immutables.value.Value;
 
 @JsonDeserialize
 @Value.Immutable
-abstract class _BitsData implements Data {
+abstract class _BitsData implements PackageData {
 
     /**
-     * The error for the package
+     * The checksum
+     */
+    @JsonProperty("checksum")
+    @Nullable
+    abstract Checksum getChecksum();
+
+    /**
+     * The error
      */
     @JsonProperty("error")
     @Nullable
     abstract String getError();
-
-    /**
-     * The hash of the package
-     */
-    @JsonProperty("hash")
-    @Nullable
-    abstract Hash getHash();
 
 }

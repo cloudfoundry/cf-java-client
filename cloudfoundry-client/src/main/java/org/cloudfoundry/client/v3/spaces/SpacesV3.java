@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 public interface SpacesV3 {
 
     /**
-     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#assign-an-isolation-segment">Assign an Isolation Segment</a> request
+     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#assign-an-isolation-segment">Assign an Isolation Segment</a> request
      *
      * @param request the Assign an Isolation Segment request
      * @return the response from the Assign an Isolation Segment request
@@ -40,7 +40,15 @@ public interface SpacesV3 {
     Mono<GetSpaceIsolationSegmentResponse> getIsolationSegment(GetSpaceIsolationSegmentRequest request);
 
     /**
-     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#list-isolation-segments">List Spaces</a> request
+     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#get-a-space">Get Space</a> request
+     *
+     * @param request the Get Space request
+     * @return the response from the Get Space request
+     */
+    Mono<GetSpaceResponse> list(GetSpaceRequest request);
+
+    /**
+     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#list-spaces">List Spaces</a> request
      *
      * @param request the List Spaces request
      * @return the response from the List Spaces request

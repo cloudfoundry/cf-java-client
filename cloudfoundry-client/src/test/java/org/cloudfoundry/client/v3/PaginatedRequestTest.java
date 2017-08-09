@@ -39,6 +39,7 @@ public final class PaginatedRequestTest {
         StubPaginatedRequest.builder()
             .page(10)
             .perPage(10)
+            .orderBy("name")
             .build();
     }
 

@@ -18,7 +18,6 @@ package org.cloudfoundry.client.v3.processes;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
@@ -32,28 +31,24 @@ abstract class _ProcessUsage {
      * The CPU
      */
     @JsonProperty("cpu")
-    @Nullable
     abstract Double getCpu();
 
     /**
      * The disk
      */
     @JsonProperty("disk")
-    @Nullable
-    abstract Long getDisk();
+    abstract Integer getDisk();
 
     /**
      * The memory
      */
     @JsonProperty("mem")
-    @Nullable
-    abstract Long getMemory();
+    abstract Integer getMemory();
 
     /**
      * The time
      */
     @JsonProperty("time")
-    @Nullable
     abstract String getTime();
 
 }

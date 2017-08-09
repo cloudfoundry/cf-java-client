@@ -69,7 +69,7 @@ public final class ReactorProcesses extends AbstractClientV3Operations implement
 
     @Override
     public Mono<ScaleProcessResponse> scale(ScaleProcessRequest request) {
-        return put(request, ScaleProcessResponse.class, builder -> builder.pathSegment("v3", "processes", request.getProcessId(), "scale"))
+        return post(request, ScaleProcessResponse.class, builder -> builder.pathSegment("v3", "processes", request.getProcessId(), "actions", "scale"))
             .checkpoint();
     }
 

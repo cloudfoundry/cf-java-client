@@ -27,7 +27,7 @@ import org.cloudfoundry.client.v3.servicebindings.GetServiceBindingRequest;
 import org.cloudfoundry.client.v3.servicebindings.GetServiceBindingResponse;
 import org.cloudfoundry.client.v3.servicebindings.ListServiceBindingsRequest;
 import org.cloudfoundry.client.v3.servicebindings.ListServiceBindingsResponse;
-import org.cloudfoundry.client.v3.servicebindings.Relationships;
+import org.cloudfoundry.client.v3.servicebindings.ServiceBindingRelationships;
 import org.cloudfoundry.client.v3.servicebindings.ServiceBindingData;
 import org.cloudfoundry.client.v3.servicebindings.ServiceBindingResource;
 import org.cloudfoundry.client.v3.servicebindings.ServiceBindingType;
@@ -69,7 +69,7 @@ public final class ReactorServiceBindingsV3Test extends AbstractClientApiTest {
                 .data(CreateServiceBindingData.builder()
                     .parameter("some_object_id", "for_the_service_broker")
                     .build())
-                .relationships(Relationships.builder()
+                .relationships(ServiceBindingRelationships.builder()
                     .application(Relationship.builder()
                         .id("74f7c078-0934-470f-9883-4fddss5b8f13")
                         .build())

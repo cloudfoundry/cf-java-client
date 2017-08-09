@@ -1,47 +1,44 @@
 {
   "pagination": {
     "total_results": 1,
+    "total_pages": 1,
     "first": {
-      "href": "/v3/apps/guid-3c5a1cae-3ee6-4dd6-b374-50c21393d353/packages?page=1&per_page=50"
+      "href": "https://api.example.org/v3/apps/f2efe391-2b5b-4836-8518-ad93fa9ebf69/packages?states=READY&page=1&per_page=50"
     },
     "last": {
-      "href": "/v3/apps/guid-3c5a1cae-3ee6-4dd6-b374-50c21393d353/packages?page=1&per_page=50"
+      "href": "https://api.example.org/v3/apps/f2efe391-2b5b-4836-8518-ad93fa9ebf69/packages?states=READY&page=1&per_page=50"
     },
     "next": null,
     "previous": null
   },
   "resources": [
     {
-      "guid": "guid-874e0dd0-2b8e-4f07-8173-f7df02094e38",
+      "guid": "752edab0-2147-4f58-9c25-cd72ad8c3561",
       "type": "bits",
       "data": {
         "error": null,
-        "hash": {
-          "type": "sha1",
+        "checksum": {
+          "type": "sha256",
           "value": null
         }
       },
-      "state": "AWAITING_UPLOAD",
-      "created_at": "2016-01-26T22:20:16Z",
-      "updated_at": null,
+      "state": "READY",
+      "created_at": "2016-03-17T21:41:09Z",
+      "updated_at": "2016-06-08T16:41:26Z",
       "links": {
         "self": {
-          "href": "/v3/packages/guid-874e0dd0-2b8e-4f07-8173-f7df02094e38"
+          "href": "https://api.example.org/v3/packages/752edab0-2147-4f58-9c25-cd72ad8c3561"
         },
         "upload": {
-          "href": "/v3/packages/guid-874e0dd0-2b8e-4f07-8173-f7df02094e38/upload",
+          "href": "https://api.example.org/v3/packages/752edab0-2147-4f58-9c25-cd72ad8c3561/upload",
           "method": "POST"
         },
         "download": {
-          "href": "/v3/packages/guid-874e0dd0-2b8e-4f07-8173-f7df02094e38/download",
+          "href": "https://api.example.org/v3/packages/752edab0-2147-4f58-9c25-cd72ad8c3561/download",
           "method": "GET"
         },
-        "stage": {
-          "href": "/v3/packages/guid-874e0dd0-2b8e-4f07-8173-f7df02094e38/droplets",
-          "method": "POST"
-        },
         "app": {
-          "href": "/v3/apps/guid-3c5a1cae-3ee6-4dd6-b374-50c21393d353"
+          "href": "https://api.example.org/v3/apps/f2efe391-2b5b-4836-8518-ad93fa9ebf69"
         }
       }
     }

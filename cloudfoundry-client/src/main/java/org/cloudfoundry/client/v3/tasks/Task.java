@@ -17,66 +17,43 @@
 package org.cloudfoundry.client.v3.tasks;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v3.Link;
-
-import java.util.Map;
+import org.cloudfoundry.client.v3.Resource;
 
 /**
  * Base class for responses that are tasks
  */
-public abstract class Task {
+public abstract class Task extends Resource {
 
     /**
-     * The command
+     * The command that will be executed
      */
     @JsonProperty("command")
     @Nullable
     public abstract String getCommand();
 
     /**
-     * The created at
+     * The amount of disk to allocate for the task in MB
      */
-    @JsonProperty("created_at")
-    @Nullable
-    public abstract String getCreatedAt();
+    @JsonProperty("disk_in_mb")
+    public abstract Integer getDiskInMb();
 
     /**
-     * The environment variables
+     * The id of the droplet that will be used to run the command
      */
-    @AllowNulls
-    @JsonProperty("environment_variables")
-    @Nullable
-    public abstract Map<String, String> getEnvironmentVariables();
+    @JsonProperty("droplet_guid")
+    public abstract String getDropletId();
 
     /**
-     * The id
-     */
-    @JsonProperty("guid")
-    @Nullable
-    public abstract String getId();
-
-    /**
-     * The links
-     */
-    @AllowNulls
-    @JsonProperty("links")
-    @Nullable
-    public abstract Map<String, Link> getLinks();
-
-    /**
-     * The memory in megabytes=
+     * The amount of memory to allocate for the task in MB
      */
     @JsonProperty("memory_in_mb")
-    @Nullable
     public abstract Integer getMemoryInMb();
 
     /**
      * The tasks name
      */
     @JsonProperty("name")
-    @Nullable
     public abstract String getName();
 
     /**
@@ -87,17 +64,15 @@ public abstract class Task {
     public abstract Result getResult();
 
     /**
-     * The task state
+     * The user-facing id of the task
      */
-    @JsonProperty("state")
-    @Nullable
-    public abstract State getState();
+    @JsonProperty("sequence_id")
+    public abstract Integer getSequenceId();
 
     /**
-     * The updated at
+     * The state of the task
      */
-    @JsonProperty("updated_at")
-    @Nullable
-    public abstract String getUpdatedAt();
+    @JsonProperty("state")
+    public abstract TaskState getState();
 
 }

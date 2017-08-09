@@ -17,7 +17,7 @@
 package org.cloudfoundry.client.v3.applications;
 
 import org.cloudfoundry.client.v3.FilterParameter;
-import org.cloudfoundry.client.v3.PaginatedAndSortedRequest;
+import org.cloudfoundry.client.v3.PaginatedRequest;
 import org.immutables.value.Value;
 
 import java.util.List;
@@ -26,13 +26,13 @@ import java.util.List;
  * The request payload for the List Applications operation
  */
 @Value.Immutable
-abstract class _ListApplicationsRequest extends PaginatedAndSortedRequest {
+abstract class _ListApplicationsRequest extends PaginatedRequest {
 
     /**
      * The ids
      */
     @FilterParameter("guids")
-    abstract List<String> getIds();
+    abstract List<String> getApplicationIds();
 
     /**
      * The names

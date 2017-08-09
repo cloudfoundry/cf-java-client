@@ -17,38 +17,32 @@
 package org.cloudfoundry.client.v3.droplets;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
+import org.cloudfoundry.client.v3.Checksum;
 import org.cloudfoundry.client.v3.Lifecycle;
-import org.cloudfoundry.client.v3.Link;
-import reactor.core.Exceptions;
+import org.cloudfoundry.client.v3.Resource;
 
-import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Base class for responses that are droplets
  */
-public abstract class Droplet {
+public abstract class Droplet extends Resource {
 
     /**
-     * The created at
+     * The buildpacks
      */
-    @JsonProperty("created_at")
+    @JsonProperty("buildpacks")
     @Nullable
-    public abstract String getCreatedAt();
+    public abstract List<Buildpack> getBuildpacks();
 
     /**
-     * The environment variables
+     * The checksum
      */
-    @AllowNulls
-    @JsonProperty("environment_variables")
+    @JsonProperty("checksum")
     @Nullable
-    public abstract Map<String, Object> getEnvironmentVariables();
+    public abstract Checksum getChecksum();
 
     /**
      * The error
@@ -58,94 +52,42 @@ public abstract class Droplet {
     public abstract String getError();
 
     /**
-     * The id
+     * Serialized JSON data resulting from staging for use when executing a droplet
      */
-    @JsonProperty("guid")
+    @JsonProperty("execution_metadata")
+    public abstract String getExecutionMetadata();
+
+    /**
+     * The docker image
+     */
+    @JsonProperty("image")
     @Nullable
-    public abstract String getId();
+    public abstract String getImage();
 
     /**
      * The lifecycle
      */
     @JsonProperty("lifecycle")
-    @Nullable
     public abstract Lifecycle getLifecycle();
 
     /**
-     * The links
+     * The process types and associated start commands
      */
-    @AllowNulls
-    @JsonProperty("links")
+    @JsonProperty("process_types")
     @Nullable
-    public abstract Map<String, Link> getLinks();
+    public abstract Map<String, String> getProcessTypes();
 
     /**
-     * The results
+     * The stack
      */
-    @JsonDeserialize(using = ResultDeserializer.class)
-    @JsonProperty("result")
+    @JsonProperty("stack")
     @Nullable
-    public abstract Result getResult();
-
-    /**
-     * The staging disk in MB
-     */
-    @JsonProperty("staging_disk_in_mb")
-    @Nullable
-    public abstract Integer getStagingDiskInMb();
-
-    /**
-     * The staging memory in MB
-     */
-    @JsonProperty("staging_memory_in_mb")
-    @Nullable
-    public abstract Integer getStagingMemoryInMb();
+    public abstract String getStack();
 
     /**
      * The state
      */
     @JsonProperty("state")
-    @Nullable
-    public abstract State getState();
-
-    /**
-     * The updated at
-     */
-    @JsonProperty("updated_at")
-    @Nullable
-    public abstract String getUpdatedAt();
-
-    public static final class ResultDeserializer extends StdDeserializer<Result> {
-
-        private static final long serialVersionUID = 4299183263982676771L;
-
-        ResultDeserializer() {
-            super(Result.class);
-        }
-
-        @Override
-        public Result deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-            State state = getState(p.getParsingContext().getParent().getCurrentValue());
-
-            switch (state) {
-                case EXPIRED:
-                    return p.readValueAs(ExpiredResult.class);
-                case FAILED:
-                    return p.readValueAs(FailedResult.class);
-                case STAGED:
-                    return p.readValueAs(StagedResult.class);
-                default:
-                    return null;
-            }
-        }
-
-        private State getState(Object droplet) {
-            try {
-                return (State) droplet.getClass().getDeclaredField("state").get(droplet);
-            } catch (IllegalAccessException | NoSuchFieldException e) {
-                throw Exceptions.propagate(e);
-            }
-        }
-    }
+    public abstract DropletState getState();
 
 }

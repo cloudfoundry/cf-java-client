@@ -1,6 +1,0 @@
-{
-  "type": "docker",
-  "data": {
-    "image": "registry/image:latest"
-  }
-}

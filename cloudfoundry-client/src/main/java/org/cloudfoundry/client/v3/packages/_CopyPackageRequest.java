@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.client.v3.packages;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.cloudfoundry.QueryParameter;
 import org.immutables.value.Value;
 
@@ -27,15 +27,15 @@ import org.immutables.value.Value;
 abstract class _CopyPackageRequest {
 
     /**
-     * The application id
+     * The relationships
      */
-    @JsonIgnore
-    abstract String getApplicationId();
+    @JsonProperty("relationships")
+    abstract PackageRelationships getRelationships();
 
     /**
      * The source package id
      */
-    @QueryParameter("source_package_guid")
+    @QueryParameter("source_guid")
     abstract String getSourcePackageId();
 
 }
