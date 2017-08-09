@@ -50,6 +50,7 @@ import org.cloudfoundry.client.v2.users.Users;
 import org.cloudfoundry.client.v3.applications.ApplicationsV3;
 import org.cloudfoundry.client.v3.builds.Builds;
 import org.cloudfoundry.client.v3.droplets.Droplets;
+import org.cloudfoundry.client.v3.jobs.JobsV3;
 import org.cloudfoundry.client.v3.packages.Packages;
 import org.cloudfoundry.client.v3.processes.Processes;
 import org.cloudfoundry.client.v3.servicebindings.ServiceBindingsV3;
@@ -126,9 +127,14 @@ public interface CloudFoundryClient {
     Info info();
 
     /**
-     * Main entry point to the Cloud Foundry Job Client API
+     * Main entry point to the Cloud Foundry Jobs Client API
      */
     Jobs jobs();
+
+    /**
+     * Main entry point to the Cloud Foundry Jobs V3 Client API
+     */
+    JobsV3 jobsV3();
 
     /**
      * Main entry point to the Cloud Foundry Quota Definitions Client API

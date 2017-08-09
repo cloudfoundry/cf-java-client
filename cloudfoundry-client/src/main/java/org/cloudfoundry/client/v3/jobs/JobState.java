@@ -14,15 +14,20 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.builds;
+package org.cloudfoundry.client.v3.jobs;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * The state of a {@link Build}
+ * The state of a {@link Job}
  */
-public enum BuildState {
+public enum JobState {
+
+    /**
+     * The complete state
+     */
+    COMPLETE("COMPLETE"),
 
     /**
      * The failed state
@@ -30,32 +35,27 @@ public enum BuildState {
     FAILED("FAILED"),
 
     /**
-     * The staged state
+     * The processing state
      */
-    STAGED("STAGED"),
-
-    /**
-     * The staging state
-     */
-    STAGING("STAGING");
+    PROCESSING("PROCESSING");
 
     private final String value;
 
-    BuildState(String value) {
+    JobState(String value) {
         this.value = value;
     }
 
     @JsonCreator
-    public static BuildState from(String s) {
+    public static JobState from(String s) {
         switch (s.toLowerCase()) {
+            case "complete":
+                return COMPLETE;
             case "failed":
                 return FAILED;
-            case "staged":
-                return STAGED;
-            case "staging":
-                return STAGING;
+            case "processing":
+                return PROCESSING;
             default:
-                throw new IllegalArgumentException(String.format("Unknown build state: %s", s));
+                throw new IllegalArgumentException(String.format("Unknown job state: %s", s));
         }
     }
 

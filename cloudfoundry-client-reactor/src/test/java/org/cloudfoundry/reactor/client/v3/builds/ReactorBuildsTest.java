@@ -45,7 +45,6 @@ public final class ReactorBuildsTest extends AbstractClientApiTest {
 
     private final ReactorBuilds builds = new ReactorBuilds(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
-
     @Test
     public void create() {
         mockRequest(InteractionContext.builder()
