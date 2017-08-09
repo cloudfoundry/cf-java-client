@@ -17,7 +17,6 @@
 package org.cloudfoundry.client.v3.jobs;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.cloudfoundry.client.v3.Error;
 import org.cloudfoundry.client.v3.Resource;
 
 import java.util.List;
@@ -31,7 +30,7 @@ public abstract class Job extends Resource {
      * Collection of errors that occurred while processing the job.
      */
     @JsonProperty("errors")
-    public abstract List<Error> getErrors();
+    public abstract List<org.cloudfoundry.client.v3.Error> getErrors();
 
     /**
      * Current desired operation of the job
