@@ -14,35 +14,31 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.packages;
+package org.cloudfoundry.client.v3.builds;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
+import org.cloudfoundry.client.v3.Lifecycle;
+import org.cloudfoundry.client.v3.Relationship;
 import org.immutables.value.Value;
 
 /**
- * Data type for docker packages
+ * The request payload for the Create Build operation
  */
-@JsonDeserialize
 @Value.Immutable
-abstract class _DockerData implements PackageData {
+abstract class _CreateBuildRequest {
 
     /**
-     * The Docker image
+     * The lifecycle
      */
-    @JsonProperty("image")
-    abstract String getImage();
+    @JsonProperty("lifecycle")
+    @Nullable
+    abstract Lifecycle getLifecycle();
 
     /**
-     * The password for the image's registry
+     * The package
      */
-    @JsonProperty("password")
-    abstract String getPassword();
-
-    /**
-     * The username for the image's registry
-     */
-    @JsonProperty("username")
-    abstract String getUsername();
+    @JsonProperty("package")
+    abstract Relationship getPackage();
 
 }
