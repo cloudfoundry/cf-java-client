@@ -17,6 +17,8 @@
 package org.cloudfoundry.reactor.client.v3.droplets;
 
 import org.cloudfoundry.client.v3.BuildpackData;
+import org.cloudfoundry.client.v3.Checksum;
+import org.cloudfoundry.client.v3.ChecksumType;
 import org.cloudfoundry.client.v3.DockerData;
 import org.cloudfoundry.client.v3.Lifecycle;
 import org.cloudfoundry.client.v3.LifecycleType;
@@ -25,8 +27,6 @@ import org.cloudfoundry.client.v3.Pagination;
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.ToOneRelationship;
 import org.cloudfoundry.client.v3.droplets.Buildpack;
-import org.cloudfoundry.client.v3.Checksum;
-import org.cloudfoundry.client.v3.ChecksumType;
 import org.cloudfoundry.client.v3.droplets.CopyDropletRequest;
 import org.cloudfoundry.client.v3.droplets.CopyDropletResponse;
 import org.cloudfoundry.client.v3.droplets.DeleteDropletRequest;
@@ -49,8 +49,8 @@ import java.time.Duration;
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
 import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
-import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorDropletsTest extends AbstractClientApiTest {
@@ -124,7 +124,8 @@ public final class ReactorDropletsTest extends AbstractClientApiTest {
                 .method(DELETE).path("/v3/droplets/test-droplet-id")
                 .build())
             .response(TestResponse.builder()
-                .status(NO_CONTENT)
+                .status(ACCEPTED)
+                .header("Location", "https://api.example.org/v3/jobs/[guid]")
                 .build())
             .build());
 
@@ -133,6 +134,7 @@ public final class ReactorDropletsTest extends AbstractClientApiTest {
                 .dropletId("test-droplet-id")
                 .build())
             .as(StepVerifier::create)
+            .expectNext("[guid]")
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }

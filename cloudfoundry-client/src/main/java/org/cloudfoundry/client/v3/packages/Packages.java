@@ -46,7 +46,7 @@ public interface Packages {
      * @param request the Delete Package request
      * @return the response from the Delete Package request
      */
-    Mono<Void> delete(DeletePackageRequest request);
+    Mono<String> delete(DeletePackageRequest request);
 
     /**
      * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#download-package-bits">Download the bits for a package</a> request

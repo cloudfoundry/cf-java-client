@@ -53,6 +53,15 @@ public abstract class AbstractReactorOperations {
                                          Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
                                          Function<Mono<HttpClientRequest>, Mono<HttpClientRequest>> requestTransformer,
                                          Function<Mono<HttpClientResponse>, Mono<HttpClientResponse>> responseTransformer) {
+
+        return doDelete(requestPayload, uriTransformer, requestTransformer, responseTransformer)
+            .transform(deserializedResponse(responseType));
+    }
+
+    protected final Mono<HttpClientResponse> doDelete(Object requestPayload,
+                                                      Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
+                                                      Function<Mono<HttpClientRequest>, Mono<HttpClientRequest>> requestTransformer,
+                                                      Function<Mono<HttpClientResponse>, Mono<HttpClientResponse>> responseTransformer) {
         return this.root
             .transform(transformUri(uriTransformer))
             .flatMap(uri -> this.connectionContext.getHttpClient()
@@ -67,8 +76,7 @@ public abstract class AbstractReactorOperations {
                 .transform(NetworkLogging.response(uri)))
             .transform(this::invalidateToken)
             .transform(responseTransformer)
-            .transform(ErrorPayloadMapper.fallback())
-            .transform(deserializedResponse(responseType));
+            .transform(ErrorPayloadMapper.fallback());
     }
 
     protected final <T> Mono<T> doGet(Class<T> responseType,

@@ -193,6 +193,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
                 .build())
             .response(TestResponse.builder()
                 .status(ACCEPTED)
+                .header("Location", "https://api.example.org/v3/jobs/[guid]")
                 .build())
             .build());
 
@@ -201,6 +202,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
                 .applicationId("test-application-id")
                 .build())
             .as(StepVerifier::create)
+            .expectNext("[guid]")
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }

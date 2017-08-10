@@ -37,7 +37,7 @@ public interface ApplicationsV3 {
      * @param request the Delete Application request
      * @return the response from the Delete Application request
      */
-    Mono<Void> delete(DeleteApplicationRequest request);
+    Mono<String> delete(DeleteApplicationRequest request);
 
     /**
      * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#get-an-app">Get Application</a> request

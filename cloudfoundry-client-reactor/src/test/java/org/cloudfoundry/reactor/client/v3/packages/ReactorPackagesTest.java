@@ -56,6 +56,7 @@ import java.time.Duration;
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
 import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -186,7 +187,8 @@ public final class ReactorPackagesTest extends AbstractClientApiTest {
                 .method(DELETE).path("/v3/packages/test-package-id")
                 .build())
             .response(TestResponse.builder()
-                .status(OK)
+                .status(ACCEPTED)
+                .header("Location", "https://api.example.org/v3/jobs/[guid]")
                 .build())
             .build());
 
@@ -195,6 +197,7 @@ public final class ReactorPackagesTest extends AbstractClientApiTest {
                 .packageId("test-package-id")
                 .build())
             .as(StepVerifier::create)
+            .expectNext("[guid]")
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
