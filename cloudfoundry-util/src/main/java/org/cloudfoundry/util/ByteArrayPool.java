@@ -66,7 +66,7 @@ public final class ByteArrayPool {
     /**
      * Executes a {@link Consumer} providing a pooled {@code byte} array
      *
-     * @param consumer the {@link Consumer} of the {@link byte} arrray
+     * @param consumer the {@link Consumer} of the {@link byte} array
      */
     public static void withByteArray(Consumer<byte[]> consumer) {
         INSTANCE.doWithByteArray(consumer);

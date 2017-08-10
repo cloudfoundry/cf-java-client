@@ -51,8 +51,8 @@ public final class ReactorDroplets extends AbstractClientV3Operations implements
     }
 
     @Override
-    public Mono<Void> delete(DeleteDropletRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("v3", "droplets", request.getDropletId()))
+    public Mono<String> delete(DeleteDropletRequest request) {
+        return delete(request, builder -> builder.pathSegment("v3", "droplets", request.getDropletId()))
             .checkpoint();
     }
 

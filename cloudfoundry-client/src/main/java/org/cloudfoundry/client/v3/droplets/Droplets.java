@@ -36,7 +36,7 @@ public interface Droplets {
      * @param request the Delete Droplet request
      * @return the response from the Delete Droplet request
      */
-    Mono<Void> delete(DeleteDropletRequest request);
+    Mono<String> delete(DeleteDropletRequest request);
 
     /**
      * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.27.0/#get-a-droplet">Get Droplet</a> request

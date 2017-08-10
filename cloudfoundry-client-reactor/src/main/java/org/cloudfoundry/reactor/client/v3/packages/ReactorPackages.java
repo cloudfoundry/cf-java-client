@@ -75,8 +75,8 @@ public final class ReactorPackages extends AbstractClientV3Operations implements
     }
 
     @Override
-    public Mono<Void> delete(DeletePackageRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("v3", "packages", request.getPackageId()))
+    public Mono<String> delete(DeletePackageRequest request) {
+        return delete(request, builder -> builder.pathSegment("v3", "packages", request.getPackageId()))
             .checkpoint();
     }
 

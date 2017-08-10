@@ -17,6 +17,7 @@
 package org.cloudfoundry.reactor.client.v3;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.QueryBuilder;
@@ -29,6 +30,7 @@ import reactor.core.publisher.Mono;
 import reactor.ipc.netty.http.client.HttpClientRequest;
 import reactor.ipc.netty.http.client.HttpClientResponse;
 
+import java.util.List;
 import java.util.function.Function;
 
 public abstract class AbstractClientV3Operations extends AbstractReactorOperations {
@@ -46,6 +48,15 @@ public abstract class AbstractClientV3Operations extends AbstractReactorOperatio
                 .andThen(uriTransformer),
             outbound -> outbound,
             ErrorPayloadMapper.clientV3(this.connectionContext.getObjectMapper()));
+    }
+
+    protected final Mono<String> delete(Object requestPayload, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+        return doDelete(requestPayload,
+            queryTransformer(requestPayload)
+                .andThen(uriTransformer),
+            outbound -> outbound,
+            inbound -> inbound)
+            .map(AbstractClientV3Operations::extractJobId);
     }
 
     protected final <T> Mono<T> get(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
@@ -107,6 +118,11 @@ public abstract class AbstractClientV3Operations extends AbstractReactorOperatio
                 .map(multipartRequest(this.connectionContext.getObjectMapper()))
                 .transform(requestTransformer),
             ErrorPayloadMapper.clientV3(this.connectionContext.getObjectMapper()));
+    }
+
+    private static String extractJobId(HttpClientResponse response) {
+        List<String> pathSegments = UriComponentsBuilder.fromUriString(response.responseHeaders().get(HttpHeaderNames.LOCATION)).build().getPathSegments();
+        return pathSegments.get(pathSegments.size() - 1);
     }
 
     private static Function<HttpClientRequest, MultipartHttpClientRequest> multipartRequest(ObjectMapper objectMapper) {
