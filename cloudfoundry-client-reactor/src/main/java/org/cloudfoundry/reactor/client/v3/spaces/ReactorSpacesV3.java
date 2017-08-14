@@ -53,14 +53,14 @@ public final class ReactorSpacesV3 extends AbstractClientV3Operations implements
     }
 
     @Override
-    public Mono<GetSpaceIsolationSegmentResponse> getIsolationSegment(GetSpaceIsolationSegmentRequest request) {
-        return get(request, GetSpaceIsolationSegmentResponse.class, builder -> builder.pathSegment("v3", "spaces", request.getSpaceId(), "relationships", "isolation_segment"))
+    public Mono<GetSpaceResponse> get(GetSpaceRequest request) {
+        return get(request, GetSpaceResponse.class, builder -> builder.pathSegment("v3", "spaces", request.getSpaceId()))
             .checkpoint();
     }
 
     @Override
-    public Mono<GetSpaceResponse> list(GetSpaceRequest request) {
-        return get(request, GetSpaceResponse.class, builder -> builder.pathSegment("v3", "spaces", request.getSpaceId()))
+    public Mono<GetSpaceIsolationSegmentResponse> getIsolationSegment(GetSpaceIsolationSegmentRequest request) {
+        return get(request, GetSpaceIsolationSegmentResponse.class, builder -> builder.pathSegment("v3", "spaces", request.getSpaceId(), "relationships", "isolation_segment"))
             .checkpoint();
     }
 

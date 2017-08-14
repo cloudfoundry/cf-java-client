@@ -32,6 +32,10 @@ import org.cloudfoundry.client.v3.applications.ApplicationState;
 import org.cloudfoundry.client.v3.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.CreateApplicationResponse;
 import org.cloudfoundry.client.v3.applications.DeleteApplicationRequest;
+import org.cloudfoundry.client.v3.applications.GetApplicationCurrentDropletRelationshipRequest;
+import org.cloudfoundry.client.v3.applications.GetApplicationCurrentDropletRelationshipResponse;
+import org.cloudfoundry.client.v3.applications.GetApplicationCurrentDropletRequest;
+import org.cloudfoundry.client.v3.applications.GetApplicationCurrentDropletResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentVariablesRequest;
@@ -61,6 +65,8 @@ import org.cloudfoundry.client.v3.applications.StartApplicationResponse;
 import org.cloudfoundry.client.v3.applications.StopApplicationRequest;
 import org.cloudfoundry.client.v3.applications.StopApplicationResponse;
 import org.cloudfoundry.client.v3.applications.TerminateApplicationInstanceRequest;
+import org.cloudfoundry.client.v3.applications.UpdateApplicationEnvironmentVariablesRequest;
+import org.cloudfoundry.client.v3.applications.UpdateApplicationEnvironmentVariablesResponse;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationResponse;
 import org.cloudfoundry.client.v3.droplets.Buildpack;
@@ -271,6 +277,97 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
                 .link("stop", Link.builder()
                     .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/actions/stop")
                     .method("POST")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void getCurrentDroplet() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/v3/apps/test-application-id/droplets/current")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v3/apps/GET_{id}_droplets_current_response.json")
+                .build())
+            .build());
+
+        this.applications
+            .getCurrentDroplet(GetApplicationCurrentDropletRequest.builder()
+                .applicationId("test-application-id")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(GetApplicationCurrentDropletResponse.builder()
+                .id("585bc3c1-3743-497d-88b0-403ad6b56d16")
+                .state(DropletState.STAGED)
+                .error(null)
+                .lifecycle(Lifecycle.builder()
+                    .type(LifecycleType.BUILDPACK)
+                    .data(BuildpackData.builder()
+                        .build())
+                    .build())
+                .executionMetadata("")
+                .processType("rake", "bundle exec rake")
+                .processType("web", "bundle exec rackup config.ru -p $PORT")
+                .checksum(Checksum.builder()
+                    .type(ChecksumType.SHA256)
+                    .value("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855")
+                    .build())
+                .buildpack(Buildpack.builder()
+                    .name("ruby_buildpack")
+                    .detectOutput("ruby 1.6.14")
+                    .build())
+                .stack("cflinuxfs2")
+                .image(null)
+                .createdAt("2016-03-28T23:39:34Z")
+                .updatedAt("2016-03-28T23:39:47Z")
+                .link("self", Link.builder()
+                    .href("https://api.example.org/v3/droplets/585bc3c1-3743-497d-88b0-403ad6b56d16")
+                    .build())
+                .link("package", Link.builder()
+                    .href("https://api.example.org/v3/packages/8222f76a-9e09-4360-b3aa-1ed329945e92")
+                    .build())
+                .link("app", Link.builder()
+                    .href("https://api.example.org/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058396")
+                    .build())
+                .link("assign_current_droplet", Link.builder()
+                    .href("https://api.example.org/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058396/relationships/current_droplet")
+                    .method("PATCH")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void getCurrentDropletRelationship() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/v3/apps/test-application-id/relationships/current_droplet")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v3/apps/GET_{id}_relationships_current_droplet_response.json")
+                .build())
+            .build());
+
+        this.applications
+            .getCurrentDropletRelationship(GetApplicationCurrentDropletRelationshipRequest.builder()
+                .applicationId("test-application-id")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(GetApplicationCurrentDropletRelationshipResponse.builder()
+                .data(Relationship.builder()
+                    .id("9d8e007c-ce52-4ea7-8a57-f2825d2c6b39")
+                    .build())
+                .link("self", Link.builder()
+                    .href("https://api.example.org/v3/apps/d4c91047-7b29-4fda-b7f9-04033e5c9c9f/relationships/current_droplet")
+                    .build())
+                .link("related", Link.builder()
+                    .href("https://api.example.org/v3/apps/d4c91047-7b29-4fda-b7f9-04033e5c9c9f/droplets/current")
                     .build())
                 .build())
             .expectComplete()
@@ -1273,6 +1370,39 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
                 .link("stop", Link.builder()
                     .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/actions/stop")
                     .method("POST")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void updateEnvironmentVariables() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(PATCH).path("/v3/apps/test-application-id/environment_variables")
+                .payload("fixtures/client/v3/apps/PATCH_{id}_environment_variables_request.json")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v3/apps/PATCH_{id}_environment_variables_response.json")
+                .build())
+            .build());
+
+        this.applications
+            .updateEnvironmentVariables(UpdateApplicationEnvironmentVariablesRequest.builder()
+                .applicationId("test-application-id")
+                .var("DEBUG", "false")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(UpdateApplicationEnvironmentVariablesResponse.builder()
+                .var("RAILS_ENV", "production")
+                .var("DEBUG", "false")
+                .link("self", Link.builder()
+                    .href("https://api.example.org/v3/apps/[guid]/environment_variables")
+                    .build())
+                .link("app", Link.builder()
+                    .href("https://api.example.org/v3/apps/[guid]")
                     .build())
                 .build())
             .expectComplete()
