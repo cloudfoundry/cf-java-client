@@ -86,6 +86,8 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
             getConnectTimeout().ifPresent(socketTimeout -> options.option(CONNECT_TIMEOUT_MILLIS, (int) socketTimeout.toMillis()));
 
             options.sslSupport(ssl -> getSslCertificateTruster().ifPresent(trustManager -> ssl.trustManager(new StaticTrustManagerFactory(trustManager))));
+            getSslCloseNotifyFlushTimeout().ifPresent(options::sslCloseNotifyFlushTimeout);
+            getSslCloseNotifyReadTimeout().ifPresent(options::sslCloseNotifyReadTimeout);
             getSslHandshakeTimeout().ifPresent(options::sslHandshakeTimeout);
         });
     }
@@ -177,6 +179,16 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
             return Optional.empty();
         }
     }
+
+    /**
+     * The timeout for the SSL close notify flush
+     */
+    abstract Optional<Duration> getSslCloseNotifyFlushTimeout();
+
+    /**
+     * THe timeout for the SSL close notify read
+     */
+    abstract Optional<Duration> getSslCloseNotifyReadTimeout();
 
     /**
      * The timeout for the SSL handshake negotiation
