@@ -15,17 +15,6 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-codec-http:4.1.12.Final" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-codec:4.1.12.Final" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-handler:4.1.12.Final" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-buffer:4.1.12.Final" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-transport:4.1.12.Final" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-resolver:4.1.12.Final" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-handler-proxy:4.1.12.Final" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-codec-socks:4.1.12.Final" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-transport-native-epoll:4.1.12.Final" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-common:4.1.12.Final" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-transport-native-unix-common:4.1.12.Final" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: com.github.zafarkhaja:java-semver:0.9.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: io.projectreactor:reactor-test:3.1.0.BUILD-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: io.projectreactor:reactor-core:3.1.0.BUILD-SNAPSHOT" level="project" />
@@ -52,7 +41,7 @@
     <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-transport-native-epoll:4.1.13.Final" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-common:4.1.13.Final" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: io.netty:netty-transport-native-unix-common:4.1.13.Final" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: io.projectreactor.ipc:reactor-ipc:0.7.0.M1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: io.projectreactor.ipc:reactor-ipc:0.7.0.BUILD-SNAPSHOT" level="project" />
     <orderEntry type="module" module-name="cloudfoundry-client" scope="TEST" />
     <orderEntry type="library" scope="TEST" name="Maven: com.squareup.wire:wire-runtime:2.2.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: com.squareup.okio:okio:1.8.0" level="project" />
