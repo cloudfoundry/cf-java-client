@@ -1,0 +1,30 @@
+---
+applications:
+  - name: quota-test-1
+    memory: 1m
+    disk_quota: 2m
+  - name: quota-test-2
+    memory: 3mb
+    disk_quota: 4mb
+  - name: quota-test-3
+    memory: 5M
+    disk_quota: 6M
+  - name: quota-test-4
+    memory: 7MB
+    disk_quota: 8MB
+  - name: quota-test-5
+    memory: 1g
+    disk_quota: 2g
+  - name: quota-test-6
+    memory: 3gb
+    disk_quota: 4gb
+  - name: quota-test-7
+    memory: 5G
+    disk_quota: 6G
+  - name: quota-test-8
+    memory: 7GB
+    disk_quota: 8GB
+  - name: quota-test-9
+    memory: 1234
+    disk_quota: 5678
+
