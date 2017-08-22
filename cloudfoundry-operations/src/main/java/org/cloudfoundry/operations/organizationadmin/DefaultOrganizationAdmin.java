@@ -65,7 +65,7 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
     @Override
     public Mono<Void> deleteQuota(DeleteQuotaRequest request) {
         return this.cloudFoundryClient
-            .flatMap(cloudFoundryClient -> Mono.when(
+            .flatMap(cloudFoundryClient -> Mono.zip(
                 Mono.just(cloudFoundryClient),
                 Mono.just(request.getCompletionTimeout()),
                 getOrganizationQuotaId(cloudFoundryClient, request.getName())
@@ -96,7 +96,7 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
     @Override
     public Mono<Void> setQuota(SetQuotaRequest request) {
         return this.cloudFoundryClient
-            .flatMap(cloudFoundryClient -> Mono.when(
+            .flatMap(cloudFoundryClient -> Mono.zip(
                 Mono.just(cloudFoundryClient),
                 getOrganizationId(cloudFoundryClient, request.getOrganizationName()),
                 getOrganizationQuotaId(cloudFoundryClient, request.getQuotaName())
@@ -110,7 +110,7 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
     @Override
     public Mono<OrganizationQuota> updateQuota(UpdateQuotaRequest request) {
         return this.cloudFoundryClient
-            .flatMap(cloudFoundryClient -> Mono.when(
+            .flatMap(cloudFoundryClient -> Mono.zip(
                 Mono.just(cloudFoundryClient),
                 getOrganizationQuota(cloudFoundryClient, request.getName())
             ))

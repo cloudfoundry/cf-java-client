@@ -94,7 +94,7 @@ public final class FeatureFlagsTest extends AbstractIntegrationTest {
                 .get(GetFeatureFlagRequest.builder()
                     .name(flagName)
                     .build())
-                .flatMap(getResponse -> Mono.when(
+                .flatMap(getResponse -> Mono.zip(
                     Mono.just(getResponse),
                     this.cloudFoundryClient.featureFlags()
                         .set(SetFeatureFlagRequest.builder()
@@ -102,16 +102,15 @@ public final class FeatureFlagsTest extends AbstractIntegrationTest {
                             .enabled(!getResponse.getEnabled())
                             .build())
                 ))
-                .flatMap(function((getResponse, setResponse) -> Mono
-                    .when(
-                        Mono.just(getResponse),
-                        Mono.just(setResponse),
-                        this.cloudFoundryClient.featureFlags()
-                            .set(SetFeatureFlagRequest.builder()
-                                .name(getResponse.getName())
-                                .enabled(getResponse.getEnabled())
-                                .build())
-                    ))))
+                .flatMap(function((getResponse, setResponse) -> Mono.zip(
+                    Mono.just(getResponse),
+                    Mono.just(setResponse),
+                    this.cloudFoundryClient.featureFlags()
+                        .set(SetFeatureFlagRequest.builder()
+                            .name(getResponse.getName())
+                            .enabled(getResponse.getEnabled())
+                            .build())
+                ))))
             .collectList()
             .as(StepVerifier::create)
             .consumeNextWith(list -> list.forEach(consumer((getResponse, setResponse, resetResponse) -> {

@@ -89,7 +89,7 @@ public final class ServiceBrokerUtils {
         String hostName = nameFactory.getHostName();
 
         return Mono
-            .when(
+            .zip(
                 createApplicationId(cloudFoundryClient, spaceId, applicationName),
                 createRouteId(cloudFoundryClient, ResourceUtils.getId(domain), spaceId, hostName)
             )

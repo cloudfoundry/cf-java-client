@@ -290,16 +290,14 @@ public final class ServicesTest extends AbstractIntegrationTest {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         this.serviceBrokerId
-            .flatMap(serviceBrokerId -> Mono
-                .when(
-                    getServiceId(this.cloudFoundryClient, serviceBrokerId),
-                    this.spaceId
-                ))
-            .flatMap(function((serviceId, spaceId) -> Mono
-                .when(
-                    Mono.just(serviceId),
-                    createServiceInstanceId(this.cloudFoundryClient, serviceInstanceName, serviceId, spaceId)
-                )))
+            .flatMap(serviceBrokerId -> Mono.zip(
+                getServiceId(this.cloudFoundryClient, serviceBrokerId),
+                this.spaceId
+            ))
+            .flatMap(function((serviceId, spaceId) -> Mono.zip(
+                Mono.just(serviceId),
+                createServiceInstanceId(this.cloudFoundryClient, serviceInstanceName, serviceId, spaceId)
+            )))
             .flatMapMany(function((serviceId, serviceInstanceId) -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.services()
                     .listServicePlans(ListServiceServicePlansRequest.builder()

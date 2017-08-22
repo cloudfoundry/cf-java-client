@@ -45,7 +45,7 @@ public final class DefaultSpaceAdmin implements SpaceAdmin {
     @Override
     public Mono<SpaceQuota> get(GetSpaceQuotaRequest request) {
         return Mono
-            .when(this.cloudFoundryClient, this.organizationId)
+            .zip(this.cloudFoundryClient, this.organizationId)
             .flatMap(function((cloudFoundryClient, organizationId) -> getSpaceQuotaDefinition(cloudFoundryClient, organizationId, request.getName())))
             .map(DefaultSpaceAdmin::toSpaceQuota)
             .transform(OperationsLogging.log("Get Space Quota"))
@@ -55,7 +55,7 @@ public final class DefaultSpaceAdmin implements SpaceAdmin {
     @Override
     public Flux<SpaceQuota> listQuotas() {
         return Mono
-            .when(this.cloudFoundryClient, this.organizationId)
+            .zip(this.cloudFoundryClient, this.organizationId)
             .flatMapMany(function(DefaultSpaceAdmin::requestSpaceQuotaDefinitions))
             .map(DefaultSpaceAdmin::toSpaceQuota)
             .transform(OperationsLogging.log("List Space Quota"))

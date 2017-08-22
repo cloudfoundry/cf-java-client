@@ -60,7 +60,8 @@ public final class ServiceKeysTest extends AbstractIntegrationTest {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
         String serviceKeyName = this.nameFactory.getServiceKeyName();
 
-        Mono.when(this.serviceBrokerId, this.spaceId)
+        Mono
+            .zip(this.serviceBrokerId, this.spaceId)
             .flatMap(function((serviceBrokerId, spaceId) -> createServiceInstanceId(this.cloudFoundryClient, serviceBrokerId, serviceInstanceName, spaceId)))
             .flatMap(serviceInstanceId -> this.cloudFoundryClient.serviceKeys()
                 .create(CreateServiceKeyRequest.builder()
@@ -82,7 +83,8 @@ public final class ServiceKeysTest extends AbstractIntegrationTest {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
         String serviceKeyName = this.nameFactory.getServiceKeyName();
 
-        Mono.when(this.serviceBrokerId, this.spaceId)
+        Mono
+            .zip(this.serviceBrokerId, this.spaceId)
             .flatMap(function((serviceBrokerId, spaceId) -> createServiceInstanceId(this.cloudFoundryClient, serviceBrokerId, serviceInstanceName, spaceId)))
             .flatMap(serviceInstanceId -> createServiceKeyId(this.cloudFoundryClient, serviceInstanceId, serviceKeyName))
             .flatMap(serviceKeyId -> this.cloudFoundryClient.serviceKeys()
@@ -101,7 +103,8 @@ public final class ServiceKeysTest extends AbstractIntegrationTest {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
         String serviceKeyName = this.nameFactory.getServiceKeyName();
 
-        Mono.when(this.serviceBrokerId, this.spaceId)
+        Mono
+            .zip(this.serviceBrokerId, this.spaceId)
             .flatMap(function((serviceBrokerId, spaceId) -> createServiceInstanceId(this.cloudFoundryClient, serviceBrokerId, serviceInstanceName, spaceId)))
             .flatMap(serviceInstanceId -> createServiceKeyId(this.cloudFoundryClient, serviceInstanceId, serviceKeyName))
             .flatMap(serviceKeyId -> this.cloudFoundryClient.serviceKeys()
@@ -120,7 +123,8 @@ public final class ServiceKeysTest extends AbstractIntegrationTest {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
         String serviceKeyName = this.nameFactory.getServiceKeyName();
 
-        Mono.when(this.serviceBrokerId, this.spaceId)
+        Mono
+            .zip(this.serviceBrokerId, this.spaceId)
             .flatMap(function((serviceBrokerId, spaceId) -> createServiceInstanceId(this.cloudFoundryClient, serviceBrokerId, serviceInstanceName, spaceId)))
             .flatMap(serviceInstanceId -> createServiceKeyId(this.cloudFoundryClient, serviceInstanceId, serviceKeyName))
             .thenMany(PaginationUtils
@@ -141,7 +145,8 @@ public final class ServiceKeysTest extends AbstractIntegrationTest {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
         String serviceKeyName = this.nameFactory.getServiceKeyName();
 
-        Mono.when(this.serviceBrokerId, this.spaceId)
+        Mono
+            .zip(this.serviceBrokerId, this.spaceId)
             .flatMap(function((serviceBrokerId, spaceId) -> createServiceInstanceId(this.cloudFoundryClient, serviceBrokerId, serviceInstanceName, spaceId)))
             .flatMap(serviceInstanceId -> createServiceKeyId(this.cloudFoundryClient, serviceInstanceId, serviceKeyName))
             .thenMany(PaginationUtils
@@ -162,7 +167,8 @@ public final class ServiceKeysTest extends AbstractIntegrationTest {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
         String serviceKeyName = this.nameFactory.getServiceKeyName();
 
-        Mono.when(this.serviceBrokerId, this.spaceId)
+        Mono
+            .zip(this.serviceBrokerId, this.spaceId)
             .flatMap(function((serviceBrokerId, spaceId) -> createServiceInstanceId(this.cloudFoundryClient, serviceBrokerId, serviceInstanceName, spaceId)))
             .delayUntil(serviceInstanceId -> createServiceKeyId(this.cloudFoundryClient, serviceInstanceId, serviceKeyName))
             .flatMapMany(serviceInstanceId -> PaginationUtils

@@ -181,18 +181,17 @@ public final class TokensTest extends AbstractIntegrationTest {
         this.uaaClient.tokens()
             .getKey(GetTokenKeyRequest.builder()
                 .build())
-            .flatMap(getKey -> Mono
-                .when(
-                    this.uaaClient.tokens()
-                        .listKeys(ListTokenKeysRequest.builder()
-                            .build())
-                        .flatMapMany(response -> Flux.fromIterable(response.getKeys()))
-                        .filter(tokenKey -> getKey.getValue().equals(tokenKey.getValue()))
-                        .single()
-                        .map(TokenKey::getId),
-                    Mono.just(getKey)
-                        .map(GetTokenKeyResponse::getId)
-                ))
+            .flatMap(getKey -> Mono.zip(
+                this.uaaClient.tokens()
+                    .listKeys(ListTokenKeysRequest.builder()
+                        .build())
+                    .flatMapMany(response -> Flux.fromIterable(response.getKeys()))
+                    .filter(tokenKey -> getKey.getValue().equals(tokenKey.getValue()))
+                    .single()
+                    .map(TokenKey::getId),
+                Mono.just(getKey)
+                    .map(GetTokenKeyResponse::getId)
+            ))
             .as(StepVerifier::create)
             .consumeNextWith(tupleEquality())
             .expectComplete()

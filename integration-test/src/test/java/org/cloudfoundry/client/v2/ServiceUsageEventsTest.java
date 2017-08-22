@@ -55,10 +55,11 @@ public final class ServiceUsageEventsTest extends AbstractIntegrationTest {
 
     @Test
     public void get() throws TimeoutException, InterruptedException {
-        Mono.when(this.serviceBrokerId, this.spaceId)
+        Mono
+            .zip(this.serviceBrokerId, this.spaceId)
             .flatMap(function((serviceBrokerId, spaceId) -> seedEvents(this.cloudFoundryClient, this.nameFactory, serviceBrokerId, spaceId)))
             .then(getFirstEvent(this.cloudFoundryClient))
-            .flatMap(resource -> Mono.when(
+            .flatMap(resource -> Mono.zip(
                 Mono.just(resource)
                     .map(ResourceUtils::getId),
                 this.cloudFoundryClient.serviceUsageEvents()
@@ -75,10 +76,11 @@ public final class ServiceUsageEventsTest extends AbstractIntegrationTest {
 
     @Test
     public void list() throws TimeoutException, InterruptedException {
-        Mono.when(this.serviceBrokerId, this.spaceId)
+        Mono
+            .zip(this.serviceBrokerId, this.spaceId)
             .flatMap(function((serviceBrokerId, spaceId) -> seedEvents(this.cloudFoundryClient, this.nameFactory, serviceBrokerId, spaceId)))
             .then(getFirstEvent(this.cloudFoundryClient))
-            .flatMap(resource -> Mono.when(
+            .flatMap(resource -> Mono.zip(
                 Mono.just(resource),
                 this.cloudFoundryClient.serviceUsageEvents()
                     .list(ListServiceUsageEventsRequest.builder()
@@ -94,10 +96,11 @@ public final class ServiceUsageEventsTest extends AbstractIntegrationTest {
 
     @Test
     public void listAfterServiceUsageEventId() {
-        Mono.when(this.serviceBrokerId, this.spaceId)
+        Mono
+            .zip(this.serviceBrokerId, this.spaceId)
             .flatMap(function((serviceBrokerId, spaceId) -> seedEvents(this.cloudFoundryClient, this.nameFactory, serviceBrokerId, spaceId)))
             .then(getFirstEvent(this.cloudFoundryClient))
-            .flatMap(resource -> Mono.when(
+            .flatMap(resource -> Mono.zip(
                 getSecondEvent(this.cloudFoundryClient),
                 this.cloudFoundryClient.serviceUsageEvents()
                     .list(ListServiceUsageEventsRequest.builder()
@@ -114,10 +117,11 @@ public final class ServiceUsageEventsTest extends AbstractIntegrationTest {
 
     @Test
     public void listFilterByServiceId() {
-        Mono.when(this.serviceBrokerId, this.spaceId)
+        Mono
+            .zip(this.serviceBrokerId, this.spaceId)
             .flatMap(function((serviceBrokerId, spaceId) -> seedEvents(this.cloudFoundryClient, this.nameFactory, serviceBrokerId, spaceId)))
             .then(getFirstEventWithServiceId(this.cloudFoundryClient))
-            .flatMap(resource -> Mono.when(
+            .flatMap(resource -> Mono.zip(
                 Mono.just(resource),
                 this.cloudFoundryClient.serviceUsageEvents()
                     .list(ListServiceUsageEventsRequest.builder()
@@ -134,10 +138,11 @@ public final class ServiceUsageEventsTest extends AbstractIntegrationTest {
 
     @Test
     public void listFilterByServiceInstanceType() {
-        Mono.when(this.serviceBrokerId, this.spaceId)
+        Mono
+            .zip(this.serviceBrokerId, this.spaceId)
             .flatMap(function((serviceBrokerId, spaceId) -> seedEvents(this.cloudFoundryClient, this.nameFactory, serviceBrokerId, spaceId)))
             .then(getFirstEvent(this.cloudFoundryClient))
-            .flatMap(resource -> Mono.when(
+            .flatMap(resource -> Mono.zip(
                 Mono.just(resource),
                 this.cloudFoundryClient.serviceUsageEvents()
                     .list(ListServiceUsageEventsRequest.builder()

@@ -50,7 +50,7 @@ public final class DefaultBuildpacks implements Buildpacks {
     @Override
     public Mono<Void> create(CreateBuildpackRequest request) {
         return this.cloudFoundryClient
-            .flatMap(cloudFoundryClient -> Mono.when(
+            .flatMap(cloudFoundryClient -> Mono.zip(
                 Mono.just(cloudFoundryClient),
                 requestCreateBuildpack(cloudFoundryClient, request.getName(), request.getPosition(), request.getEnable())
             ))
@@ -63,7 +63,7 @@ public final class DefaultBuildpacks implements Buildpacks {
     @Override
     public Mono<Void> delete(DeleteBuildpackRequest request) {
         return this.cloudFoundryClient
-            .flatMap(cloudFoundryClient -> Mono.when(
+            .flatMap(cloudFoundryClient -> Mono.zip(
                 getBuildPackId(cloudFoundryClient, request.getName()),
                 Mono.just(cloudFoundryClient)
             ))
@@ -85,7 +85,7 @@ public final class DefaultBuildpacks implements Buildpacks {
     @Override
     public Mono<Void> rename(RenameBuildpackRequest request) {
         return this.cloudFoundryClient
-            .flatMap(cloudFoundryClient -> Mono.when(
+            .flatMap(cloudFoundryClient -> Mono.zip(
                 getBuildPackId(cloudFoundryClient, request.getName()),
                 Mono.just(cloudFoundryClient)
             ))
@@ -98,11 +98,11 @@ public final class DefaultBuildpacks implements Buildpacks {
     @Override
     public Mono<Void> update(UpdateBuildpackRequest request) {
         return this.cloudFoundryClient
-            .flatMap(cloudFoundryClient -> Mono.when(
+            .flatMap(cloudFoundryClient -> Mono.zip(
                 getBuildPackId(cloudFoundryClient, request.getName()),
                 Mono.just(cloudFoundryClient)
             ))
-            .flatMap(function((buildpackId, cloudFoundryClient) -> Mono.when(
+            .flatMap(function((buildpackId, cloudFoundryClient) -> Mono.zip(
                 requestUpdateBuildpack(cloudFoundryClient, buildpackId, request),
                 uploadBuildpackBits(cloudFoundryClient, buildpackId, request)
             )))

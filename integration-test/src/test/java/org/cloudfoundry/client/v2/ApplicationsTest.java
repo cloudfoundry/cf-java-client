@@ -115,14 +115,14 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
 
         Mono
-            .when(this.organizationId, this.spaceId)
-            .flatMap(function((organizationId, spaceId) -> Mono.when(
+            .zip(this.organizationId, this.spaceId)
+            .flatMap(function((organizationId, spaceId) -> Mono.zip(
                 createApplicationId(this.cloudFoundryClient, spaceId, applicationName),
                 createRouteWithDomain(this.cloudFoundryClient, organizationId, spaceId, domainName, "test-host", "/test/path")
                     .map(ResourceUtils::getId)
             )))
             .delayUntil(function((applicationId, routeId) -> requestAssociateRoute(this.cloudFoundryClient, applicationId, routeId)))
-            .flatMap(function((applicationId, routeId) -> Mono.when(
+            .flatMap(function((applicationId, routeId) -> Mono.zip(
                 getSingleRouteId(this.cloudFoundryClient, applicationId),
                 Mono.just(routeId)
             )))
@@ -138,7 +138,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String copyApplicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
-            .flatMap(spaceId -> Mono.when(
+            .flatMap(spaceId -> Mono.zip(
                 createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
                     .delayUntil(applicationId -> uploadApplication(this.cloudFoundryClient, applicationId)),
                 requestCreateApplication(this.cloudFoundryClient, spaceId, copyApplicationName)
@@ -151,7 +151,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .build())
                 .flatMap(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job))
             ))
-            .flatMap(function((sourceId, targetId) -> Mono.when(
+            .flatMap(function((sourceId, targetId) -> Mono.zip(
                 downloadApplication(this.cloudFoundryClient, sourceId),
                 downloadApplication(this.cloudFoundryClient, targetId)
             )))
@@ -166,7 +166,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
-            .flatMap(spaceId -> Mono.when(
+            .flatMap(spaceId -> Mono.zip(
                 Mono.just(spaceId),
                 requestCreateApplication(this.cloudFoundryClient, spaceId, applicationName)
                     .map(ResourceUtils::getEntity)
@@ -220,7 +220,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
         this.spaceId
             .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .flatMap(applicationId -> Mono.when(
+            .flatMap(applicationId -> Mono.zip(
                 Mono.just(applicationId),
                 this.cloudFoundryClient.applicationsV2()
                     .environment(ApplicationEnvironmentRequest.builder()
@@ -240,7 +240,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
         this.spaceId
             .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .flatMap(applicationId -> Mono.when(
+            .flatMap(applicationId -> Mono.zip(
                 Mono.just(applicationId),
                 requestGetApplication(this.cloudFoundryClient, applicationId)
             ))
@@ -276,7 +276,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
         this.spaceId
             .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .flatMap(applicationId -> Mono.when(
+            .flatMap(applicationId -> Mono.zip(
                 Mono.just(applicationId),
                 PaginationUtils
                     .requestClientV2Resources(page -> this.cloudFoundryClient.applicationsV2()
@@ -299,7 +299,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
         this.spaceId
             .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .flatMap(applicationId -> Mono.when(
+            .flatMap(applicationId -> Mono.zip(
                 Mono.just(applicationId),
                 PaginationUtils
                     .requestClientV2Resources(page -> this.cloudFoundryClient.applicationsV2()
@@ -323,7 +323,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
         this.spaceId
             .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .flatMap(applicationId -> Mono.when(
+            .flatMap(applicationId -> Mono.zip(
                 Mono.just(applicationId),
                 PaginationUtils
                     .requestClientV2Resources(page -> this.cloudFoundryClient.applicationsV2()
@@ -345,12 +345,13 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     public void listFilterByOrganizationId() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
 
-        Mono.when(
-            this.organizationId,
-            this.spaceId
-                .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-        )
-            .flatMap(function((organizationId, applicationId) -> Mono.when(
+        Mono
+            .zip(
+                this.organizationId,
+                this.spaceId
+                    .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
+            )
+            .flatMap(function((organizationId, applicationId) -> Mono.zip(
                 Mono.just(applicationId),
                 PaginationUtils
                     .requestClientV2Resources(page -> this.cloudFoundryClient.applicationsV2()
@@ -373,11 +374,11 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
-            .flatMap(spaceId -> Mono.when(
+            .flatMap(spaceId -> Mono.zip(
                 Mono.just(spaceId),
                 createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
             ))
-            .flatMap(function((spaceId, applicationId) -> Mono.when(
+            .flatMap(function((spaceId, applicationId) -> Mono.zip(
                 Mono.just(applicationId),
                 PaginationUtils
                     .requestClientV2Resources(page -> this.cloudFoundryClient.applicationsV2()
@@ -399,12 +400,13 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     public void listFilterByStackId() {
         String applicationName = this.nameFactory.getApplicationName();
 
-        Mono.when(
-            this.stackId,
-            this.spaceId
-                .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-        )
-            .flatMap(function((stackId, applicationId) -> Mono.when(
+        Mono
+            .zip(
+                this.stackId,
+                this.spaceId
+                    .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
+            )
+            .flatMap(function((stackId, applicationId) -> Mono.zip(
                 Mono.just(applicationId),
                 PaginationUtils
                     .requestClientV2Resources(page -> this.cloudFoundryClient.applicationsV2()
@@ -427,17 +429,18 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
-        Mono.when(this.organizationId, this.spaceId)
-            .flatMap(function((organizationId, spaceId) -> Mono.when(
+        Mono
+            .zip(this.organizationId, this.spaceId)
+            .flatMap(function((organizationId, spaceId) -> Mono.zip(
                 Mono.just(organizationId),
                 Mono.just(spaceId),
                 createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
             )))
-            .flatMap(function((organizationId, spaceId, applicationId) -> Mono.when(
+            .flatMap(function((organizationId, spaceId, applicationId) -> Mono.zip(
                 Mono.just(applicationId),
                 createApplicationRoute(this.cloudFoundryClient, organizationId, spaceId, domainName, applicationId)
             )))
-            .flatMap(function((applicationId, routeResponse) -> Mono.when(
+            .flatMap(function((applicationId, routeResponse) -> Mono.zip(
                 Mono.just(ResourceUtils.getId(routeResponse)),
                 PaginationUtils
                     .requestClientV2Resources(page -> this.cloudFoundryClient.applicationsV2()
@@ -459,17 +462,18 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
-        Mono.when(this.organizationId, this.spaceId)
-            .flatMap(function((organizationId, spaceId) -> Mono.when(
+        Mono
+            .zip(this.organizationId, this.spaceId)
+            .flatMap(function((organizationId, spaceId) -> Mono.zip(
                 Mono.just(organizationId),
                 Mono.just(spaceId),
                 createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
             )))
-            .flatMap(function((organizationId, spaceId, applicationId) -> Mono.when(
+            .flatMap(function((organizationId, spaceId, applicationId) -> Mono.zip(
                 Mono.just(applicationId),
                 createApplicationRoute(this.cloudFoundryClient, organizationId, spaceId, domainName, applicationId)
             )))
-            .flatMap(function((applicationId, routeResponse) -> Mono.when(
+            .flatMap(function((applicationId, routeResponse) -> Mono.zip(
                 Mono.just(ResourceUtils.getId(routeResponse)),
                 PaginationUtils
                     .requestClientV2Resources(page -> this.cloudFoundryClient.applicationsV2()
@@ -492,17 +496,18 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
-        Mono.when(this.organizationId, this.spaceId)
-            .flatMap(function((organizationId, spaceId) -> Mono.when(
+        Mono
+            .zip(this.organizationId, this.spaceId)
+            .flatMap(function((organizationId, spaceId) -> Mono.zip(
                 Mono.just(organizationId),
                 Mono.just(spaceId),
                 createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
             )))
-            .flatMap(function((organizationId, spaceId, applicationId) -> Mono.when(
+            .flatMap(function((organizationId, spaceId, applicationId) -> Mono.zip(
                 Mono.just(applicationId),
                 createApplicationRoute(this.cloudFoundryClient, organizationId, spaceId, domainName, applicationId)
             )))
-            .flatMap(function((applicationId, routeResponse) -> Mono.when(
+            .flatMap(function((applicationId, routeResponse) -> Mono.zip(
                 Mono.just(ResourceUtils.getId(routeResponse)),
                 PaginationUtils
                     .requestClientV2Resources(page -> this.cloudFoundryClient.applicationsV2()
@@ -525,17 +530,18 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
-        Mono.when(this.organizationId, this.spaceId)
-            .flatMap(function((organizationId, spaceId) -> Mono.when(
+        Mono
+            .zip(this.organizationId, this.spaceId)
+            .flatMap(function((organizationId, spaceId) -> Mono.zip(
                 Mono.just(organizationId),
                 Mono.just(spaceId),
                 createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
             )))
-            .flatMap(function((organizationId, spaceId, applicationId) -> Mono.when(
+            .flatMap(function((organizationId, spaceId, applicationId) -> Mono.zip(
                 Mono.just(applicationId),
                 createApplicationRoute(this.cloudFoundryClient, organizationId, spaceId, domainName, applicationId)
             )))
-            .flatMap(function((applicationId, routeResponse) -> Mono.when(
+            .flatMap(function((applicationId, routeResponse) -> Mono.zip(
                 Mono.just(ResourceUtils.getId(routeResponse)),
                 PaginationUtils
                     .requestClientV2Resources(page -> this.cloudFoundryClient.applicationsV2()
@@ -558,17 +564,18 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
-        Mono.when(this.organizationId, this.spaceId)
-            .flatMap(function((organizationId, spaceId) -> Mono.when(
+        Mono
+            .zip(this.organizationId, this.spaceId)
+            .flatMap(function((organizationId, spaceId) -> Mono.zip(
                 Mono.just(organizationId),
                 Mono.just(spaceId),
                 createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
             )))
-            .flatMap(function((organizationId, spaceId, applicationId) -> Mono.when(
+            .flatMap(function((organizationId, spaceId, applicationId) -> Mono.zip(
                 Mono.just(applicationId),
                 createApplicationRoute(this.cloudFoundryClient, organizationId, spaceId, domainName, applicationId)
             )))
-            .flatMap(function((applicationId, routeResponse) -> Mono.when(
+            .flatMap(function((applicationId, routeResponse) -> Mono.zip(
                 Mono.just(ResourceUtils.getId(routeResponse)),
                 PaginationUtils
                     .requestClientV2Resources(page -> {
@@ -597,12 +604,12 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         this.spaceId
-            .flatMap(spaceId -> Mono.when(
+            .flatMap(spaceId -> Mono.zip(
                 createApplicationId(this.cloudFoundryClient, spaceId, applicationName),
                 createUserServiceInstanceId(this.cloudFoundryClient, spaceId, serviceInstanceName)
             ))
             .delayUntil(function((applicationId, serviceInstanceId) -> createServiceBindingId(this.cloudFoundryClient, applicationId, serviceInstanceId)))
-            .flatMap(function((applicationId, serviceInstanceId) -> Mono.when(
+            .flatMap(function((applicationId, serviceInstanceId) -> Mono.zip(
                 Mono.just(serviceInstanceId),
                 getSingleServiceBindingInstanceId(this.cloudFoundryClient, applicationId)
             )))
@@ -618,16 +625,16 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         this.spaceId
-            .flatMap(spaceId -> Mono.when(
+            .flatMap(spaceId -> Mono.zip(
                 createApplicationId(this.cloudFoundryClient, spaceId, applicationName),
                 createUserServiceInstanceId(this.cloudFoundryClient, spaceId, serviceInstanceName)
             ))
-            .flatMap(function((applicationId, serviceInstanceId) -> Mono.when(
+            .flatMap(function((applicationId, serviceInstanceId) -> Mono.zip(
                 Mono.just(applicationId),
                 Mono.just(serviceInstanceId),
                 createServiceBindingId(this.cloudFoundryClient, applicationId, serviceInstanceId)
             )))
-            .flatMap(function((applicationId, serviceInstanceId, serviceBindingId) -> Mono.when(
+            .flatMap(function((applicationId, serviceInstanceId, serviceBindingId) -> Mono.zip(
                 Mono.just(serviceBindingId),
                 PaginationUtils
                     .requestClientV2Resources(page -> this.cloudFoundryClient.applicationsV2()
@@ -650,13 +657,14 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
-        Mono.when(this.organizationId, this.spaceId)
-            .flatMap(function((organizationId, spaceId) -> Mono.when(
+        Mono
+            .zip(this.organizationId, this.spaceId)
+            .flatMap(function((organizationId, spaceId) -> Mono.zip(
                 Mono.just(organizationId),
                 Mono.just(spaceId),
                 createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
             )))
-            .flatMap(function((organizationId, spaceId, applicationId) -> Mono.when(
+            .flatMap(function((organizationId, spaceId, applicationId) -> Mono.zip(
                 Mono.just(applicationId),
                 createApplicationRoute(this.cloudFoundryClient, organizationId, spaceId, domainName, applicationId)
             )))
@@ -677,11 +685,11 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         this.spaceId
-            .flatMap(spaceId -> Mono.when(
+            .flatMap(spaceId -> Mono.zip(
                 createApplicationId(this.cloudFoundryClient, spaceId, applicationName),
                 createUserServiceInstanceId(this.cloudFoundryClient, spaceId, serviceInstanceName)
             ))
-            .flatMap(function((applicationId, serviceInstanceId) -> Mono.when(
+            .flatMap(function((applicationId, serviceInstanceId) -> Mono.zip(
                 Mono.just(applicationId),
                 createServiceBindingId(this.cloudFoundryClient, applicationId, serviceInstanceId)
             )))
@@ -758,7 +766,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         this.spaceId
             .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
             .delayUntil(applicationId -> uploadAndStartApplication(this.cloudFoundryClient, applicationId))
-            .flatMap(applicationId -> Mono.when(
+            .flatMap(applicationId -> Mono.zip(
                 Mono.just(applicationId),
                 getInstanceInfo(this.cloudFoundryClient, applicationId, "0")
                     .map(info -> Optional.ofNullable(info.getSince()))
@@ -789,23 +797,21 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .environmentJson("test-var", "test-value")
                     .build())
                 .map(ResourceUtils::getId))
-            .flatMap(applicationId ->
-                Mono.when(
-                    Mono.just(applicationId),
-                    requestGetApplication(this.cloudFoundryClient, applicationId)
-                        .map(ResourceUtils::getEntity)
-                ))
-            .flatMap(function((applicationId, entity1) ->
-                Mono.when(
-                    Mono.just(entity1),
-                    this.cloudFoundryClient.applicationsV2()
-                        .update(UpdateApplicationRequest.builder()
-                            .applicationId(applicationId)
-                            .environmentJsons(Collections.emptyMap())
-                            .build())
-                        .then(requestGetApplication(this.cloudFoundryClient, applicationId)
-                            .map(ResourceUtils::getEntity))
-                )))
+            .flatMap(applicationId -> Mono.zip(
+                Mono.just(applicationId),
+                requestGetApplication(this.cloudFoundryClient, applicationId)
+                    .map(ResourceUtils::getEntity)
+            ))
+            .flatMap(function((applicationId, entity1) -> Mono.zip(
+                Mono.just(entity1),
+                this.cloudFoundryClient.applicationsV2()
+                    .update(UpdateApplicationRequest.builder()
+                        .applicationId(applicationId)
+                        .environmentJsons(Collections.emptyMap())
+                        .build())
+                    .then(requestGetApplication(this.cloudFoundryClient, applicationId)
+                        .map(ResourceUtils::getEntity))
+            )))
             .as(StepVerifier::create)
             .consumeNextWith(consumer((entity1, entity2) -> {
                 assertThat(entity1.getName()).isEqualTo(applicationName2);
@@ -823,7 +829,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         this.spaceId
             .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
             .delayUntil(applicationId -> uploadApplication(this.cloudFoundryClient, applicationId))
-            .flatMap(applicationId -> Mono.when(
+            .flatMap(applicationId -> Mono.zip(
                 downloadApplication(this.cloudFoundryClient, applicationId),
                 getBytes("test-application.zip")
             ))
@@ -840,7 +846,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         this.spaceId
             .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
             .delayUntil(applicationId -> uploadApplicationAsyncFalse(this.cloudFoundryClient, applicationId))
-            .flatMap(applicationId -> Mono.when(
+            .flatMap(applicationId -> Mono.zip(
                 downloadApplication(this.cloudFoundryClient, applicationId),
                 getBytes("test-application.zip")
             ))

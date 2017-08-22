@@ -73,11 +73,11 @@ public final class GroupsTest extends AbstractIntegrationTest {
         String memberDisplayName = this.nameFactory.getGroupName();
 
         Mono
-            .when(
+            .zip(
                 createGroupId(this.uaaClient, baseDisplayName),
                 createGroupId(this.uaaClient, memberDisplayName)
             )
-            .flatMap(function((baseGroupId, memberGroupId) -> Mono.when(
+            .flatMap(function((baseGroupId, memberGroupId) -> Mono.zip(
                 this.uaaClient.groups()
                     .addMember(AddMemberRequest.builder()
                         .groupId(baseGroupId)
@@ -103,11 +103,11 @@ public final class GroupsTest extends AbstractIntegrationTest {
         String userName = this.nameFactory.getUserName();
 
         Mono.
-            when(
+            zip(
                 createGroupId(this.uaaClient, displayName),
                 createUserId(this.uaaClient, userName)
             )
-            .flatMap(function((groupId, userId) -> Mono.when(
+            .flatMap(function((groupId, userId) -> Mono.zip(
                 this.uaaClient.groups()
                     .addMember(AddMemberRequest.builder()
                         .groupId(groupId)
@@ -133,11 +133,11 @@ public final class GroupsTest extends AbstractIntegrationTest {
         String userName = this.nameFactory.getUserName();
 
         createUserId(this.uaaClient, userName)
-            .flatMap(userId -> Mono.when(
+            .flatMap(userId -> Mono.zip(
                 createGroupIdWithMember(this.uaaClient, displayName, userId),
                 Mono.just(userId)
             ))
-            .flatMap(function((groupId, userId) -> Mono.when(
+            .flatMap(function((groupId, userId) -> Mono.zip(
                 this.uaaClient.groups()
                     .checkMembership(CheckMembershipRequest.builder()
                         .groupId(groupId)
@@ -253,11 +253,11 @@ public final class GroupsTest extends AbstractIntegrationTest {
         String userName = this.nameFactory.getUserName();
 
         createUserId(this.uaaClient, userName)
-            .flatMap(userId -> Mono.when(
+            .flatMap(userId -> Mono.zip(
                 createGroupIdWithMember(this.uaaClient, displayName, userId),
                 Mono.just(userId)
             ))
-            .flatMap(function((groupId, userId) -> Mono.when(
+            .flatMap(function((groupId, userId) -> Mono.zip(
                 this.uaaClient.groups()
                     .listMembers(ListMembersRequest.builder()
                         .groupId(groupId)
@@ -326,11 +326,11 @@ public final class GroupsTest extends AbstractIntegrationTest {
         String userName = this.nameFactory.getUserName();
 
         createUserId(this.uaaClient, userName)
-            .flatMap(userId -> Mono.when(
+            .flatMap(userId -> Mono.zip(
                 createGroupIdWithMember(this.uaaClient, displayName, userId),
                 Mono.just(userId)
             ))
-            .flatMap(function((groupId, userId) -> Mono.when(
+            .flatMap(function((groupId, userId) -> Mono.zip(
                 this.uaaClient.groups()
                     .removeMember(RemoveMemberRequest.builder()
                         .groupId(groupId)

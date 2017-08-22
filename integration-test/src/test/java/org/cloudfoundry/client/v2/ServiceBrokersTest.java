@@ -76,11 +76,10 @@ public final class ServiceBrokersTest extends AbstractIntegrationTest {
         }
 
         ServiceBrokerUtils.ApplicationMetadata applicationMetadata = this.organizationId
-            .flatMap(organizationId -> Mono
-                .when(
-                    createSpaceId(this.cloudFoundryClient, organizationId, spaceName),
-                    getSharedDomain(this.cloudFoundryClient)
-                ))
+            .flatMap(organizationId -> Mono.zip(
+                createSpaceId(this.cloudFoundryClient, organizationId, spaceName),
+                getSharedDomain(this.cloudFoundryClient)
+            ))
             .flatMap(function((spaceId, domain) -> ServiceBrokerUtils.pushServiceBrokerApplication(this.cloudFoundryClient, application, domain, this.nameFactory, planName, serviceName, spaceId)))
             .block(Duration.ofMinutes(5));
 

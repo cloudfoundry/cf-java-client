@@ -133,7 +133,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
         String instanceName = this.nameFactory.getServiceInstanceName();
 
         this.spaceId
-            .flatMap(spaceId -> Mono.when(
+            .flatMap(spaceId -> Mono.zip(
                 getCreateApplicationId(this.cloudFoundryClient, applicationName, spaceId),
                 getCreateUserProvidedServiceInstanceId(this.cloudFoundryClient, instanceName, spaceId)
             ))
@@ -142,8 +142,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
                     .applicationId(applicationId)
                     .serviceInstanceId(instanceId)
                     .build())))
-            .flatMap(function((applicationId, instanceId) -> Mono
-                .when(
+            .flatMap(function((applicationId, instanceId) -> Mono.zip(
                     Mono.just(applicationId),
                     Mono.just(instanceId),
                     PaginationUtils
@@ -167,8 +166,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
 
         this.spaceId
             .flatMap(spaceId -> getCreateUserProvidedServiceInstanceId(this.cloudFoundryClient, instanceName, spaceId))
-            .flatMap(instanceId -> Mono
-                .when(
+            .flatMap(instanceId -> Mono.zip(
                     Mono.just(instanceId),
                     this.cloudFoundryClient.userProvidedServiceInstances()
                         .update(UpdateUserProvidedServiceInstanceRequest.builder()
@@ -178,8 +176,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
                             .build())
                         .map(UpdateUserProvidedServiceInstanceResponse::getEntity)
                 ))
-            .flatMap(function((instanceId, entity1) -> Mono
-                .when(
+            .flatMap(function((instanceId, entity1) -> Mono.zip(
                     Mono.just(entity1),
                     this.cloudFoundryClient.userProvidedServiceInstances()
                         .update(UpdateUserProvidedServiceInstanceRequest.builder()

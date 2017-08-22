@@ -173,8 +173,8 @@ public final class DefaultApplications implements Applications {
     @Override
     public Mono<Void> copySource(CopySourceApplicationRequest request) {
         return Mono
-            .when(this.cloudFoundryClient, this.spaceId)
-            .flatMap(function((cloudFoundryClient, spaceId) -> Mono.when(
+            .zip(this.cloudFoundryClient, this.spaceId)
+            .flatMap(function((cloudFoundryClient, spaceId) -> Mono.zip(
                 Mono.just(cloudFoundryClient),
                 getApplicationId(cloudFoundryClient, request.getName(), spaceId),
                 getApplicationIdFromOrgSpace(cloudFoundryClient, request.getTargetName(), spaceId, request.getTargetOrganization(), request.getTargetSpace())
@@ -191,7 +191,7 @@ public final class DefaultApplications implements Applications {
     @Override
     public Mono<Void> delete(DeleteApplicationRequest request) {
         return Mono
-            .when(this.cloudFoundryClient, this.spaceId)
+            .zip(this.cloudFoundryClient, this.spaceId)
             .flatMap(function((cloudFoundryClient, spaceId) -> getRoutesAndApplicationId(cloudFoundryClient, request, spaceId, Optional.ofNullable(request.getDeleteRoutes()).orElse(false))
                 .map(function((routes, applicationId) -> Tuples.of(cloudFoundryClient, routes, applicationId)))))
             .flatMap(function((cloudFoundryClient, routes, applicationId) -> deleteRoutes(cloudFoundryClient, request.getCompletionTimeout(), routes)
@@ -205,8 +205,8 @@ public final class DefaultApplications implements Applications {
     @Override
     public Mono<Void> disableSsh(DisableApplicationSshRequest request) {
         return Mono
-            .when(this.cloudFoundryClient, this.spaceId)
-            .flatMap(function((cloudFoundryClient, spaceId) -> Mono.when(
+            .zip(this.cloudFoundryClient, this.spaceId)
+            .flatMap(function((cloudFoundryClient, spaceId) -> Mono.zip(
                 Mono.just(cloudFoundryClient),
                 getApplicationIdWhere(cloudFoundryClient, request.getName(), spaceId, sshEnabled(true))
             )))
@@ -219,8 +219,8 @@ public final class DefaultApplications implements Applications {
     @Override
     public Mono<Void> enableSsh(EnableApplicationSshRequest request) {
         return Mono
-            .when(this.cloudFoundryClient, this.spaceId)
-            .flatMap(function((cloudFoundryClient, spaceId) -> Mono.when(
+            .zip(this.cloudFoundryClient, this.spaceId)
+            .flatMap(function((cloudFoundryClient, spaceId) -> Mono.zip(
                 Mono.just(cloudFoundryClient),
                 getApplicationIdWhere(cloudFoundryClient, request.getName(), spaceId, sshEnabled(false))
             )))
@@ -233,8 +233,8 @@ public final class DefaultApplications implements Applications {
     @Override
     public Mono<ApplicationDetail> get(GetApplicationRequest request) {
         return Mono
-            .when(this.cloudFoundryClient, this.spaceId)
-            .flatMap(function((cloudFoundryClient, spaceId) -> Mono.when(
+            .zip(this.cloudFoundryClient, this.spaceId)
+            .flatMap(function((cloudFoundryClient, spaceId) -> Mono.zip(
                 Mono.just(cloudFoundryClient),
                 getApplication(cloudFoundryClient, request.getName(), spaceId)
             )))
@@ -247,16 +247,16 @@ public final class DefaultApplications implements Applications {
     @Override
     public Mono<ApplicationManifest> getApplicationManifest(GetApplicationManifestRequest request) {
         return Mono
-            .when(this.cloudFoundryClient, this.spaceId)
-            .flatMap(function((cloudFoundryClient, spaceId) -> Mono.when(
+            .zip(this.cloudFoundryClient, this.spaceId)
+            .flatMap(function((cloudFoundryClient, spaceId) -> Mono.zip(
                 Mono.just(cloudFoundryClient),
                 getApplicationId(cloudFoundryClient, request.getName(), spaceId)
             )))
-            .flatMap(function((cloudFoundryClient, applicationId) -> Mono.when(
+            .flatMap(function((cloudFoundryClient, applicationId) -> Mono.zip(
                 Mono.just(cloudFoundryClient),
                 requestApplicationSummary(cloudFoundryClient, applicationId)
             )))
-            .flatMap(function((cloudFoundryClient, response) -> Mono.when(
+            .flatMap(function((cloudFoundryClient, response) -> Mono.zip(
                 Mono.just(response),
                 getStackName(cloudFoundryClient, response.getStackId())
             )))
@@ -268,8 +268,8 @@ public final class DefaultApplications implements Applications {
     @Override
     public Mono<ApplicationEnvironments> getEnvironments(GetApplicationEnvironmentsRequest request) {
         return Mono
-            .when(this.cloudFoundryClient, this.spaceId)
-            .flatMap(function((cloudFoundryClient, spaceId) -> Mono.when(
+            .zip(this.cloudFoundryClient, this.spaceId)
+            .flatMap(function((cloudFoundryClient, spaceId) -> Mono.zip(
                 Mono.just(cloudFoundryClient),
                 getApplicationId(cloudFoundryClient, request.getName(), spaceId)
             )))
@@ -282,8 +282,8 @@ public final class DefaultApplications implements Applications {
     @Override
     public Flux<ApplicationEvent> getEvents(GetApplicationEventsRequest request) {
         return Mono
-            .when(this.cloudFoundryClient, this.spaceId)
-            .flatMap(function((cloudFoundryClient, spaceId) -> Mono.when(
+            .zip(this.cloudFoundryClient, this.spaceId)
+            .flatMap(function((cloudFoundryClient, spaceId) -> Mono.zip(
                 Mono.just(cloudFoundryClient),
                 getApplicationId(cloudFoundryClient, request.getName(), spaceId)
             )))
@@ -297,7 +297,7 @@ public final class DefaultApplications implements Applications {
     @Override
     public Mono<ApplicationHealthCheck> getHealthCheck(GetApplicationHealthCheckRequest request) {
         return Mono
-            .when(this.cloudFoundryClient, this.spaceId)
+            .zip(this.cloudFoundryClient, this.spaceId)
             .flatMap(function((cloudFoundryClient, spaceId) -> getApplication(cloudFoundryClient, request.getName(), spaceId)))
             .map(DefaultApplications::toHealthCheck)
             .transform(OperationsLogging.log("Get Application Health Check"))
@@ -307,7 +307,7 @@ public final class DefaultApplications implements Applications {
     @Override
     public Flux<ApplicationSummary> list() {
         return Mono
-            .when(this.cloudFoundryClient, this.spaceId)
+            .zip(this.cloudFoundryClient, this.spaceId)
             .flatMap(function(DefaultApplications::requestSpaceSummary))
             .flatMapMany(DefaultApplications::extractApplications)
             .map(DefaultApplications::toApplicationSummary)
@@ -318,7 +318,7 @@ public final class DefaultApplications implements Applications {
     @Override
     public Flux<LogMessage> logs(LogsRequest request) {
         return Mono
-            .when(this.cloudFoundryClient, this.spaceId)
+            .zip(this.cloudFoundryClient, this.spaceId)
             .flatMap(function((cloudFoundryClient, spaceId) -> getApplicationId(cloudFoundryClient, request.getName(), spaceId)))
             .flatMapMany(applicationId -> getLogs(this.dopplerClient, applicationId, request.getRecent()))
             .transform(OperationsLogging.log("Get Application Logs"))
@@ -366,13 +366,13 @@ public final class DefaultApplications implements Applications {
     @Override
     public Mono<Void> pushManifest(PushApplicationManifestRequest request) {
         return Mono
-            .when(this.cloudFoundryClient, this.spaceId)
-            .flatMap(function((cloudFoundryClient, spaceId) -> Mono.when(
+            .zip(this.cloudFoundryClient, this.spaceId)
+            .flatMap(function((cloudFoundryClient, spaceId) -> Mono.zip(
                 Mono.just(cloudFoundryClient),
                 getSpaceOrganizationId(cloudFoundryClient, spaceId),
                 Mono.just(spaceId)
             )))
-            .flatMap(function((cloudFoundryClient, organizationId, spaceId) -> Mono.when(
+            .flatMap(function((cloudFoundryClient, organizationId, spaceId) -> Mono.zip(
                 Mono.just(cloudFoundryClient),
                 listAvailableDomains(cloudFoundryClient, organizationId),
                 Mono.just(spaceId))))
@@ -394,8 +394,8 @@ public final class DefaultApplications implements Applications {
     @Override
     public Mono<Void> rename(RenameApplicationRequest request) {
         return Mono
-            .when(this.cloudFoundryClient, this.spaceId)
-            .flatMap(function((cloudFoundryClient, spaceId) -> Mono.when(
+            .zip(this.cloudFoundryClient, this.spaceId)
+            .flatMap(function((cloudFoundryClient, spaceId) -> Mono.zip(
                 Mono.just(cloudFoundryClient),
                 getApplicationId(cloudFoundryClient, request.getName(), spaceId)
             )))
@@ -408,12 +408,13 @@ public final class DefaultApplications implements Applications {
     @Override
     public Mono<Void> restage(RestageApplicationRequest request) {
         return Mono
-            .when(this.cloudFoundryClient, this.spaceId)
-            .flatMap(function((cloudFoundryClient, spaceId) -> Mono.when(
+            .zip(this.cloudFoundryClient, this.spaceId)
+            .flatMap(function((cloudFoundryClient, spaceId) -> Mono.zip(
                 Mono.just(cloudFoundryClient),
                 getApplicationId(cloudFoundryClient, request.getName(), spaceId)
             )))
-            .flatMap(function((cloudFoundryClient, applicationId) -> restageApplication(cloudFoundryClient, request.getName(), applicationId, request.getStagingTimeout(), request.getStartupTimeout())))
+            .flatMap(function((cloudFoundryClient, applicationId) -> restageApplication(cloudFoundryClient, request.getName(), applicationId, request.getStagingTimeout(), request.getStartupTimeout
+                ())))
             .transform(OperationsLogging.log("Restage Application"))
             .checkpoint();
     }
@@ -421,12 +422,12 @@ public final class DefaultApplications implements Applications {
     @Override
     public Mono<Void> restart(RestartApplicationRequest request) {
         return Mono
-            .when(this.cloudFoundryClient, this.spaceId)
-            .flatMap(function((cloudFoundryClient, spaceId) -> Mono.when(
+            .zip(this.cloudFoundryClient, this.spaceId)
+            .flatMap(function((cloudFoundryClient, spaceId) -> Mono.zip(
                 Mono.just(cloudFoundryClient),
                 getApplication(cloudFoundryClient, request.getName(), spaceId)
             )))
-            .flatMap(function((cloudFoundryClient, resource) -> Mono.when(
+            .flatMap(function((cloudFoundryClient, resource) -> Mono.zip(
                 Mono.just(cloudFoundryClient),
                 stopApplicationIfNotStopped(cloudFoundryClient, resource)
             )))
@@ -439,8 +440,8 @@ public final class DefaultApplications implements Applications {
     @Override
     public Mono<Void> restartInstance(RestartApplicationInstanceRequest request) {
         return Mono
-            .when(this.cloudFoundryClient, this.spaceId)
-            .flatMap(function((cloudFoundryClient, spaceId) -> Mono.when(
+            .zip(this.cloudFoundryClient, this.spaceId)
+            .flatMap(function((cloudFoundryClient, spaceId) -> Mono.zip(
                 Mono.just(cloudFoundryClient),
                 getApplicationId(cloudFoundryClient, request.getName(), spaceId)
             )))
@@ -452,13 +453,13 @@ public final class DefaultApplications implements Applications {
     @Override
     public Mono<Void> scale(ScaleApplicationRequest request) {
         return Mono
-            .when(this.cloudFoundryClient, this.spaceId)
+            .zip(this.cloudFoundryClient, this.spaceId)
             .filter(predicate((cloudFoundryClient, spaceId) -> areModifiersPresent(request)))
-            .flatMap(function((cloudFoundryClient, spaceId) -> Mono.when(
+            .flatMap(function((cloudFoundryClient, spaceId) -> Mono.zip(
                 Mono.just(cloudFoundryClient),
                 getApplicationId(cloudFoundryClient, request.getName(), spaceId)
             )))
-            .flatMap(function((cloudFoundryClient, applicationId) -> Mono.when(
+            .flatMap(function((cloudFoundryClient, applicationId) -> Mono.zip(
                 Mono.just(cloudFoundryClient),
                 requestUpdateApplicationScale(cloudFoundryClient, applicationId, request.getDiskLimit(), request.getInstances(), request.getMemoryLimit())
             )))
@@ -472,8 +473,8 @@ public final class DefaultApplications implements Applications {
     @Override
     public Mono<Void> setEnvironmentVariable(SetEnvironmentVariableApplicationRequest request) {
         return Mono
-            .when(this.cloudFoundryClient, this.spaceId)
-            .flatMap(function((cloudFoundryClient, spaceId) -> Mono.when(
+            .zip(this.cloudFoundryClient, this.spaceId)
+            .flatMap(function((cloudFoundryClient, spaceId) -> Mono.zip(
                 Mono.just(cloudFoundryClient),
                 getApplication(cloudFoundryClient, request.getName(), spaceId)
             )))
@@ -487,8 +488,8 @@ public final class DefaultApplications implements Applications {
     @Override
     public Mono<Void> setHealthCheck(SetApplicationHealthCheckRequest request) {
         return Mono
-            .when(this.cloudFoundryClient, this.spaceId)
-            .flatMap(function((cloudFoundryClient, spaceId) -> Mono.when(
+            .zip(this.cloudFoundryClient, this.spaceId)
+            .flatMap(function((cloudFoundryClient, spaceId) -> Mono.zip(
                 Mono.just(cloudFoundryClient),
                 getApplicationId(cloudFoundryClient, request.getName(), spaceId)
             )))
@@ -501,7 +502,7 @@ public final class DefaultApplications implements Applications {
     @Override
     public Mono<Boolean> sshEnabled(ApplicationSshEnabledRequest request) {
         return Mono
-            .when(this.cloudFoundryClient, this.spaceId)
+            .zip(this.cloudFoundryClient, this.spaceId)
             .flatMap(function((cloudFoundryClient, spaceId) -> getApplication(cloudFoundryClient, request.getName(), spaceId)))
             .map(applicationResource -> ResourceUtils.getEntity(applicationResource).getEnableSsh())
             .transform(OperationsLogging.log("Is Application SSH Enabled"))
@@ -511,8 +512,8 @@ public final class DefaultApplications implements Applications {
     @Override
     public Mono<Void> start(StartApplicationRequest request) {
         return Mono
-            .when(this.cloudFoundryClient, this.spaceId)
-            .flatMap(function((cloudFoundryClient, spaceId) -> Mono.when(
+            .zip(this.cloudFoundryClient, this.spaceId)
+            .flatMap(function((cloudFoundryClient, spaceId) -> Mono.zip(
                 Mono.just(cloudFoundryClient),
                 getApplicationIdWhere(cloudFoundryClient, request.getName(), spaceId, isNotIn(STARTED_STATE))
             )))
@@ -525,8 +526,8 @@ public final class DefaultApplications implements Applications {
     @Override
     public Mono<Void> stop(StopApplicationRequest request) {
         return Mono
-            .when(this.cloudFoundryClient, this.spaceId)
-            .flatMap(function((cloudFoundryClient, spaceId) -> Mono.when(
+            .zip(this.cloudFoundryClient, this.spaceId)
+            .flatMap(function((cloudFoundryClient, spaceId) -> Mono.zip(
                 Mono.just(cloudFoundryClient),
                 getApplicationIdWhere(cloudFoundryClient, request.getName(), spaceId, isNotIn(STOPPED_STATE))
             )))
@@ -539,8 +540,8 @@ public final class DefaultApplications implements Applications {
     @Override
     public Mono<Void> unsetEnvironmentVariable(UnsetEnvironmentVariableApplicationRequest request) {
         return Mono
-            .when(this.cloudFoundryClient, this.spaceId)
-            .flatMap(function((cloudFoundryClient, spaceId) -> Mono.when(
+            .zip(this.cloudFoundryClient, this.spaceId)
+            .flatMap(function((cloudFoundryClient, spaceId) -> Mono.zip(
                 Mono.just(cloudFoundryClient),
                 getApplication(cloudFoundryClient, request.getName(), spaceId)
             )))
@@ -747,12 +748,12 @@ public final class DefaultApplications implements Applications {
         String stackId = ResourceUtils.getEntity(applicationResource).getStackId();
 
         return Mono
-            .when(
+            .zip(
                 getApplicationStatistics(cloudFoundryClient, applicationId),
                 requestApplicationSummary(cloudFoundryClient, applicationId),
                 getApplicationInstances(cloudFoundryClient, applicationId)
             )
-            .flatMap(function((applicationStatisticsResponse, summaryApplicationResponse, applicationInstancesResponse) -> Mono.when(
+            .flatMap(function((applicationStatisticsResponse, summaryApplicationResponse, applicationInstancesResponse) -> Mono.zip(
                 Mono.just(summaryApplicationResponse),
                 requestStack(cloudFoundryClient, stackId),
                 toInstanceDetailList(applicationInstancesResponse, applicationStatisticsResponse),
@@ -1046,9 +1047,10 @@ public final class DefaultApplications implements Applications {
 
     private static Flux<Void> pushApplication(CloudFoundryClient cloudFoundryClient, List<DomainSummary> availableDomains, ApplicationManifest manifest, RandomWords randomWords,
                                               PushApplicationManifestRequest request, String spaceId) {
+
         return getOptionalStackId(cloudFoundryClient, manifest.getStack())
             .flatMapMany(stackId -> getApplicationId(cloudFoundryClient, manifest, spaceId, stackId.orElse(null)))
-            .flatMap(applicationId -> Mono.when(
+            .flatMap(applicationId -> Mono.zip(
                 Mono.just(applicationId),
                 getApplicationRoutes(cloudFoundryClient, applicationId),
                 ResourceMatchingUtils.getMatchedResources(cloudFoundryClient, manifest.getPath())
@@ -1056,20 +1058,20 @@ public final class DefaultApplications implements Applications {
             .flatMap(function((applicationId, existingRoutes, matchedResources) -> prepareDomainsAndRoutes(cloudFoundryClient, applicationId, availableDomains, manifest, existingRoutes,
                 randomWords, spaceId)
                 .then(Mono.just(Tuples.of(applicationId, matchedResources)))))
-            .flatMap(function((applicationId, matchedResources) -> Mono
-                .when(
-                    uploadApplicationAndWait(cloudFoundryClient, applicationId, manifest.getPath(), matchedResources, request.getStagingTimeout()),
-                    bindServices(cloudFoundryClient, applicationId, manifest, spaceId)
-                )
+            .flatMap(function((applicationId, matchedResources) -> Mono.zip(
+                uploadApplicationAndWait(cloudFoundryClient, applicationId, manifest.getPath(), matchedResources, request.getStagingTimeout()),
+                bindServices(cloudFoundryClient, applicationId, manifest, spaceId)
+            )
                 .then(Mono.just(applicationId))))
             .flatMap(applicationId -> stopAndStartApplication(cloudFoundryClient, applicationId, manifest.getName(), request));
     }
 
     private static Flux<Void> pushDocker(CloudFoundryClient cloudFoundryClient, List<DomainSummary> availableDomains, ApplicationManifest manifest, RandomWords randomWords,
                                          PushApplicationManifestRequest request, String spaceId) {
+
         return getOptionalStackId(cloudFoundryClient, manifest.getStack())
             .flatMapMany(stackId -> getApplicationId(cloudFoundryClient, manifest, spaceId, stackId.orElse(null)))
-            .flatMap(applicationId -> Mono.when(
+            .flatMap(applicationId -> Mono.zip(
                 Mono.just(applicationId),
                 getApplicationRoutes(cloudFoundryClient, applicationId)
             ))

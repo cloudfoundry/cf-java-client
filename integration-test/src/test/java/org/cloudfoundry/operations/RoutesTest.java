@@ -309,7 +309,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String path = this.nameFactory.getPath();
 
         Mono
-            .when(
+            .zip(
                 createDomainAndRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path),
                 requestCreateApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, true)
             )
@@ -336,7 +336,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String path = this.nameFactory.getPath();
 
         Mono
-            .when(
+            .zip(
                 createDomainAndRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path),
                 requestCreateApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, true)
             )
@@ -363,7 +363,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String path = null;
 
         Mono
-            .when(
+            .zip(
                 createDomainAndRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path),
                 requestCreateApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, true)
             )
@@ -388,7 +388,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
 
         Mono
-            .when(
+            .zip(
                 createSharedDomainAndTcpRoute(this.cloudFoundryOperations, domainName, this.spaceName),
                 requestCreateApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, true)
             )
@@ -413,7 +413,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
 
         Mono
-            .when(
+            .zip(
                 requestCreateSharedDomain(this.cloudFoundryOperations, domainName, DEFAULT_ROUTER_GROUP),
                 requestCreateApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, true)
             )
@@ -445,7 +445,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String path = this.nameFactory.getPath();
 
         Mono
-            .when(
+            .zip(
                 createDomainAndRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path),
                 requestCreateApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, true)
             )
@@ -472,7 +472,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String path = null;
 
         Mono
-            .when(
+            .zip(
                 createDomainAndRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path),
                 requestCreateApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, true)
             )
@@ -497,7 +497,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
 
         Mono
-            .when(
+            .zip(
                 createSharedDomainAndTcpRoute(this.cloudFoundryOperations, domainName, this.spaceName),
                 requestCreateApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, true)
             )

@@ -64,7 +64,7 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
-            .flatMap(organizationId -> Mono.when(
+            .flatMap(organizationId -> Mono.zip(
                 createSpaceId(this.cloudFoundryClient, organizationId, spaceName),
                 createSpaceQuotaDefinitionId(this.cloudFoundryClient, organizationId, quotaName)
             ))
@@ -164,7 +164,7 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
-            .flatMap(organizationId -> Mono.when(
+            .flatMap(organizationId -> Mono.zip(
                 createSpaceId(this.cloudFoundryClient, organizationId, spaceName),
                 createSpaceQuotaDefinitionId(this.cloudFoundryClient, organizationId, quotaName)
             ))
@@ -191,11 +191,11 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
-            .flatMap(organizationId -> Mono.when(
+            .flatMap(organizationId -> Mono.zip(
                 createSpaceQuotaDefinitionId(this.cloudFoundryClient, organizationId, quotaName),
                 createSpaceId(this.cloudFoundryClient, organizationId, spaceName)
             ))
-            .flatMap(function((quotaId, spaceId) -> Mono.when(
+            .flatMap(function((quotaId, spaceId) -> Mono.zip(
                 requestAssociateSpace(this.cloudFoundryClient, quotaId, spaceId)
                     .then(Mono.just(quotaId)),
                 createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
@@ -228,7 +228,7 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
-            .flatMap(organizationId -> Mono.when(
+            .flatMap(organizationId -> Mono.zip(
                 createSpaceId(this.cloudFoundryClient, organizationId, spaceName),
                 createSpaceQuotaDefinitionId(this.cloudFoundryClient, organizationId, quotaName)
             ))
@@ -255,7 +255,7 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
-            .flatMap(organizationId -> Mono.when(
+            .flatMap(organizationId -> Mono.zip(
                 Mono.just(organizationId),
                 createSpaceId(this.cloudFoundryClient, organizationId, spaceName),
                 createSpaceQuotaDefinitionId(this.cloudFoundryClient, organizationId, quotaName)
@@ -299,7 +299,7 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
-            .flatMap(organizationId -> Mono.when(
+            .flatMap(organizationId -> Mono.zip(
                 createSpaceId(this.cloudFoundryClient, organizationId, spaceName),
                 createSpaceQuotaDefinitionId(this.cloudFoundryClient, organizationId, quotaName)
             ))
@@ -325,7 +325,7 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
-            .flatMap(organizationId -> Mono.when(
+            .flatMap(organizationId -> Mono.zip(
                 createSpaceId(this.cloudFoundryClient, organizationId, spaceName),
                 createSpaceQuotaDefinitionId(this.cloudFoundryClient, organizationId, quotaName)
             ))

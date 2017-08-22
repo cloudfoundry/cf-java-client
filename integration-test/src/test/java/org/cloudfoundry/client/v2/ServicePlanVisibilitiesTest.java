@@ -69,7 +69,7 @@ public final class ServicePlanVisibilitiesTest extends AbstractIntegrationTest {
             .block(Duration.ofMinutes(5));
 
         Mono
-            .when(
+            .zip(
                 this.organizationId,
                 getServicePlanId(this.cloudFoundryClient, serviceBrokerMetadata.serviceBrokerId)
             )
@@ -103,15 +103,14 @@ public final class ServicePlanVisibilitiesTest extends AbstractIntegrationTest {
             .block(Duration.ofMinutes(5));
 
         Mono
-            .when(
+            .zip(
                 this.organizationId,
                 getServicePlanId(this.cloudFoundryClient, serviceBrokerMetadata.serviceBrokerId)
             )
-            .flatMap(function((organizationId, servicePlanId) -> Mono
-                .when(
-                    Mono.just(servicePlanId),
-                    createServicePlanVisibilityId(this.cloudFoundryClient, organizationId, servicePlanId)
-                )))
+            .flatMap(function((organizationId, servicePlanId) -> Mono.zip(
+                Mono.just(servicePlanId),
+                createServicePlanVisibilityId(this.cloudFoundryClient, organizationId, servicePlanId)
+            )))
             .flatMap(function((servicePlanId, servicePlanIdVisibilityId) -> this.cloudFoundryClient.servicePlanVisibilities()
                 .delete(DeleteServicePlanVisibilityRequest.builder()
                     .async(true)
@@ -141,15 +140,14 @@ public final class ServicePlanVisibilitiesTest extends AbstractIntegrationTest {
             .block(Duration.ofMinutes(5));
 
         Mono
-            .when(
+            .zip(
                 this.organizationId,
                 getServicePlanId(this.cloudFoundryClient, serviceBrokerMetadata.serviceBrokerId)
             )
-            .flatMap(function((organizationId, servicePlanId) -> Mono
-                .when(
-                    Mono.just(servicePlanId),
-                    createServicePlanVisibilityId(this.cloudFoundryClient, organizationId, servicePlanId)
-                )))
+            .flatMap(function((organizationId, servicePlanId) -> Mono.zip(
+                Mono.just(servicePlanId),
+                createServicePlanVisibilityId(this.cloudFoundryClient, organizationId, servicePlanId)
+            )))
             .flatMap(function((servicePlanId, servicePlanIdVisibilityId) -> this.cloudFoundryClient.servicePlanVisibilities()
                 .delete(DeleteServicePlanVisibilityRequest.builder()
                     .async(false)
@@ -178,24 +176,22 @@ public final class ServicePlanVisibilitiesTest extends AbstractIntegrationTest {
             .block(Duration.ofMinutes(5));
 
         Mono
-            .when(
+            .zip(
                 this.organizationId,
                 getServicePlanId(this.cloudFoundryClient, serviceBrokerMetadata.serviceBrokerId)
             )
-            .flatMap(function((organizationId, servicePlanId) -> Mono
-                .when(
-                    Mono.just(organizationId),
-                    createServicePlanVisibilityId(this.cloudFoundryClient, organizationId, servicePlanId)
-                )))
-            .flatMap(function((organizationId, servicePlanVisibilityId) -> Mono
-                .when(
-                    Mono.just(organizationId),
-                    this.cloudFoundryClient.servicePlanVisibilities()
-                        .get(GetServicePlanVisibilityRequest.builder()
-                            .servicePlanVisibilityId(servicePlanVisibilityId)
-                            .build())
-                        .map(response -> ResourceUtils.getEntity(response).getOrganizationId())
-                )))
+            .flatMap(function((organizationId, servicePlanId) -> Mono.zip(
+                Mono.just(organizationId),
+                createServicePlanVisibilityId(this.cloudFoundryClient, organizationId, servicePlanId)
+            )))
+            .flatMap(function((organizationId, servicePlanVisibilityId) -> Mono.zip(
+                Mono.just(organizationId),
+                this.cloudFoundryClient.servicePlanVisibilities()
+                    .get(GetServicePlanVisibilityRequest.builder()
+                        .servicePlanVisibilityId(servicePlanVisibilityId)
+                        .build())
+                    .map(response -> ResourceUtils.getEntity(response).getOrganizationId())
+            )))
             .as(StepVerifier::create)
             .consumeNextWith(tupleEquality())
             .expectComplete()
@@ -218,27 +214,25 @@ public final class ServicePlanVisibilitiesTest extends AbstractIntegrationTest {
             .block(Duration.ofMinutes(5));
 
         Mono
-            .when(
+            .zip(
                 this.organizationId,
                 getServicePlanId(this.cloudFoundryClient, serviceBrokerMetadata.serviceBrokerId)
             )
-            .flatMap(function((organizationId, servicePlanId) -> Mono
-                .when(
-                    Mono.just(organizationId),
-                    createServicePlanVisibilityId(this.cloudFoundryClient, organizationId, servicePlanId)
-                )))
-            .flatMapMany(function((organizationId, servicePlanVisibilityId) -> Mono
-                .when(
-                    Mono.just(organizationId),
-                    PaginationUtils
-                        .requestClientV2Resources(page -> this.cloudFoundryClient.servicePlanVisibilities()
-                            .list(ListServicePlanVisibilitiesRequest.builder()
-                                .page(page)
-                                .build()))
-                        .filter(response -> servicePlanVisibilityId.equals(ResourceUtils.getId(response)))
-                        .single()
-                        .map(response -> ResourceUtils.getEntity(response).getOrganizationId())
-                )))
+            .flatMap(function((organizationId, servicePlanId) -> Mono.zip(
+                Mono.just(organizationId),
+                createServicePlanVisibilityId(this.cloudFoundryClient, organizationId, servicePlanId)
+            )))
+            .flatMapMany(function((organizationId, servicePlanVisibilityId) -> Mono.zip(
+                Mono.just(organizationId),
+                PaginationUtils
+                    .requestClientV2Resources(page -> this.cloudFoundryClient.servicePlanVisibilities()
+                        .list(ListServicePlanVisibilitiesRequest.builder()
+                            .page(page)
+                            .build()))
+                    .filter(response -> servicePlanVisibilityId.equals(ResourceUtils.getId(response)))
+                    .single()
+                    .map(response -> ResourceUtils.getEntity(response).getOrganizationId())
+            )))
             .as(StepVerifier::create)
             .consumeNextWith(tupleEquality())
             .expectComplete()
@@ -261,28 +255,26 @@ public final class ServicePlanVisibilitiesTest extends AbstractIntegrationTest {
             .block(Duration.ofMinutes(5));
 
         Mono
-            .when(
+            .zip(
                 this.organizationId,
                 getServicePlanId(this.cloudFoundryClient, serviceBrokerMetadata.serviceBrokerId)
             )
-            .flatMap(function((organizationId, servicePlanId) -> Mono
-                .when(
-                    Mono.just(organizationId),
-                    createServicePlanVisibilityId(this.cloudFoundryClient, organizationId, servicePlanId)
-                )))
-            .flatMapMany(function((organizationId, servicePlanVisibilityId) -> Mono
-                .when(
-                    Mono.just(organizationId),
-                    PaginationUtils
-                        .requestClientV2Resources(page -> this.cloudFoundryClient.servicePlanVisibilities()
-                            .list(ListServicePlanVisibilitiesRequest.builder()
-                                .organizationId(organizationId)
-                                .page(page)
-                                .build()))
-                        .filter(response -> servicePlanVisibilityId.equals(ResourceUtils.getId(response)))
-                        .single()
-                        .map(response -> ResourceUtils.getEntity(response).getOrganizationId())
-                )))
+            .flatMap(function((organizationId, servicePlanId) -> Mono.zip(
+                Mono.just(organizationId),
+                createServicePlanVisibilityId(this.cloudFoundryClient, organizationId, servicePlanId)
+            )))
+            .flatMapMany(function((organizationId, servicePlanVisibilityId) -> Mono.zip(
+                Mono.just(organizationId),
+                PaginationUtils
+                    .requestClientV2Resources(page -> this.cloudFoundryClient.servicePlanVisibilities()
+                        .list(ListServicePlanVisibilitiesRequest.builder()
+                            .organizationId(organizationId)
+                            .page(page)
+                            .build()))
+                    .filter(response -> servicePlanVisibilityId.equals(ResourceUtils.getId(response)))
+                    .single()
+                    .map(response -> ResourceUtils.getEntity(response).getOrganizationId())
+            )))
             .as(StepVerifier::create)
             .consumeNextWith(tupleEquality())
             .expectComplete()
@@ -305,27 +297,25 @@ public final class ServicePlanVisibilitiesTest extends AbstractIntegrationTest {
             .block(Duration.ofMinutes(5));
 
         Mono
-            .when(
+            .zip(
                 this.organizationId,
                 getServicePlanId(this.cloudFoundryClient, serviceBrokerMetadata.serviceBrokerId)
             )
-            .flatMap(function((organizationId, servicePlanId) -> Mono
-                .when(
-                    Mono.just(servicePlanId),
-                    createServicePlanVisibilityId(this.cloudFoundryClient, organizationId, servicePlanId)
-                )))
-            .flatMapMany(function((servicePlanId, servicePlanVisibilityId) -> Mono
-                .when(
-                    Mono.just(servicePlanId),
-                    PaginationUtils
-                        .requestClientV2Resources(page -> this.cloudFoundryClient.servicePlanVisibilities()
-                            .list(ListServicePlanVisibilitiesRequest.builder()
-                                .servicePlanId(servicePlanId)
-                                .page(page)
-                                .build()))
-                        .single()
-                        .map(response -> ResourceUtils.getEntity(response).getServicePlanId())
-                )))
+            .flatMap(function((organizationId, servicePlanId) -> Mono.zip(
+                Mono.just(servicePlanId),
+                createServicePlanVisibilityId(this.cloudFoundryClient, organizationId, servicePlanId)
+            )))
+            .flatMapMany(function((servicePlanId, servicePlanVisibilityId) -> Mono.zip(
+                Mono.just(servicePlanId),
+                PaginationUtils
+                    .requestClientV2Resources(page -> this.cloudFoundryClient.servicePlanVisibilities()
+                        .list(ListServicePlanVisibilitiesRequest.builder()
+                            .servicePlanId(servicePlanId)
+                            .page(page)
+                            .build()))
+                    .single()
+                    .map(response -> ResourceUtils.getEntity(response).getServicePlanId())
+            )))
             .as(StepVerifier::create)
             .consumeNextWith(tupleEquality())
             .expectComplete()
@@ -349,16 +339,15 @@ public final class ServicePlanVisibilitiesTest extends AbstractIntegrationTest {
             .block(Duration.ofMinutes(5));
 
         Mono
-            .when(
+            .zip(
                 this.organizationId,
                 getServicePlanId(this.cloudFoundryClient, serviceBrokerMetadata.serviceBrokerId)
             )
-            .flatMap(function((organizationId, servicePlanId) -> Mono
-                .when(
-                    createOrganizationId(this.cloudFoundryClient, organizationName),
-                    Mono.just(servicePlanId),
-                    createServicePlanVisibilityId(this.cloudFoundryClient, organizationId, servicePlanId)
-                )))
+            .flatMap(function((organizationId, servicePlanId) -> Mono.zip(
+                createOrganizationId(this.cloudFoundryClient, organizationName),
+                Mono.just(servicePlanId),
+                createServicePlanVisibilityId(this.cloudFoundryClient, organizationId, servicePlanId)
+            )))
             .flatMap(function((newOrganizationId, servicePlanId, servicePlanIdVisibilityId) -> this.cloudFoundryClient.servicePlanVisibilities()
                 .update(UpdateServicePlanVisibilityRequest.builder()
                     .organizationId(newOrganizationId)
@@ -366,13 +355,12 @@ public final class ServicePlanVisibilitiesTest extends AbstractIntegrationTest {
                     .servicePlanVisibilityId(servicePlanIdVisibilityId)
                     .build())
                 .then(Mono.just(Tuples.of(newOrganizationId, servicePlanId)))))
-            .flatMapMany(function((newOrganizationId, servicePlanId) -> Mono
-                .when(
-                    Mono.just(newOrganizationId),
-                    requestListServicePlanVisibilities(this.cloudFoundryClient, servicePlanId)
-                        .single()
-                        .map(response -> ResourceUtils.getEntity(response).getOrganizationId())
-                )))
+            .flatMapMany(function((newOrganizationId, servicePlanId) -> Mono.zip(
+                Mono.just(newOrganizationId),
+                requestListServicePlanVisibilities(this.cloudFoundryClient, servicePlanId)
+                    .single()
+                    .map(response -> ResourceUtils.getEntity(response).getOrganizationId())
+            )))
             .as(StepVerifier::create)
             .consumeNextWith(tupleEquality())
             .expectComplete()

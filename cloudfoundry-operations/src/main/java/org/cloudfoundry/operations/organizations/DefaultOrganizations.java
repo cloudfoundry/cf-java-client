@@ -74,8 +74,8 @@ public final class DefaultOrganizations implements Organizations {
     @Override
     public Mono<Void> create(CreateOrganizationRequest request) {
         return Mono
-            .when(this.cloudFoundryClient, this.username)
-            .flatMap(function((cloudFoundryClient, username) -> Mono.when(
+            .zip(this.cloudFoundryClient, this.username)
+            .flatMap(function((cloudFoundryClient, username) -> Mono.zip(
                 Mono.just(cloudFoundryClient),
                 createOrganization(cloudFoundryClient, request),
                 getFeatureFlagEnabled(cloudFoundryClient, SET_ROLES_BY_USERNAME_FEATURE_FLAG),
@@ -90,7 +90,7 @@ public final class DefaultOrganizations implements Organizations {
     @Override
     public Mono<Void> delete(DeleteOrganizationRequest request) {
         return this.cloudFoundryClient
-            .flatMap(cloudFoundryClient -> Mono.when(
+            .flatMap(cloudFoundryClient -> Mono.zip(
                 Mono.just(cloudFoundryClient),
                 Mono.just(request.getCompletionTimeout()),
                 getOrganizationId(cloudFoundryClient, request.getName())
@@ -103,7 +103,7 @@ public final class DefaultOrganizations implements Organizations {
     @Override
     public Mono<OrganizationDetail> get(OrganizationInfoRequest request) {
         return this.cloudFoundryClient
-            .flatMap(cloudFoundryClient -> Mono.when(
+            .flatMap(cloudFoundryClient -> Mono.zip(
                 Mono.just(cloudFoundryClient),
                 getOrganization(cloudFoundryClient, request.getName())
             ))
@@ -125,7 +125,7 @@ public final class DefaultOrganizations implements Organizations {
     @Override
     public Mono<Void> rename(RenameOrganizationRequest request) {
         return this.cloudFoundryClient
-            .flatMap(cloudFoundryClient -> Mono.when(
+            .flatMap(cloudFoundryClient -> Mono.zip(
                 Mono.just(cloudFoundryClient),
                 getOrganizationId(cloudFoundryClient, request.getName())
             ))
@@ -152,7 +152,7 @@ public final class DefaultOrganizations implements Organizations {
         String organizationId = ResourceUtils.getId(organizationResource);
 
         return Mono
-            .when(
+            .zip(
                 getDomainNames(cloudFoundryClient, organizationId),
                 getOrganizationQuota(cloudFoundryClient, organizationResource),
                 getSpaceQuotas(cloudFoundryClient, organizationId),
@@ -336,7 +336,7 @@ public final class DefaultOrganizations implements Organizations {
 
     private static Mono<Void> setOrganizationManager(CloudFoundryClient cloudFoundryClient, String organizationId, String username) {
         return Mono
-            .when(
+            .zip(
                 requestAssociateOrganizationManagerByUsername(cloudFoundryClient, organizationId, username),
                 requestAssociateOrganizationUserByUsername(cloudFoundryClient, organizationId, username)
             )

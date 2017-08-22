@@ -59,25 +59,25 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
 
-        Mono.when(
-            getSharedDomainId(this.cloudFoundryClient, domainName),
-            this.spaceId
-        )
-            .flatMap(function((domainId, spaceId) -> Mono.when(
+        Mono
+            .zip(
+                getSharedDomainId(this.cloudFoundryClient, domainName),
+                this.spaceId
+            )
+            .flatMap(function((domainId, spaceId) -> Mono.zip(
                 getApplicationId(this.cloudFoundryClient, applicationName, spaceId),
                 getRouteId(this.cloudFoundryClient, domainId, hostName, spaceId))
             ))
-            .flatMap(function((applicationId, routeId) -> Mono
-                .when(
-                    Mono.just(applicationId),
-                    Mono.just(routeId),
-                    this.cloudFoundryClient.routeMappings()
-                        .create(CreateRouteMappingRequest.builder()
-                            .applicationId(applicationId)
-                            .routeId(routeId)
-                            .build())
-                        .map(ResourceUtils::getEntity)
-                )))
+            .flatMap(function((applicationId, routeId) -> Mono.zip(
+                Mono.just(applicationId),
+                Mono.just(routeId),
+                this.cloudFoundryClient.routeMappings()
+                    .create(CreateRouteMappingRequest.builder()
+                        .applicationId(applicationId)
+                        .routeId(routeId)
+                        .build())
+                    .map(ResourceUtils::getEntity)
+            )))
             .as(StepVerifier::create)
             .consumeNextWith(consumer((applicationId, routeId, entity) -> {
                 assertThat(entity.getApplicationId()).isEqualTo(applicationId);
@@ -134,7 +134,7 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
 
         this.spaceId
             .flatMap(spaceId -> getRouteMappingId(this.cloudFoundryClient, applicationName, domainName, hostName, spaceId))
-            .flatMap(routeMappingId -> Mono.when(
+            .flatMap(routeMappingId -> Mono.zip(
                 Mono.just(routeMappingId),
                 this.cloudFoundryClient.routeMappings()
                     .get(GetRouteMappingRequest.builder()
@@ -154,11 +154,11 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
         String hostName = this.nameFactory.getHostName();
 
         this.spaceId
-            .flatMap(spaceId -> Mono.when(
+            .flatMap(spaceId -> Mono.zip(
                 getSharedDomainId(this.cloudFoundryClient, domainName),
                 Mono.just(spaceId)
             ))
-            .flatMap(function((domainId, spaceId) -> Mono.when(
+            .flatMap(function((domainId, spaceId) -> Mono.zip(
                 getApplicationId(this.cloudFoundryClient, applicationName, spaceId),
                 getRouteId(this.cloudFoundryClient, domainId, hostName, spaceId)
             )))
@@ -185,11 +185,11 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
         String hostName = this.nameFactory.getHostName();
 
         this.spaceId
-            .flatMap(spaceId -> Mono.when(
+            .flatMap(spaceId -> Mono.zip(
                 getSharedDomainId(this.cloudFoundryClient, domainName),
                 Mono.just(spaceId)
             ))
-            .flatMap(function((domainId, spaceId) -> Mono.when(
+            .flatMap(function((domainId, spaceId) -> Mono.zip(
                 getApplicationId(this.cloudFoundryClient, applicationName, spaceId),
                 getRouteId(this.cloudFoundryClient, domainId, hostName, spaceId)
             )))
@@ -226,7 +226,7 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
 
     private static Mono<String> getRouteMappingId(CloudFoundryClient cloudFoundryClient, String applicationName, String domainName, String hostName, String spaceId) {
         return getSharedDomainId(cloudFoundryClient, domainName)
-            .flatMap(domainId -> Mono.when(
+            .flatMap(domainId -> Mono.zip(
                 getApplicationId(cloudFoundryClient, applicationName, spaceId),
                 getRouteId(cloudFoundryClient, domainId, hostName, spaceId)
             ))

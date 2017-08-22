@@ -77,7 +77,7 @@ public final class ServicesTest extends AbstractIntegrationTest {
         String userProvidedServiceInstanceName = this.nameFactory.getServiceInstanceName();
 
         Mono
-            .when(
+            .zip(
                 requestCreatePrivateDomain(this.cloudFoundryOperations, domainName, this.organizationName),
                 requestCreateRoute(this.cloudFoundryOperations, domainName, hostName, path, this.spaceName),
                 requestCreateUserProvidedServiceInstance(this.cloudFoundryOperations, userProvidedServiceInstanceName)

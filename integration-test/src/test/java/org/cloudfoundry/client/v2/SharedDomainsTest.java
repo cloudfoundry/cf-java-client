@@ -133,7 +133,7 @@ public final class SharedDomainsTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
 
         getSharedDomainId(this.cloudFoundryClient, domainName)
-            .flatMap(sharedDomainId -> Mono.when(
+            .flatMap(sharedDomainId -> Mono.zip(
                 Mono.just(sharedDomainId),
                 requestListSharedDomains(this.cloudFoundryClient, domainName)
                     .single()
