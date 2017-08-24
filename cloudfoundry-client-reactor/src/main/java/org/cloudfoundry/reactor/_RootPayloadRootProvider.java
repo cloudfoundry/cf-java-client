@@ -59,7 +59,7 @@ abstract class _RootPayloadRootProvider extends AbstractRootProvider {
     private Mono<Map<String, String>> getPayload(ConnectionContext connectionContext) {
         return doGetRoot(connectionContext)
             .map(UriComponents::toUriString)
-            .then(uri -> connectionContext.getHttpClient()
+            .flatMap(uri -> connectionContext.getHttpClient()
                 .get(uri, request -> Mono.just(request)
                     .map(UserAgent::addUserAgent)
                     .map(JsonCodec::addDecodeHeaders)
