@@ -68,7 +68,7 @@ public final class ReactorRoutesTest extends AbstractClientApiTest {
     public void associateApplication() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/v2/routes/test-route-id/apps/test-app-id")
+                .method(PUT).path("/routes/test-route-id/apps/test-app-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -108,7 +108,7 @@ public final class ReactorRoutesTest extends AbstractClientApiTest {
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/v2/routes")
+                .method(POST).path("/routes")
                 .payload("fixtures/client/v2/routes/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -150,7 +150,7 @@ public final class ReactorRoutesTest extends AbstractClientApiTest {
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v2/routes/test-route-id")
+                .method(DELETE).path("/routes/test-route-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
@@ -170,7 +170,7 @@ public final class ReactorRoutesTest extends AbstractClientApiTest {
     public void deleteAsync() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v2/routes/test-route-id?async=true")
+                .method(DELETE).path("/routes/test-route-id?async=true")
                 .build())
             .response(TestResponse.builder()
                 .status(ACCEPTED)
@@ -203,7 +203,7 @@ public final class ReactorRoutesTest extends AbstractClientApiTest {
     public void exists() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/routes/reserved/domain/test-domain-id/host/test-host?path=test-path")
+                .method(GET).path("/routes/reserved/domain/test-domain-id/host/test-host?path=test-path")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
@@ -226,7 +226,7 @@ public final class ReactorRoutesTest extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/routes/test-route-id")
+                .method(GET).path("/routes/test-route-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -267,7 +267,7 @@ public final class ReactorRoutesTest extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/routes?page=-1")
+                .method(GET).path("/routes?page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -313,7 +313,7 @@ public final class ReactorRoutesTest extends AbstractClientApiTest {
     public void listApplications() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/routes/81464707-0f48-4ab9-87dc-667ef15489fb/apps?app_guid=6e62b293-f4c8-405a-be2b-b719e2848984")
+                .method(GET).path("/routes/81464707-0f48-4ab9-87dc-667ef15489fb/apps?app_guid=6e62b293-f4c8-405a-be2b-b719e2848984")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -372,7 +372,7 @@ public final class ReactorRoutesTest extends AbstractClientApiTest {
     public void listMappings() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/routes/521c375d-a7e2-4f87-9527-7fd1db1b2010/route_mappings")
+                .method(GET).path("/routes/521c375d-a7e2-4f87-9527-7fd1db1b2010/route_mappings")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -411,7 +411,7 @@ public final class ReactorRoutesTest extends AbstractClientApiTest {
     public void removeApplication() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v2/routes/test-route-id/apps/test-app-id")
+                .method(DELETE).path("/routes/test-route-id/apps/test-app-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
@@ -432,7 +432,7 @@ public final class ReactorRoutesTest extends AbstractClientApiTest {
     public void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/v2/routes/test-route-id")
+                .method(PUT).path("/routes/test-route-id")
                 .payload("fixtures/client/v2/routes/PUT_{id}_request.json")
                 .build())
             .response(TestResponse.builder()

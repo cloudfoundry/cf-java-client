@@ -47,7 +47,7 @@ public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
     public void assignDefaultIsolationSegment() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PATCH).path("/v3/organizations/test-organization-id/relationships/default_isolation_segment")
+                .method(PATCH).path("/organizations/test-organization-id/relationships/default_isolation_segment")
                 .payload("fixtures/client/v3/organizations/PATCH_{id}_relationships_default_isolation_segment_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -83,7 +83,7 @@ public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
     public void getDefaultIsolationSegment() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v3/organizations/test-organization-id/relationships/default_isolation_segment")
+                .method(GET).path("/organizations/test-organization-id/relationships/default_isolation_segment")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -115,7 +115,7 @@ public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v3/organizations")
+                .method(GET).path("/organizations")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)

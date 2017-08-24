@@ -55,50 +55,50 @@ public final class ReactorUserProvidedServiceInstances extends AbstractClientV2O
     @Override
     public Mono<AssociateUserProvidedServiceInstanceRouteResponse> associateRoute(AssociateUserProvidedServiceInstanceRouteRequest request) {
         return put(request, AssociateUserProvidedServiceInstanceRouteResponse.class,
-            builder -> builder.pathSegment("v2", "user_provided_service_instances", request.getUserProvidedServiceInstanceId(), "routes", request.getRouteId()))
+            builder -> builder.pathSegment("user_provided_service_instances", request.getUserProvidedServiceInstanceId(), "routes", request.getRouteId()))
             .checkpoint();
     }
 
     @Override
     public Mono<CreateUserProvidedServiceInstanceResponse> create(CreateUserProvidedServiceInstanceRequest request) {
-        return post(request, CreateUserProvidedServiceInstanceResponse.class, builder -> builder.pathSegment("v2", "user_provided_service_instances"))
+        return post(request, CreateUserProvidedServiceInstanceResponse.class, builder -> builder.pathSegment("user_provided_service_instances"))
             .checkpoint();
     }
 
     @Override
     public Mono<Void> delete(DeleteUserProvidedServiceInstanceRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("v2", "user_provided_service_instances", request.getUserProvidedServiceInstanceId()))
+        return delete(request, Void.class, builder -> builder.pathSegment("user_provided_service_instances", request.getUserProvidedServiceInstanceId()))
             .checkpoint();
     }
 
     @Override
     public Mono<GetUserProvidedServiceInstanceResponse> get(GetUserProvidedServiceInstanceRequest request) {
-        return get(request, GetUserProvidedServiceInstanceResponse.class, builder -> builder.pathSegment("v2", "user_provided_service_instances", request.getUserProvidedServiceInstanceId()))
+        return get(request, GetUserProvidedServiceInstanceResponse.class, builder -> builder.pathSegment("user_provided_service_instances", request.getUserProvidedServiceInstanceId()))
             .checkpoint();
     }
 
     @Override
     public Mono<ListUserProvidedServiceInstancesResponse> list(ListUserProvidedServiceInstancesRequest request) {
-        return get(request, ListUserProvidedServiceInstancesResponse.class, builder -> builder.pathSegment("v2", "user_provided_service_instances"))
+        return get(request, ListUserProvidedServiceInstancesResponse.class, builder -> builder.pathSegment("user_provided_service_instances"))
             .checkpoint();
     }
 
     @Override
     public Mono<ListUserProvidedServiceInstanceServiceBindingsResponse> listServiceBindings(ListUserProvidedServiceInstanceServiceBindingsRequest request) {
         return get(request, ListUserProvidedServiceInstanceServiceBindingsResponse.class,
-            builder -> builder.pathSegment("v2", "user_provided_service_instances", request.getUserProvidedServiceInstanceId(), "service_bindings"))
+            builder -> builder.pathSegment("user_provided_service_instances", request.getUserProvidedServiceInstanceId(), "service_bindings"))
             .checkpoint();
     }
 
     @Override
     public Mono<Void> removeRoute(RemoveUserProvidedServiceInstanceRouteRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("v2", "user_provided_service_instances", request.getUserProvidedServiceInstanceId(), "routes", request.getRouteId()))
+        return delete(request, Void.class, builder -> builder.pathSegment("user_provided_service_instances", request.getUserProvidedServiceInstanceId(), "routes", request.getRouteId()))
             .checkpoint();
     }
 
     @Override
     public Mono<UpdateUserProvidedServiceInstanceResponse> update(UpdateUserProvidedServiceInstanceRequest request) {
-        return put(request, UpdateUserProvidedServiceInstanceResponse.class, builder -> builder.pathSegment("v2", "user_provided_service_instances", request.getUserProvidedServiceInstanceId()))
+        return put(request, UpdateUserProvidedServiceInstanceResponse.class, builder -> builder.pathSegment("user_provided_service_instances", request.getUserProvidedServiceInstanceId()))
             .checkpoint();
     }
 

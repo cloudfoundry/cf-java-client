@@ -59,63 +59,63 @@ public final class ReactorIsolationSegments extends AbstractClientV3Operations i
     @Override
     public Mono<AddIsolationSegmentOrganizationEntitlementResponse> addOrganizationEntitlement(AddIsolationSegmentOrganizationEntitlementRequest request) {
         return post(request, AddIsolationSegmentOrganizationEntitlementResponse.class, builder ->
-            builder.pathSegment("v3", "isolation_segments", request.getIsolationSegmentId(), "relationships", "organizations"))
+            builder.pathSegment("isolation_segments", request.getIsolationSegmentId(), "relationships", "organizations"))
             .checkpoint();
     }
 
     @Override
     public Mono<CreateIsolationSegmentResponse> create(CreateIsolationSegmentRequest request) {
-        return post(request, CreateIsolationSegmentResponse.class, builder -> builder.pathSegment("v3", "isolation_segments"))
+        return post(request, CreateIsolationSegmentResponse.class, builder -> builder.pathSegment("isolation_segments"))
             .checkpoint();
     }
 
     @Override
     public Mono<Void> delete(DeleteIsolationSegmentRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("v3", "isolation_segments", request.getIsolationSegmentId()))
+        return delete(request, Void.class, builder -> builder.pathSegment("isolation_segments", request.getIsolationSegmentId()))
             .checkpoint();
     }
 
     @Override
     public Mono<GetIsolationSegmentResponse> get(GetIsolationSegmentRequest request) {
-        return get(request, GetIsolationSegmentResponse.class, builder -> builder.pathSegment("v3", "isolation_segments", request.getIsolationSegmentId()))
+        return get(request, GetIsolationSegmentResponse.class, builder -> builder.pathSegment("isolation_segments", request.getIsolationSegmentId()))
             .checkpoint();
     }
 
     @Override
     public Mono<ListIsolationSegmentsResponse> list(ListIsolationSegmentsRequest request) {
-        return get(request, ListIsolationSegmentsResponse.class, builder -> builder.pathSegment("v3", "isolation_segments"))
+        return get(request, ListIsolationSegmentsResponse.class, builder -> builder.pathSegment("isolation_segments"))
             .checkpoint();
     }
 
     @Override
     public Mono<ListIsolationSegmentEntitledOrganizationsResponse> listEntitledOrganizations(ListIsolationSegmentEntitledOrganizationsRequest request) {
-        return get(request, ListIsolationSegmentEntitledOrganizationsResponse.class, builder -> builder.pathSegment("v3", "isolation_segments", request.getIsolationSegmentId(), "organizations"))
+        return get(request, ListIsolationSegmentEntitledOrganizationsResponse.class, builder -> builder.pathSegment("isolation_segments", request.getIsolationSegmentId(), "organizations"))
             .checkpoint();
     }
 
     @Override
     public Mono<ListIsolationSegmentOrganizationsRelationshipResponse> listOrganizationsRelationship(ListIsolationSegmentOrganizationsRelationshipRequest request) {
         return get(request, ListIsolationSegmentOrganizationsRelationshipResponse.class, builder ->
-            builder.pathSegment("v3", "isolation_segments", request.getIsolationSegmentId(), "relationships", "organizations"))
+            builder.pathSegment("isolation_segments", request.getIsolationSegmentId(), "relationships", "organizations"))
             .checkpoint();
     }
 
     @Override
     public Mono<ListIsolationSegmentSpacesRelationshipResponse> listSpacesRelationship(ListIsolationSegmentSpacesRelationshipRequest request) {
         return get(request, ListIsolationSegmentSpacesRelationshipResponse.class, builder ->
-            builder.pathSegment("v3", "isolation_segments", request.getIsolationSegmentId(), "relationships", "spaces"))
+            builder.pathSegment("isolation_segments", request.getIsolationSegmentId(), "relationships", "spaces"))
             .checkpoint();
     }
 
     @Override
     public Mono<Void> removeOrganizationEntitlement(RemoveIsolationSegmentOrganizationEntitlementRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("v3", "isolation_segments", request.getIsolationSegmentId(), "relationships", "organizations", request.getOrganizationId()))
+        return delete(request, Void.class, builder -> builder.pathSegment("isolation_segments", request.getIsolationSegmentId(), "relationships", "organizations", request.getOrganizationId()))
             .checkpoint();
     }
 
     @Override
     public Mono<UpdateIsolationSegmentResponse> update(UpdateIsolationSegmentRequest request) {
-        return patch(request, UpdateIsolationSegmentResponse.class, builder -> builder.pathSegment("v3", "isolation_segments", request.getIsolationSegmentId()))
+        return patch(request, UpdateIsolationSegmentResponse.class, builder -> builder.pathSegment("isolation_segments", request.getIsolationSegmentId()))
             .checkpoint();
     }
 

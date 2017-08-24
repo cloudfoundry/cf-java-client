@@ -64,7 +64,7 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
     public void addOrganizationEntitlement() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/v3/isolation_segments/test-isolation-segment-id/relationships/organizations")
+                .method(POST).path("/isolation_segments/test-isolation-segment-id/relationships/organizations")
                 .payload("fixtures/client/v3/isolation_segments/POST_{id}_relationships_organizations_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -106,7 +106,7 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/v3/isolation_segments")
+                .method(POST).path("/isolation_segments")
                 .payload("fixtures/client/v3/isolation_segments/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -140,7 +140,7 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v3/isolation_segments/test-isolation-segment-id")
+                .method(DELETE).path("/isolation_segments/test-isolation-segment-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
@@ -160,7 +160,7 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v3/isolation_segments/test-isolation-segment-id")
+                .method(GET).path("/isolation_segments/test-isolation-segment-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -193,7 +193,7 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v3/isolation_segments")
+                .method(GET).path("/isolation_segments")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -288,7 +288,7 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
     public void listEntitledOrganizations() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v3/isolation_segments/test-isolation-segment-id/organizations")
+                .method(GET).path("/isolation_segments/test-isolation-segment-id/organizations")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -333,7 +333,7 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
     public void listOrganizationsRelationship() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v3/isolation_segments/test-isolation-segment-id/relationships/organizations")
+                .method(GET).path("/isolation_segments/test-isolation-segment-id/relationships/organizations")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -368,7 +368,7 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
     public void listSpacesRelationship() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v3/isolation_segments/test-isolation-segment-id/relationships/spaces")
+                .method(GET).path("/isolation_segments/test-isolation-segment-id/relationships/spaces")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -400,7 +400,7 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
     public void removeOrganizationEntitlement() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v3/isolation_segments/test-isolation-segment-id/relationships/organizations/test-organization-id")
+                .method(DELETE).path("/isolation_segments/test-isolation-segment-id/relationships/organizations/test-organization-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
@@ -421,7 +421,7 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
     public void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PATCH).path("/v3/isolation_segments/test-isolation-segment-id")
+                .method(PATCH).path("/isolation_segments/test-isolation-segment-id")
                 .payload("fixtures/client/v3/isolation_segments/PATCH_{id}_request.json")
                 .build())
             .response(TestResponse.builder()

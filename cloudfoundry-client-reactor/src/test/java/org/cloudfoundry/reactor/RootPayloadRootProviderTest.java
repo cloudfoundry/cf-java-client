@@ -24,16 +24,27 @@ import java.time.Duration;
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public final class DefaultConnectionContextTest extends AbstractRestTest {
+public final class RootPayloadRootProviderTest extends AbstractRestTest {
 
-    private final ConnectionContext connectionContext = DefaultConnectionContext.builder()
-        .apiHost(this.mockWebServer.getHostName())
+    private final RootPayloadRootProvider rootProvider = RootPayloadRootProvider.builder()
+        .apiHost("localhost")
         .port(this.mockWebServer.getPort())
         .secure(false)
+        .objectMapper(CONNECTION_CONTEXT.getObjectMapper())
         .build();
 
     @Test
-    public void getInfo() throws Exception {
+    public void getRoot() {
+        this.rootProvider
+            .getRoot(CONNECTION_CONTEXT)
+            .as(StepVerifier::create)
+            .expectNext(String.format("http://localhost:%d", this.mockWebServer.getPort()))
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void getRootKey() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/")
@@ -44,21 +55,30 @@ public final class DefaultConnectionContextTest extends AbstractRestTest {
                 .build())
             .build());
 
+        this.rootProvider
+            .getRoot("cloud_controller_v2", CONNECTION_CONTEXT)
+            .as(StepVerifier::create)
+            .expectNext("http://api.run.pivotal.io/v2")
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void getRootKeyNoKey() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/info")
+                .method(GET).path("/")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
-                .payload("fixtures/client/v2/info/GET_response.json")
+                .payload("fixtures/GET_response.json")
                 .build())
             .build());
 
-        this.connectionContext.getRootProvider()
-            .getRoot("token_endpoint", this.connectionContext)
+        this.rootProvider
+            .getRoot("invalid-key", CONNECTION_CONTEXT)
             .as(StepVerifier::create)
-            .expectNext("http://localhost:8080/uaa")
-            .expectComplete()
+            .expectError(IllegalArgumentException.class)
             .verify(Duration.ofSeconds(5));
     }
 

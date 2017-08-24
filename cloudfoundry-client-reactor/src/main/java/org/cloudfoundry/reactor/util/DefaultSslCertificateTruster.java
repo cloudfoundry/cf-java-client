@@ -41,6 +41,10 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public final class DefaultSslCertificateTruster implements SslCertificateTruster {
 
+    private static final int DEFAULT_PORT = 443;
+
+    private static final int UNDEFINED_PORT = -1;
+
     private final Logger logger = LoggerFactory.getLogger("cloudfoundry-client.trust");
 
     private final AtomicReference<X509TrustManager> delegate;
@@ -113,7 +117,8 @@ public final class DefaultSslCertificateTruster implements SslCertificateTruster
     private static TcpClient getTcpClient(Optional<ProxyConfiguration> proxyConfiguration, CertificateCollectingTrustManager collector, String host, int port) {
         return TcpClient.create(options -> {
             options
-                .host(host).port(port)
+                .host(host)
+                .port(UNDEFINED_PORT == port ? DEFAULT_PORT : port)
                 .disablePool()
                 .sslSupport(ssl -> ssl.trustManager(new StaticTrustManagerFactory(collector)));
 

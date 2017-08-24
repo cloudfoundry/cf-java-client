@@ -53,7 +53,7 @@ public final class ReactorRouteMappingsTest extends AbstractClientApiTest {
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/v2/route_mappings")
+                .method(POST).path("/route_mappings")
                 .payload("fixtures/client/v2/route_mappings/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -91,7 +91,7 @@ public final class ReactorRouteMappingsTest extends AbstractClientApiTest {
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v2/route_mappings/random-route-mapping-id")
+                .method(DELETE).path("/route_mappings/random-route-mapping-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
@@ -111,7 +111,7 @@ public final class ReactorRouteMappingsTest extends AbstractClientApiTest {
     public void deleteAsync() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v2/route_mappings/random-route-mapping-id?async=true")
+                .method(DELETE).path("/route_mappings/random-route-mapping-id?async=true")
                 .build())
             .response(TestResponse.builder()
                 .status(ACCEPTED)
@@ -144,7 +144,7 @@ public final class ReactorRouteMappingsTest extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/route_mappings/route-mapping-id")
+                .method(GET).path("/route_mappings/route-mapping-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -179,7 +179,7 @@ public final class ReactorRouteMappingsTest extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/route_mappings?page=-1")
+                .method(GET).path("/route_mappings?page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)

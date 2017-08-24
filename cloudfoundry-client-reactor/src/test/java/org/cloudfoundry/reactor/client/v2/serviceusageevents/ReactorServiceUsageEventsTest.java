@@ -46,7 +46,7 @@ public final class ReactorServiceUsageEventsTest extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/service_usage_events/9470627d-0488-4d9a-8564-f97571487893")
+                .method(GET).path("/service_usage_events/9470627d-0488-4d9a-8564-f97571487893")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -87,7 +87,7 @@ public final class ReactorServiceUsageEventsTest extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/service_usage_events?after_guid=e5defac2-4ae1-44ac-a3d0-1684ae657453&page=-1")
+                .method(GET).path("/service_usage_events?after_guid=e5defac2-4ae1-44ac-a3d0-1684ae657453&page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -133,7 +133,7 @@ public final class ReactorServiceUsageEventsTest extends AbstractClientApiTest {
     public void purgeAndReseed() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/v2/service_usage_events/destructively_purge_all_and_reseed_existing_instances")
+                .method(POST).path("/service_usage_events/destructively_purge_all_and_reseed_existing_instances")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)

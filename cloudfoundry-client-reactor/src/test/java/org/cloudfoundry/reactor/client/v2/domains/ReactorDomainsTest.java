@@ -57,7 +57,7 @@ public final class ReactorDomainsTest extends AbstractClientApiTest {
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/v2/domains")
+                .method(POST).path("/domains")
                 .payload("fixtures/client/v2/domains/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -95,7 +95,7 @@ public final class ReactorDomainsTest extends AbstractClientApiTest {
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v2/domains/test-domain-id")
+                .method(DELETE).path("/domains/test-domain-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
@@ -115,7 +115,7 @@ public final class ReactorDomainsTest extends AbstractClientApiTest {
     public void deleteAsync() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v2/domains/test-domain-id?async=true")
+                .method(DELETE).path("/domains/test-domain-id?async=true")
                 .build())
             .response(TestResponse.builder()
                 .status(ACCEPTED)
@@ -148,7 +148,7 @@ public final class ReactorDomainsTest extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/domains/test-domain-id")
+                .method(GET).path("/domains/test-domain-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -179,7 +179,7 @@ public final class ReactorDomainsTest extends AbstractClientApiTest {
     public void listDomains() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/domains?page=-1")
+                .method(GET).path("/domains?page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -247,7 +247,7 @@ public final class ReactorDomainsTest extends AbstractClientApiTest {
     public void listSpaces() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/domains/test-domain-id/spaces?page=-1")
+                .method(GET).path("/domains/test-domain-id/spaces?page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)

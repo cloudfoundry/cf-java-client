@@ -61,7 +61,7 @@ public final class ReactorBuildpacksTest extends AbstractClientApiTest {
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/v2/buildpacks")
+                .method(POST).path("/buildpacks")
                 .payload("fixtures/client/v2/buildpacks/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -96,7 +96,7 @@ public final class ReactorBuildpacksTest extends AbstractClientApiTest {
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v2/buildpacks/test-buildpack-id?async=true")
+                .method(DELETE).path("/buildpacks/test-buildpack-id?async=true")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -129,7 +129,7 @@ public final class ReactorBuildpacksTest extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/buildpacks/test-buildpack-id")
+                .method(GET).path("/buildpacks/test-buildpack-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -165,7 +165,7 @@ public final class ReactorBuildpacksTest extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/buildpacks?q=name:test-name&page=-1")
+                .method(GET).path("/buildpacks?q=name:test-name&page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -233,7 +233,7 @@ public final class ReactorBuildpacksTest extends AbstractClientApiTest {
     public void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/v2/buildpacks/test-buildpack-id")
+                .method(PUT).path("/buildpacks/test-buildpack-id")
                 .payload("fixtures/client/v2/buildpacks/PUT_{id}_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -271,7 +271,7 @@ public final class ReactorBuildpacksTest extends AbstractClientApiTest {
     public void upload() throws IOException {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/v2/buildpacks/test-buildpack-id/bits")
+                .method(PUT).path("/buildpacks/test-buildpack-id/bits")
                 .contents(consumer((headers, body) -> {
                     String boundary = extractBoundary(headers);
 

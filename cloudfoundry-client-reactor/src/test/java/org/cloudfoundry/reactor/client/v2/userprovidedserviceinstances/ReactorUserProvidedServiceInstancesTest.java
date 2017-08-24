@@ -62,7 +62,7 @@ public final class ReactorUserProvidedServiceInstancesTest extends AbstractClien
     public void associateRoute() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/v2/user_provided_service_instances/5badd282-6e07-4fc6-a8c4-78be99040774/routes/237d9236-7997-4b1a-be8d-2aaf2d85421a")
+                .method(PUT).path("/user_provided_service_instances/5badd282-6e07-4fc6-a8c4-78be99040774/routes/237d9236-7997-4b1a-be8d-2aaf2d85421a")
                 .payload("fixtures/client/v2/user_provided_service_instances/PUT_{id}_route_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -103,7 +103,7 @@ public final class ReactorUserProvidedServiceInstancesTest extends AbstractClien
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/v2/user_provided_service_instances")
+                .method(POST).path("/user_provided_service_instances")
                 .payload("fixtures/client/v2/user_provided_service_instances/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -147,7 +147,7 @@ public final class ReactorUserProvidedServiceInstancesTest extends AbstractClien
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v2/user_provided_service_instances/5b6b45c8-89be-48d2-affd-f64346ad4d93")
+                .method(DELETE).path("/user_provided_service_instances/5b6b45c8-89be-48d2-affd-f64346ad4d93")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
@@ -167,7 +167,7 @@ public final class ReactorUserProvidedServiceInstancesTest extends AbstractClien
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/user_provided_service_instances/8c12fd06-6639-4844-b5e7-a6831cadbbcc")
+                .method(GET).path("/user_provided_service_instances/8c12fd06-6639-4844-b5e7-a6831cadbbcc")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -205,7 +205,7 @@ public final class ReactorUserProvidedServiceInstancesTest extends AbstractClien
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/user_provided_service_instances?page=-1")
+                .method(GET).path("/user_provided_service_instances?page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -247,7 +247,7 @@ public final class ReactorUserProvidedServiceInstancesTest extends AbstractClien
     public void listServiceBindings() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/user_provided_service_instances/test-user-provided-service-instance-id/service_bindings?page=-1")
+                .method(GET).path("/user_provided_service_instances/test-user-provided-service-instance-id/service_bindings?page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -290,7 +290,7 @@ public final class ReactorUserProvidedServiceInstancesTest extends AbstractClien
     public void removeRoute() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v2/user_provided_service_instances/fd195229-117c-4bbe-9418-c5df97131eae/routes/c3bc74b0-9465-413d-b5e6-3b305fb439cc")
+                .method(DELETE).path("/user_provided_service_instances/fd195229-117c-4bbe-9418-c5df97131eae/routes/c3bc74b0-9465-413d-b5e6-3b305fb439cc")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
@@ -311,7 +311,7 @@ public final class ReactorUserProvidedServiceInstancesTest extends AbstractClien
     public void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/v2/user_provided_service_instances/e2c198b1-fa15-414e-a9a4-31537996b39d")
+                .method(PUT).path("/user_provided_service_instances/e2c198b1-fa15-414e-a9a4-31537996b39d")
                 .payload("fixtures/client/v2/user_provided_service_instances/PUT_{id}_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -352,7 +352,7 @@ public final class ReactorUserProvidedServiceInstancesTest extends AbstractClien
     public void updateWithEmptyCredentials() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/v2/user_provided_service_instances/e2c198b1-fa15-414e-a9a4-31537996b39d")
+                .method(PUT).path("/user_provided_service_instances/e2c198b1-fa15-414e-a9a4-31537996b39d")
                 .payload("fixtures/client/v2/user_provided_service_instances/PUT_{id}_empty_creds_request.json")
                 .build())
             .response(TestResponse.builder()

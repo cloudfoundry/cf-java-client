@@ -50,7 +50,7 @@ public final class ReactorServiceKeysTest extends AbstractClientApiTest {
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/v2/service_keys")
+                .method(POST).path("/service_keys")
                 .payload("fixtures/client/v2/service_keys/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -86,7 +86,7 @@ public final class ReactorServiceKeysTest extends AbstractClientApiTest {
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v2/service_keys/test-service-key-id")
+                .method(DELETE).path("/service_keys/test-service-key-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
@@ -106,7 +106,7 @@ public final class ReactorServiceKeysTest extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/service_keys/test-service-key-id")
+                .method(GET).path("/service_keys/test-service-key-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -140,7 +140,7 @@ public final class ReactorServiceKeysTest extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/service_keys?q=name:test-name&page=-1")
+                .method(GET).path("/service_keys?q=name:test-name&page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)

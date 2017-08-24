@@ -27,25 +27,28 @@ import reactor.core.publisher.Mono;
 import reactor.ipc.netty.http.client.HttpClientRequest;
 
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
- * A {@link RootProvider} that returns endpoints extracted from the `/v2/info` API for the configured endpoint.
+ * A {@link RootProvider} that returns endpoints extracted from the `/` API for the configured endpoint.
  */
 @Value.Immutable
-abstract class _InfoPayloadRootProvider extends AbstractRootProvider {
+abstract class _RootPayloadRootProvider extends AbstractRootProvider {
 
+    @Override
     protected Mono<UriComponents> doGetRoot(ConnectionContext connectionContext) {
         return Mono.just(getRoot());
     }
 
+    @Override
     protected Mono<UriComponents> doGetRoot(String key, ConnectionContext connectionContext) {
-        return getInfo(connectionContext)
-            .map(info -> {
-                if (!info.containsKey(key)) {
-                    throw new IllegalArgumentException(String.format("Info payload does not contain key '%s;", key));
+        return getPayload(connectionContext)
+            .map(payload -> {
+                if (!payload.containsKey(key)) {
+                    throw new IllegalArgumentException(String.format("Root payload does not contain key '%s;", key));
                 }
 
-                return normalize(UriComponentsBuilder.fromUriString(info.get(key)));
+                return normalize(UriComponentsBuilder.fromUriString(payload.get(key)));
             });
     }
 
@@ -53,10 +56,10 @@ abstract class _InfoPayloadRootProvider extends AbstractRootProvider {
 
     @SuppressWarnings("unchecked")
     @Value.Derived
-    private Mono<Map<String, String>> getInfo(ConnectionContext connectionContext) {
+    private Mono<Map<String, String>> getPayload(ConnectionContext connectionContext) {
         return doGetRoot(connectionContext)
-            .map(uri -> UriComponentsBuilder.newInstance().uriComponents(uri).pathSegment("v2", "info").build().encode().toUriString())
-            .flatMap(uri -> connectionContext.getHttpClient()
+            .map(UriComponents::toUriString)
+            .then(uri -> connectionContext.getHttpClient()
                 .get(uri, request -> Mono.just(request)
                     .map(UserAgent::addUserAgent)
                     .map(JsonCodec::addDecodeHeaders)
@@ -64,8 +67,13 @@ abstract class _InfoPayloadRootProvider extends AbstractRootProvider {
                 .doOnSubscribe(NetworkLogging.get(uri))
                 .transform(NetworkLogging.response(uri)))
             .transform(JsonCodec.decode(getObjectMapper(), Map.class))
-            .map(m -> (Map<String, String>) m)
+            .map(this::parsePayload)
             .checkpoint();
+    }
+
+    private Map<String, String> parsePayload(Map<String, Map<String, Map<String, String>>> payload) {
+        return payload.get("links").entrySet().stream()
+            .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().get("href")));
     }
 
 }

@@ -51,35 +51,35 @@ public final class ReactorDomains extends AbstractClientV2Operations implements 
     @Override
     @SuppressWarnings("deprecation")
     public Mono<CreateDomainResponse> create(CreateDomainRequest request) {
-        return post(request, CreateDomainResponse.class, builder -> builder.pathSegment("v2", "domains"))
+        return post(request, CreateDomainResponse.class, builder -> builder.pathSegment("domains"))
             .checkpoint();
     }
 
     @Override
     @SuppressWarnings("deprecation")
     public Mono<DeleteDomainResponse> delete(DeleteDomainRequest request) {
-        return delete(request, DeleteDomainResponse.class, builder -> builder.pathSegment("v2", "domains", request.getDomainId()))
+        return delete(request, DeleteDomainResponse.class, builder -> builder.pathSegment("domains", request.getDomainId()))
             .checkpoint();
     }
 
     @Override
     @SuppressWarnings("deprecation")
     public Mono<GetDomainResponse> get(GetDomainRequest request) {
-        return get(request, GetDomainResponse.class, builder -> builder.pathSegment("v2", "domains", request.getDomainId()))
+        return get(request, GetDomainResponse.class, builder -> builder.pathSegment("domains", request.getDomainId()))
             .checkpoint();
     }
 
     @Override
     @SuppressWarnings("deprecation")
     public Mono<ListDomainsResponse> list(ListDomainsRequest request) {
-        return get(request, ListDomainsResponse.class, builder -> builder.pathSegment("v2", "domains"))
+        return get(request, ListDomainsResponse.class, builder -> builder.pathSegment("domains"))
             .checkpoint();
     }
 
     @Override
     @SuppressWarnings("deprecation")
     public Mono<ListDomainSpacesResponse> listSpaces(ListDomainSpacesRequest request) {
-        return get(request, ListDomainSpacesResponse.class, builder -> builder.pathSegment("v2", "domains", request.getDomainId(), "spaces"))
+        return get(request, ListDomainSpacesResponse.class, builder -> builder.pathSegment("domains", request.getDomainId(), "spaces"))
             .checkpoint();
     }
 

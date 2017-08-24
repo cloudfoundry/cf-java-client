@@ -46,7 +46,7 @@ public final class ReactorApplicationUsageEventsTest extends AbstractClientApiTe
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/app_usage_events/caac0ed4-febf-48a4-951f-c0a7fadf6a68")
+                .method(GET).path("/app_usage_events/caac0ed4-febf-48a4-951f-c0a7fadf6a68")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -88,7 +88,7 @@ public final class ReactorApplicationUsageEventsTest extends AbstractClientApiTe
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/app_usage_events?after_guid=f1d8ddec-d36a-4670-acb8-6082a1f1a95f&results-per-page=1")
+                .method(GET).path("/app_usage_events?after_guid=f1d8ddec-d36a-4670-acb8-6082a1f1a95f&results-per-page=1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -136,7 +136,7 @@ public final class ReactorApplicationUsageEventsTest extends AbstractClientApiTe
     public void purgeAndReseed() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/v2/app_usage_events/destructively_purge_all_and_reseed_started_apps")
+                .method(POST).path("/app_usage_events/destructively_purge_all_and_reseed_started_apps")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)

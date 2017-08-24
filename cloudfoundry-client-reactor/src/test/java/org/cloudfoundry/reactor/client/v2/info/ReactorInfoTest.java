@@ -39,7 +39,7 @@ public final class ReactorInfoTest extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/info")
+                .method(GET).path("/info")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)

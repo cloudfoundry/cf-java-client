@@ -51,32 +51,32 @@ public final class ReactorServicePlans extends AbstractClientV2Operations implem
 
     @Override
     public Mono<DeleteServicePlanResponse> delete(DeleteServicePlanRequest request) {
-        return delete(request, DeleteServicePlanResponse.class, builder -> builder.pathSegment("v2", "service_plans", request.getServicePlanId()))
+        return delete(request, DeleteServicePlanResponse.class, builder -> builder.pathSegment("service_plans", request.getServicePlanId()))
             .checkpoint();
     }
 
     @Override
     public Mono<GetServicePlanResponse> get(GetServicePlanRequest request) {
-        return get(request, GetServicePlanResponse.class, builder -> builder.pathSegment("v2", "service_plans", request.getServicePlanId()))
+        return get(request, GetServicePlanResponse.class, builder -> builder.pathSegment("service_plans", request.getServicePlanId()))
             .checkpoint();
     }
 
     @Override
     public Mono<ListServicePlansResponse> list(ListServicePlansRequest request) {
-        return get(request, ListServicePlansResponse.class, builder -> builder.pathSegment("v2", "service_plans"))
+        return get(request, ListServicePlansResponse.class, builder -> builder.pathSegment("service_plans"))
             .checkpoint();
     }
 
     @Override
     public Mono<ListServicePlanServiceInstancesResponse> listServiceInstances(ListServicePlanServiceInstancesRequest request) {
         return get(request, ListServicePlanServiceInstancesResponse.class,
-            builder -> builder.pathSegment("v2", "service_plans", request.getServicePlanId(), "service_instances"))
+            builder -> builder.pathSegment("service_plans", request.getServicePlanId(), "service_instances"))
             .checkpoint();
     }
 
     @Override
     public Mono<UpdateServicePlanResponse> update(UpdateServicePlanRequest request) {
-        return put(request, UpdateServicePlanResponse.class, builder -> builder.pathSegment("v2", "service_plans", request.getServicePlanId()))
+        return put(request, UpdateServicePlanResponse.class, builder -> builder.pathSegment("service_plans", request.getServicePlanId()))
             .checkpoint();
     }
 

@@ -75,7 +75,7 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
     public void bindRoute() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/v2/service_instances/test-service-instance-id/routes/route-id")
+                .method(PUT).path("/service_instances/test-service-instance-id/routes/route-id")
                 .payload("fixtures/client/v2/service_instances/PUT_{id}_routes_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -119,7 +119,7 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/v2/service_instances?accepts_incomplete=true")
+                .method(POST).path("/service_instances?accepts_incomplete=true")
                 .payload("fixtures/client/v2/service_instances/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -174,7 +174,7 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v2/service_instances/test-service-instance-id?accepts_incomplete=true&purge=true")
+                .method(DELETE).path("/service_instances/test-service-instance-id?accepts_incomplete=true&purge=true")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
@@ -196,7 +196,7 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
     public void deleteAcceptsIncomplete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v2/service_instances/test-service-instance-id?accepts_incomplete=true")
+                .method(DELETE).path("/service_instances/test-service-instance-id?accepts_incomplete=true")
                 .build())
             .response(TestResponse.builder()
                 .status(ACCEPTED)
@@ -245,7 +245,7 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
     public void deleteAsync() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v2/service_instances/test-service-instance-id?async=true&purge=true")
+                .method(DELETE).path("/service_instances/test-service-instance-id?async=true&purge=true")
                 .build())
             .response(TestResponse.builder()
                 .status(ACCEPTED)
@@ -279,7 +279,7 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/service_instances/test-service-instance-id")
+                .method(GET).path("/service_instances/test-service-instance-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -329,7 +329,7 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
     public void getPermissions() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/service_instances/test-service-instance-id/permissions")
+                .method(GET).path("/service_instances/test-service-instance-id/permissions")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -354,7 +354,7 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/service_instances?q=name:test-name&page=-1")
+                .method(GET).path("/service_instances?q=name:test-name&page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -409,7 +409,7 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
     public void listRoutes() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/service_instances/26fae4d0-df82-42f3-ac67-da5873e3a277/routes")
+                .method(GET).path("/service_instances/26fae4d0-df82-42f3-ac67-da5873e3a277/routes")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -454,7 +454,7 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
     public void listServiceBindings() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/service_instances/test-service-instance-id/service_bindings?q=app_guid:test-application-id&page=-1")
+                .method(GET).path("/service_instances/test-service-instance-id/service_bindings?q=app_guid:test-application-id&page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -497,7 +497,7 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
     public void listServiceKeys() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/service_instances/test-service-instance-id/service_keys?page=-1")
+                .method(GET).path("/service_instances/test-service-instance-id/service_keys?page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -536,7 +536,7 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
     public void unbindRoute() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v2/service_instances/8fe97ac9-d53a-4858-b6a4-53c20f1fe409/routes/3bbd74b5-516d-409e-a107-19eaf9b2da18")
+                .method(DELETE).path("/service_instances/8fe97ac9-d53a-4858-b6a4-53c20f1fe409/routes/3bbd74b5-516d-409e-a107-19eaf9b2da18")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
@@ -557,7 +557,7 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
     public void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/v2/service_instances/test-service-instance-id?accepts_incomplete=true")
+                .method(PUT).path("/service_instances/test-service-instance-id?accepts_incomplete=true")
                 .payload("fixtures/client/v2/service_instances/PUT_{id}_request.json")
                 .build())
             .response(TestResponse.builder()

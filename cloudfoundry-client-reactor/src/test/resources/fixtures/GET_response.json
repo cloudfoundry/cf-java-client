@@ -1,0 +1,31 @@
+{
+  "links": {
+    "self": {
+      "href": "https://api.run.pivotal.io"
+    },
+    "cloud_controller_v2": {
+      "href": "https://api.run.pivotal.io/v2",
+      "meta": {
+        "version": "2.93.0"
+      }
+    },
+    "cloud_controller_v3": {
+      "href": "https://api.run.pivotal.io/v3",
+      "meta": {
+        "version": "3.28.0"
+      }
+    },
+    "network_policy_v0": {
+      "href": "https://api.run.pivotal.io/networking/v0/external"
+    },
+    "network_policy_v1": {
+      "href": "https://api.run.pivotal.io/networking/v1/external"
+    },
+    "uaa": {
+      "href": "https://uaa.run.pivotal.io"
+    },
+    "logging": {
+      "href": "wss://doppler.run.pivotal.io:443"
+    }
+  }
+}

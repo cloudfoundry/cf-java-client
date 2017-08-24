@@ -53,7 +53,7 @@ public final class ReactorServiceBrokersTest extends AbstractClientApiTest {
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/v2/service_brokers")
+                .method(POST).path("/service_brokers")
                 .payload("fixtures/client/v2/service_brokers/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -90,7 +90,7 @@ public final class ReactorServiceBrokersTest extends AbstractClientApiTest {
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v2/service_brokers/test-service-broker-id")
+                .method(DELETE).path("/service_brokers/test-service-broker-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
@@ -110,7 +110,7 @@ public final class ReactorServiceBrokersTest extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/service_brokers/test-service-broker-id")
+                .method(GET).path("/service_brokers/test-service-broker-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -145,7 +145,7 @@ public final class ReactorServiceBrokersTest extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/service_brokers?q=name:test-name&page=-1")
+                .method(GET).path("/service_brokers?q=name:test-name&page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -209,7 +209,7 @@ public final class ReactorServiceBrokersTest extends AbstractClientApiTest {
     public void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/v2/service_brokers/test-service-broker-id")
+                .method(PUT).path("/service_brokers/test-service-broker-id")
                 .payload("fixtures/client/v2/service_brokers/PUT_{id}_request.json")
                 .build())
             .response(TestResponse.builder()

@@ -54,7 +54,7 @@ public final class ReactorOrganizationQuotaDefinitionsTest extends AbstractClien
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/v2/quota_definitions")
+                .method(POST).path("/quota_definitions")
                 .payload("fixtures/client/v2/quota_definitions/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -106,7 +106,7 @@ public final class ReactorOrganizationQuotaDefinitionsTest extends AbstractClien
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v2/quota_definitions/test-quota-definition-id")
+                .method(DELETE).path("/quota_definitions/test-quota-definition-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
@@ -127,7 +127,7 @@ public final class ReactorOrganizationQuotaDefinitionsTest extends AbstractClien
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/quota_definitions/test-quota-definition-id")
+                .method(GET).path("/quota_definitions/test-quota-definition-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -169,7 +169,7 @@ public final class ReactorOrganizationQuotaDefinitionsTest extends AbstractClien
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/quota_definitions?page=-1")
+                .method(GET).path("/quota_definitions?page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -215,7 +215,7 @@ public final class ReactorOrganizationQuotaDefinitionsTest extends AbstractClien
     public void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/v2/quota_definitions/test-quota-definition-id")
+                .method(PUT).path("/quota_definitions/test-quota-definition-id")
                 .payload("fixtures/client/v2/quota_definitions/PUT_{id}_request.json")
                 .build())
             .response(TestResponse.builder()

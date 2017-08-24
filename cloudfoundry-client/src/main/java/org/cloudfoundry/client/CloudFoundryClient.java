@@ -50,10 +50,13 @@ import org.cloudfoundry.client.v2.users.Users;
 import org.cloudfoundry.client.v3.applications.ApplicationsV3;
 import org.cloudfoundry.client.v3.builds.Builds;
 import org.cloudfoundry.client.v3.droplets.Droplets;
+import org.cloudfoundry.client.v3.isolationsegments.IsolationSegments;
 import org.cloudfoundry.client.v3.jobs.JobsV3;
+import org.cloudfoundry.client.v3.organizations.OrganizationsV3;
 import org.cloudfoundry.client.v3.packages.Packages;
 import org.cloudfoundry.client.v3.processes.Processes;
 import org.cloudfoundry.client.v3.servicebindings.ServiceBindingsV3;
+import org.cloudfoundry.client.v3.spaces.SpacesV3;
 import org.cloudfoundry.client.v3.tasks.Tasks;
 
 /**
@@ -82,12 +85,12 @@ public interface CloudFoundryClient {
     ApplicationsV3 applicationsV3();
 
     /**
-     * Main entry point to the Cloud Foundry Blobstores V2 Client API
+     * Main entry point to the Cloud Foundry Blobstores Client API
      */
     Blobstores blobstores();
 
     /**
-     * Main entry point to the Cloud Foundry Buildpacks V2 Client API
+     * Main entry point to the Cloud Foundry Buildpacks Client API
      */
     Buildpacks buildpacks();
 
@@ -127,6 +130,11 @@ public interface CloudFoundryClient {
     Info info();
 
     /**
+     * Main entry point to the Cloud Foundry Isolation Segments API
+     */
+    IsolationSegments isolationSegments();
+
+    /**
      * Main entry point to the Cloud Foundry Jobs Client API
      */
     Jobs jobs();
@@ -142,9 +150,14 @@ public interface CloudFoundryClient {
     OrganizationQuotaDefinitions organizationQuotaDefinitions();
 
     /**
-     * Main entry point to the Cloud Foundry Organizations Client API
+     * Main entry point to the Cloud Foundry Organizations V2 Client API
      */
     Organizations organizations();
+
+    /**
+     * Main entry point to the Cloud Foundry Organizations V3 Client API
+     */
+    OrganizationsV3 organizationsV3();
 
     /**
      * Main entry point to the Cloud Foundry Packages Client API
@@ -237,9 +250,14 @@ public interface CloudFoundryClient {
     SpaceQuotaDefinitions spaceQuotaDefinitions();
 
     /**
-     * Main entry point to the Cloud Foundry Spaces Client API
+     * Main entry point to the Cloud Foundry Spaces V2 Client API
      */
     Spaces spaces();
+
+    /**
+     * Main entry point to the Cloud Foundry Spaces V3 Client API
+     */
+    SpacesV3 spacesV3();
 
     /**
      * Main entry point to the Cloud Foundry Stacks Client API

@@ -42,7 +42,7 @@ public final class ReactorResourceMatch extends AbstractClientV2Operations imple
 
     @Override
     public Mono<ListMatchingResourcesResponse> list(ListMatchingResourcesRequest request) {
-        return put(request, ListMatchingResourcesResponse.class, builder -> builder.pathSegment("v2", "resource_match"))
+        return put(request, ListMatchingResourcesResponse.class, builder -> builder.pathSegment("resource_match"))
             .checkpoint();
     }
 
