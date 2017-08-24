@@ -101,7 +101,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     public void associateAuditedOrganization() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/v2/users/uaa-id-295/audited_organizations/52c32226-3446-4212-929a-c3b67d36f657")
+                .method(PUT).path("/users/uaa-id-295/audited_organizations/52c32226-3446-4212-929a-c3b67d36f657")
                 .build())
             .response(TestResponse.builder()
                 .status(CREATED)
@@ -144,7 +144,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     public void associateAuditedSpace() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/v2/users/uaa-id-280/audited_spaces/012602a2-98d7-4ab7-a766-bdf5a841c2d4")
+                .method(PUT).path("/users/uaa-id-280/audited_spaces/012602a2-98d7-4ab7-a766-bdf5a841c2d4")
                 .build())
             .response(TestResponse.builder()
                 .status(CREATED)
@@ -187,7 +187,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     public void associateBillingManagedOrganization() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/v2/users/uaa-id-272/billing_managed_organizations/d0b087e3-cd43-4f3c-ba09-c00556976b1c")
+                .method(PUT).path("/users/uaa-id-272/billing_managed_organizations/d0b087e3-cd43-4f3c-ba09-c00556976b1c")
                 .build())
             .response(TestResponse.builder()
                 .status(CREATED)
@@ -230,7 +230,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     public void associateManagedOrganization() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/v2/users/uaa-id-287/managed_organizations/97e1bd4a-828e-4edf-b140-506533d4008e")
+                .method(PUT).path("/users/uaa-id-287/managed_organizations/97e1bd4a-828e-4edf-b140-506533d4008e")
                 .build())
             .response(TestResponse.builder()
                 .status(CREATED)
@@ -273,7 +273,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     public void associateManagedSpace() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/v2/users/uaa-id-268/managed_spaces/b133899a-c3ea-451b-adaa-f8e2174cbfec")
+                .method(PUT).path("/users/uaa-id-268/managed_spaces/b133899a-c3ea-451b-adaa-f8e2174cbfec")
                 .build())
             .response(TestResponse.builder()
                 .status(CREATED)
@@ -316,7 +316,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     public void associateOrganization() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/v2/users/uaa-id-301/organizations/2f0bb84e-5229-4dd4-b053-855910833d2a")
+                .method(PUT).path("/users/uaa-id-301/organizations/2f0bb84e-5229-4dd4-b053-855910833d2a")
                 .build())
             .response(TestResponse.builder()
                 .status(CREATED)
@@ -359,7 +359,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     public void associateSpace() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/v2/users/uaa-id-305/spaces/063d1561-16ab-4ece-825d-30e3814f4e2f")
+                .method(PUT).path("/users/uaa-id-305/spaces/063d1561-16ab-4ece-825d-30e3814f4e2f")
                 .build())
             .response(TestResponse.builder()
                 .status(CREATED)
@@ -402,7 +402,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/v2/users")
+                .method(POST).path("/users")
                 .payload("fixtures/client/v2/users/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -443,7 +443,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v2/users/uaa-id-319")
+                .method(DELETE).path("/users/uaa-id-319")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
@@ -463,7 +463,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/users/uaa-id-317")
+                .method(GET).path("/users/uaa-id-317")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -505,7 +505,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/users?page=-1")
+                .method(GET).path("/users?page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -569,7 +569,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     public void listAuditedOrganizations() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/users/uaa-id-297/audited_organizations")
+                .method(GET).path("/users/uaa-id-297/audited_organizations")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -618,7 +618,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     public void listAuditedSpaces() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/users/uaa-id-282/audited_spaces")
+                .method(GET).path("/users/uaa-id-282/audited_spaces")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -668,7 +668,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     public void listBillingManagedOrganizations() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/users/uaa-id-276/billing_managed_organizations")
+                .method(GET).path("/users/uaa-id-276/billing_managed_organizations")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -717,7 +717,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     public void listManagedOrganizations() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/users/uaa-id-290/managed_organizations")
+                .method(GET).path("/users/uaa-id-290/managed_organizations")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -766,7 +766,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     public void listManagedSpaces() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/users/uaa-id-270/managed_spaces")
+                .method(GET).path("/users/uaa-id-270/managed_spaces")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -816,7 +816,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     public void listOrganizations() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/users/uaa-id-299/organizations")
+                .method(GET).path("/users/uaa-id-299/organizations")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -865,7 +865,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     public void listSpaces() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/users/uaa-id-309/spaces")
+                .method(GET).path("/users/uaa-id-309/spaces")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -915,7 +915,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     public void removeAuditedOrganization() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v2/users/uaa-id-293/audited_organizations/ab4226af-73e8-4c7d-a2e0-a713ebf9fd84")
+                .method(DELETE).path("/users/uaa-id-293/audited_organizations/ab4226af-73e8-4c7d-a2e0-a713ebf9fd84")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
@@ -936,7 +936,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     public void removeAuditedSpace() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v2/users/uaa-id-278/audited_spaces/95b843ee-9f7a-4021-a155-ad9c0f76e6fc")
+                .method(DELETE).path("/users/uaa-id-278/audited_spaces/95b843ee-9f7a-4021-a155-ad9c0f76e6fc")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
@@ -957,7 +957,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     public void removeBillingManagedOrganization() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v2/users/uaa-id-274/billing_managed_organizations/a2d908b0-504d-435c-83ef-82969d353741")
+                .method(DELETE).path("/users/uaa-id-274/billing_managed_organizations/a2d908b0-504d-435c-83ef-82969d353741")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
@@ -978,7 +978,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     public void removeManagedOrganization() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v2/users/uaa-id-284/managed_organizations/229d8290-bf5a-45f9-b6c4-2ad6500bb17e")
+                .method(DELETE).path("/users/uaa-id-284/managed_organizations/229d8290-bf5a-45f9-b6c4-2ad6500bb17e")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
@@ -999,7 +999,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     public void removeManagedSpace() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v2/users/uaa-id-266/managed_spaces/0af3c27b-d995-4a63-a9c5-26fc01210128")
+                .method(DELETE).path("/users/uaa-id-266/managed_spaces/0af3c27b-d995-4a63-a9c5-26fc01210128")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
@@ -1020,7 +1020,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     public void removeOrganization() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v2/users/uaa-id-303/organizations/aaac52d1-e99d-4536-a981-379980a3cb23")
+                .method(DELETE).path("/users/uaa-id-303/organizations/aaac52d1-e99d-4536-a981-379980a3cb23")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
@@ -1041,7 +1041,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     public void removeSpace() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v2/users/uaa-id-307/spaces/6c37bc37-f712-4399-be89-2272980b66ef")
+                .method(DELETE).path("/users/uaa-id-307/spaces/6c37bc37-f712-4399-be89-2272980b66ef")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
@@ -1063,7 +1063,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     public void summary() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/users/uaa-id-355/summary")
+                .method(GET).path("/users/uaa-id-355/summary")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -1343,7 +1343,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     public void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/v2/users/uaa-id-313")
+                .method(PUT).path("/users/uaa-id-313")
                 .payload("fixtures/client/v2/users/PUT_{id}_request.json")
                 .build())
             .response(TestResponse.builder()

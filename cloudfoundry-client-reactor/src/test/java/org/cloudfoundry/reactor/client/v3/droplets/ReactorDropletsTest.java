@@ -61,7 +61,7 @@ public final class ReactorDropletsTest extends AbstractClientApiTest {
     public void copy() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/v3/droplets?source_guid=test-source-droplet-id")
+                .method(POST).path("/droplets?source_guid=test-source-droplet-id")
                 .payload("fixtures/client/v3/droplets/POST_?source_guid={id}_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -121,7 +121,7 @@ public final class ReactorDropletsTest extends AbstractClientApiTest {
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v3/droplets/test-droplet-id")
+                .method(DELETE).path("/droplets/test-droplet-id")
                 .build())
             .response(TestResponse.builder()
                 .status(ACCEPTED)
@@ -143,7 +143,7 @@ public final class ReactorDropletsTest extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v3/droplets/test-droplet-id")
+                .method(GET).path("/droplets/test-droplet-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -202,7 +202,7 @@ public final class ReactorDropletsTest extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v3/droplets")
+                .method(GET).path("/droplets")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)

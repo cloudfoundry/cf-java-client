@@ -48,25 +48,25 @@ public final class ReactorRouteMappings extends AbstractClientV2Operations imple
 
     @Override
     public Mono<CreateRouteMappingResponse> create(CreateRouteMappingRequest request) {
-        return post(request, CreateRouteMappingResponse.class, builder -> builder.pathSegment("v2", "route_mappings"))
+        return post(request, CreateRouteMappingResponse.class, builder -> builder.pathSegment("route_mappings"))
             .checkpoint();
     }
 
     @Override
     public Mono<DeleteRouteMappingResponse> delete(DeleteRouteMappingRequest request) {
-        return delete(request, DeleteRouteMappingResponse.class, builder -> builder.pathSegment("v2", "route_mappings", request.getRouteMappingId()))
+        return delete(request, DeleteRouteMappingResponse.class, builder -> builder.pathSegment("route_mappings", request.getRouteMappingId()))
             .checkpoint();
     }
 
     @Override
     public Mono<GetRouteMappingResponse> get(GetRouteMappingRequest request) {
-        return get(request, GetRouteMappingResponse.class, builder -> builder.pathSegment("v2", "route_mappings", request.getRouteMappingId()))
+        return get(request, GetRouteMappingResponse.class, builder -> builder.pathSegment("route_mappings", request.getRouteMappingId()))
             .checkpoint();
     }
 
     @Override
     public Mono<ListRouteMappingsResponse> list(ListRouteMappingsRequest request) {
-        return get(request, ListRouteMappingsResponse.class, builder -> builder.pathSegment("v2", "route_mappings"))
+        return get(request, ListRouteMappingsResponse.class, builder -> builder.pathSegment("route_mappings"))
             .checkpoint();
     }
 

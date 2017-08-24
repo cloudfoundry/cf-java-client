@@ -52,7 +52,7 @@ public final class ReactorSharedDomainsTest extends AbstractClientApiTest {
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/v2/shared_domains")
+                .method(POST).path("/shared_domains")
                 .payload("fixtures/client/v2/shared_domains/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -87,7 +87,7 @@ public final class ReactorSharedDomainsTest extends AbstractClientApiTest {
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v2/shared_domains/fa1385de-55ba-41d3-beb2-f83919c634d6")
+                .method(DELETE).path("/shared_domains/fa1385de-55ba-41d3-beb2-f83919c634d6")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
@@ -107,7 +107,7 @@ public final class ReactorSharedDomainsTest extends AbstractClientApiTest {
     public void deleteAsync() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v2/shared_domains/fa1385de-55ba-41d3-beb2-f83919c634d6?async=true")
+                .method(DELETE).path("/shared_domains/fa1385de-55ba-41d3-beb2-f83919c634d6?async=true")
                 .build())
             .response(TestResponse.builder()
                 .status(ACCEPTED)
@@ -140,7 +140,7 @@ public final class ReactorSharedDomainsTest extends AbstractClientApiTest {
     public void listSharedDomains() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/shared_domains?page=-1")
+                .method(GET).path("/shared_domains?page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -241,7 +241,7 @@ public final class ReactorSharedDomainsTest extends AbstractClientApiTest {
         public InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
-                    .method(GET).path("/v2/shared_domains/fa1385de-55ba-41d3-beb2-f83919c634d6")
+                    .method(GET).path("/shared_domains/fa1385de-55ba-41d3-beb2-f83919c634d6")
                     .build())
                 .response(TestResponse.builder()
                     .status(OK)

@@ -47,20 +47,20 @@ public final class ReactorOrganizationsV3 extends AbstractClientV3Operations imp
     @Override
     public Mono<AssignOrganizationDefaultIsolationSegmentResponse> assignDefaultIsolationSegment(AssignOrganizationDefaultIsolationSegmentRequest request) {
         return patch(request, AssignOrganizationDefaultIsolationSegmentResponse.class, builder ->
-            builder.pathSegment("v3", "organizations", request.getOrganizationId(), "relationships", "default_isolation_segment"))
+            builder.pathSegment("organizations", request.getOrganizationId(), "relationships", "default_isolation_segment"))
             .checkpoint();
     }
 
     @Override
     public Mono<GetOrganizationDefaultIsolationSegmentResponse> getDefaultIsolationSegment(GetOrganizationDefaultIsolationSegmentRequest request) {
         return get(request, GetOrganizationDefaultIsolationSegmentResponse.class, builder ->
-            builder.pathSegment("v3", "organizations", request.getOrganizationId(), "relationships", "default_isolation_segment"))
+            builder.pathSegment("organizations", request.getOrganizationId(), "relationships", "default_isolation_segment"))
             .checkpoint();
     }
 
     @Override
     public Mono<ListOrganizationsResponse> list(ListOrganizationsRequest request) {
-        return get(request, ListOrganizationsResponse.class, builder -> builder.pathSegment("v3", "organizations"))
+        return get(request, ListOrganizationsResponse.class, builder -> builder.pathSegment("organizations"))
             .checkpoint();
     }
 

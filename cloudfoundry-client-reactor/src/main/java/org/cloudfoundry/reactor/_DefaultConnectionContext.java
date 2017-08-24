@@ -109,7 +109,7 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
     @Override
     @Value.Default
     public RootProvider getRootProvider() {
-        return InfoPayloadRootProvider.builder()
+        return DelegatingRootProvider.builder()
             .apiHost(getApiHost())
             .objectMapper(getObjectMapper())
             .port(getPort())

@@ -48,7 +48,7 @@ abstract class _RootPayloadRootProvider extends AbstractRootProvider {
                     throw new IllegalArgumentException(String.format("Root payload does not contain key '%s;", key));
                 }
 
-                return UriComponentsBuilder.fromUriString(payload.get(key)).build();
+                return normalize(UriComponentsBuilder.fromUriString(payload.get(key)));
             });
     }
 

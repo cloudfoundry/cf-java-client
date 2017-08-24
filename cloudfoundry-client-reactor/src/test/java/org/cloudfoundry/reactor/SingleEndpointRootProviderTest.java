@@ -32,7 +32,7 @@ public final class SingleEndpointRootProviderTest extends AbstractRestTest {
         this.rootProvider
             .getRoot(CONNECTION_CONTEXT)
             .as(StepVerifier::create)
-            .expectNext("https://localhost:443")
+            .expectNext("https://localhost")
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -42,7 +42,7 @@ public final class SingleEndpointRootProviderTest extends AbstractRestTest {
         this.rootProvider
             .getRoot(null, CONNECTION_CONTEXT)
             .as(StepVerifier::create)
-            .expectNext("https://localhost:443")
+            .expectNext("https://localhost")
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }

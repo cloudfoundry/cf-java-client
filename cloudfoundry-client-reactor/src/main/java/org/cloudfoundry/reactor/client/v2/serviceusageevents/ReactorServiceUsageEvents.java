@@ -45,19 +45,19 @@ public final class ReactorServiceUsageEvents extends AbstractClientV2Operations 
 
     @Override
     public Mono<GetServiceUsageEventResponse> get(GetServiceUsageEventRequest request) {
-        return get(request, GetServiceUsageEventResponse.class, builder -> builder.pathSegment("v2", "service_usage_events", request.getServiceUsageEventId()))
+        return get(request, GetServiceUsageEventResponse.class, builder -> builder.pathSegment("service_usage_events", request.getServiceUsageEventId()))
             .checkpoint();
     }
 
     @Override
     public Mono<ListServiceUsageEventsResponse> list(ListServiceUsageEventsRequest request) {
-        return get(request, ListServiceUsageEventsResponse.class, builder -> builder.pathSegment("v2", "service_usage_events"))
+        return get(request, ListServiceUsageEventsResponse.class, builder -> builder.pathSegment("service_usage_events"))
             .checkpoint();
     }
 
     @Override
     public Mono<Void> purgeAndReseed(PurgeAndReseedServiceUsageEventsRequest request) {
-        return post(request, Void.class, builder -> builder.pathSegment("v2", "service_usage_events", "destructively_purge_all_and_reseed_existing_instances"))
+        return post(request, Void.class, builder -> builder.pathSegment("service_usage_events", "destructively_purge_all_and_reseed_existing_instances"))
             .checkpoint();
     }
 

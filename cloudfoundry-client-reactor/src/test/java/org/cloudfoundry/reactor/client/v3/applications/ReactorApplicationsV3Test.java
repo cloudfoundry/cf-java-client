@@ -117,7 +117,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/v3/apps")
+                .method(POST).path("/apps")
                 .payload("fixtures/client/v3/apps/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -195,7 +195,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v3/apps/test-application-id")
+                .method(DELETE).path("/apps/test-application-id")
                 .build())
             .response(TestResponse.builder()
                 .status(ACCEPTED)
@@ -217,7 +217,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v3/apps/test-application-id")
+                .method(GET).path("/apps/test-application-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -287,7 +287,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     public void getCurrentDroplet() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v3/apps/test-application-id/droplets/current")
+                .method(GET).path("/apps/test-application-id/droplets/current")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -346,7 +346,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     public void getCurrentDropletRelationship() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v3/apps/test-application-id/relationships/current_droplet")
+                .method(GET).path("/apps/test-application-id/relationships/current_droplet")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -378,7 +378,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     public void getEnvironment() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v3/apps/test-application-id/env")
+                .method(GET).path("/apps/test-application-id/env")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -430,7 +430,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     public void getEnvironmentVariables() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v3/apps/test-application-id/environment_variables")
+                .method(GET).path("/apps/test-application-id/environment_variables")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -460,7 +460,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     public void getProcess() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v3/apps/test-application-id/processes/test-type")
+                .method(GET).path("/apps/test-application-id/processes/test-type")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -515,7 +515,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     public void getProcessStatistics() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v3/apps/test-id/processes/test-type/stats")
+                .method(GET).path("/apps/test-id/processes/test-type/stats")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -559,7 +559,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v3/apps")
+                .method(GET).path("/apps")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -692,7 +692,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     public void listDroplets() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v3/apps/test-application-id/droplets")
+                .method(GET).path("/apps/test-application-id/droplets")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -793,7 +793,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     public void listPackages() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v3/apps/test-application-id/packages")
+                .method(GET).path("/apps/test-application-id/packages")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -854,7 +854,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     public void listProcesses() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v3/apps/test-application-id/processes")
+                .method(GET).path("/apps/test-application-id/processes")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -956,7 +956,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     public void listTasks() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v3/apps/test-application-id/tasks")
+                .method(GET).path("/apps/test-application-id/tasks")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -1045,7 +1045,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     public void scale() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/v3/apps/test-application-id/processes/test-type/actions/scale")
+                .method(PUT).path("/apps/test-application-id/processes/test-type/actions/scale")
                 .payload("fixtures/client/v3/apps/PUT_{id}_processes_{type}_actions_scale_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -1104,7 +1104,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     public void setCurrentDroplet() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PATCH).path("/v3/apps/test-application-id/relationships/current_droplet")
+                .method(PATCH).path("/apps/test-application-id/relationships/current_droplet")
                 .payload("fixtures/client/v3/apps/PATCH_{id}_relationships_current_droplet_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -1140,7 +1140,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     public void start() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/v3/apps/test-application-id/actions/start")
+                .method(POST).path("/apps/test-application-id/actions/start")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -1210,7 +1210,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     public void stop() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/v3/apps/test-application-id/actions/stop")
+                .method(POST).path("/apps/test-application-id/actions/stop")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -1280,7 +1280,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     public void terminateInstance() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v3/apps/test-application-id/processes/test-type/instances/test-index")
+                .method(DELETE).path("/apps/test-application-id/processes/test-type/instances/test-index")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
@@ -1302,7 +1302,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     public void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PATCH).path("/v3/apps/test-application-id")
+                .method(PATCH).path("/apps/test-application-id")
                 .payload("fixtures/client/v3/apps/PATCH_{id}_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -1380,7 +1380,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     public void updateEnvironmentVariables() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PATCH).path("/v3/apps/test-application-id/environment_variables")
+                .method(PATCH).path("/apps/test-application-id/environment_variables")
                 .payload("fixtures/client/v3/apps/PATCH_{id}_environment_variables_request.json")
                 .build())
             .response(TestResponse.builder()

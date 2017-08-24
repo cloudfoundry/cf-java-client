@@ -59,7 +59,7 @@ public final class ReactorServicePlansTest extends AbstractClientApiTest {
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v2/service_plans/test-service-plan-id")
+                .method(DELETE).path("/service_plans/test-service-plan-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
@@ -79,7 +79,7 @@ public final class ReactorServicePlansTest extends AbstractClientApiTest {
     public void deleteAsync() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v2/service_plans/test-service-plan-id?async=true")
+                .method(DELETE).path("/service_plans/test-service-plan-id?async=true")
                 .build())
             .response(TestResponse.builder()
                 .status(ACCEPTED)
@@ -112,7 +112,7 @@ public final class ReactorServicePlansTest extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/service_plans/test-service-plan-id")
+                .method(GET).path("/service_plans/test-service-plan-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -151,7 +151,7 @@ public final class ReactorServicePlansTest extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/service_plans?q=service_guid:test-service-id&page=-1")
+                .method(GET).path("/service_plans?q=service_guid:test-service-id&page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -195,7 +195,7 @@ public final class ReactorServicePlansTest extends AbstractClientApiTest {
     public void listServiceInstances() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/service_plans/test-service-plan-id/service_instances?q=space_guid:test-space-id&page=-1")
+                .method(GET).path("/service_plans/test-service-plan-id/service_instances?q=space_guid:test-space-id&page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -241,7 +241,7 @@ public final class ReactorServicePlansTest extends AbstractClientApiTest {
     public void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/v2/service_plans/test-service-plan-id")
+                .method(PUT).path("/service_plans/test-service-plan-id")
                 .payload("fixtures/client/v2/service_plans/PUT_{id}_request.json")
                 .build())
             .response(TestResponse.builder()

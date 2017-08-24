@@ -59,7 +59,7 @@ public final class DelegatingRootProviderTest extends AbstractRestTest {
         this.rootProvider
             .getRoot("cloud_controller_v2", CONNECTION_CONTEXT)
             .as(StepVerifier::create)
-            .expectNext("https://api.run.pivotal.io/v2")
+            .expectNext("http://api.run.pivotal.io/v2")
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -99,7 +99,7 @@ public final class DelegatingRootProviderTest extends AbstractRestTest {
         this.rootProvider
             .getRoot("cloud_controller_v3", CONNECTION_CONTEXT)
             .as(StepVerifier::create)
-            .expectNext("https://api.run.pivotal.io/v3")
+            .expectNext("http://api.run.pivotal.io/v3")
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -139,7 +139,7 @@ public final class DelegatingRootProviderTest extends AbstractRestTest {
         this.rootProvider
             .getRoot("logging", CONNECTION_CONTEXT)
             .as(StepVerifier::create)
-            .expectNext("wss://doppler.run.pivotal.io:443")
+            .expectNext("http://doppler.run.pivotal.io:443")
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -218,7 +218,7 @@ public final class DelegatingRootProviderTest extends AbstractRestTest {
         this.rootProvider
             .getRoot("network_policy_v1", CONNECTION_CONTEXT)
             .as(StepVerifier::create)
-            .expectNext("https://api.run.pivotal.io/networking/v1/external")
+            .expectNext("http://api.run.pivotal.io/networking/v1/external")
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -298,7 +298,7 @@ public final class DelegatingRootProviderTest extends AbstractRestTest {
         this.rootProvider
             .getRoot("uaa", CONNECTION_CONTEXT)
             .as(StepVerifier::create)
-            .expectNext("https://uaa.run.pivotal.io")
+            .expectNext("http://uaa.run.pivotal.io")
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }

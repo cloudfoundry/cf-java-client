@@ -45,19 +45,19 @@ public final class ReactorApplicationUsageEvents extends AbstractClientV2Operati
 
     @Override
     public Mono<GetApplicationUsageEventResponse> get(GetApplicationUsageEventRequest request) {
-        return get(request, GetApplicationUsageEventResponse.class, builder -> builder.pathSegment("v2", "app_usage_events", request.getApplicationUsageEventId()))
+        return get(request, GetApplicationUsageEventResponse.class, builder -> builder.pathSegment("app_usage_events", request.getApplicationUsageEventId()))
             .checkpoint();
     }
 
     @Override
     public Mono<ListApplicationUsageEventsResponse> list(ListApplicationUsageEventsRequest request) {
-        return get(request, ListApplicationUsageEventsResponse.class, builder -> builder.pathSegment("v2", "app_usage_events"))
+        return get(request, ListApplicationUsageEventsResponse.class, builder -> builder.pathSegment("app_usage_events"))
             .checkpoint();
     }
 
     @Override
     public Mono<Void> purgeAndReseed(PurgeAndReseedApplicationUsageEventsRequest request) {
-        return post(request, Void.class, builder -> builder.pathSegment("v2", "app_usage_events", "destructively_purge_all_and_reseed_started_apps"))
+        return post(request, Void.class, builder -> builder.pathSegment("app_usage_events", "destructively_purge_all_and_reseed_started_apps"))
             .checkpoint();
     }
 

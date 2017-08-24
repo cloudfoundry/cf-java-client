@@ -51,7 +51,7 @@ public final class ReactorStacksTest extends AbstractClientApiTest {
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/v2/stacks")
+                .method(POST).path("/stacks")
                 .payload("fixtures/client/v2/stacks/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -86,7 +86,7 @@ public final class ReactorStacksTest extends AbstractClientApiTest {
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v2/stacks/test-stack-id")
+                .method(DELETE).path("/stacks/test-stack-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
@@ -106,7 +106,7 @@ public final class ReactorStacksTest extends AbstractClientApiTest {
     public void deleteAsync() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v2/stacks/test-stack-id?async=true")
+                .method(DELETE).path("/stacks/test-stack-id?async=true")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -139,7 +139,7 @@ public final class ReactorStacksTest extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/stacks/test-stack-id")
+                .method(GET).path("/stacks/test-stack-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -171,7 +171,7 @@ public final class ReactorStacksTest extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/stacks?q=name:test-name&page=-1")
+                .method(GET).path("/stacks?q=name:test-name&page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)

@@ -48,25 +48,25 @@ public final class ReactorTasks extends AbstractClientV3Operations implements Ta
 
     @Override
     public Mono<CancelTaskResponse> cancel(CancelTaskRequest request) {  // TODO: Modify once support has aged out http://v3-apidocs.cloudfoundry.org/version/3.27.0/#cancel-a-task
-        return put(request, CancelTaskResponse.class, builder -> builder.pathSegment("v3", "tasks", request.getTaskId(), "cancel"))
+        return put(request, CancelTaskResponse.class, builder -> builder.pathSegment("tasks", request.getTaskId(), "cancel"))
             .checkpoint();
     }
 
     @Override
     public Mono<CreateTaskResponse> create(CreateTaskRequest request) {
-        return post(request, CreateTaskResponse.class, builder -> builder.pathSegment("v3", "apps", request.getApplicationId(), "tasks"))
+        return post(request, CreateTaskResponse.class, builder -> builder.pathSegment("apps", request.getApplicationId(), "tasks"))
             .checkpoint();
     }
 
     @Override
     public Mono<GetTaskResponse> get(GetTaskRequest request) {
-        return get(request, GetTaskResponse.class, builder -> builder.pathSegment("v3", "tasks", request.getTaskId()))
+        return get(request, GetTaskResponse.class, builder -> builder.pathSegment("tasks", request.getTaskId()))
             .checkpoint();
     }
 
     @Override
     public Mono<ListTasksResponse> list(ListTasksRequest request) {
-        return get(request, ListTasksResponse.class, builder -> builder.pathSegment("v3", "tasks"))
+        return get(request, ListTasksResponse.class, builder -> builder.pathSegment("tasks"))
             .checkpoint();
     }
 

@@ -42,7 +42,7 @@ public final class ReactorJobsV3 extends AbstractClientV3Operations implements J
 
     @Override
     public Mono<GetJobResponse> get(GetJobRequest request) {
-        return get(request, GetJobResponse.class, builder -> builder.pathSegment("v3", "jobs", request.getJobId()))
+        return get(request, GetJobResponse.class, builder -> builder.pathSegment("jobs", request.getJobId()))
             .checkpoint();
     }
 

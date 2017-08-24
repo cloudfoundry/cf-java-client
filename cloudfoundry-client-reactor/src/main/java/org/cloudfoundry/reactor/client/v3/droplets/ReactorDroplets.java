@@ -47,24 +47,24 @@ public final class ReactorDroplets extends AbstractClientV3Operations implements
 
     @Override
     public Mono<CopyDropletResponse> copy(CopyDropletRequest request) {
-        return post(request, CopyDropletResponse.class, builder -> builder.pathSegment("v3", "droplets"));
+        return post(request, CopyDropletResponse.class, builder -> builder.pathSegment("droplets"));
     }
 
     @Override
     public Mono<String> delete(DeleteDropletRequest request) {
-        return delete(request, builder -> builder.pathSegment("v3", "droplets", request.getDropletId()))
+        return delete(request, builder -> builder.pathSegment("droplets", request.getDropletId()))
             .checkpoint();
     }
 
     @Override
     public Mono<GetDropletResponse> get(GetDropletRequest request) {
-        return get(request, GetDropletResponse.class, builder -> builder.pathSegment("v3", "droplets", request.getDropletId()))
+        return get(request, GetDropletResponse.class, builder -> builder.pathSegment("droplets", request.getDropletId()))
             .checkpoint();
     }
 
     @Override
     public Mono<ListDropletsResponse> list(ListDropletsRequest request) {
-        return get(request, ListDropletsResponse.class, builder -> builder.pathSegment("v3", "droplets"))
+        return get(request, ListDropletsResponse.class, builder -> builder.pathSegment("droplets"))
             .checkpoint();
     }
 

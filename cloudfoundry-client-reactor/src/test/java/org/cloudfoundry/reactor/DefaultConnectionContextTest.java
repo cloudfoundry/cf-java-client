@@ -36,6 +36,16 @@ public final class DefaultConnectionContextTest extends AbstractRestTest {
     public void getInfo() throws Exception {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
+                .method(GET).path("/")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/GET_response.json")
+                .build())
+            .build());
+
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
                 .method(GET).path("/v2/info")
                 .build())
             .response(TestResponse.builder()

@@ -55,7 +55,7 @@ public final class ReactorServiceBindingsV2Test extends AbstractClientApiTest {
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/v2/service_bindings")
+                .method(POST).path("/service_bindings")
                 .payload("fixtures/client/v2/service_bindings/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -95,7 +95,7 @@ public final class ReactorServiceBindingsV2Test extends AbstractClientApiTest {
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v2/service_bindings/test-service-binding-id")
+                .method(DELETE).path("/service_bindings/test-service-binding-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
@@ -115,7 +115,7 @@ public final class ReactorServiceBindingsV2Test extends AbstractClientApiTest {
     public void deleteAsync() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v2/service_bindings/test-service-binding-id?async=true")
+                .method(DELETE).path("/service_bindings/test-service-binding-id?async=true")
                 .build())
             .response(TestResponse.builder()
                 .status(ACCEPTED)
@@ -148,7 +148,7 @@ public final class ReactorServiceBindingsV2Test extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/service_bindings/test-service-binding-id")
+                .method(GET).path("/service_bindings/test-service-binding-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -186,7 +186,7 @@ public final class ReactorServiceBindingsV2Test extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/service_bindings?q=app_guid:dd44fd4f-5e20-4c52-b66d-7af6e201f01e&page=-1")
+                .method(GET).path("/service_bindings?q=app_guid:dd44fd4f-5e20-4c52-b66d-7af6e201f01e&page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)

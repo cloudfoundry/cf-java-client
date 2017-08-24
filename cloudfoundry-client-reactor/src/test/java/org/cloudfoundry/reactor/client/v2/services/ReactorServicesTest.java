@@ -55,7 +55,7 @@ public final class ReactorServicesTest extends AbstractClientApiTest {
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v2/services/test-service-id?purge=true")
+                .method(DELETE).path("/services/test-service-id?purge=true")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
@@ -76,7 +76,7 @@ public final class ReactorServicesTest extends AbstractClientApiTest {
     public void deleteAsync() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v2/services/test-service-id?async=true")
+                .method(DELETE).path("/services/test-service-id?async=true")
                 .build())
             .response(TestResponse.builder()
                 .status(ACCEPTED)
@@ -109,7 +109,7 @@ public final class ReactorServicesTest extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/services/test-service-id")
+                .method(GET).path("/services/test-service-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -147,7 +147,7 @@ public final class ReactorServicesTest extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/services?q=label:test-label&page=-1")
+                .method(GET).path("/services?q=label:test-label&page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -192,7 +192,7 @@ public final class ReactorServicesTest extends AbstractClientApiTest {
     public void listServicePlans() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/services/f1b0edbe-fac4-4512-9071-8b26045413bb/service_plans?page=-1")
+                .method(GET).path("/services/f1b0edbe-fac4-4512-9071-8b26045413bb/service_plans?page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)

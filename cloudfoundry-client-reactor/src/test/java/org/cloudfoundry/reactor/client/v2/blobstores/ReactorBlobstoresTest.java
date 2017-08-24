@@ -40,7 +40,7 @@ public final class ReactorBlobstoresTest extends AbstractClientApiTest {
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v2/blobstores/buildpack_cache")
+                .method(DELETE).path("/blobstores/buildpack_cache")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)

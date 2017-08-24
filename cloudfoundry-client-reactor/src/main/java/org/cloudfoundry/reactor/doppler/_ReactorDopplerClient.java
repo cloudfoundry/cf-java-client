@@ -66,7 +66,7 @@ abstract class _ReactorDopplerClient implements DopplerClient {
 
     @Value.Default
     Mono<String> getRoot() {
-        return getConnectionContext().getRootProvider().getRoot("doppler_logging_endpoint", getConnectionContext());
+        return getConnectionContext().getRootProvider().getRoot("logging", getConnectionContext());
     }
 
     /**

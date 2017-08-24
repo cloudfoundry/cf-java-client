@@ -48,25 +48,25 @@ public final class ReactorEnvironmentVariableGroups extends AbstractClientV2Oper
 
     @Override
     public Mono<GetRunningEnvironmentVariablesResponse> getRunningEnvironmentVariables(GetRunningEnvironmentVariablesRequest request) {
-        return get(request, GetRunningEnvironmentVariablesResponse.class, builder -> builder.pathSegment("v2", "config", "environment_variable_groups", "running"))
+        return get(request, GetRunningEnvironmentVariablesResponse.class, builder -> builder.pathSegment("config", "environment_variable_groups", "running"))
             .checkpoint();
     }
 
     @Override
     public Mono<GetStagingEnvironmentVariablesResponse> getStagingEnvironmentVariables(GetStagingEnvironmentVariablesRequest request) {
-        return get(request, GetStagingEnvironmentVariablesResponse.class, builder -> builder.pathSegment("v2", "config", "environment_variable_groups", "staging"))
+        return get(request, GetStagingEnvironmentVariablesResponse.class, builder -> builder.pathSegment("config", "environment_variable_groups", "staging"))
             .checkpoint();
     }
 
     @Override
     public Mono<UpdateRunningEnvironmentVariablesResponse> updateRunningEnvironmentVariables(UpdateRunningEnvironmentVariablesRequest request) {
-        return put(request, UpdateRunningEnvironmentVariablesResponse.class, builder -> builder.pathSegment("v2", "config", "environment_variable_groups", "running"))
+        return put(request, UpdateRunningEnvironmentVariablesResponse.class, builder -> builder.pathSegment("config", "environment_variable_groups", "running"))
             .checkpoint();
     }
 
     @Override
     public Mono<UpdateStagingEnvironmentVariablesResponse> updateStagingEnvironmentVariables(UpdateStagingEnvironmentVariablesRequest request) {
-        return put(request, UpdateStagingEnvironmentVariablesResponse.class, builder -> builder.pathSegment("v2", "config", "environment_variable_groups", "staging"))
+        return put(request, UpdateStagingEnvironmentVariablesResponse.class, builder -> builder.pathSegment("config", "environment_variable_groups", "staging"))
             .checkpoint();
     }
 
