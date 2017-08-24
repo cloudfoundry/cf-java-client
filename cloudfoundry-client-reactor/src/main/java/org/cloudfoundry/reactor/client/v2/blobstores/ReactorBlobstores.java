@@ -42,7 +42,7 @@ public final class ReactorBlobstores extends AbstractClientV2Operations implemen
 
     @Override
     public Mono<DeleteBlobstoreBuildpackCachesResponse> deleteBuildpackCaches(DeleteBlobstoreBuildpackCachesRequest request) {
-        return delete(request, DeleteBlobstoreBuildpackCachesResponse.class, builder -> builder.pathSegment("v2", "blobstores", "buildpack_cache"))
+        return delete(request, DeleteBlobstoreBuildpackCachesResponse.class, builder -> builder.pathSegment("blobstores", "buildpack_cache"))
             .checkpoint();
     }
 

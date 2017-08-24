@@ -49,7 +49,7 @@ public class ReactorSpacesV3Test extends AbstractClientApiTest {
     public void assignDefaultIsolationSegment() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PATCH).path("/v3/spaces/test-space-id/relationships/isolation_segment")
+                .method(PATCH).path("/spaces/test-space-id/relationships/isolation_segment")
                 .payload("fixtures/client/v3/spaces/PATCH_{id}_relationships_isolation_segment_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -85,7 +85,7 @@ public class ReactorSpacesV3Test extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v3/spaces/test-space-id")
+                .method(GET).path("/spaces/test-space-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -115,7 +115,7 @@ public class ReactorSpacesV3Test extends AbstractClientApiTest {
     public void getDefaultIsolationSegment() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v3/spaces/test-space-id/relationships/isolation_segment")
+                .method(GET).path("/spaces/test-space-id/relationships/isolation_segment")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -147,7 +147,7 @@ public class ReactorSpacesV3Test extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v3/spaces")
+                .method(GET).path("/spaces")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)

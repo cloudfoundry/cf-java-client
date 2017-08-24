@@ -25,7 +25,8 @@ public final class ReactorCloudFoundryClientTest extends AbstractRestTest {
 
     private final ReactorCloudFoundryClient client = ReactorCloudFoundryClient.builder()
         .connectionContext(CONNECTION_CONTEXT)
-        .root(this.root)
+        .rootV2(this.root)
+        .rootV3(this.root)
         .tokenProvider(TOKEN_PROVIDER)
         .build();
 
@@ -85,6 +86,11 @@ public final class ReactorCloudFoundryClientTest extends AbstractRestTest {
     }
 
     @Test
+    public void isolationSegments() {
+        assertThat(this.client.isolationSegments()).isNotNull();
+    }
+
+    @Test
     public void jobs() {
         assertThat(this.client.jobs()).isNotNull();
     }
@@ -102,6 +108,11 @@ public final class ReactorCloudFoundryClientTest extends AbstractRestTest {
     @Test
     public void organizations() {
         assertThat(this.client.organizations()).isNotNull();
+    }
+
+    @Test
+    public void organizationsV3() {
+        assertThat(this.client.organizationsV3()).isNotNull();
     }
 
     @Test
@@ -190,13 +201,18 @@ public final class ReactorCloudFoundryClientTest extends AbstractRestTest {
     }
 
     @Test
-    public void space() {
+    public void spaceQuotaDefinitions() {
+        assertThat(this.client.spaceQuotaDefinitions()).isNotNull();
+    }
+
+    @Test
+    public void spaces() {
         assertThat(this.client.spaces()).isNotNull();
     }
 
     @Test
-    public void spaceQuotaDefinitions() {
-        assertThat(this.client.spaceQuotaDefinitions()).isNotNull();
+    public void spacesV3() {
+        assertThat(this.client.spacesV3()).isNotNull();
     }
 
     @Test

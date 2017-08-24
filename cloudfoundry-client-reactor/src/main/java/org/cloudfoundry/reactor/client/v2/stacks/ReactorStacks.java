@@ -48,25 +48,25 @@ public final class ReactorStacks extends AbstractClientV2Operations implements S
 
     @Override
     public Mono<CreateStackResponse> create(CreateStackRequest request) {
-        return post(request, CreateStackResponse.class, builder -> builder.pathSegment("v2", "stacks"))
+        return post(request, CreateStackResponse.class, builder -> builder.pathSegment("stacks"))
             .checkpoint();
     }
 
     @Override
     public Mono<DeleteStackResponse> delete(DeleteStackRequest request) {
-        return delete(request, DeleteStackResponse.class, builder -> builder.pathSegment("v2", "stacks", request.getStackId()))
+        return delete(request, DeleteStackResponse.class, builder -> builder.pathSegment("stacks", request.getStackId()))
             .checkpoint();
     }
 
     @Override
     public Mono<GetStackResponse> get(GetStackRequest request) {
-        return get(request, GetStackResponse.class, builder -> builder.pathSegment("v2", "stacks", request.getStackId()))
+        return get(request, GetStackResponse.class, builder -> builder.pathSegment("stacks", request.getStackId()))
             .checkpoint();
     }
 
     @Override
     public Mono<ListStacksResponse> list(ListStacksRequest request) {
-        return get(request, ListStacksResponse.class, builder -> builder.pathSegment("v2", "stacks"))
+        return get(request, ListStacksResponse.class, builder -> builder.pathSegment("stacks"))
             .checkpoint();
     }
 

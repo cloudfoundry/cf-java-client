@@ -61,7 +61,7 @@ public final class ReactorProcessesTest extends AbstractClientApiTest {
     public void deleteInstance() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v3/processes/test-process-id/instances/test-index")
+                .method(DELETE).path("/processes/test-process-id/instances/test-index")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
@@ -82,7 +82,7 @@ public final class ReactorProcessesTest extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v3/processes/test-process-id")
+                .method(GET).path("/processes/test-process-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -136,7 +136,7 @@ public final class ReactorProcessesTest extends AbstractClientApiTest {
     public void getProcessStatistics() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v3/processes/test-id/stats")
+                .method(GET).path("/processes/test-id/stats")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -179,7 +179,7 @@ public final class ReactorProcessesTest extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v3/processes")
+                .method(GET).path("/processes")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -280,7 +280,7 @@ public final class ReactorProcessesTest extends AbstractClientApiTest {
     public void scale() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/v3/processes/test-process-id/actions/scale")
+                .method(POST).path("/processes/test-process-id/actions/scale")
                 .payload("fixtures/client/v3/processes/POST_{id}_actions_scale_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -338,7 +338,7 @@ public final class ReactorProcessesTest extends AbstractClientApiTest {
     public void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PATCH).path("/v3/processes/test-process-id")
+                .method(PATCH).path("/processes/test-process-id")
                 .payload("fixtures/client/v3/processes/PATCH_{id}_request.json")
                 .build())
             .response(TestResponse.builder()

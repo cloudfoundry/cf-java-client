@@ -49,7 +49,7 @@ public final class ReactorBuildsTest extends AbstractClientApiTest {
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/v3/builds")
+                .method(POST).path("/builds")
                 .payload("fixtures/client/v3/builds/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -102,7 +102,7 @@ public final class ReactorBuildsTest extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v3/builds/test-build-id")
+                .method(GET).path("/builds/test-build-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)

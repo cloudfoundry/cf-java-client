@@ -26,7 +26,7 @@ public interface RootProvider {
     /**
      * The normalized API root
      *
-     * @param connectionContext a {@link ConnectionContext} to be used if the roo needs to be retrieved via a network request
+     * @param connectionContext a {@link ConnectionContext} to be used if the root needs to be retrieved via a network request
      * @return the normalized API root
      */
     Mono<String> getRoot(ConnectionContext connectionContext);

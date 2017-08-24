@@ -51,31 +51,31 @@ public final class ReactorServicePlanVisibilities extends AbstractClientV2Operat
 
     @Override
     public Mono<CreateServicePlanVisibilityResponse> create(CreateServicePlanVisibilityRequest request) {
-        return post(request, CreateServicePlanVisibilityResponse.class, builder -> builder.pathSegment("v2", "service_plan_visibilities"))
+        return post(request, CreateServicePlanVisibilityResponse.class, builder -> builder.pathSegment("service_plan_visibilities"))
             .checkpoint();
     }
 
     @Override
     public Mono<DeleteServicePlanVisibilityResponse> delete(DeleteServicePlanVisibilityRequest request) {
-        return delete(request, DeleteServicePlanVisibilityResponse.class, builder -> builder.pathSegment("v2", "service_plan_visibilities", request.getServicePlanVisibilityId()))
+        return delete(request, DeleteServicePlanVisibilityResponse.class, builder -> builder.pathSegment("service_plan_visibilities", request.getServicePlanVisibilityId()))
             .checkpoint();
     }
 
     @Override
     public Mono<GetServicePlanVisibilityResponse> get(GetServicePlanVisibilityRequest request) {
-        return get(request, GetServicePlanVisibilityResponse.class, builder -> builder.pathSegment("v2", "service_plan_visibilities", request.getServicePlanVisibilityId()))
+        return get(request, GetServicePlanVisibilityResponse.class, builder -> builder.pathSegment("service_plan_visibilities", request.getServicePlanVisibilityId()))
             .checkpoint();
     }
 
     @Override
     public Mono<ListServicePlanVisibilitiesResponse> list(ListServicePlanVisibilitiesRequest request) {
-        return get(request, ListServicePlanVisibilitiesResponse.class, builder -> builder.pathSegment("v2", "service_plan_visibilities"))
+        return get(request, ListServicePlanVisibilitiesResponse.class, builder -> builder.pathSegment("service_plan_visibilities"))
             .checkpoint();
     }
 
     @Override
     public Mono<UpdateServicePlanVisibilityResponse> update(UpdateServicePlanVisibilityRequest request) {
-        return put(request, UpdateServicePlanVisibilityResponse.class, builder -> builder.pathSegment("v2", "service_plan_visibilities", request.getServicePlanVisibilityId()))
+        return put(request, UpdateServicePlanVisibilityResponse.class, builder -> builder.pathSegment("service_plan_visibilities", request.getServicePlanVisibilityId()))
             .checkpoint();
     }
 

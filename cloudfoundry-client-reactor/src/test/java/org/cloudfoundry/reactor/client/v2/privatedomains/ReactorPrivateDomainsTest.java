@@ -56,7 +56,7 @@ public final class ReactorPrivateDomainsTest extends AbstractClientApiTest {
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/v2/private_domains")
+                .method(POST).path("/private_domains")
                 .payload("fixtures/client/v2/private_domains/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -92,7 +92,7 @@ public final class ReactorPrivateDomainsTest extends AbstractClientApiTest {
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v2/private_domains/test-private-domain-id")
+                .method(DELETE).path("/private_domains/test-private-domain-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
@@ -112,7 +112,7 @@ public final class ReactorPrivateDomainsTest extends AbstractClientApiTest {
     public void deleteAsync() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v2/private_domains/test-private-domain-id?async=true")
+                .method(DELETE).path("/private_domains/test-private-domain-id?async=true")
                 .build())
             .response(TestResponse.builder()
                 .status(ACCEPTED)
@@ -145,7 +145,7 @@ public final class ReactorPrivateDomainsTest extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/private_domains/test-private-domain-id")
+                .method(GET).path("/private_domains/test-private-domain-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -179,7 +179,7 @@ public final class ReactorPrivateDomainsTest extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/private_domains?q=name:test-name.com&page=-1")
+                .method(GET).path("/private_domains?q=name:test-name.com&page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -218,7 +218,7 @@ public final class ReactorPrivateDomainsTest extends AbstractClientApiTest {
     public void listSharedOrganizations() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/private_domains/b2a35f0c-d5ad-4a59-bea7-461711d96b0d/shared_organizations")
+                .method(GET).path("/private_domains/b2a35f0c-d5ad-4a59-bea7-461711d96b0d/shared_organizations")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)

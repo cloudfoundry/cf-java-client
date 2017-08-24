@@ -41,7 +41,7 @@ public final class ReactorJobsV3Test extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v3/jobs/test-job-id")
+                .method(GET).path("/jobs/test-job-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)

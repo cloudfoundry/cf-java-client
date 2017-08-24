@@ -78,7 +78,7 @@ public final class ReactorPackagesTest extends AbstractClientApiTest {
     public void copy() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/v3/packages?source_guid=test-source-package-id")
+                .method(POST).path("/packages?source_guid=test-source-package-id")
                 .payload("fixtures/client/v3/packages/POST_?source_guid={id}_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -135,7 +135,7 @@ public final class ReactorPackagesTest extends AbstractClientApiTest {
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/v3/packages")
+                .method(POST).path("/packages")
                 .payload("fixtures/client/v3/packages/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -192,7 +192,7 @@ public final class ReactorPackagesTest extends AbstractClientApiTest {
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v3/packages/test-package-id")
+                .method(DELETE).path("/packages/test-package-id")
                 .build())
             .response(TestResponse.builder()
                 .status(ACCEPTED)
@@ -214,7 +214,7 @@ public final class ReactorPackagesTest extends AbstractClientApiTest {
     public void download() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v3/packages/test-package-id/download")
+                .method(GET).path("/packages/test-package-id/download")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -237,7 +237,7 @@ public final class ReactorPackagesTest extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v3/packages/test-package-id")
+                .method(GET).path("/packages/test-package-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -286,7 +286,7 @@ public final class ReactorPackagesTest extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v3/packages")
+                .method(GET).path("/packages")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -364,7 +364,7 @@ public final class ReactorPackagesTest extends AbstractClientApiTest {
     public void listDroplets() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v3/packages/test-package-id/droplets")
+                .method(GET).path("/packages/test-package-id/droplets")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -465,7 +465,7 @@ public final class ReactorPackagesTest extends AbstractClientApiTest {
     public void upload() throws IOException {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/v3/packages/test-package-id/upload")
+                .method(POST).path("/packages/test-package-id/upload")
                 .contents(consumer((headers, body) -> {
                     String boundary = extractBoundary(headers);
 

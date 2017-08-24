@@ -106,7 +106,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     public void associateRoute() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/v2/apps/test-application-id/routes/test-route-id")
+                .method(PUT).path("/apps/test-application-id/routes/test-route-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -163,7 +163,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     public void copy() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/v2/apps/test-application-id/copy_bits")
+                .method(POST).path("/apps/test-application-id/copy_bits")
                 .payload("fixtures/client/v2/apps/POST_{id}_copy_bits_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -198,7 +198,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/v2/apps")
+                .method(POST).path("/apps")
                 .payload("fixtures/client/v2/apps/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -258,7 +258,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v2/apps/test-application-id")
+                .method(DELETE).path("/apps/test-application-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
@@ -278,7 +278,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     public void download() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/apps/test-application-id/download")
+                .method(GET).path("/apps/test-application-id/download")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -301,7 +301,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     public void downloadDroplet() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/apps/test-application-id/droplet/download")
+                .method(GET).path("/apps/test-application-id/droplet/download")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -324,7 +324,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     public void environment() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/apps/test-application-id/env")
+                .method(GET).path("/apps/test-application-id/env")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -369,7 +369,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/apps/test-application-id")
+                .method(GET).path("/apps/test-application-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -423,7 +423,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     public void getPermissions() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/apps/6fd65993-fbd8-447c-8c04-6e4fe3ac561c/permissions")
+                .method(GET).path("/apps/6fd65993-fbd8-447c-8c04-6e4fe3ac561c/permissions")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -448,7 +448,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     public void instances() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/apps/test-application-id/instances")
+                .method(GET).path("/apps/test-application-id/instances")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -476,7 +476,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/apps?q=name:test-name&page=-1")
+                .method(GET).path("/apps?q=name:test-name&page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -604,7 +604,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     public void listRoutes() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/apps/test-application-id/routes?page=-1")
+                .method(GET).path("/apps/test-application-id/routes?page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -648,7 +648,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     public void listServiceBindings() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/apps/test-application-id/service_bindings?q=service_instance_guid:test-instance-id&page=-1")
+                .method(GET).path("/apps/test-application-id/service_bindings?q=service_instance_guid:test-instance-id&page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -691,7 +691,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     public void removeRoute() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v2/apps/test-application-id/routes/test-route-id")
+                .method(DELETE).path("/apps/test-application-id/routes/test-route-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
@@ -712,7 +712,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     public void removeServiceBinding() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v2/apps/test-application-id/service_bindings/test-service-binding-id")
+                .method(DELETE).path("/apps/test-application-id/service_bindings/test-service-binding-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
@@ -734,7 +734,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     public void restage() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/v2/apps/test-application-id/restage")
+                .method(POST).path("/apps/test-application-id/restage")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -784,7 +784,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     public void statistics() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/apps/test-application-id/stats")
+                .method(GET).path("/apps/test-application-id/stats")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -827,7 +827,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     public void summary() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/apps/test-application-id/summary")
+                .method(GET).path("/apps/test-application-id/summary")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -905,7 +905,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     public void terminateInstance() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v2/apps/test-application-id/instances/0")
+                .method(DELETE).path("/apps/test-application-id/instances/0")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
@@ -927,7 +927,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     public void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/v2/apps/test-application-id")
+                .method(PUT).path("/apps/test-application-id")
                 .payload("fixtures/client/v2/apps/PUT_{id}_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -986,7 +986,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     public void upload() throws IOException {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/v2/apps/test-application-id/bits")
+                .method(PUT).path("/apps/test-application-id/bits")
                 .contents(consumer((headers, body) -> {
                     String boundary = extractBoundary(headers);
 
@@ -1049,7 +1049,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     public void uploadDroplet() throws IOException {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/v2/apps/test-application-id/droplet/upload")
+                .method(PUT).path("/apps/test-application-id/droplet/upload")
                 .contents(consumer((headers, body) -> {
                     String boundary = extractBoundary(headers);
 

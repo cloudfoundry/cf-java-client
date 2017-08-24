@@ -31,6 +31,10 @@ import reactor.core.publisher.Mono;
 import reactor.ipc.netty.http.client.HttpClient;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
@@ -50,11 +54,18 @@ public abstract class AbstractRestTest {
         SLF4JBridgeHandler.install();
     }
 
-    final MockWebServer mockWebServer = new MockWebServer();
+    protected final Mono<String> root;
 
-    protected final Mono<String> root = Mono.just(this.mockWebServer.url("/").uri().toString());
+    final MockWebServer mockWebServer;
 
-    private InteractionContext interactionContext;
+    private MultipleRequestDispatcher multipleRequestDispatcher = new MultipleRequestDispatcher();
+
+    protected AbstractRestTest() {
+        this.mockWebServer = new MockWebServer();
+        this.mockWebServer.setDispatcher(this.multipleRequestDispatcher);
+
+        this.root = Mono.just(this.mockWebServer.url("/").uri().toString());
+    }
 
     @After
     public final void shutdown() throws IOException {
@@ -63,34 +74,11 @@ public abstract class AbstractRestTest {
 
     @After
     public final void verify() {
-        if (this.interactionContext != null) {
-            assertThat(this.interactionContext.isDone()).as("Expected request not received").isTrue();
-        }
+        this.multipleRequestDispatcher.verify();
     }
 
     protected final void mockRequest(InteractionContext interactionContext) {
-        this.interactionContext = interactionContext;
-
-
-        this.mockWebServer.setDispatcher(new Dispatcher() {
-
-            @Override
-            public MockResponse dispatch(RecordedRequest request) throws InterruptedException {
-                if (interactionContext.isDone()) {
-                    throw new IllegalStateException("Additional request received: " + request);
-                }
-
-                interactionContext.setDone(true);
-
-                try {
-                    interactionContext.getRequest().assertEquals(request);
-                    return interactionContext.getResponse().getMockResponse();
-                } catch (ComparisonFailure e) {
-                    e.printStackTrace();
-                    return new MockResponse().setResponseCode(400);
-                }
-            }
-        });
+        this.multipleRequestDispatcher.add(interactionContext);
     }
 
     private static final class FailingDeserializationProblemHandler extends DeserializationProblemHandler {
@@ -99,6 +87,48 @@ public abstract class AbstractRestTest {
         public boolean handleUnknownProperty(DeserializationContext ctxt, JsonParser jp, JsonDeserializer<?> deserializer, Object beanOrClass, String propertyName) {
             fail(String.format("Found unexpected property %s in payload for %s", propertyName, beanOrClass.getClass().getName()));
             return false;
+        }
+
+    }
+
+    private static final class MultipleRequestDispatcher extends Dispatcher {
+
+        private Queue<InteractionContext> responses = new LinkedList<>();
+
+        private List<InteractionContext> verifications = new ArrayList<>();
+
+        @Override
+        public MockResponse dispatch(RecordedRequest request) throws InterruptedException {
+            InteractionContext interactionContext = this.responses.poll();
+
+            if (interactionContext == null) {
+                throw new IllegalStateException(String.format("Unexpected request for %s %s received", request.getMethod(), request.getPath()));
+            }
+
+            interactionContext.setDone(true);
+
+            try {
+                interactionContext.getRequest().assertEquals(request);
+                return interactionContext.getResponse().getMockResponse();
+            } catch (ComparisonFailure e) {
+                e.printStackTrace();
+                return new MockResponse().setResponseCode(400);
+            }
+        }
+
+        private void add(InteractionContext interactionContext) {
+            this.responses.add(interactionContext);
+            this.verifications.add(interactionContext);
+        }
+
+        private void verify() {
+            for (InteractionContext interactionContext : this.verifications) {
+                TestRequest request = interactionContext.getRequest();
+
+                assertThat(interactionContext.isDone())
+                    .as("Expected request to %s %s not received", request.getMethod(), request.getPath())
+                    .isTrue();
+            }
         }
 
     }

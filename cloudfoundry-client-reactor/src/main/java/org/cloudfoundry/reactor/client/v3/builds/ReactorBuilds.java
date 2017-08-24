@@ -44,13 +44,13 @@ public final class ReactorBuilds extends AbstractClientV3Operations implements B
 
     @Override
     public Mono<CreateBuildResponse> create(CreateBuildRequest request) {
-        return post(request, CreateBuildResponse.class, builder -> builder.pathSegment("v3", "builds"))
+        return post(request, CreateBuildResponse.class, builder -> builder.pathSegment("builds"))
             .checkpoint();
     }
 
     @Override
     public Mono<GetBuildResponse> get(GetBuildRequest request) {
-        return get(request, GetBuildResponse.class, builder -> builder.pathSegment("v3", "builds", request.getBuildId()))
+        return get(request, GetBuildResponse.class, builder -> builder.pathSegment("builds", request.getBuildId()))
             .checkpoint();
     }
 

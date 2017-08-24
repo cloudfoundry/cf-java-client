@@ -52,7 +52,7 @@ public final class ReactorTasksTest extends AbstractClientApiTest {
     public void cancel() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/v3/tasks/test-id/cancel")
+                .method(PUT).path("/tasks/test-id/cancel")
                 .build())
             .response(TestResponse.builder()
                 .status(ACCEPTED)
@@ -100,7 +100,7 @@ public final class ReactorTasksTest extends AbstractClientApiTest {
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/v3/apps/test-application-id/tasks")
+                .method(POST).path("/apps/test-application-id/tasks")
                 .payload("fixtures/client/v3/tasks/POST_apps_{id}_tasks_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -150,7 +150,7 @@ public final class ReactorTasksTest extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v3/tasks/test-id")
+                .method(GET).path("/tasks/test-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -198,7 +198,7 @@ public final class ReactorTasksTest extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v3/tasks")
+                .method(GET).path("/tasks")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)

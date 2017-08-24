@@ -44,7 +44,7 @@ public final class ReactorFeatureFlagsTest extends AbstractClientApiTest {
     public void getAppScaling() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/config/feature_flags/app_scaling")
+                .method(GET).path("/config/feature_flags/app_scaling")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -70,7 +70,7 @@ public final class ReactorFeatureFlagsTest extends AbstractClientApiTest {
     public void getUserRoles() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/config/feature_flags/set_roles_by_username")
+                .method(GET).path("/config/feature_flags/set_roles_by_username")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -96,7 +96,7 @@ public final class ReactorFeatureFlagsTest extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/config/feature_flags")
+                .method(GET).path("/config/feature_flags")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -191,7 +191,7 @@ public final class ReactorFeatureFlagsTest extends AbstractClientApiTest {
     public void set() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/v2/config/feature_flags/user_org_creation")
+                .method(PUT).path("/config/feature_flags/user_org_creation")
                 .payload("fixtures/client/v2/feature_flags/PUT_user_org_creation_request.json")
                 .build())
             .response(TestResponse.builder()

@@ -55,7 +55,7 @@ public final class ReactorServiceBindingsV3Test extends AbstractClientApiTest {
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/v3/service_bindings")
+                .method(POST).path("/service_bindings")
                 .payload("fixtures/client/v3/servicebindings/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -106,7 +106,7 @@ public final class ReactorServiceBindingsV3Test extends AbstractClientApiTest {
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v3/service_bindings/test-service-binding-id")
+                .method(DELETE).path("/service_bindings/test-service-binding-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
@@ -126,7 +126,7 @@ public final class ReactorServiceBindingsV3Test extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v3/service_bindings/test-service-binding-id")
+                .method(GET).path("/service_bindings/test-service-binding-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -165,7 +165,7 @@ public final class ReactorServiceBindingsV3Test extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v3/service_bindings?app_guids=test-application-id&order_by=%2Bcreated_at&page=1")
+                .method(GET).path("/service_bindings?app_guids=test-application-id&order_by=%2Bcreated_at&page=1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)

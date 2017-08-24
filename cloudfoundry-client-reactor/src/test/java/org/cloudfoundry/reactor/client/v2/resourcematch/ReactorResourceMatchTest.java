@@ -39,7 +39,7 @@ public final class ReactorResourceMatchTest extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/v2/resource_match")
+                .method(PUT).path("/resource_match")
                 .payload("fixtures/client/v2/resource_match/PUT_request.json")
                 .build())
             .response(TestResponse.builder()

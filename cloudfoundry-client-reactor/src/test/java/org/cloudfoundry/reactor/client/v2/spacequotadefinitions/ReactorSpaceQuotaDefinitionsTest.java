@@ -63,7 +63,7 @@ public final class ReactorSpaceQuotaDefinitionsTest extends AbstractClientApiTes
     public void associateSpace() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/v2/space_quota_definitions/test-space-quota-definition-id/spaces/test-space-id")
+                .method(PUT).path("/space_quota_definitions/test-space-quota-definition-id/spaces/test-space-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -104,7 +104,7 @@ public final class ReactorSpaceQuotaDefinitionsTest extends AbstractClientApiTes
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/v2/space_quota_definitions")
+                .method(POST).path("/space_quota_definitions")
                 .payload("fixtures/client/v2/space_quota_definitions/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -154,7 +154,7 @@ public final class ReactorSpaceQuotaDefinitionsTest extends AbstractClientApiTes
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v2/space_quota_definitions/test-space-quota-definition-id")
+                .method(DELETE).path("/space_quota_definitions/test-space-quota-definition-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
@@ -174,7 +174,7 @@ public final class ReactorSpaceQuotaDefinitionsTest extends AbstractClientApiTes
     public void deleteAsync() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v2/space_quota_definitions/test-space-quota-definition-id?async=true")
+                .method(DELETE).path("/space_quota_definitions/test-space-quota-definition-id?async=true")
                 .build())
             .response(TestResponse.builder()
                 .status(ACCEPTED)
@@ -207,7 +207,7 @@ public final class ReactorSpaceQuotaDefinitionsTest extends AbstractClientApiTes
     public void getSpaceQuotaDefinition() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/space_quota_definitions/test-space-quota-definition-id")
+                .method(GET).path("/space_quota_definitions/test-space-quota-definition-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -247,7 +247,7 @@ public final class ReactorSpaceQuotaDefinitionsTest extends AbstractClientApiTes
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/space_quota_definitions?page=-1")
+                .method(GET).path("/space_quota_definitions?page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -291,7 +291,7 @@ public final class ReactorSpaceQuotaDefinitionsTest extends AbstractClientApiTes
     public void listSpaces() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v2/space_quota_definitions/e37cdd97-af56-4417-a99d-060093057275/spaces")
+                .method(GET).path("/space_quota_definitions/e37cdd97-af56-4417-a99d-060093057275/spaces")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -343,7 +343,7 @@ public final class ReactorSpaceQuotaDefinitionsTest extends AbstractClientApiTes
     public void removeSpace() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/v2/space_quota_definitions/test-space-quota-definition-id/spaces/test-space-id")
+                .method(DELETE).path("/space_quota_definitions/test-space-quota-definition-id/spaces/test-space-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
@@ -364,7 +364,7 @@ public final class ReactorSpaceQuotaDefinitionsTest extends AbstractClientApiTes
     public void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/v2/space_quota_definitions/bbd837ac-309d-4f53-9d49-67cb75364904")
+                .method(PUT).path("/space_quota_definitions/bbd837ac-309d-4f53-9d49-67cb75364904")
                 .payload("fixtures/client/v2/space_quota_definitions/PUT_{id}_request.json")
                 .build())
             .response(TestResponse.builder()

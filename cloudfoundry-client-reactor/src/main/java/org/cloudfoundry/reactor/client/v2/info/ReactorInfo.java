@@ -43,7 +43,7 @@ public final class ReactorInfo extends AbstractClientV2Operations implements Inf
 
     @Override
     public Mono<GetInfoResponse> get(GetInfoRequest request) {
-        return get(request, GetInfoResponse.class, builder -> builder.pathSegment("v2", "info"))
+        return get(request, GetInfoResponse.class, builder -> builder.pathSegment("info"))
             .checkpoint();
     }
 

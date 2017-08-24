@@ -24,26 +24,27 @@ import java.time.Duration;
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public final class DefaultConnectionContextTest extends AbstractRestTest {
+public final class InfoPayloadRootProviderTest extends AbstractRestTest {
 
-    private final ConnectionContext connectionContext = DefaultConnectionContext.builder()
-        .apiHost(this.mockWebServer.getHostName())
+    private final InfoPayloadRootProvider rootProvider = InfoPayloadRootProvider.builder()
+        .apiHost("localhost")
         .port(this.mockWebServer.getPort())
         .secure(false)
+        .objectMapper(CONNECTION_CONTEXT.getObjectMapper())
         .build();
 
     @Test
-    public void getInfo() throws Exception {
-        mockRequest(InteractionContext.builder()
-            .request(TestRequest.builder()
-                .method(GET).path("/")
-                .build())
-            .response(TestResponse.builder()
-                .status(OK)
-                .payload("fixtures/GET_response.json")
-                .build())
-            .build());
+    public void getRoot() {
+        this.rootProvider
+            .getRoot(CONNECTION_CONTEXT)
+            .as(StepVerifier::create)
+            .expectNext(String.format("http://localhost:%d", this.mockWebServer.getPort()))
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
 
+    @Test
+    public void getRootKey() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/v2/info")
@@ -54,11 +55,30 @@ public final class DefaultConnectionContextTest extends AbstractRestTest {
                 .build())
             .build());
 
-        this.connectionContext.getRootProvider()
-            .getRoot("token_endpoint", this.connectionContext)
+        this.rootProvider
+            .getRoot("authorization_endpoint", CONNECTION_CONTEXT)
             .as(StepVerifier::create)
             .expectNext("http://localhost:8080/uaa")
             .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void getRootKeyNoKey() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/v2/info")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/info/GET_response.json")
+                .build())
+            .build());
+
+        this.rootProvider
+            .getRoot("invalid-key", CONNECTION_CONTEXT)
+            .as(StepVerifier::create)
+            .expectError(IllegalArgumentException.class)
             .verify(Duration.ofSeconds(5));
     }
 
