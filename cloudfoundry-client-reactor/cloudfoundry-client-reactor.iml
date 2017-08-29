@@ -29,7 +29,7 @@
     <orderEntry type="library" scope="TEST" name="Maven: io.projectreactor.addons:reactor-test:3.0.7.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: io.projectreactor:reactor-core:3.0.7.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.reactivestreams:reactive-streams:1.0.0" level="project" />
-    <orderEntry type="library" name="Maven: io.projectreactor.ipc:reactor-netty:0.6.5.BUILD-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: io.projectreactor.ipc:reactor-netty:0.6.5.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: io.netty:netty-codec-http:4.1.15.Final" level="project" />
     <orderEntry type="library" name="Maven: io.netty:netty-codec:4.1.15.Final" level="project" />
     <orderEntry type="library" name="Maven: io.netty:netty-handler:4.1.15.Final" level="project" />
