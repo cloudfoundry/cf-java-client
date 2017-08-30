@@ -24,6 +24,14 @@ import reactor.core.publisher.Mono;
 public interface Policies {
 
     /**
+     * Makes the <a href="https://github.com/cloudfoundry-incubator/cf-networking-release/blob/develop/docs/API.md#post-networkingv1externalpolicies">Create Policies</a> request
+     *
+     * @param request the Create Policies request
+     * @return the response to the Create Policies request
+     */
+    Mono<Void> create(CreatePoliciesRequest request);
+
+    /**
      * Makes the <a href="https://github.com/cloudfoundry-incubator/cf-networking-release/blob/develop/docs/API.md#get-networkingv1externalpolicies">List Policies</a> request
      *
      * @param request the List Policies request

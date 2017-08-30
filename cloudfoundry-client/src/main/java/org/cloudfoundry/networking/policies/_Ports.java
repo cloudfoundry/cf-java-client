@@ -18,7 +18,6 @@ package org.cloudfoundry.networking.policies;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
@@ -32,14 +31,12 @@ abstract class _Ports {
      * The ending port
      */
     @JsonProperty("end")
-    @Nullable
     abstract Integer getEnd();
 
     /**
      * The starting port
      */
     @JsonProperty("start")
-    @Nullable
     abstract Integer getStart();
 
 }

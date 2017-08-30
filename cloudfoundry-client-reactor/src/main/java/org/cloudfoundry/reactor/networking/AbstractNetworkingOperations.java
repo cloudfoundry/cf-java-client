@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.reactor.routing.v1;
+package org.cloudfoundry.reactor.networking;
 
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
@@ -25,9 +25,9 @@ import reactor.ipc.netty.http.client.HttpClientResponse;
 
 import java.util.function.Function;
 
-public abstract class AbstractRoutingV1Operations extends AbstractReactorOperations {
+public abstract class AbstractNetworkingOperations extends AbstractReactorOperations {
 
-    protected AbstractRoutingV1Operations(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
+    protected AbstractNetworkingOperations(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
         super(connectionContext, root, tokenProvider);
     }
 

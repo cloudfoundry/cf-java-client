@@ -16,18 +16,19 @@
 
 package org.cloudfoundry.reactor.networking.policies;
 
+import org.cloudfoundry.networking.policies.CreatePoliciesRequest;
 import org.cloudfoundry.networking.policies.ListPoliciesRequest;
 import org.cloudfoundry.networking.policies.ListPoliciesResponse;
 import org.cloudfoundry.networking.policies.Policies;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
-import org.cloudfoundry.reactor.routing.v1.AbstractRoutingV1Operations;
+import org.cloudfoundry.reactor.networking.AbstractNetworkingOperations;
 import reactor.core.publisher.Mono;
 
 /**
  * The Reactor-based implementation of {@link Policies}
  */
-public class ReactorPolicies extends AbstractRoutingV1Operations implements Policies {
+public class ReactorPolicies extends AbstractNetworkingOperations implements Policies {
 
     /**
      * Creates an instance
@@ -38,6 +39,12 @@ public class ReactorPolicies extends AbstractRoutingV1Operations implements Poli
      */
     public ReactorPolicies(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
         super(connectionContext, root, tokenProvider);
+    }
+
+    @Override
+    public Mono<Void> create(CreatePoliciesRequest request) {
+        return post(request, Void.class, builder -> builder.pathSegment("v1", "external", "policies"))
+            .checkpoint();
     }
 
     @Override

@@ -18,7 +18,6 @@ package org.cloudfoundry.networking.policies;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 import java.util.List;
@@ -31,17 +30,15 @@ import java.util.List;
 abstract class _ListPoliciesResponse {
 
     /**
-     * The number of policies listed
-     */
-    @JsonProperty("total_policies")
-    @Nullable
-    abstract Integer getTotalPolicies();
-
-    /**
      * The policies
      */
     @JsonProperty("policies")
-    @Nullable
     abstract List<Policy> getPolicies();
+
+    /**
+     * The number of policies listed
+     */
+    @JsonProperty("total_policies")
+    abstract Integer getTotalPolicies();
 
 }

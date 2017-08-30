@@ -18,7 +18,6 @@ package org.cloudfoundry.networking.policies;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
@@ -32,7 +31,6 @@ abstract class _Source {
      * The id
      */
     @JsonProperty("id")
-    @Nullable
     abstract String getId();
 
 }

@@ -17,32 +17,27 @@
 package org.cloudfoundry.networking.policies;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.immutables.value.Value;
 
+import java.util.List;
+
 /**
- * The payload for Router Group responses
+ * The request payload for the Create Policies operation
  */
-@JsonDeserialize
 @Value.Immutable
-abstract class _Destination {
+abstract class _CreatePoliciesRequest {
+
+    @Value.Check
+    void check() {
+        if (getPolicies() == null || getPolicies().isEmpty()) {
+            throw new IllegalStateException("Cannot build CreatePoliciesRequest, attribute policies must be specified");
+        }
+    }
 
     /**
-     * The id
+     * The policies
      */
-    @JsonProperty("id")
-    abstract String getId();
-
-    /**
-     * The protocol
-     */
-    @JsonProperty("ports")
-    abstract Ports getPorts();
-
-    /**
-     * The protocol
-     */
-    @JsonProperty("protocol")
-    abstract String getProtocol();
+    @JsonProperty("policies")
+    abstract List<Policy> getPolicies();
 
 }
