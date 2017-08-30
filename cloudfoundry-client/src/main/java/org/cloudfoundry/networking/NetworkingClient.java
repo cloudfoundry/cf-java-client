@@ -17,6 +17,7 @@
 package org.cloudfoundry.networking;
 
 import org.cloudfoundry.networking.policies.Policies;
+import org.cloudfoundry.networking.tags.Tags;
 
 /**
  * Main entry point to the Networking Client API
@@ -27,5 +28,10 @@ public interface NetworkingClient {
      * Main entry point to the Policies API
      */
     Policies policies();
+
+    /**
+     * Main entry point to the Tags API
+     */
+    Tags tags();
 
 }

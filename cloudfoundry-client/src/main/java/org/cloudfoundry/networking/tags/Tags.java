@@ -14,10 +14,21 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.reactor.networking;
+package org.cloudfoundry.networking.tags;
 
-import org.cloudfoundry.reactor.AbstractRestTest;
+import reactor.core.publisher.Mono;
 
-public abstract class AbstractNetworkingApiTest extends AbstractRestTest {
+/**
+ * Main entry point to the Tags API
+ */
+public interface Tags {
+
+    /**
+     * Makes the <a href="https://github.com/cloudfoundry-incubator/cf-networking-release/blob/develop/docs/API.md#get-networkingv1externaltags">List Tags</a> request
+     *
+     * @param request the List Tags request
+     * @return the response to the List Tags request
+     */
+    Mono<ListTagsResponse> list(ListTagsRequest request);
 
 }

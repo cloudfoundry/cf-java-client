@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.reactor.networking;
+package org.cloudfoundry.reactor.networking.policies;
 
 import org.cloudfoundry.networking.policies.CreatePoliciesRequest;
 import org.cloudfoundry.networking.policies.DeletePoliciesRequest;
@@ -27,7 +27,7 @@ import org.cloudfoundry.networking.policies.Source;
 import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
-import org.cloudfoundry.reactor.networking.policies.ReactorPolicies;
+import org.cloudfoundry.reactor.networking.AbstractNetworkingApiTest;
 import org.junit.Test;
 import reactor.test.StepVerifier;
 
@@ -37,7 +37,7 @@ import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public final class ReactorNetworkingClientTest extends AbstractNetworkingApiTest {
+public final class ReactorPoliciesClientTest extends AbstractNetworkingApiTest {
 
     private final ReactorPolicies policies = new ReactorPolicies(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 

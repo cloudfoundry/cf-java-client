@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.networking.policies;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.immutables.value.Value;
 
@@ -24,6 +25,18 @@ import org.immutables.value.Value;
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _Policy extends AbstractPolicy {
+abstract class _Policy {
+
+    /**
+     * Source for the Policy
+     */
+    @JsonProperty("destination")
+    abstract Destination getDestination();
+
+    /**
+     * Source for the Policy
+     */
+    @JsonProperty("source")
+    abstract Source getSource();
 
 }

@@ -14,10 +14,16 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.reactor.networking;
+package org.cloudfoundry.networking.tags;
 
-import org.cloudfoundry.reactor.AbstractRestTest;
+import org.junit.Test;
 
-public abstract class AbstractNetworkingApiTest extends AbstractRestTest {
+public class ListTagsRequestTest {
+
+    @Test
+    public void valid() {
+        ListTagsRequest.builder()
+            .build();
+    }
 
 }

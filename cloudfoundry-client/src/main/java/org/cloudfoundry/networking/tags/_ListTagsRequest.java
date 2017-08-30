@@ -14,25 +14,14 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.networking.policies;
+package org.cloudfoundry.networking.tags;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.immutables.value.Value;
 
 /**
- * The payload for Policy responses
+ * The request payload for the List Tags operation
  */
-abstract class AbstractPolicy {
-
-    /**
-     * Source for the Policy
-     */
-    @JsonProperty("destination")
-    abstract Destination getDestination();
-
-    /**
-     * Source for the Policy
-     */
-    @JsonProperty("source")
-    abstract Source getSource();
+@Value.Immutable
+abstract class _ListTagsRequest {
 
 }

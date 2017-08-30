@@ -18,9 +18,11 @@ package org.cloudfoundry.reactor.networking;
 
 import org.cloudfoundry.networking.NetworkingClient;
 import org.cloudfoundry.networking.policies.Policies;
+import org.cloudfoundry.networking.tags.Tags;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.networking.policies.ReactorPolicies;
+import org.cloudfoundry.reactor.networking.tags.ReactorTags;
 import org.immutables.value.Value;
 import reactor.core.publisher.Mono;
 
@@ -36,6 +38,12 @@ abstract class _ReactorNetworkingClient implements NetworkingClient {
         return new ReactorPolicies(getConnectionContext(), getRoot(), getTokenProvider());
     }
 
+    @Override
+    @Value.Derived
+    public Tags tags() {
+        return new ReactorTags(getConnectionContext(), getRoot(), getTokenProvider());
+    }
+
     /**
      * The connection context
      */
@@ -43,7 +51,7 @@ abstract class _ReactorNetworkingClient implements NetworkingClient {
 
     @Value.Default
     Mono<String> getRoot() {
-        return getConnectionContext().getRootProvider().getRoot("networking_endpoint", getConnectionContext());
+        return getConnectionContext().getRootProvider().getRoot("networking", getConnectionContext());
     }
 
     /**

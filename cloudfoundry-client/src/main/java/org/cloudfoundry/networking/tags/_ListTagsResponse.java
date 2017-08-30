@@ -14,10 +14,25 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.reactor.networking;
+package org.cloudfoundry.networking.tags;
 
-import org.cloudfoundry.reactor.AbstractRestTest;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.immutables.value.Value;
 
-public abstract class AbstractNetworkingApiTest extends AbstractRestTest {
+import java.util.List;
+
+/**
+ * The response payload for the List Tags operation
+ */
+@JsonDeserialize
+@Value.Immutable
+abstract class _ListTagsResponse {
+
+    /**
+     * The policies
+     */
+    @JsonProperty("tags")
+    abstract List<Tag> getTags();
 
 }
