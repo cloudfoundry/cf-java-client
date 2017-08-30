@@ -32,6 +32,14 @@ public interface Policies {
     Mono<Void> create(CreatePoliciesRequest request);
 
     /**
+     * Makes the <a href="https://github.com/cloudfoundry-incubator/cf-networking-release/blob/develop/docs/API.md#post-networkingv1externalpoliciesdelete">Delete Policies</a> request
+     *
+     * @param request the Delete Policies request
+     * @return the response to the Delete Policies request
+     */
+    Mono<Void> delete(DeletePoliciesRequest request);
+
+    /**
      * Makes the <a href="https://github.com/cloudfoundry-incubator/cf-networking-release/blob/develop/docs/API.md#get-networkingv1externalpolicies">List Policies</a> request
      *
      * @param request the List Policies request

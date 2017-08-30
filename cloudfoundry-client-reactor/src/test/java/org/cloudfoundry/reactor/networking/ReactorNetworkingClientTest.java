@@ -17,6 +17,7 @@
 package org.cloudfoundry.reactor.networking;
 
 import org.cloudfoundry.networking.policies.CreatePoliciesRequest;
+import org.cloudfoundry.networking.policies.DeletePoliciesRequest;
 import org.cloudfoundry.networking.policies.Destination;
 import org.cloudfoundry.networking.policies.ListPoliciesRequest;
 import org.cloudfoundry.networking.policies.ListPoliciesResponse;
@@ -54,6 +55,52 @@ public final class ReactorNetworkingClientTest extends AbstractNetworkingApiTest
 
         this.policies
             .create(CreatePoliciesRequest.builder()
+                .policy(Policy.builder()
+                    .destination(Destination.builder()
+                        .id("38f08df0-19df-4439-b4e9-61096d4301ea")
+                        .protocol("tcp")
+                        .ports(Ports.builder()
+                            .end(1235)
+                            .start(1234)
+                            .build())
+                        .build())
+                    .source(Source.builder()
+                        .id("1081ceac-f5c4-47a8-95e8-88e1e302efb5")
+                        .build())
+                    .build())
+                .policy(Policy.builder()
+                    .destination(Destination.builder()
+                        .id("308e7ef1-63f1-4a6c-978c-2e527cbb1c36")
+                        .protocol("tcp")
+                        .ports(Ports.builder()
+                            .end(1235)
+                            .start(1234)
+                            .build())
+                        .build())
+                    .source(Source.builder()
+                        .id("308e7ef1-63f1-4a6c-978c-2e527cbb1c36")
+                        .build())
+                    .build())
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void delete() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(POST).path("/v1/external/policies/delete")
+                .payload("fixtures/networking/policies/POST_delete_request.json")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .build())
+            .build());
+
+        this.policies
+            .delete(DeletePoliciesRequest.builder()
                 .policy(Policy.builder()
                     .destination(Destination.builder()
                         .id("38f08df0-19df-4439-b4e9-61096d4301ea")

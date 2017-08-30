@@ -17,6 +17,7 @@
 package org.cloudfoundry.reactor.networking.policies;
 
 import org.cloudfoundry.networking.policies.CreatePoliciesRequest;
+import org.cloudfoundry.networking.policies.DeletePoliciesRequest;
 import org.cloudfoundry.networking.policies.ListPoliciesRequest;
 import org.cloudfoundry.networking.policies.ListPoliciesResponse;
 import org.cloudfoundry.networking.policies.Policies;
@@ -44,6 +45,12 @@ public class ReactorPolicies extends AbstractNetworkingOperations implements Pol
     @Override
     public Mono<Void> create(CreatePoliciesRequest request) {
         return post(request, Void.class, builder -> builder.pathSegment("v1", "external", "policies"))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<Void> delete(DeletePoliciesRequest request) {
+        return post(request, Void.class, builder -> builder.pathSegment("v1", "external", "policies", "delete"))
             .checkpoint();
     }
 
