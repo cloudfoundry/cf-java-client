@@ -18,8 +18,23 @@ package org.cloudfoundry.util.tuple;
 
 import java.util.function.BiFunction;
 
+/**
+ * Represents a function that accepts two arguments and produces a result
+ *
+ * @param <T1> The type of the first input to the function
+ * @param <T2> The type of the second input to the function
+ * @param <R>  the type of the result of the function
+ */
+@FunctionalInterface
 public interface Function2<T1, T2, R> extends BiFunction<T1, T2, R> {
 
+    /**
+     * Applies this function to the given arguments
+     *
+     * @param t1 the first input argument
+     * @param t2 the second input argument
+     * @return the function result
+     */
     R apply(T1 t1, T2 t2);
 
 }

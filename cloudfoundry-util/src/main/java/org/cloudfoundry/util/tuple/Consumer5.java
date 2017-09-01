@@ -16,8 +16,27 @@
 
 package org.cloudfoundry.util.tuple;
 
+/**
+ * An operation that accepts five input arguments and returns no result
+ *
+ * @param <T1> The type of the first input to the operation
+ * @param <T2> The type of the second input to the operation
+ * @param <T3> The type of the third input to the operation
+ * @param <T4> The type of the fourth input to the operation
+ * @param <T5> The type of the fifth input to the operation
+ */
+@FunctionalInterface
 public interface Consumer5<T1, T2, T3, T4, T5> {
 
+    /**
+     * Performs this operation on the given arguments
+     *
+     * @param t1 the first input argument
+     * @param t2 the second input argument
+     * @param t3 the third input argument
+     * @param t4 the fourth input argument
+     * @param t5 the fifth input argument
+     */
     void accept(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5);
 
 }
