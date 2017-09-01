@@ -16,8 +16,21 @@
 
 package org.cloudfoundry.util.tuple;
 
+/**
+ * An operation that accepts two input arguments and returns no result
+ *
+ * @param <T1> The type of the first input to the operation
+ * @param <T2> The type of the second input to the operation
+ */
+@FunctionalInterface
 public interface Consumer2<T1, T2> {
 
+    /**
+     * Performs this operation on the given arguments
+     *
+     * @param t1 the first input argument
+     * @param t2 the second input argument
+     */
     void accept(T1 t1, T2 t2);
 
 }

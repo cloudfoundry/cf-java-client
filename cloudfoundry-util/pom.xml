@@ -60,6 +60,11 @@
             <version>${commons-compress.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.atteo</groupId>
             <artifactId>evo-inflector</artifactId>
         </dependency>
