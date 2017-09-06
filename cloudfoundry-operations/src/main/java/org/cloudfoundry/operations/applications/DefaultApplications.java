@@ -924,7 +924,7 @@ public final class DefaultApplications implements Applications {
                                                                                                                            String spaceId, boolean deleteRoutes) {
         return getApplicationId(cloudFoundryClient, request.getName(), spaceId)
             .flatMap(applicationId -> getOptionalRoutes(cloudFoundryClient, deleteRoutes, applicationId)
-                .and(Mono.just(applicationId)));
+                .zipWith(Mono.just(applicationId)));
     }
 
     private static Mono<String> getServiceId(CloudFoundryClient cloudFoundryClient, String serviceInstanceName, String spaceId) {
@@ -1698,7 +1698,7 @@ public final class DefaultApplications implements Applications {
 
                     return FileUtils.compress(application, p -> !paths.contains(p))
                         .flatMap(filteredApplication -> requestUploadApplication(cloudFoundryClient, applicationId, filteredApplication, matchedResources)
-                            .doOnTerminate((v, t) -> {
+                            .doOnTerminate(() -> {
                                 try {
                                     Files.delete(filteredApplication);
                                 } catch (IOException e) {

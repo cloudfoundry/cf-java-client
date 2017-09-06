@@ -98,7 +98,7 @@ public final class ReactorBuildpacks extends AbstractClientV2Operations implemen
                     if (Files.isDirectory(request.getBuildpack())) {
                         return FileUtils.compress(request.getBuildpack())
                             .flatMap(buildpack -> upload(buildpack, r, request.getFilename() + ".zip")
-                                .doOnTerminate((v, t) -> {
+                                .doOnTerminate(() -> {
                                     try {
                                         Files.delete(buildpack);
                                     } catch (IOException e) {

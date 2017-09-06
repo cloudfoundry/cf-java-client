@@ -219,7 +219,7 @@ public final class ReactorApplicationsV2 extends AbstractClientV2Operations impl
                     if (Files.isDirectory(request.getApplication())) {
                         return FileUtils.compress(request.getApplication())
                             .flatMap(application -> upload(application, r, request)
-                                .doOnTerminate((v, t) -> {
+                                .doOnTerminate(() -> {
                                     try {
                                         Files.delete(application);
                                     } catch (IOException e) {

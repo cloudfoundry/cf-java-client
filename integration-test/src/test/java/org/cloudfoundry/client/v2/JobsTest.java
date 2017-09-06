@@ -58,7 +58,7 @@ public final class JobsTest extends AbstractIntegrationTest {
                     .jobId(jobId)
                     .build())
                 .map(ResourceUtils::getId)
-                .and(Mono.just(jobId)))
+                .zipWith(Mono.just(jobId)))
             .filter(predicate((getId, deleteId) -> !"0".equals(getId)))
             .repeatWhenEmpty(5, DelayUtils.instant())
             .as(StepVerifier::create)

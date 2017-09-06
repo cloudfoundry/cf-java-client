@@ -111,7 +111,7 @@ public final class TcpRoutesTest extends AbstractIntegrationTest {
         Integer backendPort = this.nameFactory.getPort();
         Integer port = this.nameFactory.getPort();
 
-        Flux.firstEmitting(
+        Flux.first(
             getRouterGroupId(this.routingClient, DEFAULT_ROUTER_GROUP)
                 .flatMapMany(routerGroupId -> Flux.interval(Duration.ofMillis(500))
                     .flatMap(i -> createTcpRoute(this.routingClient, backendIp, backendPort, port, routerGroupId)))

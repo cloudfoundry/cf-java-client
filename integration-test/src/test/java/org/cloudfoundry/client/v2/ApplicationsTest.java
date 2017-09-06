@@ -752,7 +752,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .applicationId(applicationId)
                     .build())
                 .map(SummaryApplicationResponse::getId)
-                .and(Mono.just(applicationId)))
+                .zipWith(Mono.just(applicationId)))
             .as(StepVerifier::create)
             .consumeNextWith(tupleEquality())
             .expectComplete()

@@ -41,7 +41,7 @@ final class CloudFoundryClientCompatibilityChecker {
             .get(GetInfoRequest.builder()
                 .build())
             .map(response -> Version.valueOf(response.getApiVersion()))
-            .and(Mono.just(Version.valueOf(CloudFoundryClient.SUPPORTED_API_VERSION)))
+            .zipWith(Mono.just(Version.valueOf(CloudFoundryClient.SUPPORTED_API_VERSION)))
             .doOnNext(consumer((server, supported) -> logCompatibility(server, supported, this.logger)))
             .subscribe();
     }
