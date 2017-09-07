@@ -23,6 +23,8 @@ import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvide
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.DeleteUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.GetUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.GetUserProvidedServiceInstanceResponse;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstanceRoutesRequest;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstanceRoutesResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstanceServiceBindingsRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstanceServiceBindingsResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstancesRequest;
@@ -80,6 +82,13 @@ public final class ReactorUserProvidedServiceInstances extends AbstractClientV2O
     @Override
     public Mono<ListUserProvidedServiceInstancesResponse> list(ListUserProvidedServiceInstancesRequest request) {
         return get(request, ListUserProvidedServiceInstancesResponse.class, builder -> builder.pathSegment("user_provided_service_instances"))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<ListUserProvidedServiceInstanceRoutesResponse> listRoutes(ListUserProvidedServiceInstanceRoutesRequest request) {
+        return get(request, ListUserProvidedServiceInstanceRoutesResponse.class, builder -> builder.pathSegment("user_provided_service_instances", request.getUserProvidedServiceInstanceId(),
+            "routes"))
             .checkpoint();
     }
 
