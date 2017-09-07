@@ -89,6 +89,7 @@ import org.cloudfoundry.client.v2.userprovidedserviceinstances.AssociateUserProv
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.AssociateUserProvidedServiceInstanceRouteResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.DeleteUserProvidedServiceInstanceRequest;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.RemoveUserProvidedServiceInstanceRouteRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UpdateUserProvidedServiceInstanceResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstanceEntity;
 import org.cloudfoundry.operations.AbstractOperationsTest;
@@ -761,6 +762,55 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
                 .build())
             .as(StepVerifier::create)
             .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void unbindRoute() {
+        requestListOrganizationPrivateDomains(this.cloudFoundryClient, "test-domain-name", TEST_ORGANIZATION_ID);
+        requestListRoutes(this.cloudFoundryClient, "test-private-domain-id");
+        requestListSpaceServiceInstancesUserProvided(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
+        requestRemoveUserProvidedServiceInstanceRoute(this.cloudFoundryClient, "test-route-id", "test-service-instance-id");
+
+        this.services
+            .unbindRoute(UnbindRouteServiceInstanceRequest.builder()
+                .domainName("test-domain-name")
+                .serviceInstanceName("test-service-instance-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void unbindRouteServiceInstanceRouteNotFound() {
+        requestListOrganizationPrivateDomains(this.cloudFoundryClient, "test-domain-name", TEST_ORGANIZATION_ID);
+        requestListRoutesEmpty(this.cloudFoundryClient, "test-private-domain-id");
+        requestListSpaceServiceInstances(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
+
+        this.services
+            .unbindRoute(UnbindRouteServiceInstanceRequest.builder()
+                .domainName("test-domain-name")
+                .serviceInstanceName("test-service-instance-name")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Route test-domain-name does not exist"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void unbindRouteServiceInstanceServiceInstanceNotFound() {
+        requestListOrganizationPrivateDomains(this.cloudFoundryClient, "test-domain-name", TEST_ORGANIZATION_ID);
+        requestListRoutes(this.cloudFoundryClient, "test-private-domain-id");
+        requestListSpaceServiceInstancesEmpty(this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
+
+        this.services
+            .unbindRoute(UnbindRouteServiceInstanceRequest.builder()
+                .domainName("test-domain-name")
+                .serviceInstanceName("test-service-instance-name")
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Service instance test-service-instance-name does not exist"))
             .verify(Duration.ofSeconds(5));
     }
 
@@ -1562,6 +1612,17 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
                     .build()));
     }
 
+    private static void requestListRoutesEmpty(CloudFoundryClient cloudFoundryClient, String domainId) {
+        when(cloudFoundryClient.routes()
+            .list(ListRoutesRequest.builder()
+                .domainId(domainId)
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(ListRoutesResponse.builder())
+                    .build()));
+    }
+
     private static void requestListSpaceServiceBindings(CloudFoundryClient cloudFoundryClient, String serviceInstanceId, String applicationId) {
         when(cloudFoundryClient.serviceBindingsV2()
             .list(ListServiceBindingsRequest.builder()
@@ -1858,6 +1919,15 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
                             .build())
                         .build())
                     .build()));
+    }
+
+    private static void requestRemoveUserProvidedServiceInstanceRoute(CloudFoundryClient cloudFoundryClient, String routeId, String serviceInstanceId) {
+        when(cloudFoundryClient.userProvidedServiceInstances()
+            .removeRoute(RemoveUserProvidedServiceInstanceRouteRequest.builder()
+                .routeId(routeId)
+                .userProvidedServiceInstanceId(serviceInstanceId)
+                .build()))
+            .thenReturn(Mono.empty());
     }
 
     private static void requestRenameServiceInstance(CloudFoundryClient cloudFoundryClient, String serviceInstanceId, String newName) {

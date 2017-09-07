@@ -59,8 +59,10 @@ import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.stacks.DeleteStackRequest;
 import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.DeleteUserProvidedServiceInstanceRequest;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstanceRoutesRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstanceServiceBindingsRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstancesRequest;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.RemoveUserProvidedServiceInstanceRouteRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstanceResource;
 import org.cloudfoundry.client.v2.users.UserResource;
 import org.cloudfoundry.uaa.UaaClient;
@@ -149,8 +151,7 @@ final class CloudFoundryCleaner {
             .thenMany(Mono.when( // After Routes/Applications
                 cleanPrivateDomains(this.cloudFoundryClient, this.nameFactory),
                 cleanSharedDomains(this.cloudFoundryClient, this.nameFactory),
-                cleanSpaces(this.cloudFoundryClient, this.nameFactory),
-                cleanUserProvidedServiceInstances(this.cloudFoundryClient, this.nameFactory)
+                cleanSpaces(this.cloudFoundryClient, this.nameFactory)
             ))
             .thenMany(cleanOrganizations(this.cloudFoundryClient, this.nameFactory)) // After Spaces
             .thenMany(cleanOrganizationQuotaDefinitions(this.cloudFoundryClient, this.nameFactory)) // After Organizations
@@ -168,8 +169,7 @@ final class CloudFoundryCleaner {
                     .page(page)
                     .build()))
             .filter(application -> nameFactory.isApplicationName(ResourceUtils.getEntity(application).getName()))
-            .flatMap(application -> removeApplicationServiceBindings(cloudFoundryClient, application)
-                .thenMany(Flux.just(application)))
+            .delayUntil(application -> removeApplicationServiceBindings(cloudFoundryClient, application))
             .flatMap(application -> cloudFoundryClient.applicationsV2()
                 .delete(DeleteApplicationRequest.builder()
                     .applicationId(ResourceUtils.getId(application))
@@ -384,12 +384,9 @@ final class CloudFoundryCleaner {
                     .page(page)
                     .build()))
             .filter(serviceInstance -> nameFactory.isServiceInstanceName(ResourceUtils.getEntity(serviceInstance).getName()))
-            .flatMap(serviceInstance -> removeRouteAssociations(cloudFoundryClient, serviceInstance)
-                .thenMany(Flux.just(serviceInstance)))
-            .flatMap(serviceInstance -> removeServiceInstanceServiceBindings(cloudFoundryClient, serviceInstance)
-                .thenMany(Flux.just(serviceInstance)))
-            .flatMap(serviceInstance -> removeServiceKeys(cloudFoundryClient, serviceInstance)
-                .thenMany(Flux.just(serviceInstance)))
+            .delayUntil(serviceInstance -> removeRouteAssociations(cloudFoundryClient, serviceInstance))
+            .delayUntil(serviceInstance -> removeServiceInstanceServiceBindings(cloudFoundryClient, serviceInstance))
+            .delayUntil(serviceInstance -> removeServiceKeys(cloudFoundryClient, serviceInstance))
             .flatMap(serviceInstance -> cloudFoundryClient.serviceInstances()
                 .delete(DeleteServiceInstanceRequest.builder()
                     .async(true)
@@ -472,7 +469,7 @@ final class CloudFoundryCleaner {
                     .stackId(ResourceUtils.getId(stack))
                     .build()))
                 .flatMapMany(job -> JobUtils.waitForCompletion(cloudFoundryClient, Duration.ofMinutes(5), job))
-                .doOnError(t -> LOGGER.error("Unable to delete stak {}", ResourceUtils.getEntity(stack).getName(), t)));
+                .doOnError(t -> LOGGER.error("Unable to delete stack {}", ResourceUtils.getEntity(stack).getName(), t)));
     }
 
     private static Flux<Void> cleanUserProvidedServiceInstances(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
@@ -482,8 +479,8 @@ final class CloudFoundryCleaner {
                     .page(page)
                     .build()))
             .filter(userProvidedServiceInstance -> nameFactory.isServiceInstanceName(ResourceUtils.getEntity(userProvidedServiceInstance).getName()))
-            .flatMap(userProvidedServiceInstance -> removeUserProvidedServiceInstanceServiceBindings(cloudFoundryClient, userProvidedServiceInstance)
-                .thenMany(Flux.just(userProvidedServiceInstance)))
+            .delayUntil(userProvidedServiceInstance -> removeRouteAssociations(cloudFoundryClient, userProvidedServiceInstance))
+            .delayUntil(userProvidedServiceInstance -> removeUserProvidedServiceInstanceServiceBindings(cloudFoundryClient, userProvidedServiceInstance))
             .flatMap(userProvidedServiceInstance -> cloudFoundryClient.userProvidedServiceInstances()
                 .delete(DeleteUserProvidedServiceInstanceRequest.builder()
                     .userProvidedServiceInstanceId(ResourceUtils.getId(userProvidedServiceInstance))
@@ -572,6 +569,21 @@ final class CloudFoundryCleaner {
                 .unbindRoute(UnbindServiceInstanceRouteRequest.builder()
                     .routeId(ResourceUtils.getId(route))
                     .serviceInstanceId(ResourceUtils.getId(serviceInstance))
+                    .build())
+                .doOnError(t -> LOGGER.error("Unable to remove route binding from {}", ResourceUtils.getEntity(serviceInstance).getName(), t)));
+    }
+
+    private static Flux<Void> removeRouteAssociations(CloudFoundryClient cloudFoundryClient, UserProvidedServiceInstanceResource serviceInstance) {
+        return PaginationUtils
+            .requestClientV2Resources(page -> cloudFoundryClient.userProvidedServiceInstances()
+                .listRoutes(ListUserProvidedServiceInstanceRoutesRequest.builder()
+                    .page(page)
+                    .userProvidedServiceInstanceId(ResourceUtils.getId(serviceInstance))
+                    .build()))
+            .flatMap(route -> cloudFoundryClient.userProvidedServiceInstances()
+                .removeRoute(RemoveUserProvidedServiceInstanceRouteRequest.builder()
+                    .routeId(ResourceUtils.getId(route))
+                    .userProvidedServiceInstanceId(ResourceUtils.getId(serviceInstance))
                     .build())
                 .doOnError(t -> LOGGER.error("Unable to remove route binding from {}", ResourceUtils.getEntity(serviceInstance).getName(), t)));
     }
