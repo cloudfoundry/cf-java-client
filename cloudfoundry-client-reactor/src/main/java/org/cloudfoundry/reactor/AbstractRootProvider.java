@@ -30,7 +30,11 @@ import java.util.regex.Pattern;
  */
 public abstract class AbstractRootProvider implements RootProvider {
 
+    private static final int DEFAULT_PORT = 443;
+
     private static final Pattern HOSTNAME_PATTERN = Pattern.compile("^[a-zA-Z0-9-.]+$");
+
+    private static final int UNDEFINED_PORT = -1;
 
     @Value.Check
     public final void checkForValidApiHost() {
@@ -74,7 +78,15 @@ public abstract class AbstractRootProvider implements RootProvider {
     }
 
     protected final UriComponents normalize(UriComponentsBuilder builder) {
-        return builder.scheme(getScheme()).build().encode();
+        UriComponents components = builder.build();
+
+        builder.scheme(getScheme());
+
+        if (UNDEFINED_PORT == components.getPort()) {
+            builder.port(getPort().orElse(DEFAULT_PORT));
+        }
+
+        return builder.build().encode();
     }
 
     /**

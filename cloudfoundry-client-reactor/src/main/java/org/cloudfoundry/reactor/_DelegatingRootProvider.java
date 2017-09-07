@@ -38,17 +38,17 @@ abstract class _DelegatingRootProvider extends AbstractRootProvider {
     protected Mono<UriComponents> doGetRoot(String key, ConnectionContext connectionContext) {
         return getRootPayloadRootProvider().doGetRoot(key, connectionContext)
             .onErrorResume(t -> {
-                if ("cloud_controller_v2" .equals(key)) {
+                if ("cloud_controller_v2".equals(key)) {
                     return getInfoPayloadRootProvider().doGetRoot(connectionContext)
                         .map(uri -> UriComponentsBuilder.fromUriString(uri.toUriString()).pathSegment("v2").build());
-                } else if ("cloud_controller_v3" .equals(key)) {
+                } else if ("cloud_controller_v3".equals(key)) {
                     return getInfoPayloadRootProvider().doGetRoot(connectionContext)
                         .map(uri -> UriComponentsBuilder.fromUriString(uri.toUriString()).pathSegment("v3").build());
-                } else if ("logging" .equals(key)) {
+                } else if ("logging".equals(key)) {
                     return getInfoPayloadRootProvider().doGetRoot("logging_endpoint", connectionContext);
-                } else if ("routing" .equals(key)) {
+                } else if ("routing".equals(key)) {
                     return getInfoPayloadRootProvider().doGetRoot("routing_endpoint", connectionContext);
-                } else if ("uaa" .equals(key)) {
+                } else if ("uaa".equals(key)) {
                     return getInfoPayloadRootProvider().doGetRoot("token_endpoint", connectionContext);
                 } else {
                     return getInfoPayloadRootProvider().doGetRoot(key, connectionContext);

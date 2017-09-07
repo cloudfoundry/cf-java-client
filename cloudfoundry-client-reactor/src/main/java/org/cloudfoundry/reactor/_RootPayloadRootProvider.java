@@ -57,8 +57,7 @@ abstract class _RootPayloadRootProvider extends AbstractRootProvider {
     @SuppressWarnings("unchecked")
     @Value.Derived
     private Mono<Map<String, String>> getPayload(ConnectionContext connectionContext) {
-        return doGetRoot(connectionContext)
-            .map(UriComponents::toUriString)
+        return getRoot(connectionContext)
             .then(uri -> connectionContext.getHttpClient()
                 .get(uri, request -> Mono.just(request)
                     .map(UserAgent::addUserAgent)
