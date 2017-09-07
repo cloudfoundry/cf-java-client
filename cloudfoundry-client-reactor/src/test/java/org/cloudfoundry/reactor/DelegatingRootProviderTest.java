@@ -59,7 +59,7 @@ public final class DelegatingRootProviderTest extends AbstractRestTest {
         this.rootProvider
             .getRoot("cloud_controller_v2", CONNECTION_CONTEXT)
             .as(StepVerifier::create)
-            .expectNext("http://api.run.pivotal.io/v2")
+            .expectNext(String.format("http://api.run.pivotal.io:%d/v2", this.mockWebServer.getPort()))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -99,7 +99,7 @@ public final class DelegatingRootProviderTest extends AbstractRestTest {
         this.rootProvider
             .getRoot("cloud_controller_v3", CONNECTION_CONTEXT)
             .as(StepVerifier::create)
-            .expectNext("http://api.run.pivotal.io/v3")
+            .expectNext(String.format("http://api.run.pivotal.io:%d/v3", this.mockWebServer.getPort()))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -218,7 +218,7 @@ public final class DelegatingRootProviderTest extends AbstractRestTest {
         this.rootProvider
             .getRoot("network_policy_v1", CONNECTION_CONTEXT)
             .as(StepVerifier::create)
-            .expectNext("http://api.run.pivotal.io/networking/v1/external")
+            .expectNext(String.format("http://api.run.pivotal.io:%d/networking/v1/external", this.mockWebServer.getPort()))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -298,7 +298,7 @@ public final class DelegatingRootProviderTest extends AbstractRestTest {
         this.rootProvider
             .getRoot("uaa", CONNECTION_CONTEXT)
             .as(StepVerifier::create)
-            .expectNext("http://uaa.run.pivotal.io")
+            .expectNext(String.format("http://uaa.run.pivotal.io:%d", this.mockWebServer.getPort()))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }

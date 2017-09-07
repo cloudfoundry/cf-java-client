@@ -58,7 +58,7 @@ public final class RootPayloadRootProviderTest extends AbstractRestTest {
         this.rootProvider
             .getRoot("cloud_controller_v2", CONNECTION_CONTEXT)
             .as(StepVerifier::create)
-            .expectNext("http://api.run.pivotal.io/v2")
+            .expectNext(String.format("http://api.run.pivotal.io:%d/v2", this.mockWebServer.getPort()))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
