@@ -551,7 +551,7 @@ public final class DefaultServices implements Services {
 
     private static Mono<RouteResource> getRoute(CloudFoundryClient cloudFoundryClient, String domain, String domainId, String host, String path) {
         return getRoute(cloudFoundryClient, domainId, host, path)
-            .switchIfEmpty(ExceptionUtils.illegalArgument("Route %s.%s does not exist", host, domain));
+            .switchIfEmpty(ExceptionUtils.illegalArgument("Route %s does not exist", host == null ? domain : host + "." + domain));
     }
 
     private static Mono<RouteResource> getRoute(CloudFoundryClient cloudFoundryClient, String domainId, String host, String routePath) {
