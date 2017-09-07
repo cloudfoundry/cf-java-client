@@ -33,6 +33,7 @@ import org.cloudfoundry.client.v2.userprovidedserviceinstances.UpdateUserProvide
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstanceResource;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
@@ -80,7 +81,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
         String instanceName = this.nameFactory.getServiceInstanceName();
 
         this.spaceId
-            .then(spaceId -> getCreateUserProvidedServiceInstanceId(this.cloudFoundryClient, instanceName, spaceId))
+            .then(spaceId -> createUserProvidedServiceInstanceId(this.cloudFoundryClient, instanceName, spaceId))
             .then(instanceId -> this.cloudFoundryClient.userProvidedServiceInstances()
                 .delete(DeleteUserProvidedServiceInstanceRequest.builder()
                     .userProvidedServiceInstanceId(instanceId)
@@ -96,7 +97,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
         String instanceName = this.nameFactory.getServiceInstanceName();
 
         this.spaceId
-            .then(spaceId -> getCreateUserProvidedServiceInstanceId(this.cloudFoundryClient, instanceName, spaceId))
+            .then(spaceId -> createUserProvidedServiceInstanceId(this.cloudFoundryClient, instanceName, spaceId))
             .then(instanceId -> this.cloudFoundryClient.userProvidedServiceInstances()
                 .get(GetUserProvidedServiceInstanceRequest.builder()
                     .userProvidedServiceInstanceId(instanceId)
@@ -128,6 +129,12 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    //TODO - Ready to implement, see https://github.com/cloudfoundry/cf-java-client/issues/812
+    @Ignore("Ready to implement, see https://github.com/cloudfoundry/cf-java-client/issues/812")
+    @Test
+    public void listRoutes() throws TimeoutException, InterruptedException {
+    }
+
     @Test
     public void listServiceBindings() throws TimeoutException, InterruptedException {
         String applicationName = this.nameFactory.getApplicationName();
@@ -135,8 +142,8 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
 
         this.spaceId
             .then(spaceId -> Mono.when(
-                getCreateApplicationId(this.cloudFoundryClient, applicationName, spaceId),
-                getCreateUserProvidedServiceInstanceId(this.cloudFoundryClient, instanceName, spaceId)
+                createApplicationId(this.cloudFoundryClient, applicationName, spaceId),
+                createUserProvidedServiceInstanceId(this.cloudFoundryClient, instanceName, spaceId)
             ))
             .as(thenKeep(function((applicationId, instanceId) -> this.cloudFoundryClient.serviceBindingsV2()
                 .create(CreateServiceBindingRequest.builder()
@@ -167,7 +174,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
         String newInstanceName = this.nameFactory.getServiceInstanceName();
 
         this.spaceId
-            .then(spaceId -> getCreateUserProvidedServiceInstanceId(this.cloudFoundryClient, instanceName, spaceId))
+            .then(spaceId -> createUserProvidedServiceInstanceId(this.cloudFoundryClient, instanceName, spaceId))
             .then(instanceId -> Mono
                 .when(
                     Mono.just(instanceId),
@@ -199,12 +206,12 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    private static Mono<String> getCreateApplicationId(CloudFoundryClient cloudFoundryClient, String applicationName, String spaceId) {
+    private static Mono<String> createApplicationId(CloudFoundryClient cloudFoundryClient, String applicationName, String spaceId) {
         return requestCreateApplication(cloudFoundryClient, spaceId, applicationName)
             .map(ResourceUtils::getId);
     }
 
-    private static Mono<String> getCreateUserProvidedServiceInstanceId(CloudFoundryClient cloudFoundryClient, String instanceName, String spaceId) {
+    private static Mono<String> createUserProvidedServiceInstanceId(CloudFoundryClient cloudFoundryClient, String instanceName, String spaceId) {
         return requestCreateUserProvidedServiceInstance(cloudFoundryClient, instanceName, spaceId)
             .map(ResourceUtils::getId);
     }

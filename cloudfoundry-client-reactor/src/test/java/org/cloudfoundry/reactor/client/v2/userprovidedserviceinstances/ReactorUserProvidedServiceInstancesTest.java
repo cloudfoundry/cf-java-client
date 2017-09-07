@@ -17,6 +17,8 @@
 package org.cloudfoundry.reactor.client.v2.userprovidedserviceinstances;
 
 import org.cloudfoundry.client.v2.Metadata;
+import org.cloudfoundry.client.v2.routes.RouteEntity;
+import org.cloudfoundry.client.v2.routes.RouteResource;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingEntity;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingResource;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.AssociateUserProvidedServiceInstanceRouteRequest;
@@ -26,6 +28,8 @@ import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvide
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.DeleteUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.GetUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.GetUserProvidedServiceInstanceResponse;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstanceRoutesRequest;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstanceRoutesResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstanceServiceBindingsRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstanceServiceBindingsResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstancesRequest;
@@ -236,6 +240,51 @@ public final class ReactorUserProvidedServiceInstancesTest extends AbstractClien
                         .spaceUrl("/v2/spaces/2fff6e71-d329-4991-9c89-7fa8abca70df")
                         .serviceBindingsUrl("/v2/user_provided_service_instances/8db6d37b-1ca8-4d0a-b1d3-2a6aaceae866/service_bindings")
                         .routesUrl("/v2/user_provided_service_instances/8db6d37b-1ca8-4d0a-b1d3-2a6aaceae866/routes")
+                        .build())
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void listRoutes() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/user_provided_service_instances/500e64c6-7f70-4e3b-ab7b-940a6303d79b/routes")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/user_provided_service_instances/GET_{id}_routes_response.json")
+                .build())
+            .build());
+
+        this.userProvidedServiceInstances
+            .listRoutes(ListUserProvidedServiceInstanceRoutesRequest.builder()
+                .userProvidedServiceInstanceId("500e64c6-7f70-4e3b-ab7b-940a6303d79b")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ListUserProvidedServiceInstanceRoutesResponse.builder()
+                .totalResults(1)
+                .totalPages(1)
+                .resource(RouteResource.builder()
+                    .metadata(Metadata.builder()
+                        .createdAt("2016-06-08T16:41:33Z")
+                        .id("d6e18af9-9d84-4a53-a301-ab9bef03a7b0")
+                        .updatedAt("2016-06-08T16:41:33Z")
+                        .url("/v2/routes/d6e18af9-9d84-4a53-a301-ab9bef03a7b0")
+                        .build())
+                    .entity(RouteEntity.builder()
+                        .applicationsUrl("/v2/routes/d6e18af9-9d84-4a53-a301-ab9bef03a7b0/apps")
+                        .domainId("428b9275-47a6-481b-97e3-d93ae18611ee")
+                        .domainUrl("/v2/private_domains/428b9275-47a6-481b-97e3-d93ae18611ee")
+                        .host("host-24")
+                        .path("")
+                        .routeMappingsUrl("/v2/routes/d6e18af9-9d84-4a53-a301-ab9bef03a7b0/route_mappings")
+                        .serviceInstanceId("500e64c6-7f70-4e3b-ab7b-940a6303d79b")
+                        .serviceInstanceUrl("/v2/user_provided_service_instances/500e64c6-7f70-4e3b-ab7b-940a6303d79b")
+                        .spaceId("dc7dd379-1ffb-4168-b2b4-773fe141dd2e")
+                        .spaceUrl("/v2/spaces/dc7dd379-1ffb-4168-b2b4-773fe141dd2e")
                         .build())
                     .build())
                 .build())

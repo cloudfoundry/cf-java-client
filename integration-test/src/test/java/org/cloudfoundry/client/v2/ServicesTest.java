@@ -35,6 +35,7 @@ import org.cloudfoundry.client.v2.spaces.CreateSpaceResponse;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
@@ -249,6 +250,13 @@ public final class ServicesTest extends AbstractIntegrationTest {
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
+
+    //TODO - Ready to implement, see https://github.com/cloudfoundry/cf-java-client/issues/812
+    @Ignore("Ready to implement, see https://github.com/cloudfoundry/cf-java-client/issues/812")
+    @Test
+    public void listRoutes() {
+    }
+
 
     @Test
     public void listServicePlans() {
