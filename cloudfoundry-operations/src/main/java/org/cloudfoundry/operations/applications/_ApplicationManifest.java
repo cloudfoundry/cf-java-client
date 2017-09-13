@@ -49,8 +49,18 @@ abstract class _ApplicationManifest {
             }
         }
 
-        if (getDockerImage() != null && getPath() != null) {
-            throw new IllegalStateException("docker image and path cannot both be set");
+        if (getDocker() != null) {
+            if (getDocker().getImage() != null && getBuildpack() != null) {
+                throw new IllegalStateException("docker image and buildpack cannot both be set");
+            }
+
+            if (getDocker().getImage() != null && getPath() != null) {
+                throw new IllegalStateException("docker image and path cannot both be set");
+            }
+
+            if (getDocker().getImage() == null && (getDocker().getUsername() != null || getDocker().getPassword() != null)) {
+                throw new IllegalStateException("docker credentials require docker image to be set");
+            }
         }
     }
 
@@ -76,11 +86,11 @@ abstract class _ApplicationManifest {
     abstract Integer getDisk();
 
     /**
-     * The docker image
+     * The docker information
      */
-    @JsonProperty("docker_image")
+    @JsonProperty("docker")
     @Nullable
-    abstract String getDockerImage();
+    abstract Docker getDocker();
 
     /**
      * The collection of domains bound to the application
