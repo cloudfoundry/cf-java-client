@@ -25,9 +25,9 @@ import java.util.Random;
 
 final class RandomNameFactory implements NameFactory {
 
-    private static final int PORT_MAXIMUM = 65_535;
+    private static final int PORT_MAXIMUM = 61_099;
 
-    private static final int PORT_MINIMUM = 1_024;
+    private static final int PORT_MINIMUM = 61_001;
 
     private final Random random;
 
