@@ -142,6 +142,12 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
      */
     abstract Optional<Duration> getConnectTimeout();
 
+    @Value.Derived
+    Optional<PoolResources> getConnectionPool() {
+        return Optional.ofNullable(getConnectionPoolSize())
+            .map(connectionPoolSize -> PoolResources.fixed("cloudfoundry-client", connectionPoolSize));
+    }
+
     /**
      * The {@code SO_KEEPALIVE} value
      */
@@ -196,12 +202,8 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
      */
     abstract Optional<Duration> getSslHandshakeTimeout();
 
-    private Optional<PoolResources> getConnectionPool() {
-        return Optional.ofNullable(getConnectionPoolSize())
-            .map(connectionPoolSize -> PoolResources.fixed("cloudfoundry-client", connectionPoolSize));
-    }
-
-    private LoopResources getThreadPool() {
+    @Value.Derived
+    LoopResources getThreadPool() {
         return LoopResources.create("cloudfoundry-client", getThreadPoolSize(), true);
     }
 
