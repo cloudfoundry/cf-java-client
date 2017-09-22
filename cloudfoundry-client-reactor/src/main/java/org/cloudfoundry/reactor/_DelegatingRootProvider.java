@@ -45,7 +45,7 @@ abstract class _DelegatingRootProvider extends AbstractRootProvider {
                     return getInfoPayloadRootProvider().doGetRoot(connectionContext)
                         .map(uri -> UriComponentsBuilder.fromUriString(uri.toUriString()).pathSegment("v3").build());
                 } else if ("logging".equals(key)) {
-                    return getInfoPayloadRootProvider().doGetRoot("logging_endpoint", connectionContext);
+                    return getInfoPayloadRootProvider().doGetRoot("doppler_logging_endpoint", connectionContext);
                 } else if ("routing".equals(key)) {
                     return getInfoPayloadRootProvider().doGetRoot("routing_endpoint", connectionContext);
                 } else if ("uaa".equals(key)) {

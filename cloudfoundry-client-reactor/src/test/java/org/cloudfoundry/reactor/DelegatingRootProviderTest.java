@@ -169,7 +169,7 @@ public final class DelegatingRootProviderTest extends AbstractRestTest {
         this.rootProvider
             .getRoot("logging", CONNECTION_CONTEXT)
             .as(StepVerifier::create)
-            .expectNext("http://loggregator.vcap.me:80")
+            .expectNext("http://doppler.vcap.me:80")
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
