@@ -13,5 +13,6 @@
   "app_ssh_host_key_fingerprint": "47:0d:d1:c8:c3:3d:0a:36:d1:49:2f:f2:90:27:31:d0",
   "app_ssh_oauth_client": null,
   "routing_endpoint": "http://localhost:3000",
-  "logging_endpoint": "ws://loggregator.vcap.me:80"
+  "logging_endpoint": "ws://loggregator.vcap.me:80",
+  "doppler_logging_endpoint": "ws://doppler.vcap.me:80"
 }
