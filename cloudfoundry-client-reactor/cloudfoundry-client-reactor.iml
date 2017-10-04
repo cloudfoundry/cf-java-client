@@ -25,10 +25,10 @@
     <orderEntry type="library" name="Maven: com.squareup.okio:okio:1.11.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.bouncycastle:bcprov-jdk15on:1.50" level="project" />
     <orderEntry type="library" name="Maven: io.jsonwebtoken:jjwt:0.7.0" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: io.projectreactor:reactor-test:3.1.0.BUILD-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: io.projectreactor:reactor-core:3.1.0.BUILD-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: io.projectreactor:reactor-test:3.1.0.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: io.projectreactor:reactor-core:3.1.0.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.reactivestreams:reactive-streams:1.0.1" level="project" />
-    <orderEntry type="library" name="Maven: io.projectreactor.ipc:reactor-netty:0.7.0.BUILD-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: io.projectreactor.ipc:reactor-netty:0.7.0.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: io.netty:netty-codec-http:4.1.15.Final" level="project" />
     <orderEntry type="library" name="Maven: io.netty:netty-codec:4.1.15.Final" level="project" />
     <orderEntry type="library" name="Maven: io.netty:netty-handler:4.1.15.Final" level="project" />
