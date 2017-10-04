@@ -14,36 +14,29 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.applications;
+package org.cloudfoundry.client.v2.serviceplans;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
+/**
+ * The entity representing a service instance schema
+ */
 @JsonDeserialize
 @Value.Immutable
-abstract class _InstanceStatistics {
+abstract class _ServiceInstanceSchema {
 
     /**
-     * The isolation segment
+     * The create schema
      */
-    @JsonProperty("isolation_segment")
-    @Nullable
-    abstract String getIsolationSegment();
+    @JsonProperty("create")
+    abstract Schema getCreate();
 
     /**
-     * The instance state
+     * The update schema
      */
-    @JsonProperty("state")
-    @Nullable
-    abstract String getState();
-
-    /**
-     * The instance statistics
-     */
-    @JsonProperty("stats")
-    @Nullable
-    abstract Statistics getStatistics();
+    @JsonProperty("update")
+    abstract Schema getUpdate();
 
 }

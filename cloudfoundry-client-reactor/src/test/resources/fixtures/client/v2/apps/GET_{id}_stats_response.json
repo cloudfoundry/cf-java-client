@@ -1,6 +1,7 @@
 {
   "0": {
     "state": "RUNNING",
+    "isolation_segment": "iso-seg-name",
     "stats": {
       "usage": {
         "disk": 66392064,
