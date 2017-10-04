@@ -79,6 +79,13 @@ abstract class _ServicePlanEntity {
     abstract Boolean getPubliclyVisible();
 
     /**
+     * The schemas
+     */
+    @JsonProperty("schemas")
+    @Nullable
+    abstract Schemas getSchemas();
+
+    /**
      * The service id
      */
     @JsonProperty("service_guid")

@@ -800,6 +800,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
             .expectNext(ApplicationStatisticsResponse.builder()
                 .instance("0", InstanceStatistics.builder()
                     .state("RUNNING")
+                    .isolationSegment("iso-seg-name")
                     .statistics(org.cloudfoundry.client.v2.applications.Statistics.builder()
                         .usage(Usage.builder()
                             .disk(66392064L)
