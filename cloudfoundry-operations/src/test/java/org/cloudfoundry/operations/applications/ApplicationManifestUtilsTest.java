@@ -372,6 +372,25 @@ public final class ApplicationManifestUtilsTest {
     }
 
     @Test
+    public void readCommonInheritance() throws IOException {
+        List<ApplicationManifest> expected = Arrays.asList(
+            ApplicationManifest.builder()
+                .buildpack("https://github.com/cloudfoundry/java-buildpack#v4.5.2")
+                .memory(1024)
+                .path(Paths.get("/target/demo.jar"))
+                .environmentVariable("JBP_CONFIG_OPEN_JDK_JRE", "{ jre: { version: 1.8.0_+ } }")
+                .name("demo")
+                .instances(2)
+                .stack("dev")
+                .environmentVariable("SOME_ENV", "test")
+            .build());
+
+        List<ApplicationManifest> actual = ApplicationManifestUtils.read(new ClassPathResource("fixtures/manifest-dev.yml").getFile().toPath());
+
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
     public void readNoApplications() throws IOException {
         List<ApplicationManifest> actual = ApplicationManifestUtils.read(new ClassPathResource("fixtures/manifest-hotel.yml").getFile().toPath());
 

@@ -1,0 +1,8 @@
+---
+inherit: base-manifest.yml
+applications:
+- name: demo
+  instances: 2
+  stack: dev
+  env:
+    SOME_ENV: "test"

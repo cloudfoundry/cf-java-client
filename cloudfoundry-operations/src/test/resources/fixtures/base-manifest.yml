@@ -1,0 +1,9 @@
+---
+buildpack: https://github.com/cloudfoundry/java-buildpack#v4.5.2
+memory: 1G
+path: /target/demo.jar
+env:
+  JBP_CONFIG_OPEN_JDK_JRE: '{ jre: { version: 1.8.0_+ } }'
+
+#applications:
+#- name: demo
