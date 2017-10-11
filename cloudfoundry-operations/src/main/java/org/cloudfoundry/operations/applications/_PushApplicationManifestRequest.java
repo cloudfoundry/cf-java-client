@@ -19,7 +19,6 @@ package org.cloudfoundry.operations.applications;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
-import java.nio.file.Path;
 import java.time.Duration;
 import java.util.List;
 
@@ -28,6 +27,29 @@ import java.util.List;
  */
 @Value.Immutable
 abstract class _PushApplicationManifestRequest {
+
+    @Value.Check
+    void check() {
+        if (getDockerPassword() != null && getDockerUsername() == null) {
+            throw new IllegalStateException("Docker password requires username");
+        }
+
+        if (getDockerUsername() != null && getDockerPassword() == null) {
+            throw new IllegalStateException("Docker username requires password");
+        }
+    }
+
+    /**
+     * The Docker repository password
+     */
+    @Nullable
+    abstract String getDockerPassword();
+
+    /**
+     * The Docker repository username
+     */
+    @Nullable
+    abstract String getDockerUsername();
 
     /**
      * The manifests to be pushed
