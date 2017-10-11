@@ -23,11 +23,35 @@ import java.nio.file.Paths;
 public final class ApplicationManifestTest {
 
     @Test(expected = IllegalStateException.class)
+    public void dockerAndBuildpack() {
+        ApplicationManifest.builder()
+            .name("test-name")
+            .buildpack("test-buildpack")
+            .docker(Docker.builder()
+                .image("test-docker-image")
+                .build())
+            .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
     public void dockerAndPath() {
         ApplicationManifest.builder()
             .name("test-name")
-            .dockerImage("test-docker-image")
+            .docker(Docker.builder()
+                .image("test-docker-image")
+                .build())
             .path(Paths.get("test-application"))
+            .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void dockerCredentialsNoImage() {
+        ApplicationManifest.builder()
+            .name("test-name")
+            .docker(Docker.builder()
+                .password("test-password")
+                .username("test-username")
+                .build())
             .build();
     }
 

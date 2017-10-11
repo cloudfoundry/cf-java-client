@@ -38,6 +38,18 @@ abstract class _PushApplicationRequest {
         if ((getApplication() != null || getPath() != null) && getDockerImage() != null) {
             throw new IllegalStateException("Only one of path or dockerImage can be supplied");
         }
+
+        if (getDockerImage() == null && (getDockerPassword() != null || getDockerUsername() != null)) {
+            throw new IllegalStateException("Docker credentials require docker image to be set");
+        }
+
+        if (getDockerPassword() != null && getDockerUsername() == null) {
+            throw new IllegalStateException("Docker password requires username");
+        }
+
+        if (getDockerPassword() == null && getDockerUsername() != null) {
+            throw new IllegalStateException("Docker username requires password");
+        }
     }
 
     /**
@@ -74,6 +86,18 @@ abstract class _PushApplicationRequest {
      */
     @Nullable
     abstract String getDockerImage();
+
+    /**
+     * The Docker repository password
+     */
+    @Nullable
+    abstract String getDockerPassword();
+
+    /**
+     * The Docker repository username
+     */
+    @Nullable
+    abstract String getDockerUsername();
 
     /**
      * The domain for the application
