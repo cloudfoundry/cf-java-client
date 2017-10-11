@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor;
 
+import org.junit.After;
 import org.junit.Test;
 import reactor.test.StepVerifier;
 
@@ -26,11 +27,16 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class DefaultConnectionContextTest extends AbstractRestTest {
 
-    private final ConnectionContext connectionContext = DefaultConnectionContext.builder()
+    private final DefaultConnectionContext connectionContext = DefaultConnectionContext.builder()
         .apiHost(this.mockWebServer.getHostName())
         .port(this.mockWebServer.getPort())
         .secure(false)
         .build();
+
+    @After
+    public void dispose() {
+        this.connectionContext.dispose();
+    }
 
     @Test
     public void getInfo() throws Exception {
