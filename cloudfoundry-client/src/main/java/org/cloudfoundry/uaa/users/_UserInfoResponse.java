@@ -64,7 +64,7 @@ abstract class _UserInfoResponse {
      */
     @JsonProperty("previous_logon_time")
     @Nullable
-    abstract Integer getPreviousLogonTime();
+    abstract Long getPreviousLogonTime();
 
     /**
      * The user sub
