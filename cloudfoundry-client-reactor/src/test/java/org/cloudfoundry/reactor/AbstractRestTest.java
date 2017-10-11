@@ -28,7 +28,6 @@ import org.junit.After;
 import org.junit.ComparisonFailure;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import reactor.core.publisher.Mono;
-import reactor.ipc.netty.http.client.HttpClient;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -43,7 +42,7 @@ public abstract class AbstractRestTest {
 
     protected static final ConnectionContext CONNECTION_CONTEXT = DefaultConnectionContext.builder()
         .apiHost("localhost")
-        .httpClient(HttpClient.create())
+        .secure(false)
         .problemHandler(new FailingDeserializationProblemHandler())  // Test-only problem handler
         .build();
 
