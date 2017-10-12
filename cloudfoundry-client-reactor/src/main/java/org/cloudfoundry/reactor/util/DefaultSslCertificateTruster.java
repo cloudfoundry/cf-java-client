@@ -16,10 +16,13 @@
 
 package org.cloudfoundry.reactor.util;
 
+import io.netty.buffer.ByteBufAllocator;
 import org.cloudfoundry.reactor.ProxyConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import reactor.core.publisher.Mono;
 import reactor.ipc.netty.options.ClientOptions;
+import reactor.ipc.netty.resources.LoopResources;
 import reactor.ipc.netty.tcp.TcpClient;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
@@ -40,18 +43,26 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static io.netty.channel.ChannelOption.ALLOCATOR;
+
 public final class DefaultSslCertificateTruster implements SslCertificateTruster {
 
     private final Logger logger = LoggerFactory.getLogger("cloudfoundry-client.trust");
+
+    private final ByteBufAllocator allocator;
 
     private final AtomicReference<X509TrustManager> delegate;
 
     private final Optional<ProxyConfiguration> proxyConfiguration;
 
+    private final LoopResources threadPool;
+
     private final Set<Tuple2<String, Integer>> trustedHostsAndPorts;
 
-    public DefaultSslCertificateTruster(Optional<ProxyConfiguration> proxyConfiguration) {
+    public DefaultSslCertificateTruster(ByteBufAllocator allocator, Optional<ProxyConfiguration> proxyConfiguration, LoopResources threadPool) {
+        this.allocator = allocator;
         this.proxyConfiguration = proxyConfiguration;
+        this.threadPool = threadPool;
         this.delegate = new AtomicReference<>(getTrustManager(getTrustManagerFactory(null)));
         this.trustedHostsAndPorts = Collections.newSetFromMap(new ConcurrentHashMap<>());
     }
@@ -72,24 +83,25 @@ public final class DefaultSslCertificateTruster implements SslCertificateTruster
     }
 
     @Override
-    public void trust(String host, int port, Duration duration) {
+    public Mono<Void> trust(String host, int port, Duration duration) {
         Tuple2<String, Integer> hostAndPort = Tuples.of(host, port);
         if (this.trustedHostsAndPorts.contains(hostAndPort)) {
-            return;
+            return Mono.empty();
         }
 
         this.logger.warn("Trusting SSL Certificate for {}:{}", host, port);
 
         X509TrustManager trustManager = this.delegate.get();
-        X509Certificate[] untrustedCertificates = getUntrustedCertificates(duration, host, port, this.proxyConfiguration, trustManager);
 
-        if (untrustedCertificates != null) {
-            KeyStore trustStore = addToTrustStore(untrustedCertificates, trustManager);
-            this.delegate.set(getTrustManager(getTrustManagerFactory(trustStore)));
-        }
+        return getUntrustedCertificates(duration, host, port, this.allocator, this.proxyConfiguration, this.threadPool, trustManager)
+            .doOnNext(untrustedCertificates -> {
+                KeyStore trustStore = addToTrustStore(untrustedCertificates, trustManager);
+                this.delegate.set(getTrustManager(getTrustManagerFactory(trustStore)));
 
-        this.trustedHostsAndPorts.add(hostAndPort);
-        this.logger.debug("Trusted SSL Certificate for {}:{}", host, port);
+                this.trustedHostsAndPorts.add(hostAndPort);
+                this.logger.debug("Trusted SSL Certificate for {}:{}", host, port);
+            })
+            .then();
     }
 
     private static KeyStore addToTrustStore(X509Certificate[] untrustedCertificates, X509TrustManager trustManager) {
@@ -111,9 +123,13 @@ public final class DefaultSslCertificateTruster implements SslCertificateTruster
         }
     }
 
-    private static TcpClient getTcpClient(Optional<ProxyConfiguration> proxyConfiguration, CertificateCollectingTrustManager collector, String host, int port) {
+    private static TcpClient getTcpClient(ByteBufAllocator allocator, Optional<ProxyConfiguration> proxyConfiguration, LoopResources threadPool, CertificateCollectingTrustManager collector,
+                                          String host, int port) {
+
         return TcpClient.create(options -> {
             options.connect(host, port)
+                .loopResources(threadPool)
+                .option(ALLOCATOR, allocator)
                 .disablePool()
                 .sslSupport(ssl -> ssl.trustManager(new StaticTrustManagerFactory(collector)));
 
@@ -142,23 +158,27 @@ public final class DefaultSslCertificateTruster implements SslCertificateTruster
         }
     }
 
-    private static X509Certificate[] getUntrustedCertificates(Duration duration, String host, int port, Optional<ProxyConfiguration> proxyConfiguration, X509TrustManager delegate) {
+    private static Mono<X509Certificate[]> getUntrustedCertificates(Duration duration, String host, int port, ByteBufAllocator allocator, Optional<ProxyConfiguration> proxyConfiguration,
+                                                                    LoopResources threadPool, X509TrustManager delegate) {
+
         CertificateCollectingTrustManager collector = new CertificateCollectingTrustManager(delegate);
 
-        getTcpClient(proxyConfiguration, collector, host, port)
+        return getTcpClient(allocator, proxyConfiguration, threadPool, collector, host, port)
             .newHandler((inbound, outbound) -> inbound.receive().then())
-            .block(duration);
+            .timeout(duration)
+            .handle((c, sink) -> {
+                X509Certificate[] chain = collector.getCollectedCertificateChain();
 
-        X509Certificate[] chain = collector.getCollectedCertificateChain();
-        if (chain == null) {
-            throw new IllegalStateException("Could not obtain server certificate chain");
-        }
+                if (chain == null) {
+                    sink.error(new IllegalStateException("Could not obtain server certificate chain"));
+                }
 
-        if (collector.isTrusted()) {
-            return null;
-        } else {
-            return chain;
-        }
+                if (collector.isTrusted()) {
+                    sink.complete();
+                } else {
+                    sink.next(chain);
+                }
+            });
     }
 
 }

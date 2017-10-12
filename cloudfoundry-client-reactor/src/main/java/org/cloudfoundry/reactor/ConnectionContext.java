@@ -17,6 +17,7 @@
 package org.cloudfoundry.reactor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import reactor.core.publisher.Mono;
 import reactor.ipc.netty.http.client.HttpClient;
 
 /**
@@ -45,6 +46,6 @@ public interface ConnectionContext {
      * @param host the host of the endpoint to trust
      * @param port the port of the endpoint to trust
      */
-    void trust(String host, int port);
+    Mono<Void> trust(String host, int port);
 
 }
