@@ -53,7 +53,7 @@ public abstract class AbstractRootProvider implements RootProvider {
     @Override
     public final Mono<String> getRoot(ConnectionContext connectionContext) {
         return doGetRoot(connectionContext)
-            .doOnNext(uri -> trust(uri.getHost(), uri.getPort(), connectionContext))
+            .delayUntil(uri -> trust(uri.getHost(), uri.getPort(), connectionContext))
             .map(UriComponents::toUriString)
             .cache();
     }
@@ -61,7 +61,7 @@ public abstract class AbstractRootProvider implements RootProvider {
     @Override
     public final Mono<String> getRoot(String key, ConnectionContext connectionContext) {
         return doGetRoot(key, connectionContext)
-            .doOnNext(uri -> trust(uri.getHost(), uri.getPort(), connectionContext))
+            .delayUntil(uri -> trust(uri.getHost(), uri.getPort(), connectionContext))
             .map(UriComponents::toUriString)
             .cache();
     }
@@ -107,8 +107,8 @@ public abstract class AbstractRootProvider implements RootProvider {
         }
     }
 
-    private void trust(String host, int port, ConnectionContext connectionContext) {
-        connectionContext.trust(host, port);
+    private Mono<Void> trust(String host, int port, ConnectionContext connectionContext) {
+        return connectionContext.trust(host, port);
     }
 
 }

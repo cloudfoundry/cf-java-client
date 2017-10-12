@@ -16,6 +16,8 @@
 
 package org.cloudfoundry.reactor.util;
 
+import reactor.core.publisher.Mono;
+
 import javax.net.ssl.X509TrustManager;
 import java.time.Duration;
 
@@ -31,6 +33,6 @@ public interface SslCertificateTruster extends X509TrustManager {
      * @param port     the port
      * @param duration the duration to wait
      */
-    void trust(String host, int port, Duration duration);
+    Mono<Void> trust(String host, int port, Duration duration);
 
 }

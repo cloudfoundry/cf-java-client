@@ -20,11 +20,14 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import io.netty.buffer.ByteBufAllocator;
+import io.netty.buffer.PooledByteBufAllocator;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.reactor.util.DefaultSslCertificateTruster;
 import org.cloudfoundry.reactor.util.SslCertificateTruster;
 import org.cloudfoundry.reactor.util.StaticTrustManagerFactory;
 import org.immutables.value.Value;
+import reactor.core.publisher.Mono;
 import reactor.ipc.netty.http.client.HttpClient;
 import reactor.ipc.netty.resources.LoopResources;
 import reactor.ipc.netty.resources.PoolResources;
@@ -36,6 +39,7 @@ import java.util.Optional;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
+import static io.netty.channel.ChannelOption.ALLOCATOR;
 import static io.netty.channel.ChannelOption.CONNECT_TIMEOUT_MILLIS;
 import static io.netty.channel.ChannelOption.SO_KEEPALIVE;
 import static io.netty.channel.ChannelOption.SO_RCVBUF;
@@ -76,6 +80,7 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
             options
                 .compression(true)
                 .loopResources(getThreadPool())
+                .option(ALLOCATOR, getAllocator())
                 .option(SO_SNDBUF, SEND_BUFFER_SIZE)
                 .option(SO_RCVBUF, RECEIVE_BUFFER_SIZE)
                 .disablePool();
@@ -127,8 +132,15 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
     }
 
     @Override
-    public void trust(String host, int port) {
-        getSslCertificateTruster().ifPresent(t -> t.trust(host, port, Duration.ofSeconds(30)));
+    public Mono<Void> trust(String host, int port) {
+        return getSslCertificateTruster()
+            .map(t -> t.trust(host, port, Duration.ofSeconds(30)))
+            .orElse(Mono.empty());
+    }
+
+    @Value.Derived
+    ByteBufAllocator getAllocator() {
+        return new PooledByteBufAllocator(false, 16, 16, 8192, 7, 512, 256, 64, true, 0);
     }
 
     /**
@@ -181,7 +193,7 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
     @Value.Derived
     Optional<SslCertificateTruster> getSslCertificateTruster() {
         if (getSkipSslValidation().orElse(false)) {
-            return Optional.of(new DefaultSslCertificateTruster(getProxyConfiguration()));
+            return Optional.of(new DefaultSslCertificateTruster(getAllocator(), getProxyConfiguration(), getThreadPool()));
         } else {
             return Optional.empty();
         }
