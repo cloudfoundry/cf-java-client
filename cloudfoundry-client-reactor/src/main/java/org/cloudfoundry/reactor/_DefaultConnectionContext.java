@@ -23,10 +23,13 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.PooledByteBufAllocator;
 import org.cloudfoundry.Nullable;
+import org.cloudfoundry.reactor.util.ByteBufAllocatorMetricProviderWrapper;
 import org.cloudfoundry.reactor.util.DefaultSslCertificateTruster;
 import org.cloudfoundry.reactor.util.SslCertificateTruster;
 import org.cloudfoundry.reactor.util.StaticTrustManagerFactory;
 import org.immutables.value.Value;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
 import reactor.ipc.netty.http.client.HttpClient;
 import reactor.ipc.netty.options.ClientOptions;
@@ -34,6 +37,9 @@ import reactor.ipc.netty.resources.LoopResources;
 import reactor.ipc.netty.resources.PoolResources;
 
 import javax.annotation.PreDestroy;
+import javax.management.JMException;
+import javax.management.ObjectName;
+import java.lang.management.ManagementFactory;
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
@@ -55,6 +61,8 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
     private static final int RECEIVE_BUFFER_SIZE = 10 * 1024 * 1024;
 
     private static final int SEND_BUFFER_SIZE = 10 * 1024 * 1024;
+
+    private final Logger logger = LoggerFactory.getLogger("cloudfoundry-client");
 
     /**
      * Disposes resources created to service this connection context
@@ -139,7 +147,16 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
 
     @Value.Derived
     ByteBufAllocator getAllocator() {
-        return new PooledByteBufAllocator(false, 16, 16, 8192, 7, 512, 256, 64, true, 0);
+        PooledByteBufAllocator byteBufAllocator = new PooledByteBufAllocator(false, 16, 16, 8192, 7, 512, 256, 64, true, 0);
+
+        try {
+            ManagementFactory.getPlatformMBeanServer()
+                .registerMBean(new ByteBufAllocatorMetricProviderWrapper(byteBufAllocator), ObjectName.getInstance("org.cloudfoundry.reactor:type=ByteBufAllocator"));
+        } catch (JMException e) {
+            this.logger.error("Unable to register ByteBufAllocator MBean", e);
+        }
+
+        return byteBufAllocator;
     }
 
     /**
