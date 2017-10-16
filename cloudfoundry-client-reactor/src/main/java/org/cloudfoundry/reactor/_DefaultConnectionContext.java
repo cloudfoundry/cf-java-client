@@ -20,7 +20,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.PooledByteBufAllocator;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.reactor.util.ByteBufAllocatorMetricProviderWrapper;
@@ -35,6 +34,7 @@ import reactor.ipc.netty.http.client.HttpClient;
 import reactor.ipc.netty.resources.LoopResources;
 import reactor.ipc.netty.resources.PoolResources;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.management.JMException;
 import javax.management.ObjectName;
@@ -45,7 +45,6 @@ import java.util.Optional;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
-import static io.netty.channel.ChannelOption.ALLOCATOR;
 import static io.netty.channel.ChannelOption.CONNECT_TIMEOUT_MILLIS;
 import static io.netty.channel.ChannelOption.SO_KEEPALIVE;
 import static io.netty.channel.ChannelOption.SO_RCVBUF;
@@ -88,7 +87,6 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
             options
                 .compression(true)
                 .loopResources(getThreadPool())
-                .option(ALLOCATOR, getAllocator())
                 .option(SO_SNDBUF, SEND_BUFFER_SIZE)
                 .option(SO_RCVBUF, RECEIVE_BUFFER_SIZE)
                 .disablePool();
@@ -146,20 +144,6 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
             .orElse(Mono.empty());
     }
 
-    @Value.Derived
-    ByteBufAllocator getAllocator() {
-        PooledByteBufAllocator byteBufAllocator = new PooledByteBufAllocator(false, 16, 16, 8192, 7, 512, 256, 64, true, 0);
-
-        try {
-            ManagementFactory.getPlatformMBeanServer()
-                .registerMBean(new ByteBufAllocatorMetricProviderWrapper(byteBufAllocator), ObjectName.getInstance("org.cloudfoundry.reactor:type=ByteBufAllocator"));
-        } catch (JMException e) {
-            this.logger.error("Unable to register ByteBufAllocator MBean", e);
-        }
-
-        return byteBufAllocator;
-    }
-
     /**
      * The hostname of the API root.  Typically something like {@code api.run.pivotal.io}.
      */
@@ -210,7 +194,7 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
     @Value.Derived
     Optional<SslCertificateTruster> getSslCertificateTruster() {
         if (getSkipSslValidation().orElse(false)) {
-            return Optional.of(new DefaultSslCertificateTruster(getAllocator(), getProxyConfiguration(), getThreadPool()));
+            return Optional.of(new DefaultSslCertificateTruster(getProxyConfiguration(), getThreadPool()));
         } else {
             return Optional.empty();
         }
@@ -234,6 +218,16 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
     @Value.Derived
     LoopResources getThreadPool() {
         return LoopResources.create("cloudfoundry-client", getThreadPoolSize(), true);
+    }
+
+    @PostConstruct
+    void monitorByteBufAllocator() {
+        try {
+            ManagementFactory.getPlatformMBeanServer()
+                .registerMBean(new ByteBufAllocatorMetricProviderWrapper(PooledByteBufAllocator.DEFAULT), ObjectName.getInstance("org.cloudfoundry.reactor:type=ByteBufAllocator"));
+        } catch (JMException e) {
+            this.logger.error("Unable to register ByteBufAllocator MBean", e);
+        }
     }
 
 }
