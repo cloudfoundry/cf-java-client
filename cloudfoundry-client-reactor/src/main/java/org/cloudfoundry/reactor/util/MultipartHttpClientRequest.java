@@ -23,9 +23,7 @@ import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.DefaultHttpHeaders;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.util.AsciiString;
-import org.cloudfoundry.util.ByteArrayPool;
 import reactor.core.Exceptions;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.ipc.netty.NettyOutbound;
 import reactor.ipc.netty.http.client.HttpClientRequest;
@@ -33,9 +31,7 @@ import reactor.ipc.netty.http.client.HttpClientRequest;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -187,32 +183,6 @@ public final class MultipartHttpClientRequest {
             return this;
         }
 
-        private static Flux<byte[]> fileReadingFlux(Path file) {
-            return Flux.generate(() -> Files.newInputStream(file, StandardOpenOption.READ),
-                (in, sink) -> {
-                    ByteArrayPool.withByteArray(buffer -> {
-                        try {
-                            int length = in.read(buffer);
-                            if (length != -1) {
-                                sink.next(Arrays.copyOf(buffer, length));
-                            } else {
-                                sink.complete();
-                            }
-                        } catch (IOException e) {
-                            sink.error(e);
-                        }
-                    });
-
-                    return in;
-                }, inputStream -> {
-                    try {
-                        inputStream.close();
-                    } catch (IOException e) {
-                        throw Exceptions.propagate(e);
-                    }
-                });
-        }
-
         private long getLength() {
             return this.renderedHeaders.readableBytes() + getPayloadLength();
         }
@@ -244,7 +214,7 @@ public final class MultipartHttpClientRequest {
 
         private NettyOutbound sendPayload(NettyOutbound request) {
             if (this.file != null) {
-                return request.sendByteArray(fileReadingFlux(this.file));
+                return request.sendFile(this.file);
             } else if (this.payload != null) {
                 return request.sendByteArray(Mono.just(this.payload));
             } else {

@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.reactor.util;
 
-import io.netty.buffer.ByteBufAllocator;
 import org.cloudfoundry.reactor.ProxyConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,13 +42,9 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static io.netty.channel.ChannelOption.ALLOCATOR;
-
 public final class DefaultSslCertificateTruster implements SslCertificateTruster {
 
     private final Logger logger = LoggerFactory.getLogger("cloudfoundry-client.trust");
-
-    private final ByteBufAllocator allocator;
 
     private final AtomicReference<X509TrustManager> delegate;
 
@@ -59,8 +54,7 @@ public final class DefaultSslCertificateTruster implements SslCertificateTruster
 
     private final Set<Tuple2<String, Integer>> trustedHostsAndPorts;
 
-    public DefaultSslCertificateTruster(ByteBufAllocator allocator, Optional<ProxyConfiguration> proxyConfiguration, LoopResources threadPool) {
-        this.allocator = allocator;
+    public DefaultSslCertificateTruster(Optional<ProxyConfiguration> proxyConfiguration, LoopResources threadPool) {
         this.proxyConfiguration = proxyConfiguration;
         this.threadPool = threadPool;
         this.delegate = new AtomicReference<>(getTrustManager(getTrustManagerFactory(null)));
@@ -93,7 +87,7 @@ public final class DefaultSslCertificateTruster implements SslCertificateTruster
 
         X509TrustManager trustManager = this.delegate.get();
 
-        return getUntrustedCertificates(duration, host, port, this.allocator, this.proxyConfiguration, this.threadPool, trustManager)
+        return getUntrustedCertificates(duration, host, port, this.proxyConfiguration, this.threadPool, trustManager)
             .doOnNext(untrustedCertificates -> {
                 KeyStore trustStore = addToTrustStore(untrustedCertificates, trustManager);
                 this.delegate.set(getTrustManager(getTrustManagerFactory(trustStore)));
@@ -123,13 +117,10 @@ public final class DefaultSslCertificateTruster implements SslCertificateTruster
         }
     }
 
-    private static TcpClient getTcpClient(ByteBufAllocator allocator, Optional<ProxyConfiguration> proxyConfiguration, LoopResources threadPool, CertificateCollectingTrustManager collector,
-                                          String host, int port) {
-
+    private static TcpClient getTcpClient(Optional<ProxyConfiguration> proxyConfiguration, LoopResources threadPool, CertificateCollectingTrustManager collector, String host, int port) {
         return TcpClient.create(options -> {
             options.connect(host, port)
                 .loopResources(threadPool)
-                .option(ALLOCATOR, allocator)
                 .disablePool()
                 .sslSupport(ssl -> ssl.trustManager(new StaticTrustManagerFactory(collector)));
 
@@ -158,12 +149,12 @@ public final class DefaultSslCertificateTruster implements SslCertificateTruster
         }
     }
 
-    private static Mono<X509Certificate[]> getUntrustedCertificates(Duration duration, String host, int port, ByteBufAllocator allocator, Optional<ProxyConfiguration> proxyConfiguration,
-                                                                    LoopResources threadPool, X509TrustManager delegate) {
+    private static Mono<X509Certificate[]> getUntrustedCertificates(Duration duration, String host, int port, Optional<ProxyConfiguration> proxyConfiguration, LoopResources threadPool,
+                                                                    X509TrustManager delegate) {
 
         CertificateCollectingTrustManager collector = new CertificateCollectingTrustManager(delegate);
 
-        return getTcpClient(allocator, proxyConfiguration, threadPool, collector, host, port)
+        return getTcpClient(proxyConfiguration, threadPool, collector, host, port)
             .newHandler((inbound, outbound) -> inbound.receive().then())
             .timeout(duration)
             .handle((c, sink) -> {
