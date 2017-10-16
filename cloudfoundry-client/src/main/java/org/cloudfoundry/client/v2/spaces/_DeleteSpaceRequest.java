@@ -35,6 +35,13 @@ abstract class _DeleteSpaceRequest {
     abstract Boolean getAsync();
 
     /**
+     * The recursive flag
+     */
+    @Nullable
+    @QueryParameter("recursive")
+    abstract Boolean getRecursive();
+
+    /**
      * The space id
      */
     @JsonIgnore
