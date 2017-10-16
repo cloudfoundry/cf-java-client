@@ -16,88 +16,20 @@
 
 package org.cloudfoundry.client.lib.rest;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.Socket;
-import java.net.SocketException;
-import java.net.URI;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-import java.util.zip.ZipFile;
-
-import javax.websocket.ClientEndpointConfig;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.cloudfoundry.client.lib.ApplicationLogListener;
-import org.cloudfoundry.client.lib.ClientHttpResponseCallback;
-import org.cloudfoundry.client.lib.CloudCredentials;
-import org.cloudfoundry.client.lib.CloudFoundryException;
-import org.cloudfoundry.client.lib.CloudOperationException;
-import org.cloudfoundry.client.lib.RestLogCallback;
-import org.cloudfoundry.client.lib.StartingInfo;
-import org.cloudfoundry.client.lib.StreamingLogToken;
-import org.cloudfoundry.client.lib.UploadStatusCallback;
+import org.cloudfoundry.client.lib.*;
 import org.cloudfoundry.client.lib.archive.ApplicationArchive;
 import org.cloudfoundry.client.lib.archive.DirectoryApplicationArchive;
 import org.cloudfoundry.client.lib.archive.ZipApplicationArchive;
-import org.cloudfoundry.client.lib.domain.ApplicationLog;
-import org.cloudfoundry.client.lib.domain.ApplicationLogs;
-import org.cloudfoundry.client.lib.domain.ApplicationStats;
-import org.cloudfoundry.client.lib.domain.CloudApplication;
-import org.cloudfoundry.client.lib.domain.CloudDomain;
-import org.cloudfoundry.client.lib.domain.CloudEvent;
-import org.cloudfoundry.client.lib.domain.CloudInfo;
-import org.cloudfoundry.client.lib.domain.CloudJob;
-import org.cloudfoundry.client.lib.domain.CloudOrganization;
-import org.cloudfoundry.client.lib.domain.CloudQuota;
-import org.cloudfoundry.client.lib.domain.CloudResource;
-import org.cloudfoundry.client.lib.domain.CloudResources;
-import org.cloudfoundry.client.lib.domain.CloudRoute;
-import org.cloudfoundry.client.lib.domain.CloudSecurityGroup;
-import org.cloudfoundry.client.lib.domain.CloudService;
-import org.cloudfoundry.client.lib.domain.CloudServiceBroker;
-import org.cloudfoundry.client.lib.domain.CloudServiceInstance;
-import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
-import org.cloudfoundry.client.lib.domain.CloudServicePlan;
-import org.cloudfoundry.client.lib.domain.CloudSpace;
-import org.cloudfoundry.client.lib.domain.CloudStack;
-import org.cloudfoundry.client.lib.domain.CrashInfo;
-import org.cloudfoundry.client.lib.domain.CrashesInfo;
-import org.cloudfoundry.client.lib.domain.InstanceState;
-import org.cloudfoundry.client.lib.domain.InstanceStats;
-import org.cloudfoundry.client.lib.domain.InstancesInfo;
-import org.cloudfoundry.client.lib.domain.SecurityGroupRule;
-import org.cloudfoundry.client.lib.domain.Staging;
-import org.cloudfoundry.client.lib.domain.UploadApplicationPayload;
-import org.cloudfoundry.client.lib.domain.CloudUser;
-import org.cloudfoundry.client.lib.domain.LastOperation;
+import org.cloudfoundry.client.lib.domain.*;
 import org.cloudfoundry.client.lib.oauth2.OauthClient;
 import org.cloudfoundry.client.lib.util.CloudEntityResourceMapper;
 import org.cloudfoundry.client.lib.util.CloudUtil;
 import org.cloudfoundry.client.lib.util.JsonUtil;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpResponse;
@@ -107,12 +39,15 @@ import org.springframework.util.Assert;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RequestCallback;
-import org.springframework.web.client.ResourceAccessException;
-import org.springframework.web.client.ResponseErrorHandler;
-import org.springframework.web.client.ResponseExtractor;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.*;
+
+import javax.websocket.ClientEndpointConfig;
+import java.io.*;
+import java.net.*;
+import java.text.ParseException;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.zip.ZipFile;
 
 /**
  * Abstract implementation of the CloudControllerClient intended to serve as the base.
@@ -1363,6 +1298,22 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 					CloudEntityResourceMapper.getEntityAttribute(d, "name", String.class),
 					CloudEntityResourceMapper.getMeta(d).getGuid());
 		}
+
+		// See: https://apidocs.cloudfoundry.org/249/organizations/list_all_private_domains_for_the_organization.html
+		urlPath = "/v2";
+		urlVars.clear();
+		if (sessionSpace != null && sessionSpace.getOrganization() != null) {
+			urlVars.put("org", sessionSpace.getOrganization().getMeta().getGuid().toString());
+			urlPath += "/organizations/{org}/private_domains";
+			resourceList = getAllResources(urlPath, urlVars);
+			for (Map<String, Object> d : resourceList) {
+				domains.put(
+					CloudEntityResourceMapper.getEntityAttribute(d, "name", String.class),
+					CloudEntityResourceMapper.getMeta(d).getGuid()
+				);
+			}
+		}
+
 		return domains;
 	}
 
@@ -1376,6 +1327,19 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 			Map<String, Object> resource = resourceList.get(0);
 			domainGuid = resourceMapper.getGuidOfResource(resource);
 		}
+		if (domainGuid != null) {
+			return domainGuid;
+		}
+
+		// See https://apidocs.cloudfoundry.org/249/private_domains/retrieve_a_particular_private_domain.html
+		// There's no API now to query a private domain with name.
+		Map<String, UUID> domainGuids = getDomainGuids();
+		for (String name : domainGuids.keySet()) {
+			if (Objects.equals(domainName, name)) {
+				return domainGuids.get(name);
+			}
+		}
+
 		if (domainGuid == null && required) {
 			throw new IllegalArgumentException("Domain '" + domainName + "' not found.");
 		}
