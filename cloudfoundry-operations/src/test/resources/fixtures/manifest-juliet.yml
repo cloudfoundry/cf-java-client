@@ -1,0 +1,5 @@
+---
+inherit: manifest-indigo.yml
+
+applications:
+- name: juliet-application

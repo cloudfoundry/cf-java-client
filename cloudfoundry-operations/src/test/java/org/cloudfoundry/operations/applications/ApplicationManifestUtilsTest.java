@@ -24,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -201,16 +202,16 @@ public final class ApplicationManifestUtilsTest {
                 .build(),
             ApplicationManifest.builder()
                 .name("charlie-application-2")
-                .buildpack("delta-buildpack")
-                .command("delta-command")
-                .disk(-3)
-                .healthCheckHttpEndpoint("delta-health-check-http-endpoint")
-                .healthCheckType(NONE)
-                .instances(-3)
-                .memory(-3)
-                .noRoute(true)
-                .path(Paths.get("/delta-path"))
-                .randomRoute(true)
+                .buildpack("alternate-buildpack")
+                .command("alternate-command")
+                .disk(-2)
+                .healthCheckHttpEndpoint("alternate-health-check-http-endpoint")
+                .healthCheckType(PORT)
+                .instances(-2)
+                .memory(-2)
+                .noRoute(false)
+                .path(Paths.get("/alternate-path"))
+                .randomRoute(false)
                 .route(Route.builder()
                     .route("charlie-route-1")
                     .build())
@@ -218,31 +219,31 @@ public final class ApplicationManifestUtilsTest {
                     .route("charlie-route-2")
                     .build())
                 .route(Route.builder()
-                    .route("alternate-route-1")
-                    .build())
-                .route(Route.builder()
-                    .route("alternate-route-2")
-                    .build())
-                .route(Route.builder()
                     .route("delta-route-1")
                     .build())
                 .route(Route.builder()
                     .route("delta-route-2")
                     .build())
-                .stack("delta-stack")
-                .timeout(-3)
+                .route(Route.builder()
+                    .route("alternate-route-1")
+                    .build())
+                .route(Route.builder()
+                    .route("alternate-route-2")
+                    .build())
+                .stack("alternate-stack")
+                .timeout(-2)
                 .environmentVariable("CHARLIE_KEY_1", "charlie-value-1")
                 .environmentVariable("CHARLIE_KEY_2", "charlie-value-2")
-                .environmentVariable("ALTERNATE_KEY_1", "alternate-value-1")
-                .environmentVariable("ALTERNATE_KEY_2", "alternate-value-2")
                 .environmentVariable("DELTA_KEY_1", "delta-value-1")
                 .environmentVariable("DELTA_KEY_2", "delta-value-2")
+                .environmentVariable("ALTERNATE_KEY_1", "alternate-value-1")
+                .environmentVariable("ALTERNATE_KEY_2", "alternate-value-2")
                 .service("charlie-instance-1")
                 .service("charlie-instance-2")
-                .service("alternate-instance-1")
-                .service("alternate-instance-2")
                 .service("delta-instance-1")
                 .service("delta-instance-2")
+                .service("alternate-instance-1")
+                .service("alternate-instance-2")
                 .build());
 
         List<ApplicationManifest> actual = ApplicationManifestUtils.read(new ClassPathResource("fixtures/manifest-delta.yml").getFile().toPath());
@@ -372,6 +373,40 @@ public final class ApplicationManifestUtilsTest {
     }
 
     @Test
+    public void readInheritCommon() throws IOException {
+        List<ApplicationManifest> expected = Collections.singletonList(
+            ApplicationManifest.builder()
+                .name("juliet-application")
+                .buildpack("indigo-buildpack")
+                .command("indigo-command")
+                .disk(-1)
+                .healthCheckHttpEndpoint("indigo-health-check-http-endpoint")
+                .healthCheckType(NONE)
+                .instances(-1)
+                .memory(-1)
+                .noRoute(true)
+                .path(Paths.get("/indigo-path"))
+                .randomRoute(true)
+                .route(Route.builder()
+                    .route("indigo-route-1")
+                    .build())
+                .route(Route.builder()
+                    .route("indigo-route-2")
+                    .build())
+                .stack("indigo-stack")
+                .timeout(-1)
+                .environmentVariable("INDIGO_KEY_1", "indigo-value-1")
+                .environmentVariable("INDIGO_KEY_2", "indigo-value-2")
+                .service("indigo-instance-1")
+                .service("indigo-instance-2")
+                .build());
+
+        List<ApplicationManifest> actual = ApplicationManifestUtils.read(new ClassPathResource("fixtures/manifest-juliet.yml").getFile().toPath());
+
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
     public void readNoApplications() throws IOException {
         List<ApplicationManifest> actual = ApplicationManifestUtils.read(new ClassPathResource("fixtures/manifest-hotel.yml").getFile().toPath());
 
@@ -386,6 +421,61 @@ public final class ApplicationManifestUtilsTest {
     @Test(expected = IllegalStateException.class)
     public void readNoRoute() throws IOException {
         ApplicationManifestUtils.read(new ClassPathResource("fixtures/manifest-golf.yml").getFile().toPath());
+    }
+
+    @Test
+    public void testDiskQuotaAndMemoryParsing() throws Exception {
+        List<ApplicationManifest> expected = Arrays.asList(
+            ApplicationManifest.builder()
+                .name("quota-test-1")
+                .memory(1)
+                .disk(2)
+                .build(),
+            ApplicationManifest.builder()
+                .name("quota-test-2")
+                .memory(3)
+                .disk(4)
+                .build(),
+            ApplicationManifest.builder()
+                .name("quota-test-3")
+                .memory(5)
+                .disk(6)
+                .build(),
+            ApplicationManifest.builder()
+                .name("quota-test-4")
+                .memory(7)
+                .disk(8)
+                .build(),
+            ApplicationManifest.builder()
+                .name("quota-test-5")
+                .memory(1024)
+                .disk(2048)
+                .build(),
+            ApplicationManifest.builder()
+                .name("quota-test-6")
+                .memory(3072)
+                .disk(4096)
+                .build(),
+            ApplicationManifest.builder()
+                .name("quota-test-7")
+                .memory(5120)
+                .disk(6144)
+                .build(),
+            ApplicationManifest.builder()
+                .name("quota-test-8")
+                .memory(7168)
+                .disk(8192)
+                .build(),
+            ApplicationManifest.builder()
+                .name("quota-test-9")
+                .memory(1234)
+                .disk(5678)
+                .build()
+        );
+
+        List<ApplicationManifest> actual = ApplicationManifestUtils.read(new ClassPathResource("fixtures/manifest-quota.yml").getFile().toPath());
+
+        assertThat(actual).isEqualTo(expected);
     }
 
     @Test
@@ -445,61 +535,6 @@ public final class ApplicationManifestUtilsTest {
 
         List<String> expected = Files.readAllLines(new ClassPathResource("fixtures/manifest-echo.yml").getFile().toPath());
         List<String> actual = Files.readAllLines(out);
-
-        assertThat(actual).isEqualTo(expected);
-    }
-
-    @Test
-    public void testDiskQuotaAndMemoryParsing() throws Exception {
-        List<ApplicationManifest> expected = Arrays.asList(
-            ApplicationManifest.builder()
-                .name("quota-test-1")
-                .memory(1)
-                .disk(2)
-                .build(),
-            ApplicationManifest.builder()
-                .name("quota-test-2")
-                .memory(3)
-                .disk(4)
-                .build(),
-            ApplicationManifest.builder()
-                .name("quota-test-3")
-                .memory(5)
-                .disk(6)
-                .build(),
-            ApplicationManifest.builder()
-                .name("quota-test-4")
-                .memory(7)
-                .disk(8)
-                .build(),
-            ApplicationManifest.builder()
-                .name("quota-test-5")
-                .memory(1024)
-                .disk(2048)
-                .build(),
-            ApplicationManifest.builder()
-                .name("quota-test-6")
-                .memory(3072)
-                .disk(4096)
-                .build(),
-            ApplicationManifest.builder()
-                .name("quota-test-7")
-                .memory(5120)
-                .disk(6144)
-                .build(),
-            ApplicationManifest.builder()
-                .name("quota-test-8")
-                .memory(7168)
-                .disk(8192)
-                .build(),
-            ApplicationManifest.builder()
-              .name("quota-test-9")
-              .memory(1234)
-              .disk(5678)
-              .build()
-        );
-
-        List<ApplicationManifest> actual = ApplicationManifestUtils.read(new ClassPathResource("fixtures/manifest-quota.yml").getFile().toPath());
 
         assertThat(actual).isEqualTo(expected);
     }
