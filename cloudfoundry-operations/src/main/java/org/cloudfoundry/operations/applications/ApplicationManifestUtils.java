@@ -19,6 +19,9 @@ package org.cloudfoundry.operations.applications;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.ValueNode;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import org.cloudfoundry.util.tuple.Consumer2;
@@ -34,11 +37,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Spliterator;
 import java.util.Spliterators;
-import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -67,10 +69,7 @@ public final class ApplicationManifestUtils {
      * @return the resolved manifests
      */
     public static List<ApplicationManifest> read(Path path) {
-        return doRead(path.toAbsolutePath())
-            .values().stream()
-            .map(ApplicationManifest.Builder::build)
-            .collect(Collectors.toList());
+        return doRead(path.toAbsolutePath());
     }
 
     /**
@@ -184,49 +183,46 @@ public final class ApplicationManifestUtils {
         as(payload, key, JsonNode::asText, consumer);
     }
 
-    private static JsonNode deserialize(Path path) {
+    private static ObjectNode deserialize(Path path) {
+        AtomicReference<ObjectNode> root = new AtomicReference<>();
+
         try (InputStream in = Files.newInputStream(path, StandardOpenOption.READ)) {
-            return OBJECT_MAPPER.readTree(in);
+            root.set(((ObjectNode) OBJECT_MAPPER.readTree(in)));
         } catch (IOException e) {
             throw Exceptions.propagate(e);
         }
+
+        asString(root.get(), "inherit", inherit -> root.set(merge(deserialize(path.getParent().resolve(inherit)), root.get())));
+
+        return root.get();
     }
 
-    private static Map<String, ApplicationManifest.Builder> doRead(Path path) {
-        Map<String, ApplicationManifest.Builder> applicationManifests = new TreeMap<>();
-
+    private static List<ApplicationManifest> doRead(Path path) {
         JsonNode root = deserialize(path);
-
-        asString(root, "inherit", inherit -> applicationManifests.putAll(doRead(path.getParent().resolve(inherit))));
-
-        applicationManifests
-            .forEach((name, builder) -> applicationManifests.put(name, toApplicationManifest(root, builder, path)));
 
         ApplicationManifest template = getTemplate(path, root);
 
-        Optional.ofNullable(root.get("applications"))
+        return Optional.ofNullable(root.get("applications"))
             .map(ApplicationManifestUtils::streamOf)
-            .ifPresent(applications -> applications
-                .forEach(application -> {
-                    String name = getName(application);
-                    ApplicationManifest.Builder builder = getBuilder(applicationManifests, template, name);
-
-                    applicationManifests.put(name, toApplicationManifest(application, builder, path));
-                }));
-
-        return applicationManifests;
-    }
-
-    private static ApplicationManifest.Builder getBuilder(Map<String, ApplicationManifest.Builder> applicationManifests, ApplicationManifest template, String name) {
-        ApplicationManifest.Builder builder = applicationManifests.get(name);
-        if (builder == null) {
-            builder = ApplicationManifest.builder().from(template);
-        }
-        return builder;
+            .orElseGet(Stream::empty)
+            .map(application -> {
+                String name = getName(application);
+                return toApplicationManifest(application, ApplicationManifest.builder().from(template), path)
+                    .name(name)
+                    .build();
+            })
+            .collect(Collectors.toList());
     }
 
     private static String getName(JsonNode raw) {
         return Optional.ofNullable(raw.get("name")).map(JsonNode::asText).orElseThrow(() -> new IllegalStateException("Application does not contain required 'name' value"));
+    }
+
+    private static ObjectNode getNamedObject(ArrayNode array, String name) {
+        return (ObjectNode) streamOf(array)
+            .filter(object -> object.has("name") && name.equals(object.get("name").asText()))
+            .findFirst()
+            .orElseGet(array::addObject);
     }
 
     private static Route getRoute(JsonNode raw) {
@@ -238,6 +234,34 @@ public final class ApplicationManifestUtils {
         return toApplicationManifest(root, ApplicationManifest.builder(), path)
             .name("template")
             .build();
+    }
+
+    private static ObjectNode merge(ObjectNode first, ObjectNode second) {
+        streamOf(second.fields())
+            .forEach(field -> {
+                String key = field.getKey();
+                JsonNode value = field.getValue();
+
+                if (value instanceof ValueNode) {
+                    first.replace(key, value);
+                } else if (value instanceof ArrayNode) {
+                    streamOf(value)
+                        .forEach(element -> {
+                            JsonNode name = element.get("name");
+
+                            if (name != null) {
+                                ObjectNode named = getNamedObject(first.withArray(key), name.asText());
+                                merge(named, (ObjectNode) element);
+                            } else {
+                                first.withArray(key).add(element);
+                            }
+                        });
+                } else if (value instanceof ObjectNode) {
+                    first.with(key).setAll((ObjectNode) value);
+                }
+            });
+
+        return first;
     }
 
     private static <T> Stream<T> streamOf(Iterator<T> iterator) {

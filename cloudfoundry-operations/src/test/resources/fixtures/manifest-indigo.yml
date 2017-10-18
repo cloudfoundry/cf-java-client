@@ -1,0 +1,22 @@
+---
+buildpack: indigo-buildpack
+command: indigo-command
+disk_quota: -1
+health-check-http-endpoint: indigo-health-check-http-endpoint
+health-check-type: none
+instances: -1
+memory: -1
+no-route: true
+path: /indigo-path
+random-route: true
+routes:
+- route: indigo-route-1
+- route: indigo-route-2
+stack: indigo-stack
+timeout: -1
+env:
+  INDIGO_KEY_1: indigo-value-1
+  INDIGO_KEY_2: indigo-value-2
+services:
+- indigo-instance-1
+- indigo-instance-2
