@@ -30,6 +30,7 @@ public abstract class EnvironmentVariables {
     /**
      * The links
      */
+    @AllowNulls
     @JsonProperty("links")
     abstract Map<String, Link> getLinks();
 
