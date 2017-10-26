@@ -66,6 +66,7 @@ abstract class _RootPayloadRootProvider extends AbstractRootProvider {
                 .doOnSubscribe(NetworkLogging.get(uri))
                 .transform(NetworkLogging.response(uri)))
             .transform(JsonCodec.decode(getObjectMapper(), Map.class))
+            .switchIfEmpty(Mono.error(new IllegalArgumentException("Root endpoint does not contain a payload")))
             .map(this::parsePayload)
             .checkpoint();
     }
