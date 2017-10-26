@@ -272,15 +272,6 @@ public abstract class AbstractReactorOperations {
 
     private Mono<HttpClientResponse> invalidateToken(Mono<HttpClientResponse> inbound) {
         return inbound
-            .onErrorResume(t -> {  // TODO: Remove pending https://github.com/reactor/reactor-netty/issues/113
-                if (isUnauthorized(t)) {
-                    this.tokenProvider.invalidate(this.connectionContext);
-                    return inbound
-                        .transform(this::invalidateToken);
-                } else {
-                    return Mono.error(t);
-                }
-            })
             .flatMap(response -> {
                 if (isUnauthorized(response)) {
                     this.tokenProvider.invalidate(this.connectionContext);
