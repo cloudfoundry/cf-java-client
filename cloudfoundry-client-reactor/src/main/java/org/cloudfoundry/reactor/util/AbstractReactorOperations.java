@@ -24,7 +24,6 @@ import org.cloudfoundry.reactor.TokenProvider;
 import org.reactivestreams.Publisher;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
-import reactor.ipc.netty.http.client.HttpClientException;
 import reactor.ipc.netty.http.client.HttpClientRequest;
 import reactor.ipc.netty.http.client.HttpClientResponse;
 
@@ -243,10 +242,6 @@ public abstract class AbstractReactorOperations {
             .failOnServerError(false);
     }
 
-    private static boolean isUnauthorized(Throwable t) {
-        return t instanceof HttpClientException && ((HttpClientException) t).status() == HttpResponseStatus.UNAUTHORIZED;
-    }
-
     private static boolean isUnauthorized(HttpClientResponse response) {
         return response.status() == HttpResponseStatus.UNAUTHORIZED;
     }
@@ -267,6 +262,7 @@ public abstract class AbstractReactorOperations {
     private <T> Function<Mono<HttpClientResponse>, Mono<T>> deserializedResponse(Class<T> responseType) {
         return inbound -> inbound
             .transform(JsonCodec.decode(this.connectionContext.getObjectMapper(), responseType))
+            .doOnNext(response -> NetworkLogging.RESPONSE_LOGGER.trace("       {}", response))
             .doOnError(JsonParsingException.class, e -> NetworkLogging.RESPONSE_LOGGER.error("{}\n{}", e.getCause().getMessage(), e.getPayload()));
     }
 
@@ -285,6 +281,7 @@ public abstract class AbstractReactorOperations {
 
     private Function<Mono<HttpClientRequest>, Publisher<Void>> serializedRequest(Object requestPayload) {
         return outbound -> outbound
+            .doOnNext(request -> NetworkLogging.REQUEST_LOGGER.trace("       {}", requestPayload))
             .transform(JsonCodec.encode(this.connectionContext.getObjectMapper(), requestPayload));
     }
 
