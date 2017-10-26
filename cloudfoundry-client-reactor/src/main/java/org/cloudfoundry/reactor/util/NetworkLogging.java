@@ -33,11 +33,11 @@ import java.util.stream.Collectors;
 
 public final class NetworkLogging {
 
+    static final Logger REQUEST_LOGGER = LoggerFactory.getLogger("cloudfoundry-client.request");
+
     static final Logger RESPONSE_LOGGER = LoggerFactory.getLogger("cloudfoundry-client.response");
 
     private static final String CF_WARNINGS = "X-Cf-Warnings";
-
-    private static final Logger REQUEST_LOGGER = LoggerFactory.getLogger("cloudfoundry-client.request");
 
     private NetworkLogging() {
     }
