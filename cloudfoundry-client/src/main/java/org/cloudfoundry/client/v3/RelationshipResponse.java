@@ -17,6 +17,7 @@
 package org.cloudfoundry.client.v3;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 
 import java.util.Map;
@@ -36,6 +37,7 @@ public abstract class RelationshipResponse {
     /**
      * The links
      */
+    @AllowNulls
     @JsonProperty("links")
     public abstract Map<String, Link> getLinks();
 
