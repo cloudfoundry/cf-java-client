@@ -64,6 +64,7 @@ abstract class _InfoPayloadRootProvider extends AbstractRootProvider {
                 .doOnSubscribe(NetworkLogging.get(uri))
                 .transform(NetworkLogging.response(uri)))
             .transform(JsonCodec.decode(getObjectMapper(), Map.class))
+            .switchIfEmpty(Mono.error(new IllegalArgumentException("Info endpoint does not contain a payload")))
             .map(m -> (Map<String, String>) m)
             .checkpoint();
     }
