@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor;
 
+import io.netty.handler.codec.http.HttpResponseStatus;
 import org.junit.Test;
 import reactor.test.StepVerifier;
 
@@ -312,6 +313,35 @@ public final class DelegatingRootProviderTest extends AbstractRestTest {
             .response(TestResponse.builder()
                 .status(NOT_FOUND)
                 .payload("fixtures/client/v2/error_response.json")
+                .build())
+            .build());
+
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/v2/info")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/info/GET_response.json")
+                .build())
+            .build());
+
+        this.rootProvider
+            .getRoot("uaa", CONNECTION_CONTEXT)
+            .as(StepVerifier::create)
+            .expectNext("http://localhost:8080/uaa")
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void getWithInvalidRoot() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/")
+                .build())
+            .response(TestResponse.builder()
+                .status(HttpResponseStatus.FOUND)
                 .build())
             .build());
 
