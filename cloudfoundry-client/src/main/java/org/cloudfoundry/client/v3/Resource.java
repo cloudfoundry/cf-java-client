@@ -17,6 +17,7 @@
 package org.cloudfoundry.client.v3;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.cloudfoundry.AllowNulls;
 
 import java.util.Map;
 
@@ -37,6 +38,7 @@ public abstract class Resource {
     /**
      * Links to related resources and actions for the resource
      */
+    @AllowNulls
     @JsonProperty("links")
     public abstract Map<String, Link> getLinks();
 
