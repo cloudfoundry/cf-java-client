@@ -71,6 +71,9 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
         getThreadPool().dispose();
     }
 
+    @Override
+    public abstract Optional<Duration> getCacheDuration();
+
     /**
      * The number of connections to use when processing requests and responses.  Setting this to `null` disables connection pooling.
      */
@@ -97,9 +100,8 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
             getConnectTimeout().ifPresent(socketTimeout -> options.option(CONNECT_TIMEOUT_MILLIS, (int) socketTimeout.toMillis()));
             getKeepAlive().ifPresent(keepAlive -> options.option(SO_KEEPALIVE, keepAlive));
             getSslHandshakeTimeout().ifPresent(options::sslHandshakeTimeout);
-// TODO: Add back once these options show up in 0.7.0
-//            getSslCloseNotifyFlushTimeout().ifPresent(options::sslCloseNotifyFlushTimeout);
-//            getSslCloseNotifyReadTimeout().ifPresent(options::sslCloseNotifyReadTimeout);
+            getSslCloseNotifyFlushTimeout().ifPresent(options::sslCloseNotifyFlushTimeout);
+            getSslCloseNotifyReadTimeout().ifPresent(options::sslCloseNotifyReadTimeout);
             getProxyConfiguration().ifPresent(c -> c.configure(options));
         });
     }

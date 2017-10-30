@@ -46,8 +46,11 @@ abstract class AbstractPayloadCachingRootProvider extends AbstractRootProvider {
     abstract ObjectMapper getObjectMapper();
 
     private Mono<Map<String, String>> getPayload(ConnectionContext connectionContext) {
-        return doGetPayload(connectionContext)
-            .cache();
+        Mono<Map<String, String>> cached = doGetPayload(connectionContext);
+
+        return connectionContext.getCacheDuration()
+            .map(cached::cache)
+            .orElseGet(cached::cache);
     }
 
 }

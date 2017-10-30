@@ -257,14 +257,17 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
     }
 
     private Mono<String> token(ConnectionContext connectionContext) {
-        return this.refreshTokens.getOrDefault(connectionContext, Mono.empty())
+        Mono<String> cached = this.refreshTokens.getOrDefault(connectionContext, Mono.empty())
             .flatMap(refreshToken -> refreshToken(connectionContext, refreshToken)
                 .doOnSubscribe(s -> LOGGER.debug("Negotiating using refresh token")))
             .switchIfEmpty(primaryToken(connectionContext)
                 .doOnSubscribe(s -> LOGGER.debug("Negotiating using token provider")))
             .transform(ErrorPayloadMapper.fallback())
-            .transform(extractTokens(connectionContext))
-            .cache()
+            .transform(extractTokens(connectionContext));
+
+        return connectionContext.getCacheDuration()
+            .map(cached::cache)
+            .orElseGet(cached::cache)
             .checkpoint();
     }
 

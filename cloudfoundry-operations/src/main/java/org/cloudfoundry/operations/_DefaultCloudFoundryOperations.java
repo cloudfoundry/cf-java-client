@@ -56,6 +56,7 @@ import org.immutables.value.Value;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -138,6 +139,11 @@ abstract class _DefaultCloudFoundryOperations implements CloudFoundryOperations 
     }
 
     /**
+     * The duration that stable responses like the organization and space id should be cached
+     */
+    abstract Optional<Duration> getCacheDuration();
+
+    /**
      * The {@link CloudFoundryClient} to use for operations functionality
      */
     @Nullable
@@ -174,9 +180,12 @@ abstract class _DefaultCloudFoundryOperations implements CloudFoundryOperations 
         String organization = getOrganization();
 
         if (hasText(organization)) {
-            return getOrganization(getCloudFoundryClientPublisher(), organization)
-                .map(ResourceUtils::getId)
-                .cache();
+            Mono<String> cached = getOrganization(getCloudFoundryClientPublisher(), organization)
+                .map(ResourceUtils::getId);
+
+            return getCacheDuration()
+                .map(cached::cache)
+                .orElseGet(cached::cache);
         } else {
             return Mono.error(new IllegalStateException("No organization targeted"));
         }
@@ -206,10 +215,13 @@ abstract class _DefaultCloudFoundryOperations implements CloudFoundryOperations 
         String space = getSpace();
 
         if (hasText(getSpace())) {
-            return getOrganizationId()
+            Mono<String> cached = getOrganizationId()
                 .flatMap(organizationId -> getSpace(getCloudFoundryClientPublisher(), organizationId, space))
-                .map(ResourceUtils::getId)
-                .cache();
+                .map(ResourceUtils::getId);
+
+            return getCacheDuration()
+                .map(cached::cache)
+                .orElseGet(cached::cache);
         } else {
             return Mono.error(new IllegalStateException("No space targeted"));
         }
