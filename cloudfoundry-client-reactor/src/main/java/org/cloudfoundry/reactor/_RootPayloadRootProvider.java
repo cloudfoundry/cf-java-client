@@ -16,13 +16,11 @@
 
 package org.cloudfoundry.reactor;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cloudfoundry.reactor.util.JsonCodec;
 import org.cloudfoundry.reactor.util.NetworkLogging;
 import org.cloudfoundry.reactor.util.UserAgent;
 import org.immutables.value.Value;
 import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.ipc.netty.http.client.HttpClientRequest;
 
@@ -33,30 +31,11 @@ import java.util.stream.Collectors;
  * A {@link RootProvider} that returns endpoints extracted from the `/` API for the configured endpoint.
  */
 @Value.Immutable
-abstract class _RootPayloadRootProvider extends AbstractRootProvider {
+abstract class _RootPayloadRootProvider extends AbstractPayloadCachingRootProvider {
 
     @Override
-    protected Mono<UriComponents> doGetRoot(ConnectionContext connectionContext) {
-        return Mono.just(getRoot());
-    }
-
-    @Override
-    protected Mono<UriComponents> doGetRoot(String key, ConnectionContext connectionContext) {
-        return getPayload(connectionContext)
-            .map(payload -> {
-                if (!payload.containsKey(key)) {
-                    throw new IllegalArgumentException(String.format("Root payload does not contain key '%s;", key));
-                }
-
-                return normalize(UriComponentsBuilder.fromUriString(payload.get(key)));
-            });
-    }
-
-    abstract ObjectMapper getObjectMapper();
-
     @SuppressWarnings("unchecked")
-    @Value.Derived
-    private Mono<Map<String, String>> getPayload(ConnectionContext connectionContext) {
+    protected Mono<Map<String, String>> doGetPayload(ConnectionContext connectionContext) {
         return getRoot(connectionContext)
             .then(uri -> connectionContext.getHttpClient()
                 .get(uri, request -> Mono.just(request)
@@ -69,6 +48,11 @@ abstract class _RootPayloadRootProvider extends AbstractRootProvider {
             .switchIfEmpty(Mono.error(new IllegalArgumentException("Root endpoint does not contain a payload")))
             .map(this::parsePayload)
             .checkpoint();
+    }
+
+    @Override
+    protected final Mono<UriComponents> doGetRoot(ConnectionContext connectionContext) {
+        return Mono.just(getRoot());
     }
 
     private Map<String, String> parsePayload(Map<String, Map<String, Map<String, String>>> payload) {

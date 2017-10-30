@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
 /**
  * An abstract implementation of {@link RootProvider} that ensures that returned values are trusted (if configured) and cached.
  */
-public abstract class AbstractRootProvider implements RootProvider {
+abstract class AbstractRootProvider implements RootProvider {
 
     private static final int DEFAULT_PORT = 443;
 
