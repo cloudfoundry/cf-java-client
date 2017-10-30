@@ -117,6 +117,7 @@ import org.springframework.core.io.ClassPathResource;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import reactor.test.scheduler.VirtualTimeScheduler;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -153,14 +154,14 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestCopyBits(this.cloudFoundryClient, "test-metadata-id", "test-metadata-id");
         requestJobSuccess(this.cloudFoundryClient, "test-copy-bits-id");
 
-        this.applications
+        StepVerifier.withVirtualTime(() -> this.applications
             .copySource(CopySourceApplicationRequest.builder()
                 .name("test-application-name")
                 .targetName("test-target-application-name")
                 .targetSpace("test-target-space")
                 .targetOrganization("test-target-organization")
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -174,13 +175,13 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestCopyBits(this.cloudFoundryClient, "test-metadata-id", "test-metadata-id");
         requestJobSuccess(this.cloudFoundryClient, "test-copy-bits-id");
 
-        this.applications
+        StepVerifier.withVirtualTime(() -> this.applications
             .copySource(CopySourceApplicationRequest.builder()
                 .name("test-application-name")
                 .targetName("test-target-application-name")
                 .targetSpace("test-target-space")
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -215,13 +216,13 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestGetApplication(this.cloudFoundryClient, "test-metadata-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-metadata-id");
 
-        this.applications
+        StepVerifier.withVirtualTime(() -> this.applications
             .copySource(CopySourceApplicationRequest.builder()
                 .name("test-application-name")
                 .targetName("test-target-application-name")
                 .restart(true)
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -252,12 +253,12 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestDeleteApplication(this.cloudFoundryClient, "test-metadata-id");
         requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
 
-        this.applications
+        StepVerifier.withVirtualTime(() -> this.applications
             .delete(DeleteApplicationRequest.builder()
                 .deleteRoutes(true)
                 .name("test-name")
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -270,12 +271,12 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestDeleteApplication(this.cloudFoundryClient, "test-metadata-id");
         requestJobFailure(this.cloudFoundryClient, "test-job-entity-id");
 
-        this.applications
+        StepVerifier.withVirtualTime(() -> this.applications
             .delete(DeleteApplicationRequest.builder()
                 .deleteRoutes(true)
                 .name("test-name")
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class).hasMessage("test-error-details-errorCode(1): test-error-details-description"))
             .verify(Duration.ofSeconds(5));
     }
@@ -306,12 +307,12 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestDeleteApplication(this.cloudFoundryClient, "test-metadata-id");
         requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
 
-        this.applications
+        StepVerifier.withVirtualTime(() -> this.applications
             .delete(DeleteApplicationRequest.builder()
                 .deleteRoutes(true)
                 .name("test-name")
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -1164,13 +1165,13 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
 
-        this.applications
+        StepVerifier.withVirtualTime(() -> this.applications
             .push(PushApplicationRequest.builder()
                 .dockerImage("cloudfoundry/lattice-app")
                 .domain("test-shared-domain")
                 .name("test-name")
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -1200,15 +1201,15 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
 
-        this.applications
+        StepVerifier.withVirtualTime(() -> this.applications
             .push(PushApplicationRequest.builder()
                 .dockerImage("cloudfoundry/lattice-app")
                 .dockerPassword("test-docker-password")
                 .dockerUsername("test-docker-username")
                 .domain("test-shared-domain")
                 .name("test-name")
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -1268,13 +1269,13 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
 
-        this.applications
+        StepVerifier.withVirtualTime(() -> this.applications
             .push(PushApplicationRequest.builder()
                 .path(testApplication)
                 .domain("test-shared-domain")
                 .name("test-name")
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -1307,7 +1308,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
 
-        this.applications
+        StepVerifier.withVirtualTime(() -> this.applications
             .pushManifest(PushApplicationManifestRequest.builder()
                 .manifest(ApplicationManifest.builder()
                     .path(testApplication)
@@ -1315,8 +1316,8 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                     .environmentVariable("test-key-2", "test-value-2")
                     .name("test-name")
                     .build())
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -1347,14 +1348,14 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
 
-        this.applications
+        StepVerifier.withVirtualTime(() -> this.applications
             .push(PushApplicationRequest.builder()
                 .path(testApplication)
                 .domain("test-shared-domain")
                 .host("test-host")
                 .name("test-name")
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -1386,14 +1387,14 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
 
-        this.applications
+        StepVerifier.withVirtualTime(() -> this.applications
             .push(PushApplicationRequest.builder()
                 .path(testApplication)
                 .domain("test-shared-domain")
                 .noHostname(true)
                 .name("test-name")
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -1446,7 +1447,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
 
-        this.applications
+        StepVerifier.withVirtualTime(() -> this.applications
             .pushManifest(PushApplicationManifestRequest.builder()
                 .manifest(ApplicationManifest.builder()
                     .path(testApplication)
@@ -1458,8 +1459,8 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                         .route("test2.test-shared-domain")
                         .build())
                     .build())
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -1490,13 +1491,13 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
 
-        this.applications
+        StepVerifier.withVirtualTime(() -> this.applications
             .push(PushApplicationRequest.builder()
                 .path(testApplication)
                 .domain("test-shared-domain")
                 .name("test-name")
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -1528,7 +1529,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
 
-        this.applications
+        StepVerifier.withVirtualTime(() -> this.applications
             .pushManifest(PushApplicationManifestRequest.builder()
                 .manifest(ApplicationManifest.builder()
                     .path(testApplication)
@@ -1536,8 +1537,8 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                     .environmentVariable("test-key", "test-value")
                     .name("test-name")
                     .build())
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -1569,14 +1570,14 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
 
-        this.applications
+        StepVerifier.withVirtualTime(() -> this.applications
             .push(PushApplicationRequest.builder()
                 .path(testApplication)
                 .domain("test-shared-domain")
                 .host("test-host")
                 .name("test-name")
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -1608,14 +1609,14 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
 
-        this.applications
+        StepVerifier.withVirtualTime(() -> this.applications
             .push(PushApplicationRequest.builder()
                 .path(testApplication)
                 .domain("test-shared-domain")
                 .noHostname(true)
                 .name("test-name")
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -1697,12 +1698,12 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
 
-        this.applications
+        StepVerifier.withVirtualTime(() -> this.applications
             .push(PushApplicationRequest.builder()
                 .path(testApplication)
                 .name("test-name")
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -1733,15 +1734,15 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
 
-        this.applications
+        StepVerifier.withVirtualTime(() -> this.applications
             .pushManifest(PushApplicationManifestRequest.builder()
                 .manifest(ApplicationManifest.builder()
                     .path(testApplication)
                     .name("test-name")
                     .noHostname(true)
                     .build())
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -1769,13 +1770,13 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
 
-        this.applications
+        StepVerifier.withVirtualTime(() -> this.applications
             .push(PushApplicationRequest.builder()
                 .path(testApplication)
                 .noRoute(true)
                 .name("test-name")
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -1804,15 +1805,15 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
 
-        this.applications
+        StepVerifier.withVirtualTime(() -> this.applications
             .pushManifest(PushApplicationManifestRequest.builder()
                 .manifest(ApplicationManifest.builder()
                     .path(testApplication)
                     .name("test-name")
                     .noRoute(true)
                     .build())
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -1839,13 +1840,13 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
 
-        this.applications
+        StepVerifier.withVirtualTime(() -> this.applications
             .push(PushApplicationRequest.builder()
                 .path(testApplication)
                 .name("test-name")
                 .noStart(true)
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -1876,13 +1877,13 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
 
-        this.applications
+        StepVerifier.withVirtualTime(() -> this.applications
             .push(PushApplicationRequest.builder()
                 .path(testApplication)
                 .domain("test-private-domain")
                 .name("test-name")
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -1916,14 +1917,14 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
 
-        this.applications
+        StepVerifier.withVirtualTime(() -> this.applications
             .push(PushApplicationRequest.builder()
                 .path(testApplication)
                 .domain("test-shared-domain")
                 .name("test-application-name")
                 .randomRoute(true)
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -1954,13 +1955,13 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
 
-        this.applications
+        StepVerifier.withVirtualTime(() -> this.applications
             .push(PushApplicationRequest.builder()
                 .path(testApplication)
                 .domain("test-shared-domain")
                 .name("test-name")
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -1991,13 +1992,13 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesFailingTotal(this.cloudFoundryClient, "test-application-id");
 
-        this.applications
+        StepVerifier.withVirtualTime(() -> this.applications
             .push(PushApplicationRequest.builder()
                 .path(testApplication)
                 .domain("test-shared-domain")
                 .name("test-name")
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalStateException.class).hasMessage("Application test-name failed during start"))
             .verify(Duration.ofSeconds(5));
     }
@@ -2027,13 +2028,13 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
         requestGetApplicationFailing(this.cloudFoundryClient, "test-application-id");
 
-        this.applications
+        StepVerifier.withVirtualTime(() -> this.applications
             .push(PushApplicationRequest.builder()
                 .path(testApplication)
                 .domain("test-shared-domain")
                 .name("test-name")
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalStateException.class).hasMessage("Application test-name failed during staging"))
             .verify(Duration.ofSeconds(5));
     }
@@ -2064,14 +2065,14 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
 
-        this.applications
+        StepVerifier.withVirtualTime(() -> this.applications
             .push(PushApplicationRequest.builder()
                 .path(testApplication)
                 .domain("test-tcp-domain")
                 .randomRoute(true)
                 .name("test-name")
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -2102,7 +2103,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
 
-        this.applications
+        StepVerifier.withVirtualTime(() -> this.applications
             .pushManifest(PushApplicationManifestRequest.builder()
                 .manifest(ApplicationManifest.builder()
                     .path(testApplication)
@@ -2111,8 +2112,8 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                         .build())
                     .name("test-name")
                     .build())
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -2139,13 +2140,13 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestUpload(this.cloudFoundryClient, "test-application-id", testApplication, "test-job-id");
         requestJobFailure(this.cloudFoundryClient, "test-job-entity-id");
 
-        this.applications
+        StepVerifier.withVirtualTime(() -> this.applications
             .push(PushApplicationRequest.builder()
                 .path(testApplication)
                 .domain("test-shared-domain")
                 .name("test-name")
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class).hasMessage("test-error-details-errorCode(1): test-error-details-description"))
             .verify(Duration.ofSeconds(5));
     }
@@ -2186,11 +2187,11 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestGetApplication(this.cloudFoundryClient, "test-metadata-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-metadata-id");
 
-        this.applications
+        StepVerifier.withVirtualTime(() -> this.applications
             .restage(RestageApplicationRequest.builder()
                 .name("test-application-name")
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -2230,11 +2231,11 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestGetApplication(this.cloudFoundryClient, "test-metadata-id");
         requestApplicationInstancesFailingPartial(this.cloudFoundryClient, "test-metadata-id");
 
-        this.applications
+        StepVerifier.withVirtualTime(() -> this.applications
             .restage(RestageApplicationRequest.builder()
                 .name("test-application-name")
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -2246,11 +2247,11 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestGetApplication(this.cloudFoundryClient, "test-metadata-id");
         requestApplicationInstancesFailingTotal(this.cloudFoundryClient, "test-metadata-id");
 
-        this.applications
+        StepVerifier.withVirtualTime(() -> this.applications
             .restage(RestageApplicationRequest.builder()
                 .name("test-application-name")
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalStateException.class).hasMessage("Application test-application-name failed during start"))
             .verify(Duration.ofSeconds(5));
     }
@@ -2279,11 +2280,11 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesFailingPartial(this.cloudFoundryClient, "test-application-id");
 
-        this.applications
+        StepVerifier.withVirtualTime(() -> this.applications
             .restart(RestartApplicationRequest.builder()
                 .name("test-app-name")
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -2296,11 +2297,11 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesFailingTotal(this.cloudFoundryClient, "test-application-id");
 
-        this.applications
+        StepVerifier.withVirtualTime(() -> this.applications
             .restart(RestartApplicationRequest.builder()
                 .name("test-app-name")
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalStateException.class).hasMessage("Application test-app-name failed during start"))
             .verify(Duration.ofSeconds(5));
     }
@@ -2310,12 +2311,12 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-metadata-id");
         requestTerminateApplicationInstance(this.cloudFoundryClient, "test-metadata-id", "0");
 
-        this.applications
+        StepVerifier.withVirtualTime(() -> this.applications
             .restartInstance(RestartApplicationInstanceRequest.builder()
                 .name("test-application-name")
                 .instanceIndex(0)
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -2341,11 +2342,11 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
 
-        this.applications
+        StepVerifier.withVirtualTime(() -> this.applications
             .restart(RestartApplicationRequest.builder()
                 .name("test-app-name")
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -2358,11 +2359,11 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
 
-        this.applications
+        StepVerifier.withVirtualTime(() -> this.applications
             .restart(RestartApplicationRequest.builder()
                 .name("test-app-name")
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -2374,11 +2375,11 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
 
-        this.applications
+        StepVerifier.withVirtualTime(() -> this.applications
             .restart(RestartApplicationRequest.builder()
                 .name("test-app-name")
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -2549,11 +2550,11 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesFailingPartial(this.cloudFoundryClient, "test-application-id");
 
-        this.applications
+        StepVerifier.withVirtualTime(() -> this.applications
             .start(StartApplicationRequest.builder()
                 .name("test-application-name")
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -2565,11 +2566,11 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesFailingTotal(this.cloudFoundryClient, "test-application-id");
 
-        this.applications
+        StepVerifier.withVirtualTime(() -> this.applications
             .start(StartApplicationRequest.builder()
                 .name("test-application-name")
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalStateException.class).hasMessage("Application test-application-name failed during start"))
             .verify(Duration.ofSeconds(5));
     }
@@ -2624,11 +2625,11 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
 
-        this.applications
+        StepVerifier.withVirtualTime(() -> this.applications
             .start(StartApplicationRequest.builder()
                 .name("test-application-name")
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }

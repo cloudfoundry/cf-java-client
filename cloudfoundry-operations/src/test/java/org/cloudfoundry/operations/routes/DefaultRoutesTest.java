@@ -53,6 +53,7 @@ import org.cloudfoundry.operations.AbstractOperationsTest;
 import org.junit.Test;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import reactor.test.scheduler.VirtualTimeScheduler;
 
 import java.time.Duration;
 import java.util.Arrays;
@@ -273,12 +274,12 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
         requestDeleteRoute(this.cloudFoundryClient, "test-route-id");
         requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
 
-        this.routes
+        StepVerifier.withVirtualTime(() -> this.routes
             .delete(DeleteRouteRequest.builder()
                 .domain("test-domain")
                 .port(9999)
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -290,13 +291,13 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
         requestDeleteRoute(this.cloudFoundryClient, "test-route-id");
         requestJobFailure(this.cloudFoundryClient, "test-job-entity-id");
 
-        this.routes
+        StepVerifier.withVirtualTime(() -> this.routes
             .delete(DeleteRouteRequest.builder()
                 .domain("test-domain")
                 .host("test-host")
                 .path("test-path")
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class).hasMessage("test-error-details-errorCode(1): test-error-details-description"))
             .verify(Duration.ofSeconds(5));
     }
@@ -365,10 +366,10 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
         requestDeleteRoute(this.cloudFoundryClient, "test-route-id");
         requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
 
-        this.routes
+        StepVerifier.withVirtualTime(() -> this.routes
             .deleteOrphanedRoutes(DeleteOrphanedRoutesRequest.builder()
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -380,10 +381,10 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
         requestDeleteRoute(this.cloudFoundryClient, "test-route-id");
         requestJobFailure(this.cloudFoundryClient, "test-job-entity-id");
 
-        this.routes
+        StepVerifier.withVirtualTime(() -> this.routes
             .deleteOrphanedRoutes(DeleteOrphanedRoutesRequest.builder()
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class).hasMessage("test-error-details-errorCode(1): test-error-details-description"))
             .verify(Duration.ofSeconds(5));
     }
@@ -407,13 +408,13 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
         requestDeleteRoute(this.cloudFoundryClient, "test-route-id");
         requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
 
-        this.routes
+        StepVerifier.withVirtualTime(() -> this.routes
             .delete(DeleteRouteRequest.builder()
                 .domain("test-domain")
                 .host("test-host")
                 .path("test-path")
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -426,13 +427,13 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
         requestDeleteRoute(this.cloudFoundryClient, "test-route-id");
         requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
 
-        this.routes
+        StepVerifier.withVirtualTime(() -> this.routes
             .delete(DeleteRouteRequest.builder()
                 .domain("test-domain")
                 .host("test-host")
                 .path("test-path")
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }

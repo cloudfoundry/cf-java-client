@@ -61,6 +61,7 @@ import org.cloudfoundry.operations.spaceadmin.SpaceQuota;
 import org.junit.Test;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import reactor.test.scheduler.VirtualTimeScheduler;
 
 import java.time.Duration;
 import java.util.Arrays;
@@ -129,11 +130,11 @@ public final class DefaultOrganizationsTest extends AbstractOperationsTest {
         requestDeleteOrganization(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
         requestJobSuccess(this.cloudFoundryClient, "test-id");
 
-        this.organizations
+        StepVerifier.withVirtualTime(() -> this.organizations
             .delete(DeleteOrganizationRequest.builder()
                 .name(TEST_ORGANIZATION_NAME)
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -144,11 +145,11 @@ public final class DefaultOrganizationsTest extends AbstractOperationsTest {
         requestDeleteOrganization(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
         requestJobFailure(this.cloudFoundryClient, "test-id");
 
-        this.organizations
+        StepVerifier.withVirtualTime(() -> this.organizations
             .delete(DeleteOrganizationRequest.builder()
                 .name(TEST_ORGANIZATION_NAME)
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class).hasMessage("test-error-details-errorCode(1): test-error-details-description"))
             .verify(Duration.ofSeconds(5));
     }
