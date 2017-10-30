@@ -40,10 +40,10 @@ abstract class _DelegatingRootProvider extends AbstractRootProvider {
             .onErrorResume(t -> {
                 if ("cloud_controller_v2".equals(key)) {
                     return getInfoPayloadRootProvider().doGetRoot(connectionContext)
-                        .map(uri -> UriComponentsBuilder.fromUriString(uri.toUriString()).pathSegment("v2").build());
+                        .map(uri -> UriComponentsBuilder.newInstance().uriComponents(uri).pathSegment("v2").build());
                 } else if ("cloud_controller_v3".equals(key)) {
                     return getInfoPayloadRootProvider().doGetRoot(connectionContext)
-                        .map(uri -> UriComponentsBuilder.fromUriString(uri.toUriString()).pathSegment("v3").build());
+                        .map(uri -> UriComponentsBuilder.newInstance().uriComponents(uri).pathSegment("v3").build());
                 } else if ("logging".equals(key)) {
                     return getInfoPayloadRootProvider().doGetRoot("doppler_logging_endpoint", connectionContext);
                 } else if ("routing".equals(key)) {
