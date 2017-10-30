@@ -90,7 +90,8 @@ public final class DefaultSslCertificateTruster implements SslCertificateTruster
             .doOnNext(untrustedCertificates -> {
                 KeyStore trustStore = addToTrustStore(untrustedCertificates, trustManager);
                 this.delegate.set(getTrustManager(getTrustManagerFactory(trustStore)));
-
+            })
+            .doOnSuccess(untrustedCertificates -> {
                 this.trustedHostsAndPorts.add(hostAndPort);
                 this.logger.debug("Trusted SSL Certificate for {}:{}", host, port);
             })
