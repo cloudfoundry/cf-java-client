@@ -96,6 +96,7 @@ import org.cloudfoundry.operations.AbstractOperationsTest;
 import org.junit.Test;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import reactor.test.scheduler.VirtualTimeScheduler;
 
 import java.time.Duration;
 import java.util.Arrays;
@@ -365,11 +366,11 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
         requestDeleteServiceInstance(this.cloudFoundryClient, "test-service-instance-id");
         requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
 
-        this.services
+        StepVerifier.withVirtualTime(() -> this.services
             .deleteInstance(DeleteServiceInstanceRequest.builder()
                 .name("test-service-instance-name")
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -822,12 +823,12 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
         requestDeleteServiceBinding(this.cloudFoundryClient, "test-service-binding-id");
         requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
 
-        this.services
+        StepVerifier.withVirtualTime(() -> this.services
             .unbind(UnbindServiceInstanceRequest.builder()
                 .applicationName("test-application-name")
                 .serviceInstanceName("test-service-instance-name")
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
@@ -840,12 +841,12 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
         requestDeleteServiceBinding(this.cloudFoundryClient, "test-service-binding-id");
         requestJobFailure(this.cloudFoundryClient, "test-job-entity-id");
 
-        this.services
+        StepVerifier.withVirtualTime(() -> this.services
             .unbind(UnbindServiceInstanceRequest.builder()
                 .applicationName("test-application-name")
                 .serviceInstanceName("test-service-instance-name")
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class).hasMessage("test-error-details-errorCode(1): test-error-details-description"))
             .verify(Duration.ofSeconds(5));
     }

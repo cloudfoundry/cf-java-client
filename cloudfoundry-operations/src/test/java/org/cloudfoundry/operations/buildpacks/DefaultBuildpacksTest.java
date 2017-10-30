@@ -33,6 +33,7 @@ import org.cloudfoundry.operations.AbstractOperationsTest;
 import org.junit.Test;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import reactor.test.scheduler.VirtualTimeScheduler;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -72,11 +73,11 @@ public final class DefaultBuildpacksTest extends AbstractOperationsTest {
         requestDeleteBuildpack(this.cloudFoundryClient, "test-buildpack-id");
         requestJobSuccess(this.cloudFoundryClient, "test-job-id");
 
-        this.buildpacks
+        StepVerifier.withVirtualTime(() -> this.buildpacks
             .delete(DeleteBuildpackRequest.builder()
                 .name("test-buildpack")
-                .build())
-            .as(StepVerifier::create)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
