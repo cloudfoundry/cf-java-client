@@ -52,18 +52,24 @@ abstract class AbstractRootProvider implements RootProvider {
 
     @Override
     public final Mono<String> getRoot(ConnectionContext connectionContext) {
-        return doGetRoot(connectionContext)
+        Mono<String> cached = doGetRoot(connectionContext)
             .delayUntil(uri -> trust(uri.getHost(), uri.getPort(), connectionContext))
-            .map(UriComponents::toUriString)
-            .cache();
+            .map(UriComponents::toUriString);
+
+        return connectionContext.getCacheDuration()
+            .map(cached::cache)
+            .orElseGet(cached::cache);
     }
 
     @Override
     public final Mono<String> getRoot(String key, ConnectionContext connectionContext) {
-        return doGetRoot(key, connectionContext)
+        Mono<String> cached = doGetRoot(key, connectionContext)
             .delayUntil(uri -> trust(uri.getHost(), uri.getPort(), connectionContext))
-            .map(UriComponents::toUriString)
-            .cache();
+            .map(UriComponents::toUriString);
+
+        return connectionContext.getCacheDuration()
+            .map(cached::cache)
+            .orElseGet(cached::cache);
     }
 
     protected abstract Mono<UriComponents> doGetRoot(ConnectionContext connectionContext);

@@ -107,9 +107,12 @@ abstract class _ReactorUaaClient implements UaaClient {
 
     @Value.Default
     Mono<String> getRoot() {
-        return getConnectionContext().getRootProvider().getRoot("uaa", getConnectionContext())
-            .map(getIdentityZoneEndpoint(getIdentityZoneSubdomain()))
-            .cache();
+        Mono<String> cached = getConnectionContext().getRootProvider().getRoot("uaa", getConnectionContext())
+            .map(getIdentityZoneEndpoint(getIdentityZoneSubdomain()));
+
+        return getConnectionContext().getCacheDuration()
+            .map(cached::cache)
+            .orElseGet(cached::cache);
     }
 
     /**

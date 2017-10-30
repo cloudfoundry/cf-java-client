@@ -20,10 +20,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import reactor.core.publisher.Mono;
 import reactor.ipc.netty.http.client.HttpClient;
 
+import java.time.Duration;
+import java.util.Optional;
+
 /**
  * Common, reusable, connection context
  */
 public interface ConnectionContext {
+
+    /**
+     * The duration that stable responses like the payload of the API root should be cached
+     */
+    Optional<Duration> getCacheDuration();
 
     /**
      * The {@link HttpClient} to use
