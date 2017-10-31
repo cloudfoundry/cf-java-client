@@ -18,6 +18,7 @@ package org.cloudfoundry.reactor.networking;
 
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
+import org.cloudfoundry.reactor.client.QueryBuilder;
 import org.cloudfoundry.reactor.util.AbstractReactorOperations;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
@@ -35,6 +36,14 @@ public abstract class AbstractNetworkingOperations extends AbstractReactorOperat
         return doGet(responseType, uriTransformer, outbound -> outbound, inbound -> inbound);
     }
 
+    protected final <T> Mono<T> get(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+        return doGet(responseType,
+            queryTransformer(requestPayload)
+                .andThen(uriTransformer),
+            outbound -> outbound,
+            inbound -> inbound);
+    }
+
     protected final Mono<HttpClientResponse> get(Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return doGet(uriTransformer, outbound -> outbound, inbound -> inbound);
     }
@@ -45,6 +54,13 @@ public abstract class AbstractNetworkingOperations extends AbstractReactorOperat
 
     protected final <T> Mono<T> put(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return doPut(requestPayload, responseType, uriTransformer, outbound -> outbound, inbound -> inbound);
+    }
+
+    private static Function<UriComponentsBuilder, UriComponentsBuilder> queryTransformer(Object requestPayload) {
+        return builder -> {
+            QueryBuilder.augment(builder, requestPayload);
+            return builder;
+        };
     }
 
 }

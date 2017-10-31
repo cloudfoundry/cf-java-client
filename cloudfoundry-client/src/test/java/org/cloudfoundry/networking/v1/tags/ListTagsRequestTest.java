@@ -14,24 +14,16 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.networking;
+package org.cloudfoundry.networking.v1.tags;
 
-import org.cloudfoundry.networking.v1.policies.Policies;
-import org.cloudfoundry.networking.v1.tags.Tags;
+import org.junit.Test;
 
-/**
- * Main entry point to the Networking Client API
- */
-public interface NetworkingClient {
+public class ListTagsRequestTest {
 
-    /**
-     * Main entry point to the Policies API
-     */
-    Policies policies();
-
-    /**
-     * Main entry point to the Tags API
-     */
-    Tags tags();
+    @Test
+    public void valid() {
+        ListTagsRequest.builder()
+            .build();
+    }
 
 }

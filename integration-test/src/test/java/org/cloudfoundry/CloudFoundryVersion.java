@@ -14,24 +14,30 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.networking;
+package org.cloudfoundry;
 
-import org.cloudfoundry.networking.v1.policies.Policies;
-import org.cloudfoundry.networking.v1.tags.Tags;
+import com.github.zafarkhaja.semver.Version;
 
-/**
- * Main entry point to the Networking Client API
- */
-public interface NetworkingClient {
+public enum CloudFoundryVersion {
 
-    /**
-     * Main entry point to the Policies API
-     */
-    Policies policies();
+    PCF_1_9(Version.forIntegers(2, 65, 0)),
 
-    /**
-     * Main entry point to the Tags API
-     */
-    Tags tags();
+    PCF_1_10(Version.forIntegers(2, 75, 0)),
+
+    PCF_1_11(Version.forIntegers(2, 82, 0)),
+
+    PCF_1_12(Version.forIntegers(2, 94, 0)),
+
+    UNSPECIFIED(Version.forIntegers(0));
+
+    private final Version version;
+
+    CloudFoundryVersion(Version version) {
+        this.version = version;
+    }
+
+    Version getVersion() {
+        return this.version;
+    }
 
 }

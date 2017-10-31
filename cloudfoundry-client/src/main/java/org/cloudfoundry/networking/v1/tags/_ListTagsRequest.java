@@ -14,24 +14,14 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.networking;
+package org.cloudfoundry.networking.v1.tags;
 
-import org.cloudfoundry.networking.v1.policies.Policies;
-import org.cloudfoundry.networking.v1.tags.Tags;
+import org.immutables.value.Value;
 
 /**
- * Main entry point to the Networking Client API
+ * The request payload for the List Tags operation
  */
-public interface NetworkingClient {
-
-    /**
-     * Main entry point to the Policies API
-     */
-    Policies policies();
-
-    /**
-     * Main entry point to the Tags API
-     */
-    Tags tags();
+@Value.Immutable
+abstract class _ListTagsRequest {
 
 }

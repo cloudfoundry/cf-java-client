@@ -25,7 +25,7 @@ import org.springframework.core.annotation.AnnotationUtils;
 
 import java.util.Optional;
 
-import static org.cloudfoundry.IfCloudFoundryVersion.CloudFoundryVersion.UNSPECIFIED;
+import static org.cloudfoundry.CloudFoundryVersion.UNSPECIFIED;
 
 final class CloudFoundryVersionConditionalRule implements MethodRule {
 

@@ -14,24 +14,21 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.networking;
+package org.cloudfoundry.networking.v1.tags;
 
-import org.cloudfoundry.networking.v1.policies.Policies;
-import org.cloudfoundry.networking.v1.tags.Tags;
+import reactor.core.publisher.Mono;
 
 /**
- * Main entry point to the Networking Client API
+ * Main entry point to the Tags API
  */
-public interface NetworkingClient {
+public interface Tags {
 
     /**
-     * Main entry point to the Policies API
+     * Makes the <a href="https://github.com/cloudfoundry-incubator/cf-networking-release/blob/develop/docs/API.md#get-networkingv1externaltags">List Tags</a> request
+     *
+     * @param request the List Tags request
+     * @return the response to the List Tags request
      */
-    Policies policies();
-
-    /**
-     * Main entry point to the Tags API
-     */
-    Tags tags();
+    Mono<ListTagsResponse> list(ListTagsRequest request);
 
 }

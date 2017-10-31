@@ -17,6 +17,7 @@
 package org.cloudfoundry.client.v3;
 
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.CloudFoundryVersion;
 import org.cloudfoundry.IfCloudFoundryVersion;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.junit.Ignore;
@@ -25,7 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.concurrent.TimeoutException;
 
-@IfCloudFoundryVersion(greaterThanOrEqualTo = IfCloudFoundryVersion.CloudFoundryVersion.PCF_1_10)
+@IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_10)
 public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Autowired

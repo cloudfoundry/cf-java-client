@@ -14,24 +14,25 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.networking;
+package org.cloudfoundry.networking.v1.policies;
 
-import org.cloudfoundry.networking.v1.policies.Policies;
-import org.cloudfoundry.networking.v1.tags.Tags;
+import org.cloudfoundry.Nullable;
+import org.cloudfoundry.QueryParameter;
+import org.immutables.value.Value;
+
+import java.util.List;
 
 /**
- * Main entry point to the Networking Client API
+ * The request payload for the List Policies operation
  */
-public interface NetworkingClient {
+@Value.Immutable
+abstract class _ListPoliciesRequest {
 
     /**
-     * Main entry point to the Policies API
+     * Policy group ids to filter on
      */
-    Policies policies();
-
-    /**
-     * Main entry point to the Tags API
-     */
-    Tags tags();
+    @Nullable
+    @QueryParameter("id")
+    abstract List<String> getPolicyGroupIds();
 
 }

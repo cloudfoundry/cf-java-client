@@ -14,24 +14,25 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.networking;
+package org.cloudfoundry.networking.v1.tags;
 
-import org.cloudfoundry.networking.v1.policies.Policies;
-import org.cloudfoundry.networking.v1.tags.Tags;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.immutables.value.Value;
+
+import java.util.List;
 
 /**
- * Main entry point to the Networking Client API
+ * The response payload for the List Tags operation
  */
-public interface NetworkingClient {
+@JsonDeserialize
+@Value.Immutable
+abstract class _ListTagsResponse {
 
     /**
-     * Main entry point to the Policies API
+     * The policies
      */
-    Policies policies();
-
-    /**
-     * Main entry point to the Tags API
-     */
-    Tags tags();
+    @JsonProperty("tags")
+    abstract List<Tag> getTags();
 
 }

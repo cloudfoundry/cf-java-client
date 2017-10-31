@@ -14,24 +14,23 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.networking;
+package org.cloudfoundry.networking.v1.policies;
 
-import org.cloudfoundry.networking.v1.policies.Policies;
-import org.cloudfoundry.networking.v1.tags.Tags;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.immutables.value.Value;
 
 /**
- * Main entry point to the Networking Client API
+ * The payload for Policy responses
  */
-public interface NetworkingClient {
+@JsonDeserialize
+@Value.Immutable
+abstract class _Source {
 
     /**
-     * Main entry point to the Policies API
+     * The id
      */
-    Policies policies();
-
-    /**
-     * Main entry point to the Tags API
-     */
-    Tags tags();
+    @JsonProperty("id")
+    abstract String getId();
 
 }
