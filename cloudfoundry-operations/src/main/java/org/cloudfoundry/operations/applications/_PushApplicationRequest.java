@@ -76,7 +76,7 @@ abstract class _PushApplicationRequest {
     abstract String getCommand();
 
     /**
-     * The disk quota for the application
+     * The disk quota in megabytes for the application
      */
     @Nullable
     abstract Integer getDiskQuota();
@@ -124,7 +124,7 @@ abstract class _PushApplicationRequest {
     abstract Integer getInstances();
 
     /**
-     * The memory in MB for the application
+     * The memory in megabytes for the application
      */
     @Nullable
     abstract Integer getMemory();
