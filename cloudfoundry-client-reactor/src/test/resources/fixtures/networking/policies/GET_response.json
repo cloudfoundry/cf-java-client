@@ -1,0 +1,31 @@
+{
+  "total_policies": 2,
+  "policies": [
+    {
+      "source": {
+        "id": "1081ceac-f5c4-47a8-95e8-88e1e302efb5"
+      },
+      "destination": {
+        "id": "38f08df0-19df-4439-b4e9-61096d4301ea",
+        "protocol": "tcp",
+        "ports": {
+          "start": 1234,
+          "end": 1235
+        }
+      }
+    },
+    {
+      "source": {
+        "id": "308e7ef1-63f1-4a6c-978c-2e527cbb1c36"
+      },
+      "destination": {
+        "id": "308e7ef1-63f1-4a6c-978c-2e527cbb1c36",
+        "protocol": "tcp",
+        "ports": {
+          "start": 1234,
+          "end": 1235
+        }
+      }
+    }
+  ]
+}

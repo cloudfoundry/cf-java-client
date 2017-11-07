@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.reactor.routing.v1;
+package org.cloudfoundry.reactor.networking;
 
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
+import org.cloudfoundry.reactor.client.QueryBuilder;
 import org.cloudfoundry.reactor.util.AbstractReactorOperations;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
@@ -25,14 +26,22 @@ import reactor.ipc.netty.http.client.HttpClientResponse;
 
 import java.util.function.Function;
 
-public abstract class AbstractRoutingV1Operations extends AbstractReactorOperations {
+public abstract class AbstractNetworkingOperations extends AbstractReactorOperations {
 
-    protected AbstractRoutingV1Operations(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
+    protected AbstractNetworkingOperations(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
         super(connectionContext, root, tokenProvider);
     }
 
     protected final <T> Mono<T> get(Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return doGet(responseType, uriTransformer, outbound -> outbound, inbound -> inbound);
+    }
+
+    protected final <T> Mono<T> get(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+        return doGet(responseType,
+            queryTransformer(requestPayload)
+                .andThen(uriTransformer),
+            outbound -> outbound,
+            inbound -> inbound);
     }
 
     protected final Mono<HttpClientResponse> get(Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
@@ -45,6 +54,13 @@ public abstract class AbstractRoutingV1Operations extends AbstractReactorOperati
 
     protected final <T> Mono<T> put(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return doPut(requestPayload, responseType, uriTransformer, outbound -> outbound, inbound -> inbound);
+    }
+
+    private static Function<UriComponentsBuilder, UriComponentsBuilder> queryTransformer(Object requestPayload) {
+        return builder -> {
+            QueryBuilder.augment(builder, requestPayload);
+            return builder;
+        };
     }
 
 }

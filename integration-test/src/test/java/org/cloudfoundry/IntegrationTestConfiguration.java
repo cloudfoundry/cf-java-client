@@ -29,6 +29,7 @@ import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
 import org.cloudfoundry.doppler.DopplerClient;
+import org.cloudfoundry.networking.NetworkingClient;
 import org.cloudfoundry.operations.DefaultCloudFoundryOperations;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.DefaultConnectionContext;
@@ -36,6 +37,7 @@ import org.cloudfoundry.reactor.ProxyConfiguration;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.ReactorCloudFoundryClient;
 import org.cloudfoundry.reactor.doppler.ReactorDopplerClient;
+import org.cloudfoundry.reactor.networking.ReactorNetworkingClient;
 import org.cloudfoundry.reactor.routing.ReactorRoutingClient;
 import org.cloudfoundry.reactor.tokenprovider.ClientCredentialsGrantTokenProvider;
 import org.cloudfoundry.reactor.tokenprovider.PasswordGrantTokenProvider;
@@ -92,6 +94,7 @@ public class IntegrationTestConfiguration {
         "clients.secret",
         "cloud_controller.admin",
         "idps.write",
+        "network.admin",
         "routing.router_groups.read",
         "routing.router_groups.write",
         "routing.routes.read",
@@ -113,6 +116,7 @@ public class IntegrationTestConfiguration {
         "cloud_controller.read",
         "cloud_controller.write",
         "idps.write",
+        "network.admin",
         "openid",
         "password.write",
         "routing.router_groups.read",
@@ -134,10 +138,20 @@ public class IntegrationTestConfiguration {
 
     @Bean
     @Qualifier("admin")
-    ReactorCloudFoundryClient adminCloudFoundryClient(ConnectionContext connectionContext,
-                                                      @Value("${test.admin.password}") String password,
-                                                      @Value("${test.admin.username}") String username) {
+    ReactorCloudFoundryClient adminCloudFoundryClient(ConnectionContext connectionContext, @Value("${test.admin.password}") String password, @Value("${test.admin.username}") String username) {
         return ReactorCloudFoundryClient.builder()
+            .connectionContext(connectionContext)
+            .tokenProvider(PasswordGrantTokenProvider.builder()
+                .password(password)
+                .username(username)
+                .build())
+            .build();
+    }
+
+    @Bean
+    @Qualifier("admin")
+    NetworkingClient adminNetworkingClient(ConnectionContext connectionContext, @Value("${test.admin.password}") String password, @Value("${test.admin.username}") String username) {
+        return ReactorNetworkingClient.builder()
             .connectionContext(connectionContext)
             .tokenProvider(PasswordGrantTokenProvider.builder()
                 .password(password)
@@ -187,8 +201,10 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean(initMethod = "clean", destroyMethod = "clean")
-    CloudFoundryCleaner cloudFoundryCleaner(@Qualifier("admin") CloudFoundryClient cloudFoundryClient, NameFactory nameFactory, @Qualifier("admin") UaaClient uaaClient) {
-        return new CloudFoundryCleaner(cloudFoundryClient, nameFactory, uaaClient);
+    CloudFoundryCleaner cloudFoundryCleaner(@Qualifier("admin") CloudFoundryClient cloudFoundryClient, NameFactory nameFactory, @Qualifier("admin") NetworkingClient networkingClient,
+                                            Version serverVersion, @Qualifier("admin") UaaClient uaaClient) {
+
+        return new CloudFoundryCleaner(cloudFoundryClient, nameFactory, networkingClient, serverVersion, uaaClient);
     }
 
     @Bean
@@ -213,15 +229,8 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean
-    CloudFoundryVersionConditionalRule cloudFoundryVersionConditionalRule(CloudFoundryClient cloudFoundryClient) {
-        return cloudFoundryClient.info()
-            .get(GetInfoRequest.builder()
-                .build())
-            .map(response -> Version.valueOf(response.getApiVersion()))
-            .map(CloudFoundryVersionConditionalRule::new)
-            .doOnSubscribe(s -> this.logger.debug(">> CLOUD FOUNDRY VERSION <<"))
-            .doOnSuccess(r -> this.logger.debug("<< CLOUD FOUNDRY VERSION >>"))
-            .block();
+    CloudFoundryVersionConditionalRule cloudFoundryVersionConditionalRule(Version serverVersion) {
+        return new CloudFoundryVersionConditionalRule(serverVersion);
     }
 
     @Bean
@@ -266,6 +275,14 @@ public class IntegrationTestConfiguration {
     @Bean
     RandomNameFactory nameFactory(Random random) {
         return new RandomNameFactory(random);
+    }
+
+    @Bean
+    NetworkingClient networkingClient(ConnectionContext connectionContext, TokenProvider tokenProvider) {
+        return ReactorNetworkingClient.builder()
+            .connectionContext(connectionContext)
+            .tokenProvider(tokenProvider)
+            .build();
     }
 
     @Bean(initMethod = "block")
@@ -338,6 +355,17 @@ public class IntegrationTestConfiguration {
             .connectionContext(connectionContext)
             .tokenProvider(tokenProvider)
             .build();
+    }
+
+    @Bean
+    Version serverVersion(@Qualifier("admin") CloudFoundryClient cloudFoundryClient) {
+        return cloudFoundryClient.info()
+            .get(GetInfoRequest.builder()
+                .build())
+            .map(response -> Version.valueOf(response.getApiVersion()))
+            .doOnSubscribe(s -> this.logger.debug(">> CLOUD FOUNDRY VERSION <<"))
+            .doOnSuccess(r -> this.logger.debug("<< CLOUD FOUNDRY VERSION >>"))
+            .block();
     }
 
     @Bean(initMethod = "block")

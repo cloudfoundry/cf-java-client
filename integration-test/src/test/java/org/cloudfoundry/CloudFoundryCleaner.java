@@ -16,6 +16,7 @@
 
 package org.cloudfoundry;
 
+import com.github.zafarkhaja.semver.Version;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.applications.DeleteApplicationRequest;
@@ -65,6 +66,14 @@ import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedS
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.RemoveUserProvidedServiceInstanceRouteRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstanceResource;
 import org.cloudfoundry.client.v2.users.UserResource;
+import org.cloudfoundry.networking.NetworkingClient;
+import org.cloudfoundry.networking.v1.policies.DeletePoliciesRequest;
+import org.cloudfoundry.networking.v1.policies.Destination;
+import org.cloudfoundry.networking.v1.policies.ListPoliciesRequest;
+import org.cloudfoundry.networking.v1.policies.ListPoliciesResponse;
+import org.cloudfoundry.networking.v1.policies.Policy;
+import org.cloudfoundry.networking.v1.policies.Ports;
+import org.cloudfoundry.networking.v1.policies.Source;
 import org.cloudfoundry.uaa.UaaClient;
 import org.cloudfoundry.uaa.clients.DeleteClientRequest;
 import org.cloudfoundry.uaa.clients.ListClientsRequest;
@@ -94,7 +103,9 @@ import reactor.util.function.Tuples;
 import javax.net.ssl.SSLException;
 import java.time.Duration;
 import java.util.Map;
+import java.util.function.Supplier;
 
+import static org.cloudfoundry.CloudFoundryVersion.PCF_1_12;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 import static org.cloudfoundry.util.tuple.TupleUtils.predicate;
 
@@ -118,11 +129,17 @@ final class CloudFoundryCleaner {
 
     private final NameFactory nameFactory;
 
+    private final NetworkingClient networkingClient;
+
+    private final Version serverVersion;
+
     private final UaaClient uaaClient;
 
-    CloudFoundryCleaner(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory, UaaClient uaaClient) {
+    CloudFoundryCleaner(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory, NetworkingClient networkingClient, Version serverVersion, UaaClient uaaClient) {
         this.cloudFoundryClient = cloudFoundryClient;
         this.nameFactory = nameFactory;
+        this.networkingClient = networkingClient;
+        this.serverVersion = serverVersion;
         this.uaaClient = uaaClient;
     }
 
@@ -139,6 +156,7 @@ final class CloudFoundryCleaner {
                 cleanGroups(this.uaaClient, this.nameFactory),
                 cleanIdentityProviders(this.uaaClient, this.nameFactory),
                 cleanIdentityZones(this.uaaClient, this.nameFactory),
+                cleanNetworkingPolicies(this.networkingClient, this.nameFactory, this.serverVersion),
                 cleanRoutes(this.cloudFoundryClient, this.nameFactory),
                 cleanSecurityGroups(this.cloudFoundryClient, this.nameFactory),
                 cleanServiceBrokers(this.cloudFoundryClient, this.nameFactory),
@@ -275,6 +293,33 @@ final class CloudFoundryCleaner {
                     .build())
                 .doOnError(t -> LOGGER.error("Unable to delete identity zone {}", zone.getName(), t))
                 .then());
+    }
+
+    private static Flux<Void> cleanNetworkingPolicies(NetworkingClient networkingClient, NameFactory nameFactory, Version serverVersion) {
+        return ifCfVersion(PCF_1_12, serverVersion, () -> networkingClient.policies()
+            .list(ListPoliciesRequest.builder()
+                .build())
+            .flatMapIterable(ListPoliciesResponse::getPolicies)
+            .filter(policy -> nameFactory.isPort(policy.getDestination().getPorts().getStart()))
+            .filter(policy -> nameFactory.isPort(policy.getDestination().getPorts().getEnd()))
+            .flatMap(policy -> networkingClient.policies()
+                .delete(DeletePoliciesRequest.builder()
+                    .policy(Policy.builder()
+                        .destination(Destination.builder()
+                            .id(policy.getDestination().getId())
+                            .ports(Ports.builder()
+                                .end(policy.getDestination().getPorts().getEnd())
+                                .start(policy.getDestination().getPorts().getStart())
+                                .build())
+                            .protocol(policy.getDestination().getProtocol())
+                            .build())
+                        .source(Source.builder()
+                            .id(policy.getSource().getId())
+                            .build())
+                        .build())
+                    .build())
+                .doOnError(t -> LOGGER.error("Unable to delete networking policy between {} and {}", policy.getSource().getId(), policy.getDestination().getId(), t))
+                .then()));
     }
 
     private static Flux<Void> cleanOrganizationQuotaDefinitions(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
@@ -541,6 +586,10 @@ final class CloudFoundryCleaner {
                         .build()))
                 .map(response -> Tuples.of(ResourceUtils.getId(response), ResourceUtils.getEntity(response).getName())))
             .collectMap(function((id, name) -> id), function((id, name) -> name));
+    }
+
+    private static Flux<Void> ifCfVersion(CloudFoundryVersion expectedVersion, Version serverVersion, Supplier<Flux<Void>> supplier) {
+        return serverVersion.lessThan(expectedVersion.getVersion()) ? Flux.empty() : supplier.get();
     }
 
     private static boolean isCleanable(NameFactory nameFactory, UserResource resource) {
