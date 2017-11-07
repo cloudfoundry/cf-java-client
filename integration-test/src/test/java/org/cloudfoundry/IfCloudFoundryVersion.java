@@ -16,8 +16,6 @@
 
 package org.cloudfoundry;
 
-import com.github.zafarkhaja.semver.Version;
-
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
@@ -25,7 +23,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import static org.cloudfoundry.IfCloudFoundryVersion.CloudFoundryVersion.UNSPECIFIED;
+import static org.cloudfoundry.CloudFoundryVersion.UNSPECIFIED;
 
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
@@ -42,29 +40,5 @@ public @interface IfCloudFoundryVersion {
     CloudFoundryVersion lessThan() default UNSPECIFIED;
 
     CloudFoundryVersion lessThanOrEqualTo() default UNSPECIFIED;
-
-    enum CloudFoundryVersion {
-
-        PCF_1_9(Version.forIntegers(2, 65, 0)),
-
-        PCF_1_10(Version.forIntegers(2, 75, 0)),
-
-        PCF_1_11(Version.forIntegers(2, 82, 0)),
-
-        PCF_1_12(Version.forIntegers(2, 94, 0)),
-
-        UNSPECIFIED(Version.forIntegers(0));
-
-        private final Version version;
-
-        CloudFoundryVersion(Version version) {
-            this.version = version;
-        }
-
-        Version getVersion() {
-            return this.version;
-        }
-
-    }
 
 }

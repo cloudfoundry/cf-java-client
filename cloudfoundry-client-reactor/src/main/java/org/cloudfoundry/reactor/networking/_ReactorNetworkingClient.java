@@ -14,34 +14,34 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.reactor.routing;
+package org.cloudfoundry.reactor.networking;
 
+import org.cloudfoundry.networking.NetworkingClient;
+import org.cloudfoundry.networking.v1.policies.Policies;
+import org.cloudfoundry.networking.v1.tags.Tags;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
-import org.cloudfoundry.reactor.routing.v1.routergroups.ReactorRouterGroups;
-import org.cloudfoundry.reactor.routing.v1.tcproutes.ReactorTcpRoutes;
-import org.cloudfoundry.routing.RoutingClient;
-import org.cloudfoundry.routing.v1.routergroups.RouterGroups;
-import org.cloudfoundry.routing.v1.tcproutes.TcpRoutes;
+import org.cloudfoundry.reactor.networking.v1.policies.ReactorPolicies;
+import org.cloudfoundry.reactor.networking.v1.tags.ReactorTags;
 import org.immutables.value.Value;
 import reactor.core.publisher.Mono;
 
 /**
- * The Reactor-based implementation of {@link RoutingClient}
+ * The Reactor-based implementation of {@link NetworkingClient}
  */
 @Value.Immutable
-abstract class _ReactorRoutingClient implements RoutingClient {
+abstract class _ReactorNetworkingClient implements NetworkingClient {
 
     @Override
     @Value.Derived
-    public RouterGroups routerGroups() {
-        return new ReactorRouterGroups(getConnectionContext(), getRoot(), getTokenProvider());
+    public Policies policies() {
+        return new ReactorPolicies(getConnectionContext(), getRoot(), getTokenProvider());
     }
 
     @Override
     @Value.Derived
-    public TcpRoutes tcpRoutes() {
-        return new ReactorTcpRoutes(getConnectionContext(), getRoot(), getTokenProvider());
+    public Tags tags() {
+        return new ReactorTags(getConnectionContext(), getRoot(), getTokenProvider());
     }
 
     /**
@@ -51,7 +51,7 @@ abstract class _ReactorRoutingClient implements RoutingClient {
 
     @Value.Default
     Mono<String> getRoot() {
-        return getConnectionContext().getRootProvider().getRoot("routing", getConnectionContext());
+        return getConnectionContext().getRootProvider().getRoot("network_policy_v1", getConnectionContext());
     }
 
     /**
