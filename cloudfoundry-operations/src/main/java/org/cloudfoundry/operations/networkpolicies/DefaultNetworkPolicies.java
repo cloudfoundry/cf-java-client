@@ -21,6 +21,7 @@ import org.cloudfoundry.client.v3.applications.ApplicationResource;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.networking.NetworkingClient;
 import org.cloudfoundry.networking.v1.policies.CreatePoliciesRequest;
+import org.cloudfoundry.networking.v1.policies.DeletePoliciesRequest;
 import org.cloudfoundry.networking.v1.policies.Destination;
 import org.cloudfoundry.networking.v1.policies.ListPoliciesRequest;
 import org.cloudfoundry.networking.v1.policies.ListPoliciesResponse;
@@ -82,6 +83,19 @@ public final class DefaultNetworkPolicies implements NetworkPolicies {
             .checkpoint();
     }
 
+    @Override
+    public Flux<Void> remove(RemoveNetworkPolicyRequest request) {
+        return Mono
+            .when(this.cloudFoundryClient, this.networkingClient, this.spaceId)
+            .flatMapMany(function((cloudFoundryClient, networkingClient, spaceId) -> Mono.when(
+                Mono.just(networkingClient),
+                getApplicationsByName(cloudFoundryClient, spaceId)
+            )))
+            .flatMap(function((networkingClient, applications) -> requestRemovePolicy(networkingClient, applications, request)))
+            .transform(OperationsLogging.log("Remove Network Policy"))
+            .checkpoint();
+    }
+
     private static Mono<Map<String, String>> getApplicationsById(CloudFoundryClient cloudFoundryClient, String spaceId) {
         return requestListApplications(cloudFoundryClient, spaceId)
             .map(resource -> Tuples.of(resource.getId(), resource.getName()))
@@ -129,6 +143,25 @@ public final class DefaultNetworkPolicies implements NetworkPolicies {
     private static Mono<ListPoliciesResponse> requestListNetworkPolicies(NetworkingClient networkingClient) {
         return networkingClient.policies()
             .list(ListPoliciesRequest.builder()
+                .build());
+    }
+
+    private static Mono<Void> requestRemovePolicy(NetworkingClient networkingClient, Map<String, String> applications, RemoveNetworkPolicyRequest request) {
+        return networkingClient.policies()
+            .delete(DeletePoliciesRequest.builder()
+                .policy(org.cloudfoundry.networking.v1.policies.Policy.builder()
+                    .destination(Destination.builder()
+                        .id(applications.get(request.getDestination()))
+                        .ports(Ports.builder()
+                            .end(Optional.ofNullable(request.getEndPort()).orElse(request.getStartPort()))
+                            .start(request.getStartPort())
+                            .build())
+                        .protocol(request.getProtocol())
+                        .build())
+                    .source(Source.builder()
+                        .id(applications.get(request.getSource()))
+                        .build())
+                    .build())
                 .build());
     }
 

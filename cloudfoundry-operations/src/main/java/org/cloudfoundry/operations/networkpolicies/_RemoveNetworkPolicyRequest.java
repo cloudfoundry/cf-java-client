@@ -16,28 +16,39 @@
 
 package org.cloudfoundry.operations.networkpolicies;
 
-import reactor.core.publisher.Flux;
+import org.cloudfoundry.Nullable;
+import org.immutables.value.Value;
 
 /**
- * Main entry point to the Cloud Foundry Network Policies Operations API
+ * The request options for the remove network policy operation
  */
-public interface NetworkPolicies {
+@Value.Immutable
+abstract class _RemoveNetworkPolicyRequest {
 
     /**
-     * Add a network policy
+     * Name of the destination
      */
-    Flux<Void> add(AddNetworkPolicyRequest request);
+    abstract String getDestination();
 
     /**
-     * Lists the network policies
-     *
-     * @return the network policies
+     * End of the port range
      */
-    Flux<Policy> list(ListNetworkPoliciesRequest request);
+    @Nullable
+    abstract Integer getEndPort();
 
     /**
-     * Remove a network policy
+     * The protocol
      */
-    Flux<Void> remove(RemoveNetworkPolicyRequest request);
+    abstract String getProtocol();
+
+    /**
+     * Name of the source
+     */
+    abstract String getSource();
+
+    /**
+     * Start of the port range
+     */
+    abstract Integer getStartPort();
 
 }
