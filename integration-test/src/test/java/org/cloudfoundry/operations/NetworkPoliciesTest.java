@@ -17,6 +17,8 @@
 package org.cloudfoundry.operations;
 
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.CloudFoundryVersion;
+import org.cloudfoundry.IfCloudFoundryVersion;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
@@ -45,6 +47,7 @@ public final class NetworkPoliciesTest extends AbstractIntegrationTest {
     @Autowired
     private Mono<String> spaceId;
 
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_12)
     @Test
     public void add() throws TimeoutException, InterruptedException {
         String destinationApplicationName = this.nameFactory.getApplicationName();
@@ -70,6 +73,7 @@ public final class NetworkPoliciesTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_12)
     @Test
     public void list() throws TimeoutException, InterruptedException {
         String destinationApplicationName = this.nameFactory.getApplicationName();
@@ -93,6 +97,7 @@ public final class NetworkPoliciesTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_12)
     @Test
     public void remove() throws TimeoutException, InterruptedException {
         String destinationApplicationName = this.nameFactory.getApplicationName();
