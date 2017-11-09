@@ -23,6 +23,7 @@ import org.cloudfoundry.client.v2.organizations.OrganizationResource;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.doppler.DopplerClient;
+import org.cloudfoundry.networking.NetworkingClient;
 import org.cloudfoundry.operations.advanced.Advanced;
 import org.cloudfoundry.operations.advanced.DefaultAdvanced;
 import org.cloudfoundry.operations.applications.Applications;
@@ -31,6 +32,8 @@ import org.cloudfoundry.operations.buildpacks.Buildpacks;
 import org.cloudfoundry.operations.buildpacks.DefaultBuildpacks;
 import org.cloudfoundry.operations.domains.DefaultDomains;
 import org.cloudfoundry.operations.domains.Domains;
+import org.cloudfoundry.operations.networkpolicies.DefaultNetworkPolicies;
+import org.cloudfoundry.operations.networkpolicies.NetworkPolicies;
 import org.cloudfoundry.operations.organizationadmin.DefaultOrganizationAdmin;
 import org.cloudfoundry.operations.organizationadmin.OrganizationAdmin;
 import org.cloudfoundry.operations.organizations.DefaultOrganizations;
@@ -88,6 +91,12 @@ abstract class _DefaultCloudFoundryOperations implements CloudFoundryOperations 
     @Value.Derived
     public Domains domains() {
         return new DefaultDomains(getCloudFoundryClientPublisher(), getRoutingClientPublisher());
+    }
+
+    @Override
+    @Value.Derived
+    public NetworkPolicies networkPolicies() {
+        return new DefaultNetworkPolicies(getCloudFoundryClientPublisher(), getNetworkingClientPublisher(), getSpaceId());
     }
 
     @Override
@@ -167,6 +176,19 @@ abstract class _DefaultCloudFoundryOperations implements CloudFoundryOperations 
         return Optional.ofNullable(getDopplerClient())
             .map(Mono::just)
             .orElse(Mono.error(new IllegalStateException("DopplerClient must be set")));
+    }
+
+    /**
+     * The {@link NetworkingClient} to use for operations functionality
+     */
+    @Nullable
+    abstract NetworkingClient getNetworkingClient();
+
+    @Value.Derived
+    Mono<NetworkingClient> getNetworkingClientPublisher() {
+        return Optional.ofNullable(getNetworkingClient())
+            .map(Mono::just)
+            .orElse(Mono.error(new IllegalStateException("NetworkingClient must be set")));
     }
 
     /**
