@@ -16,37 +16,30 @@
 
 package org.cloudfoundry.operations.networkpolicies;
 
-import org.immutables.value.Value;
+import org.junit.Test;
 
-/**
- * A Cloud Foundry Network Policy
- */
-@Value.Immutable
-abstract class _Policy {
+public final class AddNetworkPolicyRequestTest {
 
-    /**
-     * The destination
-     */
-    abstract String getDestination();
+    @Test(expected = IllegalStateException.class)
+    public void noDestination() {
+        AddNetworkPolicyRequest.builder()
+            .source("test-source")
+            .build();
+    }
 
-    /**
-     * The ending port
-     */
-    abstract Integer getEndPort();
+    @Test(expected = IllegalStateException.class)
+    public void noSource() {
+        AddNetworkPolicyRequest.builder()
+            .destination("test-destination")
+            .build();
+    }
 
-    /**
-     * The protocol
-     */
-    abstract String getProtocol();
-
-    /**
-     * The source
-     */
-    abstract String getSource();
-
-    /**
-     * The starting port
-     */
-    abstract Integer getStartPort();
+    @Test
+    public void valid() {
+        AddNetworkPolicyRequest.builder()
+            .destination("test-destination")
+            .source("test-source")
+            .build();
+    }
 
 }

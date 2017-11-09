@@ -24,6 +24,11 @@ import reactor.core.publisher.Flux;
 public interface NetworkPolicies {
 
     /**
+     * Add a network policy
+     */
+    Flux<Void> add(AddNetworkPolicyRequest request);
+
+    /**
      * Lists the network policies
      *
      * @return the network policies

@@ -20,8 +20,12 @@ import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v3.applications.ApplicationResource;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.networking.NetworkingClient;
+import org.cloudfoundry.networking.v1.policies.CreatePoliciesRequest;
+import org.cloudfoundry.networking.v1.policies.Destination;
 import org.cloudfoundry.networking.v1.policies.ListPoliciesRequest;
 import org.cloudfoundry.networking.v1.policies.ListPoliciesResponse;
+import org.cloudfoundry.networking.v1.policies.Ports;
+import org.cloudfoundry.networking.v1.policies.Source;
 import org.cloudfoundry.operations.util.OperationsLogging;
 import org.cloudfoundry.util.PaginationUtils;
 import reactor.core.publisher.Flux;
@@ -30,10 +34,15 @@ import reactor.util.function.Tuples;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public final class DefaultNetworkPolicies implements NetworkPolicies {
+
+    private static final Integer DEFAULT_PORT = 8080;
+
+    private static final String DEFAULT_PROTOCOL = "tcp";
 
     private final Mono<CloudFoundryClient> cloudFoundryClient;
 
@@ -48,11 +57,24 @@ public final class DefaultNetworkPolicies implements NetworkPolicies {
     }
 
     @Override
+    public Flux<Void> add(AddNetworkPolicyRequest request) {
+        return Mono
+            .when(this.cloudFoundryClient, this.networkingClient, this.spaceId)
+            .flatMapMany(function((cloudFoundryClient, networkingClient, spaceId) -> Mono.when(
+                Mono.just(networkingClient),
+                getApplicationsByName(cloudFoundryClient, spaceId)
+            )))
+            .flatMap(function((networkingClient, applications) -> requestAddPolicy(networkingClient, applications, request)))
+            .transform(OperationsLogging.log("Add Network Policy"))
+            .checkpoint();
+    }
+
+    @Override
     public Flux<Policy> list(ListNetworkPoliciesRequest request) {
         return Mono
             .when(this.cloudFoundryClient, this.networkingClient, this.spaceId)
             .flatMapMany(function((cloudFoundryClient, networkingClient, spaceId) -> Mono.when(
-                getApplications(cloudFoundryClient, spaceId),
+                getApplicationsById(cloudFoundryClient, spaceId),
                 getPolicies(networkingClient)
             )))
             .flatMap(function((applications, policies) -> toPolicy(applications, policies, request)))
@@ -60,15 +82,40 @@ public final class DefaultNetworkPolicies implements NetworkPolicies {
             .checkpoint();
     }
 
-    private static Mono<Map<String, String>> getApplications(CloudFoundryClient cloudFoundryClient, String spaceId) {
+    private static Mono<Map<String, String>> getApplicationsById(CloudFoundryClient cloudFoundryClient, String spaceId) {
         return requestListApplications(cloudFoundryClient, spaceId)
             .map(resource -> Tuples.of(resource.getId(), resource.getName()))
             .collectMap(function((id, name) -> id), function((id, name) -> name));
     }
 
+    private static Mono<Map<String, String>> getApplicationsByName(CloudFoundryClient cloudFoundryClient, String spaceId) {
+        return requestListApplications(cloudFoundryClient, spaceId)
+            .map(resource -> Tuples.of(resource.getId(), resource.getName()))
+            .collectMap(function((id, name) -> name), function((id, name) -> id));
+    }
+
     private static Mono<List<org.cloudfoundry.networking.v1.policies.Policy>> getPolicies(NetworkingClient networkingClient) {
         return requestListNetworkPolicies(networkingClient)
             .map(ListPoliciesResponse::getPolicies);
+    }
+
+    private static Mono<Void> requestAddPolicy(NetworkingClient networkingClient, Map<String, String> applications, AddNetworkPolicyRequest request) {
+        return networkingClient.policies()
+            .create(CreatePoliciesRequest.builder()
+                .policy(org.cloudfoundry.networking.v1.policies.Policy.builder()
+                    .destination(Destination.builder()
+                        .id(applications.get(request.getDestination()))
+                        .ports(Ports.builder()
+                            .end(Optional.ofNullable(request.getEndPort()).orElse(request.getStartPort() != null ? request.getStartPort() : DEFAULT_PORT))
+                            .start(Optional.ofNullable(request.getStartPort()).orElse(request.getEndPort() != null ? request.getEndPort() : DEFAULT_PORT))
+                            .build())
+                        .protocol(Optional.ofNullable(request.getProtocol()).orElse(DEFAULT_PROTOCOL))
+                        .build())
+                    .source(Source.builder()
+                        .id(applications.get(request.getSource()))
+                        .build())
+                    .build())
+                .build());
     }
 
     private static Flux<ApplicationResource> requestListApplications(CloudFoundryClient cloudFoundryClient, String spaceId) {

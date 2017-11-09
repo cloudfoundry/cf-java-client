@@ -16,12 +16,41 @@
 
 package org.cloudfoundry.operations.networkpolicies;
 
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
- * The request options for the list network policies operation
+ * The request options for the add network policy operation
  */
 @Value.Immutable
-abstract class _ListNetworkPoliciesRequest {
+abstract class _AddNetworkPolicyRequest {
+
+    /**
+     * Name of the destination
+     */
+    abstract String getDestination();
+
+    /**
+     * End of the port range
+     */
+    @Nullable
+    abstract Integer getEndPort();
+
+    /**
+     * The protocol
+     */
+    @Nullable
+    abstract String getProtocol();
+
+    /**
+     * Name of the source
+     */
+    abstract String getSource();
+
+    /**
+     * Start of the port range
+     */
+    @Nullable
+    abstract Integer getStartPort();
 
 }
