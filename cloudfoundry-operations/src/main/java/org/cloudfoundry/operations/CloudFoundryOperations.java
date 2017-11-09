@@ -20,6 +20,7 @@ import org.cloudfoundry.operations.advanced.Advanced;
 import org.cloudfoundry.operations.applications.Applications;
 import org.cloudfoundry.operations.buildpacks.Buildpacks;
 import org.cloudfoundry.operations.domains.Domains;
+import org.cloudfoundry.operations.networkpolicies.NetworkPolicies;
 import org.cloudfoundry.operations.organizationadmin.OrganizationAdmin;
 import org.cloudfoundry.operations.organizations.Organizations;
 import org.cloudfoundry.operations.routes.Routes;
@@ -66,6 +67,13 @@ public interface CloudFoundryOperations {
      * @return the Cloud Foundry Domains Operations API
      */
     Domains domains();
+
+    /**
+     * Main entry point to the Cloud Foundry Networking Policies Operations API
+     *
+     * @return the Cloud Foundry Networking Policies Operations API
+     */
+    NetworkPolicies networkPolicies();
 
     /**
      * Main entry point to the Cloud Foundry Organization Admin Operations API
