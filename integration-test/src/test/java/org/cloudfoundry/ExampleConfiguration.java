@@ -53,7 +53,6 @@ import org.springframework.context.annotation.Lazy;
  *     public void run(ApplicationArguments args) throws Exception {
  *     }
  *
- *     }
  * }
  * }</pre>
  */
