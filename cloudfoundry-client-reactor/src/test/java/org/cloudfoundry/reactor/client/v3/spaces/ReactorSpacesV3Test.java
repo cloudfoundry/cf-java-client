@@ -19,14 +19,18 @@ package org.cloudfoundry.reactor.client.v3.spaces;
 import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.Pagination;
 import org.cloudfoundry.client.v3.Relationship;
+import org.cloudfoundry.client.v3.ToOneRelationship;
 import org.cloudfoundry.client.v3.spaces.AssignSpaceIsolationSegmentRequest;
 import org.cloudfoundry.client.v3.spaces.AssignSpaceIsolationSegmentResponse;
+import org.cloudfoundry.client.v3.spaces.CreateSpaceRequest;
+import org.cloudfoundry.client.v3.spaces.CreateSpaceResponse;
 import org.cloudfoundry.client.v3.spaces.GetSpaceIsolationSegmentRequest;
 import org.cloudfoundry.client.v3.spaces.GetSpaceIsolationSegmentResponse;
 import org.cloudfoundry.client.v3.spaces.GetSpaceRequest;
 import org.cloudfoundry.client.v3.spaces.GetSpaceResponse;
 import org.cloudfoundry.client.v3.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v3.spaces.ListSpacesResponse;
+import org.cloudfoundry.client.v3.spaces.SpaceRelationships;
 import org.cloudfoundry.client.v3.spaces.SpaceResource;
 import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
@@ -39,6 +43,7 @@ import java.time.Duration;
 
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.PATCH;
+import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public class ReactorSpacesV3Test extends AbstractClientApiTest {
@@ -75,6 +80,54 @@ public class ReactorSpacesV3Test extends AbstractClientApiTest {
                     .build())
                 .link("related", Link.builder()
                     .href("https://api.example.org/v3/isolation_segments/e4c91047-3b29-4fda-b7f9-04033e5a9c9f")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void create() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(POST).path("/spaces")
+                .payload("fixtures/client/v3/spaces/POST_request.json")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v3/spaces/POST_response.json")
+                .build())
+            .build());
+
+        this.spaces
+            .create(CreateSpaceRequest.builder()
+                .name("my-space")
+                .relationships(SpaceRelationships.builder()
+                    .organization(ToOneRelationship.builder()
+                        .data(Relationship.builder()
+                            .id("e00705b9-7b42-4561-ae97-2520399d2133")
+                            .build())
+                        .build())
+                    .build())
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(CreateSpaceResponse.builder()
+                .createdAt("2017-02-01T01:33:58Z")
+                .id("885735b5-aea4-4cf5-8e44-961af0e41920")
+                .name("my-space")
+                .relationships(SpaceRelationships.builder()
+                    .organization(ToOneRelationship.builder()
+                        .data(Relationship.builder()
+                            .id("e00705b9-7b42-4561-ae97-2520399d2133")
+                            .build())
+                        .build())
+                    .build())
+                .updatedAt("2017-02-01T01:33:58Z")
+                .link("self", Link.builder()
+                    .href("https://api.example.org/v3/spaces/885735b5-aea4-4cf5-8e44-961af0e41920")
+                    .build())
+                .link("organization", Link.builder()
+                    .href("https://api.example.org/v3/organizations/e00705b9-7b42-4561-ae97-2520399d2133")
                     .build())
                 .build())
             .expectComplete()
