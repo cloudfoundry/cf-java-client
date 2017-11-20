@@ -17,18 +17,21 @@
 package org.cloudfoundry.client.v3.spaces;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v3.Resource;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.client.v3.ToOneRelationship;
+import org.immutables.value.Value;
 
 /**
- * Base class for responses that are spaces
+ * The relationships for the Create Space request
  */
-public abstract class Space extends Resource {
+@Value.Immutable
+@JsonDeserialize
+abstract class _SpaceRelationships {
 
     /**
-     * The name
+     * The organization relationship
      */
-    @JsonProperty("name")
-    public abstract String getName();
+    @JsonProperty("organization")
+    abstract ToOneRelationship getOrganization();
 
 }

@@ -1,0 +1,10 @@
+{
+  "name": "my-space",
+  "relationships": {
+    "organization": {
+      "data": {
+        "guid": "e00705b9-7b42-4561-ae97-2520399d2133"
+      }
+    }
+  }
+}
