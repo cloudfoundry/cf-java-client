@@ -71,6 +71,13 @@ abstract class _OrganizationEntity {
     abstract String getDomainsUrl();
 
     /**
+     * The isolation segment url
+     */
+    @JsonProperty("isolation_segment_url")
+    @Nullable
+    abstract String getIsolationSegmentUrl();
+
+    /**
      * The managers url
      */
     @JsonProperty("managers_url")
