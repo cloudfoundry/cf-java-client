@@ -39,6 +39,8 @@ public interface NameFactory {
 
     String IDENTITY_ZONE_PREFIX = "test-identity-zone-";
 
+    String ISOLATION_SEGMENT_PREFIX = "test-isolation-segment-";
+
     String ORGANIZATION_PREFIX = "test-organization-";
 
     String PASSWORD_PREFIX = "test-password-";
@@ -144,7 +146,7 @@ public interface NameFactory {
     }
 
     /**
-     * Creates a identity zone name
+     * Creates an identity zone name
      *
      * @return the identity zone name
      */
@@ -160,6 +162,15 @@ public interface NameFactory {
     String getIpAddress();
 
     /**
+     * Creates an isolation segment name
+     *
+     * @return the isolation segment name
+     */
+    default String getIsolationSegmentName() {
+        return getName(ISOLATION_SEGMENT_PREFIX);
+    }
+
+    /**
      * Creates a name
      *
      * @param prefix the prefix to the name
@@ -168,7 +179,7 @@ public interface NameFactory {
     String getName(String prefix);
 
     /**
-     * Creates a organization name
+     * Creates an organization name
      *
      * @return the organization name
      */
@@ -415,6 +426,16 @@ public interface NameFactory {
      * @return {@code true} if the string is an IP address, {@code false} otherwise
      */
     boolean isIpAddress(String candidate);
+
+    /**
+     * Tests a name to determine if it is an isolation segment name
+     *
+     * @param candidate the candidate name
+     * @return {@code true} if the name is an isolation segment name, {@code false} otherwise
+     */
+    default boolean isIsolationSegmentName(String candidate) {
+        return isName(ISOLATION_SEGMENT_PREFIX, candidate);
+    }
 
     /**
      * Tests a name to determine if it starts with a prefix

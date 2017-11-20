@@ -16,18 +16,10 @@
 
 package org.cloudfoundry.client.v3.isolationsegments;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.AllowNulls;
-import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.PaginatedResponse;
-import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.organizations.OrganizationResource;
 import org.immutables.value.Value;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * The response payload for the List Entitled Organizations operation
