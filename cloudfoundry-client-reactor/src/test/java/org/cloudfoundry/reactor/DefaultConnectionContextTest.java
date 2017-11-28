@@ -68,4 +68,21 @@ public final class DefaultConnectionContextTest extends AbstractRestTest {
             .verify(Duration.ofSeconds(5));
     }
 
+    @Test
+    public void multipleInstances() {
+        DefaultConnectionContext first = DefaultConnectionContext.builder()
+            .apiHost("test-host")
+            .build();
+
+        DefaultConnectionContext second = DefaultConnectionContext.builder()
+            .apiHost("test-host")
+            .build();
+
+        first.monitorByteBufAllocator();
+        second.monitorByteBufAllocator();
+
+        first.dispose();
+        second.dispose();
+    }
+
 }
