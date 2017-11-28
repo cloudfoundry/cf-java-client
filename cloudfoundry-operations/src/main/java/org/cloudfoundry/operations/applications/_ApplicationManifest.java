@@ -17,7 +17,6 @@
 package org.cloudfoundry.operations.applications;
 
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
@@ -67,35 +66,30 @@ abstract class _ApplicationManifest {
     /**
      * The buildpack used by the application
      */
-    @JsonProperty("buildpack")
     @Nullable
     abstract String getBuildpack();
 
     /**
      * The command used to execute the application
      */
-    @JsonProperty("command")
     @Nullable
     abstract String getCommand();
 
     /**
      * The disk quota in megabytes
      */
-    @JsonProperty("disk_quota")
     @Nullable
     abstract Integer getDisk();
 
     /**
      * The docker information
      */
-    @JsonProperty("docker")
     @Nullable
     abstract Docker getDocker();
 
     /**
      * The collection of domains bound to the application
      */
-    @JsonProperty("domains")
     @Nullable
     abstract List<String> getDomains();
 
@@ -103,111 +97,95 @@ abstract class _ApplicationManifest {
      * The environment variables to set on the application
      */
     @AllowNulls
-    @JsonProperty("env")
     @Nullable
     abstract Map<String, Object> getEnvironmentVariables();
 
     /**
      * The HTTP health check endpoint
      */
-    @JsonProperty("health-check-http-endpoint")
     @Nullable
     abstract String getHealthCheckHttpEndpoint();
 
     /**
      * The health check type
      */
-    @JsonProperty("health-check-type")
     @Nullable
     abstract ApplicationHealthCheck getHealthCheckType();
 
     /**
      * The collection of hosts bound to the application
      */
-    @JsonProperty("hosts")
     @Nullable
     abstract List<String> getHosts();
 
     /**
      * The number of instances of the application
      */
-    @JsonProperty("instances")
     @Nullable
     abstract Integer getInstances();
 
     /**
      * The memory quota in megabytes
      */
-    @JsonProperty("memory")
     @Nullable
     abstract Integer getMemory();
 
     /**
      * The name of the application
      */
-    @JsonProperty("name")
     abstract String getName();
 
     /**
      * Map the the root domain to the app
      */
-    @JsonProperty("no-hostname")
     @Nullable
     abstract Boolean getNoHostname();
 
     /**
      * Prevent a route being created for the app
      */
-    @JsonProperty("no-route")
     @Nullable
     abstract Boolean getNoRoute();
 
     /**
      * The location of the application
      */
-    @JsonProperty("path")
     @Nullable
     abstract Path getPath();
 
     /**
      * Generate a random route
      */
-    @JsonProperty("random-route")
     @Nullable
     abstract Boolean getRandomRoute();
 
     /**
      * The route path for all applications
      */
-    @JsonProperty("route-path")
     @Nullable
     abstract String getRoutePath();
 
     /**
      * The collection of routes bound to the application
      */
-    @JsonProperty("routes")
     @Nullable
     abstract List<Route> getRoutes();
 
     /**
      * The collection of service names bound to the application
      */
-    @JsonProperty("services")
     @Nullable
     abstract List<String> getServices();
 
     /**
      * The stack used to run the application
      */
-    @JsonProperty("stack")
     @Nullable
     abstract String getStack();
 
     /**
      * The number of seconds allowed for application start
      */
-    @JsonProperty("timeout")
     @Nullable
     abstract Integer getTimeout();
 
