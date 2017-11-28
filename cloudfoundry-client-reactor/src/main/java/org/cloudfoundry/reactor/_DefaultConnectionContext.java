@@ -37,6 +37,7 @@ import reactor.ipc.netty.resources.PoolResources;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.management.JMException;
+import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import java.lang.management.ManagementFactory;
 import java.time.Duration;
@@ -56,6 +57,8 @@ import static io.netty.channel.ChannelOption.SO_SNDBUF;
 @Value.Immutable
 abstract class _DefaultConnectionContext implements ConnectionContext {
 
+    private static final int DEFAULT_PORT = 443;
+
     private static final int RECEIVE_BUFFER_SIZE = 10 * 1024 * 1024;
 
     private static final int SEND_BUFFER_SIZE = 10 * 1024 * 1024;
@@ -69,6 +72,16 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
     public final void dispose() {
         getConnectionPool().ifPresent(PoolResources::dispose);
         getThreadPool().dispose();
+
+        try {
+            ObjectName name = getByteBufAllocatorObjectName();
+
+            if (ManagementFactory.getPlatformMBeanServer().isRegistered(name)) {
+                ManagementFactory.getPlatformMBeanServer().unregisterMBean(name);
+            }
+        } catch (JMException e) {
+            this.logger.error("Unable to register ByteBufAllocator MBean", e);
+        }
     }
 
     @Override
@@ -149,7 +162,6 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
     /**
      * The hostname of the API root.  Typically something like {@code api.run.pivotal.io}.
      */
-    @Nullable
     abstract String getApiHost();
 
     /**
@@ -225,11 +237,21 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
     @PostConstruct
     void monitorByteBufAllocator() {
         try {
-            ManagementFactory.getPlatformMBeanServer()
-                .registerMBean(new ByteBufAllocatorMetricProviderWrapper(PooledByteBufAllocator.DEFAULT), ObjectName.getInstance("org.cloudfoundry.reactor:type=ByteBufAllocator"));
+            ObjectName name = getByteBufAllocatorObjectName();
+
+            if (ManagementFactory.getPlatformMBeanServer().isRegistered(name)) {
+                this.logger.warn("MBean '{}' is already registered and will be removed. You should only have a single DefaultConnectionContext per endpoint.", name);
+                ManagementFactory.getPlatformMBeanServer().unregisterMBean(name);
+            }
+
+            ManagementFactory.getPlatformMBeanServer().registerMBean(new ByteBufAllocatorMetricProviderWrapper(PooledByteBufAllocator.DEFAULT), name);
         } catch (JMException e) {
             this.logger.error("Unable to register ByteBufAllocator MBean", e);
         }
+    }
+
+    private ObjectName getByteBufAllocatorObjectName() throws MalformedObjectNameException {
+        return ObjectName.getInstance(String.format("org.cloudfoundry.reactor:type=ByteBufAllocator,endpoint=%s/%d", getApiHost(), getPort().orElse(DEFAULT_PORT)));
     }
 
 }
