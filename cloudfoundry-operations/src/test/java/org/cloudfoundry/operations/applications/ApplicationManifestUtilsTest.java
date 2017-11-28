@@ -34,6 +34,19 @@ import static org.cloudfoundry.operations.applications.ApplicationHealthCheck.PO
 public final class ApplicationManifestUtilsTest {
 
     @Test
+    public void anchorsAndReferences() throws IOException {
+        List<ApplicationManifest> expected = Collections.singletonList(
+            ApplicationManifest.builder()
+                .name("test-application")
+                .service("test-service-name")
+                .build());
+
+        List<ApplicationManifest> actual = ApplicationManifestUtils.read(new ClassPathResource("fixtures/manifest-kilo.yml").getFile().toPath());
+
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
     public void read() throws IOException {
         List<ApplicationManifest> expected = Arrays.asList(
             ApplicationManifest.builder()
