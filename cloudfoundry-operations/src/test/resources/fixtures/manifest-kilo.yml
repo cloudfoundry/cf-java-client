@@ -1,0 +1,8 @@
+---
+holder:
+- &foo test-service-name
+
+applications:
+- name: test-application
+  services:
+  - *foo
