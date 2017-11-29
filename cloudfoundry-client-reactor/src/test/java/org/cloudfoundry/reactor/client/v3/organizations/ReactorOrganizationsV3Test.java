@@ -21,6 +21,8 @@ import org.cloudfoundry.client.v3.Pagination;
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.organizations.AssignOrganizationDefaultIsolationSegmentRequest;
 import org.cloudfoundry.client.v3.organizations.AssignOrganizationDefaultIsolationSegmentResponse;
+import org.cloudfoundry.client.v3.organizations.CreateOrganizationRequest;
+import org.cloudfoundry.client.v3.organizations.CreateOrganizationResponse;
 import org.cloudfoundry.client.v3.organizations.GetOrganizationDefaultIsolationSegmentRequest;
 import org.cloudfoundry.client.v3.organizations.GetOrganizationDefaultIsolationSegmentResponse;
 import org.cloudfoundry.client.v3.organizations.ListOrganizationsRequest;
@@ -37,6 +39,7 @@ import java.time.Duration;
 
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.PATCH;
+import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
@@ -74,6 +77,37 @@ public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
                 .link("related", Link.builder()
                     .href("https://api.example.org/v3/isolation_segments/9d8e007c-ce52-4ea7-8a57-f2825d2c6b39")
                     .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void create() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(POST).path("/organizations")
+                .payload("fixtures/client/v3/organizations/POST_request.json")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v3/organizations/POST_response.json")
+                .build())
+            .build());
+
+        this.organizations
+            .create(CreateOrganizationRequest.builder()
+                .name("my-organization")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(CreateOrganizationResponse.builder()
+                .createdAt("2017-02-01T01:33:58Z")
+                .id("24637893-3b77-489d-bb79-8466f0d88b52")
+                .link("self", Link.builder()
+                    .href("https://api.example.org/v3/organizations/24637893-3b77-489d-bb79-8466f0d88b52")
+                    .build())
+                .name("my-organization")
+                .updatedAt("2017-02-01T01:33:58Z")
                 .build())
             .expectComplete()
             .verify(Duration.ofSeconds(5));
