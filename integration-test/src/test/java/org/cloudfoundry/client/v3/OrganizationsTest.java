@@ -20,44 +20,208 @@ import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.CloudFoundryVersion;
 import org.cloudfoundry.IfCloudFoundryVersion;
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.junit.Ignore;
+import org.cloudfoundry.client.v3.isolationsegments.AddIsolationSegmentOrganizationEntitlementRequest;
+import org.cloudfoundry.client.v3.isolationsegments.AddIsolationSegmentOrganizationEntitlementResponse;
+import org.cloudfoundry.client.v3.isolationsegments.CreateIsolationSegmentRequest;
+import org.cloudfoundry.client.v3.isolationsegments.CreateIsolationSegmentResponse;
+import org.cloudfoundry.client.v3.organizations.AssignOrganizationDefaultIsolationSegmentRequest;
+import org.cloudfoundry.client.v3.organizations.AssignOrganizationDefaultIsolationSegmentResponse;
+import org.cloudfoundry.client.v3.organizations.CreateOrganizationRequest;
+import org.cloudfoundry.client.v3.organizations.CreateOrganizationResponse;
+import org.cloudfoundry.client.v3.organizations.GetOrganizationDefaultIsolationSegmentRequest;
+import org.cloudfoundry.client.v3.organizations.GetOrganizationRequest;
+import org.cloudfoundry.client.v3.organizations.GetOrganizationResponse;
+import org.cloudfoundry.client.v3.organizations.ListOrganizationsRequest;
+import org.cloudfoundry.client.v3.organizations.OrganizationResource;
+import org.cloudfoundry.util.PaginationUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
+import reactor.util.function.Tuples;
 
+import java.time.Duration;
 import java.util.concurrent.TimeoutException;
 
-@IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_10)
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
+
+@IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_12)
 public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
 
-    //TODO: Await 1.10 test environment
-    @Ignore("Await 1.10 test environment")
     @Test
     public void assignDefaultIsolationSegment() throws TimeoutException, InterruptedException {
-        //
+        String isolationSegmentName = this.nameFactory.getIsolationSegmentName();
+        String organizationName = this.nameFactory.getOrganizationName();
+
+        createOrganizationId(this.cloudFoundryClient, organizationName)
+            .then(organizationId -> Mono.when(
+                createEntitledIsolationSegmentId(this.cloudFoundryClient, isolationSegmentName, organizationId),
+                Mono.just(organizationId)
+            ))
+            .then(function((isolationSegmentId, organizationId) -> Mono.when(
+                Mono.just(isolationSegmentId),
+                this.cloudFoundryClient.organizationsV3()
+                    .assignDefaultIsolationSegment(AssignOrganizationDefaultIsolationSegmentRequest.builder()
+                        .organizationId(organizationId)
+                        .data(Relationship.builder()
+                            .id(isolationSegmentId)
+                            .build())
+                        .build())
+                    .map(r -> r.getData().getId()))))
+            .as(StepVerifier::create)
+            .consumeNextWith(tupleEquality())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: Await 1.10 test environment
-    @Ignore("Await 1.10 test environment")
+    @Test
+    public void create() throws TimeoutException, InterruptedException {
+        String organizationName = this.nameFactory.getOrganizationName();
+
+        this.cloudFoundryClient.organizationsV3()
+            .create(CreateOrganizationRequest.builder()
+                .name(organizationName)
+                .build())
+            .thenMany(requestListOrganizations(this.cloudFoundryClient, organizationName))
+            .single()
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void get() throws TimeoutException, InterruptedException {
+        String organizationName = this.nameFactory.getOrganizationName();
+
+        createOrganizationId(this.cloudFoundryClient, organizationName)
+            .then(organizationId -> this.cloudFoundryClient.organizationsV3()
+                .get(GetOrganizationRequest.builder()
+                    .organizationId(organizationId)
+                    .build()))
+            .map(GetOrganizationResponse::getName)
+            .as(StepVerifier::create)
+            .expectNext(organizationName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
     @Test
     public void getDefaultIsolationSegment() throws TimeoutException, InterruptedException {
-        //
+        String isolationSegmentName = this.nameFactory.getIsolationSegmentName();
+        String organizationName = this.nameFactory.getOrganizationName();
+
+        createOrganizationId(this.cloudFoundryClient, organizationName)
+            .then(organizationId -> Mono.when(
+                createEntitledIsolationSegmentId(this.cloudFoundryClient, isolationSegmentName, organizationId),
+                Mono.just(organizationId)
+            ))
+            .then(function((isolationSegmentId, organizationId) -> requestAssignDefaultIsolationSegment(this.cloudFoundryClient, isolationSegmentId, organizationId)
+                .then((Mono.just(Tuples.of(isolationSegmentId, organizationId))))))
+            .then(function((isolationSegmentId, organizationId) -> Mono.when(
+                Mono.just(isolationSegmentId),
+                this.cloudFoundryClient.organizationsV3()
+                    .getDefaultIsolationSegment(GetOrganizationDefaultIsolationSegmentRequest.builder()
+                        .organizationId(organizationId)
+                        .build())
+                    .map(r -> r.getData().getId()))))
+            .as(StepVerifier::create)
+            .consumeNextWith(tupleEquality())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: Await 1.10 test environment
-    @Ignore("Await 1.10 test environment")
     @Test
     public void list() throws TimeoutException, InterruptedException {
-        //
+        String organizationName = this.nameFactory.getOrganizationName();
+
+        requestCreateOrganization(this.cloudFoundryClient, organizationName)
+            .thenMany(PaginationUtils.requestClientV3Resources(page -> this.cloudFoundryClient.organizationsV3()
+                .list(ListOrganizationsRequest.builder()
+                    .build())))
+            .filter(resource -> organizationName.equals(resource.getName()))
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: Await 1.10 test environment
-    @Ignore("Await 1.10 test environment")
     @Test
     public void listFilterByName() throws TimeoutException, InterruptedException {
-        //
+        String organizationName = this.nameFactory.getOrganizationName();
+
+        requestCreateOrganization(this.cloudFoundryClient, organizationName)
+            .thenMany(PaginationUtils.requestClientV3Resources(page -> this.cloudFoundryClient.organizationsV3()
+                .list(ListOrganizationsRequest.builder()
+                    .name(organizationName)
+                    .build())))
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    private static Mono<String> createEntitledIsolationSegmentId(CloudFoundryClient cloudFoundryClient, String isolationSegmentName, String organizationId) {
+        return createIsolationSegmentId(cloudFoundryClient, isolationSegmentName)
+            .then(isolationSegmentId -> requestAddIsolationSegmentOrganizationEntitlement(cloudFoundryClient, isolationSegmentId, organizationId)
+                .then(Mono.just(isolationSegmentId)));
+    }
+
+    private static Mono<String> createIsolationSegmentId(CloudFoundryClient cloudFoundryClient, String isolationSegmentName) {
+        return requestCreateIsolationSegment(cloudFoundryClient, isolationSegmentName)
+            .map(CreateIsolationSegmentResponse::getId);
+    }
+
+    private static Mono<String> createOrganizationId(CloudFoundryClient cloudFoundryClient, String organizationName) {
+        return requestCreateOrganization(cloudFoundryClient, organizationName)
+            .map(CreateOrganizationResponse::getId);
+    }
+
+    private static Mono<AddIsolationSegmentOrganizationEntitlementResponse> requestAddIsolationSegmentOrganizationEntitlement(CloudFoundryClient cloudFoundryClient, String isolationSegmentId,
+                                                                                                                              String organizationId) {
+        return cloudFoundryClient.isolationSegments()
+            .addOrganizationEntitlement(AddIsolationSegmentOrganizationEntitlementRequest.builder()
+                .isolationSegmentId(isolationSegmentId)
+                .data(Relationship.builder()
+                    .id(organizationId)
+                    .build())
+                .build());
+    }
+
+    private static Mono<AssignOrganizationDefaultIsolationSegmentResponse> requestAssignDefaultIsolationSegment(CloudFoundryClient cloudFoundryClient, String isolationSegmentId,
+                                                                                                                String organizationId) {
+        return cloudFoundryClient.organizationsV3()
+            .assignDefaultIsolationSegment(AssignOrganizationDefaultIsolationSegmentRequest.builder()
+                .organizationId(organizationId)
+                .data(Relationship.builder()
+                    .id(isolationSegmentId)
+                    .build())
+                .build());
+    }
+
+    private static Mono<CreateIsolationSegmentResponse> requestCreateIsolationSegment(CloudFoundryClient cloudFoundryClient, String isolationSegmentName) {
+        return cloudFoundryClient.isolationSegments()
+            .create(CreateIsolationSegmentRequest.builder()
+                .name(isolationSegmentName)
+                .build());
+    }
+
+    private static Mono<CreateOrganizationResponse> requestCreateOrganization(CloudFoundryClient cloudFoundryClient, String organizationName) {
+        return cloudFoundryClient.organizationsV3()
+            .create(CreateOrganizationRequest.builder()
+                .name(organizationName)
+                .build());
+    }
+
+    private static Flux<OrganizationResource> requestListOrganizations(CloudFoundryClient cloudFoundryClient, String organizationName) {
+        return PaginationUtils.requestClientV3Resources(page -> cloudFoundryClient.organizationsV3()
+            .list(ListOrganizationsRequest.builder()
+                .name(organizationName)
+                .build()));
     }
 
 }
