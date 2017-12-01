@@ -40,6 +40,14 @@ public interface OrganizationsV3 {
     Mono<CreateOrganizationResponse> create(CreateOrganizationRequest request);
 
     /**
+     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.34.0/index.html#create-an-organization">Get Organization</a> request
+     *
+     * @param request the Get Organization request
+     * @return the response from the Get Organization request
+     */
+    Mono<GetOrganizationResponse> get(GetOrganizationRequest request);
+
+    /**
      * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#get-default-isolation-segment">Get Default Isolation Segment</a> request
      *
      * @param request the Get Default Isolation Segment request

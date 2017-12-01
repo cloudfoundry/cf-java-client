@@ -25,6 +25,8 @@ import org.cloudfoundry.client.v3.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v3.organizations.CreateOrganizationResponse;
 import org.cloudfoundry.client.v3.organizations.GetOrganizationDefaultIsolationSegmentRequest;
 import org.cloudfoundry.client.v3.organizations.GetOrganizationDefaultIsolationSegmentResponse;
+import org.cloudfoundry.client.v3.organizations.GetOrganizationRequest;
+import org.cloudfoundry.client.v3.organizations.GetOrganizationResponse;
 import org.cloudfoundry.client.v3.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v3.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v3.organizations.OrganizationResource;
@@ -101,6 +103,36 @@ public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
                 .build())
             .as(StepVerifier::create)
             .expectNext(CreateOrganizationResponse.builder()
+                .createdAt("2017-02-01T01:33:58Z")
+                .id("24637893-3b77-489d-bb79-8466f0d88b52")
+                .link("self", Link.builder()
+                    .href("https://api.example.org/v3/organizations/24637893-3b77-489d-bb79-8466f0d88b52")
+                    .build())
+                .name("my-organization")
+                .updatedAt("2017-02-01T01:33:58Z")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void get() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/organizations/24637893-3b77-489d-bb79-8466f0d88b52")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v3/organizations/GET_{id}_response.json")
+                .build())
+            .build());
+
+        this.organizations
+            .get(GetOrganizationRequest.builder()
+                .organizationId("24637893-3b77-489d-bb79-8466f0d88b52")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(GetOrganizationResponse.builder()
                 .createdAt("2017-02-01T01:33:58Z")
                 .id("24637893-3b77-489d-bb79-8466f0d88b52")
                 .link("self", Link.builder()
