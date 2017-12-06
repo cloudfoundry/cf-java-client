@@ -94,7 +94,7 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void deleteBuildpackNotFound() throws IOException {
+    public void deleteBuildpackNotFound() {
         String buildpackName = this.nameFactory.getBuildpackName();
 
         this.cloudFoundryOperations.buildpacks()

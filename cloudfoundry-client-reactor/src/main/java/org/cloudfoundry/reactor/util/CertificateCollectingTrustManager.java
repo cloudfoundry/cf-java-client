@@ -36,7 +36,7 @@ final class CertificateCollectingTrustManager implements X509TrustManager {
     }
 
     @Override
-    public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+    public void checkClientTrusted(X509Certificate[] chain, String authType) {
         synchronized (this.monitor) {
             if (this.collected != null) {
                 throw new IllegalStateException("A certificate chain has already been collected.");
@@ -54,7 +54,7 @@ final class CertificateCollectingTrustManager implements X509TrustManager {
     }
 
     @Override
-    public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+    public void checkServerTrusted(X509Certificate[] chain, String authType) {
         synchronized (this.monitor) {
             if (this.collected != null) {
                 throw new IllegalStateException("A certificate chain has already been collected.");

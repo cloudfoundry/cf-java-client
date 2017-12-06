@@ -56,7 +56,7 @@ public final class PoliciesTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_12)
     @Test
-    public void create() throws TimeoutException, InterruptedException {
+    public void create() {
         String destinationApplicationName = this.nameFactory.getApplicationName();
         String sourceApplicationName = this.nameFactory.getApplicationName();
         Integer port = this.nameFactory.getPort();
@@ -96,7 +96,7 @@ public final class PoliciesTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_12)
     @Test
-    public void delete() throws TimeoutException, InterruptedException {
+    public void delete() {
         String destinationApplicationName = this.nameFactory.getApplicationName();
         String sourceApplicationName = this.nameFactory.getApplicationName();
         Integer port = this.nameFactory.getPort();
@@ -134,7 +134,7 @@ public final class PoliciesTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_12)
     @Test
-    public void list() throws TimeoutException, InterruptedException {
+    public void list() {
         String destinationApplicationName = this.nameFactory.getApplicationName();
         String sourceApplicationName = this.nameFactory.getApplicationName();
         Integer port = this.nameFactory.getPort();
@@ -160,7 +160,7 @@ public final class PoliciesTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_12)
     @Test
-    public void listFiltered() throws TimeoutException, InterruptedException {
+    public void listFiltered() {
         String destinationApplicationName = this.nameFactory.getApplicationName();
         String sourceApplicationName = this.nameFactory.getApplicationName();
         Integer port = this.nameFactory.getPort();

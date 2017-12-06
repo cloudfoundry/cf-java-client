@@ -54,7 +54,7 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
     private Mono<String> spaceId;
 
     @Test
-    public void createSharedDomain() throws TimeoutException, InterruptedException {
+    public void createSharedDomain() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
@@ -88,7 +88,7 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void deleteAsyncFalse() throws TimeoutException, InterruptedException {
+    public void deleteAsyncFalse() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
@@ -107,7 +107,7 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void deleteAsyncTrue() throws TimeoutException, InterruptedException {
+    public void deleteAsyncTrue() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
@@ -127,7 +127,7 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void get() throws TimeoutException, InterruptedException {
+    public void get() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
@@ -148,7 +148,7 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByApplicationId() throws TimeoutException, InterruptedException {
+    public void listFilterByApplicationId() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
@@ -179,7 +179,7 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByRouteId() throws TimeoutException, InterruptedException {
+    public void listFilterByRouteId() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();

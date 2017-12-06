@@ -81,7 +81,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
     private Mono<String> spaceId;
 
     @Test
-    public void create() throws TimeoutException, InterruptedException {
+    public void create() {
         String instanceName = this.nameFactory.getServiceInstanceName();
 
         this.spaceId
@@ -98,7 +98,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void delete() throws TimeoutException, InterruptedException {
+    public void delete() {
         String instanceName = this.nameFactory.getServiceInstanceName();
 
         this.spaceId
@@ -114,7 +114,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void get() throws TimeoutException, InterruptedException {
+    public void get() {
         String instanceName = this.nameFactory.getServiceInstanceName();
 
         this.spaceId
@@ -131,7 +131,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() throws TimeoutException, InterruptedException {
+    public void list() {
         String instanceName = this.nameFactory.getServiceInstanceName();
 
         this.spaceId
@@ -151,7 +151,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listRoutes() throws TimeoutException, InterruptedException {
+    public void listRoutes() {
         String domainName = this.nameFactory.getDomainName();
         String instanceName = this.nameFactory.getServiceInstanceName();
 
@@ -215,7 +215,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listRoutesFilterByHost() throws TimeoutException, InterruptedException {
+    public void listRoutesFilterByHost() {
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
         String instanceName = this.nameFactory.getServiceInstanceName();
@@ -350,7 +350,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listServiceBindings() throws TimeoutException, InterruptedException {
+    public void listServiceBindings() {
         String applicationName = this.nameFactory.getApplicationName();
         String instanceName = this.nameFactory.getServiceInstanceName();
 
@@ -382,7 +382,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void update() throws TimeoutException, InterruptedException {
+    public void update() {
         String instanceName = this.nameFactory.getServiceInstanceName();
         String newInstanceName = this.nameFactory.getServiceInstanceName();
 

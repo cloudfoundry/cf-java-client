@@ -54,7 +54,7 @@ public final class ServiceUsageEventsTest extends AbstractIntegrationTest {
     private Mono<String> spaceId;
 
     @Test
-    public void get() throws TimeoutException, InterruptedException {
+    public void get() {
         Mono
             .zip(this.serviceBrokerId, this.spaceId)
             .flatMap(function((serviceBrokerId, spaceId) -> seedEvents(this.cloudFoundryClient, this.nameFactory, serviceBrokerId, spaceId)))
@@ -75,7 +75,7 @@ public final class ServiceUsageEventsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() throws TimeoutException, InterruptedException {
+    public void list() {
         Mono
             .zip(this.serviceBrokerId, this.spaceId)
             .flatMap(function((serviceBrokerId, spaceId) -> seedEvents(this.cloudFoundryClient, this.nameFactory, serviceBrokerId, spaceId)))

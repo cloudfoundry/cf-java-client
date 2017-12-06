@@ -36,12 +36,12 @@ public final class StaticTrustManagerFactory extends SimpleTrustManagerFactory {
     }
 
     @Override
-    protected void engineInit(ManagerFactoryParameters managerFactoryParameters) throws Exception {
+    protected void engineInit(ManagerFactoryParameters managerFactoryParameters) {
         // Do nothing
     }
 
     @Override
-    protected void engineInit(KeyStore keyStore) throws Exception {
+    protected void engineInit(KeyStore keyStore) {
         // Do nothing
     }
 

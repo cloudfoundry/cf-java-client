@@ -144,7 +144,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     private UaaClient uaaClient;
 
     @Test
-    public void associateAuditor() throws TimeoutException, InterruptedException {
+    public void associateAuditor() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();
@@ -166,7 +166,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void associateAuditorByUsername() throws TimeoutException, InterruptedException {
+    public void associateAuditorByUsername() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();
@@ -187,7 +187,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void associateDeveloper() throws TimeoutException, InterruptedException {
+    public void associateDeveloper() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();
@@ -209,7 +209,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void associateDeveloperByUsername() throws TimeoutException, InterruptedException {
+    public void associateDeveloperByUsername() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();
@@ -229,7 +229,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void associateManager() throws TimeoutException, InterruptedException {
+    public void associateManager() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();
@@ -251,7 +251,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void associateManagerByUsername() throws TimeoutException, InterruptedException {
+    public void associateManagerByUsername() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();
@@ -295,7 +295,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void create() throws TimeoutException, InterruptedException {
+    public void create() {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
@@ -312,7 +312,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void delete() throws TimeoutException, InterruptedException {
+    public void delete() {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
@@ -332,7 +332,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void deleteAsyncFalse() throws TimeoutException, InterruptedException {
+    public void deleteAsyncFalse() {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
@@ -351,7 +351,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void get() throws TimeoutException, InterruptedException {
+    public void get() {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
@@ -368,7 +368,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void getSummary() throws TimeoutException, InterruptedException {
+    public void getSummary() {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
@@ -385,7 +385,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() throws TimeoutException, InterruptedException {
+    public void list() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -405,7 +405,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listApplications() throws TimeoutException, InterruptedException {
+    public void listApplications() {
         String applicationName = this.nameFactory.getApplicationName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -422,7 +422,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listApplicationsFilterByDiego() throws TimeoutException, InterruptedException {
+    public void listApplicationsFilterByDiego() {
         String applicationName = this.nameFactory.getApplicationName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -439,7 +439,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listApplicationsFilterByName() throws TimeoutException, InterruptedException {
+    public void listApplicationsFilterByName() {
         String applicationName = this.nameFactory.getApplicationName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -462,7 +462,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listApplicationsFilterByOrganizationId() throws TimeoutException, InterruptedException {
+    public void listApplicationsFilterByOrganizationId() {
         String applicationName = this.nameFactory.getApplicationName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -481,7 +481,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listApplicationsFilterByStackId() throws TimeoutException, InterruptedException {
+    public void listApplicationsFilterByStackId() {
         String applicationName = this.nameFactory.getApplicationName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -508,7 +508,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listAuditors() throws TimeoutException, InterruptedException {
+    public void listAuditors() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();
@@ -533,7 +533,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listDevelopers() throws TimeoutException, InterruptedException {
+    public void listDevelopers() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();
@@ -559,7 +559,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @SuppressWarnings("deprecation")
     @Test
-    public void listDomains() throws TimeoutException, InterruptedException {
+    public void listDomains() {
         String domainName = this.nameFactory.getDomainName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -575,7 +575,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @SuppressWarnings("deprecation")
     @Test
-    public void listDomainsFilterByName() throws TimeoutException, InterruptedException {
+    public void listDomainsFilterByName() {
         String domainName = this.nameFactory.getDomainName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -590,7 +590,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listEvents() throws TimeoutException, InterruptedException {
+    public void listEvents() {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
@@ -604,7 +604,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listEventsFilterByActee() throws TimeoutException, InterruptedException {
+    public void listEventsFilterByActee() {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
@@ -618,7 +618,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listEventsFilterByTimestamp() throws TimeoutException, InterruptedException {
+    public void listEventsFilterByTimestamp() {
         String spaceName = this.nameFactory.getSpaceName();
         String timestamp = getPastTimestamp();
 
@@ -633,7 +633,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listEventsFilterByType() throws TimeoutException, InterruptedException {
+    public void listEventsFilterByType() {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
@@ -651,7 +651,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByApplicationId() throws TimeoutException, InterruptedException {
+    public void listFilterByApplicationId() {
         String applicationName = this.nameFactory.getApplicationName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -694,7 +694,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByName() throws TimeoutException, InterruptedException {
+    public void listFilterByName() {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
@@ -712,7 +712,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByOrganizationId() throws TimeoutException, InterruptedException {
+    public void listFilterByOrganizationId() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -730,7 +730,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listManagers() throws TimeoutException, InterruptedException {
+    public void listManagers() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();
@@ -746,7 +746,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listManagersFilterByAuditedOrganizationId() throws TimeoutException, InterruptedException {
+    public void listManagersFilterByAuditedOrganizationId() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();
@@ -773,7 +773,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listManagersFilterByAuditedSpaceId() throws TimeoutException, InterruptedException {
+    public void listManagersFilterByAuditedSpaceId() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();
@@ -792,7 +792,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listManagersFilterByBillingManagedOrganizationId() throws TimeoutException, InterruptedException {
+    public void listManagersFilterByBillingManagedOrganizationId() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();
@@ -824,7 +824,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listManagersFilterByManagedOrganizationId() throws TimeoutException, InterruptedException {
+    public void listManagersFilterByManagedOrganizationId() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();
@@ -856,7 +856,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listManagersFilterByManagedSpaceId() throws TimeoutException, InterruptedException {
+    public void listManagersFilterByManagedSpaceId() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();
@@ -872,7 +872,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listManagersFilterByOrganizationId() throws TimeoutException, InterruptedException {
+    public void listManagersFilterByOrganizationId() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();
@@ -897,7 +897,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listRoutes() throws TimeoutException, InterruptedException {
+    public void listRoutes() {
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
         String spaceName = this.nameFactory.getSpaceName();
@@ -921,7 +921,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listRoutesFilterByDomainId() throws TimeoutException, InterruptedException {
+    public void listRoutesFilterByDomainId() {
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
         String spaceName = this.nameFactory.getSpaceName();
@@ -946,7 +946,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listRoutesFilterByHost() throws TimeoutException, InterruptedException {
+    public void listRoutesFilterByHost() {
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
         String spaceName = this.nameFactory.getSpaceName();
@@ -970,7 +970,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listRoutesFilterByPath() throws TimeoutException, InterruptedException {
+    public void listRoutesFilterByPath() {
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
         String spaceName = this.nameFactory.getSpaceName();
@@ -1254,7 +1254,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listUserRoles() throws TimeoutException, InterruptedException {
+    public void listUserRoles() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();
@@ -1278,7 +1278,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void removeAuditor() throws TimeoutException, InterruptedException {
+    public void removeAuditor() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();
@@ -1297,7 +1297,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void removeAuditorByUsername() throws TimeoutException, InterruptedException {
+    public void removeAuditorByUsername() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();
@@ -1316,7 +1316,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void removeDeveloper() throws TimeoutException, InterruptedException {
+    public void removeDeveloper() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();
@@ -1335,7 +1335,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void removeDeveloperByUsername() throws TimeoutException, InterruptedException {
+    public void removeDeveloperByUsername() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();
@@ -1354,7 +1354,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void removeManager() throws TimeoutException, InterruptedException {
+    public void removeManager() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();
@@ -1373,7 +1373,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void removeManagerByUsername() throws TimeoutException, InterruptedException {
+    public void removeManagerByUsername() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();
@@ -1416,7 +1416,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void update() throws TimeoutException, InterruptedException {
+    public void update() {
         String spaceName = this.nameFactory.getSpaceName();
         String spaceName2 = this.nameFactory.getSpaceName();
 
@@ -1439,7 +1439,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void updateEmptyManagers() throws TimeoutException, InterruptedException {
+    public void updateEmptyManagers() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();

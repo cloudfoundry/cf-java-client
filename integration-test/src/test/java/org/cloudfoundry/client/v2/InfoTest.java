@@ -36,7 +36,7 @@ public final class InfoTest extends AbstractIntegrationTest {
     private CloudFoundryClient cloudFoundryClient;
 
     @Test
-    public void info() throws TimeoutException, InterruptedException {
+    public void info() {
         this.cloudFoundryClient.info()
             .get(GetInfoRequest.builder()
                 .build())

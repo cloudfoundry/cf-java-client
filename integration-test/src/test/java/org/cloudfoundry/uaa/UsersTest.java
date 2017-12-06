@@ -60,7 +60,7 @@ public final class UsersTest extends AbstractIntegrationTest {
     private UaaClient uaaClient;
 
     @Test
-    public void changePassword() throws TimeoutException, InterruptedException {
+    public void changePassword() {
         String userName = this.nameFactory.getUserName();
 
         requestCreateUser(this.uaaClient, userName)
@@ -81,7 +81,7 @@ public final class UsersTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void create() throws TimeoutException, InterruptedException {
+    public void create() {
         String userName = this.nameFactory.getUserName();
 
         this.uaaClient.users()
@@ -108,7 +108,7 @@ public final class UsersTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void delete() throws TimeoutException, InterruptedException {
+    public void delete() {
         String userName = this.nameFactory.getUserName();
 
         createUserId(this.uaaClient, userName)
@@ -127,7 +127,7 @@ public final class UsersTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_10)
     @Test
-    public void expirePassword() throws TimeoutException, InterruptedException {
+    public void expirePassword() {
         String userName = this.nameFactory.getUserName();
 
         createUserId(this.uaaClient, userName)
@@ -146,7 +146,7 @@ public final class UsersTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(equalTo = CloudFoundryVersion.PCF_1_9)
     @Test
-    public void expirePassword19() throws TimeoutException, InterruptedException {
+    public void expirePassword19() {
         String userName = this.nameFactory.getUserName();
 
         createUserId(this.uaaClient, userName)
@@ -163,7 +163,7 @@ public final class UsersTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void getVerificationLink() throws TimeoutException, InterruptedException {
+    public void getVerificationLink() {
         String userName = this.nameFactory.getUserName();
 
         createUserId(this.uaaClient, userName)
@@ -179,7 +179,7 @@ public final class UsersTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void invite() throws TimeoutException, InterruptedException {
+    public void invite() {
         this.uaaClient.users()
             .invite(InviteUsersRequest.builder()
                 .email("test@email.address")
@@ -198,7 +198,7 @@ public final class UsersTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() throws TimeoutException, InterruptedException {
+    public void list() {
         String userName = this.nameFactory.getUserName();
 
         createUserId(this.uaaClient, userName)
@@ -215,7 +215,7 @@ public final class UsersTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void lookup() throws TimeoutException, InterruptedException {
+    public void lookup() {
         String userName = this.nameFactory.getUserName();
 
         createUserId(this.uaaClient, userName)
@@ -232,7 +232,7 @@ public final class UsersTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void update() throws TimeoutException, InterruptedException {
+    public void update() {
         String userName = this.nameFactory.getUserName();
 
         createUserId(this.uaaClient, userName)
@@ -259,7 +259,7 @@ public final class UsersTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void userInfo() throws TimeoutException, InterruptedException {
+    public void userInfo() {
         this.uaaClient.users()
             .userInfo(UserInfoRequest.builder()
                 .build())
@@ -271,7 +271,7 @@ public final class UsersTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void verifyUser() throws TimeoutException, InterruptedException {
+    public void verifyUser() {
         String userName = this.nameFactory.getUserName();
 
         createUserId(this.uaaClient, userName)

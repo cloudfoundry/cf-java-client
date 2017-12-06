@@ -76,7 +76,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     private Mono<String> userId;
 
     @Test
-    public void create() throws TimeoutException, InterruptedException {
+    public void create() {
         String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
@@ -91,7 +91,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void delete() throws TimeoutException, InterruptedException {
+    public void delete() {
         String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
@@ -105,7 +105,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void deleteNotAsync() throws TimeoutException, InterruptedException {
+    public void deleteNotAsync() {
         String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
@@ -118,7 +118,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void get() throws TimeoutException, InterruptedException {
+    public void get() {
         String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
@@ -137,7 +137,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() throws TimeoutException, InterruptedException {
+    public void list() {
         String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
@@ -159,7 +159,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listDomainSpaces() throws TimeoutException, InterruptedException {
+    public void listDomainSpaces() {
         String domainName = this.nameFactory.getDomainName();
 
         Mono.zip(this.organizationId, this.spaceId)
@@ -181,7 +181,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listDomainSpacesFilterByApplicationId() throws TimeoutException, InterruptedException {
+    public void listDomainSpacesFilterByApplicationId() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -209,7 +209,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listDomainSpacesFilterByDeveloperId() throws TimeoutException, InterruptedException {
+    public void listDomainSpacesFilterByDeveloperId() {
         String domainName = this.nameFactory.getDomainName();
 
         Mono.zip(this.spaceId, this.organizationId, this.userId)
@@ -232,7 +232,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listDomainSpacesFilterByName() throws TimeoutException, InterruptedException {
+    public void listDomainSpacesFilterByName() {
         String domainName = this.nameFactory.getDomainName();
 
         Mono.zip(this.organizationId, this.spaceId)
@@ -255,7 +255,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listDomainSpacesFilterByOrganizationId() throws TimeoutException, InterruptedException {
+    public void listDomainSpacesFilterByOrganizationId() {
         String domainName = this.nameFactory.getDomainName();
 
         Mono.zip(this.organizationId, this.spaceId)
@@ -278,7 +278,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByName() throws TimeoutException, InterruptedException {
+    public void listFilterByName() {
         String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
@@ -300,7 +300,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByOwningOrganizationId() throws TimeoutException, InterruptedException {
+    public void listFilterByOwningOrganizationId() {
         String domainName = this.nameFactory.getDomainName();
 
         this.organizationId

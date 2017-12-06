@@ -21,34 +21,34 @@ import org.junit.Test;
 public final class GetFeatureFlagRequestTest {
 
     @Test(expected = IllegalStateException.class)
-    public void badName1() throws Exception {
+    public void badName1() {
         GetFeatureFlagRequest.builder()
             .name("mustn't have spaces or / chars (or quotes, or parentheses, or commas)")
             .build();
     }
 
     @Test(expected = IllegalStateException.class)
-    public void badName2() throws Exception {
+    public void badName2() {
         GetFeatureFlagRequest.builder()
             .name("good_name_with_bad_at_end ")
             .build();
     }
 
     @Test(expected = IllegalStateException.class)
-    public void badName3() throws Exception {
+    public void badName3() {
         GetFeatureFlagRequest.builder()
             .name("good_name_with_bad_at_end.")
             .build();
     }
 
     @Test(expected = IllegalStateException.class)
-    public void noName() throws Exception {
+    public void noName() {
         GetFeatureFlagRequest.builder()
             .build();
     }
 
     @Test
-    public void valid() throws Exception {
+    public void valid() {
         GetFeatureFlagRequest.builder()
             .name("test_feature_flag_name")
             .build();

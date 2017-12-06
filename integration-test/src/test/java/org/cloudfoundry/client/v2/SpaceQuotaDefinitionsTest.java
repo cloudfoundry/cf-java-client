@@ -140,7 +140,7 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() throws TimeoutException, InterruptedException {
+    public void list() {
         String quotaName = this.nameFactory.getQuotaDefinitionName();
 
         this.organizationId

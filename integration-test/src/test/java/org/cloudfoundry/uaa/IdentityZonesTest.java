@@ -39,7 +39,7 @@ public final class IdentityZonesTest extends AbstractIntegrationTest {
     private UaaClient uaaClient;
 
     @Test
-    public void create() throws TimeoutException, InterruptedException {
+    public void create() {
         String identityZoneName = this.nameFactory.getIdentityZoneName();
         String subdomainName = this.nameFactory.getDomainName();
 
@@ -58,7 +58,7 @@ public final class IdentityZonesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void delete() throws TimeoutException, InterruptedException {
+    public void delete() {
         String identityZoneName = this.nameFactory.getIdentityZoneName();
         String subdomainName = this.nameFactory.getDomainName();
 
@@ -76,7 +76,7 @@ public final class IdentityZonesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void get() throws TimeoutException, InterruptedException {
+    public void get() {
         String identityZoneName = this.nameFactory.getIdentityZoneName();
         String subdomainName = this.nameFactory.getDomainName();
 
@@ -93,7 +93,7 @@ public final class IdentityZonesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() throws TimeoutException, InterruptedException {
+    public void list() {
         String identityZoneName = this.nameFactory.getIdentityZoneName();
         String subdomainName = this.nameFactory.getDomainName();
 
@@ -110,7 +110,7 @@ public final class IdentityZonesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void update() throws TimeoutException, InterruptedException {
+    public void update() {
         String identityZoneName = this.nameFactory.getIdentityZoneName();
         String baseSubdomainName = this.nameFactory.getDomainName();
         String newSubdomainName = this.nameFactory.getDomainName();

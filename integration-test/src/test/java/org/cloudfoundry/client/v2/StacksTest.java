@@ -48,7 +48,7 @@ public final class StacksTest extends AbstractIntegrationTest {
     private String stackName;
 
     @Test
-    public void create() throws TimeoutException, InterruptedException {
+    public void create() {
         String stackName = this.nameFactory.getStackName();
 
         this.cloudFoundryClient.stacks()
@@ -65,7 +65,7 @@ public final class StacksTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void delete() throws TimeoutException, InterruptedException {
+    public void delete() {
         String stackName = this.nameFactory.getStackName();
 
         createStackId(this.cloudFoundryClient, stackName)
@@ -81,7 +81,7 @@ public final class StacksTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void deleteAsync() throws TimeoutException, InterruptedException {
+    public void deleteAsync() {
         String stackName = this.nameFactory.getStackName();
 
         createStackId(this.cloudFoundryClient, stackName)
@@ -98,7 +98,7 @@ public final class StacksTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void get() throws TimeoutException, InterruptedException {
+    public void get() {
         getStackId(this.cloudFoundryClient, this.stackName)
             .flatMap(stackId -> this.cloudFoundryClient.stacks()
                 .get(GetStackRequest.builder()
@@ -112,7 +112,7 @@ public final class StacksTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() throws TimeoutException, InterruptedException {
+    public void list() {
         getStackId(this.cloudFoundryClient, this.stackName)
             .flatMapMany(stackId -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.stacks()
@@ -128,7 +128,7 @@ public final class StacksTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByName() throws TimeoutException, InterruptedException {
+    public void listFilterByName() {
         PaginationUtils
             .requestClientV2Resources(page -> this.cloudFoundryClient.stacks()
                 .list(ListStacksRequest.builder()

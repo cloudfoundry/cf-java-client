@@ -37,7 +37,7 @@ public final class CertificateCollectingTrustManagerTest {
     private final CertificateCollectingTrustManager trustManager = new CertificateCollectingTrustManager(this.delegate);
 
     @Test(expected = IllegalStateException.class)
-    public void checkClientTrustedAlreadyCollected() throws CertificateException {
+    public void checkClientTrustedAlreadyCollected() {
         this.trustManager.checkClientTrusted(this.chain, null);
         this.trustManager.checkClientTrusted(this.chain, null);
     }
@@ -52,14 +52,14 @@ public final class CertificateCollectingTrustManagerTest {
     }
 
     @Test
-    public void checkClientTrustedTrusted() throws CertificateException {
+    public void checkClientTrustedTrusted() {
         this.trustManager.checkClientTrusted(this.chain, null);
 
         assertThat(this.trustManager.isTrusted()).isTrue();
     }
 
     @Test(expected = IllegalStateException.class)
-    public void checkServerTrustedAlreadyCollected() throws CertificateException {
+    public void checkServerTrustedAlreadyCollected() {
         this.trustManager.checkServerTrusted(this.chain, null);
         this.trustManager.checkServerTrusted(this.chain, null);
     }
@@ -74,7 +74,7 @@ public final class CertificateCollectingTrustManagerTest {
     }
 
     @Test
-    public void checkServerTrustedTrusted() throws CertificateException {
+    public void checkServerTrustedTrusted() {
         this.trustManager.checkServerTrusted(this.chain, null);
 
         assertThat(this.trustManager.isTrusted()).isTrue();
@@ -88,7 +88,7 @@ public final class CertificateCollectingTrustManagerTest {
     }
 
     @Test
-    public void getCollectedCertificateChain() throws CertificateException {
+    public void getCollectedCertificateChain() {
         this.trustManager.checkServerTrusted(this.chain, null);
 
         X509Certificate[] collectedCertificateChain = this.trustManager.getCollectedCertificateChain();

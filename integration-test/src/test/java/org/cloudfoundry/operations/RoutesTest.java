@@ -63,7 +63,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     private String spaceName;
 
     @Test
-    public void checkFalse() throws TimeoutException, InterruptedException {
+    public void checkFalse() {
         String domainName = this.nameFactory.getDomainName();
         String host = this.nameFactory.getHostName();
         String path = this.nameFactory.getPath();
@@ -81,7 +81,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void checkTruePrivateDomainNoHost() throws TimeoutException, InterruptedException {
+    public void checkTruePrivateDomainNoHost() {
         String domainName = this.nameFactory.getDomainName();
         String hostName = null;
         String path = this.nameFactory.getPath();
@@ -99,7 +99,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void checkTrueSharedDomain() throws TimeoutException, InterruptedException {
+    public void checkTrueSharedDomain() {
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
         String path = this.nameFactory.getPath();
@@ -118,7 +118,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void create() throws TimeoutException, InterruptedException {
+    public void create() {
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
         String path = this.nameFactory.getPath();
@@ -137,7 +137,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void createRouteTcpAssignedPort() throws TimeoutException, InterruptedException {
+    public void createRouteTcpAssignedPort() {
         String domainName = this.nameFactory.getDomainName();
         Integer port = 61002;
 
@@ -152,7 +152,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void createRouteTcpRandomPort() throws TimeoutException, InterruptedException {
+    public void createRouteTcpRandomPort() {
         String domainName = this.nameFactory.getDomainName();
 
         requestCreateSharedDomain(this.cloudFoundryOperations, domainName, DEFAULT_ROUTER_GROUP)
@@ -166,7 +166,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void createRouteWithNonExistentDomain() throws TimeoutException, InterruptedException {
+    public void createRouteWithNonExistentDomain() {
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
         String path = this.nameFactory.getPath();
@@ -184,7 +184,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void delete() throws TimeoutException, InterruptedException {
+    public void delete() {
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
         String path = this.nameFactory.getPath();
@@ -209,7 +209,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void deleteInvalidDomain() throws TimeoutException, InterruptedException {
+    public void deleteInvalidDomain() {
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
         String path = this.nameFactory.getPath();
@@ -226,7 +226,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void deleteOrphanedRoutes() throws TimeoutException, InterruptedException {
+    public void deleteOrphanedRoutes() {
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
         String path = this.nameFactory.getPath();
@@ -248,7 +248,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void deleteTcpRoute() throws TimeoutException, InterruptedException {
+    public void deleteTcpRoute() {
         String domainName = this.nameFactory.getDomainName();
 
         requestCreateSharedDomain(this.cloudFoundryOperations, domainName, DEFAULT_ROUTER_GROUP)
@@ -266,7 +266,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listWithOrganizationLevel() throws TimeoutException, InterruptedException {
+    public void listWithOrganizationLevel() {
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
         String path = this.nameFactory.getPath();
@@ -284,7 +284,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listWithSpaceLevel() throws TimeoutException, InterruptedException {
+    public void listWithSpaceLevel() {
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
         String path = this.nameFactory.getPath();
@@ -302,7 +302,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void map() throws TimeoutException, InterruptedException, IOException {
+    public void map() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
@@ -329,7 +329,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void mapNoHost() throws TimeoutException, InterruptedException, IOException {
+    public void mapNoHost() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
         String hostName = null;
@@ -356,7 +356,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void mapNoPath() throws TimeoutException, InterruptedException, IOException {
+    public void mapNoPath() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
@@ -383,7 +383,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void mapTcpRoute() throws TimeoutException, InterruptedException, IOException {
+    public void mapTcpRoute() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -408,7 +408,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void mapTcpRouteTwice() throws TimeoutException, InterruptedException, IOException {
+    public void mapTcpRouteTwice() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -438,7 +438,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void unmap() throws TimeoutException, InterruptedException, IOException {
+    public void unmap() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
@@ -465,7 +465,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void unmapNoPath() throws TimeoutException, InterruptedException, IOException {
+    public void unmapNoPath() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
@@ -492,7 +492,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void unmapTcpRoute() throws TimeoutException, InterruptedException, IOException {
+    public void unmapTcpRoute() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 

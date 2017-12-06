@@ -97,7 +97,7 @@ public abstract class AbstractRestTest {
         private List<InteractionContext> verifications = new ArrayList<>();
 
         @Override
-        public MockResponse dispatch(RecordedRequest request) throws InterruptedException {
+        public MockResponse dispatch(RecordedRequest request) {
             InteractionContext interactionContext = this.responses.poll();
 
             if (interactionContext == null) {

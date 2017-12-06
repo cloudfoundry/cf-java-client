@@ -36,7 +36,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     private Mono<String> organizationId;
 
     @Test
-    public void create() throws TimeoutException, InterruptedException {
+    public void create() {
         String organizationName = this.nameFactory.getOrganizationName();
 
         this.cloudFoundryOperations.organizations()
@@ -53,7 +53,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() throws TimeoutException, InterruptedException {
+    public void list() {
         this.organizationId
             .flatMapMany(organizationId -> this.cloudFoundryOperations.organizations()
                 .list()

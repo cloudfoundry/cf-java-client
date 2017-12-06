@@ -111,7 +111,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     private Mono<String> stackId;
 
     @Test
-    public void associateRoute() throws TimeoutException, InterruptedException {
+    public void associateRoute() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -134,7 +134,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void copy() throws TimeoutException, InterruptedException {
+    public void copy() {
         String applicationName = this.nameFactory.getApplicationName();
         String copyApplicationName = this.nameFactory.getApplicationName();
 
@@ -163,7 +163,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void create() throws TimeoutException, InterruptedException {
+    public void create() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -182,7 +182,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void delete() throws TimeoutException, InterruptedException {
+    public void delete() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -198,7 +198,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void downloadDroplet() throws TimeoutException, InterruptedException {
+    public void downloadDroplet() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -216,7 +216,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void environment() throws TimeoutException, InterruptedException {
+    public void environment() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -236,7 +236,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void get() throws TimeoutException, InterruptedException {
+    public void get() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -253,7 +253,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_9)
     @Test
-    public void getPermissions() throws TimeoutException, InterruptedException {
+    public void getPermissions() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -272,7 +272,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() throws TimeoutException, InterruptedException {
+    public void list() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -295,7 +295,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByDiego() throws TimeoutException, InterruptedException {
+    public void listFilterByDiego() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -319,7 +319,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByName() throws TimeoutException, InterruptedException {
+    public void listFilterByName() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -343,7 +343,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByOrganizationId() throws TimeoutException, InterruptedException {
+    public void listFilterByOrganizationId() {
         String applicationName = this.nameFactory.getApplicationName();
 
         Mono
@@ -371,7 +371,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterBySpaceId() throws TimeoutException, InterruptedException {
+    public void listFilterBySpaceId() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -426,7 +426,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listRoutes() throws TimeoutException, InterruptedException {
+    public void listRoutes() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -459,7 +459,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listRoutesFilterByDomainId() throws TimeoutException, InterruptedException {
+    public void listRoutesFilterByDomainId() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -493,7 +493,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listRoutesFilterByHost() throws TimeoutException, InterruptedException {
+    public void listRoutesFilterByHost() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -527,7 +527,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listRoutesFilterByPath() throws TimeoutException, InterruptedException {
+    public void listRoutesFilterByPath() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -561,7 +561,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listRoutesFilterByPort() throws TimeoutException, InterruptedException {
+    public void listRoutesFilterByPort() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -600,7 +600,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listServiceBindings() throws TimeoutException, InterruptedException {
+    public void listServiceBindings() {
         String applicationName = this.nameFactory.getApplicationName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
@@ -621,7 +621,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listServiceBindingsFilterByServiceInstanceId() throws TimeoutException, InterruptedException {
+    public void listServiceBindingsFilterByServiceInstanceId() {
         String applicationName = this.nameFactory.getApplicationName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
@@ -654,7 +654,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void removeRoute() throws TimeoutException, InterruptedException {
+    public void removeRoute() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -681,7 +681,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void removeServiceBinding() throws TimeoutException, InterruptedException {
+    public void removeServiceBinding() {
         String applicationName = this.nameFactory.getApplicationName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
@@ -706,7 +706,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void restage() throws TimeoutException, InterruptedException {
+    public void restage() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -725,7 +725,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void statistics() throws TimeoutException, InterruptedException {
+    public void statistics() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -743,7 +743,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void summary() throws TimeoutException, InterruptedException {
+    public void summary() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -761,7 +761,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void terminateInstance() throws TimeoutException, InterruptedException {
+    public void terminateInstance() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -785,7 +785,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void update() throws TimeoutException, InterruptedException {
+    public void update() {
         String applicationName = this.nameFactory.getApplicationName();
         String applicationName2 = this.nameFactory.getApplicationName();
 
@@ -824,7 +824,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void uploadAndDownload() throws TimeoutException, InterruptedException {
+    public void uploadAndDownload() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -841,7 +841,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void uploadAndDownloadAsyncFalse() throws TimeoutException, InterruptedException {
+    public void uploadAndDownloadAsyncFalse() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -883,7 +883,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_9)
     @Test
-    public void uploadDroplet() throws TimeoutException, InterruptedException {
+    public void uploadDroplet() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId

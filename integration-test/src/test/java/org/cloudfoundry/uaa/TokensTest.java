@@ -65,7 +65,7 @@ public final class TokensTest extends AbstractIntegrationTest {
     private UaaClient uaaClient;
 
     @Test
-    public void checkTokenNotAuthorized() throws TimeoutException, InterruptedException {
+    public void checkTokenNotAuthorized() {
         this.tokenProvider.getToken(this.connectionContext)
             .flatMap(token -> this.uaaClient.tokens()
                 .check(CheckTokenRequest.builder()
@@ -83,7 +83,7 @@ public final class TokensTest extends AbstractIntegrationTest {
     //TODO: Ready to Implement - use test authorizationCode
     @Ignore("Ready to Implement - use test authorizationCode")
     @Test
-    public void getTokenByAuthorizationCode() throws TimeoutException, InterruptedException {
+    public void getTokenByAuthorizationCode() {
         this.uaaClient.tokens()
             .getByAuthorizationCode(GetTokenByAuthorizationCodeRequest.builder()
                 .authorizationCode("some auth code")
@@ -97,7 +97,7 @@ public final class TokensTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void getTokenByClientCredentials() throws TimeoutException, InterruptedException {
+    public void getTokenByClientCredentials() {
         this.uaaClient.tokens()
             .getByClientCredentials(GetTokenByClientCredentialsRequest.builder()
                 .clientId(this.clientId)
@@ -114,7 +114,7 @@ public final class TokensTest extends AbstractIntegrationTest {
     //TODO: Ready to Implement - use test one-time passcode
     @Ignore("Ready to Implement - use test one-time passcode")
     @Test
-    public void getTokenByOneTimePasscode() throws TimeoutException, InterruptedException {
+    public void getTokenByOneTimePasscode() {
         this.uaaClient.tokens()
             .getByOneTimePasscode(GetTokenByOneTimePasscodeRequest.builder()
                 .passcode("Some passcode")
@@ -131,7 +131,7 @@ public final class TokensTest extends AbstractIntegrationTest {
     //TODO: Ready to Implement - use test openid authorizationCode
     @Ignore("Ready to Implement - use test openid authorizationCode")
     @Test
-    public void getTokenByOpenId() throws TimeoutException, InterruptedException {
+    public void getTokenByOpenId() {
         this.uaaClient.tokens()
             .getByOpenId(GetTokenByOpenIdRequest.builder()
                 .authorizationCode("Some authorization code")
@@ -149,7 +149,7 @@ public final class TokensTest extends AbstractIntegrationTest {
     //TODO: Ready to Implement - use test username and password
     @Ignore("Ready to Implement - use test username and password")
     @Test
-    public void getTokenByPassword() throws TimeoutException, InterruptedException {
+    public void getTokenByPassword() {
         this.uaaClient.tokens()
             .getByPassword(GetTokenByPasswordRequest.builder()
                 .password("a-password")
@@ -166,7 +166,7 @@ public final class TokensTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void getTokenKey() throws TimeoutException, InterruptedException {
+    public void getTokenKey() {
         this.uaaClient.tokens()
             .getKey(GetTokenKeyRequest.builder()
                 .build())
@@ -177,7 +177,7 @@ public final class TokensTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listTokenKeys() throws TimeoutException, InterruptedException {
+    public void listTokenKeys() {
         this.uaaClient.tokens()
             .getKey(GetTokenKeyRequest.builder()
                 .build())
@@ -201,7 +201,7 @@ public final class TokensTest extends AbstractIntegrationTest {
     //TODO: Ready to Implement - use test refresh token
     @Ignore("Ready to Implement - use test refresh token")
     @Test
-    public void refreshToken() throws TimeoutException, InterruptedException {
+    public void refreshToken() {
         this.uaaClient.tokens()
             .refresh(RefreshTokenRequest.builder()
                 .tokenFormat(TokenFormat.OPAQUE)

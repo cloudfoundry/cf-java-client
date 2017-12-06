@@ -37,7 +37,7 @@ public final class EventsTest extends AbstractIntegrationTest {
     private CloudFoundryClient cloudFoundryClient;
 
     @Test
-    public void get() throws TimeoutException, InterruptedException {
+    public void get() {
         getFirstEvent(this.cloudFoundryClient)
             .flatMap(resource -> Mono.zip(
                 Mono.just(resource)
@@ -55,7 +55,7 @@ public final class EventsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() throws TimeoutException, InterruptedException {
+    public void list() {
         getFirstEvent(this.cloudFoundryClient)
             .flatMap(resource -> Mono.zip(
                 Mono.just(resource),
@@ -72,7 +72,7 @@ public final class EventsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByActee() throws TimeoutException, InterruptedException {
+    public void listFilterByActee() {
         getFirstEvent(this.cloudFoundryClient)
             .flatMap(resource -> Mono.zip(
                 Mono.just(resource),
@@ -90,7 +90,7 @@ public final class EventsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByTimestamp() throws TimeoutException, InterruptedException {
+    public void listFilterByTimestamp() {
         getFirstEvent(this.cloudFoundryClient)
             .flatMap(resource -> Mono.zip(
                 Mono.just(resource),
@@ -108,7 +108,7 @@ public final class EventsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByType() throws TimeoutException, InterruptedException {
+    public void listFilterByType() {
         getFirstEvent(this.cloudFoundryClient)
             .flatMap(resource -> Mono.zip(
                 Mono.just(resource),

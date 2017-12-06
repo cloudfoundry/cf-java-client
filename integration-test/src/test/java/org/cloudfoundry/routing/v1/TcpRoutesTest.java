@@ -51,7 +51,7 @@ public final class TcpRoutesTest extends AbstractIntegrationTest {
     private RoutingClient routingClient;
 
     @Test
-    public void create() throws TimeoutException, InterruptedException {
+    public void create() {
         String backendIp = this.nameFactory.getIpAddress();
         Integer backendPort = this.nameFactory.getPort();
         Integer port = this.nameFactory.getPort();
@@ -79,7 +79,7 @@ public final class TcpRoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void delete() throws TimeoutException, InterruptedException {
+    public void delete() {
         String backendIp = this.nameFactory.getIpAddress();
         Integer backendPort = this.nameFactory.getPort();
         Integer port = this.nameFactory.getPort();
@@ -128,7 +128,7 @@ public final class TcpRoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() throws TimeoutException, InterruptedException {
+    public void list() {
         String backendIp = this.nameFactory.getIpAddress();
         Integer backendPort = this.nameFactory.getPort();
         Integer port = this.nameFactory.getPort();

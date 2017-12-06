@@ -52,7 +52,7 @@ public final class PackagesTest extends AbstractIntegrationTest {
     private Mono<String> spaceId;
 
     @Test
-    public void upload() throws TimeoutException, InterruptedException {
+    public void upload() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId

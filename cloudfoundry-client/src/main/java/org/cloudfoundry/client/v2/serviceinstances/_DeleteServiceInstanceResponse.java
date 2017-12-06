@@ -64,7 +64,7 @@ abstract class _DeleteServiceInstanceResponse extends Resource<Object> {
         }
 
         @Override
-        public JavaType typeFromId(DatabindContext context, String id) throws IOException {
+        public JavaType typeFromId(DatabindContext context, String id) {
             return context.constructType(ServiceInstanceEntity.class);
         }
 

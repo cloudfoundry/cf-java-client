@@ -54,7 +54,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     private Mono<String> organizationId;
 
     @Test
-    public void assignIsolationSegment() throws TimeoutException, InterruptedException {
+    public void assignIsolationSegment() {
         String isolationSegmentName = this.nameFactory.getIsolationSegmentName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -81,7 +81,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void create() throws TimeoutException, InterruptedException {
+    public void create() {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
@@ -105,7 +105,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void getIsolationSegment() throws TimeoutException, InterruptedException {
+    public void getIsolationSegment() {
         String isolationSegmentName = this.nameFactory.getIsolationSegmentName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -129,7 +129,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() throws TimeoutException, InterruptedException {
+    public void list() {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
@@ -146,7 +146,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByName() throws TimeoutException, InterruptedException {
+    public void listFilterByName() {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
@@ -164,7 +164,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByOrganization() throws TimeoutException, InterruptedException {
+    public void listFilterByOrganization() {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId

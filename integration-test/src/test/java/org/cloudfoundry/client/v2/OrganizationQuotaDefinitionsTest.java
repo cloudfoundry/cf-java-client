@@ -46,7 +46,7 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
 
     @SuppressWarnings("deprecation")
     @Test
-    public void create() throws TimeoutException, InterruptedException {
+    public void create() {
         String quotaDefinitionName = this.nameFactory.getQuotaDefinitionName();
 
         this.cloudFoundryClient.organizationQuotaDefinitions()
@@ -79,7 +79,7 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
     }
 
     @Test
-    public void delete() throws TimeoutException, InterruptedException {
+    public void delete() {
         String quotaDefinitionName = this.nameFactory.getQuotaDefinitionName();
 
         requestCreateOrganizationQuotaDefinition(this.cloudFoundryClient, quotaDefinitionName)
@@ -98,7 +98,7 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
 
     @SuppressWarnings("deprecation")
     @Test
-    public void get() throws TimeoutException, InterruptedException {
+    public void get() {
         String quotaDefinitionName = this.nameFactory.getQuotaDefinitionName();
 
         requestCreateOrganizationQuotaDefinition(this.cloudFoundryClient, quotaDefinitionName)
@@ -128,7 +128,7 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
     }
 
     @Test
-    public void list() throws TimeoutException, InterruptedException {
+    public void list() {
         String quotaDefinitionName = this.nameFactory.getQuotaDefinitionName();
 
         requestCreateOrganizationQuotaDefinition(this.cloudFoundryClient, quotaDefinitionName)
@@ -150,7 +150,7 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
 
     @SuppressWarnings("deprecation")
     @Test
-    public void update() throws TimeoutException, InterruptedException {
+    public void update() {
         String quotaDefinitionName = this.nameFactory.getQuotaDefinitionName();
 
         requestCreateOrganizationQuotaDefinition(this.cloudFoundryClient, quotaDefinitionName)

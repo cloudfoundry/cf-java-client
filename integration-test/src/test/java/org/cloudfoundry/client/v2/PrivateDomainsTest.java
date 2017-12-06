@@ -71,7 +71,7 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
     private Mono<String> userId;
 
     @Test
-    public void create() throws TimeoutException, InterruptedException {
+    public void create() {
         String privateDomainName = this.nameFactory.getDomainName();
 
         this.organizationId
@@ -86,7 +86,7 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void delete() throws TimeoutException, InterruptedException {
+    public void delete() {
         String privateDomainName = this.nameFactory.getDomainName();
 
         this.organizationId
@@ -100,7 +100,7 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void get() throws TimeoutException, InterruptedException {
+    public void get() {
         String privateDomainName = this.nameFactory.getDomainName();
 
         this.organizationId
@@ -119,7 +119,7 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() throws TimeoutException, InterruptedException {
+    public void list() {
         String privateDomainName = this.nameFactory.getDomainName();
 
         this.organizationId
@@ -140,7 +140,7 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByName() throws TimeoutException, InterruptedException {
+    public void listFilterByName() {
         String privateDomainName = this.nameFactory.getDomainName();
 
         this.organizationId
@@ -161,7 +161,7 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listSharedOrganizations() throws TimeoutException, InterruptedException {
+    public void listSharedOrganizations() {
         String sharedOrganizationName = this.nameFactory.getOrganizationName();
         String privateDomainName = this.nameFactory.getDomainName();
 
@@ -187,7 +187,7 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listSharedOrganizationsFilterByAuditorId() throws TimeoutException, InterruptedException {
+    public void listSharedOrganizationsFilterByAuditorId() {
         String sharedOrganizationName = this.nameFactory.getOrganizationName();
         String privateDomainName = this.nameFactory.getDomainName();
 
@@ -218,7 +218,7 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listSharedOrganizationsFilterByBillingManagerId() throws TimeoutException, InterruptedException {
+    public void listSharedOrganizationsFilterByBillingManagerId() {
         String sharedOrganizationName = this.nameFactory.getOrganizationName();
         String privateDomainName = this.nameFactory.getDomainName();
 
@@ -249,7 +249,7 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listSharedOrganizationsFilterByManagerId() throws TimeoutException, InterruptedException {
+    public void listSharedOrganizationsFilterByManagerId() {
         String sharedOrganizationName = this.nameFactory.getOrganizationName();
         String privateDomainName = this.nameFactory.getDomainName();
 
@@ -280,7 +280,7 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listSharedOrganizationsFilterByName() throws TimeoutException, InterruptedException {
+    public void listSharedOrganizationsFilterByName() {
         String sharedOrganizationName = this.nameFactory.getOrganizationName();
         String privateDomainName = this.nameFactory.getDomainName();
 
@@ -306,7 +306,7 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listSharedOrganizationsFilterBySpaceId() throws TimeoutException, InterruptedException {
+    public void listSharedOrganizationsFilterBySpaceId() {
         String sharedOrganizationName = this.nameFactory.getOrganizationName();
         String privateDomainName = this.nameFactory.getDomainName();
         String spaceName = this.nameFactory.getSpaceName();
@@ -336,7 +336,7 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listSharedOrganizationsFilterByStatus() throws TimeoutException, InterruptedException {
+    public void listSharedOrganizationsFilterByStatus() {
         String sharedOrganizationName = this.nameFactory.getOrganizationName();
         String privateDomainName = this.nameFactory.getDomainName();
 
@@ -362,7 +362,7 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listSharedOrganizationsFilterByUserId() throws TimeoutException, InterruptedException {
+    public void listSharedOrganizationsFilterByUserId() {
         String sharedOrganizationName = this.nameFactory.getOrganizationName();
         String privateDomainName = this.nameFactory.getDomainName();
 

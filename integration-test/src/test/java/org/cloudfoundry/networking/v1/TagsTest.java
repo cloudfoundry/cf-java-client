@@ -54,7 +54,7 @@ public final class TagsTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_12)
     @Test
-    public void create() throws TimeoutException, InterruptedException {
+    public void create() {
         String destinationApplicationName = this.nameFactory.getApplicationName();
         String sourceApplicationName = this.nameFactory.getApplicationName();
         Integer port = this.nameFactory.getPort();
