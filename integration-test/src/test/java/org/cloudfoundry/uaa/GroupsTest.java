@@ -69,7 +69,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
     private UaaClient uaaClient;
 
     @Test
-    public void addMemberGroup() throws TimeoutException, InterruptedException {
+    public void addMemberGroup() {
         String baseDisplayName = this.nameFactory.getGroupName();
         String memberDisplayName = this.nameFactory.getGroupName();
 
@@ -99,7 +99,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void addMemberUser() throws TimeoutException, InterruptedException {
+    public void addMemberUser() {
         String displayName = this.nameFactory.getGroupName();
         String userName = this.nameFactory.getUserName();
 
@@ -129,7 +129,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void checkMembership() throws TimeoutException, InterruptedException {
+    public void checkMembership() {
         String displayName = this.nameFactory.getGroupName();
         String userName = this.nameFactory.getUserName();
 
@@ -157,7 +157,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void create() throws TimeoutException, InterruptedException {
+    public void create() {
         String displayName = this.nameFactory.getGroupName();
         String userName = this.nameFactory.getUserName();
 
@@ -179,7 +179,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void delete() throws TimeoutException, InterruptedException {
+    public void delete() {
         String displayName = this.nameFactory.getGroupName();
 
         createGroupId(this.uaaClient, displayName)
@@ -195,7 +195,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void get() throws TimeoutException, InterruptedException {
+    public void get() {
         String displayName = this.nameFactory.getGroupName();
 
         createGroupId(this.uaaClient, displayName)
@@ -211,7 +211,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() throws TimeoutException, InterruptedException {
+    public void list() {
         String displayName = this.nameFactory.getGroupName();
 
         createGroupId(this.uaaClient, displayName)
@@ -230,7 +230,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listExternalGroupMappings() throws TimeoutException, InterruptedException {
+    public void listExternalGroupMappings() {
         String displayName = this.nameFactory.getGroupName();
 
         createGroupId(this.uaaClient, displayName)
@@ -249,7 +249,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listMembers() throws TimeoutException, InterruptedException {
+    public void listMembers() {
         String displayName = this.nameFactory.getGroupName();
         String userName = this.nameFactory.getUserName();
 
@@ -276,7 +276,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listMembersWithEntity() throws TimeoutException, InterruptedException {
+    public void listMembersWithEntity() {
         String displayName = this.nameFactory.getGroupName();
         String userName = this.nameFactory.getUserName();
 
@@ -322,7 +322,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void removeMember() throws TimeoutException, InterruptedException {
+    public void removeMember() {
         String displayName = this.nameFactory.getGroupName();
         String userName = this.nameFactory.getUserName();
 
@@ -347,7 +347,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void unmapExternalGroupMappingsByGroupDisplayName() throws TimeoutException, InterruptedException {
+    public void unmapExternalGroupMappingsByGroupDisplayName() {
         String displayName = this.nameFactory.getGroupName();
 
         createGroupId(this.uaaClient, displayName)
@@ -366,7 +366,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void unmapExternalGroupMappingsByGroupId() throws TimeoutException, InterruptedException {
+    public void unmapExternalGroupMappingsByGroupId() {
         String displayName = this.nameFactory.getGroupName();
 
         createGroupId(this.uaaClient, displayName)
@@ -385,7 +385,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void update() throws TimeoutException, InterruptedException {
+    public void update() {
         String baseDisplayName = this.nameFactory.getGroupName();
         String newDisplayName = this.nameFactory.getGroupName();
 

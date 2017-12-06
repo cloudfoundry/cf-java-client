@@ -32,7 +32,7 @@ public final class AdvancedTest extends AbstractIntegrationTest {
     private CloudFoundryOperations cloudFoundryOperations;
 
     @Test
-    public void sshCode() throws TimeoutException, InterruptedException {
+    public void sshCode() {
         this.cloudFoundryOperations.advanced()
             .sshCode()
             .as(StepVerifier::create)

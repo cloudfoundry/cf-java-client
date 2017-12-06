@@ -49,7 +49,7 @@ public final class NetworkPoliciesTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_12)
     @Test
-    public void add() throws TimeoutException, InterruptedException {
+    public void add() {
         String destinationApplicationName = this.nameFactory.getApplicationName();
         String sourceApplicationName = this.nameFactory.getApplicationName();
         Integer port = this.nameFactory.getPort();
@@ -75,7 +75,7 @@ public final class NetworkPoliciesTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_12)
     @Test
-    public void list() throws TimeoutException, InterruptedException {
+    public void list() {
         String destinationApplicationName = this.nameFactory.getApplicationName();
         String sourceApplicationName = this.nameFactory.getApplicationName();
         Integer port = this.nameFactory.getPort();
@@ -99,7 +99,7 @@ public final class NetworkPoliciesTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_12)
     @Test
-    public void remove() throws TimeoutException, InterruptedException {
+    public void remove() {
         String destinationApplicationName = this.nameFactory.getApplicationName();
         String sourceApplicationName = this.nameFactory.getApplicationName();
         Integer port = this.nameFactory.getPort();

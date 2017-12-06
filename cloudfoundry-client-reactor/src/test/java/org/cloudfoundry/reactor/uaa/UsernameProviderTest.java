@@ -55,7 +55,7 @@ public final class UsernameProviderTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void getInvalidToken() throws InterruptedException, TimeoutException, NoSuchAlgorithmException {
+    public void getInvalidToken() throws NoSuchAlgorithmException {
         KeyPair keyPair = getKeyPair();
         when(this.signingKeyResolver.resolveSigningKey(any(JwsHeader.class), any(Claims.class))).thenReturn(keyPair.getPublic());
 

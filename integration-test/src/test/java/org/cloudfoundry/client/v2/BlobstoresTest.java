@@ -33,7 +33,7 @@ public final class BlobstoresTest extends AbstractIntegrationTest {
     private CloudFoundryClient cloudFoundryClient;
 
     @Test
-    public void delete() throws TimeoutException, InterruptedException {
+    public void delete() {
         this.cloudFoundryClient.blobstores()
             .deleteBuildpackCaches(DeleteBlobstoreBuildpackCachesRequest.builder()
                 .build())

@@ -78,7 +78,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     private String serviceName;
 
     @Test
-    public void deleteApplication() throws IOException, TimeoutException, InterruptedException {
+    public void deleteApplication() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, false)
@@ -94,7 +94,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void deleteApplicationAndRoutes() throws IOException, TimeoutException, InterruptedException {
+    public void deleteApplicationAndRoutes() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, false)
@@ -112,7 +112,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void deleteApplicationWithServiceBindings() throws IOException, TimeoutException, InterruptedException {
+    public void deleteApplicationWithServiceBindings() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
@@ -128,7 +128,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void get() throws TimeoutException, InterruptedException, IOException {
+    public void get() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, false)
@@ -144,7 +144,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void getEvents() throws TimeoutException, InterruptedException, IOException {
+    public void getEvents() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, true)
@@ -161,7 +161,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void getHealthCheck() throws IOException, TimeoutException, InterruptedException {
+    public void getHealthCheck() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, true)
@@ -176,7 +176,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void getManifest() throws TimeoutException, InterruptedException, IOException {
+    public void getManifest() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, true)
@@ -192,7 +192,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void getManifestForTcpRoute() throws TimeoutException, InterruptedException, IOException {
+    public void getManifestForTcpRoute() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, true)
@@ -208,7 +208,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void getStopped() throws TimeoutException, InterruptedException, IOException {
+    public void getStopped() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, true)
@@ -224,7 +224,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void getTcp() throws TimeoutException, InterruptedException, IOException {
+    public void getTcp() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -242,7 +242,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void pushBindServices() throws TimeoutException, InterruptedException, IOException {
+    public void pushBindServices() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
@@ -271,7 +271,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void pushDirectory() throws TimeoutException, InterruptedException, IOException {
+    public void pushDirectory() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application").getFile().toPath(), applicationName, false)
@@ -281,7 +281,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void pushDomainHostPathRoute() throws TimeoutException, InterruptedException, IOException {
+    public void pushDomainHostPathRoute() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
         String routePath = this.nameFactory.getPath();
@@ -312,7 +312,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void pushDomainNotFound() throws TimeoutException, InterruptedException, IOException {
+    public void pushDomainNotFound() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -331,7 +331,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void pushExisting() throws TimeoutException, InterruptedException, IOException {
+    public void pushExisting() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, false)
@@ -349,7 +349,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void pushMultipleRoutes() throws TimeoutException, InterruptedException, IOException {
+    public void pushMultipleRoutes() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -384,7 +384,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void pushNew() throws TimeoutException, InterruptedException, IOException {
+    public void pushNew() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, false)
@@ -394,7 +394,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void pushNewDocker() throws TimeoutException, InterruptedException {
+    public void pushNewDocker() {
         String applicationName = this.nameFactory.getApplicationName();
 
         createDockerApplication(this.cloudFoundryOperations, applicationName, false)
@@ -404,7 +404,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void pushNoHostName() throws TimeoutException, InterruptedException, IOException {
+    public void pushNoHostName() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -433,7 +433,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void pushNoRoute() throws TimeoutException, InterruptedException, IOException {
+    public void pushNoRoute() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -467,7 +467,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void pushPrivateDomain() throws TimeoutException, InterruptedException, IOException {
+    public void pushPrivateDomain() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -487,7 +487,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void pushRouteAndRoutePath() throws TimeoutException, InterruptedException, IOException {
+    public void pushRouteAndRoutePath() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
         String routePath1 = this.nameFactory.getPath();
@@ -520,7 +520,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void pushRoutePath() throws TimeoutException, InterruptedException, IOException {
+    public void pushRoutePath() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String routePath = this.nameFactory.getPath();
 
@@ -544,7 +544,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void pushTcpRoute() throws TimeoutException, InterruptedException, IOException {
+    public void pushTcpRoute() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -577,7 +577,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void pushUpdateRoute() throws TimeoutException, InterruptedException, IOException {
+    public void pushUpdateRoute() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
         String originalHostName = this.nameFactory.getHostName();
@@ -626,7 +626,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void pushUpdateTcpRoute() throws TimeoutException, InterruptedException, IOException {
+    public void pushUpdateTcpRoute() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -679,7 +679,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void pushWithHost() throws TimeoutException, InterruptedException, IOException {
+    public void pushWithHost() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String host = this.nameFactory.getHostName();
 
@@ -699,7 +699,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void restartNotStarted() throws IOException, TimeoutException, InterruptedException {
+    public void restartNotStarted() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, true)
@@ -713,7 +713,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void restartStarted() throws IOException, TimeoutException, InterruptedException {
+    public void restartStarted() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, false)
@@ -728,7 +728,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void setEnvironmentVariable() throws IOException, TimeoutException, InterruptedException {
+    public void setEnvironmentVariable() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String variableName1 = this.nameFactory.getVariableName();
         String variableName2 = this.nameFactory.getVariableName();
@@ -765,7 +765,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void startNotStarted() throws IOException, TimeoutException, InterruptedException {
+    public void startNotStarted() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, true)
@@ -779,7 +779,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void startStarted() throws IOException, TimeoutException, InterruptedException {
+    public void startStarted() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, false)
@@ -794,7 +794,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void unsetEnvironmentVariableComplete() throws IOException, TimeoutException, InterruptedException {
+    public void unsetEnvironmentVariableComplete() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String variableName1 = this.nameFactory.getVariableName();
         String variableName2 = this.nameFactory.getVariableName();
@@ -837,7 +837,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void unsetEnvironmentVariablePartial() throws IOException, TimeoutException, InterruptedException {
+    public void unsetEnvironmentVariablePartial() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String variableName1 = this.nameFactory.getVariableName();
         String variableName2 = this.nameFactory.getVariableName();

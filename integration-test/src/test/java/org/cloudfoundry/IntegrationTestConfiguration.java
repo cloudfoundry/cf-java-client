@@ -288,7 +288,7 @@ public class IntegrationTestConfiguration {
 
     @Bean(initMethod = "block")
     @DependsOn("cloudFoundryCleaner")
-    Mono<String> organizationId(CloudFoundryClient cloudFoundryClient, String organizationName, String organizationQuotaName, Mono<String> userId) throws InterruptedException {
+    Mono<String> organizationId(CloudFoundryClient cloudFoundryClient, String organizationName, String organizationQuotaName, Mono<String> userId) {
         return userId
             .then(userId1 -> cloudFoundryClient.organizationQuotaDefinitions()
                 .create(CreateOrganizationQuotaDefinitionRequest.builder()
@@ -393,7 +393,7 @@ public class IntegrationTestConfiguration {
 
     @Bean(initMethod = "block")
     @DependsOn("cloudFoundryCleaner")
-    Mono<String> spaceId(CloudFoundryClient cloudFoundryClient, Mono<String> organizationId, String spaceName) throws InterruptedException {
+    Mono<String> spaceId(CloudFoundryClient cloudFoundryClient, Mono<String> organizationId, String spaceName) {
         return organizationId
             .then(orgId -> cloudFoundryClient.spaces()
                 .create(CreateSpaceRequest.builder()
@@ -414,7 +414,7 @@ public class IntegrationTestConfiguration {
 
     @Bean(initMethod = "block")
     @DependsOn("cloudFoundryCleaner")
-    Mono<String> stackId(CloudFoundryClient cloudFoundryClient, String stackName) throws InterruptedException {
+    Mono<String> stackId(CloudFoundryClient cloudFoundryClient, String stackName) {
         return PaginationUtils
             .requestClientV2Resources(page -> cloudFoundryClient.stacks()
                 .list(ListStacksRequest.builder()

@@ -61,7 +61,7 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
     private Mono<String> spaceId;
 
     @Test
-    public void create() throws TimeoutException, InterruptedException {
+    public void create() {
         String applicationName = this.nameFactory.getApplicationName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
@@ -79,7 +79,7 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void delete() throws TimeoutException, InterruptedException {
+    public void delete() {
         String applicationName = this.nameFactory.getApplicationName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
@@ -98,7 +98,7 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void get() throws TimeoutException, InterruptedException {
+    public void get() {
         String applicationName = this.nameFactory.getApplicationName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
@@ -122,7 +122,7 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() throws TimeoutException, InterruptedException {
+    public void list() {
         String applicationName = this.nameFactory.getApplicationName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
@@ -148,7 +148,7 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByApplicationId() throws TimeoutException, InterruptedException {
+    public void listFilterByApplicationId() {
         String applicationName = this.nameFactory.getApplicationName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
@@ -174,7 +174,7 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByServiceInstanceId() throws TimeoutException, InterruptedException {
+    public void listFilterByServiceInstanceId() {
         String applicationName = this.nameFactory.getApplicationName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 

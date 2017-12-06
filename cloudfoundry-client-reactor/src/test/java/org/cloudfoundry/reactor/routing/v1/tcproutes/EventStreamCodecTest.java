@@ -31,7 +31,7 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 public final class EventStreamCodecTest extends AbstractRestTest {
 
     @Test
-    public void allData() throws Exception {
+    public void allData() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/")
@@ -61,7 +61,7 @@ public final class EventStreamCodecTest extends AbstractRestTest {
     }
 
     @Test
-    public void colonSpacing() throws Exception {
+    public void colonSpacing() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/")
@@ -87,7 +87,7 @@ public final class EventStreamCodecTest extends AbstractRestTest {
     }
 
     @Test
-    public void randomColons() throws Exception {
+    public void randomColons() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/")
@@ -114,7 +114,7 @@ public final class EventStreamCodecTest extends AbstractRestTest {
     }
 
     @Test
-    public void threeLines() throws Exception {
+    public void threeLines() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/")
@@ -139,7 +139,7 @@ public final class EventStreamCodecTest extends AbstractRestTest {
     }
 
     @Test
-    public void withComment() throws Exception {
+    public void withComment() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/")
@@ -170,7 +170,7 @@ public final class EventStreamCodecTest extends AbstractRestTest {
     }
 
     @Test
-    public void withEventTypes() throws Exception {
+    public void withEventTypes() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/")

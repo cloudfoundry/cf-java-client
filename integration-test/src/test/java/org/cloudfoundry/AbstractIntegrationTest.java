@@ -61,7 +61,7 @@ public abstract class AbstractIntegrationTest {
     }
 
     @After
-    public final void testExit() throws InterruptedException {
+    public final void testExit() {
         this.logger.debug("<< {} >>", getTestName());
     }
 

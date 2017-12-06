@@ -39,7 +39,7 @@ public final class DefaultConnectionContextTest extends AbstractRestTest {
     }
 
     @Test
-    public void getInfo() throws Exception {
+    public void getInfo() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/")

@@ -61,7 +61,7 @@ public final class IsolationSegmentsTest extends AbstractIntegrationTest {
     private CloudFoundryClient cloudFoundryClient;
 
     @Test
-    public void addOrganizationEntitlement() throws TimeoutException, InterruptedException {
+    public void addOrganizationEntitlement() {
         String isolationSegmentName = this.nameFactory.getIsolationSegmentName();
         String organizationName = this.nameFactory.getOrganizationName();
 
@@ -87,7 +87,7 @@ public final class IsolationSegmentsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void create() throws TimeoutException, InterruptedException {
+    public void create() {
         String isolationSegmentName = this.nameFactory.getIsolationSegmentName();
 
         this.cloudFoundryClient.isolationSegments()
@@ -104,7 +104,7 @@ public final class IsolationSegmentsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void delete() throws TimeoutException, InterruptedException {
+    public void delete() {
         String isolationSegmentName = this.nameFactory.getIsolationSegmentName();
 
         createIsolationSegmentId(this.cloudFoundryClient, isolationSegmentName)
@@ -119,7 +119,7 @@ public final class IsolationSegmentsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void get() throws TimeoutException, InterruptedException {
+    public void get() {
         String isolationSegmentName = this.nameFactory.getIsolationSegmentName();
 
         createIsolationSegmentId(this.cloudFoundryClient, isolationSegmentName)
@@ -135,7 +135,7 @@ public final class IsolationSegmentsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() throws TimeoutException, InterruptedException {
+    public void list() {
         String isolationSegmentName = this.nameFactory.getIsolationSegmentName();
 
         requestCreateIsolationSegment(this.cloudFoundryClient, isolationSegmentName)
@@ -151,7 +151,7 @@ public final class IsolationSegmentsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listEntitledOrganizations() throws TimeoutException, InterruptedException {
+    public void listEntitledOrganizations() {
         String isolationSegmentName = this.nameFactory.getIsolationSegmentName();
         String organizationName = this.nameFactory.getOrganizationName();
 
@@ -177,7 +177,7 @@ public final class IsolationSegmentsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listEntitledOrganizationsFilterByName() throws TimeoutException, InterruptedException {
+    public void listEntitledOrganizationsFilterByName() {
         String isolationSegmentName = this.nameFactory.getIsolationSegmentName();
         String organizationName = this.nameFactory.getOrganizationName();
 
@@ -204,7 +204,7 @@ public final class IsolationSegmentsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterById() throws TimeoutException, InterruptedException {
+    public void listFilterById() {
         String isolationSegmentName = this.nameFactory.getIsolationSegmentName();
 
         createIsolationSegmentId(this.cloudFoundryClient, isolationSegmentName)
@@ -221,7 +221,7 @@ public final class IsolationSegmentsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByName() throws TimeoutException, InterruptedException {
+    public void listFilterByName() {
         String isolationSegmentName = this.nameFactory.getIsolationSegmentName();
 
         requestCreateIsolationSegment(this.cloudFoundryClient, isolationSegmentName)
@@ -237,7 +237,7 @@ public final class IsolationSegmentsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByOrganizationId() throws TimeoutException, InterruptedException {
+    public void listFilterByOrganizationId() {
         String isolationSegmentName = this.nameFactory.getIsolationSegmentName();
         String organizationName = this.nameFactory.getOrganizationName();
 
@@ -258,7 +258,7 @@ public final class IsolationSegmentsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listOrganizationsRelationship() throws TimeoutException, InterruptedException {
+    public void listOrganizationsRelationship() {
         String isolationSegmentName = this.nameFactory.getIsolationSegmentName();
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
@@ -292,7 +292,7 @@ public final class IsolationSegmentsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listSpacesRelationship() throws TimeoutException, InterruptedException {
+    public void listSpacesRelationship() {
         String isolationSegmentName = this.nameFactory.getIsolationSegmentName();
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
@@ -325,7 +325,7 @@ public final class IsolationSegmentsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void removeOrganizationEntitlement() throws TimeoutException, InterruptedException {
+    public void removeOrganizationEntitlement() {
         String isolationSegmentName = this.nameFactory.getIsolationSegmentName();
         String organizationName = this.nameFactory.getOrganizationName();
 
@@ -355,7 +355,7 @@ public final class IsolationSegmentsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void update() throws TimeoutException, InterruptedException {
+    public void update() {
         String isolationSegmentName1 = this.nameFactory.getIsolationSegmentName();
         String isolationSegmentName2 = this.nameFactory.getIsolationSegmentName();
 

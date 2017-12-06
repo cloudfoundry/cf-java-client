@@ -39,7 +39,7 @@ public final class RouterGroupsTest extends AbstractIntegrationTest {
     private RoutingClient routingClient;
 
     @Test
-    public void list() throws TimeoutException, InterruptedException {
+    public void list() {
         this.routingClient.routerGroups()
             .list(ListRouterGroupsRequest.builder()
                 .build())
@@ -53,7 +53,7 @@ public final class RouterGroupsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void update() throws TimeoutException, InterruptedException {
+    public void update() {
         getRouterGroupId(this.routingClient, DEFAULT_ROUTER_GROUP)
             .then(routerGroupId -> this.routingClient.routerGroups()
                 .update(UpdateRouterGroupRequest.builder()

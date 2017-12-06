@@ -39,7 +39,7 @@ public final class JobsTest extends AbstractIntegrationTest {
     private CloudFoundryClient cloudFoundryClient;
 
     @Test
-    public void getJob() throws TimeoutException, InterruptedException {
+    public void getJob() {
         String organizationName = this.nameFactory.getOrganizationName();
 
         this.cloudFoundryClient.organizations()

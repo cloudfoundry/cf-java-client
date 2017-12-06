@@ -75,7 +75,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
     private UaaClient uaaClient;
 
     @Test
-    public void batchChangeSecret() throws TimeoutException, InterruptedException {
+    public void batchChangeSecret() {
         String clientId1 = this.nameFactory.getClientId();
         String clientId2 = this.nameFactory.getClientId();
         String clientSecret = this.nameFactory.getClientSecret();
@@ -105,7 +105,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void batchCreate() throws TimeoutException, InterruptedException {
+    public void batchCreate() {
         String clientId1 = this.nameFactory.getClientId();
         String clientId2 = this.nameFactory.getClientId();
         String clientSecret = this.nameFactory.getClientSecret();
@@ -143,7 +143,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void batchDelete() throws TimeoutException, InterruptedException {
+    public void batchDelete() {
         String clientId1 = this.nameFactory.getClientId();
         String clientId2 = this.nameFactory.getClientId();
         String clientSecret = this.nameFactory.getClientSecret();
@@ -164,7 +164,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void batchUpdate() throws TimeoutException, InterruptedException {
+    public void batchUpdate() {
         String clientId1 = this.nameFactory.getClientId();
         String clientId2 = this.nameFactory.getClientId();
         String clientSecret = this.nameFactory.getClientSecret();
@@ -204,7 +204,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void changeSecret() throws TimeoutException, InterruptedException {
+    public void changeSecret() {
         String clientId = this.nameFactory.getClientId();
         String newClientSecret = this.nameFactory.getClientSecret();
         String oldClientSecret = this.nameFactory.getClientSecret();
@@ -228,7 +228,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void create() throws TimeoutException, InterruptedException {
+    public void create() {
         String clientId = this.nameFactory.getClientId();
         String clientSecret = this.nameFactory.getClientSecret();
 
@@ -253,7 +253,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void delete() throws TimeoutException, InterruptedException {
+    public void delete() {
         String clientId = this.nameFactory.getClientId();
         String clientSecret = this.nameFactory.getClientSecret();
 
@@ -270,7 +270,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void get() throws TimeoutException, InterruptedException {
+    public void get() {
         String clientId = this.nameFactory.getClientId();
         String clientSecret = this.nameFactory.getClientSecret();
 
@@ -289,7 +289,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void getMetadata() throws TimeoutException, InterruptedException {
+    public void getMetadata() {
         requestUpdateMetadata(this.uaaClient, this.clientId, "http://test.get.url")
             .then(this.uaaClient.clients()
                 .getMetadata(GetMetadataRequest.builder()
@@ -305,7 +305,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() throws TimeoutException, InterruptedException {
+    public void list() {
         String clientId = this.nameFactory.getClientId();
         String clientSecret = this.nameFactory.getClientSecret();
 
@@ -322,7 +322,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listMetadatas() throws TimeoutException, InterruptedException {
+    public void listMetadatas() {
         requestUpdateMetadata(this.uaaClient, this.clientId, "http://test.list.url")
             .then(this.uaaClient.clients()
                 .listMetadatas(ListMetadatasRequest.builder()
@@ -340,7 +340,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void mixedActions() throws TimeoutException, InterruptedException {
+    public void mixedActions() {
         String clientId1 = this.nameFactory.getClientId();
         String clientId2 = this.nameFactory.getClientId();
         String clientSecret = this.nameFactory.getClientSecret();
@@ -387,7 +387,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void update() throws TimeoutException, InterruptedException {
+    public void update() {
         String clientId = this.nameFactory.getClientId();
         String clientSecret = this.nameFactory.getClientSecret();
 
@@ -411,7 +411,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void updateMetadata() throws TimeoutException, InterruptedException {
+    public void updateMetadata() {
         String appIcon = Base64.getEncoder().encodeToString(new AsciiString("test-image").toByteArray());
 
         this.uaaClient.clients()

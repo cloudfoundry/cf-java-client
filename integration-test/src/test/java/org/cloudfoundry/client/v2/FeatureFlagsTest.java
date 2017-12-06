@@ -58,7 +58,7 @@ public final class FeatureFlagsTest extends AbstractIntegrationTest {
     private CloudFoundryClient cloudFoundryClient;
 
     @Test
-    public void getEach() throws TimeoutException, InterruptedException {
+    public void getEach() {
         Flux
             .fromIterable(coreFeatureFlagNameList)
             .flatMap(flagName -> this.cloudFoundryClient.featureFlags()
@@ -74,7 +74,7 @@ public final class FeatureFlagsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() throws TimeoutException, InterruptedException {
+    public void list() {
         this.cloudFoundryClient.featureFlags()
             .list(ListFeatureFlagsRequest.builder()
                 .build())
@@ -88,7 +88,7 @@ public final class FeatureFlagsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void setAndResetEach() throws TimeoutException, InterruptedException {
+    public void setAndResetEach() {
         Flux.fromIterable(coreFeatureFlagNameList)
             .flatMap(flagName -> this.cloudFoundryClient.featureFlags()
                 .get(GetFeatureFlagRequest.builder()

@@ -36,7 +36,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     private String organizationName;
 
     @Test
-    public void create() throws TimeoutException, InterruptedException {
+    public void create() {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.cloudFoundryOperations.spaces()
@@ -54,7 +54,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() throws TimeoutException, InterruptedException {
+    public void list() {
         this.cloudFoundryOperations.spaces()
             .list()
             .count()

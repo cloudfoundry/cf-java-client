@@ -48,7 +48,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     private String organizationName;
 
     @Test
-    public void createInvalidDomain() throws TimeoutException, InterruptedException {
+    public void createInvalidDomain() {
         this.cloudFoundryOperations.domains()
             .create(CreateDomainRequest.builder()
                 .domain("invalid-domain")
@@ -60,7 +60,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void createPrivate() throws TimeoutException, InterruptedException {
+    public void createPrivate() {
         String domainName = this.nameFactory.getDomainName();
 
         this.cloudFoundryOperations.domains()
@@ -78,7 +78,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void createShared() throws TimeoutException, InterruptedException {
+    public void createShared() {
         String domainName = this.nameFactory.getDomainName();
 
         this.cloudFoundryOperations.domains()
@@ -95,7 +95,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void createSharedTcp() throws TimeoutException, InterruptedException {
+    public void createSharedTcp() {
         String domainName = this.nameFactory.getDomainName();
 
         this.cloudFoundryOperations.domains()
@@ -113,7 +113,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() throws TimeoutException, InterruptedException {
+    public void list() {
         String domainName = this.nameFactory.getDomainName();
 
         requestCreateDomain(this.cloudFoundryOperations, domainName, this.organizationName)
@@ -128,7 +128,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listRouterGroups() throws TimeoutException, InterruptedException {
+    public void listRouterGroups() {
         this.cloudFoundryOperations.domains()
             .listRouterGroups()
             .filter(response -> DEFAULT_ROUTER_GROUP.equals(response.getName()))
@@ -139,7 +139,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listTcp() throws TimeoutException, InterruptedException {
+    public void listTcp() {
         String domainName = this.nameFactory.getDomainName();
 
         requestCreateTcpDomain(this.cloudFoundryOperations, domainName)
@@ -154,7 +154,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void share() throws TimeoutException, InterruptedException {
+    public void share() {
         String domainName = this.nameFactory.getDomainName();
         String targetOrganizationName = this.nameFactory.getOrganizationName();
 
@@ -171,7 +171,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void unshare() throws TimeoutException, InterruptedException {
+    public void unshare() {
         String domainName = this.nameFactory.getDomainName();
         String targetOrganizationName = this.nameFactory.getOrganizationName();
 
