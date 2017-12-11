@@ -26,7 +26,7 @@
     <parent>
         <groupId>io.spring.platform</groupId>
         <artifactId>platform-bom</artifactId>
-        <version>Brussels-SR5</version>
+        <version>Brussels-SR6</version>
     </parent>
 
     <groupId>org.cloudfoundry</groupId>
@@ -50,8 +50,8 @@
         <java-semver.version>0.9.0</java-semver.version>
         <jjwt.version>0.9.0</jjwt.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <reactor-core.version>3.1.0.RELEASE</reactor-core.version>
-        <reactor-netty.version>0.7.1.RELEASE</reactor-netty.version>
+        <reactor-core.version>3.1.2.RELEASE</reactor-core.version>
+        <reactor-netty.version>0.7.2.RELEASE</reactor-netty.version>
         <wire.version>2.2.0</wire.version>
     </properties>
 
