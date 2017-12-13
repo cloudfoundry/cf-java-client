@@ -46,7 +46,7 @@ applications:
   stack: alpha-stack
   timeout: -1
   env:
-    ALPHA_KEY_1: alpha-value-1
+    ALPHA_KEY_1: 1
     ALPHA_KEY_2: alpha-value-2
   services:
   - alpha-instance-1
