@@ -158,7 +158,7 @@ public final class ApplicationManifestUtils {
     }
 
     private static void asMapOfStringString(Map<String, Object> payload, String key, Consumer2<String, String> consumer) {
-        asMap(payload, key, String.class::cast, consumer);
+        asMap(payload, key, String::valueOf, consumer);
     }
 
     @SuppressWarnings("unchecked")
@@ -260,19 +260,17 @@ public final class ApplicationManifestUtils {
 
     @SuppressWarnings("unchecked")
     private static void merge(Map<String, Object> first, Map<String, Object> second) {
-        second.forEach((key, value) -> {
-            first.merge(key, value, (firstValue, secondValue) -> {
-                if (secondValue instanceof Map) {
-                    merge((Map<String, Object>) firstValue, (Map<String, Object>) secondValue);
-                    return firstValue;
-                } else if (secondValue instanceof List) {
-                    merge((List<Object>) firstValue, (List<Object>) secondValue);
-                    return firstValue;
-                } else {
-                    return secondValue;
-                }
-            });
-        });
+        second.forEach((key, value) -> first.merge(key, value, (firstValue, secondValue) -> {
+            if (secondValue instanceof Map) {
+                merge((Map<String, Object>) firstValue, (Map<String, Object>) secondValue);
+                return firstValue;
+            } else if (secondValue instanceof List) {
+                merge((List<Object>) firstValue, (List<Object>) secondValue);
+                return firstValue;
+            } else {
+                return secondValue;
+            }
+        }));
     }
 
     @SuppressWarnings("unchecked")
