@@ -142,6 +142,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         requestCreateOrganization(this.cloudFoundryClient, organizationName)
             .thenMany(PaginationUtils.requestClientV3Resources(page -> this.cloudFoundryClient.organizationsV3()
                 .list(ListOrganizationsRequest.builder()
+                    .page(page)
                     .build())))
             .filter(resource -> organizationName.equals(resource.getName()))
             .as(StepVerifier::create)
@@ -158,6 +159,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             .thenMany(PaginationUtils.requestClientV3Resources(page -> this.cloudFoundryClient.organizationsV3()
                 .list(ListOrganizationsRequest.builder()
                     .name(organizationName)
+                    .page(page)
                     .build())))
             .as(StepVerifier::create)
             .expectNextCount(1)
@@ -221,6 +223,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
         return PaginationUtils.requestClientV3Resources(page -> cloudFoundryClient.organizationsV3()
             .list(ListOrganizationsRequest.builder()
                 .name(organizationName)
+                .page(page)
                 .build()));
     }
 
