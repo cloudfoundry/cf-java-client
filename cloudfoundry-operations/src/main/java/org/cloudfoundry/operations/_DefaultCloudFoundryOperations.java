@@ -50,6 +50,8 @@ import org.cloudfoundry.operations.spaces.DefaultSpaces;
 import org.cloudfoundry.operations.spaces.Spaces;
 import org.cloudfoundry.operations.stacks.DefaultStacks;
 import org.cloudfoundry.operations.stacks.Stacks;
+import org.cloudfoundry.operations.useradmin.DefaultUserAdmin;
+import org.cloudfoundry.operations.useradmin.UserAdmin;
 import org.cloudfoundry.routing.RoutingClient;
 import org.cloudfoundry.uaa.UaaClient;
 import org.cloudfoundry.util.ExceptionUtils;
@@ -144,6 +146,12 @@ abstract class _DefaultCloudFoundryOperations implements CloudFoundryOperations 
     @Value.Derived
     public Stacks stacks() {
         return new DefaultStacks(getCloudFoundryClientPublisher());
+    }
+
+    @Override
+    @Value.Derived
+    public UserAdmin userAdmin() {
+        return new DefaultUserAdmin(getCloudFoundryClientPublisher(), getUaaClientPublisher());
     }
 
     /**
