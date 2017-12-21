@@ -16,27 +16,21 @@
 
 package org.cloudfoundry.operations.useradmin;
 
-import reactor.core.publisher.Mono;
+import org.junit.Test;
 
-/**
- * Main entry point to the Cloud Foundry User Admin Operations API
- */
-public interface UserAdmin {
+public final class DeleteUserRequestTest {
 
-    /**
-     * Create a user
-     *
-     * @param request the create user request
-     * @return completion indicator
-     */
-    Mono<Void> create(CreateUserRequest request);
+    @Test(expected = IllegalStateException.class)
+    public void noUsername() {
+        DeleteUserRequest.builder()
+            .build();
+    }
 
-    /**
-     * Delete a user
-     *
-     * @param request the delete user request
-     * @return completion indicator
-     */
-    Mono<Void> delete(DeleteUserRequest request);
+    @Test
+    public void valid() {
+        DeleteUserRequest.builder()
+            .username("test-username")
+            .build();
+    }
 
 }

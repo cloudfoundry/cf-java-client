@@ -17,14 +17,22 @@
 package org.cloudfoundry.operations.useradmin;
 
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v2.ClientV2Exception;
 import org.cloudfoundry.operations.util.OperationsLogging;
 import org.cloudfoundry.uaa.UaaClient;
 import org.cloudfoundry.uaa.UaaException;
 import org.cloudfoundry.uaa.users.CreateUserResponse;
+import org.cloudfoundry.uaa.users.DeleteUserResponse;
 import org.cloudfoundry.uaa.users.Email;
+import org.cloudfoundry.uaa.users.ListUsersRequest;
 import org.cloudfoundry.uaa.users.Name;
+import org.cloudfoundry.uaa.users.User;
 import org.cloudfoundry.util.ExceptionUtils;
+import org.cloudfoundry.util.JobUtils;
+import org.cloudfoundry.util.PaginationUtils;
 import reactor.core.publisher.Mono;
+
+import java.time.Duration;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
@@ -51,10 +59,43 @@ public final class DefaultUserAdmin implements UserAdmin {
             .checkpoint();
     }
 
+    @Override
+    public Mono<Void> delete(DeleteUserRequest request) {
+        return Mono.when(this.cloudFoundryClient, this.uaaClient)
+            .then(function((cloudFoundryClient, uaaClient) -> Mono.when(
+                Mono.just(cloudFoundryClient),
+                Mono.just(uaaClient),
+                getUserId(uaaClient, request))))
+            .then(function((cloudFoundryClient, uaaClient, userId) -> Mono.when(
+                deleteUser(cloudFoundryClient, userId),
+                requestDeleteUaaUser(uaaClient, userId))))
+            .then()
+            .transform(OperationsLogging.log("Delete User"))
+            .checkpoint();
+    }
+
     private static Mono<String> createUaaUserId(UaaClient uaaClient, CreateUserRequest request) {
         return requestCreateUaaUser(uaaClient, request)
             .map(CreateUserResponse::getId)
             .onErrorResume(UaaException.class, t -> ExceptionUtils.illegalArgument("User %s already exists", request.getUsername()));
+    }
+
+    private static Mono<Void> deleteUser(CloudFoundryClient cloudFoundryClient, String userId) {
+        return requestDeleteUser(cloudFoundryClient, userId)
+            .onErrorResume(t -> t instanceof ClientV2Exception && ((ClientV2Exception) t).getStatusCode() == 404, t -> Mono.empty())
+            .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, Duration.ofMinutes(5), job));
+    }
+
+    private static Mono<String> getUserId(UaaClient uaaClient, DeleteUserRequest request) {
+        return PaginationUtils
+            .requestUaaResources(startIndex -> uaaClient.users()
+                .list(ListUsersRequest.builder()
+                    .filter(String.format("userName eq \"%s\"", request.getUsername()))
+                    .startIndex(startIndex)
+                    .build()))
+            .switchIfEmpty(ExceptionUtils.illegalArgument("User %s does not exist", request.getUsername()))
+            .single()
+            .map(User::getId);
     }
 
     private static Mono<CreateUserResponse> requestCreateUaaUser(UaaClient uaaClient, CreateUserRequest request) {
@@ -78,6 +119,20 @@ public final class DefaultUserAdmin implements UserAdmin {
         return cloudFoundryClient.users()
             .create(org.cloudfoundry.client.v2.users.CreateUserRequest.builder()
                 .uaaId(userId)
+                .build());
+    }
+
+    private static Mono<DeleteUserResponse> requestDeleteUaaUser(UaaClient uaaClient, String userId) {
+        return uaaClient.users().delete(org.cloudfoundry.uaa.users.DeleteUserRequest.builder()
+            .userId(userId)
+            .build());
+    }
+
+    private static Mono<org.cloudfoundry.client.v2.users.DeleteUserResponse> requestDeleteUser(CloudFoundryClient cloudFoundryClient, String userId) {
+        return cloudFoundryClient.users()
+            .delete(org.cloudfoundry.client.v2.users.DeleteUserRequest.builder()
+                .async(true)
+                .userId(userId)
                 .build());
     }
 

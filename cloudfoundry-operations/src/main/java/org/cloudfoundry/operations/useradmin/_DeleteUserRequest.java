@@ -16,27 +16,17 @@
 
 package org.cloudfoundry.operations.useradmin;
 
-import reactor.core.publisher.Mono;
+import org.immutables.value.Value;
 
 /**
- * Main entry point to the Cloud Foundry User Admin Operations API
+ * The request options for the delete user operation
  */
-public interface UserAdmin {
+@Value.Immutable
+abstract class _DeleteUserRequest {
 
     /**
-     * Create a user
-     *
-     * @param request the create user request
-     * @return completion indicator
+     * The username of the user to delete
      */
-    Mono<Void> create(CreateUserRequest request);
-
-    /**
-     * Delete a user
-     *
-     * @param request the delete user request
-     * @return completion indicator
-     */
-    Mono<Void> delete(DeleteUserRequest request);
+    abstract String getUsername();
 
 }
