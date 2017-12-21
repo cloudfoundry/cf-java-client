@@ -29,6 +29,7 @@ import org.cloudfoundry.operations.services.Services;
 import org.cloudfoundry.operations.spaceadmin.SpaceAdmin;
 import org.cloudfoundry.operations.spaces.Spaces;
 import org.cloudfoundry.operations.stacks.Stacks;
+import org.cloudfoundry.operations.useradmin.UserAdmin;
 
 /**
  * Main entry point to the Cloud Foundry Operations API
@@ -130,5 +131,12 @@ public interface CloudFoundryOperations {
      * @return the Cloud Foundry Stacks Operations API
      */
     Stacks stacks();
+
+    /**
+     * Main entry point to the Cloud Foundry User Admin Operations API
+     *
+     * @return the Cloud Foundry User Admin Operations API
+     */
+    UserAdmin userAdmin();
 
 }
