@@ -132,6 +132,8 @@ public abstract class AbstractOperationsTest {
 
     protected final UaaClient uaaClient = mock(UaaClient.class, RETURNS_SMART_NULLS);
 
+    protected final org.cloudfoundry.uaa.users.Users uaaUsers = mock(org.cloudfoundry.uaa.users.Users.class, RETURNS_SMART_NULLS);
+
     protected final UserProvidedServiceInstances userProvidedServiceInstances = mock(UserProvidedServiceInstances.class, RETURNS_SMART_NULLS);
 
     protected final Users users = mock(Users.class, RETURNS_SMART_NULLS);
@@ -167,6 +169,7 @@ public abstract class AbstractOperationsTest {
 
         when(this.uaaClient.authorizations()).thenReturn(this.authorizations);
         when(this.uaaClient.tokens()).thenReturn(this.tokens);
+        when(this.uaaClient.users()).thenReturn(this.uaaUsers);
     }
 
 }
