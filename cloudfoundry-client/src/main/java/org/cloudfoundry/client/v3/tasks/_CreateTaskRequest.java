@@ -33,7 +33,6 @@ abstract class _CreateTaskRequest {
     @JsonIgnore
     abstract String getApplicationId();
 
-
     /**
      * The command that will be executed
      */
@@ -45,7 +44,7 @@ abstract class _CreateTaskRequest {
      */
     @JsonProperty("disk_in_mb")
     @Nullable
-    abstract String getDiskInMb();
+    abstract Integer getDiskInMb();
 
     /**
      * The id of the droplet that will be used to run the command

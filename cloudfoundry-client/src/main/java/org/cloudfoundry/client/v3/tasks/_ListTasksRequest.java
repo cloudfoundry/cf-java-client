@@ -55,7 +55,7 @@ abstract class _ListTasksRequest extends PaginatedRequest {
     /**
      * The states
      */
-    @FilterParameter("guids")
+    @FilterParameter("states")
     abstract List<TaskState> getStates();
 
     /**
