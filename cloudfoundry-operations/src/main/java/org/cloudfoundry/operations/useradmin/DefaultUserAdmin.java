@@ -18,6 +18,14 @@ package org.cloudfoundry.operations.useradmin;
 
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.ClientV2Exception;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
+import org.cloudfoundry.client.v2.organizations.OrganizationResource;
+import org.cloudfoundry.client.v2.spaces.ListSpaceAuditorsRequest;
+import org.cloudfoundry.client.v2.spaces.ListSpaceDevelopersRequest;
+import org.cloudfoundry.client.v2.spaces.ListSpaceManagersRequest;
+import org.cloudfoundry.client.v2.spaces.SpaceResource;
+import org.cloudfoundry.client.v2.users.UserResource;
 import org.cloudfoundry.operations.util.OperationsLogging;
 import org.cloudfoundry.uaa.UaaClient;
 import org.cloudfoundry.uaa.UaaException;
@@ -30,9 +38,12 @@ import org.cloudfoundry.uaa.users.User;
 import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
+import org.cloudfoundry.util.ResourceUtils;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
+import java.util.List;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
@@ -65,12 +76,33 @@ public final class DefaultUserAdmin implements UserAdmin {
             .then(function((cloudFoundryClient, uaaClient) -> Mono.when(
                 Mono.just(cloudFoundryClient),
                 Mono.just(uaaClient),
-                getUserId(uaaClient, request))))
+                getUserId(uaaClient, request.getUsername()))))
             .then(function((cloudFoundryClient, uaaClient, userId) -> Mono.when(
                 deleteUser(cloudFoundryClient, userId),
                 requestDeleteUaaUser(uaaClient, userId))))
             .then()
             .transform(OperationsLogging.log("Delete User"))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<SpaceUsers> listSpaceUsers(ListSpaceUsersRequest request) {
+        return this.cloudFoundryClient
+            .then(cloudFoundryClient -> Mono.when(
+                Mono.just(cloudFoundryClient),
+                getOrganizationId(cloudFoundryClient, request.getOrganizationName())
+            ))
+            .then(function((cloudFoundryClient, organizationId) -> Mono.when(
+                Mono.just(cloudFoundryClient),
+                getSpaceId(cloudFoundryClient, organizationId, request.getSpaceName()))
+            ))
+            .then(function((cloudFoundryClient, spaceId) -> Mono.when(
+                listSpaceAuditorNames(cloudFoundryClient, spaceId),
+                listSpaceDeveloperNames(cloudFoundryClient, spaceId),
+                listSpaceManagerNames(cloudFoundryClient, spaceId)
+            )))
+            .then(function(this::toSpaceUsers))
+            .transform(OperationsLogging.log("List Space Users"))
             .checkpoint();
     }
 
@@ -86,16 +118,48 @@ public final class DefaultUserAdmin implements UserAdmin {
             .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, Duration.ofMinutes(5), job));
     }
 
-    private static Mono<String> getUserId(UaaClient uaaClient, DeleteUserRequest request) {
+    private static Mono<String> getOrganizationId(CloudFoundryClient cloudFoundryClient, String organizationName) {
+        return requestListOrganizations(cloudFoundryClient, organizationName)
+            .singleOrEmpty()
+            .map(ResourceUtils::getId)
+            .switchIfEmpty(ExceptionUtils.illegalArgument("Organization %s not found", organizationName));
+    }
+
+    private static Mono<String> getSpaceId(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceName) {
+        return requestListSpaces(cloudFoundryClient, organizationId, spaceName)
+            .singleOrEmpty()
+            .map(ResourceUtils::getId)
+            .switchIfEmpty(ExceptionUtils.illegalArgument("Space %s not found", spaceName));
+    }
+
+    private static Mono<String> getUserId(UaaClient uaaClient, String username) {
         return PaginationUtils
             .requestUaaResources(startIndex -> uaaClient.users()
                 .list(ListUsersRequest.builder()
-                    .filter(String.format("userName eq \"%s\"", request.getUsername()))
+                    .filter(String.format("userName eq \"%s\"", username))
                     .startIndex(startIndex)
                     .build()))
-            .switchIfEmpty(ExceptionUtils.illegalArgument("User %s does not exist", request.getUsername()))
+            .switchIfEmpty(ExceptionUtils.illegalArgument("User %s does not exist", username))
             .single()
             .map(User::getId);
+    }
+
+    private static Mono<List<String>> listSpaceAuditorNames(CloudFoundryClient cloudFoundryClient, String spaceId) {
+        return requestListSpaceAuditors(cloudFoundryClient, spaceId)
+            .map(resource -> ResourceUtils.getEntity(resource).getUsername())
+            .collectList();
+    }
+
+    private static Mono<List<String>> listSpaceDeveloperNames(CloudFoundryClient cloudFoundryClient, String spaceId) {
+        return requestListSpaceDevelopers(cloudFoundryClient, spaceId)
+            .map(resource -> ResourceUtils.getEntity(resource).getUsername())
+            .collectList();
+    }
+
+    private static Mono<List<String>> listSpaceManagerNames(CloudFoundryClient cloudFoundryClient, String spaceId) {
+        return requestListSpaceManagers(cloudFoundryClient, spaceId)
+            .map(resource -> ResourceUtils.getEntity(resource).getUsername())
+            .collectList();
     }
 
     private static Mono<CreateUserResponse> requestCreateUaaUser(UaaClient uaaClient, CreateUserRequest request) {
@@ -134,6 +198,55 @@ public final class DefaultUserAdmin implements UserAdmin {
                 .async(true)
                 .userId(userId)
                 .build());
+    }
+
+    private static Flux<OrganizationResource> requestListOrganizations(CloudFoundryClient cloudFoundryClient, String organizationName) {
+        return PaginationUtils.requestClientV2Resources(page -> cloudFoundryClient.organizations()
+            .list(ListOrganizationsRequest.builder()
+                .name(organizationName)
+                .page(page)
+                .build()));
+    }
+
+    private static Flux<UserResource> requestListSpaceAuditors(CloudFoundryClient cloudFoundryClient, String spaceId) {
+        return PaginationUtils.requestClientV2Resources(page -> cloudFoundryClient.spaces()
+            .listAuditors(ListSpaceAuditorsRequest.builder()
+                .page(page)
+                .spaceId(spaceId)
+                .build()));
+    }
+
+    private static Flux<UserResource> requestListSpaceDevelopers(CloudFoundryClient cloudFoundryClient, String spaceId) {
+        return PaginationUtils.requestClientV2Resources(page -> cloudFoundryClient.spaces()
+            .listDevelopers(ListSpaceDevelopersRequest.builder()
+                .page(page)
+                .spaceId(spaceId)
+                .build()));
+    }
+
+    private static Flux<UserResource> requestListSpaceManagers(CloudFoundryClient cloudFoundryClient, String spaceId) {
+        return PaginationUtils.requestClientV2Resources(page -> cloudFoundryClient.spaces()
+            .listManagers(ListSpaceManagersRequest.builder()
+                .page(page)
+                .spaceId(spaceId)
+                .build()));
+    }
+
+    private static Flux<SpaceResource> requestListSpaces(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceName) {
+        return PaginationUtils.requestClientV2Resources(page -> cloudFoundryClient.organizations()
+            .listSpaces(ListOrganizationSpacesRequest.builder()
+                .organizationId(organizationId)
+                .name(spaceName)
+                .page(page)
+                .build()));
+    }
+
+    private Mono<SpaceUsers> toSpaceUsers(List<String> auditors, List<String> developers, List<String> managers) {
+        return Mono.just(SpaceUsers.builder()
+            .addAllAuditors(auditors)
+            .addAllDevelopers(developers)
+            .addAllManagers(managers)
+            .build());
     }
 
 }

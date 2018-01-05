@@ -18,11 +18,26 @@ package org.cloudfoundry.operations.useradmin;
 
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.ClientV2Exception;
+import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.jobs.ErrorDetails;
 import org.cloudfoundry.client.v2.jobs.GetJobRequest;
 import org.cloudfoundry.client.v2.jobs.GetJobResponse;
 import org.cloudfoundry.client.v2.jobs.JobEntity;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesResponse;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
+import org.cloudfoundry.client.v2.organizations.OrganizationResource;
+import org.cloudfoundry.client.v2.spaces.ListSpaceAuditorsRequest;
+import org.cloudfoundry.client.v2.spaces.ListSpaceAuditorsResponse;
+import org.cloudfoundry.client.v2.spaces.ListSpaceDevelopersRequest;
+import org.cloudfoundry.client.v2.spaces.ListSpaceDevelopersResponse;
+import org.cloudfoundry.client.v2.spaces.ListSpaceManagersRequest;
+import org.cloudfoundry.client.v2.spaces.ListSpaceManagersResponse;
+import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.client.v2.users.DeleteUserResponse;
+import org.cloudfoundry.client.v2.users.UserEntity;
+import org.cloudfoundry.client.v2.users.UserResource;
 import org.cloudfoundry.operations.AbstractOperationsTest;
 import org.cloudfoundry.uaa.UaaClient;
 import org.cloudfoundry.uaa.UaaException;
@@ -50,21 +65,6 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
     private final DefaultUserAdmin userAdmin = new DefaultUserAdmin(Mono.just(this.cloudFoundryClient), Mono.just(this.uaaClient));
 
     @Test
-    public void createWithPassword() {
-        requestCreateUaaUser(this.uaaClient);
-        requestCreateUser(this.cloudFoundryClient);
-
-        this.userAdmin
-            .create(CreateUserRequest.builder()
-                .username("test-username")
-                .password("test-password")
-                .build())
-            .as(StepVerifier::create)
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
-    }
-
-    @Test
     public void createUaaUserExists() {
         requestCreateUaaUserAlreadyExists(this.uaaClient);
         requestCreateUser(this.cloudFoundryClient);
@@ -79,7 +79,20 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
             .verify(Duration.ofSeconds(5));
     }
 
+    @Test
+    public void createWithPassword() {
+        requestCreateUaaUser(this.uaaClient);
+        requestCreateUser(this.cloudFoundryClient);
 
+        this.userAdmin
+            .create(CreateUserRequest.builder()
+                .username("test-username")
+                .password("test-password")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
 
     @Test
     public void delete() {
@@ -138,6 +151,78 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
                 .build())
             .as(StepVerifier::create)
             .expectErrorMessage("User test-username does not exist")
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void listSpaceUsersAllFound() {
+        requestOrganization(this.cloudFoundryClient);
+        requestSpace(this.cloudFoundryClient);
+        requestListSpaceAuditors(this.cloudFoundryClient);
+        requestListSpaceDevelopers(this.cloudFoundryClient);
+        requestListSpaceManagers(this.cloudFoundryClient);
+
+        this.userAdmin
+            .listSpaceUsers(ListSpaceUsersRequest.builder()
+                .organizationName("test-organization-name")
+                .spaceName("test-space-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(SpaceUsers.builder()
+                .auditor("test-auditor-username")
+                .developer("test-developer-username")
+                .manager("test-manager-username")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void listSpaceUsersNoneFound() {
+        requestOrganization(this.cloudFoundryClient);
+        requestSpace(this.cloudFoundryClient);
+        requestListSpaceAuditorsEmpty(this.cloudFoundryClient);
+        requestListSpaceDevelopersEmpty(this.cloudFoundryClient);
+        requestListSpaceManagersEmpty(this.cloudFoundryClient);
+
+        this.userAdmin
+            .listSpaceUsers(ListSpaceUsersRequest.builder()
+                .organizationName("test-organization-name")
+                .spaceName("test-space-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(SpaceUsers.builder()
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void listSpaceUsersOrganizationNotFound() {
+        requestOrganizationEmpty(this.cloudFoundryClient);
+
+        this.userAdmin
+            .listSpaceUsers(ListSpaceUsersRequest.builder()
+                .organizationName("unknown-organization-name")
+                .spaceName("test-space-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectErrorMessage("Organization unknown-organization-name not found")
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void listSpaceUsersSpaceNotFound() {
+        requestOrganization(this.cloudFoundryClient);
+        requestSpaceEmpty(this.cloudFoundryClient);
+
+        this.userAdmin
+            .listSpaceUsers(ListSpaceUsersRequest.builder()
+                .organizationName("test-organization-name")
+                .spaceName("unknown-space-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectErrorMessage("Space unknown-space-name not found")
             .verify(Duration.ofSeconds(5));
     }
 
@@ -305,6 +390,87 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
                 }));
     }
 
+    private static void requestListSpaceAuditors(CloudFoundryClient cloudFoundryClient) {
+        when(cloudFoundryClient.spaces()
+            .listAuditors(ListSpaceAuditorsRequest.builder()
+                .spaceId("test-space-id")
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(ListSpaceAuditorsResponse.builder())
+                    .resource(fill(UserResource.builder())
+                        .entity(fill(UserEntity.builder())
+                            .username("test-auditor-username")
+                            .build())
+                        .build())
+                    .build()));
+    }
+
+    private static void requestListSpaceAuditorsEmpty(CloudFoundryClient cloudFoundryClient) {
+        when(cloudFoundryClient.spaces()
+            .listAuditors(ListSpaceAuditorsRequest.builder()
+                .spaceId("test-space-id")
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(ListSpaceAuditorsResponse.builder())
+                    .build()));
+    }
+
+    private static void requestListSpaceDevelopers(CloudFoundryClient cloudFoundryClient) {
+        when(cloudFoundryClient.spaces()
+            .listDevelopers(ListSpaceDevelopersRequest.builder()
+                .spaceId("test-space-id")
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(ListSpaceDevelopersResponse.builder())
+                    .resource(fill(UserResource.builder())
+                        .entity(fill(UserEntity.builder())
+                            .username("test-developer-username")
+                            .build())
+                        .build())
+                    .build()));
+    }
+
+    private static void requestListSpaceDevelopersEmpty(CloudFoundryClient cloudFoundryClient) {
+        when(cloudFoundryClient.spaces()
+            .listDevelopers(ListSpaceDevelopersRequest.builder()
+                .spaceId("test-space-id")
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(ListSpaceDevelopersResponse.builder())
+                    .build()));
+    }
+
+    private static void requestListSpaceManagers(CloudFoundryClient cloudFoundryClient) {
+        when(cloudFoundryClient.spaces()
+            .listManagers(ListSpaceManagersRequest.builder()
+                .spaceId("test-space-id")
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(ListSpaceManagersResponse.builder())
+                    .resource(fill(UserResource.builder())
+                        .entity(fill(UserEntity.builder())
+                            .username("test-manager-username")
+                            .build())
+                        .build())
+                    .build()));
+    }
+
+    private static void requestListSpaceManagersEmpty(CloudFoundryClient cloudFoundryClient) {
+        when(cloudFoundryClient.spaces()
+            .listManagers(ListSpaceManagersRequest.builder()
+                .spaceId("test-space-id")
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(ListSpaceManagersResponse.builder())
+                    .build()));
+    }
+
     private static void requestListUser(UaaClient uaaClient) {
         when(uaaClient.users()
             .list(org.cloudfoundry.uaa.users.ListUsersRequest.builder()
@@ -339,6 +505,59 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
                 .build()))
             .thenReturn(Mono
                 .just(fill(org.cloudfoundry.uaa.users.ListUsersResponse.builder())
+                    .build()));
+    }
+
+    private static void requestOrganization(CloudFoundryClient cloudFoundryClient) {
+        when(cloudFoundryClient.organizations()
+            .list(ListOrganizationsRequest.builder()
+                .name("test-organization-name")
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(ListOrganizationsResponse.builder())
+                    .resource(fill(OrganizationResource.builder(), "organization-")
+                        .metadata(fill(Metadata.builder())
+                            .id("test-organization-id")
+                            .build())
+                        .build())
+                    .build()));
+    }
+
+    private static void requestOrganizationEmpty(CloudFoundryClient cloudFoundryClient) {
+        when(cloudFoundryClient.organizations()
+            .list(ListOrganizationsRequest.builder()
+                .name("unknown-organization-name")
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(ListOrganizationsResponse.builder())
+                    .build()));
+    }
+
+    private static void requestSpace(CloudFoundryClient cloudFoundryClient) {
+        when(cloudFoundryClient.organizations()
+            .listSpaces(ListOrganizationSpacesRequest.builder()
+                .name("test-space-name")
+                .organizationId("test-organization-id")
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(ListOrganizationSpacesResponse.builder())
+                    .resource(fill(SpaceResource.builder(), "space-")
+                        .build())
+                    .build()));
+    }
+
+    private static void requestSpaceEmpty(CloudFoundryClient cloudFoundryClient) {
+        when(cloudFoundryClient.organizations()
+            .listSpaces(ListOrganizationSpacesRequest.builder()
+                .name("unknown-space-name")
+                .organizationId("test-organization-id")
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(ListOrganizationSpacesResponse.builder())
                     .build()));
     }
 
