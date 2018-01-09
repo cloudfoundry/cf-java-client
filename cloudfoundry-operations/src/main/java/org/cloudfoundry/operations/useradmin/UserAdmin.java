@@ -43,8 +43,16 @@ public interface UserAdmin {
      * List space users
      *
      * @param request the list space users request
-     * @return completion indicator
+     * @return the Space Users
      */
     Mono<SpaceUsers> listSpaceUsers(ListSpaceUsersRequest request);
+
+    /**
+     * Set space user
+     *
+     * @param request the set space user request
+     * @return completion indicator
+     */
+    Mono<Void> setSpaceRole(SetSpaceRoleRequest request);
 
 }

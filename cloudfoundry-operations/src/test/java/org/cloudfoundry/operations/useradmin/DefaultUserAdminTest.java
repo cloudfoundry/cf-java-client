@@ -19,21 +19,29 @@ package org.cloudfoundry.operations.useradmin;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.ClientV2Exception;
 import org.cloudfoundry.client.v2.Metadata;
+import org.cloudfoundry.client.v2.featureflags.GetFeatureFlagRequest;
+import org.cloudfoundry.client.v2.featureflags.GetFeatureFlagResponse;
 import org.cloudfoundry.client.v2.jobs.ErrorDetails;
 import org.cloudfoundry.client.v2.jobs.GetJobRequest;
 import org.cloudfoundry.client.v2.jobs.GetJobResponse;
 import org.cloudfoundry.client.v2.jobs.JobEntity;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserByUsernameRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserByUsernameResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
+import org.cloudfoundry.client.v2.organizations.OrganizationEntity;
 import org.cloudfoundry.client.v2.organizations.OrganizationResource;
+import org.cloudfoundry.client.v2.spaces.AssociateSpaceManagerByUsernameRequest;
+import org.cloudfoundry.client.v2.spaces.AssociateSpaceManagerByUsernameResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceAuditorsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceAuditorsResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceDevelopersRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceDevelopersResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceManagersRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceManagersResponse;
+import org.cloudfoundry.client.v2.spaces.SpaceEntity;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.client.v2.users.DeleteUserResponse;
 import org.cloudfoundry.client.v2.users.UserEntity;
@@ -226,6 +234,99 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
             .verify(Duration.ofSeconds(5));
     }
 
+    @Test
+    public void setSpaceRole() {
+        requestGetFeatureFlag(this.cloudFoundryClient, "set_roles_by_username", true);
+        requestListOrganizations(this.cloudFoundryClient, "test-organization-name");
+        requestListOrganizationSpaces(this.cloudFoundryClient, "test-organization-id", "test-space-name");
+        requestAssociateOrganizationUserByUsername(this.cloudFoundryClient, "test-organization-id", "test-username");
+        requestAssociateSpaceManagerByUsername(this.cloudFoundryClient, "test-space-id", "test-username");
+
+        this.userAdmin
+            .setSpaceRole(SetSpaceRoleRequest.builder()
+                .organizationName("test-organization-name")
+                .spaceName("test-space-name")
+                .spaceRole(SpaceRole.MANAGER)
+                .username("test-username")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void setSpaceRoleFeatureDisabled() {
+        requestGetFeatureFlag(this.cloudFoundryClient, "set_roles_by_username", false);
+
+        this.userAdmin
+            .setSpaceRole(SetSpaceRoleRequest.builder()
+                .organizationName("test-organization-name")
+                .spaceName("test-space-name")
+                .spaceRole(SpaceRole.MANAGER)
+                .username("test-username")
+                .build())
+            .as(StepVerifier::create)
+            .expectErrorMessage("Setting roles by username is not enabled")
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void setSpaceRoleInvalidOrganization() {
+        requestGetFeatureFlag(this.cloudFoundryClient, "set_roles_by_username", true);
+        requestListOrganizationsEmpty(this.cloudFoundryClient, "test-organization-name");
+
+        this.userAdmin
+            .setSpaceRole(SetSpaceRoleRequest.builder()
+                .organizationName("test-organization-name")
+                .spaceName("test-space-name")
+                .spaceRole(SpaceRole.MANAGER)
+                .username("test-username")
+                .build())
+            .as(StepVerifier::create)
+            .expectErrorMessage("Organization test-organization-name not found")
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void setSpaceRoleInvalidSpace() {
+        requestGetFeatureFlag(this.cloudFoundryClient, "set_roles_by_username", true);
+        requestListOrganizations(this.cloudFoundryClient, "test-organization-name");
+        requestListOrganizationSpacesEmpty(this.cloudFoundryClient, "test-organization-id", "test-space-name");
+
+        this.userAdmin
+            .setSpaceRole(SetSpaceRoleRequest.builder()
+                .organizationName("test-organization-name")
+                .spaceName("test-space-name")
+                .spaceRole(SpaceRole.MANAGER)
+                .username("test-username")
+                .build())
+            .as(StepVerifier::create)
+            .expectErrorMessage("Space test-space-name not found")
+            .verify(Duration.ofSeconds(5));
+    }
+
+    private static void requestAssociateOrganizationUserByUsername(CloudFoundryClient cloudFoundryClient, String organizationId, String username) {
+        when(cloudFoundryClient.organizations()
+            .associateUserByUsername(AssociateOrganizationUserByUsernameRequest.builder()
+                .organizationId(organizationId)
+                .username(username)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(AssociateOrganizationUserByUsernameResponse.builder(), "associate-user-")
+                    .build()));
+    }
+
+    private static void requestAssociateSpaceManagerByUsername(CloudFoundryClient cloudFoundryClient, String spaceId, String username) {
+        when(cloudFoundryClient.spaces()
+            .associateManagerByUsername(AssociateSpaceManagerByUsernameRequest.builder()
+                .spaceId(spaceId)
+                .username(username)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(AssociateSpaceManagerByUsernameResponse.builder(), "associate-manager-")
+                    .build()));
+    }
+
     private static void requestCreateUaaUser(UaaClient uaaClient) {
         when(uaaClient.users()
             .create(org.cloudfoundry.uaa.users.CreateUserRequest.builder()
@@ -330,6 +431,16 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
             .thenReturn(Mono.error(new ClientV2Exception(404, 404, "test-description", "test-error-code")));
     }
 
+    private static void requestGetFeatureFlag(CloudFoundryClient cloudFoundryClient, String featureFlag, Boolean enabled) {
+        when(cloudFoundryClient.featureFlags()
+            .get(GetFeatureFlagRequest.builder()
+                .name(featureFlag)
+                .build()))
+            .thenReturn(Mono.just(GetFeatureFlagResponse.builder()
+                .enabled(enabled)
+                .build()));
+    }
+
     private static void requestJobFailure(CloudFoundryClient cloudFoundryClient, String jobId) {
         when(cloudFoundryClient.jobs()
             .get(GetJobRequest.builder()
@@ -388,6 +499,60 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
                     }
 
                 }));
+    }
+
+    private static void requestListOrganizationSpaces(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceName) {
+        when(cloudFoundryClient.organizations()
+            .listSpaces(ListOrganizationSpacesRequest.builder()
+                .name(spaceName)
+                .organizationId(organizationId)
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(ListOrganizationSpacesResponse.builder())
+                    .resource(fill(SpaceResource.builder(), "space-")
+                        .entity(fill(SpaceEntity.builder(), "space-entity-")
+                            .build())
+                        .build())
+                    .build()));
+    }
+
+    private static void requestListOrganizationSpacesEmpty(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceName) {
+        when(cloudFoundryClient.organizations()
+            .listSpaces(ListOrganizationSpacesRequest.builder()
+                .name(spaceName)
+                .organizationId(organizationId)
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(ListOrganizationSpacesResponse.builder())
+                    .build()));
+    }
+
+    private static void requestListOrganizations(CloudFoundryClient cloudFoundryClient, String organizationName) {
+        when(cloudFoundryClient.organizations()
+            .list(ListOrganizationsRequest.builder()
+                .name(organizationName)
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(ListOrganizationsResponse.builder())
+                    .resource(fill(OrganizationResource.builder(), "organization-")
+                        .entity(fill(OrganizationEntity.builder(), "organization-entity-")
+                            .build())
+                        .build())
+                    .build()));
+    }
+
+    private static void requestListOrganizationsEmpty(CloudFoundryClient cloudFoundryClient, String organizationName) {
+        when(cloudFoundryClient.organizations()
+            .list(ListOrganizationsRequest.builder()
+                .name(organizationName)
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(ListOrganizationsResponse.builder())
+                    .build()));
     }
 
     private static void requestListSpaceAuditors(CloudFoundryClient cloudFoundryClient) {

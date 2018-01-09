@@ -18,9 +18,16 @@ package org.cloudfoundry.operations.useradmin;
 
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.ClientV2Exception;
+import org.cloudfoundry.client.v2.featureflags.GetFeatureFlagRequest;
+import org.cloudfoundry.client.v2.featureflags.GetFeatureFlagResponse;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserByUsernameRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserByUsernameResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.OrganizationResource;
+import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorByUsernameRequest;
+import org.cloudfoundry.client.v2.spaces.AssociateSpaceDeveloperByUsernameRequest;
+import org.cloudfoundry.client.v2.spaces.AssociateSpaceManagerByUsernameRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceAuditorsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceDevelopersRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceManagersRequest;
@@ -46,8 +53,11 @@ import java.time.Duration;
 import java.util.List;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
+import static org.cloudfoundry.util.tuple.TupleUtils.predicate;
 
 public final class DefaultUserAdmin implements UserAdmin {
+
+    private static final String SET_ROLES_BY_USERNAME_FEATURE_FLAG = "set_roles_by_username";
 
     private final Mono<CloudFoundryClient> cloudFoundryClient;
 
@@ -106,6 +116,73 @@ public final class DefaultUserAdmin implements UserAdmin {
             .checkpoint();
     }
 
+    @Override
+    public Mono<Void> setSpaceRole(SetSpaceRoleRequest request) {
+        return this.cloudFoundryClient
+            .then(cloudFoundryClient -> Mono.when(
+                Mono.just(cloudFoundryClient),
+                getFeatureFlagEnabled(cloudFoundryClient, SET_ROLES_BY_USERNAME_FEATURE_FLAG)
+            ))
+            .filter(predicate((cloudFoundryClient, setRolesByUsernameEnabled) -> setRolesByUsernameEnabled))
+            .switchIfEmpty(ExceptionUtils.illegalState("Setting roles by username is not enabled"))
+            .then(function((cloudFoundryClient, ignore) -> Mono.when(
+                Mono.just(cloudFoundryClient),
+                getOrganizationId(cloudFoundryClient, request.getOrganizationName()))
+            ))
+            .then(function((cloudFoundryClient, organizationId) -> Mono.when(
+                Mono.just(cloudFoundryClient),
+                Mono.just(organizationId),
+                getSpaceId(cloudFoundryClient, organizationId, request.getSpaceName())
+            )))
+            .then(function((cloudFoundryClient, organizationId, spaceId) -> Mono.when(
+                Mono.just(cloudFoundryClient),
+                Mono.just(spaceId),
+                assignOrganizationRole(cloudFoundryClient, request.getUsername(), organizationId))
+            ))
+            .then(function((cloudFoundryClient, spaceId, ignore) -> assignSpaceRole(cloudFoundryClient, request, spaceId)))
+            .transform(OperationsLogging.log("Create Space User"))
+            .then();
+    }
+
+    private static Mono<AssociateOrganizationUserByUsernameResponse> assignOrganizationRole(CloudFoundryClient cloudFoundryClient, String username, String organizationId) {
+        return cloudFoundryClient.organizations()
+            .associateUserByUsername(AssociateOrganizationUserByUsernameRequest.builder()
+                .organizationId(organizationId)
+                .username(username)
+                .build());
+    }
+
+    private static Mono<Void> assignSpaceRole(CloudFoundryClient cloudFoundryClient, SetSpaceRoleRequest request, String spaceId) {
+        if (SpaceRole.AUDITOR == request.getSpaceRole()) {
+            return cloudFoundryClient.spaces()
+                .associateAuditorByUsername(AssociateSpaceAuditorByUsernameRequest.builder()
+                    .spaceId(spaceId)
+                    .username(request.getUsername())
+                    .build())
+                .then();
+        }
+
+        if (SpaceRole.DEVELOPER == request.getSpaceRole()) {
+            return cloudFoundryClient.spaces()
+                .associateDeveloperByUsername(AssociateSpaceDeveloperByUsernameRequest.builder()
+                    .spaceId(spaceId)
+                    .username(request.getUsername())
+                    .build())
+                .then();
+        }
+
+        if (SpaceRole.MANAGER == request.getSpaceRole()) {
+            return cloudFoundryClient.spaces()
+                .associateManagerByUsername(AssociateSpaceManagerByUsernameRequest.builder()
+                    .spaceId(spaceId)
+                    .username(request.getUsername())
+                    .build())
+                .then();
+        }
+
+        return ExceptionUtils.illegalArgument("Unknown space role specified");
+    }
+
     private static Mono<String> createUaaUserId(UaaClient uaaClient, CreateUserRequest request) {
         return requestCreateUaaUser(uaaClient, request)
             .map(CreateUserResponse::getId)
@@ -116,6 +193,11 @@ public final class DefaultUserAdmin implements UserAdmin {
         return requestDeleteUser(cloudFoundryClient, userId)
             .onErrorResume(t -> t instanceof ClientV2Exception && ((ClientV2Exception) t).getStatusCode() == 404, t -> Mono.empty())
             .then(job -> JobUtils.waitForCompletion(cloudFoundryClient, Duration.ofMinutes(5), job));
+    }
+
+    private static Mono<Boolean> getFeatureFlagEnabled(CloudFoundryClient cloudFoundryClient, String featureFlag) {
+        return requestGetFeatureFlag(cloudFoundryClient, featureFlag)
+            .map(GetFeatureFlagResponse::getEnabled);
     }
 
     private static Mono<String> getOrganizationId(CloudFoundryClient cloudFoundryClient, String organizationName) {
@@ -197,6 +279,13 @@ public final class DefaultUserAdmin implements UserAdmin {
             .delete(org.cloudfoundry.client.v2.users.DeleteUserRequest.builder()
                 .async(true)
                 .userId(userId)
+                .build());
+    }
+
+    private static Mono<GetFeatureFlagResponse> requestGetFeatureFlag(CloudFoundryClient cloudFoundryClient, String featureFlag) {
+        return cloudFoundryClient.featureFlags()
+            .get(GetFeatureFlagRequest.builder()
+                .name(featureFlag)
                 .build());
     }
 
