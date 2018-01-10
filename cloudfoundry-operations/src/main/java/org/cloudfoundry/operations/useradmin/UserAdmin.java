@@ -39,4 +39,28 @@ public interface UserAdmin {
      */
     Mono<Void> delete(DeleteUserRequest request);
 
+    /**
+     * List space users
+     *
+     * @param request the list space users request
+     * @return the Space Users
+     */
+    Mono<SpaceUsers> listSpaceUsers(ListSpaceUsersRequest request);
+
+    /**
+     * Assign a space role to a user
+     *
+     * @param request the set space user request
+     * @return completion indicator
+     */
+    Mono<Void> setSpaceRole(SetSpaceRoleRequest request);
+
+    /**
+     * Remove a space role from a user
+     *
+     * @param request the unset space user request
+     * @return completion indicator
+     */
+    Mono<Void> unsetSpaceRole(UnsetSpaceRoleRequest request);
+
 }
