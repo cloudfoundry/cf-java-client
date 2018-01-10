@@ -41,6 +41,8 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceDevelopersRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceDevelopersResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceManagersRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceManagersResponse;
+import org.cloudfoundry.client.v2.spaces.RemoveSpaceManagerByUsernameRequest;
+import org.cloudfoundry.client.v2.spaces.RemoveSpaceManagerByUsernameResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceEntity;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.client.v2.users.DeleteUserResponse;
@@ -295,6 +297,76 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
 
         this.userAdmin
             .setSpaceRole(SetSpaceRoleRequest.builder()
+                .organizationName("test-organization-name")
+                .spaceName("test-space-name")
+                .spaceRole(SpaceRole.MANAGER)
+                .username("test-username")
+                .build())
+            .as(StepVerifier::create)
+            .expectErrorMessage("Space test-space-name not found")
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void unsetSpaceRole() {
+        requestGetFeatureFlag(this.cloudFoundryClient, "unset_roles_by_username", true);
+        requestListOrganizations(this.cloudFoundryClient, "test-organization-name");
+        requestListOrganizationSpaces(this.cloudFoundryClient, "test-organization-id", "test-space-name");
+        requestRemoveSpaceManagerByUsername(this.cloudFoundryClient, "test-space-id", "test-username");
+
+        this.userAdmin
+            .unsetSpaceRole(UnsetSpaceRoleRequest.builder()
+                .organizationName("test-organization-name")
+                .spaceName("test-space-name")
+                .spaceRole(SpaceRole.MANAGER)
+                .username("test-username")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void unsetSpaceRoleFeatureDisabled() {
+        requestGetFeatureFlag(this.cloudFoundryClient, "unset_roles_by_username", false);
+
+        this.userAdmin
+            .unsetSpaceRole(UnsetSpaceRoleRequest.builder()
+                .organizationName("test-organization-name")
+                .spaceName("test-space-name")
+                .spaceRole(SpaceRole.MANAGER)
+                .username("test-username")
+                .build())
+            .as(StepVerifier::create)
+            .expectErrorMessage("Unsetting roles by username is not enabled")
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void unsetSpaceRoleInvalidOrganization() {
+        requestGetFeatureFlag(this.cloudFoundryClient, "unset_roles_by_username", true);
+        requestListOrganizationsEmpty(this.cloudFoundryClient, "test-organization-name");
+
+        this.userAdmin
+            .unsetSpaceRole(UnsetSpaceRoleRequest.builder()
+                .organizationName("test-organization-name")
+                .spaceName("test-space-name")
+                .spaceRole(SpaceRole.MANAGER)
+                .username("test-username")
+                .build())
+            .as(StepVerifier::create)
+            .expectErrorMessage("Organization test-organization-name not found")
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void unsetSpaceRoleInvalidSpace() {
+        requestGetFeatureFlag(this.cloudFoundryClient, "unset_roles_by_username", true);
+        requestListOrganizations(this.cloudFoundryClient, "test-organization-name");
+        requestListOrganizationSpacesEmpty(this.cloudFoundryClient, "test-organization-id", "test-space-name");
+
+        this.userAdmin
+            .unsetSpaceRole(UnsetSpaceRoleRequest.builder()
                 .organizationName("test-organization-name")
                 .spaceName("test-space-name")
                 .spaceRole(SpaceRole.MANAGER)
@@ -697,6 +769,17 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
                 .build()))
             .thenReturn(Mono
                 .just(fill(ListOrganizationsResponse.builder())
+                    .build()));
+    }
+
+    private static void requestRemoveSpaceManagerByUsername(CloudFoundryClient cloudFoundryClient, String spaceId, String username) {
+        when(cloudFoundryClient.spaces()
+            .removeManagerByUsername(RemoveSpaceManagerByUsernameRequest.builder()
+                .spaceId(spaceId)
+                .username(username)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(RemoveSpaceManagerByUsernameResponse.builder(), "associate-manager-")
                     .build()));
     }
 

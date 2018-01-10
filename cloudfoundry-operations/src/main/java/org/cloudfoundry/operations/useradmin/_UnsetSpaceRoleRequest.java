@@ -19,10 +19,10 @@ package org.cloudfoundry.operations.useradmin;
 import org.immutables.value.Value;
 
 /**
- * The request options for the set space role operation
+ * The request options for the unset space role operation
  */
 @Value.Immutable
-abstract class _SetSpaceRoleRequest {
+abstract class _UnsetSpaceRoleRequest {
 
     /**
      * Organization name
