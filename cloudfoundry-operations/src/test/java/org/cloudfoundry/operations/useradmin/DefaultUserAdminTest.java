@@ -25,6 +25,8 @@ import org.cloudfoundry.client.v2.jobs.ErrorDetails;
 import org.cloudfoundry.client.v2.jobs.GetJobRequest;
 import org.cloudfoundry.client.v2.jobs.GetJobResponse;
 import org.cloudfoundry.client.v2.jobs.JobEntity;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorByUsernameRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorByUsernameResponse;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserByUsernameResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesRequest;
@@ -237,6 +239,55 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
     }
 
     @Test
+    public void setOrganizationRole() {
+        requestGetFeatureFlag(this.cloudFoundryClient, "set_roles_by_username", true);
+        requestListOrganizations(this.cloudFoundryClient, "test-organization-name");
+        requestAssociateOrganizationUserByUsername(this.cloudFoundryClient, "test-organization-id", "test-username");
+        requestAssociateOrganizationAuditorByUsername(this.cloudFoundryClient, "test-organization-id", "test-username");
+
+        this.userAdmin
+            .setOrganizationRole(SetOrganizationRoleRequest.builder()
+                .organizationName("test-organization-name")
+                .organizationRole(OrganizationRole.AUDITOR)
+                .username("test-username")
+            .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void setOrganizationRoleInvalidOrganization() {
+        requestGetFeatureFlag(this.cloudFoundryClient, "set_roles_by_username", true);
+        requestListOrganizationsEmpty(this.cloudFoundryClient, "test-organization-name");
+
+        this.userAdmin
+            .setOrganizationRole(SetOrganizationRoleRequest.builder()
+                .organizationName("test-organization-name")
+                .organizationRole(OrganizationRole.BILLING_MANAGER)
+                .username("test-username")
+                .build())
+            .as(StepVerifier::create)
+            .expectErrorMessage("Organization test-organization-name not found")
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void setOrganizationRoleFeatureDisabled() {
+        requestGetFeatureFlag(this.cloudFoundryClient, "set_roles_by_username", false);
+
+        this.userAdmin
+            .setOrganizationRole(SetOrganizationRoleRequest.builder()
+                .organizationName("test-organization-name")
+                .organizationRole(OrganizationRole.MANAGER)
+                .username("test-username")
+                .build())
+            .as(StepVerifier::create)
+            .expectErrorMessage("Setting roles by username is not enabled")
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
     public void setSpaceRole() {
         requestGetFeatureFlag(this.cloudFoundryClient, "set_roles_by_username", true);
         requestListOrganizations(this.cloudFoundryClient, "test-organization-name");
@@ -385,6 +436,17 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
                 .build()))
             .thenReturn(Mono
                 .just(fill(AssociateOrganizationUserByUsernameResponse.builder(), "associate-user-")
+                    .build()));
+    }
+
+    private static void requestAssociateOrganizationAuditorByUsername(CloudFoundryClient cloudFoundryClient, String organizationId, String username) {
+        when(cloudFoundryClient.organizations()
+            .associateAuditorByUsername(AssociateOrganizationAuditorByUsernameRequest.builder()
+                .organizationId(organizationId)
+                .username(username)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(AssociateOrganizationAuditorByUsernameResponse.builder(), "associate-auditor-")
                     .build()));
     }
 

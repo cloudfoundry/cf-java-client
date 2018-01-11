@@ -20,6 +20,9 @@ import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.ClientV2Exception;
 import org.cloudfoundry.client.v2.featureflags.GetFeatureFlagRequest;
 import org.cloudfoundry.client.v2.featureflags.GetFeatureFlagResponse;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorByUsernameRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationBillingManagerByUsernameRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserByUsernameResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesRequest;
@@ -122,6 +125,27 @@ public final class DefaultUserAdmin implements UserAdmin {
     }
 
     @Override
+    public Mono<Void> setOrganizationRole(SetOrganizationRoleRequest request) {
+        return this.cloudFoundryClient
+            .then(cloudFoundryClient -> Mono.when(
+                Mono.just(cloudFoundryClient),
+                getFeatureFlagEnabled(cloudFoundryClient, SET_ROLES_BY_USERNAME_FEATURE_FLAG)
+            ))
+            .filter(predicate((cloudFoundryClient, setRolesByUsernameEnabled) -> setRolesByUsernameEnabled))
+            .switchIfEmpty(ExceptionUtils.illegalState("Setting roles by username is not enabled"))
+            .then(function((cloudFoundryClient, ignore) -> Mono.when(
+                Mono.just(cloudFoundryClient),
+                getOrganizationId(cloudFoundryClient, request.getOrganizationName()))
+            ))
+            .then(function((cloudFoundryClient, organizationId) -> Mono.when(
+                requestAssociateOrganizationUserByUsername(cloudFoundryClient, organizationId, request),
+                associateOrganizationRole(cloudFoundryClient, organizationId, request))
+            ))
+            .transform(OperationsLogging.log("Set User Organization Role"))
+            .then();
+    }
+
+    @Override
     public Mono<Void> setSpaceRole(SetSpaceRoleRequest request) {
         return this.cloudFoundryClient
             .then(cloudFoundryClient -> Mono.when(
@@ -169,6 +193,37 @@ public final class DefaultUserAdmin implements UserAdmin {
             .then(function((cloudFoundryClient, spaceId) -> removeSpaceRole(cloudFoundryClient, request, spaceId)))
             .transform(OperationsLogging.log("Unset User Space Role"))
             .then();
+    }
+
+    private static Mono<Void> associateOrganizationRole(CloudFoundryClient cloudFoundryClient, String organizationId, SetOrganizationRoleRequest request) {
+        if (OrganizationRole.AUDITOR == request.getOrganizationRole()) {
+            return cloudFoundryClient.organizations()
+                .associateAuditorByUsername(AssociateOrganizationAuditorByUsernameRequest.builder()
+                    .organizationId(organizationId)
+                    .username(request.getUsername())
+                    .build())
+                .then();
+        }
+
+        if (OrganizationRole.BILLING_MANAGER == request.getOrganizationRole()) {
+            return cloudFoundryClient.organizations()
+                .associateBillingManagerByUsername(AssociateOrganizationBillingManagerByUsernameRequest.builder()
+                    .organizationId(organizationId)
+                    .username(request.getUsername())
+                    .build())
+                .then();
+        }
+
+        if (OrganizationRole.MANAGER == request.getOrganizationRole()) {
+            return cloudFoundryClient.organizations()
+                .associateManagerByUsername(AssociateOrganizationManagerByUsernameRequest.builder()
+                    .organizationId(organizationId)
+                    .username(request.getUsername())
+                    .build())
+                .then();
+        }
+
+        return ExceptionUtils.illegalArgument("Unknown organization role specified");
     }
 
     private static Mono<AssociateOrganizationUserByUsernameResponse> associateOrganizationRole(CloudFoundryClient cloudFoundryClient, String username, String organizationId) {
@@ -300,6 +355,15 @@ public final class DefaultUserAdmin implements UserAdmin {
         }
 
         return ExceptionUtils.illegalArgument("Unknown space role specified");
+    }
+
+    private static Mono<AssociateOrganizationUserByUsernameResponse> requestAssociateOrganizationUserByUsername(CloudFoundryClient cloudFoundryClient, String organizationId,
+                                                                                                                SetOrganizationRoleRequest request) {
+        return cloudFoundryClient.organizations()
+            .associateUserByUsername(AssociateOrganizationUserByUsernameRequest.builder()
+                .organizationId(organizationId)
+                .username(request.getUsername())
+                .build());
     }
 
     private static Mono<CreateUserResponse> requestCreateUaaUser(UaaClient uaaClient, CreateUserRequest request) {

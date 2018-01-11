@@ -48,6 +48,14 @@ public interface UserAdmin {
     Mono<SpaceUsers> listSpaceUsers(ListSpaceUsersRequest request);
 
     /**
+     * Assign an organization role to a user
+     *
+     * @param request the set organization user request
+     * @return completion indicator
+     */
+    Mono<Void> setOrganizationRole(SetOrganizationRoleRequest request);
+
+    /**
      * Assign a space role to a user
      *
      * @param request the set space user request
