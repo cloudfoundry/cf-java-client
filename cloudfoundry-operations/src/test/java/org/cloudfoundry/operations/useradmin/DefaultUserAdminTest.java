@@ -35,6 +35,7 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.organizations.OrganizationEntity;
 import org.cloudfoundry.client.v2.organizations.OrganizationResource;
+import org.cloudfoundry.client.v2.organizations.RemoveOrganizationManagerByUsernameRequest;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceManagerByUsernameRequest;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceManagerByUsernameResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceAuditorsRequest;
@@ -250,9 +251,24 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
                 .organizationName("test-organization-name")
                 .organizationRole(OrganizationRole.AUDITOR)
                 .username("test-username")
-            .build())
+                .build())
             .as(StepVerifier::create)
             .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void setOrganizationRoleFeatureDisabled() {
+        requestGetFeatureFlag(this.cloudFoundryClient, "set_roles_by_username", false);
+
+        this.userAdmin
+            .setOrganizationRole(SetOrganizationRoleRequest.builder()
+                .organizationName("test-organization-name")
+                .organizationRole(OrganizationRole.MANAGER)
+                .username("test-username")
+                .build())
+            .as(StepVerifier::create)
+            .expectErrorMessage("Setting roles by username is not enabled")
             .verify(Duration.ofSeconds(5));
     }
 
@@ -269,21 +285,6 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
                 .build())
             .as(StepVerifier::create)
             .expectErrorMessage("Organization test-organization-name not found")
-            .verify(Duration.ofSeconds(5));
-    }
-
-    @Test
-    public void setOrganizationRoleFeatureDisabled() {
-        requestGetFeatureFlag(this.cloudFoundryClient, "set_roles_by_username", false);
-
-        this.userAdmin
-            .setOrganizationRole(SetOrganizationRoleRequest.builder()
-                .organizationName("test-organization-name")
-                .organizationRole(OrganizationRole.MANAGER)
-                .username("test-username")
-                .build())
-            .as(StepVerifier::create)
-            .expectErrorMessage("Setting roles by username is not enabled")
             .verify(Duration.ofSeconds(5));
     }
 
@@ -359,6 +360,54 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
     }
 
     @Test
+    public void unsetOrganizationRole() {
+        requestGetFeatureFlag(this.cloudFoundryClient, "unset_roles_by_username", true);
+        requestListOrganizations(this.cloudFoundryClient, "test-organization-name");
+        requestRemoveOrganizationManagerByUsername(this.cloudFoundryClient, "test-organization-id", "test-username");
+
+        this.userAdmin
+            .unsetOrganizationRole(UnsetOrganizationRoleRequest.builder()
+                .organizationName("test-organization-name")
+                .organizationRole(OrganizationRole.MANAGER)
+                .username("test-username")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void unsetOrganizationRoleFeatureDisabled() {
+        requestGetFeatureFlag(this.cloudFoundryClient, "unset_roles_by_username", false);
+
+        this.userAdmin
+            .unsetOrganizationRole(UnsetOrganizationRoleRequest.builder()
+                .organizationName("test-organization-name")
+                .organizationRole(OrganizationRole.MANAGER)
+                .username("test-username")
+                .build())
+            .as(StepVerifier::create)
+            .expectErrorMessage("Unsetting roles by username is not enabled")
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void unsetOrganizationRoleInvalidOrganization() {
+        requestGetFeatureFlag(this.cloudFoundryClient, "unset_roles_by_username", true);
+        requestListOrganizationsEmpty(this.cloudFoundryClient, "test-organization-name");
+
+        this.userAdmin
+            .unsetOrganizationRole(UnsetOrganizationRoleRequest.builder()
+                .organizationName("test-organization-name")
+                .organizationRole(OrganizationRole.MANAGER)
+                .username("test-username")
+                .build())
+            .as(StepVerifier::create)
+            .expectErrorMessage("Organization test-organization-name not found")
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
     public void unsetSpaceRole() {
         requestGetFeatureFlag(this.cloudFoundryClient, "unset_roles_by_username", true);
         requestListOrganizations(this.cloudFoundryClient, "test-organization-name");
@@ -392,6 +441,7 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
             .expectErrorMessage("Unsetting roles by username is not enabled")
             .verify(Duration.ofSeconds(5));
     }
+
 
     @Test
     public void unsetSpaceRoleInvalidOrganization() {
@@ -428,17 +478,6 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
             .verify(Duration.ofSeconds(5));
     }
 
-    private static void requestAssociateOrganizationUserByUsername(CloudFoundryClient cloudFoundryClient, String organizationId, String username) {
-        when(cloudFoundryClient.organizations()
-            .associateUserByUsername(AssociateOrganizationUserByUsernameRequest.builder()
-                .organizationId(organizationId)
-                .username(username)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(AssociateOrganizationUserByUsernameResponse.builder(), "associate-user-")
-                    .build()));
-    }
-
     private static void requestAssociateOrganizationAuditorByUsername(CloudFoundryClient cloudFoundryClient, String organizationId, String username) {
         when(cloudFoundryClient.organizations()
             .associateAuditorByUsername(AssociateOrganizationAuditorByUsernameRequest.builder()
@@ -447,6 +486,17 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
                 .build()))
             .thenReturn(Mono
                 .just(fill(AssociateOrganizationAuditorByUsernameResponse.builder(), "associate-auditor-")
+                    .build()));
+    }
+
+    private static void requestAssociateOrganizationUserByUsername(CloudFoundryClient cloudFoundryClient, String organizationId, String username) {
+        when(cloudFoundryClient.organizations()
+            .associateUserByUsername(AssociateOrganizationUserByUsernameRequest.builder()
+                .organizationId(organizationId)
+                .username(username)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(AssociateOrganizationUserByUsernameResponse.builder(), "associate-user-")
                     .build()));
     }
 
@@ -832,6 +882,15 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
             .thenReturn(Mono
                 .just(fill(ListOrganizationsResponse.builder())
                     .build()));
+    }
+
+    private static void requestRemoveOrganizationManagerByUsername(CloudFoundryClient cloudFoundryClient, String organizationId, String username) {
+        when(cloudFoundryClient.organizations()
+            .removeManagerByUsername(RemoveOrganizationManagerByUsernameRequest.builder()
+                .organizationId(organizationId)
+                .username(username)
+                .build()))
+            .thenReturn(Mono.empty());
     }
 
     private static void requestRemoveSpaceManagerByUsername(CloudFoundryClient cloudFoundryClient, String spaceId, String username) {

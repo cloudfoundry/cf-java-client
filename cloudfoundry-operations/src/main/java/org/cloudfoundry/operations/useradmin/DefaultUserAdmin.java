@@ -28,6 +28,9 @@ import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserByUsern
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.OrganizationResource;
+import org.cloudfoundry.client.v2.organizations.RemoveOrganizationAuditorByUsernameRequest;
+import org.cloudfoundry.client.v2.organizations.RemoveOrganizationBillingManagerByUsernameRequest;
+import org.cloudfoundry.client.v2.organizations.RemoveOrganizationManagerByUsernameRequest;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorByUsernameRequest;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceDeveloperByUsernameRequest;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceManagerByUsernameRequest;
@@ -170,6 +173,24 @@ public final class DefaultUserAdmin implements UserAdmin {
             ))
             .then(function((cloudFoundryClient, spaceId, ignore) -> associateSpaceRole(cloudFoundryClient, request, spaceId)))
             .transform(OperationsLogging.log("Set User Space Role"))
+            .then();
+    }
+
+    @Override
+    public Mono<Void> unsetOrganizationRole(UnsetOrganizationRoleRequest request) {
+        return this.cloudFoundryClient
+            .then(cloudFoundryClient -> Mono.when(
+                Mono.just(cloudFoundryClient),
+                getFeatureFlagEnabled(cloudFoundryClient, UNSET_ROLES_BY_USERNAME_FEATURE_FLAG)
+            ))
+            .filter(predicate((cloudFoundryClient, setRolesByUsernameEnabled) -> setRolesByUsernameEnabled))
+            .switchIfEmpty(ExceptionUtils.illegalState("Unsetting roles by username is not enabled"))
+            .then(function((cloudFoundryClient, ignore) -> Mono.when(
+                Mono.just(cloudFoundryClient),
+                getOrganizationId(cloudFoundryClient, request.getOrganizationName()))
+            ))
+            .then(function((cloudFoundryClient, organizationId) -> removeOrganizationRole(cloudFoundryClient, organizationId, request)))
+            .transform(OperationsLogging.log("Unset User Organization Role"))
             .then();
     }
 
@@ -324,6 +345,37 @@ public final class DefaultUserAdmin implements UserAdmin {
         return requestListSpaceManagers(cloudFoundryClient, spaceId)
             .map(resource -> ResourceUtils.getEntity(resource).getUsername())
             .collectList();
+    }
+
+    private static Mono<Void> removeOrganizationRole(CloudFoundryClient cloudFoundryClient, String organizationId, UnsetOrganizationRoleRequest request) {
+        if (OrganizationRole.AUDITOR == request.getOrganizationRole()) {
+            return cloudFoundryClient.organizations()
+                .removeAuditorByUsername(RemoveOrganizationAuditorByUsernameRequest.builder()
+                    .organizationId(organizationId)
+                    .username(request.getUsername())
+                    .build())
+                .then();
+        }
+
+        if (OrganizationRole.BILLING_MANAGER == request.getOrganizationRole()) {
+            return cloudFoundryClient.organizations()
+                .removeBillingManagerByUsername(RemoveOrganizationBillingManagerByUsernameRequest.builder()
+                    .organizationId(organizationId)
+                    .username(request.getUsername())
+                    .build())
+                .then();
+        }
+
+        if (OrganizationRole.MANAGER == request.getOrganizationRole()) {
+            return cloudFoundryClient.organizations()
+                .removeManagerByUsername(RemoveOrganizationManagerByUsernameRequest.builder()
+                    .organizationId(organizationId)
+                    .username(request.getUsername())
+                    .build())
+                .then();
+        }
+
+        return ExceptionUtils.illegalArgument("Unknown organization role specified");
     }
 
     private static Mono<Void> removeSpaceRole(CloudFoundryClient cloudFoundryClient, UnsetSpaceRoleRequest request, String spaceId) {

@@ -64,6 +64,14 @@ public interface UserAdmin {
     Mono<Void> setSpaceRole(SetSpaceRoleRequest request);
 
     /**
+     * Remove an organization role from a user
+     *
+     * @param request the unset organization user request
+     * @return completion indicator
+     */
+    Mono<Void> unsetOrganizationRole(UnsetOrganizationRoleRequest request);
+
+    /**
      * Remove a space role from a user
      *
      * @param request the unset space user request
