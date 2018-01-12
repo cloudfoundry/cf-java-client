@@ -40,6 +40,14 @@ public interface UserAdmin {
     Mono<Void> delete(DeleteUserRequest request);
 
     /**
+     * List organization users
+     *
+     * @param request the list organization users request
+     * @return the Organization Users
+     */
+    Mono<OrganizationUsers> listOrganizationUsers(ListOrganizationUsersRequest request);
+
+    /**
      * List space users
      *
      * @param request the list space users request
@@ -48,12 +56,28 @@ public interface UserAdmin {
     Mono<SpaceUsers> listSpaceUsers(ListSpaceUsersRequest request);
 
     /**
+     * Assign an organization role to a user
+     *
+     * @param request the set organization user request
+     * @return completion indicator
+     */
+    Mono<Void> setOrganizationRole(SetOrganizationRoleRequest request);
+
+    /**
      * Assign a space role to a user
      *
      * @param request the set space user request
      * @return completion indicator
      */
     Mono<Void> setSpaceRole(SetSpaceRoleRequest request);
+
+    /**
+     * Remove an organization role from a user
+     *
+     * @param request the unset organization user request
+     * @return completion indicator
+     */
+    Mono<Void> unsetOrganizationRole(UnsetOrganizationRoleRequest request);
 
     /**
      * Remove a space role from a user

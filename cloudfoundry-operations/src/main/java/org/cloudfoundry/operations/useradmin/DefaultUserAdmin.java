@@ -20,11 +20,20 @@ import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.ClientV2Exception;
 import org.cloudfoundry.client.v2.featureflags.GetFeatureFlagRequest;
 import org.cloudfoundry.client.v2.featureflags.GetFeatureFlagResponse;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorByUsernameRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationBillingManagerByUsernameRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserByUsernameResponse;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationAuditorsRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationBillingManagersRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationManagersRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.OrganizationResource;
+import org.cloudfoundry.client.v2.organizations.RemoveOrganizationAuditorByUsernameRequest;
+import org.cloudfoundry.client.v2.organizations.RemoveOrganizationBillingManagerByUsernameRequest;
+import org.cloudfoundry.client.v2.organizations.RemoveOrganizationManagerByUsernameRequest;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorByUsernameRequest;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceDeveloperByUsernameRequest;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceManagerByUsernameRequest;
@@ -101,6 +110,23 @@ public final class DefaultUserAdmin implements UserAdmin {
     }
 
     @Override
+    public Mono<OrganizationUsers> listOrganizationUsers(ListOrganizationUsersRequest request) {
+        return this.cloudFoundryClient
+            .flatMap(cloudFoundryClient -> Mono.zip(
+                Mono.just(cloudFoundryClient),
+                getOrganizationId(cloudFoundryClient, request.getOrganizationName())
+            ))
+            .flatMap(function((cloudFoundryClient, organizationId) -> Mono.zip(
+                listOrganizationAuditorNames(cloudFoundryClient, organizationId),
+                listOrganizationBillingManagerNames(cloudFoundryClient, organizationId),
+                listOrganizationManagerNames(cloudFoundryClient, organizationId)
+            )))
+            .flatMap(function(this::toOrganizationUsers))
+            .transform(OperationsLogging.log("List Organization Users"))
+            .checkpoint();
+    }
+
+    @Override
     public Mono<SpaceUsers> listSpaceUsers(ListSpaceUsersRequest request) {
         return this.cloudFoundryClient
             .flatMap(cloudFoundryClient -> Mono.zip(
@@ -119,6 +145,27 @@ public final class DefaultUserAdmin implements UserAdmin {
             .flatMap(function(this::toSpaceUsers))
             .transform(OperationsLogging.log("List Space Users"))
             .checkpoint();
+    }
+
+    @Override
+    public Mono<Void> setOrganizationRole(SetOrganizationRoleRequest request) {
+        return this.cloudFoundryClient
+            .flatMap(cloudFoundryClient -> Mono.zip(
+                Mono.just(cloudFoundryClient),
+                getFeatureFlagEnabled(cloudFoundryClient, SET_ROLES_BY_USERNAME_FEATURE_FLAG)
+            ))
+            .filter(predicate((cloudFoundryClient, setRolesByUsernameEnabled) -> setRolesByUsernameEnabled))
+            .switchIfEmpty(ExceptionUtils.illegalState("Setting roles by username is not enabled"))
+            .flatMap(function((cloudFoundryClient, ignore) -> Mono.zip(
+                Mono.just(cloudFoundryClient),
+                getOrganizationId(cloudFoundryClient, request.getOrganizationName()))
+            ))
+            .flatMap(function((cloudFoundryClient, organizationId) -> Mono.zip(
+                requestAssociateOrganizationUserByUsername(cloudFoundryClient, organizationId, request),
+                associateOrganizationRole(cloudFoundryClient, organizationId, request))
+            ))
+            .transform(OperationsLogging.log("Set User Organization Role"))
+            .then();
     }
 
     @Override
@@ -150,6 +197,24 @@ public final class DefaultUserAdmin implements UserAdmin {
     }
 
     @Override
+    public Mono<Void> unsetOrganizationRole(UnsetOrganizationRoleRequest request) {
+        return this.cloudFoundryClient
+            .flatMap(cloudFoundryClient -> Mono.zip(
+                Mono.just(cloudFoundryClient),
+                getFeatureFlagEnabled(cloudFoundryClient, UNSET_ROLES_BY_USERNAME_FEATURE_FLAG)
+            ))
+            .filter(predicate((cloudFoundryClient, setRolesByUsernameEnabled) -> setRolesByUsernameEnabled))
+            .switchIfEmpty(ExceptionUtils.illegalState("Unsetting roles by username is not enabled"))
+            .flatMap(function((cloudFoundryClient, ignore) -> Mono.zip(
+                Mono.just(cloudFoundryClient),
+                getOrganizationId(cloudFoundryClient, request.getOrganizationName()))
+            ))
+            .flatMap(function((cloudFoundryClient, organizationId) -> removeOrganizationRole(cloudFoundryClient, organizationId, request)))
+            .transform(OperationsLogging.log("Unset User Organization Role"))
+            .then();
+    }
+
+    @Override
     public Mono<Void> unsetSpaceRole(UnsetSpaceRoleRequest request) {
         return this.cloudFoundryClient
             .flatMap(cloudFoundryClient -> Mono.zip(
@@ -169,6 +234,37 @@ public final class DefaultUserAdmin implements UserAdmin {
             .flatMap(function((cloudFoundryClient, spaceId) -> removeSpaceRole(cloudFoundryClient, request, spaceId)))
             .transform(OperationsLogging.log("Unset User Space Role"))
             .then();
+    }
+
+    private static Mono<Void> associateOrganizationRole(CloudFoundryClient cloudFoundryClient, String organizationId, SetOrganizationRoleRequest request) {
+        if (OrganizationRole.AUDITOR == request.getOrganizationRole()) {
+            return cloudFoundryClient.organizations()
+                .associateAuditorByUsername(AssociateOrganizationAuditorByUsernameRequest.builder()
+                    .organizationId(organizationId)
+                    .username(request.getUsername())
+                    .build())
+                .then();
+        }
+
+        if (OrganizationRole.BILLING_MANAGER == request.getOrganizationRole()) {
+            return cloudFoundryClient.organizations()
+                .associateBillingManagerByUsername(AssociateOrganizationBillingManagerByUsernameRequest.builder()
+                    .organizationId(organizationId)
+                    .username(request.getUsername())
+                    .build())
+                .then();
+        }
+
+        if (OrganizationRole.MANAGER == request.getOrganizationRole()) {
+            return cloudFoundryClient.organizations()
+                .associateManagerByUsername(AssociateOrganizationManagerByUsernameRequest.builder()
+                    .organizationId(organizationId)
+                    .username(request.getUsername())
+                    .build())
+                .then();
+        }
+
+        return ExceptionUtils.illegalArgument("Unknown organization role specified");
     }
 
     private static Mono<AssociateOrganizationUserByUsernameResponse> associateOrganizationRole(CloudFoundryClient cloudFoundryClient, String username, String organizationId) {
@@ -253,6 +349,24 @@ public final class DefaultUserAdmin implements UserAdmin {
             .map(User::getId);
     }
 
+    private static Mono<List<String>> listOrganizationAuditorNames(CloudFoundryClient cloudFoundryClient, String organizationId) {
+        return requestListOrganizationAuditors(cloudFoundryClient, organizationId)
+            .map(resource -> ResourceUtils.getEntity(resource).getUsername())
+            .collectList();
+    }
+
+    private static Mono<List<String>> listOrganizationBillingManagerNames(CloudFoundryClient cloudFoundryClient, String organizationId) {
+        return requestListOrganizationBillingManagers(cloudFoundryClient, organizationId)
+            .map(resource -> ResourceUtils.getEntity(resource).getUsername())
+            .collectList();
+    }
+
+    private static Mono<List<String>> listOrganizationManagerNames(CloudFoundryClient cloudFoundryClient, String organizationId) {
+        return requestListOrganizationManagers(cloudFoundryClient, organizationId)
+            .map(resource -> ResourceUtils.getEntity(resource).getUsername())
+            .collectList();
+    }
+
     private static Mono<List<String>> listSpaceAuditorNames(CloudFoundryClient cloudFoundryClient, String spaceId) {
         return requestListSpaceAuditors(cloudFoundryClient, spaceId)
             .map(resource -> ResourceUtils.getEntity(resource).getUsername())
@@ -269,6 +383,37 @@ public final class DefaultUserAdmin implements UserAdmin {
         return requestListSpaceManagers(cloudFoundryClient, spaceId)
             .map(resource -> ResourceUtils.getEntity(resource).getUsername())
             .collectList();
+    }
+
+    private static Mono<Void> removeOrganizationRole(CloudFoundryClient cloudFoundryClient, String organizationId, UnsetOrganizationRoleRequest request) {
+        if (OrganizationRole.AUDITOR == request.getOrganizationRole()) {
+            return cloudFoundryClient.organizations()
+                .removeAuditorByUsername(RemoveOrganizationAuditorByUsernameRequest.builder()
+                    .organizationId(organizationId)
+                    .username(request.getUsername())
+                    .build())
+                .then();
+        }
+
+        if (OrganizationRole.BILLING_MANAGER == request.getOrganizationRole()) {
+            return cloudFoundryClient.organizations()
+                .removeBillingManagerByUsername(RemoveOrganizationBillingManagerByUsernameRequest.builder()
+                    .organizationId(organizationId)
+                    .username(request.getUsername())
+                    .build())
+                .then();
+        }
+
+        if (OrganizationRole.MANAGER == request.getOrganizationRole()) {
+            return cloudFoundryClient.organizations()
+                .removeManagerByUsername(RemoveOrganizationManagerByUsernameRequest.builder()
+                    .organizationId(organizationId)
+                    .username(request.getUsername())
+                    .build())
+                .then();
+        }
+
+        return ExceptionUtils.illegalArgument("Unknown organization role specified");
     }
 
     private static Mono<Void> removeSpaceRole(CloudFoundryClient cloudFoundryClient, UnsetSpaceRoleRequest request, String spaceId) {
@@ -300,6 +445,15 @@ public final class DefaultUserAdmin implements UserAdmin {
         }
 
         return ExceptionUtils.illegalArgument("Unknown space role specified");
+    }
+
+    private static Mono<AssociateOrganizationUserByUsernameResponse> requestAssociateOrganizationUserByUsername(CloudFoundryClient cloudFoundryClient, String organizationId,
+                                                                                                                SetOrganizationRoleRequest request) {
+        return cloudFoundryClient.organizations()
+            .associateUserByUsername(AssociateOrganizationUserByUsernameRequest.builder()
+                .organizationId(organizationId)
+                .username(request.getUsername())
+                .build());
     }
 
     private static Mono<CreateUserResponse> requestCreateUaaUser(UaaClient uaaClient, CreateUserRequest request) {
@@ -347,6 +501,30 @@ public final class DefaultUserAdmin implements UserAdmin {
                 .build());
     }
 
+    private static Flux<UserResource> requestListOrganizationAuditors(CloudFoundryClient cloudFoundryClient, String organizationId) {
+        return PaginationUtils.requestClientV2Resources(page -> cloudFoundryClient.organizations()
+            .listAuditors(ListOrganizationAuditorsRequest.builder()
+                .organizationId(organizationId)
+                .page(page)
+                .build()));
+    }
+
+    private static Flux<UserResource> requestListOrganizationBillingManagers(CloudFoundryClient cloudFoundryClient, String organizationId) {
+        return PaginationUtils.requestClientV2Resources(page -> cloudFoundryClient.organizations()
+            .listBillingManagers(ListOrganizationBillingManagersRequest.builder()
+                .organizationId(organizationId)
+                .page(page)
+                .build()));
+    }
+
+    private static Flux<UserResource> requestListOrganizationManagers(CloudFoundryClient cloudFoundryClient, String organizationId) {
+        return PaginationUtils.requestClientV2Resources(page -> cloudFoundryClient.organizations()
+            .listManagers(ListOrganizationManagersRequest.builder()
+                .organizationId(organizationId)
+                .page(page)
+                .build()));
+    }
+
     private static Flux<OrganizationResource> requestListOrganizations(CloudFoundryClient cloudFoundryClient, String organizationName) {
         return PaginationUtils.requestClientV2Resources(page -> cloudFoundryClient.organizations()
             .list(ListOrganizationsRequest.builder()
@@ -386,6 +564,14 @@ public final class DefaultUserAdmin implements UserAdmin {
                 .name(spaceName)
                 .page(page)
                 .build()));
+    }
+
+    private Mono<OrganizationUsers> toOrganizationUsers(List<String> auditors, List<String> billingManagers, List<String> managers) {
+        return Mono.just(OrganizationUsers.builder()
+            .addAllAuditors(auditors)
+            .addAllBillingManagers(billingManagers)
+            .addAllManagers(managers)
+            .build());
     }
 
     private Mono<SpaceUsers> toSpaceUsers(List<String> auditors, List<String> developers, List<String> managers) {

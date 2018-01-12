@@ -18,16 +18,23 @@ package org.cloudfoundry.operations;
 
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationAuditorsRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
 import org.cloudfoundry.client.v2.users.UserResource;
 import org.cloudfoundry.operations.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.operations.spaces.CreateSpaceRequest;
 import org.cloudfoundry.operations.useradmin.CreateUserRequest;
 import org.cloudfoundry.operations.useradmin.DeleteUserRequest;
+import org.cloudfoundry.operations.useradmin.ListOrganizationUsersRequest;
 import org.cloudfoundry.operations.useradmin.ListSpaceUsersRequest;
+import org.cloudfoundry.operations.useradmin.OrganizationRole;
+import org.cloudfoundry.operations.useradmin.OrganizationUsers;
+import org.cloudfoundry.operations.useradmin.SetOrganizationRoleRequest;
 import org.cloudfoundry.operations.useradmin.SetSpaceRoleRequest;
 import org.cloudfoundry.operations.useradmin.SpaceRole;
 import org.cloudfoundry.operations.useradmin.SpaceUsers;
+import org.cloudfoundry.operations.useradmin.UnsetOrganizationRoleRequest;
 import org.cloudfoundry.operations.useradmin.UnsetSpaceRoleRequest;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
@@ -40,8 +47,6 @@ import reactor.test.StepVerifier;
 import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.cloudfoundry.operations.useradmin.SpaceRole.AUDITOR;
-import static org.cloudfoundry.operations.useradmin.SpaceRole.MANAGER;
 
 public final class UserAdminTest extends AbstractIntegrationTest {
 
@@ -107,6 +112,27 @@ public final class UserAdminTest extends AbstractIntegrationTest {
     }
 
     @Test
+    public void listOrganizationUsers() {
+        String organizationName = this.nameFactory.getOrganizationName();
+        String username = this.nameFactory.getUserName();
+
+        Mono.when(
+            createUser(this.cloudFoundryOperations, username),
+            createOrganization(this.cloudFoundryOperations, organizationName)
+        )
+            .then(setOrganizationRole(this.cloudFoundryOperations, organizationName, OrganizationRole.BILLING_MANAGER, username))
+            .then(this.cloudFoundryOperations.userAdmin()
+                .listOrganizationUsers(ListOrganizationUsersRequest.builder()
+                    .organizationName(organizationName)
+                    .build()))
+            .flatMapIterable(OrganizationUsers::getBillingManagers)
+            .as(StepVerifier::create)
+            .expectNext(username)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
     public void listSpaceUsers() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
@@ -117,13 +143,37 @@ public final class UserAdminTest extends AbstractIntegrationTest {
             createOrganization(this.cloudFoundryOperations, organizationName)
         )
             .then(createSpace(this.cloudFoundryOperations, organizationName, spaceName))
-            .then(setSpaceRole(this.cloudFoundryOperations, organizationName, spaceName, AUDITOR, username))
+            .then(setSpaceRole(this.cloudFoundryOperations, organizationName, spaceName, SpaceRole.AUDITOR, username))
             .then(this.cloudFoundryOperations.userAdmin()
                 .listSpaceUsers(ListSpaceUsersRequest.builder()
                     .organizationName(organizationName)
                     .spaceName(spaceName)
                     .build()))
             .flatMapIterable(SpaceUsers::getAuditors)
+            .as(StepVerifier::create)
+            .expectNext(username)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void setOrganizationUser() {
+        String organizationName = this.nameFactory.getOrganizationName();
+        String username = this.nameFactory.getUserName();
+
+        Mono.when(
+            createUser(this.cloudFoundryOperations, username),
+            createOrganization(this.cloudFoundryOperations, organizationName)
+        )
+            .then(this.cloudFoundryOperations.userAdmin()
+                .setOrganizationRole(SetOrganizationRoleRequest.builder()
+                    .organizationName(organizationName)
+                    .organizationRole(OrganizationRole.AUDITOR)
+                    .username(username)
+                    .build()))
+            .thenMany(getOrganizationId(this.cloudFoundryClient, organizationName))
+            .flatMap(organizationId -> requestListOrganizationAuditors(this.cloudFoundryClient, organizationId))
+            .map(resource -> ResourceUtils.getEntity(resource).getUsername())
             .as(StepVerifier::create)
             .expectNext(username)
             .expectComplete()
@@ -145,13 +195,37 @@ public final class UserAdminTest extends AbstractIntegrationTest {
                 .setSpaceRole(SetSpaceRoleRequest.builder()
                     .organizationName(organizationName)
                     .spaceName(spaceName)
-                    .spaceRole(AUDITOR)
+                    .spaceRole(SpaceRole.AUDITOR)
                     .username(username)
                     .build()))
             .thenMany(listSpaceUsers(this.cloudFoundryOperations, organizationName, spaceName))
             .flatMapIterable(SpaceUsers::getAuditors)
             .as(StepVerifier::create)
             .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void unsetOrganizationUser() {
+        String organizationName = this.nameFactory.getOrganizationName();
+        String username = this.nameFactory.getUserName();
+
+        Mono.when(
+            createUser(this.cloudFoundryOperations, username),
+            createOrganization(this.cloudFoundryOperations, organizationName)
+        )
+            .then(setOrganizationRole(this.cloudFoundryOperations, organizationName, OrganizationRole.MANAGER, username))
+            .then(this.cloudFoundryOperations.userAdmin()
+                .unsetOrganizationRole(UnsetOrganizationRoleRequest.builder()
+                    .organizationName(organizationName)
+                    .organizationRole(OrganizationRole.MANAGER)
+                    .username(username)
+                    .build()))
+            .thenMany(listOrganizationUsers(this.cloudFoundryOperations, organizationName))
+            .flatMapIterable(OrganizationUsers::getManagers)
+            .filter(username::equals)
+            .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -167,12 +241,12 @@ public final class UserAdminTest extends AbstractIntegrationTest {
             createOrganization(this.cloudFoundryOperations, organizationName)
         )
             .then(createSpace(this.cloudFoundryOperations, organizationName, spaceName))
-            .then(requestSetSpaceRole(this.cloudFoundryOperations, organizationName, spaceName, MANAGER, username))
+            .then(setSpaceRole(this.cloudFoundryOperations, organizationName, spaceName, SpaceRole.MANAGER, username))
             .then(this.cloudFoundryOperations.userAdmin()
                 .unsetSpaceRole(UnsetSpaceRoleRequest.builder()
                     .organizationName(organizationName)
                     .spaceName(spaceName)
-                    .spaceRole(MANAGER)
+                    .spaceRole(SpaceRole.MANAGER)
                     .username(username)
                     .build()))
             .thenMany(listSpaceUsers(this.cloudFoundryOperations, organizationName, spaceName))
@@ -206,12 +280,37 @@ public final class UserAdminTest extends AbstractIntegrationTest {
                 .build());
     }
 
+    private static Mono<String> getOrganizationId(CloudFoundryClient cloudFoundryClient, String organizationName) {
+        return PaginationUtils.requestClientV2Resources(page -> cloudFoundryClient.organizations()
+            .list(ListOrganizationsRequest.builder()
+                .page(page)
+                .build()))
+            .filter(r -> organizationName.equals(ResourceUtils.getEntity(r).getName()))
+            .map(ResourceUtils::getId)
+            .singleOrEmpty();
+    }
+
+    private static Mono<OrganizationUsers> listOrganizationUsers(CloudFoundryOperations cloudFoundryOperations, String organizationName) {
+        return cloudFoundryOperations.userAdmin()
+            .listOrganizationUsers(ListOrganizationUsersRequest.builder()
+                .organizationName(organizationName)
+                .build());
+    }
+
     private static Mono<SpaceUsers> listSpaceUsers(CloudFoundryOperations cloudFoundryOperations, String organizationName, String spaceName) {
         return cloudFoundryOperations.userAdmin()
             .listSpaceUsers(ListSpaceUsersRequest.builder()
                 .organizationName(organizationName)
                 .spaceName(spaceName)
                 .build());
+    }
+
+    private static Flux<UserResource> requestListOrganizationAuditors(CloudFoundryClient cloudFoundryClient, String organizationId) {
+        return PaginationUtils.requestClientV2Resources(page -> cloudFoundryClient.organizations()
+            .listAuditors(ListOrganizationAuditorsRequest.builder()
+                .organizationId(organizationId)
+                .page(page)
+                .build()));
     }
 
     private static Flux<UserResource> requestListUsers(CloudFoundryClient cloudFoundryClient) {
@@ -221,12 +320,11 @@ public final class UserAdminTest extends AbstractIntegrationTest {
                 .build()));
     }
 
-    private static Mono<Void> requestSetSpaceRole(CloudFoundryOperations cloudFoundryOperations, String organizationName, String spaceName, SpaceRole spaceRole, String username) {
+    private static Mono<Void> setOrganizationRole(CloudFoundryOperations cloudFoundryOperations, String organizationName, OrganizationRole organizationRole, String username) {
         return cloudFoundryOperations.userAdmin()
-            .setSpaceRole(SetSpaceRoleRequest.builder()
+            .setOrganizationRole(SetOrganizationRoleRequest.builder()
                 .organizationName(organizationName)
-                .spaceName(spaceName)
-                .spaceRole(spaceRole)
+                .organizationRole(organizationRole)
                 .username(username)
                 .build());
     }
@@ -234,9 +332,9 @@ public final class UserAdminTest extends AbstractIntegrationTest {
     private static Mono<Void> setSpaceRole(CloudFoundryOperations cloudFoundryOperations, String organizationName, String spaceName, SpaceRole spaceRole, String username) {
         return cloudFoundryOperations.userAdmin()
             .setSpaceRole(SetSpaceRoleRequest.builder()
-                .spaceRole(spaceRole)
                 .organizationName(organizationName)
                 .spaceName(spaceName)
+                .spaceRole(spaceRole)
                 .username(username)
                 .build());
     }
