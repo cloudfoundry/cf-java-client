@@ -25,6 +25,9 @@ import org.cloudfoundry.client.v2.organizations.AssociateOrganizationBillingMana
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserByUsernameRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserByUsernameResponse;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationAuditorsRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationBillingManagersRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationManagersRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.OrganizationResource;
@@ -103,6 +106,23 @@ public final class DefaultUserAdmin implements UserAdmin {
                 requestDeleteUaaUser(uaaClient, userId))))
             .then()
             .transform(OperationsLogging.log("Delete User"))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<OrganizationUsers> listOrganizationUsers(ListOrganizationUsersRequest request) {
+        return this.cloudFoundryClient
+            .then(cloudFoundryClient -> Mono.when(
+                Mono.just(cloudFoundryClient),
+                getOrganizationId(cloudFoundryClient, request.getOrganizationName())
+            ))
+            .then(function((cloudFoundryClient, organizationId) -> Mono.when(
+                listOrganizationAuditorNames(cloudFoundryClient, organizationId),
+                listOrganizationBillingManagerNames(cloudFoundryClient, organizationId),
+                listOrganizationManagerNames(cloudFoundryClient, organizationId)
+            )))
+            .then(function(this::toOrganizationUsers))
+            .transform(OperationsLogging.log("List Organization Users"))
             .checkpoint();
     }
 
@@ -329,6 +349,24 @@ public final class DefaultUserAdmin implements UserAdmin {
             .map(User::getId);
     }
 
+    private static Mono<List<String>> listOrganizationAuditorNames(CloudFoundryClient cloudFoundryClient, String organizationId) {
+        return requestListOrganizationAuditors(cloudFoundryClient, organizationId)
+            .map(resource -> ResourceUtils.getEntity(resource).getUsername())
+            .collectList();
+    }
+
+    private static Mono<List<String>> listOrganizationBillingManagerNames(CloudFoundryClient cloudFoundryClient, String organizationId) {
+        return requestListOrganizationBillingManagers(cloudFoundryClient, organizationId)
+            .map(resource -> ResourceUtils.getEntity(resource).getUsername())
+            .collectList();
+    }
+
+    private static Mono<List<String>> listOrganizationManagerNames(CloudFoundryClient cloudFoundryClient, String organizationId) {
+        return requestListOrganizationManagers(cloudFoundryClient, organizationId)
+            .map(resource -> ResourceUtils.getEntity(resource).getUsername())
+            .collectList();
+    }
+
     private static Mono<List<String>> listSpaceAuditorNames(CloudFoundryClient cloudFoundryClient, String spaceId) {
         return requestListSpaceAuditors(cloudFoundryClient, spaceId)
             .map(resource -> ResourceUtils.getEntity(resource).getUsername())
@@ -463,6 +501,30 @@ public final class DefaultUserAdmin implements UserAdmin {
                 .build());
     }
 
+    private static Flux<UserResource> requestListOrganizationAuditors(CloudFoundryClient cloudFoundryClient, String organizationId) {
+        return PaginationUtils.requestClientV2Resources(page -> cloudFoundryClient.organizations()
+            .listAuditors(ListOrganizationAuditorsRequest.builder()
+                .organizationId(organizationId)
+                .page(page)
+                .build()));
+    }
+
+    private static Flux<UserResource> requestListOrganizationBillingManagers(CloudFoundryClient cloudFoundryClient, String organizationId) {
+        return PaginationUtils.requestClientV2Resources(page -> cloudFoundryClient.organizations()
+            .listBillingManagers(ListOrganizationBillingManagersRequest.builder()
+                .organizationId(organizationId)
+                .page(page)
+                .build()));
+    }
+
+    private static Flux<UserResource> requestListOrganizationManagers(CloudFoundryClient cloudFoundryClient, String organizationId) {
+        return PaginationUtils.requestClientV2Resources(page -> cloudFoundryClient.organizations()
+            .listManagers(ListOrganizationManagersRequest.builder()
+                .organizationId(organizationId)
+                .page(page)
+                .build()));
+    }
+
     private static Flux<OrganizationResource> requestListOrganizations(CloudFoundryClient cloudFoundryClient, String organizationName) {
         return PaginationUtils.requestClientV2Resources(page -> cloudFoundryClient.organizations()
             .list(ListOrganizationsRequest.builder()
@@ -502,6 +564,14 @@ public final class DefaultUserAdmin implements UserAdmin {
                 .name(spaceName)
                 .page(page)
                 .build()));
+    }
+
+    private Mono<OrganizationUsers> toOrganizationUsers(List<String> auditors, List<String> billingManagers, List<String> managers) {
+        return Mono.just(OrganizationUsers.builder()
+            .addAllAuditors(auditors)
+            .addAllBillingManagers(billingManagers)
+            .addAllManagers(managers)
+            .build());
     }
 
     private Mono<SpaceUsers> toSpaceUsers(List<String> auditors, List<String> developers, List<String> managers) {

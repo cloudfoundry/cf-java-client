@@ -40,6 +40,14 @@ public interface UserAdmin {
     Mono<Void> delete(DeleteUserRequest request);
 
     /**
+     * List organization users
+     *
+     * @param request the list organization users request
+     * @return the Organization Users
+     */
+    Mono<OrganizationUsers> listOrganizationUsers(ListOrganizationUsersRequest request);
+
+    /**
      * List space users
      *
      * @param request the list space users request
