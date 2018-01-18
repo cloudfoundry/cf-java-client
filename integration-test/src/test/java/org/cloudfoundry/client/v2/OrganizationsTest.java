@@ -94,7 +94,6 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
-import java.util.concurrent.TimeoutException;
 import java.util.function.UnaryOperator;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -153,6 +152,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 Mono.just(organizationId),
                 this.cloudFoundryClient.organizations()
                     .associateAuditorByUsername(AssociateOrganizationAuditorByUsernameRequest.builder()
+                        .origin("uaa")
                         .organizationId(organizationId)
                         .username(this.username)
                         .build())
@@ -1733,6 +1733,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             .delayUntil(function((organizationId, userId) -> requestAssociateBillingManager(this.cloudFoundryClient, organizationId, userId)))
             .delayUntil(function((organizationId, userId) -> this.cloudFoundryClient.organizations()
                 .removeBillingManagerByUsername(RemoveOrganizationBillingManagerByUsernameRequest.builder()
+                    .origin("uaa")
                     .username(this.username)
                     .organizationId(organizationId)
                     .build())))
