@@ -18,6 +18,7 @@ package org.cloudfoundry.client.v2.spaces;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
@@ -25,6 +26,13 @@ import org.immutables.value.Value;
  */
 @Value.Immutable
 abstract class _AssociateSpaceAuditorByUsernameRequest {
+
+    /**
+     * The origin
+     */
+    @JsonProperty("origin")
+    @Nullable
+    abstract String getOrigin();
 
     /**
      * The space id

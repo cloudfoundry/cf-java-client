@@ -18,6 +18,7 @@ package org.cloudfoundry.client.v2.organizations;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
@@ -32,6 +33,13 @@ abstract class _RemoveOrganizationAuditorByUsernameRequest {
     @JsonIgnore
     abstract String getOrganizationId();
 
+    /**
+     * The origin
+     */
+    @JsonProperty("origin")
+    @Nullable
+    abstract String getOrigin();
+    
     /**
      * The username
      */
