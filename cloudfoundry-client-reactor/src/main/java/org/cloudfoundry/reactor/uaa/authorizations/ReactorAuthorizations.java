@@ -29,6 +29,8 @@ import org.cloudfoundry.uaa.authorizations.AuthorizeByImplicitGrantBrowserReques
 import org.cloudfoundry.uaa.authorizations.AuthorizeByOpenIdWithAuthorizationCodeGrantRequest;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByOpenIdWithIdTokenRequest;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByOpenIdWithImplicitGrantRequest;
+import org.cloudfoundry.uaa.authorizations.GetOpenIdProviderConfigurationRequest;
+import org.cloudfoundry.uaa.authorizations.GetOpenIdProviderConfigurationResponse;
 import org.cloudfoundry.util.ExceptionUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
@@ -85,6 +87,12 @@ public final class ReactorAuthorizations extends AbstractUaaOperations implement
             outbound -> outbound
                 .map(ReactorAuthorizations::removeAuthorization))
             .map(inbound -> inbound.responseHeaders().get(LOCATION))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<GetOpenIdProviderConfigurationResponse> getOpenIdProviderConfiguration(GetOpenIdProviderConfigurationRequest request) {
+        return get(request, GetOpenIdProviderConfigurationResponse.class, builder -> builder.pathSegment(".well-known", "openid-configuration"))
             .checkpoint();
     }
 
