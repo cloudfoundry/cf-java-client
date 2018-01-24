@@ -48,6 +48,14 @@ public interface Authorizations {
     Mono<String> authorizationCodeGrantHybrid(AuthorizeByAuthorizationCodeGrantHybridRequest request);
 
     /**
+     * Makes the <a href="http://docs.cloudfoundry.org/api/uaa/version/4.8.0/index.html#openid-connect-flow">Get Open ID Provider Configuration</a> request
+     *
+     * @param request Get Open ID Provider Configuration request
+     * @return the Open ID Provider Configuration
+     */
+    Mono<GetOpenIdProviderConfigurationResponse> getOpenIdProviderConfiguration(GetOpenIdProviderConfigurationRequest request);
+
+    /**
      * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#implicit-grant">Authorize By Implicit Grant (Browser)</a> request
      *
      * @param request Authorize By Implicit Grant (Browser) request

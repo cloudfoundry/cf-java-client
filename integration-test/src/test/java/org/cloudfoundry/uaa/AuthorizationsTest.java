@@ -24,13 +24,13 @@ import org.cloudfoundry.uaa.authorizations.AuthorizeByImplicitGrantBrowserReques
 import org.cloudfoundry.uaa.authorizations.AuthorizeByOpenIdWithAuthorizationCodeGrantRequest;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByOpenIdWithIdTokenRequest;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByOpenIdWithImplicitGrantRequest;
-import org.junit.Ignore;
+import org.cloudfoundry.uaa.authorizations.GetOpenIdProviderConfigurationRequest;
+import org.cloudfoundry.uaa.authorizations.GetOpenIdProviderConfigurationResponse;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
-import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -136,11 +136,16 @@ public final class AuthorizationsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/670
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/670")
     @Test
     public void openIdProviderConfiguration() {
-        //
+        this.uaaClient.authorizations()
+            .getOpenIdProviderConfiguration(GetOpenIdProviderConfigurationRequest.builder()
+                .build())
+            .map(GetOpenIdProviderConfigurationResponse::getServiceDocumentation)
+            .as(StepVerifier::create)
+            .expectNext("http://docs.cloudfoundry.org/api/uaa/")
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     private static Consumer<String> startsWithExpectation(String prefix) {
