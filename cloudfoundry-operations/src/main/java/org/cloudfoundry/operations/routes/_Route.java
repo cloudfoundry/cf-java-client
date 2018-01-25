@@ -32,6 +32,11 @@ abstract class _Route {
     abstract List<String> getApplications();
 
     /**
+     * The route service bound to this route.
+     */
+    abstract String getRouteService();
+
+    /**
      * The domain of this route
      */
     abstract String getDomain();
