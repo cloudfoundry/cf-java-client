@@ -40,6 +40,10 @@ import org.cloudfoundry.client.v2.routes.ListRoutesResponse;
 import org.cloudfoundry.client.v2.routes.RouteEntity;
 import org.cloudfoundry.client.v2.routes.RouteExistsRequest;
 import org.cloudfoundry.client.v2.routes.RouteResource;
+import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceRequest;
+import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceResponse;
+import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceEntity;
+import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceResource;
 import org.cloudfoundry.client.v2.services.ListServicesRequest;
 import org.cloudfoundry.client.v2.services.ListServicesResponse;
 import org.cloudfoundry.client.v2.services.ServiceEntity;
@@ -54,6 +58,7 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceRoutesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceEntity;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.operations.AbstractOperationsTest;
+import org.cloudfoundry.operations.services.ServiceInstance;
 import org.junit.Test;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -450,7 +455,6 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
         requestSharedDomainsAll(this.cloudFoundryClient);
         requestSpacesAll(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
         requestApplications(this.cloudFoundryClient, "test-id");
-        requestService(this.cloudFoundryClient, "test-service-entity-id", "test-service-entity-name");
 
         this.routes
             .list(ListRoutesRequest.builder()
@@ -464,7 +468,7 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
                 .id("test-id")
                 .path("test-route-entity-path")
                 .space("test-space-entity-name")
-                .routeService("")
+                .routeService(null)
                 .build())
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -494,7 +498,7 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
         requestSharedDomainsAll(this.cloudFoundryClient);
         requestSpacesAll(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
         requestApplications(this.cloudFoundryClient, "test-route-id");
-        requestService(this.cloudFoundryClient, "test-service-entity-id", "test-service-entity-name");
+        requestServiceInstance(this.cloudFoundryClient, "test-service-entity-id", "test-service-entity-name");
 
         this.routes
             .list(ListRoutesRequest.builder()
@@ -792,23 +796,22 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
                     .build()));
     }
 
-    private static void requestService(CloudFoundryClient cloudFoundryClient, String serviceId, String serviceName) {
-        List<ServiceResource> resources = Arrays.asList(
-            fill(ServiceResource.builder())
+    private static void requestServiceInstance(CloudFoundryClient cloudFoundryClient, String serviceId, String serviceName) {
+        ServiceInstanceResource resource =
+            fill(ServiceInstanceResource.builder())
                 .metadata(fill(Metadata.builder())
                     .id(serviceId).build())
-                .entity(fill(ServiceEntity.builder())
-                    .label(serviceName).build())
-                .build(),
-            fill(ServiceResource.builder()).build()
-        );
-        when(cloudFoundryClient.services()
-            .list(ListServicesRequest.builder()
-                .page(1)
+                .entity(fill(ServiceInstanceEntity.builder())
+                    .name(serviceName).build())
+                .build();
+        when(cloudFoundryClient.serviceInstances()
+            .get(GetServiceInstanceRequest.builder()
+                .serviceInstanceId(serviceId)
                 .build()))
             .thenReturn(Mono
-                .just(fill(ListServicesResponse.builder())
-                    .addAllResources(resources)
+                .just(fill(GetServiceInstanceResponse.builder())
+                    .entity(resource.getEntity())
+                    .metadata(resource.getMetadata())
                     .build()));
     }
 
@@ -959,6 +962,8 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
                     .resource(fill(RouteResource.builder())
                         .entity(fill(RouteEntity.builder(), "route-entity-")
                             .domainId("test-domain-id")
+                            .serviceInstanceId(null)
+                            .serviceInstanceUrl(null)
                             .build())
                         .build())
                     .build()));

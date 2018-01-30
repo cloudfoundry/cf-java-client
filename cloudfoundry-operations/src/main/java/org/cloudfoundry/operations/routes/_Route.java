@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.operations.routes;
 
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 import java.util.List;
@@ -34,6 +35,7 @@ abstract class _Route {
     /**
      * The route service bound to this route.
      */
+    @Nullable
     abstract String getRouteService();
 
     /**

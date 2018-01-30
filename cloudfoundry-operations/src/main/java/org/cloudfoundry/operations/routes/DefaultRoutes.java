@@ -32,8 +32,8 @@ import org.cloudfoundry.client.v2.routes.ListRouteApplicationsRequest;
 import org.cloudfoundry.client.v2.routes.RouteEntity;
 import org.cloudfoundry.client.v2.routes.RouteExistsRequest;
 import org.cloudfoundry.client.v2.routes.RouteResource;
-import org.cloudfoundry.client.v2.services.ListServicesRequest;
-import org.cloudfoundry.client.v2.services.ServiceResource;
+import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceRequest;
+import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceResponse;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomainResource;
 import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsRequest;
@@ -163,6 +163,8 @@ public final class DefaultRoutes implements Routes {
                 Mono.just(resource),
                 getSpaceName(spaces, ResourceUtils.getEntity(resource).getSpaceId()),
                 getServiceName(cloudFoundryClient, ResourceUtils.getEntity(resource).getServiceInstanceId())
+                    .map(Optional::of)
+                    .defaultIfEmpty(Optional.empty())
             )))
             .map(function(DefaultRoutes::toRoute))
             .transform(OperationsLogging.log("List Routes"))
@@ -236,7 +238,8 @@ public final class DefaultRoutes implements Routes {
     }
 
     private static Mono<String> getServiceName(CloudFoundryClient cloudFoundryClient, String serviceId) {
-        return requestServiceSummary(cloudFoundryClient, serviceId).map(sr -> ResourceUtils.getEntity(sr).getLabel()).defaultIfEmpty("");
+        return requestServiceInstance(cloudFoundryClient, serviceId)
+            .map(sr -> ResourceUtils.getEntity(sr).getName());
     }
 
     private static Mono<List<ApplicationResource>> getApplications(CloudFoundryClient cloudFoundryClient, String routeId) {
@@ -378,11 +381,12 @@ public final class DefaultRoutes implements Routes {
                     .build()));
     }
 
-    private static Mono<ServiceResource> requestServiceSummary(CloudFoundryClient cloudFoundryClient, String serviceId) {
-        return PaginationUtils.requestClientV2Resources(page -> cloudFoundryClient.services()
-            .list(ListServicesRequest.builder().page(page).build()))
-            .filter(si -> serviceId == null || serviceId.equals(ResourceUtils.getId(si)))
-            .next();
+    private static Mono<GetServiceInstanceResponse> requestServiceInstance(CloudFoundryClient cloudFoundryClient, String serviceId) {
+        return Mono.justOrEmpty(serviceId)
+            .flatMap(sid ->
+                cloudFoundryClient.serviceInstances()
+                    .get(GetServiceInstanceRequest.builder().serviceInstanceId(sid).build()));
+
     }
 
     private static Flux<ApplicationResource> requestApplications(CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
@@ -506,18 +510,18 @@ public final class DefaultRoutes implements Routes {
                     .build()));
     }
 
-    private static Route toRoute(List<String> applications, String domain, RouteResource resource, String space, String routeService) {
+    private static Route toRoute(List<String> applications, String domain, RouteResource resource, String space, Optional<String> routeService) {
         RouteEntity entity = ResourceUtils.getEntity(resource);
 
-        return Route.builder()
+        Route.Builder builder = Route.builder()
             .applications(applications)
             .domain(domain)
             .host(entity.getHost())
             .id(ResourceUtils.getId(resource))
             .path(entity.getPath())
-            .space(space)
-            .routeService(routeService)
-            .build();
+            .space(space);
+        routeService.ifPresent(builder::routeService);
+        return builder.build();
     }
 
     private boolean isRouteOrphan(RouteEntity entity) {
