@@ -22,31 +22,45 @@ import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
- * The payload for the key
+ * The payload for the identity branding banner configuration
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _Key {
+abstract class _Banner {
 
     /**
-     * The certificate
+     * The hexadecimal color code for banner background color
      */
-    @JsonProperty("certificate")
+    @JsonProperty("backgroundColor")
     @Nullable
-    abstract String getCertificate();
+    abstract String getBackgroundColor();
 
     /**
-     * The SAML provider's private key
+     * The UAA login banner will be a link pointing to this url
      */
-    @JsonProperty("key")
+    @JsonProperty("link")
     @Nullable
-    abstract String getKey();
+    abstract String getLink();
 
     /**
-     * The SAML provider's private key password
+     * The base64 encoded PNG data displayed in a banner at the top of the UAA login page, overrides banner text
      */
-    @JsonProperty("passphrase")
+    @JsonProperty("logo")
     @Nullable
-    abstract String getPassphrase();
+    abstract String getLogo();
+
+    /**
+     * The text displayed in a banner at the top of the UAA login page
+     */
+    @JsonProperty("text")
+    @Nullable
+    abstract String getText();
+
+    /**
+     * The hexadecimal color code for the banner text color
+     */
+    @JsonProperty("textColor")
+    @Nullable
+    abstract String getTextColor();
 
 }

@@ -33,13 +33,9 @@ abstract class _SamlConfiguration {
     /**
      * The active key id
      */
-    @Nullable
     @JsonProperty("activeKeyId")
-    abstract String getActiveKeyId();
-
     @Nullable
-    @JsonProperty("keys")
-    abstract Map<String, Key> getKeys();
+    abstract String getActiveKeyId();
 
     /**
      * If true, the SAML provider will sign all assertions.
@@ -61,6 +57,27 @@ abstract class _SamlConfiguration {
     @JsonProperty("certificate")
     @Nullable
     abstract String getCertificate();
+
+    /**
+     * If true, this zone will not validate the InResponseToField part of an incoming IDP assertion.
+     */
+    @JsonProperty("disableInResponseToCheck")
+    @Nullable
+    abstract Boolean getDisableInResponseToCheck();
+
+    /**
+     * Unique ID of the SAML2 entity.
+     */
+    @JsonProperty("entityID")
+    @Nullable
+    abstract String getEntityId();
+
+    /**
+     * The keys
+     */
+    @Nullable
+    @JsonProperty("keys")
+    abstract Map<String, Key> getKeys();
 
     /**
      * Exposed SAML metadata property. The SAML provider’s private key.

@@ -32,6 +32,13 @@ import java.util.Map;
 abstract class _Branding {
 
     /**
+     * The banner configuration
+     */
+    @JsonProperty("banner")
+    @Nullable
+    abstract Banner getBanner();
+
+    /**
      * This name is used on the UAA Pages and in account management related communication in UAA
      */
     @JsonProperty("companyName")

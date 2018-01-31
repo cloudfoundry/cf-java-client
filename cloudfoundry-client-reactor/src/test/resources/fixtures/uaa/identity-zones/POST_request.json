@@ -2,15 +2,20 @@
   "id": "twiglet-create",
   "subdomain": "twiglet-create",
   "config": {
-    "clientLockoutPolicy": {
-      "lockoutPeriodSeconds": 300,
-      "lockoutAfterFailures": 5,
-      "countFailuresWithin": 3600
+    "clientSecretPolicy": {
+      "minLength": -1,
+      "maxLength": -1,
+      "requireUpperCaseCharacter": -1,
+      "requireLowerCaseCharacter": -1,
+      "requireDigit": -1,
+      "requireSpecialCharacter": -1
     },
     "tokenPolicy": {
       "accessTokenValidity": -1,
       "refreshTokenValidity": -1,
       "jwtRevocable": false,
+      "refreshTokenUnique": false,
+      "refreshTokenFormat": "jwt",
       "keys": {
         "exampleKeyId": {
           "signingKey": "s1gNiNg.K3y/t3XT"
@@ -22,7 +27,20 @@
       "requestSigned": true,
       "wantAssertionSigned": true,
       "wantAuthnRequestSigned": false,
-      "assertionTimeToLiveSeconds": 600
+      "assertionTimeToLiveSeconds": 600,
+      "activeKeyId": "legacy-saml-key",
+      "keys": {
+        "legacy-saml-key": {
+          "key": "-----BEGIN RSA PRIVATE KEY-----\nMIIBOwIBAAJBAJv8ZpB5hEK7qxP9K3v43hUS5fGT4waKe7ix4Z4mu5UBv+cw7WSF\nAt0Vaag0sAbsPzU8Hhsrj/qPABvfB8asUwcCAwEAAQJAG0r3ezH35WFG1tGGaUOr\nQA61cyaII53ZdgCR1IU8bx7AUevmkFtBf+aqMWusWVOWJvGu2r5VpHVAIl8nF6DS\nkQIhAMjEJ3zVYa2/Mo4ey+iU9J9Vd+WoyXDQD4EEtwmyG1PpAiEAxuZlvhDIbbce\n7o5BvOhnCZ2N7kYb1ZC57g3F+cbJyW8CIQCbsDGHBto2qJyFxbAO7uQ8Y0UVHa0J\nBO/g900SAcJbcQIgRtEljIShOB8pDjrsQPxmI1BLhnjD1EhRSubwhDw5AFUCIQCN\nA24pDtdOHydwtSB5+zFqFLfmVZplQM/g5kb4so70Yw==\n-----END RSA PRIVATE KEY-----\n",
+          "passphrase": "password",
+          "certificate": "-----BEGIN CERTIFICATE-----\nMIICEjCCAXsCAg36MA0GCSqGSIb3DQEBBQUAMIGbMQswCQYDVQQGEwJKUDEOMAwG\nA1UECBMFVG9reW8xEDAOBgNVBAcTB0NodW8ta3UxETAPBgNVBAoTCEZyYW5rNERE\nMRgwFgYDVQQLEw9XZWJDZXJ0IFN1cHBvcnQxGDAWBgNVBAMTD0ZyYW5rNEREIFdl\nYiBDQTEjMCEGCSqGSIb3DQEJARYUc3VwcG9ydEBmcmFuazRkZC5jb20wHhcNMTIw\nODIyMDUyNjU0WhcNMTcwODIxMDUyNjU0WjBKMQswCQYDVQQGEwJKUDEOMAwGA1UE\nCAwFVG9reW8xETAPBgNVBAoMCEZyYW5rNEREMRgwFgYDVQQDDA93d3cuZXhhbXBs\nZS5jb20wXDANBgkqhkiG9w0BAQEFAANLADBIAkEAm/xmkHmEQrurE/0re/jeFRLl\n8ZPjBop7uLHhnia7lQG/5zDtZIUC3RVpqDSwBuw/NTweGyuP+o8AG98HxqxTBwID\nAQABMA0GCSqGSIb3DQEBBQUAA4GBABS2TLuBeTPmcaTaUW/LCB2NYOy8GMdzR1mx\n8iBIu2H6/E2tiY3RIevV2OW61qY2/XRQg7YPxx3ffeUugX9F4J/iPnnu1zAxxyBy\n2VguKv4SWjRFoRkIfIlHX0qVviMhSlNy2ioFLy7JcPZb+v3ftDGywUqcBiVDoea0\nHn+GmxZA\n-----END CERTIFICATE-----\n"
+        }
+      },
+      "entityID": "cloudfoundry-saml-login",
+      "disableInResponseToCheck": false,
+      "privateKey": "-----BEGIN RSA PRIVATE KEY-----\nMIIBOwIBAAJBAJv8ZpB5hEK7qxP9K3v43hUS5fGT4waKe7ix4Z4mu5UBv+cw7WSF\nAt0Vaag0sAbsPzU8Hhsrj/qPABvfB8asUwcCAwEAAQJAG0r3ezH35WFG1tGGaUOr\nQA61cyaII53ZdgCR1IU8bx7AUevmkFtBf+aqMWusWVOWJvGu2r5VpHVAIl8nF6DS\nkQIhAMjEJ3zVYa2/Mo4ey+iU9J9Vd+WoyXDQD4EEtwmyG1PpAiEAxuZlvhDIbbce\n7o5BvOhnCZ2N7kYb1ZC57g3F+cbJyW8CIQCbsDGHBto2qJyFxbAO7uQ8Y0UVHa0J\nBO/g900SAcJbcQIgRtEljIShOB8pDjrsQPxmI1BLhnjD1EhRSubwhDw5AFUCIQCN\nA24pDtdOHydwtSB5+zFqFLfmVZplQM/g5kb4so70Yw==\n-----END RSA PRIVATE KEY-----\n",
+      "privateKeyPassword": "password",
+      "certificate": "-----BEGIN CERTIFICATE-----\nMIICEjCCAXsCAg36MA0GCSqGSIb3DQEBBQUAMIGbMQswCQYDVQQGEwJKUDEOMAwG\nA1UECBMFVG9reW8xEDAOBgNVBAcTB0NodW8ta3UxETAPBgNVBAoTCEZyYW5rNERE\nMRgwFgYDVQQLEw9XZWJDZXJ0IFN1cHBvcnQxGDAWBgNVBAMTD0ZyYW5rNEREIFdl\nYiBDQTEjMCEGCSqGSIb3DQEJARYUc3VwcG9ydEBmcmFuazRkZC5jb20wHhcNMTIw\nODIyMDUyNjU0WhcNMTcwODIxMDUyNjU0WjBKMQswCQYDVQQGEwJKUDEOMAwGA1UE\nCAwFVG9reW8xETAPBgNVBAoMCEZyYW5rNEREMRgwFgYDVQQDDA93d3cuZXhhbXBs\nZS5jb20wXDANBgkqhkiG9w0BAQEFAANLADBIAkEAm/xmkHmEQrurE/0re/jeFRLl\n8ZPjBop7uLHhnia7lQG/5zDtZIUC3RVpqDSwBuw/NTweGyuP+o8AG98HxqxTBwID\nAQABMA0GCSqGSIb3DQEBBQUAA4GBABS2TLuBeTPmcaTaUW/LCB2NYOy8GMdzR1mx\n8iBIu2H6/E2tiY3RIevV2OW61qY2/XRQg7YPxx3ffeUugX9F4J/iPnnu1zAxxyBy\n2VguKv4SWjRFoRkIfIlHX0qVviMhSlNy2ioFLy7JcPZb+v3ftDGywUqcBiVDoea0\nHn+GmxZA\n-----END CERTIFICATE-----\n"
     },
     "corsPolicy": {
       "xhrConfiguration": {
@@ -70,13 +88,11 @@
       "logout": {
         "redirectUrl": "/login",
         "redirectParameterName": "redirect",
-        "disableRedirectParameter": true
+        "disableRedirectParameter": false
       },
       "homeRedirect": "http://my.hosted.homepage.com/",
       "selfService": {
-        "selfServiceLinksEnabled": true,
-        "signup": "/create_account",
-        "passwd": "/forgot_password"
+        "selfServiceLinksEnabled": true
       }
     },
     "prompts": [
@@ -104,13 +120,35 @@
       "footerLegalText": "Test footer legal text",
       "footerLinks": {
         "Support": "http://support.example.com"
+      },
+      "banner": {
+        "logo": "VGVzdFByb2R1Y3RMb2dv",
+        "text": "Announcement",
+        "textColor": "#000000",
+        "backgroundColor": "#89cff0",
+        "link": "http://announce.example.com"
       }
     },
-    "accountChooserEnabled": false
+    "accountChooserEnabled": false,
+    "userConfig": {
+      "defaultGroups": [
+        "openid",
+        "password.write",
+        "uaa.user",
+        "approvals.me",
+        "profile",
+        "roles",
+        "user_attributes",
+        "uaa.offline_token"
+      ]
+    },
+    "mfaConfig": {
+      "enabled": false
+    }
   },
   "name": "The Twiglet Zone",
   "version": 0,
   "description": "Like the Twilight Zone but tastier.",
-  "created": 1481728057524,
-  "last_modified": 1481728057524
+  "created": 1512452533738,
+  "last_modified": 1512452533738
 }
