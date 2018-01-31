@@ -40,6 +40,11 @@ import org.cloudfoundry.client.v2.routes.ListRoutesResponse;
 import org.cloudfoundry.client.v2.routes.RouteEntity;
 import org.cloudfoundry.client.v2.routes.RouteExistsRequest;
 import org.cloudfoundry.client.v2.routes.RouteResource;
+import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceRequest;
+import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceResponse;
+import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceResource;
+import org.cloudfoundry.client.v2.serviceinstances.UnionServiceInstanceEntity;
+import org.cloudfoundry.client.v2.serviceinstances.UnionServiceInstanceResource;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsResponse;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomainResource;
@@ -47,6 +52,8 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceRoutesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceRoutesResponse;
+import org.cloudfoundry.client.v2.spaces.ListSpaceServiceInstancesRequest;
+import org.cloudfoundry.client.v2.spaces.ListSpaceServiceInstancesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceEntity;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.operations.AbstractOperationsTest;
@@ -444,6 +451,7 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
         requestPrivateDomainsAll(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
         requestSharedDomainsAll(this.cloudFoundryClient);
         requestSpacesAll(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
+        requestSpaceServiceInstances(this.cloudFoundryClient, "test-route-entity-serviceInstanceId", "test-route-entity-spaceId");
         requestApplications(this.cloudFoundryClient, "test-id");
 
         this.routes
@@ -451,12 +459,13 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
                 .level(Level.ORGANIZATION)
                 .build())
             .as(StepVerifier::create)
-            .expectNext(fill(Route.builder())
+            .expectNext(Route.builder()
                 .application("test-application-name")
                 .domain("test-shared-domain-name")
                 .host("test-route-entity-host")
                 .id("test-id")
                 .path("test-route-entity-path")
+                .service("test-service-instance-entityname")
                 .space("test-space-entity-name")
                 .build())
             .expectComplete()
@@ -493,12 +502,36 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
                 .level(Level.SPACE)
                 .build())
             .as(StepVerifier::create)
-            .expectNext(fill(Route.builder())
+            .expectNext(Route.builder()
                 .application("test-application-name")
                 .domain("test-shared-domain-name")
                 .host("test-route-entity-host")
                 .id("test-route-id")
                 .path("test-route-entity-path")
+                .space("test-space-entity-name")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void listCurrentSpaceNoPath() {
+        requestSpaceRoutesNoPath(this.cloudFoundryClient, TEST_SPACE_ID);
+        requestPrivateDomainsAll(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
+        requestSharedDomainsAll(this.cloudFoundryClient);
+        requestSpacesAll(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
+        requestApplications(this.cloudFoundryClient, "test-route-id");
+
+        this.routes
+            .list(ListRoutesRequest.builder()
+                .level(Level.SPACE)
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(Route.builder()
+                .application("test-application-name")
+                .domain("test-shared-domain-name")
+                .host("test-route-entity-host")
+                .id("test-route-id")
                 .space("test-space-entity-name")
                 .build())
             .expectComplete()
@@ -1152,6 +1185,24 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
                     .build()));
     }
 
+    private static void requestSpaceRoutesNoPath(CloudFoundryClient cloudFoundryClient, String spaceId) {
+        when(cloudFoundryClient.spaces()
+            .listRoutes(ListSpaceRoutesRequest.builder()
+                .page(1)
+                .spaceId(spaceId)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(ListSpaceRoutesResponse.builder())
+                    .resource(fill(RouteResource.builder(), "route-")
+                        .entity(fill(RouteEntity.builder(), "route-entity-")
+                            .domainId("test-domain-id")
+                            .path(null)
+                            .serviceInstanceId(null)
+                            .build())
+                        .build())
+                    .build()));
+    }
+
     private static void requestSpaceRoutesService(CloudFoundryClient cloudFoundryClient, String spaceId) {
         when(cloudFoundryClient.spaces()
             .listRoutes(ListSpaceRoutesRequest.builder()
@@ -1164,6 +1215,26 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
                         .entity(fill(RouteEntity.builder(), "route-entity-")
                             .domainId("test-domain-id")
                             .serviceInstanceId("test-service-instance-id")
+                            .build())
+                        .build())
+                    .build()));
+    }
+
+    private static void requestSpaceServiceInstances(CloudFoundryClient cloudFoundryClient, String serviceInstanceId, String spaceId) {
+        when(cloudFoundryClient.spaces()
+            .listServiceInstances(ListSpaceServiceInstancesRequest.builder()
+                .page(1)
+                .returnUserProvidedServiceInstances(true)
+                .spaceId(spaceId)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(ListSpaceServiceInstancesResponse.builder())
+                    .resource(fill(UnionServiceInstanceResource.builder(), "service-instance-")
+                        .metadata(fill(Metadata.builder(), "service-instance-metadata-")
+                            .id(serviceInstanceId)
+                            .build())
+                        .entity(fill(UnionServiceInstanceEntity.builder(), "service-instance-entity")
+                            .spaceId(spaceId)
                             .build())
                         .build())
                     .build()));

@@ -16,12 +16,13 @@
 
 package org.cloudfoundry.operations.routes;
 
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 import java.util.List;
 
 /**
- * A route and the applications which are bound to the route.
+ * A route and the applications that are bound to the route.
  */
 @Value.Immutable
 abstract class _Route {
@@ -49,10 +50,30 @@ abstract class _Route {
     /**
      * The path of this route
      */
+    @Nullable
     abstract String getPath();
+
+    /**
+     * The port of this route
+     */
+    @Nullable
+    abstract String getPort();
+
+    /**
+     * The service of this route
+     */
+    @Nullable
+    abstract String getService();
 
     /**
      * The name of the space of this route
      */
     abstract String getSpace();
+
+    /**
+     * The type of this route
+     */
+    @Nullable
+    abstract String getType();
+
 }
