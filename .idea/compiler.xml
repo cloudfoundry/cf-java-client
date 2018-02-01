@@ -12,7 +12,6 @@
         <module name="cloudfoundry-operations" />
         <module name="cloudfoundry-util" />
         <module name="integration-test" />
-        <module name="test-service-broker" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>

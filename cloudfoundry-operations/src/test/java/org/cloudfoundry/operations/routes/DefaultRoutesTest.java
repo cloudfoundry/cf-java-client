@@ -40,6 +40,14 @@ import org.cloudfoundry.client.v2.routes.ListRoutesResponse;
 import org.cloudfoundry.client.v2.routes.RouteEntity;
 import org.cloudfoundry.client.v2.routes.RouteExistsRequest;
 import org.cloudfoundry.client.v2.routes.RouteResource;
+import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceRequest;
+import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceResponse;
+import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceEntity;
+import org.cloudfoundry.client.v2.serviceinstances.ServiceInstanceResource;
+import org.cloudfoundry.client.v2.services.ListServicesRequest;
+import org.cloudfoundry.client.v2.services.ListServicesResponse;
+import org.cloudfoundry.client.v2.services.ServiceEntity;
+import org.cloudfoundry.client.v2.services.ServiceResource;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsResponse;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomainResource;
@@ -50,6 +58,7 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceRoutesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceEntity;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.operations.AbstractOperationsTest;
+import org.cloudfoundry.operations.services.ServiceInstance;
 import org.junit.Test;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -59,6 +68,7 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.function.Supplier;
@@ -458,6 +468,7 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
                 .id("test-id")
                 .path("test-route-entity-path")
                 .space("test-space-entity-name")
+                .routeService(null)
                 .build())
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -482,11 +493,12 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
 
     @Test
     public void listCurrentSpace() {
-        requestSpaceRoutes(this.cloudFoundryClient, TEST_SPACE_ID);
+        requestSpaceRoutesWithServiceId(this.cloudFoundryClient, TEST_SPACE_ID);
         requestPrivateDomainsAll(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
         requestSharedDomainsAll(this.cloudFoundryClient);
         requestSpacesAll(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
         requestApplications(this.cloudFoundryClient, "test-route-id");
+        requestServiceInstance(this.cloudFoundryClient, "test-service-entity-id", "test-service-entity-name");
 
         this.routes
             .list(ListRoutesRequest.builder()
@@ -500,6 +512,7 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
                 .id("test-route-id")
                 .path("test-route-entity-path")
                 .space("test-space-entity-name")
+                .routeService("test-service-entity-name")
                 .build())
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -783,6 +796,25 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
                     .build()));
     }
 
+    private static void requestServiceInstance(CloudFoundryClient cloudFoundryClient, String serviceId, String serviceName) {
+        ServiceInstanceResource resource =
+            fill(ServiceInstanceResource.builder())
+                .metadata(fill(Metadata.builder())
+                    .id(serviceId).build())
+                .entity(fill(ServiceInstanceEntity.builder())
+                    .name(serviceName).build())
+                .build();
+        when(cloudFoundryClient.serviceInstances()
+            .get(GetServiceInstanceRequest.builder()
+                .serviceInstanceId(serviceId)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(GetServiceInstanceResponse.builder())
+                    .entity(resource.getEntity())
+                    .metadata(resource.getMetadata())
+                    .build()));
+    }
+
     private static void requestApplications(CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
         when(cloudFoundryClient.spaces()
             .listApplications(ListSpaceApplicationsRequest.builder()
@@ -930,6 +962,8 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
                     .resource(fill(RouteResource.builder())
                         .entity(fill(RouteEntity.builder(), "route-entity-")
                             .domainId("test-domain-id")
+                            .serviceInstanceId(null)
+                            .serviceInstanceUrl(null)
                             .build())
                         .build())
                     .build()));
@@ -1136,6 +1170,23 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
                         .entity(fill(RouteEntity.builder(), "route-entity-")
                             .domainId("test-domain-id")
                             .serviceInstanceId(null)
+                            .build())
+                        .build())
+                    .build()));
+    }
+
+    private static void requestSpaceRoutesWithServiceId(CloudFoundryClient cloudFoundryClient, String spaceId) {
+        when(cloudFoundryClient.spaces()
+            .listRoutes(ListSpaceRoutesRequest.builder()
+                .page(1)
+                .spaceId(spaceId)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(ListSpaceRoutesResponse.builder())
+                    .resource(fill(RouteResource.builder(), "route-")
+                        .entity(fill(RouteEntity.builder(), "route-entity-")
+                            .domainId("test-domain-id")
+                            .serviceInstanceId("test-service-entity-id")
                             .build())
                         .build())
                     .build()));
