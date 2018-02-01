@@ -29,6 +29,8 @@ import org.cloudfoundry.operations.routes.ListRoutesRequest;
 import org.cloudfoundry.operations.routes.MapRouteRequest;
 import org.cloudfoundry.operations.routes.Route;
 import org.cloudfoundry.operations.routes.UnmapRouteRequest;
+import org.cloudfoundry.operations.services.BindRouteServiceInstanceRequest;
+import org.cloudfoundry.operations.services.CreateUserProvidedServiceInstanceRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -41,7 +43,6 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.Optional;
-import java.util.concurrent.TimeoutException;
 import java.util.function.Predicate;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -279,6 +280,28 @@ public final class RoutesTest extends AbstractIntegrationTest {
             .filter(filterRoutes(domainName, hostName, path, null))
             .as(StepVerifier::create)
             .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void listWithService() {
+        String domainName = this.nameFactory.getDomainName();
+        String hostName = this.nameFactory.getHostName();
+        String path = this.nameFactory.getPath();
+        String serviceInstanceName = this.nameFactory.getServiceInstanceName();
+
+        createSharedDomainAndRoute(this.cloudFoundryOperations, this.spaceName, domainName, hostName, path)
+            .then(requestCreateUserProvidedServiceInstance(this.cloudFoundryOperations, serviceInstanceName))
+            .then(requestBindRouteServiceInstance(this.cloudFoundryOperations, domainName, hostName, path, serviceInstanceName))
+            .thenMany(this.cloudFoundryOperations.routes()
+                .list(ListRoutesRequest.builder()
+                    .level(SPACE)
+                    .build()))
+            .filter(filterRoutes(domainName, hostName, path, null))
+            .map(Route::getService)
+            .as(StepVerifier::create)
+            .expectNext(serviceInstanceName)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -539,6 +562,16 @@ public final class RoutesTest extends AbstractIntegrationTest {
             && Optional.ofNullable(path).map(route.getPath()::equals).orElse(true);
     }
 
+    private static Mono<Void> requestBindRouteServiceInstance(CloudFoundryOperations cloudFoundryOperations, String domainName, String hostName, String path, String serviceInstanceName) {
+        return cloudFoundryOperations.services()
+            .bindRoute(BindRouteServiceInstanceRequest.builder()
+                .domainName(domainName)
+                .hostname(hostName)
+                .path(path)
+                .serviceInstanceName(serviceInstanceName)
+                .build());
+    }
+
     private static Mono<Void> requestCreateApplication(CloudFoundryOperations cloudFoundryOperations, Path application, String name, Boolean noStart) {
         return cloudFoundryOperations.applications()
             .push(PushApplicationRequest.builder()
@@ -593,6 +626,14 @@ public final class RoutesTest extends AbstractIntegrationTest {
             .createShared(CreateSharedDomainRequest.builder()
                 .domain(domainName)
                 .routerGroup(routerGroup)
+                .build());
+    }
+
+    private static Mono<Void> requestCreateUserProvidedServiceInstance(CloudFoundryOperations cloudFoundryOperations, String name) {
+        return cloudFoundryOperations.services()
+            .createUserProvidedInstance(CreateUserProvidedServiceInstanceRequest.builder()
+                .name(name)
+                .routeServiceUrl("https://test.route.service")
                 .build());
     }
 
