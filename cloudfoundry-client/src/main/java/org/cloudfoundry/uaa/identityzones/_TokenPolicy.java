@@ -32,7 +32,7 @@ import java.util.Map;
 abstract class _TokenPolicy {
 
     /**
-     * Time in seconds between when a access token is issued and when it expires
+     * Time in seconds between when an access token is issued and when it expires
      */
     @JsonProperty("accessTokenValidity")
     @Nullable

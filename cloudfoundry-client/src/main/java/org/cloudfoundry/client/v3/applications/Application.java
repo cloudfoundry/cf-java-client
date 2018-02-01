@@ -19,6 +19,7 @@ package org.cloudfoundry.client.v3.applications;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.cloudfoundry.client.v3.Lifecycle;
 import org.cloudfoundry.client.v3.Resource;
+import org.cloudfoundry.client.v3.spaces.SpaceRelationships;
 
 /**
  * Base class for responses that are applications
@@ -36,6 +37,12 @@ public abstract class Application extends Resource {
      */
     @JsonProperty("name")
     public abstract String getName();
+
+    /**
+     * The relationships
+     */
+    @JsonProperty("relationships")
+    public abstract ApplicationRelationships getRelationships();
 
     /**
      * The state

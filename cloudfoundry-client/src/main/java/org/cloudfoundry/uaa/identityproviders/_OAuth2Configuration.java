@@ -36,6 +36,13 @@ abstract class _OAuth2Configuration extends AbstractAuthenticationConfiguration 
     abstract String getCheckTokenUrl();
 
     /**
+     * Send the client credentials in the token retrieval call as body parameters instead of a Basic Authorization header.
+     */
+    @JsonProperty("clientAuthInBody")
+    @Nullable
+    abstract Boolean getClientAuthInBody();
+
+    /**
      * The OAuth 2.0 token issuer.
      */
     @JsonProperty("issuer")
