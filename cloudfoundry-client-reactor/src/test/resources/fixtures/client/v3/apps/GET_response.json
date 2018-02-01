@@ -23,8 +23,17 @@
       "lifecycle": {
         "type": "buildpack",
         "data": {
-          "buildpacks": ["java_buildpack"],
+          "buildpacks": [
+            "java_buildpack"
+          ],
           "stack": "cflinuxfs2"
+        }
+      },
+      "relationships": {
+        "space": {
+          "data": {
+            "guid": "2f35885d-0c9d-4423-83ad-fd05066f8576"
+          }
         }
       },
       "links": {
@@ -74,8 +83,17 @@
       "lifecycle": {
         "type": "buildpack",
         "data": {
-          "buildpacks": ["ruby_buildpack"],
+          "buildpacks": [
+            "ruby_buildpack"
+          ],
           "stack": "cflinuxfs2"
+        }
+      },
+      "relationships": {
+        "space": {
+          "data": {
+            "guid": "2f35885d-0c9d-4423-83ad-fd05066f8576"
+          }
         }
       },
       "links": {

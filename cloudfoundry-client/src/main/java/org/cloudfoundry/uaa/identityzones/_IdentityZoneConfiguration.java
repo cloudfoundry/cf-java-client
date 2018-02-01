@@ -52,6 +52,13 @@ abstract class _IdentityZoneConfiguration {
     abstract ClientLockoutPolicy getClientLockoutPolicy();
 
     /**
+     * The client secret policy
+     */
+    @JsonProperty("clientSecretPolicy")
+    @Nullable
+    abstract ClientSecretPolicy getClientSecretPolicy();
+
+    /**
      * The CORS policy
      */
     @JsonProperty("corsPolicy")
@@ -66,11 +73,18 @@ abstract class _IdentityZoneConfiguration {
     abstract Boolean getLdapDiscoveryEnabled();
 
     /**
-     * Array The links
+     * The links
      */
     @JsonProperty("links")
     @Nullable
     abstract Links getLinks();
+
+    /**
+     * The Multi-factor Authentication configuration
+     */
+    @JsonProperty("mfaConfig")
+    @Nullable
+    abstract MfaConfig getMfaConfig();
 
     /**
      * The prompts

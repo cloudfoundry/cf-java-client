@@ -22,31 +22,31 @@ import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
- * The payload for the key
+ * The payload for the Multi-factor Authentication configuration
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _Key {
+abstract class _MfaConfig {
+
+    @Value.Check
+    void check() {
+        if (getEnabled() && getProviderName().isEmpty()) {
+            throw new IllegalStateException("Cannot build MfaConfig, providerName must be specified if MFA is enabled");
+        }
+    }
 
     /**
-     * The certificate
+     * Whether Multi-factor Authentication is enabled
      */
-    @JsonProperty("certificate")
+    @JsonProperty("enabled")
     @Nullable
-    abstract String getCertificate();
+    abstract Boolean getEnabled();
 
     /**
-     * The SAML provider's private key
+     * The XHR configuration
      */
-    @JsonProperty("key")
+    @JsonProperty("providerName")
     @Nullable
-    abstract String getKey();
-
-    /**
-     * The SAML provider's private key password
-     */
-    @JsonProperty("passphrase")
-    @Nullable
-    abstract String getPassphrase();
+    abstract String getProviderName();
 
 }
