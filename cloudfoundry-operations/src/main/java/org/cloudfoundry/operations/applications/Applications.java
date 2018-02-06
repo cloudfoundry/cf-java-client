@@ -107,6 +107,14 @@ public interface Applications {
     Flux<ApplicationSummary> list();
 
     /**
+     * Lists the tasks for an application
+     *
+     * @param request the list tasks request
+     * @return the tasks
+     */
+    Flux<Task> listTasks(ListApplicationTasksRequest request);
+
+    /**
      * List the applications logs
      *
      * @param request the application logs request

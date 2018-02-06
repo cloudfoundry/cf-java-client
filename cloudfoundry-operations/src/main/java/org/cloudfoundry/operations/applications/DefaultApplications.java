@@ -80,6 +80,8 @@ import org.cloudfoundry.client.v2.stacks.GetStackRequest;
 import org.cloudfoundry.client.v2.stacks.GetStackResponse;
 import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
 import org.cloudfoundry.client.v2.stacks.StackResource;
+import org.cloudfoundry.client.v3.tasks.ListTasksRequest;
+import org.cloudfoundry.client.v3.tasks.TaskResource;
 import org.cloudfoundry.doppler.DopplerClient;
 import org.cloudfoundry.doppler.Envelope;
 import org.cloudfoundry.doppler.EventType;
@@ -313,6 +315,20 @@ public final class DefaultApplications implements Applications {
             .flatMapMany(DefaultApplications::extractApplications)
             .map(DefaultApplications::toApplicationSummary)
             .transform(OperationsLogging.log("List Applications"))
+            .checkpoint();
+    }
+
+    @Override
+    public Flux<Task> listTasks(ListApplicationTasksRequest request) {
+        return Mono
+            .when(this.cloudFoundryClient, this.spaceId)
+            .then(function((cloudFoundryClient, spaceId) -> Mono.when(
+                Mono.just(cloudFoundryClient),
+                getApplicationId(cloudFoundryClient, request.getName(), spaceId))
+            ))
+            .flatMapMany(function(DefaultApplications::listTasks))
+            .map(DefaultApplications::toTask)
+            .transform(OperationsLogging.log("Get Application Logs"))
             .checkpoint();
     }
 
@@ -1016,6 +1032,14 @@ public final class DefaultApplications implements Applications {
             .collectList();
     }
 
+    private static Flux<TaskResource> listTasks(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        return PaginationUtils.requestClientV3Resources(page -> cloudFoundryClient.tasks()
+            .list(ListTasksRequest.builder()
+                .applicationId(applicationId)
+                .page(page)
+                .build()));
+    }
+
     private static Mono<Void> prepareDomainsAndRoutes(CloudFoundryClient cloudFoundryClient, String applicationId, List<DomainSummary> availableDomains, ApplicationManifest manifest,
                                                       List<RouteResource> existingRoutes, RandomWords randomWords, String spaceId) {
         if (Optional.ofNullable(manifest.getNoRoute()).orElse(false)) {
@@ -1677,6 +1701,26 @@ public final class DefaultApplications implements Applications {
             .fromIterable(instancesResponse.getInstances().entrySet())
             .map(entry -> toInstanceDetail(entry, statisticsResponse))
             .collectList();
+    }
+
+    private static Task toTask(TaskResource task) {
+        return Task.builder()
+            .command(task.getCommand())
+            .sequenceId(task.getSequenceId())
+            .name(task.getName())
+            .startTime(task.getCreatedAt())
+            .state(TaskState.valueOf(task.getState().getValue()))
+            .build();
+    }
+
+    private static Task toTask(org.cloudfoundry.client.v3.tasks.Task task) {
+        return Task.builder()
+            .command(task.getCommand())
+            .sequenceId(task.getSequenceId())
+            .name(task.getName())
+            .startTime(task.getCreatedAt())
+            .state(TaskState.valueOf(task.getState().getValue()))
+            .build();
     }
 
     private static String toUrl(org.cloudfoundry.client.v2.routes.Route route) {
