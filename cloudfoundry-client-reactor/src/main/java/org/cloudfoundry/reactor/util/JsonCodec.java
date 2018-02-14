@@ -42,14 +42,14 @@ public final class JsonCodec {
 
     public static <T> Function<Mono<HttpClientResponse>, Flux<T>> decode(ObjectMapper objectMapper, Class<T> responseType) {
         return inbound -> inbound
-            .flatMapMany(response -> response.addHandler(new JsonObjectDecoder(MAX_PAYLOAD_SIZE)).receive().asByteArray())
-            .map(payload -> {
-                try {
-                    return objectMapper.readValue(payload, responseType);
-                } catch (Throwable t) {
-                    throw new JsonParsingException(t.getMessage(), t, new String(payload, Charset.defaultCharset()));
-                }
-            });
+            .flatMapMany(response -> response.addHandler(new JsonObjectDecoder(MAX_PAYLOAD_SIZE)).receive().asByteArray()
+                .map(payload -> {
+                    try {
+                        return objectMapper.readValue(payload, responseType);
+                    } catch (Throwable t) {
+                        throw new JsonParsingException(t.getMessage(), t, new String(payload, Charset.defaultCharset()));
+                    }
+                }));
     }
 
     static Function<Mono<HttpClientRequest>, Publisher<Void>> encode(ObjectMapper objectMapper, Object requestPayload) {
