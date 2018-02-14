@@ -102,8 +102,14 @@ import org.cloudfoundry.client.v2.stacks.GetStackResponse;
 import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
 import org.cloudfoundry.client.v2.stacks.ListStacksResponse;
 import org.cloudfoundry.client.v2.stacks.StackEntity;
-import org.cloudfoundry.client.v3.Link;
-import org.cloudfoundry.client.v3.Pagination;
+import org.cloudfoundry.client.v3.BuildpackData;
+import org.cloudfoundry.client.v3.Lifecycle;
+import org.cloudfoundry.client.v3.LifecycleType;
+import org.cloudfoundry.client.v3.applications.ApplicationState;
+import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
+import org.cloudfoundry.client.v3.applications.ListApplicationsResponse;
+import org.cloudfoundry.client.v3.tasks.CreateTaskRequest;
+import org.cloudfoundry.client.v3.tasks.CreateTaskResponse;
 import org.cloudfoundry.client.v3.tasks.ListTasksRequest;
 import org.cloudfoundry.client.v3.tasks.ListTasksResponse;
 import org.cloudfoundry.client.v3.tasks.TaskResource;
@@ -2411,6 +2417,28 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
+    public void runTask() {
+        requestApplicationsV3(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-metadata-id");
+        requestRunTask(this.cloudFoundryClient, "test-metadata-id");
+
+        this.applications
+            .runTask(RunApplicationTaskRequest.builder()
+                .applicationName("test-application-name")
+                .command("test-command")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(fill(Task.builder())
+                .command("test-command")
+                .state(TaskState.CANCELING)
+                .name("test-name")
+                .sequenceId(1)
+                .startTime("test-createdAt")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
     public void scaleDiskAndInstancesNotStarted() {
         requestApplicationsSpecificState(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "STOPPED");
         requestUpdateApplicationScale(this.cloudFoundryClient, "test-application-id", 2048, 2, null);
@@ -3108,6 +3136,31 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                     .build()));
     }
 
+    private static void requestApplicationsV3(CloudFoundryClient cloudFoundryClient, String application, String spaceId, String applicationId) {
+        when(cloudFoundryClient.applicationsV3()
+            .list(ListApplicationsRequest.builder()
+                .name(application)
+                .page(1)
+                .spaceId(spaceId)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(ListApplicationsResponse.builder())
+                    .resource(org.cloudfoundry.client.v3.applications.ApplicationResource.builder()
+                        .createdAt("test-created-at")
+                        .id(applicationId)
+                        .lifecycle(Lifecycle.builder()
+                            .data(BuildpackData.builder()
+                                .buildpack("test-buildpack")
+                                .build())
+                            .type(LifecycleType.BUILDPACK)
+                            .build())
+                        .name("test-name")
+                        .state(ApplicationState.STOPPED)
+                        .updatedAt("test-updated-at")
+                        .build())
+                    .build()));
+    }
+
     private static void requestApplicationsWithSsh(CloudFoundryClient cloudFoundryClient, String application, String spaceId, Boolean sshEnabled) {
         when(cloudFoundryClient.spaces()
             .listApplications(ListSpaceApplicationsRequest.builder()
@@ -3625,6 +3678,17 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .build()))
             .thenReturn(Mono
                 .just(fill(ListRoutesResponse.builder())
+                    .build()));
+    }
+
+    private static void requestRunTask(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        when(cloudFoundryClient.tasks()
+            .create(CreateTaskRequest.builder()
+                .applicationId(applicationId)
+                .command("test-command")
+                .build()))
+            .thenReturn(Mono
+                .just(fill(CreateTaskResponse.builder())
                     .build()));
     }
 

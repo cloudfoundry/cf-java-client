@@ -171,6 +171,14 @@ public interface Applications {
     Mono<Void> restartInstance(RestartApplicationInstanceRequest request);
 
     /**
+     * Run a one-off task on an application
+     *
+     * @param request the run task request
+     * @return the tasks???
+     */
+    Mono<Task> runTask(RunApplicationTaskRequest request);
+
+    /**
      * Scales a specific application
      *
      * @param request the scale application request
