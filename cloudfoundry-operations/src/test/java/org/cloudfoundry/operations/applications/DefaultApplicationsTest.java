@@ -108,10 +108,10 @@ import org.cloudfoundry.client.v3.LifecycleType;
 import org.cloudfoundry.client.v3.applications.ApplicationState;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsResponse;
+import org.cloudfoundry.client.v3.tasks.CancelTaskRequest;
+import org.cloudfoundry.client.v3.tasks.CancelTaskResponse;
 import org.cloudfoundry.client.v3.tasks.CreateTaskRequest;
 import org.cloudfoundry.client.v3.tasks.CreateTaskResponse;
-import org.cloudfoundry.client.v3.tasks.ListTasksRequest;
-import org.cloudfoundry.client.v3.tasks.ListTasksResponse;
 import org.cloudfoundry.client.v3.tasks.TaskResource;
 import org.cloudfoundry.doppler.DopplerClient;
 import org.cloudfoundry.doppler.Envelope;
@@ -1093,7 +1093,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     @Test
     public void listTasks() {
         requestApplications(this.cloudFoundryClient, "test-name", TEST_SPACE_ID, "test-metadata-id");
-        requestTasks(this.cloudFoundryClient, "test-metadata-id");
+        requestListTasks(this.cloudFoundryClient, "test-metadata-id");
 
         this.applications
             .listTasks(ListApplicationTasksRequest.builder()
@@ -2729,6 +2729,38 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
+    public void terminateTask() {
+        requestApplicationsV3(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-metadata-id");
+        requestListTasks(this.cloudFoundryClient, "test-metadata-id", 1);
+        requestCancelTask(this.cloudFoundryClient, "test-id");
+
+        this.applications
+            .terminateTask(TerminateApplicationTaskRequest.builder()
+                .applicationName("test-application-name")
+                .sequenceId(1)
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void terminateTaskNoTask() {
+        requestApplicationsV3(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-metadata-id");
+        requestListTasksEmpty(this.cloudFoundryClient, "test-metadata-id", 1);
+        requestCancelTask(this.cloudFoundryClient, "test-id");
+
+        this.applications
+            .terminateTask(TerminateApplicationTaskRequest.builder()
+                .applicationName("test-application-name")
+                .sequenceId(1)
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Task with sequence id of 1 does not exist"))
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
     public void unsetEnvironmentVariable() {
         requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id",
             FluentMap.<String, Object>builder()
@@ -3192,6 +3224,16 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
             .thenReturn(Mono.empty());
     }
 
+    private static void requestCancelTask(CloudFoundryClient cloudFoundryClient, String taskId) {
+        when(cloudFoundryClient.tasks()
+            .cancel(CancelTaskRequest.builder()
+                .taskId(taskId)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(CancelTaskResponse.builder())
+                    .build()));
+    }
+
     private static void requestCopyBits(CloudFoundryClient cloudFoundryClient, String sourceApplicationId, String targetApplicationId) {
         when(cloudFoundryClient.applicationsV2()
             .copy(CopyApplicationRequest.builder()
@@ -3476,6 +3518,45 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
             .list(request))
             .thenReturn(Mono
                 .just(ListMatchingResourcesResponse.builder()
+                    .build()));
+    }
+
+    private static void requestListTasks(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        when(cloudFoundryClient.applicationsV3()
+            .listTasks(org.cloudfoundry.client.v3.applications.ListApplicationTasksRequest.builder()
+                .applicationId(applicationId)
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(org.cloudfoundry.client.v3.applications.ListApplicationTasksResponse.builder())
+                    .resource(fill(TaskResource.builder())
+                        .build())
+                    .build()));
+    }
+
+    private static void requestListTasks(CloudFoundryClient cloudFoundryClient, String applicationId, Integer sequenceId) {
+        when(cloudFoundryClient.applicationsV3()
+            .listTasks(org.cloudfoundry.client.v3.applications.ListApplicationTasksRequest.builder()
+                .applicationId(applicationId)
+                .page(1)
+                .sequenceId(sequenceId.toString())
+                .build()))
+            .thenReturn(Mono
+                .just(fill(org.cloudfoundry.client.v3.applications.ListApplicationTasksResponse.builder())
+                    .resource(fill(TaskResource.builder())
+                        .build())
+                    .build()));
+    }
+
+    private static void requestListTasksEmpty(CloudFoundryClient cloudFoundryClient, String applicationId, Integer sequenceId) {
+        when(cloudFoundryClient.applicationsV3()
+            .listTasks(org.cloudfoundry.client.v3.applications.ListApplicationTasksRequest.builder()
+                .applicationId(applicationId)
+                .page(1)
+                .sequenceId(sequenceId.toString())
+                .build()))
+            .thenReturn(Mono
+                .just(fill(org.cloudfoundry.client.v3.applications.ListApplicationTasksResponse.builder())
                     .build()));
     }
 
@@ -3784,19 +3865,6 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .build()))
             .thenReturn(Mono
                 .just(fill(ListStacksResponse.builder())
-                    .build()));
-    }
-
-    private static void requestTasks(CloudFoundryClient cloudFoundryClient, String applicationId) {
-        when(cloudFoundryClient.tasks()
-            .list(ListTasksRequest.builder()
-                .applicationId(applicationId)
-                .page(1)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(ListTasksResponse.builder())
-                    .resource(fill(TaskResource.builder())
-                        .build())
                     .build()));
     }
 

@@ -174,9 +174,17 @@ public interface Applications {
      * Run a one-off task on an application
      *
      * @param request the run task request
-     * @return the tasks???
+     * @return the task
      */
     Mono<Task> runTask(RunApplicationTaskRequest request);
+
+    /**
+     * Terminate a running task of an application
+     *
+     * @param request the terminate task request
+     * @return a completion indicator
+     */
+    Mono<Void> terminateTask(TerminateApplicationTaskRequest request);
 
     /**
      * Scales a specific application

@@ -80,11 +80,14 @@ import org.cloudfoundry.client.v2.stacks.GetStackRequest;
 import org.cloudfoundry.client.v2.stacks.GetStackResponse;
 import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
 import org.cloudfoundry.client.v2.stacks.StackResource;
+import org.cloudfoundry.client.v3.Resource;
 import org.cloudfoundry.client.v3.applications.ApplicationResource;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
+import org.cloudfoundry.client.v3.tasks.CancelTaskRequest;
+import org.cloudfoundry.client.v3.tasks.CancelTaskResponse;
 import org.cloudfoundry.client.v3.tasks.CreateTaskRequest;
 import org.cloudfoundry.client.v3.tasks.CreateTaskResponse;
-import org.cloudfoundry.client.v3.tasks.ListTasksRequest;
+import org.cloudfoundry.client.v3.tasks.TaskResource;
 import org.cloudfoundry.doppler.DopplerClient;
 import org.cloudfoundry.doppler.Envelope;
 import org.cloudfoundry.doppler.EventType;
@@ -329,7 +332,7 @@ public final class DefaultApplications implements Applications {
                 Mono.just(cloudFoundryClient),
                 getApplicationId(cloudFoundryClient, request.getName(), spaceId))
             ))
-            .flatMapMany(function(DefaultApplications::listTasks))
+            .flatMapMany(function((cloudFoundryClient, applicationId) -> requestListTasks(cloudFoundryClient, applicationId)))
             .map(DefaultApplications::toTask)
             .transform(OperationsLogging.log("List Application Tasks"))
             .checkpoint();
@@ -479,13 +482,12 @@ public final class DefaultApplications implements Applications {
             .when(this.cloudFoundryClient, this.spaceId)
             .then(function((cloudFoundryClient, spaceId) -> Mono.when(
                 Mono.just(cloudFoundryClient),
-                getApplicationIdV3(cloudFoundryClient, request, spaceId))
+                getApplicationIdV3(cloudFoundryClient, request.getApplicationName(), spaceId))
             ))
             .then(function((cloudFoundryClient, applicationId) -> requestCreateTask(cloudFoundryClient, applicationId, request)))
             .map(DefaultApplications::toTask)
             .transform(OperationsLogging.log("Run Application Task Instance"))
             .checkpoint();
-
     }
 
     @Override
@@ -572,6 +574,24 @@ public final class DefaultApplications implements Applications {
             .then(function(DefaultApplications::stopApplication))
             .then()
             .transform(OperationsLogging.log("Stop Application"))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<Void> terminateTask(TerminateApplicationTaskRequest request) {
+        return Mono
+            .when(this.cloudFoundryClient, this.spaceId)
+            .then(function((cloudFoundryClient, spaceId) -> Mono.when(
+                Mono.just(cloudFoundryClient),
+                getApplicationIdV3(cloudFoundryClient, request.getApplicationName(), spaceId))
+            ))
+            .then(function((cloudFoundryClient, applicationId) -> Mono.when(
+                Mono.just(cloudFoundryClient),
+                getTaskId(cloudFoundryClient, applicationId, request.getSequenceId()))
+            ))
+            .then(function(DefaultApplications::requestTerminateTask))
+            .then()
+            .transform(OperationsLogging.log("Terminate Application Task Instance"))
             .checkpoint();
     }
 
@@ -757,8 +777,8 @@ public final class DefaultApplications implements Applications {
                 .then(spaceId1 -> getApplicationId(cloudFoundryClient, application, spaceId1));
     }
 
-    private static Mono<String> getApplicationIdV3(CloudFoundryClient cloudFoundryClient, RunApplicationTaskRequest request, String spaceId) {
-        return getApplicationV3(cloudFoundryClient, request.getApplicationName(), spaceId)
+    private static Mono<String> getApplicationIdV3(CloudFoundryClient cloudFoundryClient, String applicationName, String spaceId) {
+        return getApplicationV3(cloudFoundryClient, applicationName, spaceId)
             .map(ApplicationResource::getId);
     }
 
@@ -1005,6 +1025,13 @@ public final class DefaultApplications implements Applications {
             .map(getStackResponse -> getStackResponse.getEntity().getName());
     }
 
+    private static Mono<String> getTaskId(CloudFoundryClient cloudFoundryClient, String applicationId, Integer sequenceId) {
+        return listTasks(cloudFoundryClient, applicationId, sequenceId)
+            .single()
+            .map(Resource::getId)
+            .onErrorResume(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Task with sequence id of %s does not exist", sequenceId));
+    }
+
     private static Mono<String> getTcpRouteId(CloudFoundryClient cloudFoundryClient, String domainId, Integer port) {
         return requestRoutes(cloudFoundryClient, domainId, null, port, null)
             .singleOrEmpty()
@@ -1062,11 +1089,12 @@ public final class DefaultApplications implements Applications {
     }
 
     private static Flux<org.cloudfoundry.client.v3.tasks.Task> listTasks(CloudFoundryClient cloudFoundryClient, String applicationId) {
-        return PaginationUtils.requestClientV3Resources(page -> cloudFoundryClient.tasks()
-            .list(ListTasksRequest.builder()
-                .applicationId(applicationId)
-                .page(page)
-                .build()))
+        return requestListTasks(cloudFoundryClient, applicationId)
+            .cast(org.cloudfoundry.client.v3.tasks.Task.class);
+    }
+
+    private static Flux<org.cloudfoundry.client.v3.tasks.Task> listTasks(CloudFoundryClient cloudFoundryClient, String applicationId, Integer sequenceId) {
+        return requestListTasks(cloudFoundryClient, applicationId, sequenceId)
             .cast(org.cloudfoundry.client.v3.tasks.Task.class);
     }
 
@@ -1376,6 +1404,25 @@ public final class DefaultApplications implements Applications {
                     .build()));
     }
 
+    private static Flux<TaskResource> requestListTasks(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        return PaginationUtils
+            .requestClientV3Resources(page -> cloudFoundryClient.applicationsV3()
+                .listTasks(org.cloudfoundry.client.v3.applications.ListApplicationTasksRequest.builder()
+                    .applicationId(applicationId)
+                    .page(page)
+                    .build()));
+    }
+
+    private static Flux<TaskResource> requestListTasks(CloudFoundryClient cloudFoundryClient, String applicationId, Integer sequenceId) {
+        return PaginationUtils
+            .requestClientV3Resources(page -> cloudFoundryClient.applicationsV3()
+                .listTasks(org.cloudfoundry.client.v3.applications.ListApplicationTasksRequest.builder()
+                    .applicationId(applicationId)
+                    .page(page)
+                    .sequenceId(sequenceId.toString())
+                    .build()));
+    }
+
     private static Flux<Envelope> requestLogsRecent(Mono<DopplerClient> dopplerClient, String applicationId) {
         return dopplerClient
             .flatMapMany(client -> client
@@ -1491,6 +1538,13 @@ public final class DefaultApplications implements Applications {
             .terminateInstance(TerminateApplicationInstanceRequest.builder()
                 .applicationId(applicationId)
                 .index(instanceIndex)
+                .build());
+    }
+
+    private static Mono<CancelTaskResponse> requestTerminateTask(CloudFoundryClient cloudFoundryClient, String taskId) {
+        return cloudFoundryClient.tasks()
+            .cancel(CancelTaskRequest.builder()
+                .taskId(taskId)
                 .build());
     }
 
