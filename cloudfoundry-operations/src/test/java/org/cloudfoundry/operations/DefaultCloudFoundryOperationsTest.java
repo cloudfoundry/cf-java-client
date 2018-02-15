@@ -51,6 +51,11 @@ public final class DefaultCloudFoundryOperationsTest extends AbstractOperationsT
     }
 
     @Test
+    public void networkPolicies() {
+        assertThat(this.operations.networkPolicies()).isNotNull();
+    }
+
+    @Test
     public void organizationAdmin() {
         assertThat(this.operations.organizationAdmin()).isNotNull();
     }
@@ -88,6 +93,11 @@ public final class DefaultCloudFoundryOperationsTest extends AbstractOperationsT
     @Test
     public void stacks() {
         assertThat(this.operations.stacks()).isNotNull();
+    }
+
+    @Test
+    public void userAdmin() {
+        assertThat(this.operations.userAdmin()).isNotNull();
     }
 
 }

@@ -29,12 +29,15 @@ import org.cloudfoundry.operations.applications.GetApplicationEventsRequest;
 import org.cloudfoundry.operations.applications.GetApplicationHealthCheckRequest;
 import org.cloudfoundry.operations.applications.GetApplicationManifestRequest;
 import org.cloudfoundry.operations.applications.GetApplicationRequest;
+import org.cloudfoundry.operations.applications.ListApplicationTasksRequest;
 import org.cloudfoundry.operations.applications.PushApplicationManifestRequest;
 import org.cloudfoundry.operations.applications.PushApplicationRequest;
 import org.cloudfoundry.operations.applications.RestartApplicationRequest;
 import org.cloudfoundry.operations.applications.Route;
+import org.cloudfoundry.operations.applications.RunApplicationTaskRequest;
 import org.cloudfoundry.operations.applications.SetEnvironmentVariableApplicationRequest;
 import org.cloudfoundry.operations.applications.StartApplicationRequest;
+import org.cloudfoundry.operations.applications.Task;
 import org.cloudfoundry.operations.applications.UnsetEnvironmentVariableApplicationRequest;
 import org.cloudfoundry.operations.domains.CreateDomainRequest;
 import org.cloudfoundry.operations.domains.CreateSharedDomainRequest;
@@ -57,7 +60,6 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.Map;
-import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -237,6 +239,38 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .map(applicationDetail -> applicationDetail.getUrls().get(0))
             .as(StepVerifier::create)
             .consumeNextWith(route -> assertThat(route).matches(domainName + "+?:\\d+$"))
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void list() throws IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, false)
+            .thenMany(this.cloudFoundryOperations.applications()
+                .list())
+            .filter(response -> applicationName.equals(response.getName()))
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void listTasks() throws IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+        String taskName = this.nameFactory.getTaskName();
+
+        createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, false)
+            .then(requestCreateTask(this.cloudFoundryOperations, applicationName, taskName))
+            .thenMany(this.cloudFoundryOperations.applications()
+                .listTasks(ListApplicationTasksRequest.builder()
+                    .name(applicationName)
+                    .build()))
+            .map(Task::getName)
+            .as(StepVerifier::create)
+            .expectNext(taskName)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -726,6 +760,27 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    @Test
+    public void runTask() throws IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+        String taskName = this.nameFactory.getTaskName();
+
+        createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, false)
+            .then(this.cloudFoundryOperations.applications()
+                .runTask(RunApplicationTaskRequest.builder()
+                    .applicationName(applicationName)
+                    .command("ls")
+                    .disk(64)
+                    .memory(64)
+                    .taskName(taskName)
+                    .build()))
+            .map(Task::getName)
+            .as(StepVerifier::create)
+            .expectNext(taskName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
     @SuppressWarnings("unchecked")
     @Test
     public void setEnvironmentVariable() throws IOException {
@@ -963,6 +1018,17 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .build());
     }
 
+    private static Mono<Task> requestCreateTask(CloudFoundryOperations cloudFoundryOperations, String applicationName, String taskName) {
+        return cloudFoundryOperations.applications()
+            .runTask(RunApplicationTaskRequest.builder()
+                .applicationName(applicationName)
+                .command("ls")
+                .disk(64)
+                .memory(64)
+                .taskName(taskName)
+                .build());
+    }
+
     private static Mono<Void> requestCreateTcpDomain(CloudFoundryOperations cloudFoundryOperations, String domainName, String routerGroup) {
         return cloudFoundryOperations.domains()
             .createShared(CreateSharedDomainRequest.builder()
@@ -979,6 +1045,13 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     private static Flux<org.cloudfoundry.operations.routes.Route> requestListRoutes(CloudFoundryOperations cloudFoundryOperations) {
         return cloudFoundryOperations.routes()
             .list(ListRoutesRequest.builder()
+                .build());
+    }
+
+    private static Flux<Task> requestListTasks(CloudFoundryOperations cloudFoundryOperations, String applicationName) {
+        return cloudFoundryOperations.applications()
+            .listTasks(ListApplicationTasksRequest.builder()
+                .name(applicationName)
                 .build());
     }
 
