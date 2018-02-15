@@ -65,6 +65,8 @@ public interface NameFactory {
 
     String STACK_PREFIX = "test-stack-";
 
+    String TASK_PREFIX = "test-task-";
+
     String USER_ID_PREFIX = "test-user-id-";
 
     String USER_PREFIX = "test-user-";
@@ -291,6 +293,15 @@ public interface NameFactory {
      */
     default String getStackName() {
         return getName(STACK_PREFIX);
+    }
+
+    /**
+     * Creates a task name
+     *
+     * @return the task name
+     */
+    default String getTaskName() {
+        return getName(TASK_PREFIX);
     }
 
     /**
@@ -572,6 +583,16 @@ public interface NameFactory {
      */
     default boolean isStackName(String candidate) {
         return isName(STACK_PREFIX, candidate);
+    }
+
+    /**
+     * Tests a name to determine if it is a task name
+     *
+     * @param candidate the candidate name
+     * @return {@code true} if the name is a task name, {@code false} otherwise
+     */
+    default boolean isTaskName(String candidate) {
+        return isName(TASK_PREFIX, candidate);
     }
 
     /**
