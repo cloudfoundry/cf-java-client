@@ -1092,7 +1092,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     public void listTasks() {
-        requestApplications(this.cloudFoundryClient, "test-name", TEST_SPACE_ID, "test-metadata-id");
+        requestApplicationsV3(this.cloudFoundryClient, "test-name", TEST_SPACE_ID, "test-metadata-id");
         requestListTasks(this.cloudFoundryClient, "test-metadata-id");
 
         this.applications

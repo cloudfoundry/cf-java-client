@@ -329,7 +329,7 @@ public final class DefaultApplications implements Applications {
             .zip(this.cloudFoundryClient, this.spaceId)
             .flatMap(function((cloudFoundryClient, spaceId) -> Mono.zip(
                 Mono.just(cloudFoundryClient),
-                getApplicationId(cloudFoundryClient, request.getName(), spaceId))
+                getApplicationIdV3(cloudFoundryClient, request.getName(), spaceId))
             ))
             .flatMapMany(function((cloudFoundryClient, applicationId) -> requestListTasks(cloudFoundryClient, applicationId)))
             .map(DefaultApplications::toTask)
