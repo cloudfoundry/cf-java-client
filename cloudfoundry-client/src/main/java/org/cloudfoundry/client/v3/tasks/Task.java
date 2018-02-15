@@ -51,7 +51,7 @@ public abstract class Task extends Resource {
     public abstract Integer getMemoryInMb();
 
     /**
-     * The tasks name
+     * The task's name
      */
     @JsonProperty("name")
     public abstract String getName();

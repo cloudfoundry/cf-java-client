@@ -102,6 +102,17 @@ import org.cloudfoundry.client.v2.stacks.GetStackResponse;
 import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
 import org.cloudfoundry.client.v2.stacks.ListStacksResponse;
 import org.cloudfoundry.client.v2.stacks.StackEntity;
+import org.cloudfoundry.client.v3.BuildpackData;
+import org.cloudfoundry.client.v3.Lifecycle;
+import org.cloudfoundry.client.v3.LifecycleType;
+import org.cloudfoundry.client.v3.applications.ApplicationState;
+import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
+import org.cloudfoundry.client.v3.applications.ListApplicationsResponse;
+import org.cloudfoundry.client.v3.tasks.CancelTaskRequest;
+import org.cloudfoundry.client.v3.tasks.CancelTaskResponse;
+import org.cloudfoundry.client.v3.tasks.CreateTaskRequest;
+import org.cloudfoundry.client.v3.tasks.CreateTaskResponse;
+import org.cloudfoundry.client.v3.tasks.TaskResource;
 import org.cloudfoundry.doppler.DopplerClient;
 import org.cloudfoundry.doppler.Envelope;
 import org.cloudfoundry.doppler.EventType;
@@ -1074,6 +1085,27 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .id("test-application-summary-id")
                 .name("test-application-summary-name")
                 .requestedState("test-application-summary-state")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void listTasks() {
+        requestApplications(this.cloudFoundryClient, "test-name", TEST_SPACE_ID, "test-metadata-id");
+        requestListTasks(this.cloudFoundryClient, "test-metadata-id");
+
+        this.applications
+            .listTasks(ListApplicationTasksRequest.builder()
+                .name("test-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(fill(Task.builder())
+                .command("test-command")
+                .state(TaskState.CANCELING)
+                .name("test-name")
+                .sequenceId(1)
+                .startTime("test-createdAt")
                 .build())
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -2385,6 +2417,28 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
+    public void runTask() {
+        requestApplicationsV3(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-metadata-id");
+        requestRunTask(this.cloudFoundryClient, "test-metadata-id");
+
+        this.applications
+            .runTask(RunApplicationTaskRequest.builder()
+                .applicationName("test-application-name")
+                .command("test-command")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(fill(Task.builder())
+                .command("test-command")
+                .state(TaskState.CANCELING)
+                .name("test-name")
+                .sequenceId(1)
+                .startTime("test-createdAt")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
     public void scaleDiskAndInstancesNotStarted() {
         requestApplicationsSpecificState(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "STOPPED");
         requestUpdateApplicationScale(this.cloudFoundryClient, "test-application-id", 2048, 2, null);
@@ -2671,6 +2725,38 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .build())
             .as(StepVerifier::create)
             .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void terminateTask() {
+        requestApplicationsV3(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-metadata-id");
+        requestListTasks(this.cloudFoundryClient, "test-metadata-id", 1);
+        requestCancelTask(this.cloudFoundryClient, "test-id");
+
+        this.applications
+            .terminateTask(TerminateApplicationTaskRequest.builder()
+                .applicationName("test-application-name")
+                .sequenceId(1)
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void terminateTaskNoTask() {
+        requestApplicationsV3(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "test-metadata-id");
+        requestListTasksEmpty(this.cloudFoundryClient, "test-metadata-id", 1);
+        requestCancelTask(this.cloudFoundryClient, "test-id");
+
+        this.applications
+            .terminateTask(TerminateApplicationTaskRequest.builder()
+                .applicationName("test-application-name")
+                .sequenceId(1)
+                .build())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Task with sequence id of 1 does not exist"))
             .verify(Duration.ofSeconds(5));
     }
 
@@ -3082,6 +3168,31 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                     .build()));
     }
 
+    private static void requestApplicationsV3(CloudFoundryClient cloudFoundryClient, String application, String spaceId, String applicationId) {
+        when(cloudFoundryClient.applicationsV3()
+            .list(ListApplicationsRequest.builder()
+                .name(application)
+                .page(1)
+                .spaceId(spaceId)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(ListApplicationsResponse.builder())
+                    .resource(org.cloudfoundry.client.v3.applications.ApplicationResource.builder()
+                        .createdAt("test-created-at")
+                        .id(applicationId)
+                        .lifecycle(Lifecycle.builder()
+                            .data(BuildpackData.builder()
+                                .buildpack("test-buildpack")
+                                .build())
+                            .type(LifecycleType.BUILDPACK)
+                            .build())
+                        .name("test-name")
+                        .state(ApplicationState.STOPPED)
+                        .updatedAt("test-updated-at")
+                        .build())
+                    .build()));
+    }
+
     private static void requestApplicationsWithSsh(CloudFoundryClient cloudFoundryClient, String application, String spaceId, Boolean sshEnabled) {
         when(cloudFoundryClient.spaces()
             .listApplications(ListSpaceApplicationsRequest.builder()
@@ -3111,6 +3222,16 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .routeId(routeId)
                 .build()))
             .thenReturn(Mono.empty());
+    }
+
+    private static void requestCancelTask(CloudFoundryClient cloudFoundryClient, String taskId) {
+        when(cloudFoundryClient.tasks()
+            .cancel(CancelTaskRequest.builder()
+                .taskId(taskId)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(CancelTaskResponse.builder())
+                    .build()));
     }
 
     private static void requestCopyBits(CloudFoundryClient cloudFoundryClient, String sourceApplicationId, String targetApplicationId) {
@@ -3400,6 +3521,45 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                     .build()));
     }
 
+    private static void requestListTasks(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        when(cloudFoundryClient.applicationsV3()
+            .listTasks(org.cloudfoundry.client.v3.applications.ListApplicationTasksRequest.builder()
+                .applicationId(applicationId)
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(org.cloudfoundry.client.v3.applications.ListApplicationTasksResponse.builder())
+                    .resource(fill(TaskResource.builder())
+                        .build())
+                    .build()));
+    }
+
+    private static void requestListTasks(CloudFoundryClient cloudFoundryClient, String applicationId, Integer sequenceId) {
+        when(cloudFoundryClient.applicationsV3()
+            .listTasks(org.cloudfoundry.client.v3.applications.ListApplicationTasksRequest.builder()
+                .applicationId(applicationId)
+                .page(1)
+                .sequenceId(sequenceId.toString())
+                .build()))
+            .thenReturn(Mono
+                .just(fill(org.cloudfoundry.client.v3.applications.ListApplicationTasksResponse.builder())
+                    .resource(fill(TaskResource.builder())
+                        .build())
+                    .build()));
+    }
+
+    private static void requestListTasksEmpty(CloudFoundryClient cloudFoundryClient, String applicationId, Integer sequenceId) {
+        when(cloudFoundryClient.applicationsV3()
+            .listTasks(org.cloudfoundry.client.v3.applications.ListApplicationTasksRequest.builder()
+                .applicationId(applicationId)
+                .page(1)
+                .sequenceId(sequenceId.toString())
+                .build()))
+            .thenReturn(Mono
+                .just(fill(org.cloudfoundry.client.v3.applications.ListApplicationTasksResponse.builder())
+                    .build()));
+    }
+
     private static void requestLogsRecent(DopplerClient dopplerClient, String applicationId) {
         when(dopplerClient
             .recentLogs(RecentLogsRequest.builder()
@@ -3599,6 +3759,17 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .build()))
             .thenReturn(Mono
                 .just(fill(ListRoutesResponse.builder())
+                    .build()));
+    }
+
+    private static void requestRunTask(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        when(cloudFoundryClient.tasks()
+            .create(CreateTaskRequest.builder()
+                .applicationId(applicationId)
+                .command("test-command")
+                .build()))
+            .thenReturn(Mono
+                .just(fill(CreateTaskResponse.builder())
                     .build()));
     }
 
