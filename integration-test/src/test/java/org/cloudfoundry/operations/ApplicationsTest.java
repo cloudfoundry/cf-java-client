@@ -17,6 +17,8 @@
 package org.cloudfoundry.operations;
 
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.CloudFoundryVersion;
+import org.cloudfoundry.IfCloudFoundryVersion;
 import org.cloudfoundry.operations.applications.ApplicationDetail;
 import org.cloudfoundry.operations.applications.ApplicationEnvironments;
 import org.cloudfoundry.operations.applications.ApplicationEvent;
@@ -38,6 +40,8 @@ import org.cloudfoundry.operations.applications.RunApplicationTaskRequest;
 import org.cloudfoundry.operations.applications.SetEnvironmentVariableApplicationRequest;
 import org.cloudfoundry.operations.applications.StartApplicationRequest;
 import org.cloudfoundry.operations.applications.Task;
+import org.cloudfoundry.operations.applications.TaskState;
+import org.cloudfoundry.operations.applications.TerminateApplicationTaskRequest;
 import org.cloudfoundry.operations.applications.UnsetEnvironmentVariableApplicationRequest;
 import org.cloudfoundry.operations.domains.CreateDomainRequest;
 import org.cloudfoundry.operations.domains.CreateSharedDomainRequest;
@@ -257,6 +261,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_11)
     @Test
     public void listTasks() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
@@ -760,6 +765,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_11)
     @Test
     public void runTask() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
@@ -843,6 +849,29 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .name(applicationName)
                     .build()))
             .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_11)
+    @Test
+    public void terminateTask() throws IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+        String taskName = this.nameFactory.getTaskName();
+
+        createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, false)
+            .then(getLongLivedTaskId(this.cloudFoundryOperations, applicationName, taskName))
+            .then(sequenceId -> this.cloudFoundryOperations.applications()
+                .terminateTask(TerminateApplicationTaskRequest.builder()
+                    .applicationName(applicationName)
+                    .sequenceId(sequenceId)
+                    .build())
+                .then(Mono.just(sequenceId)))
+            .flatMapMany(sequenceId -> requestListTasks(this.cloudFoundryOperations, applicationName)
+                .filter(task -> sequenceId.equals(task.getSequenceId())))
+            .map(Task::getState)
+            .as(StepVerifier::create)
+            .expectNext(TaskState.FAILED)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -1003,6 +1032,11 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .build());
     }
 
+    private static Mono<Integer> getLongLivedTaskId(CloudFoundryOperations cloudFoundryOperations, String applicationName, String taskName) {
+        return requestCreateLongLivedTask(cloudFoundryOperations, applicationName, taskName)
+            .map(Task::getSequenceId);
+    }
+
     private static Mono<ServiceInstance> getServiceInstance(CloudFoundryOperations cloudFoundryOperations, String serviceInstanceName) {
         return cloudFoundryOperations.services()
             .getInstance(GetServiceInstanceRequest.builder()
@@ -1015,6 +1049,17 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .create(CreateDomainRequest.builder()
                 .domain(domainName)
                 .organization(organizationName)
+                .build());
+    }
+
+    private static Mono<Task> requestCreateLongLivedTask(CloudFoundryOperations cloudFoundryOperations, String applicationName, String taskName) {
+        return cloudFoundryOperations.applications()
+            .runTask(RunApplicationTaskRequest.builder()
+                .applicationName(applicationName)
+                .command("sleep 99")
+                .disk(64)
+                .memory(64)
+                .taskName(taskName)
                 .build());
     }
 
