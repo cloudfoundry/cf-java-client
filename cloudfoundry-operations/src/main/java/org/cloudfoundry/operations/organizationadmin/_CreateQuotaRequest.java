@@ -26,19 +26,25 @@ import org.immutables.value.Value;
 abstract class _CreateQuotaRequest {
 
     /**
-     * The allow paid service plans flag
+     * Can provision instances of paid service plans
      */
     @Nullable
     abstract Boolean getAllowPaidServicePlans();
 
     /**
-     * The instance memory limit
+     * Total number of application instances
+     */
+    @Nullable
+    abstract Integer getApplicationInstanceLimit();
+
+    /**
+     * The application instance memory limit in mb
      */
     @Nullable
     abstract Integer getInstanceMemoryLimit();
 
     /**
-     * The memory limit
+     * Total amount of memory a space can have in mb
      */
     @Nullable
     abstract Integer getMemoryLimit();
@@ -49,13 +55,19 @@ abstract class _CreateQuotaRequest {
     abstract String getName();
 
     /**
-     * The total routes
+     * Maximum number of routes that may be created with reserved ports
+     */
+    @Nullable
+    abstract Integer getTotalReservedRoutePorts();
+
+    /**
+     * The total number of routes
      */
     @Nullable
     abstract Integer getTotalRoutes();
 
     /**
-     * The total services
+     * Total number of service instances
      */
     @Nullable
     abstract Integer getTotalServices();

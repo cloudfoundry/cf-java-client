@@ -55,6 +55,11 @@ abstract class _OrganizationQuota {
     abstract String getName();
 
     /**
+     * Maximum number of routes that may be created with reserved ports
+     */
+    abstract Integer getTotalReservedRoutePorts();
+
+    /**
      * The total routes
      */
     abstract Integer getTotalRoutes();
