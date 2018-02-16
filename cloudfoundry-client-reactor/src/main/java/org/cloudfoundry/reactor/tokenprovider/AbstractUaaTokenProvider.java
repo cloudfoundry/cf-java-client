@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.ReplayProcessor;
 import reactor.ipc.netty.http.client.HttpClientRequest;
@@ -72,7 +73,7 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
 
     private final ConcurrentMap<ConnectionContext, Mono<String>> accessTokens = new ConcurrentHashMap<>(1);
 
-    private final ConcurrentMap<ConnectionContext, ReplayProcessor<String>> refreshTokenStreams = new ConcurrentHashMap<>(1);
+    private final ConcurrentMap<ConnectionContext, RefreshToken> refreshTokenStreams = new ConcurrentHashMap<>(1);
 
     private final ConcurrentMap<ConnectionContext, Mono<String>> refreshTokens = new ConcurrentHashMap<>(1);
 
@@ -99,7 +100,7 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
      * @return a {@link Flux} that emits the last token on subscribe and new refresh tokens as they are negotiated
      */
     public Flux<String> getRefreshTokens(ConnectionContext connectionContext) {
-        return getRefreshTokenStream(connectionContext);
+        return getRefreshTokenStream(connectionContext).processor;
     }
 
     @Override
@@ -200,7 +201,7 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
                 }
 
                 this.refreshTokens.put(connectionContext, Mono.just(refreshToken));
-                getRefreshTokenStream(connectionContext).onNext(refreshToken);
+                getRefreshTokenStream(connectionContext).sink.next(refreshToken);
             });
     }
 
@@ -213,8 +214,8 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
             .map(AbstractUaaTokenProvider::extractAccessToken);
     }
 
-    private ReplayProcessor<String> getRefreshTokenStream(ConnectionContext connectionContext) {
-        return this.refreshTokenStreams.computeIfAbsent(connectionContext, c -> ReplayProcessor.create(1));
+    private RefreshToken getRefreshTokenStream(ConnectionContext connectionContext) {
+        return this.refreshTokenStreams.computeIfAbsent(connectionContext, c -> new RefreshToken());
     }
 
     private Mono<HttpClientResponse> primaryToken(ConnectionContext connectionContext) {
@@ -269,6 +270,14 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
             .map(cached::cache)
             .orElseGet(cached::cache)
             .checkpoint();
+    }
+
+    private static final class RefreshToken {
+
+        private ReplayProcessor<String> processor = ReplayProcessor.cacheLast();
+
+        private FluxSink<String> sink = this.processor.sink();
+
     }
 
 }
