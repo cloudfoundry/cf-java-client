@@ -111,7 +111,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
                     .routeId(routeId)
                     .serviceInstanceId(serviceInstanceId)
                     .build())
-                .then(Mono.just(serviceInstanceId))))
+                .thenReturn(serviceInstanceId)))
             .flatMapMany(serviceInstanceId -> requestListRoutes(this.cloudFoundryClient, serviceInstanceId)
                 .filter(route -> serviceInstanceId.equals(route.getEntity().getServiceInstanceId())))
             .map(route -> ResourceUtils.getEntity(route).getHost())
@@ -261,7 +261,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
                 Mono.just(spaceId)
             )))
             .flatMap(function((organizationId, serviceInstanceId, spaceId) -> createAndBindRoute(this.cloudFoundryClient, domainName, organizationId, spaceId, serviceInstanceId)
-                .then(Mono.just(serviceInstanceId))))
+                .thenReturn(serviceInstanceId)))
             .flatMap(serviceInstanceId -> this.cloudFoundryClient.serviceInstances()
                 .delete(DeleteServiceInstanceRequest.builder()
                     .async(true)
@@ -290,7 +290,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
                 Mono.just(spaceId)
             )))
             .flatMap(function((organizationId, serviceInstanceId, spaceId) -> createAndBindRoute(this.cloudFoundryClient, domainName, organizationId, spaceId, serviceInstanceId)
-                .then(Mono.just(serviceInstanceId))))
+                .thenReturn(serviceInstanceId)))
             .flatMap(serviceInstanceId -> this.cloudFoundryClient.serviceInstances()
                 .delete(DeleteServiceInstanceRequest.builder()
                     .async(true)
@@ -378,7 +378,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
         Mono
             .zip(this.organizationId, this.spaceId)
             .flatMap(function((organizationId, spaceId) -> createServiceInstanceId(this.cloudFoundryClient, this.serviceBrokerId, serviceInstanceName, spaceId)
-                .then(Mono.just(organizationId))))
+                .thenReturn(organizationId)))
             .flatMapMany(organizationId -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.serviceInstances()
                     .list(ListServiceInstancesRequest.builder()
@@ -449,7 +449,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
                 Mono.just(spaceId)
             )))
             .flatMap(function((planId, spaceId) -> requestCreateServiceInstance(this.cloudFoundryClient, planId, serviceInstanceName, spaceId)
-                .then(Mono.just(planId))))
+                .thenReturn(planId)))
             .flatMapMany(planId -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.serviceInstances()
                     .list(ListServiceInstancesRequest.builder()
@@ -501,7 +501,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
                 Mono.just(serviceInstanceId))
             ))
             .flatMap(function((routeId, serviceInstanceId) -> requestBindServiceInstanceRoute(this.cloudFoundryClient, routeId, serviceInstanceId)
-                .then(Mono.just(serviceInstanceId))))
+                .thenReturn(serviceInstanceId)))
             .flatMapMany(serviceInstanceId -> Mono.zip(
                 Mono.just(serviceInstanceId),
                 PaginationUtils.requestClientV2Resources(page -> this.cloudFoundryClient.serviceInstances()
@@ -535,7 +535,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
                 Mono.just(serviceInstanceId))
             ))
             .flatMap(function((domainId, routeId, serviceInstanceId) -> requestBindServiceInstanceRoute(this.cloudFoundryClient, routeId, serviceInstanceId)
-                .then(Mono.just(Tuples.of(domainId, serviceInstanceId)))))
+                .thenReturn(Tuples.of(domainId, serviceInstanceId))))
             .flatMapMany(function((domainId, serviceInstanceId) -> Mono.zip(
                 Mono.just(serviceInstanceId),
                 PaginationUtils.requestClientV2Resources(page -> this.cloudFoundryClient.serviceInstances()
@@ -569,7 +569,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
                 Mono.just(serviceInstanceId))
             ))
             .flatMap(function((routeId, serviceInstanceId) -> requestBindServiceInstanceRoute(this.cloudFoundryClient, routeId, serviceInstanceId)
-                .then(Mono.just(serviceInstanceId))))
+                .thenReturn(serviceInstanceId)))
             .flatMapMany(serviceInstanceId -> Mono.zip(
                 Mono.just(serviceInstanceId),
                 PaginationUtils.requestClientV2Resources(page -> this.cloudFoundryClient.serviceInstances()
@@ -607,7 +607,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
                 Mono.just(serviceInstanceId))
             ))
             .flatMap(function((routeId, organizationId, serviceInstanceId) -> requestBindServiceInstanceRoute(this.cloudFoundryClient, routeId, serviceInstanceId)
-                .then(Mono.just(Tuples.of(organizationId, serviceInstanceId)))))
+                .thenReturn(Tuples.of(organizationId, serviceInstanceId))))
             .flatMapMany(function((organizationId, serviceInstanceId) -> Mono.zip(
                 Mono.just(serviceInstanceId),
                 PaginationUtils.requestClientV2Resources(page -> this.cloudFoundryClient.serviceInstances()
@@ -641,7 +641,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
                 Mono.just(serviceInstanceId))
             ))
             .flatMap(function((routeId, serviceInstanceId) -> requestBindServiceInstanceRoute(this.cloudFoundryClient, routeId, serviceInstanceId)
-                .then(Mono.just(serviceInstanceId))))
+                .thenReturn(serviceInstanceId)))
             .flatMapMany(serviceInstanceId -> Mono.zip(
                 Mono.just(serviceInstanceId),
                 PaginationUtils.requestClientV2Resources(page -> this.cloudFoundryClient.serviceInstances()
@@ -676,7 +676,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
                 Mono.just(serviceInstanceId))
             ))
             .flatMap(function((routeId, serviceInstanceId) -> requestBindServiceInstanceRoute(this.cloudFoundryClient, routeId, serviceInstanceId)
-                .then(Mono.just(serviceInstanceId))))
+                .thenReturn(serviceInstanceId)))
             .flatMapMany(serviceInstanceId -> Mono.zip(
                 Mono.just(serviceInstanceId),
                 PaginationUtils.requestClientV2Resources(page -> this.cloudFoundryClient.serviceInstances()
@@ -768,7 +768,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
                         .routeId(routeId)
                         .serviceInstanceId(serviceInstanceId)
                         .build()))
-                .then(Mono.just(serviceInstanceId))))
+                .thenReturn(serviceInstanceId)))
             .flatMapMany(serviceInstanceId -> requestListRoutes(this.cloudFoundryClient, serviceInstanceId)
                 .filter(route -> serviceInstanceId.equals(route.getEntity().getServiceInstanceId())))
             .as(StepVerifier::create)

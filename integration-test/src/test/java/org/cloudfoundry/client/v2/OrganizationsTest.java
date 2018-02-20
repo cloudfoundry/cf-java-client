@@ -429,7 +429,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 this.userId
             )
             .flatMap(function((organizationId, userId) -> requestAssociateUser(this.cloudFoundryClient, organizationId, userId)
-                .then(Mono.just(organizationId))))
+                .thenReturn(organizationId)))
             .flatMapMany(organizationId -> PaginationUtils.
                 requestClientV2Resources(page -> this.cloudFoundryClient.organizations()
                     .getUserRoles(GetOrganizationUserRolesRequest.builder()

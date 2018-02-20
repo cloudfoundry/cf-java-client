@@ -117,7 +117,7 @@ public final class ServicePlanVisibilitiesTest extends AbstractIntegrationTest {
                     .servicePlanVisibilityId(servicePlanIdVisibilityId)
                     .build())
                 .flatMap(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job))
-                .then(Mono.just(servicePlanId))))
+                .thenReturn(servicePlanId)))
             .flatMapMany(servicePlanId -> requestListServicePlanVisibilities(this.cloudFoundryClient, servicePlanId))
             .as(StepVerifier::create)
             .expectComplete()
@@ -153,7 +153,7 @@ public final class ServicePlanVisibilitiesTest extends AbstractIntegrationTest {
                     .async(false)
                     .servicePlanVisibilityId(servicePlanIdVisibilityId)
                     .build())
-                .then(Mono.just(servicePlanId))))
+                .thenReturn(servicePlanId)))
             .flatMapMany(servicePlanId -> requestListServicePlanVisibilities(this.cloudFoundryClient, servicePlanId))
             .as(StepVerifier::create)
             .expectComplete()
@@ -354,7 +354,7 @@ public final class ServicePlanVisibilitiesTest extends AbstractIntegrationTest {
                     .servicePlanId(servicePlanId)
                     .servicePlanVisibilityId(servicePlanIdVisibilityId)
                     .build())
-                .then(Mono.just(Tuples.of(newOrganizationId, servicePlanId)))))
+                .thenReturn(Tuples.of(newOrganizationId, servicePlanId))))
             .flatMapMany(function((newOrganizationId, servicePlanId) -> Mono.zip(
                 Mono.just(newOrganizationId),
                 requestListServicePlanVisibilities(this.cloudFoundryClient, servicePlanId)

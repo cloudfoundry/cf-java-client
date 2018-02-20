@@ -37,7 +37,6 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
-import java.util.concurrent.TimeoutException;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
@@ -65,7 +64,7 @@ public final class TagsTest extends AbstractIntegrationTest {
                 createApplicationId(this.cloudFoundryClient, sourceApplicationName, spaceId)
             ))
             .flatMap(function((destinationApplicationId, sourceApplicationId) -> requestCreatePolicy(this.networkingClient, destinationApplicationId, port, sourceApplicationId)
-                .then(Mono.just(destinationApplicationId))))
+                .thenReturn(destinationApplicationId)))
             .flatMap(destinationApplicationId -> this.networkingClient.tags()
                 .list(ListTagsRequest.builder()
                     .build())

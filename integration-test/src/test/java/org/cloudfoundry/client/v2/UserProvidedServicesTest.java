@@ -57,7 +57,6 @@ import reactor.util.function.Tuples;
 
 import java.time.Duration;
 import java.util.Collections;
-import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -165,7 +164,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
                 createRouteId(this.cloudFoundryClient, domainId, null, null, spaceId))
             ))
             .flatMap(function((instanceId, routeId) -> requestAssociateRoute(this.cloudFoundryClient, instanceId, routeId)
-                .then(Mono.just(instanceId))))
+                .thenReturn(instanceId)))
             .flatMapMany(instanceId -> Mono.zip(
                 Mono.just(instanceId),
                 PaginationUtils.requestClientV2Resources(page -> this.cloudFoundryClient.userProvidedServiceInstances()
@@ -197,7 +196,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
                 createRouteId(this.cloudFoundryClient, domainId, null, null, spaceId))
             ))
             .flatMap(function((domainId, instanceId, routeId) -> requestAssociateRoute(this.cloudFoundryClient, instanceId, routeId)
-                .then(Mono.just(Tuples.of(domainId, instanceId)))))
+                .thenReturn(Tuples.of(domainId, instanceId))))
             .flatMapMany(function((domainId, instanceId) -> Mono.zip(
                 Mono.just(instanceId),
                 PaginationUtils.requestClientV2Resources(page -> this.cloudFoundryClient.userProvidedServiceInstances()
@@ -230,7 +229,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
                 createRouteId(this.cloudFoundryClient, domainId, hostName, null, spaceId))
             ))
             .flatMap(function((instanceId, routeId) -> requestAssociateRoute(this.cloudFoundryClient, instanceId, routeId)
-                .then(Mono.just(instanceId))))
+                .thenReturn(instanceId)))
             .flatMapMany(instanceId -> Mono.zip(
                 Mono.just(instanceId),
                 PaginationUtils.requestClientV2Resources(page -> this.cloudFoundryClient.userProvidedServiceInstances()
@@ -266,7 +265,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
                 createRouteId(this.cloudFoundryClient, domainId, null, null, spaceId))
             ))
             .flatMap(function((instanceId, organizationId, routeId) -> requestAssociateRoute(this.cloudFoundryClient, instanceId, routeId)
-                .then(Mono.just(Tuples.of(instanceId, organizationId)))))
+                .thenReturn(Tuples.of(instanceId, organizationId))))
             .flatMapMany(function((instanceId, organizationId) -> Mono.zip(
                 Mono.just(instanceId),
                 PaginationUtils.requestClientV2Resources(page -> this.cloudFoundryClient.userProvidedServiceInstances()
@@ -299,7 +298,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
                 createRouteId(this.cloudFoundryClient, domainId, null, path, spaceId))
             ))
             .flatMap(function((instanceId, routeId) -> requestAssociateRoute(this.cloudFoundryClient, instanceId, routeId)
-                .then(Mono.just(instanceId))))
+                .thenReturn(instanceId)))
             .flatMapMany(instanceId -> Mono.zip(
                 Mono.just(instanceId),
                 PaginationUtils.requestClientV2Resources(page -> this.cloudFoundryClient.userProvidedServiceInstances()
@@ -332,7 +331,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
                 createRouteId(this.cloudFoundryClient, domainId, port, spaceId))
             ))
             .flatMap(function((instanceId, routeId) -> requestAssociateRoute(this.cloudFoundryClient, instanceId, routeId)
-                .then(Mono.just(instanceId))))
+                .thenReturn(instanceId)))
             .flatMapMany(instanceId -> Mono.zip(
                 Mono.just(instanceId),
                 PaginationUtils.requestClientV2Resources(page -> this.cloudFoundryClient.userProvidedServiceInstances()

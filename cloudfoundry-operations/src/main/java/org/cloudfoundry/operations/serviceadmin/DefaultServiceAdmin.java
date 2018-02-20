@@ -163,7 +163,7 @@ public final class DefaultServiceAdmin implements ServiceAdmin {
         }
 
         return Mono
-            .zip(
+            .when(
                 validateOrganization(cloudFoundryClient, request.getOrganizationName()),
                 validateService(cloudFoundryClient, request.getServiceName()))
             .thenMany(requestListServices(cloudFoundryClient, brokerIds))

@@ -415,7 +415,7 @@ public final class DefaultServices implements Services {
         return requestListServicePlanVisibilities(cloudFoundryClient, organizationId, servicePlanId)
             .next()
             .switchIfEmpty(ExceptionUtils.illegalArgument("Service Plan %s is not visible to your organization", resource.getEntity().getName()))
-            .then(Mono.just(Optional.of(servicePlanId)));
+            .thenReturn(Optional.of(servicePlanId));
     }
 
     private static Mono<AssociateUserProvidedServiceInstanceRouteResponse> createRouteBinding(CloudFoundryClient cloudFoundryClient, String routeId, String userProvidedServiceInstanceId,

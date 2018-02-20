@@ -243,7 +243,7 @@ public final class IsolationSegmentsTest extends AbstractIntegrationTest {
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
             .flatMap(organizationId -> createEntitledIsolationSegmentId(this.cloudFoundryClient, isolationSegmentName, organizationId)
-                .then(Mono.just(organizationId)))
+                .thenReturn(organizationId))
             .flatMapMany(organizationId -> PaginationUtils
                 .requestClientV3Resources(page -> this.cloudFoundryClient.isolationSegments()
                     .list(ListIsolationSegmentsRequest.builder()
@@ -275,7 +275,7 @@ public final class IsolationSegmentsTest extends AbstractIntegrationTest {
             )))
             .flatMap(function((isolationSegmentId, organizationId, spaceId) -> Mono.zip(
                 requestAssignIsolationSegment(this.cloudFoundryClient, isolationSegmentId, spaceId)
-                    .then(Mono.just(isolationSegmentId)),
+                    .thenReturn(isolationSegmentId),
                 Mono.just(organizationId)
             )))
             .flatMapMany(function((isolationSegmentId, organizationId) -> Mono.zip(
@@ -335,7 +335,7 @@ public final class IsolationSegmentsTest extends AbstractIntegrationTest {
                     .isolationSegmentId(isolationSegmentId)
                     .organizationId(organizationId)
                     .build())
-                .then(Mono.just(isolationSegmentId))))
+                .thenReturn(isolationSegmentId)))
             .flatMapMany(isolationSegmentId -> PaginationUtils
                 .requestClientV3Resources(page -> this.cloudFoundryClient.isolationSegments()
                     .listEntitledOrganizations(ListIsolationSegmentEntitledOrganizationsRequest.builder()

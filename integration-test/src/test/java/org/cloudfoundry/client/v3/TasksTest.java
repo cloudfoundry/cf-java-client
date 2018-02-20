@@ -43,7 +43,6 @@ import org.springframework.core.io.ClassPathResource;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import reactor.util.function.Tuples;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -135,7 +134,7 @@ public final class TasksTest extends AbstractIntegrationTest {
                 Mono.just(applicationId),
                 getDropletId(this.cloudFoundryClient, applicationId)))
             .flatMap(function((applicationId, dropletId) -> requestCreateTask(this.cloudFoundryClient, applicationId)
-                .then(Mono.just(dropletId))))
+                .thenReturn(dropletId)))
             .flatMapMany(dropletId -> PaginationUtils.
                 requestClientV3Resources(page -> this.cloudFoundryClient.tasks()
                     .list(ListTasksRequest.builder()
@@ -204,7 +203,7 @@ public final class TasksTest extends AbstractIntegrationTest {
                 Mono.just(applicationId),
                 getDropletId(this.cloudFoundryClient, applicationId)))
             .flatMap(function((applicationId, dropletId) -> requestCreateTask(this.cloudFoundryClient, applicationId)
-                .then(Mono.just(dropletId))))
+                .thenReturn(dropletId)))
             .flatMapMany(dropletId -> PaginationUtils.
                 requestClientV3Resources(page -> this.cloudFoundryClient.tasks()
                     .list(ListTasksRequest.builder()

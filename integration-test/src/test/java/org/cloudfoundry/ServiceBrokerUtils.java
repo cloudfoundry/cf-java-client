@@ -94,7 +94,7 @@ public final class ServiceBrokerUtils {
                 createRouteId(cloudFoundryClient, ResourceUtils.getId(domain), spaceId, hostName)
             )
             .flatMap(function((applicationId, routeId) -> requestAssociateApplicationRoute(cloudFoundryClient, applicationId, routeId)
-                .then(Mono.just(applicationId))))
+                .thenReturn(applicationId)))
             .flatMap(applicationId -> createRunningServiceBrokerApplication(cloudFoundryClient, application, applicationId, planName, serviceName)
                 .map(ignore -> new ApplicationMetadata(applicationId, spaceId, String.format("https://%s.%s", hostName, ResourceUtils.getEntity(domain).getName()))));
     }

@@ -866,7 +866,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .applicationName(applicationName)
                     .sequenceId(sequenceId)
                     .build())
-                .then(Mono.just(sequenceId)))
+                .thenReturn(sequenceId))
             .flatMapMany(sequenceId -> requestListTasks(this.cloudFoundryOperations, applicationName)
                 .filter(task -> sequenceId.equals(task.getSequenceId())))
             .map(Task::getState)

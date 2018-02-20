@@ -184,7 +184,7 @@ public class IntegrationTestConfiguration {
                 .redirectUriPattern("https://test.com/login")
                 .scopes(SCOPES)
                 .build())
-            .then(Mono.just(Tuples.of(clientId, clientSecret)))
+            .thenReturn(Tuples.of(clientId, clientSecret))
             .doOnSubscribe(s -> this.logger.debug(">> CLIENT ({}/{}) <<", clientId, clientSecret))
             .doOnError(Throwable::printStackTrace)
             .doOnSuccess(r -> this.logger.debug("<< CLIENT ({})>>", clientId));
@@ -318,7 +318,7 @@ public class IntegrationTestConfiguration {
                     .organizationId(organizationId)
                     .managerId(userId1)
                     .build())
-                .then(Mono.just(organizationId))))
+                .thenReturn(organizationId)))
             .doOnSubscribe(s -> this.logger.debug(">> ORGANIZATION ({}) <<", organizationName))
             .doOnError(Throwable::printStackTrace)
             .doOnSuccess(id -> this.logger.debug("<< ORGANIZATION ({}) >>", id))
