@@ -188,7 +188,7 @@ public final class DefaultApplications implements Applications {
                 getApplicationIdFromOrgSpace(cloudFoundryClient, request.getTargetName(), spaceId, request.getTargetOrganization(), request.getTargetSpace())
             )))
             .flatMap(function((cloudFoundryClient, sourceApplicationId, targetApplicationId) -> copyBits(cloudFoundryClient, request.getStagingTimeout(), sourceApplicationId, targetApplicationId)
-                .then(Mono.just(Tuples.of(cloudFoundryClient, targetApplicationId)))))
+                .thenReturn(Tuples.of(cloudFoundryClient, targetApplicationId))))
             .filter(predicate((cloudFoundryClient, targetApplicationId) -> Optional.ofNullable(request.getRestart()).orElse(false)))
             .flatMap(function((cloudFoundryClient, targetApplicationId) -> restartApplication(cloudFoundryClient, request.getTargetName(), targetApplicationId, request.getStagingTimeout(),
                 request.getStartupTimeout())))
@@ -203,7 +203,7 @@ public final class DefaultApplications implements Applications {
             .flatMap(function((cloudFoundryClient, spaceId) -> getRoutesAndApplicationId(cloudFoundryClient, request, spaceId, Optional.ofNullable(request.getDeleteRoutes()).orElse(false))
                 .map(function((routes, applicationId) -> Tuples.of(cloudFoundryClient, routes, applicationId)))))
             .flatMap(function((cloudFoundryClient, routes, applicationId) -> deleteRoutes(cloudFoundryClient, request.getCompletionTimeout(), routes)
-                .then(Mono.just(Tuples.of(cloudFoundryClient, applicationId)))))
+                .thenReturn(Tuples.of(cloudFoundryClient, applicationId))))
             .delayUntil(function(DefaultApplications::removeServiceBindings))
             .flatMap(function(DefaultApplications::requestDeleteApplication))
             .transform(OperationsLogging.log("Delete Application"))
@@ -1143,12 +1143,12 @@ public final class DefaultApplications implements Applications {
             ))
             .flatMap(function((applicationId, existingRoutes, matchedResources) -> prepareDomainsAndRoutes(cloudFoundryClient, applicationId, availableDomains, manifest, existingRoutes,
                 randomWords, spaceId)
-                .then(Mono.just(Tuples.of(applicationId, matchedResources)))))
-            .flatMap(function((applicationId, matchedResources) -> Mono.zip(
+                .thenReturn(Tuples.of(applicationId, matchedResources))))
+            .flatMap(function((applicationId, matchedResources) -> Mono.when(
                 uploadApplicationAndWait(cloudFoundryClient, applicationId, manifest.getPath(), matchedResources, request.getStagingTimeout()),
                 bindServices(cloudFoundryClient, applicationId, manifest, spaceId)
             )
-                .then(Mono.just(applicationId))))
+                .thenReturn(applicationId)))
             .flatMap(applicationId -> stopAndStartApplication(cloudFoundryClient, applicationId, manifest.getName(), request));
     }
 
@@ -1162,7 +1162,7 @@ public final class DefaultApplications implements Applications {
                 getApplicationRoutes(cloudFoundryClient, applicationId)
             ))
             .flatMap(function((applicationId, existingRoutes) -> prepareDomainsAndRoutes(cloudFoundryClient, applicationId, availableDomains, manifest, existingRoutes, randomWords, spaceId)
-                .then(Mono.just(applicationId))))
+                .thenReturn(applicationId)))
             .delayUntil(applicationId -> bindServices(cloudFoundryClient, applicationId, manifest, spaceId))
             .flatMap(applicationId -> stopAndStartApplication(cloudFoundryClient, applicationId, manifest.getName(), request));
     }

@@ -117,7 +117,7 @@ public final class ServicesTest extends AbstractIntegrationTest {
                     .async(false)
                     .serviceId(serviceId)
                     .build())
-                .then(Mono.just(serviceBrokerMetadata.serviceBrokerId)))
+                .thenReturn(serviceBrokerMetadata.serviceBrokerId))
             .thenMany(requestListServices(this.cloudFoundryClient, serviceBrokerMetadata.serviceBrokerId))
             .as(StepVerifier::create)
             .expectComplete()

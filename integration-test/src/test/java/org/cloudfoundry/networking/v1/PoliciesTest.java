@@ -36,10 +36,8 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import reactor.util.function.Tuples;
 
 import java.time.Duration;
-import java.util.concurrent.TimeoutException;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
@@ -82,7 +80,7 @@ public final class PoliciesTest extends AbstractIntegrationTest {
                             .build())
                         .build())
                     .build())
-                .then(Mono.just(destinationApplicationId))))
+                .thenReturn(destinationApplicationId)))
             .flatMap(destinationApplicationId -> requestListPolicies(this.networkingClient)
                 .flatMapIterable(ListPoliciesResponse::getPolicies)
                 .filter(policy -> destinationApplicationId.equals(policy.getDestination().getId()))
@@ -171,7 +169,7 @@ public final class PoliciesTest extends AbstractIntegrationTest {
                 createApplicationId(this.cloudFoundryClient, sourceApplicationName, spaceId)
             ))
             .flatMap(function((destinationApplicationId, sourceApplicationId) -> requestCreatePolicy(this.networkingClient, destinationApplicationId, port, sourceApplicationId)
-                .then(Mono.just(destinationApplicationId))))
+                .thenReturn(destinationApplicationId)))
             .flatMap(destinationApplicationId -> this.networkingClient.policies()
                 .list(ListPoliciesRequest.builder()
                     .policyGroupId(destinationApplicationId)

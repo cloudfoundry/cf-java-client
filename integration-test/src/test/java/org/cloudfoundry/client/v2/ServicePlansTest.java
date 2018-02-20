@@ -243,7 +243,7 @@ public final class ServicePlansTest extends AbstractIntegrationTest {
                 this.spaceId
             ))
             .flatMap(function((servicePlanId, spaceId) -> createServiceInstanceId(this.cloudFoundryClient, serviceInstanceName, servicePlanId, spaceId)
-                .then(Mono.just(servicePlanId))))
+                .thenReturn(servicePlanId)))
             .flatMapMany(servicePlanId -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.servicePlans()
                     .listServiceInstances(ListServicePlanServiceInstancesRequest.builder()
@@ -268,7 +268,7 @@ public final class ServicePlansTest extends AbstractIntegrationTest {
                 this.spaceId
             ))
             .flatMap(function((servicePlanId, spaceId) -> createServiceInstanceId(this.cloudFoundryClient, serviceInstanceName, servicePlanId, spaceId)
-                .then(Mono.just(servicePlanId))))
+                .thenReturn(servicePlanId)))
             .flatMapMany(servicePlanId -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.servicePlans()
                     .listServiceInstances(ListServicePlanServiceInstancesRequest.builder()

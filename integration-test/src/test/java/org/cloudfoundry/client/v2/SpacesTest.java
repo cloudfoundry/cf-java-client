@@ -112,7 +112,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.Date;
-import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
@@ -285,7 +284,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .securityGroupId(securityGroupId)
                     .spaceId(spaceId)
                     .build())
-                .then(Mono.just(spaceId))))
+                .thenReturn(spaceId)))
             .flatMapMany(spaceId -> requestListSecurityGroups(this.cloudFoundryClient, spaceId))
             .filter(response -> securityGroupName.equals(response.getEntity().getName()))
             .as(StepVerifier::create)
@@ -1004,7 +1003,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 createSpaceId(this.cloudFoundryClient, organizationId, spaceName)
             ))
             .flatMap(function((securityGroupId, spaceId) -> requestAssociateSpaceSecurityGroup(this.cloudFoundryClient, spaceId, securityGroupId)
-                .then(Mono.just(spaceId))))
+                .thenReturn(spaceId)))
             .flatMapMany(spaceId -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.spaces()
                     .listSecurityGroups(ListSpaceSecurityGroupsRequest.builder()
@@ -1029,7 +1028,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 createSpaceId(this.cloudFoundryClient, organizationId, spaceName)
             ))
             .flatMap(function((securityGroupId, spaceId) -> requestAssociateSpaceSecurityGroup(this.cloudFoundryClient, spaceId, securityGroupId)
-                .then(Mono.just(spaceId))))
+                .thenReturn(spaceId)))
             .flatMapMany(spaceId -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.spaces()
                     .listSecurityGroups(ListSpaceSecurityGroupsRequest.builder()
@@ -1054,7 +1053,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 createSpaceId(this.cloudFoundryClient, organizationId, spaceName)
             ))
             .flatMap(function((serviceBrokerId, spaceId) -> createServiceInstanceId(this.cloudFoundryClient, serviceBrokerId, serviceInstanceName, spaceId)
-                .then(Mono.just(spaceId))))
+                .thenReturn(spaceId)))
             .flatMapMany(spaceId -> requestListServiceInstances(this.cloudFoundryClient, spaceId))
             .filter(resource -> serviceInstanceName.equals(ResourceUtils.getEntity(resource).getName()))
             .as(StepVerifier::create)
@@ -1074,7 +1073,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 createSpaceId(this.cloudFoundryClient, organizationId, spaceName)
             ))
             .flatMap(function((serviceBrokerId, spaceId) -> createServiceInstanceId(this.cloudFoundryClient, serviceBrokerId, serviceInstanceName, spaceId)
-                .then(Mono.just(spaceId))))
+                .thenReturn(spaceId)))
             .flatMapMany(spaceId -> requestListServiceInstances(this.cloudFoundryClient, spaceId, builder -> builder.gatewayName("")))
             .filter(resource -> serviceInstanceName.equals(ResourceUtils.getEntity(resource).getName()))
             .as(StepVerifier::create)
@@ -1094,7 +1093,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 createSpaceId(this.cloudFoundryClient, organizationId, spaceName)
             ))
             .flatMap(function((serviceBrokerId, spaceId) -> createServiceInstanceId(this.cloudFoundryClient, serviceBrokerId, serviceInstanceName, spaceId)
-                .then(Mono.just(spaceId))))
+                .thenReturn(spaceId)))
             .flatMapMany(spaceId -> requestListServiceInstances(this.cloudFoundryClient, spaceId, builder -> builder.name(serviceInstanceName)))
             .as(StepVerifier::create)
             .expectNextCount(1)
@@ -1407,7 +1406,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .securityGroupId(securityGroupId)
                     .spaceId(spaceId)
                     .build())
-                .then(Mono.just(spaceId))))
+                .thenReturn(spaceId)))
             .flatMapMany(spaceId -> requestListSecurityGroups(this.cloudFoundryClient, spaceId))
             .filter(response -> securityGroupName.equals(response.getEntity().getName()))
             .as(StepVerifier::create)
@@ -1559,7 +1558,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .organizationId(organizationId)
                     .userId(userId)
                     .build())
-                .then(Mono.just(userId)));
+                .thenReturn(userId));
     }
 
     private static String getPastTimestamp() {
