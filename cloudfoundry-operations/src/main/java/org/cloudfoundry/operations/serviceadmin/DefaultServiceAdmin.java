@@ -100,7 +100,7 @@ public final class DefaultServiceAdmin implements ServiceAdmin {
                 Mono.just(cloudFoundryClient),
                 getServicePlans(cloudFoundryClient, serviceId)
             )))
-            .flatMap(function((cloudFoundryClient, servicePlans) -> Mono.zip(
+            .flatMap(function((cloudFoundryClient, servicePlans) -> Mono.when(
                 updateServicePlanVisibilities(cloudFoundryClient, request, servicePlans),
                 updateServicePlansPublicStatus(cloudFoundryClient, request, servicePlans)
             )))
@@ -119,7 +119,7 @@ public final class DefaultServiceAdmin implements ServiceAdmin {
                 Mono.just(cloudFoundryClient),
                 getServicePlans(cloudFoundryClient, serviceId)
             )))
-            .flatMap(function((cloudFoundryClient, servicePlans) -> Mono.zip(
+            .flatMap(function((cloudFoundryClient, servicePlans) -> Mono.when(
                 updateServicePlanVisibilities(cloudFoundryClient, request, servicePlans),
                 updateServicePlansPublicStatus(cloudFoundryClient, request, servicePlans)
             )))

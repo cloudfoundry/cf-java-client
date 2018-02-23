@@ -61,7 +61,6 @@ import reactor.test.StepVerifier;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Duration;
-import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.operations.routes.Level.SPACE;
@@ -97,7 +96,7 @@ public final class ServicesTest extends AbstractIntegrationTest {
         String userProvidedServiceInstanceName = this.nameFactory.getServiceInstanceName();
 
         Mono
-            .zip(
+            .when(
                 requestCreatePrivateDomain(this.cloudFoundryOperations, domainName, this.organizationName),
                 requestCreateUserProvidedServiceInstance(this.cloudFoundryOperations, userProvidedServiceInstanceName)
             )
@@ -125,7 +124,7 @@ public final class ServicesTest extends AbstractIntegrationTest {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         Mono
-            .zip(
+            .when(
                 requestCreateApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName),
                 requestCreateServiceInstance(this.cloudFoundryOperations, this.planName, serviceInstanceName, this.serviceName)
             )
@@ -335,7 +334,7 @@ public final class ServicesTest extends AbstractIntegrationTest {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         Mono
-            .zip(
+            .when(
                 requestCreatePrivateDomain(this.cloudFoundryOperations, domainName, this.organizationName),
                 requestCreateUserProvidedServiceInstance(this.cloudFoundryOperations, serviceInstanceName)
             )
@@ -361,7 +360,7 @@ public final class ServicesTest extends AbstractIntegrationTest {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         Mono
-            .zip(
+            .when(
                 requestCreateApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName),
                 requestCreateServiceInstance(this.cloudFoundryOperations, this.planName, serviceInstanceName, this.serviceName)
             )
