@@ -123,6 +123,24 @@ public final class DefaultBuildpacksTest extends AbstractOperationsTest {
 
         this.buildpacks
             .update(UpdateBuildpackRequest.builder()
+                .enable(true)
+                .lock(true)
+                .name("test-buildpack")
+                .position(5)
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void updateWithBits() {
+        requestListBuildpacks(this.cloudFoundryClient, "test-buildpack");
+        requestUpdateBuildpack(this.cloudFoundryClient, "test-buildpack-id", true, true, 5);
+        requestUploadBuildpack(this.cloudFoundryClient, "test-buildpack-id", Paths.get("test-buildpack"), "test-buildpack");
+
+        this.buildpacks
+            .update(UpdateBuildpackRequest.builder()
                 .buildpack(Paths.get("test-buildpack"))
                 .enable(true)
                 .lock(true)

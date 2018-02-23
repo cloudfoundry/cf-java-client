@@ -198,9 +198,10 @@ public final class DefaultBuildpacks implements Buildpacks {
             .build();
     }
 
-    private static Mono<UploadBuildpackResponse> uploadBuildpackBits(CloudFoundryClient cloudFoundryClient, String buildpackId, UpdateBuildpackRequest request) {
+    private static Mono<Void> uploadBuildpackBits(CloudFoundryClient cloudFoundryClient, String buildpackId, UpdateBuildpackRequest request) {
         if (request.getBuildpack() != null) {
-            requestUploadBuildpackBits(cloudFoundryClient, buildpackId, request.getBuildpack());
+            return requestUploadBuildpackBits(cloudFoundryClient, buildpackId, request.getBuildpack())
+                .then(Mono.empty());
         }
 
         return Mono.empty();

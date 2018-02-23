@@ -519,12 +519,9 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
-        Mono
-            .when(
-                createSharedDomainAndTcpRoute(this.cloudFoundryOperations, domainName, this.spaceName),
-                requestCreateApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, true)
-            )
-            .then(function((port, ignore) -> requestMapRoute(this.cloudFoundryOperations, applicationName, domainName, port)))
+        requestCreateApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, true)
+            .then(createSharedDomainAndTcpRoute(this.cloudFoundryOperations, domainName, this.spaceName))
+            .then(port -> requestMapRoute(this.cloudFoundryOperations, applicationName, domainName, port))
             .then(port -> this.cloudFoundryOperations.routes()
                 .unmap(UnmapRouteRequest.builder()
                     .applicationName(applicationName)
