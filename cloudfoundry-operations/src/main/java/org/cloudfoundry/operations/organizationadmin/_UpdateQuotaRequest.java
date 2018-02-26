@@ -32,6 +32,12 @@ abstract class _UpdateQuotaRequest {
     abstract Boolean getAllowPaidServicePlans();
 
     /**
+     * Total number of application instances
+     */
+    @Nullable
+    abstract Integer getApplicationInstanceLimit();
+
+    /**
      * The instance memory limit
      */
     @Nullable
@@ -53,6 +59,12 @@ abstract class _UpdateQuotaRequest {
      */
     @Nullable
     abstract String getNewName();
+
+    /**
+     * Maximum number of routes that may be created with reserved ports
+     */
+    @Nullable
+    abstract Integer getTotalReservedRoutePorts();
 
     /**
      * The total routes

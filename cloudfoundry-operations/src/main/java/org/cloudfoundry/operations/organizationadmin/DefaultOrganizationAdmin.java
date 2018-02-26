@@ -123,10 +123,12 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
     private static Mono<CreateOrganizationQuotaDefinitionResponse> createOrganizationQuota(CloudFoundryClient cloudFoundryClient, CreateQuotaRequest request) {
         return requestCreateOrganizationQuota(
             cloudFoundryClient,
+            Optional.ofNullable(request.getApplicationInstanceLimit()).orElse(-1),
             Optional.ofNullable(request.getInstanceMemoryLimit()).orElse(-1),
             Optional.ofNullable(request.getMemoryLimit()).orElse(0),
             request.getName(),
             Optional.ofNullable(request.getAllowPaidServicePlans()).orElse(false),
+            Optional.ofNullable(request.getTotalReservedRoutePorts()).orElse(0),
             Optional.ofNullable(request.getTotalRoutes()).orElse(0),
             Optional.ofNullable(request.getTotalServices()).orElse(0));
     }
@@ -154,14 +156,17 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
             .map(ResourceUtils::getId);
     }
 
-    private static Mono<CreateOrganizationQuotaDefinitionResponse> requestCreateOrganizationQuota(CloudFoundryClient cloudFoundryClient, Integer instanceMemoryLimit, Integer memoryLimit, String name,
-                                                                                                  Boolean nonBasicServicesAllowed, Integer totalRoutes, Integer totalServices) {
+    private static Mono<CreateOrganizationQuotaDefinitionResponse> requestCreateOrganizationQuota(CloudFoundryClient cloudFoundryClient, Integer applicationInstanceLimit, Integer instanceMemoryLimit,
+                                                                                                  Integer memoryLimit, String name, Boolean nonBasicServicesAllowed, Integer totalReservedRoutePorts,
+                                                                                                  Integer totalRoutes, Integer totalServices) {
         return cloudFoundryClient.organizationQuotaDefinitions()
             .create(CreateOrganizationQuotaDefinitionRequest.builder()
+                .applicationInstanceLimit(applicationInstanceLimit)
                 .instanceMemoryLimit(instanceMemoryLimit)
                 .memoryLimit(memoryLimit)
                 .name(name)
                 .nonBasicServicesAllowed(nonBasicServicesAllowed)
+                .totalReservedRoutePorts(totalReservedRoutePorts)
                 .totalRoutes(totalRoutes)
                 .totalServices(totalServices)
                 .build());
@@ -209,16 +214,19 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
                 .build());
     }
 
-    private static Mono<UpdateOrganizationQuotaDefinitionResponse> requestUpdateOrganizationQuota(CloudFoundryClient cloudFoundryClient, String organizationQuotaDefinitionId,
-                                                                                                  Integer instanceMemoryLimit, Integer memoryLimit, String name, Boolean nonBasicServicesAllowed,
-                                                                                                  Integer totalRoutes, Integer totalServices) {
+    private static Mono<UpdateOrganizationQuotaDefinitionResponse> requestUpdateOrganizationQuota(CloudFoundryClient cloudFoundryClient, Integer applicationInstanceLimit, Integer instanceMemoryLimit,
+                                                                                                  Integer memoryLimit, String name, Boolean nonBasicServicesAllowed,
+                                                                                                  String organizationQuotaDefinitionId, Integer totalReservedRoutePorts, Integer totalRoutes,
+                                                                                                  Integer totalServices) {
         return cloudFoundryClient.organizationQuotaDefinitions()
             .update(UpdateOrganizationQuotaDefinitionRequest.builder()
+                .applicationInstanceLimit(applicationInstanceLimit)
                 .instanceMemoryLimit(instanceMemoryLimit)
                 .memoryLimit(memoryLimit)
                 .name(name)
                 .organizationQuotaDefinitionId(organizationQuotaDefinitionId)
                 .nonBasicServicesAllowed(nonBasicServicesAllowed)
+                .totalReservedRoutePorts(totalReservedRoutePorts)
                 .totalRoutes(totalRoutes)
                 .totalServices(totalServices)
                 .build());
@@ -234,6 +242,7 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
             .instanceMemoryLimit(entity.getInstanceMemoryLimit())
             .memoryLimit(entity.getMemoryLimit())
             .name(entity.getName())
+            .totalReservedRoutePorts(entity.getTotalReservedRoutePorts())
             .totalRoutes(entity.getTotalRoutes())
             .totalServices(entity.getTotalServices())
             .build();
@@ -245,11 +254,11 @@ public final class DefaultOrganizationAdmin implements OrganizationAdmin {
 
         return requestUpdateOrganizationQuota(
             cloudFoundryClient,
+            Optional.ofNullable(request.getApplicationInstanceLimit()).orElse(-1),
+            Optional.ofNullable(request.getInstanceMemoryLimit()).orElse(existing.getInstanceMemoryLimit()), Optional.ofNullable(request.getMemoryLimit()).orElse(existing.getMemoryLimit()),
+            Optional.ofNullable(request.getNewName()).orElse(existing.getName()), Optional.ofNullable(request.getAllowPaidServicePlans()).orElse(existing.getNonBasicServicesAllowed()),
             ResourceUtils.getId(resource),
-            Optional.ofNullable(request.getInstanceMemoryLimit()).orElse(existing.getInstanceMemoryLimit()),
-            Optional.ofNullable(request.getMemoryLimit()).orElse(existing.getMemoryLimit()),
-            Optional.ofNullable(request.getNewName()).orElse(existing.getName()),
-            Optional.ofNullable(request.getAllowPaidServicePlans()).orElse(existing.getNonBasicServicesAllowed()),
+            Optional.ofNullable(request.getTotalReservedRoutePorts()).orElse(0),
             Optional.ofNullable(request.getTotalRoutes()).orElse(existing.getTotalRoutes()),
             Optional.ofNullable(request.getTotalServices()).orElse(existing.getTotalServices()));
     }
