@@ -50,8 +50,8 @@
         <java-semver.version>0.9.0</java-semver.version>
         <jjwt.version>0.9.0</jjwt.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <reactor-core.version>3.1.5.BUILD-SNAPSHOT</reactor-core.version>
-        <reactor-netty.version>0.7.5.BUILD-SNAPSHOT</reactor-netty.version>
+        <reactor-core.version>3.1.5.RELEASE</reactor-core.version>
+        <reactor-netty.version>0.7.5.RELEASE</reactor-netty.version>
         <wire.version>2.2.0</wire.version>
     </properties>
 
