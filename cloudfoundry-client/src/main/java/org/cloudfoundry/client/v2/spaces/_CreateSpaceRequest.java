@@ -85,7 +85,7 @@ abstract class _CreateSpaceRequest {
     /**
      * The space quota definition id
      */
-    @JsonProperty("space quota definition guid")
+    @JsonProperty("space_quota_definition_guid")
     @Nullable
     abstract String getSpaceQuotaDefinitionId();
 
