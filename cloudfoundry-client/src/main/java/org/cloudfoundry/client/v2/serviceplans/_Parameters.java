@@ -20,17 +20,31 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.immutables.value.Value;
 
+import java.util.Map;
+
 /**
- * The entity representing a service plan schema
+ * The entity representing service plan schema parameters
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _Schema {
+abstract class _Parameters {
 
     /**
-     * The schema parameters
+     * The JSON schema
      */
-    @JsonProperty("parameters")
-    abstract Parameters getParameters();
+    @JsonProperty("$schema")
+    abstract String getJsonSchema();
+
+    /**
+     * The parameter type
+     */
+    @JsonProperty("type")
+    abstract String getType();
+
+    /**
+     * The parameter properties
+     */
+    @JsonProperty("properties")
+    abstract Map<String, Object> getProperties();
 
 }

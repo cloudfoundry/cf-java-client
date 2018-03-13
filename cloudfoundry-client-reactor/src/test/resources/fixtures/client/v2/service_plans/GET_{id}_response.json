@@ -15,6 +15,48 @@
     "public": true,
     "active": true,
     "service_url": "/v2/services/8ac39757-0f9d-4295-9b6f-e626f7ee3cd4",
-    "service_instances_url": "/v2/service_plans/f6ceb8a2-e6fc-43d5-a11b-7ced9e1b47c7/service_instances"
+    "service_instances_url": "/v2/service_plans/f6ceb8a2-e6fc-43d5-a11b-7ced9e1b47c7/service_instances",
+    "schemas": {
+      "service_instance": {
+        "create": {
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "type": "object",
+            "properties": {
+              "billing-account": {
+                "description": "Billing account number used to charge use of shared fake server.",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "update": {
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "type": "object",
+            "properties": {
+              "billing-account": {
+                "description": "Billing account number used to charge use of shared fake server.",
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "service_binding": {
+        "create": {
+          "parameters": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "type": "object",
+            "properties": {
+              "billing-account": {
+                "description": "Billing account number used to charge use of shared fake server.",
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }
