@@ -28,6 +28,11 @@ import org.cloudfoundry.client.v2.serviceplans.ListServicePlanServiceInstancesRe
 import org.cloudfoundry.client.v2.serviceplans.ListServicePlanServiceInstancesResponse;
 import org.cloudfoundry.client.v2.serviceplans.ListServicePlansRequest;
 import org.cloudfoundry.client.v2.serviceplans.ListServicePlansResponse;
+import org.cloudfoundry.client.v2.serviceplans.Parameters;
+import org.cloudfoundry.client.v2.serviceplans.Schema;
+import org.cloudfoundry.client.v2.serviceplans.Schemas;
+import org.cloudfoundry.client.v2.serviceplans.ServiceBindingSchema;
+import org.cloudfoundry.client.v2.serviceplans.ServiceInstanceSchema;
 import org.cloudfoundry.client.v2.serviceplans.ServicePlanEntity;
 import org.cloudfoundry.client.v2.serviceplans.ServicePlanResource;
 import org.cloudfoundry.client.v2.serviceplans.UpdateServicePlanRequest;
@@ -41,6 +46,8 @@ import reactor.test.StepVerifier;
 
 import java.time.Duration;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
@@ -110,6 +117,18 @@ public final class ReactorServicePlansTest extends AbstractClientApiTest {
 
     @Test
     public void get() {
+        Map<String, String> details = new HashMap<>();
+        details.put("description", "Billing account number used to charge use of shared fake server.");
+        details.put("type", "string");
+
+        Schema testSchema = Schema.builder()
+            .parameters(Parameters.builder()
+                .jsonSchema("http://json-schema.org/draft-04/schema#")
+                .properties(Collections.singletonMap("billing-account", details))
+                .type("object")
+                .build())
+            .build();
+
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/service_plans/test-service-plan-id")
@@ -139,6 +158,15 @@ public final class ReactorServicePlansTest extends AbstractClientApiTest {
                     .uniqueId("2aa0162c-9c88-4084-ad1d-566a09e8d316")
                     .publiclyVisible(true)
                     .active(true)
+                    .schemas(Schemas.builder()
+                        .serviceBinding(ServiceBindingSchema.builder()
+                            .create(testSchema)
+                            .build())
+                        .serviceInstance(ServiceInstanceSchema.builder()
+                            .create(testSchema)
+                            .update(testSchema)
+                            .build())
+                        .build())
                     .serviceUrl("/v2/services/8ac39757-0f9d-4295-9b6f-e626f7ee3cd4")
                     .serviceInstancesUrl("/v2/service_plans/f6ceb8a2-e6fc-43d5-a11b-7ced9e1b47c7/service_instances")
                     .build())
