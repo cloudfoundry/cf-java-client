@@ -18,6 +18,7 @@ package org.cloudfoundry.client.v2.serviceplans;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 import java.util.Map;
@@ -33,18 +34,21 @@ abstract class _Parameters {
      * The JSON schema
      */
     @JsonProperty("$schema")
+    @Nullable
     abstract String getJsonSchema();
 
     /**
      * The parameter type
      */
     @JsonProperty("type")
+    @Nullable
     abstract String getType();
 
     /**
      * The parameter properties
      */
     @JsonProperty("properties")
+    @Nullable
     abstract Map<String, Object> getProperties();
 
 }
