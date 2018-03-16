@@ -38,8 +38,8 @@ import org.springframework.context.annotation.Lazy;
 /**
  * The ExampleConfiguration should typically be used like this:
  *
- * <pre>{@code
- * @Component
+ * <pre><code>
+ * {@literal}@Component
  * final class Example implements ApplicationRunner {
  *
  *     private final Logger logger = LoggerFactory.getLogger("example");
@@ -49,12 +49,12 @@ import org.springframework.context.annotation.Lazy;
  *        .run(args);
  *     }
  *
- *     @Override
+ *     {@literal}@Override
  *     public void run(ApplicationArguments args) throws Exception {
  *     }
  *
  * }
- * }</pre>
+ * </code></pre>
  */
 @Configuration
 @EnableAutoConfiguration
