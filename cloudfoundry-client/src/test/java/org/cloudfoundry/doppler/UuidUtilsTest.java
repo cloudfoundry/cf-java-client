@@ -16,18 +16,21 @@
 
 package org.cloudfoundry.doppler;
 
-import java.util.Optional;
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.util.UUID;
 
-final class UuidUtils {
+public final class UuidUtilsTest {
 
-    private UuidUtils() {
-    }
+    @Test
+    public void from() {
+        org.cloudfoundry.dropsonde.events.UUID dropsondeUuid = new org.cloudfoundry.dropsonde.events.UUID.Builder()
+            .high(0x79d4c3b2020e67a5L)
+            .low(0x7243cc580bc17af4L)
+            .build();
 
-    static UUID from(org.cloudfoundry.dropsonde.events.UUID dropsonde) {
-        return Optional.ofNullable(dropsonde)
-            .map(d -> new UUID(Long.reverseBytes(d.low), Long.reverseBytes(d.high)))
-            .orElse(null);
+        Assert.assertEquals(UUID.fromString("f47ac10b-58cc-4372-a567-0e02b2c3d479"), UuidUtils.from(dropsondeUuid));
     }
 
 }
