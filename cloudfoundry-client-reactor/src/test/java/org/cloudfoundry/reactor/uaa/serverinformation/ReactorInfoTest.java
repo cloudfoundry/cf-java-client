@@ -21,6 +21,8 @@ import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.uaa.AbstractUaaApiTest;
 import org.cloudfoundry.uaa.serverinformation.ApplicationInfo;
+import org.cloudfoundry.uaa.serverinformation.GetAutoLoginAuthenticationCodeRequest;
+import org.cloudfoundry.uaa.serverinformation.GetAutoLoginAuthenticationCodeResponse;
 import org.cloudfoundry.uaa.serverinformation.GetInfoRequest;
 import org.cloudfoundry.uaa.serverinformation.GetInfoResponse;
 import org.cloudfoundry.uaa.serverinformation.Links;
@@ -34,11 +36,41 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorInfoTest extends AbstractUaaApiTest {
 
     private final ReactorServerInformation info = new ReactorServerInformation(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+
+    @Test
+    public void getAutoLoginAuthenticationCode() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(POST).path("/autologin")
+                .payload("fixtures/uaa/info/POST_request.json")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/uaa/info/POST_response.json")
+                .build())
+            .build());
+
+        this.info
+            .getAuthenticationCode(GetAutoLoginAuthenticationCodeRequest.builder()
+                .clientId("admin")
+                .clientSecret("adminsecret")
+                .password("koala")
+                .username("marissa")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(GetAutoLoginAuthenticationCodeResponse.builder()
+                .code("m0R24i7t2s")
+                .path("/oauth/authorize")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
 
     @Test
     public void getInfo() {

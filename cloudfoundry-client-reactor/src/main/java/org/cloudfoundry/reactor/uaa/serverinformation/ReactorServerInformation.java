@@ -16,19 +16,28 @@
 
 package org.cloudfoundry.reactor.uaa.serverinformation;
 
+import io.netty.util.AsciiString;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.uaa.AbstractUaaOperations;
 import org.cloudfoundry.uaa.identityzones.IdentityZones;
+import org.cloudfoundry.uaa.serverinformation.GetAutoLoginAuthenticationCodeRequest;
+import org.cloudfoundry.uaa.serverinformation.GetAutoLoginAuthenticationCodeResponse;
 import org.cloudfoundry.uaa.serverinformation.GetInfoRequest;
 import org.cloudfoundry.uaa.serverinformation.GetInfoResponse;
 import org.cloudfoundry.uaa.serverinformation.ServerInformation;
 import reactor.core.publisher.Mono;
 
+import java.util.Base64;
+
+import static io.netty.handler.codec.http.HttpHeaderNames.AUTHORIZATION;
+
 /**
  * The Reactor-based implementation of {@link IdentityZones}
  */
 public final class ReactorServerInformation extends AbstractUaaOperations implements ServerInformation {
+
+    private static final AsciiString BASIC_PREAMBLE = new AsciiString("Basic ");
 
     /**
      * Creates an instance
@@ -39,6 +48,18 @@ public final class ReactorServerInformation extends AbstractUaaOperations implem
      */
     public ReactorServerInformation(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
         super(connectionContext, root, tokenProvider);
+    }
+
+    @Override
+    public Mono<GetAutoLoginAuthenticationCodeResponse> getAuthenticationCode(GetAutoLoginAuthenticationCodeRequest request) {
+        return post(request, GetAutoLoginAuthenticationCodeResponse.class, builder -> builder.pathSegment("autologin"),
+        outbound -> outbound
+            .map(r -> {
+                String encoded = Base64.getEncoder().encodeToString(new AsciiString(request.getClientId()).concat(":").concat(request.getClientSecret()).toByteArray());
+                r.requestHeaders().set(AUTHORIZATION, BASIC_PREAMBLE + encoded);
+                return r;
+            }))
+            .checkpoint();
     }
 
     @Override
