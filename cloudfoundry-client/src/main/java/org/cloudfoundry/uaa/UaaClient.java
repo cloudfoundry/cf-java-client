@@ -21,6 +21,7 @@ import org.cloudfoundry.uaa.clients.Clients;
 import org.cloudfoundry.uaa.groups.Groups;
 import org.cloudfoundry.uaa.identityproviders.IdentityProviders;
 import org.cloudfoundry.uaa.identityzones.IdentityZones;
+import org.cloudfoundry.uaa.serverinformation.ServerInformation;
 import org.cloudfoundry.uaa.tokens.Tokens;
 import org.cloudfoundry.uaa.users.Users;
 import reactor.core.publisher.Mono;
@@ -64,6 +65,11 @@ public interface UaaClient {
      * Main entry point to the UAA Identity Zone Client API
      */
     IdentityZones identityZones();
+
+    /**
+     * Main entry point to the UAA Server Information API
+     */
+    ServerInformation serverInformation();
 
     /**
      * Main entry point to the UAA Token Client API
