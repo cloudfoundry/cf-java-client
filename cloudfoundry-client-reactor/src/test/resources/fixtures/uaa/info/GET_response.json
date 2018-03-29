@@ -1,0 +1,34 @@
+{
+  "app": {
+    "version": "4.7.0-SNAPSHOT"
+  },
+  "showLoginLinks": true,
+  "links": {
+    "uaa": "http://localhost:8080/uaa",
+    "passwd": "/forgot_password",
+    "login": "http://localhost:8080/uaa",
+    "register": "/create_account"
+  },
+  "zone_name": "uaa",
+  "entityID": "cloudfoundry-saml-login",
+  "commit_id": "4bba13c",
+  "idpDefinitions": {
+    "SAMLMetadataUrl": "http://localhost:8080/uaa/saml/discovery?returnIDParam=idp&entityID=cloudfoundry-saml-login&idp=SAMLMetadataUrl&isPassive=true",
+    "SAML": "http://localhost:8080/uaa/saml/discovery?returnIDParam=idp&entityID=cloudfoundry-saml-login&idp=SAML&isPassive=true"
+  },
+  "prompts": {
+    "username": [
+      "text",
+      "Email"
+    ],
+    "password": [
+      "password",
+      "Password"
+    ],
+    "passcode": [
+      "password",
+      "One Time Code ( Get one at http://localhost:8080/uaa/passcode )"
+    ]
+  },
+  "timestamp": "2017-09-08T23:11:58+0000"
+}
