@@ -39,4 +39,12 @@ public interface ServerInformation {
      */
     Mono<GetInfoResponse> getInfo(GetInfoRequest request);
 
+    /**
+     * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/version/4.10.0/index.html#perform-login">Perform Auto Login</a> request
+     *
+     * @param request the Perform Auto Login request
+     * @return the response from the Perform Auto Login request
+     */
+    Mono<Void> autoLogin(AutoLoginRequest request);
+
 }

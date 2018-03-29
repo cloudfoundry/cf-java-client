@@ -21,6 +21,7 @@ import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.uaa.AbstractUaaApiTest;
 import org.cloudfoundry.uaa.serverinformation.ApplicationInfo;
+import org.cloudfoundry.uaa.serverinformation.AutoLoginRequest;
 import org.cloudfoundry.uaa.serverinformation.GetAutoLoginAuthenticationCodeRequest;
 import org.cloudfoundry.uaa.serverinformation.GetAutoLoginAuthenticationCodeResponse;
 import org.cloudfoundry.uaa.serverinformation.GetInfoRequest;
@@ -37,11 +38,33 @@ import java.util.Map;
 
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpResponseStatus.FOUND;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorInfoTest extends AbstractUaaApiTest {
 
     private final ReactorServerInformation info = new ReactorServerInformation(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+
+    @Test
+    public void autoLogin() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/autologin?client_id=admin&code=NaOjAprtCK")
+                .build())
+            .response(TestResponse.builder()
+                .status(FOUND)
+                .build())
+            .build());
+
+        this.info
+            .autoLogin(AutoLoginRequest.builder()
+                .clientId("admin")
+                .code("NaOjAprtCK")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
 
     @Test
     public void getAutoLoginAuthenticationCode() {

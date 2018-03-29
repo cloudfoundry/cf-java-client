@@ -21,6 +21,7 @@ import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.uaa.AbstractUaaOperations;
 import org.cloudfoundry.uaa.identityzones.IdentityZones;
+import org.cloudfoundry.uaa.serverinformation.AutoLoginRequest;
 import org.cloudfoundry.uaa.serverinformation.GetAutoLoginAuthenticationCodeRequest;
 import org.cloudfoundry.uaa.serverinformation.GetAutoLoginAuthenticationCodeResponse;
 import org.cloudfoundry.uaa.serverinformation.GetInfoRequest;
@@ -51,14 +52,20 @@ public final class ReactorServerInformation extends AbstractUaaOperations implem
     }
 
     @Override
+    public Mono<Void> autoLogin(AutoLoginRequest request) {
+        return get(request, Void.class, builder -> builder.pathSegment("autologin"))
+            .checkpoint();
+    }
+
+    @Override
     public Mono<GetAutoLoginAuthenticationCodeResponse> getAuthenticationCode(GetAutoLoginAuthenticationCodeRequest request) {
         return post(request, GetAutoLoginAuthenticationCodeResponse.class, builder -> builder.pathSegment("autologin"),
-        outbound -> outbound
-            .map(r -> {
-                String encoded = Base64.getEncoder().encodeToString(new AsciiString(request.getClientId()).concat(":").concat(request.getClientSecret()).toByteArray());
-                r.requestHeaders().set(AUTHORIZATION, BASIC_PREAMBLE + encoded);
-                return r;
-            }))
+            outbound -> outbound
+                .map(r -> {
+                    String encoded = Base64.getEncoder().encodeToString(new AsciiString(request.getClientId()).concat(":").concat(request.getClientSecret()).toByteArray());
+                    r.requestHeaders().set(AUTHORIZATION, BASIC_PREAMBLE + encoded);
+                    return r;
+                }))
             .checkpoint();
     }
 
