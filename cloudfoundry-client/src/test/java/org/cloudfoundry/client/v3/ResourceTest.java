@@ -37,14 +37,6 @@ public final class ResourceTest {
             .build();
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void noUpdatedAt() {
-        StubResource.builder()
-            .createdAt("test-created-at")
-            .id("test-id")
-            .build();
-    }
-
     @Test
     public void valid() {
         StubResource.builder()
