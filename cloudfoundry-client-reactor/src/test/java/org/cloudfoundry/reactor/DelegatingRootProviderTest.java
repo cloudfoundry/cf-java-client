@@ -205,6 +205,35 @@ public final class DelegatingRootProviderTest extends AbstractRestTest {
     }
 
     @Test
+    public void getRootKeyNoValue() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/")
+                .build())
+            .response(TestResponse.builder()
+                .status(NOT_FOUND)
+                .payload("fixtures/client/v2/error_response.json")
+                .build())
+            .build());
+
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/v2/info")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/info/GET_response.json")
+                .build())
+            .build());
+
+        this.rootProvider
+            .getRoot("empty_value", CONNECTION_CONTEXT)
+            .as(StepVerifier::create)
+            .expectError(IllegalArgumentException.class)
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
     public void getRootNetworkingClient() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
