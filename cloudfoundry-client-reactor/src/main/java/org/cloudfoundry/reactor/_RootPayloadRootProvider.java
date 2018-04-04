@@ -73,6 +73,7 @@ abstract class _RootPayloadRootProvider extends AbstractRootProvider {
 
     private Map<String, String> parsePayload(Map<String, Map<String, Map<String, String>>> payload) {
         return payload.get("links").entrySet().stream()
+            .filter(item -> null != item.getValue())
             .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().get("href")));
     }
 
