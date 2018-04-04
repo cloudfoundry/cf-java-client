@@ -15,6 +15,7 @@
         "version": "3.28.0"
       }
     },
+    "empty_value": null,
     "network_policy_v0": {
       "href": "https://api.run.pivotal.io/networking/v0/external"
     },
