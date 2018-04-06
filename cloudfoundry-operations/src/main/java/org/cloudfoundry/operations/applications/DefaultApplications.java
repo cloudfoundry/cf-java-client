@@ -149,6 +149,10 @@ public final class DefaultApplications implements Applications {
 
     private static final int CF_STAGING_TIME_EXPIRED = 170007;
 
+    private static final String[] ENTRY_FIELDS_CRASH = {"index", "reason", "exit_description"};
+
+    private static final String[] ENTRY_FIELDS_NORMAL = {"instances", "memory", "state", "environment_json"};
+
     private static final Comparator<LogMessage> LOG_MESSAGE_COMPARATOR = Comparator.comparing(LogMessage::getTimestamp);
 
     private static final Duration LOG_MESSAGE_TIMESPAN = Duration.ofMillis(500);
@@ -665,7 +669,7 @@ public final class DefaultApplications implements Applications {
         }
         return ApplicationEvent.builder()
             .actor(entity.getActorName())
-            .description(eventDescription(getMetadataRequest(entity), "instances", "memory", "state", "environment_json"))
+            .description(eventDescription(getMetadataRequest(entity), getEntryNames(entity.getType())))
             .id(ResourceUtils.getId(resource))
             .event(entity.getType())
             .time(timestamp)
@@ -851,6 +855,10 @@ public final class DefaultApplications implements Applications {
             .orElseThrow(() -> new IllegalArgumentException(String.format("Domain %s not found", domainName)));
     }
 
+    private static String[] getEntryNames(String type) {
+        return type.contains("crash") ? ENTRY_FIELDS_CRASH : ENTRY_FIELDS_NORMAL;
+    }
+
     private static Map<String, Object> getEnvironment(AbstractApplicationResource resource) {
         return ResourceUtils.getEntity(resource).getEnvironmentJsons();
     }
@@ -880,6 +888,9 @@ public final class DefaultApplications implements Applications {
             return metadata.get("request")
                 .map(m -> (Map<String, Object>) m)
                 .orElse(Collections.emptyMap());
+        } else if (metadata.get("instance") != null) {
+            return metadata.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, v -> v.getValue().orElse("")));
         } else {
             return Collections.emptyMap();
         }
