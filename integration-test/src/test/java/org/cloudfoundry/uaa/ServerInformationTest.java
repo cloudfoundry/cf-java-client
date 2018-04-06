@@ -27,6 +27,9 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
+import java.util.function.Consumer;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public final class ServerInformationTest extends AbstractIntegrationTest {
 
@@ -81,9 +84,13 @@ public final class ServerInformationTest extends AbstractIntegrationTest {
                 .build())
             .map(response -> response.getLinks().getPassword())
             .as(StepVerifier::create)
-            .expectNext("/forgot_password")
+            .consumeNextWith(endsWithExpectation("/forgot_password"))
             .expectComplete()
             .verify(Duration.ofMinutes(5));
+    }
+
+    private static Consumer<String> endsWithExpectation(String suffix) {
+        return actual -> assertThat(actual).endsWith(suffix);
     }
 
     private static Mono<String> getAuthenticationCode(UaaClient uaaClient, String clientId, String clientSecret, String password, String username) {
