@@ -84,7 +84,7 @@ public final class ServerInformationTest extends AbstractIntegrationTest {
                 .build())
             .map(response -> response.getLinks().getPassword())
             .as(StepVerifier::create)
-            .consumeNextWith(endsWithExpectation("/forgot_password"))
+            .consumeNextWith(endsWithExpectation("password"))
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
