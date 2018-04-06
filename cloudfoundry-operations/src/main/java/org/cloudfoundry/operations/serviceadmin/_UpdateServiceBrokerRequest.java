@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.operations.serviceadmin;
 
-import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**

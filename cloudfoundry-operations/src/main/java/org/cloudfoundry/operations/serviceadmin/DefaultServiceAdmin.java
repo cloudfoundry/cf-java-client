@@ -162,15 +162,14 @@ public final class DefaultServiceAdmin implements ServiceAdmin {
     @Override
     public Mono<Void> update(UpdateServiceBrokerRequest request) {
         return this.cloudFoundryClient
-                .flatMap(cloudFoundryClient -> Mono.zip(
-                        Mono.just(cloudFoundryClient),
-                        getServiceBrokerId(cloudFoundryClient, request.getName())
-                ))
-                .flatMap(function((cloudFoundryClient,serviceBrokerId) -> requestUpdateServiceBroker(cloudFoundryClient, request.getName(), request.getUrl(), request.getUsername(),
-                        request.getPassword(),serviceBrokerId)))
-                .then()
-                .transform(OperationsLogging.log("Update Service Broker"))
-                .checkpoint();
+            .then(cloudFoundryClient -> Mono.when(
+                Mono.just(cloudFoundryClient),
+                getServiceBrokerId(cloudFoundryClient, request.getName())
+            ))
+            .then(function((cloudFoundryClient, serviceBrokerId) -> requestUpdateServiceBroker(cloudFoundryClient, request, serviceBrokerId)))
+            .then()
+            .transform(OperationsLogging.log("Update Service Broker"))
+            .checkpoint();
     }
 
     private static Flux<ServiceAccess> collectServiceAccessSettings(CloudFoundryClient cloudFoundryClient, List<ServiceBrokerResource> brokers, ListServiceAccessSettingsRequest request,
@@ -412,22 +411,22 @@ public final class DefaultServiceAdmin implements ServiceAdmin {
                     .build()));
     }
 
+    private static Mono<UpdateServiceBrokerResponse> requestUpdateServiceBroker(CloudFoundryClient cloudFoundryClient, UpdateServiceBrokerRequest request, String serviceBrokerId) {
+        return cloudFoundryClient.serviceBrokers()
+            .update(org.cloudfoundry.client.v2.servicebrokers.UpdateServiceBrokerRequest.builder()
+                .serviceBrokerId(serviceBrokerId)
+                .name(request.getName())
+                .brokerUrl(request.getUrl())
+                .authenticationUsername(request.getUsername())
+                .authenticationPassword(request.getPassword())
+                .build());
+    }
+
     private static Mono<UpdateServicePlanResponse> requestUpdateServicePlanPublicStatus(CloudFoundryClient cloudFoundryClient, boolean publiclyVisible, String servicePlanId) {
         return cloudFoundryClient.servicePlans()
             .update(UpdateServicePlanRequest.builder()
                 .publiclyVisible(publiclyVisible)
                 .servicePlanId(servicePlanId)
-                .build());
-    }
-
-    private static Mono<UpdateServiceBrokerResponse> requestUpdateServiceBroker(CloudFoundryClient cloudFoundryClient, String name, String url, String username, String password,String serviceBrokerId) {
-        return cloudFoundryClient.serviceBrokers()
-             .update(org.cloudfoundry.client.v2.servicebrokers.UpdateServiceBrokerRequest.builder()
-                .serviceBrokerId(serviceBrokerId)
-                .name(name)
-                .brokerUrl(url)
-                .authenticationUsername(username)
-                .authenticationPassword(password)
                 .build());
     }
 
