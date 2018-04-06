@@ -71,4 +71,13 @@ public interface ServiceAdmin {
      */
     Flux<ServiceAccess> listServiceAccessSettings(ListServiceAccessSettingsRequest request);
 
+    /**
+     * Update an existing service broker
+     *
+     * @param request The Update Service Broker request
+     * @return a completion indicator
+     */
+
+    Mono<Void> update(UpdateServiceBrokerRequest request);
+
 }
