@@ -18,6 +18,7 @@ package org.cloudfoundry.client.v2.serviceplans;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
@@ -31,6 +32,7 @@ abstract class _Schemas {
      * The service binding schema
      */
     @JsonProperty("service_binding")
+    @Nullable
     abstract ServiceBindingSchema getServiceBinding();
 
     /**
