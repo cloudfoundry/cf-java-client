@@ -86,7 +86,7 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
     }
 
     /**
-     * The number of connections to use when processing requests and responses.  Setting this to `null` disables connection pooling.
+     * The number of connections to use when processing requests and responses.  Setting this to {@code null} disables connection pooling.
      */
     @Nullable
     @Value.Default
