@@ -350,7 +350,7 @@ public final class ApplicationManifestUtils {
         putIfPresent(yaml, "name", applicationManifest.getName());
         putIfPresent(yaml, "no-hostname", applicationManifest.getNoHostname());
         putIfPresent(yaml, "no-route", applicationManifest.getNoRoute());
-        putIfPresent(yaml, "path", applicationManifest.getPath());
+        putIfPresent(yaml, "path", applicationManifest.getPath() != null ? applicationManifest.getPath().toString() : null);
         putIfPresent(yaml, "random-route", applicationManifest.getRandomRoute());
         putIfPresent(yaml, "route-path", applicationManifest.getRoutePath());
         putIfPresent(yaml, "routes", applicationManifest.getRoutes(), ApplicationManifestUtils::toRoutesYaml);
