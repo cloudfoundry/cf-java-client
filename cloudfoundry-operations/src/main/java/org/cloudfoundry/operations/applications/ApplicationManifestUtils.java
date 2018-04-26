@@ -343,14 +343,14 @@ public final class ApplicationManifestUtils {
         putIfPresent(yaml, "domains", applicationManifest.getDomains());
         putIfPresent(yaml, "env", applicationManifest.getEnvironmentVariables());
         putIfPresent(yaml, "health-check-http-endpoint", applicationManifest.getHealthCheckHttpEndpoint());
-        putIfPresent(yaml, "health-check-type", applicationManifest.getHealthCheckType().getValue());
+        putIfPresent(yaml, "health-check-type", applicationManifest.getHealthCheckType() != null ? applicationManifest.getHealthCheckType().getValue() : null);
         putIfPresent(yaml, "hosts", applicationManifest.getHosts());
         putIfPresent(yaml, "instances", applicationManifest.getInstances());
         putIfPresent(yaml, "memory", applicationManifest.getMemory());
         putIfPresent(yaml, "name", applicationManifest.getName());
         putIfPresent(yaml, "no-hostname", applicationManifest.getNoHostname());
         putIfPresent(yaml, "no-route", applicationManifest.getNoRoute());
-        putIfPresent(yaml, "path", applicationManifest.getPath());
+        putIfPresent(yaml, "path", applicationManifest.getPath() != null ? applicationManifest.getPath().toString() : null);
         putIfPresent(yaml, "random-route", applicationManifest.getRandomRoute());
         putIfPresent(yaml, "route-path", applicationManifest.getRoutePath());
         putIfPresent(yaml, "routes", applicationManifest.getRoutes(), ApplicationManifestUtils::toRoutesYaml);
