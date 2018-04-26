@@ -12,6 +12,7 @@ applications:
   memory: -1
   name: alpha-application-1
   no-route: true
+  path: /alpha-path
   random-route: true
   routes:
   - route: alpha-route-1

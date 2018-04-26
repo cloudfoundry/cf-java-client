@@ -506,6 +506,7 @@ public final class ApplicationManifestUtilsTest {
                 .instances(-1)
                 .memory(-1)
                 .noRoute(true)
+                .path(Paths.get("/alpha-path"))
                 .randomRoute(true)
                 .route(Route.builder()
                     .route("alpha-route-1")
