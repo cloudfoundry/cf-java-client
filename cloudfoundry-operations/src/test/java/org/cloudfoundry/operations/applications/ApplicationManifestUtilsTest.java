@@ -502,7 +502,6 @@ public final class ApplicationManifestUtilsTest {
                 .command("alpha-command")
                 .disk(-1)
                 .healthCheckHttpEndpoint("alpha-health-check-http-endpoint")
-                .healthCheckType(NONE)
                 .instances(-1)
                 .memory(-1)
                 .noRoute(true)

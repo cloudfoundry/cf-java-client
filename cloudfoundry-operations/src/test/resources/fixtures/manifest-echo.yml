@@ -7,7 +7,6 @@ applications:
     ALPHA_KEY_1: alpha-value-1
     ALPHA_KEY_2: alpha-value-2
   health-check-http-endpoint: alpha-health-check-http-endpoint
-  health-check-type: none
   instances: -1
   memory: -1
   name: alpha-application-1
