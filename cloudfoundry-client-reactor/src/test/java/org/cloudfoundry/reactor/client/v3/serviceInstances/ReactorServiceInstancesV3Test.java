@@ -197,7 +197,7 @@ public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest{
                     .id("b19f6525-cbd3-4155-b156-dc0c2a431b4c")
                     .build())
                 .link("self", Link.builder()
-                    .href("https://api.example.org/v3/service_instances/bdeg4371-cbd3-4155-b156-dc0c2a431b4c/relationships/shared_spaces")
+                    .href("/v3/service_instances/bdeg4371-cbd3-4155-b156-dc0c2a431b4c/relationships/shared_spaces")
                     .build())
                 .build())
             .expectComplete()
