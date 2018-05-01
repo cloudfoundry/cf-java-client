@@ -23,7 +23,7 @@ import org.immutables.value.Value;
 import java.util.List;
 
 /**
- * The request payload for the List Applications operation
+ * The request payload for the List Packages operation
  */
 @Value.Immutable
 abstract class _ListPackagesRequest extends PaginatedRequest {

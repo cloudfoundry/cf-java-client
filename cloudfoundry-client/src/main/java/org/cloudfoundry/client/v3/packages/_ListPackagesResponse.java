@@ -21,7 +21,7 @@ import org.cloudfoundry.client.v3.PaginatedResponse;
 import org.immutables.value.Value;
 
 /**
- * The response payload for the List Applications operation
+ * The response payload for the List Packages operation
  */
 @JsonDeserialize
 @Value.Immutable
