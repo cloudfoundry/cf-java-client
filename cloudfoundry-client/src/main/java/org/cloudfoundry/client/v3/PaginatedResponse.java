@@ -22,7 +22,7 @@ import org.cloudfoundry.Nullable;
 import java.util.List;
 
 /**
- * Base class for requests that are paginated
+ * Base class for responses that are paginated
  *
  * @param <T> the entity type
  */
