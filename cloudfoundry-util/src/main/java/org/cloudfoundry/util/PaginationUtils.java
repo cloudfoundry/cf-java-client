@@ -23,7 +23,8 @@ import java.util.Optional;
 import java.util.function.Function;
 
 /**
- * A utility class to provide functions for handling {@link org.cloudfoundry.client.v2.PaginatedResponse}s and those containing lists of {@link org.cloudfoundry.client.v2.Resource}s.
+ * A utility class to provide functions for handling PaginatedResponse and those containing lists of Resources.
+ *
  */
 public final class PaginationUtils {
 
