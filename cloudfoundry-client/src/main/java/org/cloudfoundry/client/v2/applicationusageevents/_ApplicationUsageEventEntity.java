@@ -65,11 +65,11 @@ abstract class _ApplicationUsageEventEntity {
     abstract Integer getInstanceCount();
 
     /**
-     * The memory in mb by instances
+     * The memory in mb by instance
      */
     @JsonProperty("memory_in_mb_per_instance")
     @Nullable
-    abstract Integer getMemoryInMbPerInstances();
+    abstract Integer getMemoryInMbPerInstance();
 
     /**
      * The organization id
