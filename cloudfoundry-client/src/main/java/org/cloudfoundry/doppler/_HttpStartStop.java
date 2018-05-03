@@ -81,6 +81,7 @@ abstract class _HttpStartStop {
     /**
      * The method of the request
      */
+    @Nullable
     abstract Method getMethod();
 
     /**

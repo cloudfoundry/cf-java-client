@@ -44,22 +44,6 @@ public final class HttpStartStopTest {
     @Test(expected = IllegalStateException.class)
     public void noContentLength() {
         HttpStartStop.builder()
-            .method(Method.GET)
-            .peerType(PeerType.CLIENT)
-            .remoteAddress("test-remote-address")
-            .requestId(UUID.randomUUID())
-            .startTimestamp(0L)
-            .statusCode(0)
-            .stopTimestamp(0L)
-            .uri("test-uri")
-            .userAgent("test-user-agent")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noMethod() {
-        HttpStartStop.builder()
-            .contentLength(0L)
             .peerType(PeerType.CLIENT)
             .remoteAddress("test-remote-address")
             .requestId(UUID.randomUUID())
@@ -75,7 +59,6 @@ public final class HttpStartStopTest {
     public void noPeerType() {
         HttpStartStop.builder()
             .contentLength(0L)
-            .method(Method.GET)
             .remoteAddress("test-remote-address")
             .requestId(UUID.randomUUID())
             .startTimestamp(0L)
@@ -90,7 +73,6 @@ public final class HttpStartStopTest {
     public void noRemoteAddress() {
         HttpStartStop.builder()
             .contentLength(0L)
-            .method(Method.GET)
             .peerType(PeerType.CLIENT)
             .requestId(UUID.randomUUID())
             .startTimestamp(0L)
@@ -105,7 +87,6 @@ public final class HttpStartStopTest {
     public void noRequestId() {
         HttpStartStop.builder()
             .contentLength(0L)
-            .method(Method.GET)
             .peerType(PeerType.CLIENT)
             .remoteAddress("test-remote-address")
             .startTimestamp(0L)
@@ -120,7 +101,6 @@ public final class HttpStartStopTest {
     public void noStartTimestamp() {
         HttpStartStop.builder()
             .contentLength(0L)
-            .method(Method.GET)
             .peerType(PeerType.CLIENT)
             .remoteAddress("test-remote-address")
             .requestId(UUID.randomUUID())
@@ -135,7 +115,6 @@ public final class HttpStartStopTest {
     public void noStatusCode() {
         HttpStartStop.builder()
             .contentLength(0L)
-            .method(Method.GET)
             .peerType(PeerType.CLIENT)
             .remoteAddress("test-remote-address")
             .requestId(UUID.randomUUID())
@@ -150,7 +129,6 @@ public final class HttpStartStopTest {
     public void noStopTimestamp() {
         HttpStartStop.builder()
             .contentLength(0L)
-            .method(Method.GET)
             .peerType(PeerType.CLIENT)
             .remoteAddress("test-remote-address")
             .requestId(UUID.randomUUID())
@@ -165,7 +143,6 @@ public final class HttpStartStopTest {
     public void noUri() {
         HttpStartStop.builder()
             .contentLength(0L)
-            .method(Method.GET)
             .peerType(PeerType.CLIENT)
             .remoteAddress("test-remote-address")
             .requestId(UUID.randomUUID())
@@ -180,7 +157,6 @@ public final class HttpStartStopTest {
     public void noUserAgent() {
         HttpStartStop.builder()
             .contentLength(0L)
-            .method(Method.GET)
             .peerType(PeerType.CLIENT)
             .remoteAddress("test-remote-address")
             .requestId(UUID.randomUUID())
@@ -195,7 +171,6 @@ public final class HttpStartStopTest {
     public void valid() {
         HttpStartStop.builder()
             .contentLength(0L)
-            .method(Method.GET)
             .peerType(PeerType.CLIENT)
             .remoteAddress("test-remote-address")
             .requestId(UUID.randomUUID())
