@@ -79,6 +79,13 @@ abstract class _ServiceBindingEntity {
     abstract String getGatewayName();
 
     /**
+     * The service binding name
+     */
+    @JsonProperty("name")
+    @Nullable
+    abstract String getName();
+
+    /**
      * The service instance id
      */
     @JsonProperty("service_instance_guid")
