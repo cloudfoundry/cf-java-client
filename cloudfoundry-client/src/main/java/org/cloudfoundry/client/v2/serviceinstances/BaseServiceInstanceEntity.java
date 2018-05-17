@@ -58,6 +58,20 @@ public abstract class BaseServiceInstanceEntity {
     public abstract String getServiceBindingsUrl();
 
     /**
+     * The shared from url
+     */
+    @JsonProperty("shared_from_url")
+    @Nullable
+    public abstract String getSharedFromUrl();
+
+    /**
+     * The shared to url
+     */
+    @JsonProperty("shared_to_url")
+    @Nullable
+    public abstract String getSharedToUrl();
+
+    /**
      * The space id
      */
     @JsonProperty("space_guid")

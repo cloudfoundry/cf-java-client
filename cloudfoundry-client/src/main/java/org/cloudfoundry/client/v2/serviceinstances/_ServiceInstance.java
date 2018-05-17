@@ -21,6 +21,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
+import java.util.List;
+
 /**
  * A service instance
  */
@@ -69,5 +71,19 @@ abstract class _ServiceInstance {
     @JsonProperty("service_plan")
     @Nullable
     abstract Plan getServicePlan();
+
+    /**
+     * The shared from
+     */
+    @JsonProperty("shared_from")
+    @Nullable
+    abstract String getSharedFrom();
+
+    /**
+     * The shared to
+     */
+    @JsonProperty("shared_to")
+    @Nullable
+    abstract List<String> getSharedTo();
 
 }
