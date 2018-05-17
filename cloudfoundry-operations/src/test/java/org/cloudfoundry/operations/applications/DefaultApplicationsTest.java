@@ -3047,7 +3047,9 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                         .path("/test-path")
                         .port(null)
                         .build())
-                    .service(fill(ServiceInstance.builder(), "service-instance-").build())
+                    .service(ServiceInstance.builder()
+                        .name("test-service-instance-name")
+                        .build())
                     .build()));
     }
 
@@ -3109,7 +3111,9 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                         .domain(fill(org.cloudfoundry.client.v2.domains.Domain.builder(), "domain-").build())
                         .port(999)
                         .build())
-                    .service(fill(ServiceInstance.builder(), "service-instance-").build())
+                    .service(ServiceInstance.builder()
+                        .name("test-service-instance-name")
+                        .build())
                     .build()));
     }
 

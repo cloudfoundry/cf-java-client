@@ -20,36 +20,9 @@ import org.junit.Test;
 
 public final class LdapConfigurationTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noBaseUrl() {
-        LdapConfiguration.builder()
-            .ldapProfileFile(LdapProfileFile.SIMPLE_BIND)
-            .ldapGroupFile(LdapGroupFile.NO_GROUP)
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noLdapGroupFile() {
-        LdapConfiguration.builder()
-            .ldapProfileFile(LdapProfileFile.SIMPLE_BIND)
-            .baseUrl("test-base-url")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noLdapProfileFile() {
-        LdapConfiguration.builder()
-            .ldapGroupFile(LdapGroupFile.NO_GROUP)
-            .baseUrl("test-base-url")
-            .build();
-    }
-
     @Test
     public void valid() {
         LdapConfiguration.builder()
-            .ldapProfileFile(LdapProfileFile.SIMPLE_BIND)
-            .ldapGroupFile(LdapGroupFile.NO_GROUP)
-            .baseUrl("test-base-url")
             .build();
     }
 

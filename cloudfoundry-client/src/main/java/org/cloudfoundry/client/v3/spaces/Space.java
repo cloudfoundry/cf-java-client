@@ -31,4 +31,11 @@ public abstract class Space extends Resource {
     @JsonProperty("name")
     public abstract String getName();
 
+    /**
+     * The relationships
+     */
+    @JsonProperty("relationships")
+    @Nullable
+    abstract SpaceRelationships getRelationships();
+
 }
