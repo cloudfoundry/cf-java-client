@@ -135,6 +135,19 @@ public final class ApplicationManifestUtils {
         as(payload, key, Boolean.class::cast, consumer);
     }
 
+    @SuppressWarnings("unchecked")
+    private static void asDocker(Map<String, Object> payload, String key, Consumer<Docker> consumer) {
+        as(payload, key, value -> {
+            Map<String, String> docker = ((Map<String, String>) value);
+
+            return Docker.builder()
+                .image(docker.get("image"))
+                .password(docker.get("password"))
+                .username(docker.get("username"))
+                .build();
+        }, consumer);
+    }
+
     private static void asInteger(Map<String, Object> payload, String key, Consumer<Integer> consumer) {
         as(payload, key, Integer.class::cast, consumer);
     }
@@ -292,6 +305,14 @@ public final class ApplicationManifestUtils {
             });
     }
 
+    private static Function<Path, Object> pathToString() {
+        return path -> Optional.ofNullable(path).map(Path::toString).orElse(null);
+    }
+
+    private static Function<ApplicationHealthCheck, Object> protectApplicationHealthCheck() {
+        return applicationHealthCheck -> Optional.ofNullable(applicationHealthCheck).map(ApplicationHealthCheck::getValue).orElse(null);
+    }
+
     private static void putIfPresent(Map<String, Object> yaml, String key, Object value) {
         putIfPresent(yaml, key, value, Function.identity());
     }
@@ -305,6 +326,7 @@ public final class ApplicationManifestUtils {
         asString(application, "buildpack", builder::buildpack);
         asString(application, "command", builder::command);
         asMemoryInteger(application, "disk_quota", builder::disk);
+        asDocker(application, "docker", builder::docker);
         asString(application, "domain", builder::domain);
         asListOfString(application, "domains", builder::domain);
         asMapOfStringString(application, "env", builder::environmentVariable);
@@ -343,14 +365,14 @@ public final class ApplicationManifestUtils {
         putIfPresent(yaml, "domains", applicationManifest.getDomains());
         putIfPresent(yaml, "env", applicationManifest.getEnvironmentVariables());
         putIfPresent(yaml, "health-check-http-endpoint", applicationManifest.getHealthCheckHttpEndpoint());
-        putIfPresent(yaml, "health-check-type", applicationManifest.getHealthCheckType() != null ? applicationManifest.getHealthCheckType().getValue() : null);
+        putIfPresent(yaml, "health-check-type", applicationManifest.getHealthCheckType(), protectApplicationHealthCheck());
         putIfPresent(yaml, "hosts", applicationManifest.getHosts());
         putIfPresent(yaml, "instances", applicationManifest.getInstances());
         putIfPresent(yaml, "memory", applicationManifest.getMemory());
         putIfPresent(yaml, "name", applicationManifest.getName());
         putIfPresent(yaml, "no-hostname", applicationManifest.getNoHostname());
         putIfPresent(yaml, "no-route", applicationManifest.getNoRoute());
-        putIfPresent(yaml, "path", applicationManifest.getPath() != null ? applicationManifest.getPath().toString() : null);
+        putIfPresent(yaml, "path", applicationManifest.getPath(), pathToString());
         putIfPresent(yaml, "random-route", applicationManifest.getRandomRoute());
         putIfPresent(yaml, "route-path", applicationManifest.getRoutePath());
         putIfPresent(yaml, "routes", applicationManifest.getRoutes(), ApplicationManifestUtils::toRoutesYaml);

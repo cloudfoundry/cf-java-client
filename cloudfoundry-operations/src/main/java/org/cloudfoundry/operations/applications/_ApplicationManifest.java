@@ -60,6 +60,14 @@ abstract class _ApplicationManifest {
             if (getDocker().getImage() == null && (getDocker().getUsername() != null || getDocker().getPassword() != null)) {
                 throw new IllegalStateException("docker credentials require docker image to be set");
             }
+
+            if (getDocker().getPassword() != null && getDocker().getUsername() == null) {
+                throw new IllegalStateException("Docker password requires username");
+            }
+
+            if (getDocker().getPassword() == null && getDocker().getUsername() != null) {
+                throw new IllegalStateException("Docker username requires password");
+            }
         }
     }
 
