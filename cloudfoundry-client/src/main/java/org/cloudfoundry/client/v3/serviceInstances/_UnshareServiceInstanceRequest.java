@@ -26,15 +26,15 @@ import org.immutables.value.Value;
 abstract class _UnshareServiceInstanceRequest {
 
     /**
-     * The space id
-     */
-    @JsonIgnore
-    abstract String getSpaceId();
-
-    /**
      * The service instance id
      */
     @JsonIgnore
     abstract String getServiceInstanceId();
+
+    /**
+     * The space id
+     */
+    @JsonIgnore
+    abstract String getSpaceId();
 
 }

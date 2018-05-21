@@ -20,10 +20,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.immutables.value.Value;
 
 /**
- * The request payload for the List Shared Spaces Relationships operation
+ * The request payload for the List Shared Spaces Relationship operation
  */
 @Value.Immutable
 abstract class _ListSharedSpacesRelationshipRequest {
+
     /**
      * The service instance id
      */

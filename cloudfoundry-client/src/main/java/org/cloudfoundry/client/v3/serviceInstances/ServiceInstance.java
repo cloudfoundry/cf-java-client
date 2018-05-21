@@ -17,45 +17,18 @@
 package org.cloudfoundry.client.v3.serviceInstances;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v3.Link;
-
-import java.util.Map;
+import org.cloudfoundry.client.v3.Resource;
 
 /**
  * Base class for responses that are service instances
  */
-public abstract class ServiceInstance {
-
-    /**
-     * The created at
-     */
-    @JsonProperty("created_at")
-    @Nullable
-    public abstract String getCreatedAt();
-
-    /**
-     * The id
-     */
-    @JsonProperty("guid")
-    @Nullable
-    public abstract String getId();
-
-    /**
-     * The links
-     */
-    @AllowNulls
-    @JsonProperty("links")
-    @Nullable
-    public abstract Map<String, Link> getLinks();
+public abstract class ServiceInstance extends Resource {
 
     /**
      * The name
      */
-    @AllowNulls
     @JsonProperty("name")
-    @Nullable
     public abstract String getName();
 
     /**
@@ -65,10 +38,4 @@ public abstract class ServiceInstance {
     @Nullable
     public abstract ServiceInstanceRelationships getRelationships();
 
-    /**
-     * The updated at
-     */
-    @JsonProperty("updated_at")
-    @Nullable
-    public abstract String getUpdatedAt();
 }

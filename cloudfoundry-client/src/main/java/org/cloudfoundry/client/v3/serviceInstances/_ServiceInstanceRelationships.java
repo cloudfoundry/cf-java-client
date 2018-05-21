@@ -22,11 +22,12 @@ import org.cloudfoundry.client.v3.ToOneRelationship;
 import org.immutables.value.Value;
 
 /**
- * The Service instance relationships
+ * The service instance relationship
  */
 @JsonDeserialize
 @Value.Immutable
 abstract class _ServiceInstanceRelationships {
+
     /**
      * The space relationship
      */

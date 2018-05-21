@@ -18,18 +18,21 @@ package org.cloudfoundry.client.v3.serviceInstances;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.cloudfoundry.client.v3.Relationship;
 import org.immutables.value.Value;
+
 import java.util.List;
 
 /**
  * The request payload for the Share Service Instance operation.
  */
+@JsonSerialize
 @Value.Immutable
 abstract class _ShareServiceInstanceRequest {
 
     /**
-     * The space service instance is shared to
+     * The spaces the service instance is shared to
      */
     @JsonProperty("data")
     abstract List<Relationship> getData();

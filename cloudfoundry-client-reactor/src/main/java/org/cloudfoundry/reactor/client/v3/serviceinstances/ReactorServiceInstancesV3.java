@@ -30,7 +30,7 @@ import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
 import reactor.core.publisher.Mono;
 
 /**
- *The Reactor-based implementation of {@link ServiceInstancesV3}
+ * The Reactor-based implementation of {@link ServiceInstancesV3}
  */
 public final class ReactorServiceInstancesV3 extends AbstractClientV3Operations implements ServiceInstancesV3 {
 
@@ -47,29 +47,26 @@ public final class ReactorServiceInstancesV3 extends AbstractClientV3Operations 
 
     @Override
     public Mono<ListServiceInstancesResponse> list(ListServiceInstancesRequest request) {
-
         return get(request, ListServiceInstancesResponse.class, builder -> builder.pathSegment("service_instances"))
-                .checkpoint();
+            .checkpoint();
     }
 
     @Override
     public Mono<ListSharedSpacesRelationshipResponse> listSharedSpacesRelationship(ListSharedSpacesRelationshipRequest request) {
-
-        return get(request, ListSharedSpacesRelationshipResponse.class, builder -> builder.pathSegment("service_instances",request.getServiceInstanceId(),"relationships","shared_spaces"))
+        return get(request, ListSharedSpacesRelationshipResponse.class, builder -> builder.pathSegment("service_instances", request.getServiceInstanceId(), "relationships", "shared_spaces"))
             .checkpoint();
     }
 
     @Override
     public Mono<ShareServiceInstanceResponse> share(ShareServiceInstanceRequest request) {
-
-        return post(request,ShareServiceInstanceResponse.class, builder -> builder.pathSegment("service_instances",request.getServiceInstanceId(),
-                "relationships","shared_spaces"));
+        return post(request, ShareServiceInstanceResponse.class, builder -> builder.pathSegment("service_instances", request.getServiceInstanceId(), "relationships", "shared_spaces"))
+            .checkpoint();
     }
 
     @Override
     public Mono<Void> unshare(UnshareServiceInstanceRequest request) {
-
-        return delete(request, Void.class, builder -> builder.pathSegment("service_instances",request.getServiceInstanceId(),
-                "relationships","shared_spaces",request.getSpaceId()));
+        return delete(request, Void.class, builder -> builder.pathSegment("service_instances", request.getServiceInstanceId(), "relationships", "shared_spaces", request.getSpaceId()))
+            .checkpoint();
     }
+
 }

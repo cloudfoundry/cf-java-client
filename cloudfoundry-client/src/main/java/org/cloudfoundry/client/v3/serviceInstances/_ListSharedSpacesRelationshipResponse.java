@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The response payload for the share service instance to other spaces operation
+ * The response payload for the List Shared Spaces Relationship operation
  */
 @JsonDeserialize
 @Value.Immutable

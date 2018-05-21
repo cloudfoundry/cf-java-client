@@ -47,51 +47,12 @@ import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 
-public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest{
+public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest {
 
     private final ReactorServiceInstancesV3 serviceInstances = new ReactorServiceInstancesV3(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 
     @Test
-    public void share(){
-        mockRequest(InteractionContext.builder()
-            .request(TestRequest.builder()
-                .method(POST).path("/service_instances/test-service-instance-id/relationships/shared_spaces")
-                .payload("fixtures/client/v3/serviceinstances/POST_request.json")
-                .build())
-            .response(TestResponse.builder()
-                .status(CREATED)
-                .payload("fixtures/client/v3/serviceinstances/POST_response.json")
-                .build())
-            .build());
-
-        this.serviceInstances
-            .share(ShareServiceInstanceRequest.builder()
-                .serviceInstanceId("test-service-instance-id")
-                .data(Relationship.builder()
-                    .id("space-guid-1")
-                .build())
-                .data(Relationship.builder()
-                    .id("space-guid-2")
-                    .build())
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(ShareServiceInstanceResponse.builder()
-                .data(Relationship.builder()
-                    .id("68d54d31-9b3a-463b-ba94-e8e4c32edbac")
-                    .build())
-                .data(Relationship.builder()
-                    .id("b19f6525-cbd3-4155-b156-dc0c2a431b4c")
-                    .build())
-                .link("self", Link.builder()
-                    .href("/v3/service_instances/bdeg4371-cbd3-4155-b156-dc0c2a431b4c/relationships/shared_spaces")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
-    }
-
-    @Test
-    public void list(){
+    public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/service_instances?names=test-service-instance-name&space_guids=test-space-id&page=1")
@@ -173,7 +134,7 @@ public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest{
     }
 
     @Test
-    public void listSharedSpaces(){
+    public void listSharedSpaces() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/service_instances/test-service-instance-id/relationships/shared_spaces")
@@ -205,7 +166,46 @@ public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest{
     }
 
     @Test
-    public void unshare(){
+    public void share() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(POST).path("/service_instances/test-service-instance-id/relationships/shared_spaces")
+                .payload("fixtures/client/v3/serviceinstances/POST_request.json")
+                .build())
+            .response(TestResponse.builder()
+                .status(CREATED)
+                .payload("fixtures/client/v3/serviceinstances/POST_response.json")
+                .build())
+            .build());
+
+        this.serviceInstances
+            .share(ShareServiceInstanceRequest.builder()
+                .serviceInstanceId("test-service-instance-id")
+                .data(Relationship.builder()
+                    .id("space-guid-1")
+                    .build())
+                .data(Relationship.builder()
+                    .id("space-guid-2")
+                    .build())
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ShareServiceInstanceResponse.builder()
+                .data(Relationship.builder()
+                    .id("68d54d31-9b3a-463b-ba94-e8e4c32edbac")
+                    .build())
+                .data(Relationship.builder()
+                    .id("b19f6525-cbd3-4155-b156-dc0c2a431b4c")
+                    .build())
+                .link("self", Link.builder()
+                    .href("https://api.example.org/v3/service_instances/bdeg4371-cbd3-4155-b156-dc0c2a431b4c/relationships/shared_spaces")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void unshare() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/service_instances/test-service-instance-id/relationships/shared_spaces/test-space-id")

@@ -26,7 +26,7 @@ import java.util.List;
  * The request payload for the List Service Instances operation.
  */
 @Value.Immutable
-abstract class _ListServiceInstancesRequest extends PaginatedRequest{
+abstract class _ListServiceInstancesRequest extends PaginatedRequest {
 
     /**
      * The service instance names

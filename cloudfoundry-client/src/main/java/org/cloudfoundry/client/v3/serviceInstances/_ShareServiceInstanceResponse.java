@@ -28,14 +28,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The response payload for the sharing a service instance to other spaces operation
+ * The response payload for the Share Service Instance operation
  */
 @JsonDeserialize
 @Value.Immutable
 abstract class _ShareServiceInstanceResponse {
 
     /**
-     * The  space
+     * The space
      */
     @JsonProperty("data")
     @Nullable

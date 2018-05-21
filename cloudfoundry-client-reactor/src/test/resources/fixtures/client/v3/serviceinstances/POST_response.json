@@ -9,7 +9,7 @@
   ],
   "links": {
     "self": {
-      "href": "/v3/service_instances/bdeg4371-cbd3-4155-b156-dc0c2a431b4c/relationships/shared_spaces"
+      "href": "https://api.example.org/v3/service_instances/bdeg4371-cbd3-4155-b156-dc0c2a431b4c/relationships/shared_spaces"
     }
   }
 }

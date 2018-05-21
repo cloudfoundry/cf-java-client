@@ -20,9 +20,10 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.immutables.value.Value;
 
 /**
- * The Resource response payload for the List Service Instances operation
+ * The resource response payload for the List Service Instances operation
  */
 @JsonSerialize
 @Value.Immutable
 abstract class _ServiceInstanceResource extends ServiceInstance {
+
 }

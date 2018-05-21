@@ -26,4 +26,5 @@ import org.immutables.value.Value;
 @JsonDeserialize
 @Value.Immutable
 abstract class _ListServiceInstancesResponse extends PaginatedResponse<ServiceInstanceResource> {
+
 }

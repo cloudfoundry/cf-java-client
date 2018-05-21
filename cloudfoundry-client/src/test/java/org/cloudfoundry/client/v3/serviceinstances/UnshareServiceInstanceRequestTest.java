@@ -22,24 +22,25 @@ import org.junit.Test;
 public class UnshareServiceInstanceRequestTest {
 
     @Test(expected = IllegalStateException.class)
-    public void noServiceInstanceId(){
+    public void noServiceInstanceId() {
         UnshareServiceInstanceRequest.builder()
             .spaceId("test-space-id")
             .build();
     }
 
     @Test(expected = IllegalStateException.class)
-    public void noSpaceId(){
+    public void noSpaceId() {
         UnshareServiceInstanceRequest.builder()
             .serviceInstanceId("test-service-instance-id")
             .build();
     }
 
     @Test
-    public void valid(){
+    public void valid() {
         UnshareServiceInstanceRequest.builder()
             .serviceInstanceId("test-service-instance-id")
             .spaceId("test-space-id")
             .build();
     }
+
 }

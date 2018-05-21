@@ -23,7 +23,7 @@ import org.junit.Test;
 public class ShareServiceInstanceRequestTest {
 
     @Test(expected = IllegalStateException.class)
-    public void noServiceInstanceId(){
+    public void noServiceInstanceId() {
         ShareServiceInstanceRequest.builder()
             .data(Relationship.builder()
                 .id("test-space-id")
@@ -40,4 +40,5 @@ public class ShareServiceInstanceRequestTest {
                 .build())
             .build();
     }
+
 }
