@@ -125,6 +125,42 @@ public final class EventsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    @Test
+    public void listFilterByOrganizationId(){
+        getFirstEvent(this.cloudFoundryClient)
+            .flatMap(resource -> Mono.zip(
+                Mono.just(resource),
+                this.cloudFoundryClient.events()
+                    .list(ListEventsRequest.builder()
+                        .spaceId(ResourceUtils.getEntity(resource).getOrganizationId())
+                        .build())
+                    .flatMapMany(ResourceUtils::getResources)
+                    .next()
+            ))
+            .as(StepVerifier::create)
+            .consumeNextWith(tupleEquality())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void listFilterBySpaceId() {
+        getFirstEvent(this.cloudFoundryClient)
+            .flatMap(resource -> Mono.zip(
+                Mono.just(resource),
+                this.cloudFoundryClient.events()
+                    .list(ListEventsRequest.builder()
+                        .spaceId(ResourceUtils.getEntity(resource).getSpaceId())
+                        .build())
+                    .flatMapMany(ResourceUtils::getResources)
+                    .next()
+            ))
+            .as(StepVerifier::create)
+            .consumeNextWith(tupleEquality())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
     private static Mono<EventResource> getFirstEvent(CloudFoundryClient cloudFoundryClient) {
         return listEvents(cloudFoundryClient)
             .next();
