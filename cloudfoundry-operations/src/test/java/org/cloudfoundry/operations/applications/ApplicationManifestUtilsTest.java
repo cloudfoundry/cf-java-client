@@ -47,6 +47,26 @@ public final class ApplicationManifestUtilsTest {
     }
 
     @Test
+    public void readDocker() throws IOException {
+        List<ApplicationManifest> expected = Collections.singletonList(
+            ApplicationManifest.builder()
+                .name("lima-application-1")
+                .docker(Docker.builder()
+                    .image("lima-docker-image")
+                    .password("lima-docker-password")
+                    .username("lima-docker-username")
+                    .build())
+                .healthCheckHttpEndpoint("lima-health-check-http-endpoint")
+                .healthCheckType(NONE)
+                .noRoute(false)
+                .build());
+
+        List<ApplicationManifest> actual = ApplicationManifestUtils.read(new ClassPathResource("fixtures/manifest-lima.yml").getFile().toPath());
+
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
     public void read() throws IOException {
         List<ApplicationManifest> expected = Arrays.asList(
             ApplicationManifest.builder()

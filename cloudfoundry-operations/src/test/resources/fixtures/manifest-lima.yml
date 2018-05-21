@@ -1,0 +1,10 @@
+---
+applications:
+- name: lima-application-1
+  docker:
+    image: lima-docker-image
+    password: lima-docker-password
+    username: lima-docker-username
+  health-check-http-endpoint: lima-health-check-http-endpoint
+  health-check-type: none
+  no-route: false

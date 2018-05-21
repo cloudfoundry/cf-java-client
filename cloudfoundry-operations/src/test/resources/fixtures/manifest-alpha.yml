@@ -8,8 +8,8 @@ applications:
   health-check-type: none
   instances: -1
   memory: 1M
-  no-route: true
   path: /alpha-path
+  no-route: true
   random-route: true
   routes:
   - route: alpha-route-1
