@@ -57,7 +57,7 @@ abstract class _TestRequest {
 
     public void assertEquals(RecordedRequest request) {
         assertThat(getMethod()).hasToString(request.getMethod());
-        assertThat(getPath()).isEqualTo(extractPath(request));
+        assertThat(extractPath(request)).isEqualTo(getPath());
 
         assertThat(request.getHeader(HttpHeaderNames.TRANSFER_ENCODING.toString())).as("Does not have Transfer-Encoding header").isNull();
 
@@ -69,12 +69,12 @@ abstract class _TestRequest {
             if (value == null) {
                 assertThat(request.getHeader(key)).as("Does not have %s header", key).isNull();
             } else {
-                assertThat(value).isEqualTo(request.getHeader(key));
+                assertThat(request.getHeader(key)).as("Header %s value", key).isEqualTo(value);
             }
         });
 
         if (getPayload().isPresent()) {
-            assertBodyEquals(getPayload().map(_TestRequest::getBuffer).get(), request.getBody());
+            assertBodyEquals(request.getBody(), getPayload().map(_TestRequest::getBuffer).get());
         } else if (getContents().isPresent()) {
             getContents().get().accept(Tuples.of(request.getHeaders(), request.getBody()));
         } else {
@@ -93,8 +93,8 @@ abstract class _TestRequest {
 
     abstract Optional<String> getPayload();
 
-    private static void assertBodyEquals(Buffer expectedBuffer, Buffer actualBuffer) {
-        assertThat(getValue(expectedBuffer)).isEqualTo(getValue(actualBuffer));
+    private static void assertBodyEquals(Buffer actualBuffer, Buffer expectedBuffer) {
+        assertThat(getValue(actualBuffer)).isEqualTo(getValue(expectedBuffer));
     }
 
     private static Object getValue(Buffer buffer) {
