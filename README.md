@@ -15,10 +15,9 @@
 | Job | 3.x Status | 2.x Status
 | --- | ---------- | ----------
 | `unit-test`             | [![unit-test-master](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/java-client/jobs/unit-test-master/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/java-client/jobs/unit-test-master)                         | [![unit-test-2.x](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/java-client/jobs/unit-test-2.x/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/java-client/jobs/unit-test-2.x)
-| `integration-test-1.10` | [![unit-test-master](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/java-client/jobs/integration-test-1.10-master/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/java-client/jobs/integration-test-1.10-master) | [![unit-test-2.x](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/java-client/jobs/integration-test-1.10-2.x/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/java-client/jobs/integration-test-1.10-2.x)
-| `integration-test-1.11` | [![unit-test-master](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/java-client/jobs/integration-test-1.11-master/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/java-client/jobs/integration-test-1.11-master) | [![unit-test-2.x](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/java-client/jobs/integration-test-1.11-2.x/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/java-client/jobs/integration-test-1.11-2.x)
 | `integration-test-1.12` | [![unit-test-master](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/java-client/jobs/integration-test-1.12-master/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/java-client/jobs/integration-test-1.12-master) | [![unit-test-2.x](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/java-client/jobs/integration-test-1.12-2.x/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/java-client/jobs/integration-test-1.12-2.x)
 | `integration-test-2.0`  | [![unit-test-master](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/java-client/jobs/integration-test-2.0-master/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/java-client/jobs/integration-test-2.0-master)   | [![unit-test-2.x](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/java-client/jobs/integration-test-2.0-2.x/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/java-client/jobs/integration-test-2.0-2.x)
+| `integration-test-2.1`  | [![unit-test-master](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/java-client/jobs/integration-test-2.1-master/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/java-client/jobs/integration-test-2.1-master)   | [![unit-test-2.x](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/java-client/jobs/integration-test-2.1-2.x/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/java-client/jobs/integration-test-2.1-2.x)
 | `deploy`                | [![deploy-master](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/java-client/jobs/deploy-master/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/java-client/jobs/deploy-master)                                  | [![deploy-2.x](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/java-client/jobs/deploy-2.x/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/java-client/jobs/deploy-2.x)
 
 
@@ -36,12 +35,12 @@ Most projects will need two dependencies; the Operations API and an implementati
     <dependency>
         <groupId>org.cloudfoundry</groupId>
         <artifactId>cloudfoundry-client-reactor</artifactId>
-        <version>2.23.0.RELEASE</version>
+        <version>2.28.0.RELEASE</version>
     </dependency>
     <dependency>
         <groupId>org.cloudfoundry</groupId>
         <artifactId>cloudfoundry-operations</artifactId>
-        <version>2.23.0.RELEASE</version>
+        <version>2.28.0.RELEASE</version>
     </dependency>
     <dependency>
         <groupId>io.projectreactor</groupId>
@@ -77,8 +76,8 @@ For Gradle, the dependencies would be defined like this:
 
 ```groovy
 dependencies {
-    compile 'org.cloudfoundry:cloudfoundry-client-reactor:2.23.0.RELEASE'
-    compile 'org.cloudfoundry:cloudfoundry-operations:2.23.0.RELEASE'
+    compile 'org.cloudfoundry:cloudfoundry-client-reactor:2.28.0.RELEASE'
+    compile 'org.cloudfoundry:cloudfoundry-operations:2.28.0.RELEASE'
     compile 'io.projectreactor:reactor-core:3.0.7.RELEASE'
     compile 'io.projectreactor.ipc:reactor-netty:0.6.6.RELEASE'
     ...
