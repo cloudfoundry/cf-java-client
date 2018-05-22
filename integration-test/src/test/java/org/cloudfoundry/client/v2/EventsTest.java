@@ -29,7 +29,6 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
-import java.util.concurrent.TimeoutException;
 
 public final class EventsTest extends AbstractIntegrationTest {
 
@@ -79,6 +78,42 @@ public final class EventsTest extends AbstractIntegrationTest {
                 this.cloudFoundryClient.events()
                     .list(ListEventsRequest.builder()
                         .actee(ResourceUtils.getEntity(resource).getActee())
+                        .build())
+                    .flatMapMany(ResourceUtils::getResources)
+                    .next()
+            ))
+            .as(StepVerifier::create)
+            .consumeNextWith(tupleEquality())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void listFilterByOrganizationId() {
+        getFirstEvent(this.cloudFoundryClient)
+            .flatMap(resource -> Mono.zip(
+                Mono.just(resource),
+                this.cloudFoundryClient.events()
+                    .list(ListEventsRequest.builder()
+                        .organizationId(ResourceUtils.getEntity(resource).getOrganizationId())
+                        .build())
+                    .flatMapMany(ResourceUtils::getResources)
+                    .next()
+            ))
+            .as(StepVerifier::create)
+            .consumeNextWith(tupleEquality())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void listFilterBySpaceId() {
+        getFirstEvent(this.cloudFoundryClient)
+            .flatMap(resource -> Mono.zip(
+                Mono.just(resource),
+                this.cloudFoundryClient.events()
+                    .list(ListEventsRequest.builder()
+                        .spaceId(ResourceUtils.getEntity(resource).getSpaceId())
                         .build())
                     .flatMapMany(ResourceUtils::getResources)
                     .next()
