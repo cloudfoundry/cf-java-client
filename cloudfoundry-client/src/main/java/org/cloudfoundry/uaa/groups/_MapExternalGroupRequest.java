@@ -17,6 +17,7 @@
 package org.cloudfoundry.uaa.groups;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.uaa.IdentityZoned;
 import org.immutables.value.Value;
@@ -24,6 +25,7 @@ import org.immutables.value.Value;
 /**
  * The request payload for the map external group request
  */
+@JsonSerialize
 @Value.Immutable
 abstract class _MapExternalGroupRequest implements IdentityZoned {
 

@@ -794,7 +794,6 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
                     .processType("redacted_message", "[PRIVATE DATA HIDDEN IN LISTS]")
                     .image("cloudfoundry/diego-docker-app-custom:latest")
                     .checksum(null)
-                    .buildpacks(null)
                     .stack(null)
                     .createdAt("2016-03-17T00:00:01Z")
                     .updatedAt("2016-03-17T21:41:32Z")

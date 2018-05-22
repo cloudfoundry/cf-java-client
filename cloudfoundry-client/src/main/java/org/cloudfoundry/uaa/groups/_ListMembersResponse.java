@@ -47,9 +47,10 @@ abstract class _ListMembersResponse {
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         public ListMembersResponse deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
             return ListMembersResponse.builder()
-                .members(p.readValueAs(new TypeReference<List<Member>>() {
+                .members((List<Member>) p.readValueAs(new TypeReference<List<Member>>() {
 
                 }))
                 .build();

@@ -18,6 +18,7 @@ package org.cloudfoundry.client.v3.isolationsegments;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.cloudfoundry.client.v3.Relationship;
 import org.immutables.value.Value;
 
@@ -26,6 +27,7 @@ import java.util.List;
 /**
  * The request payload for the Entitle one or more Organizations for an Isolation Segment operation
  */
+@JsonSerialize
 @Value.Immutable
 abstract class _AddIsolationSegmentOrganizationEntitlementRequest {
 

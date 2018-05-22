@@ -17,11 +17,13 @@
 package org.cloudfoundry.client.v3.spaces;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.immutables.value.Value;
 
 /**
  * The request payload for the Create Space operation
  */
+@JsonSerialize
 @Value.Immutable
 abstract class _CreateSpaceRequest {
 

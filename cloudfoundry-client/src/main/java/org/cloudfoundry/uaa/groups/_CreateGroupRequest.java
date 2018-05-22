@@ -17,6 +17,7 @@
 package org.cloudfoundry.uaa.groups;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.uaa.IdentityZoned;
 import org.immutables.value.Value;
@@ -26,6 +27,7 @@ import java.util.List;
 /**
  * The request payload for the create group
  */
+@JsonSerialize
 @Value.Immutable
 abstract class _CreateGroupRequest implements IdentityZoned {
 

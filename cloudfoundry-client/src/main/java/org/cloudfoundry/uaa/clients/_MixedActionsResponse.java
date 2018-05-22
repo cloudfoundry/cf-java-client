@@ -47,9 +47,10 @@ abstract class _MixedActionsResponse {
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         public MixedActionsResponse deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
             return MixedActionsResponse.builder()
-                .clients(p.readValueAs(new TypeReference<List<ActionClient>>() {
+                .clients((List<ActionClient>) p.readValueAs(new TypeReference<List<ActionClient>>() {
 
                 }))
                 .build();

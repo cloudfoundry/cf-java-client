@@ -48,9 +48,10 @@ abstract class _ListIdentityZonesResponse {
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         public ListIdentityZonesResponse deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
             return ListIdentityZonesResponse.builder()
-                .identityZones(p.readValueAs(new TypeReference<List<IdentityZone>>() {
+                .identityZones((List<IdentityZone>) p.readValueAs(new TypeReference<List<IdentityZone>>() {
 
                 }))
                 .build();

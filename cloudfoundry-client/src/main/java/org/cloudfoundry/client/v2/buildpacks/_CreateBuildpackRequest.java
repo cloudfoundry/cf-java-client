@@ -18,12 +18,14 @@ package org.cloudfoundry.client.v2.buildpacks;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
  * The request payload for the Create Buildpack
  */
+@JsonSerialize
 @Value.Immutable
 abstract class _CreateBuildpackRequest {
 

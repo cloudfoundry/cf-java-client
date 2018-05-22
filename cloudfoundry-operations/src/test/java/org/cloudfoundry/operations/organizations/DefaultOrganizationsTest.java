@@ -169,7 +169,7 @@ public final class DefaultOrganizationsTest extends AbstractOperationsTest {
                 .build())
             .as(StepVerifier::create)
             .expectNext(fill(OrganizationDetail.builder())
-                .domain("test-private-domain-name", "test-shared-domain-name")
+                .domains("test-private-domain-name", "test-shared-domain-name")
                 .id(TEST_ORGANIZATION_ID)
                 .name(TEST_ORGANIZATION_NAME)
                 .quota(fill(OrganizationQuota.builder())

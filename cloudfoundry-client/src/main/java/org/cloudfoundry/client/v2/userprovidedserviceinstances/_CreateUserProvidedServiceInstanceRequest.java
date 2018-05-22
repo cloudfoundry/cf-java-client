@@ -18,6 +18,7 @@ package org.cloudfoundry.client.v2.userprovidedserviceinstances;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
@@ -27,6 +28,7 @@ import java.util.Map;
 /**
  * The request payload for the Create User Provided Service Instance
  */
+@JsonSerialize
 @Value.Immutable
 abstract class _CreateUserProvidedServiceInstanceRequest {
 

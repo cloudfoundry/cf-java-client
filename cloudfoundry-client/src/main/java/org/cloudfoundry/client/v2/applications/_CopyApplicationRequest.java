@@ -18,11 +18,13 @@ package org.cloudfoundry.client.v2.applications;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.immutables.value.Value;
 
 /**
  * The request payload for the Copy the Application operation
  */
+@JsonSerialize
 @Value.Immutable
 abstract class _CopyApplicationRequest {
 

@@ -19,12 +19,14 @@ package org.cloudfoundry.client.v2.servicebrokers;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
  * The request payload to Update a Service Broker
  */
+@JsonSerialize
 @Value.Immutable
 abstract class _UpdateServiceBrokerRequest {
 

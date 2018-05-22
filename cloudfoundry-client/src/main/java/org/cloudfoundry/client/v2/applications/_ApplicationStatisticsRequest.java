@@ -16,11 +16,13 @@
 
 package org.cloudfoundry.client.v2.applications;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.immutables.value.Value;
 
 /**
  * The request payload for the Get Application Statistics operation.
  */
+@JsonSerialize
 @Value.Immutable
 abstract class _ApplicationStatisticsRequest {
 
