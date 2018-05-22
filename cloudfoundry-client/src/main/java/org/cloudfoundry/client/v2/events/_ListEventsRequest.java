@@ -37,18 +37,18 @@ abstract class _ListEventsRequest extends PaginatedRequest {
     abstract List<String> getActees();
 
     /**
-     * The organization id
+     * The organization ids
      */
     @FilterParameter("organization_guid")
     @Nullable
-    abstract List<String> getOrganizationId();
+    abstract List<String> getOrganizationIds();
 
     /**
-     * The space id
+     * The space ids
      */
     @FilterParameter("space_guid")
     @Nullable
-    abstract List<String> getSpaceId();
+    abstract List<String> getSpaceIds();
 
     /**
      * The timestamps
