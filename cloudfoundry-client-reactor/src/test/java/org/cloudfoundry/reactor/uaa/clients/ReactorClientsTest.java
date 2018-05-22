@@ -553,7 +553,7 @@ public final class ReactorClientsTest extends AbstractUaaApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/oauth/clients?count=10&filter=client_id%2Beq%2B%22EGgNW3%22&sortBy=client_id&sortOrder=descending&startIndex=1")
+                .method(GET).path("/oauth/clients?count=10&filter=client_id+eq+%22EGgNW3%22&sortBy=client_id&sortOrder=descending&startIndex=1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)

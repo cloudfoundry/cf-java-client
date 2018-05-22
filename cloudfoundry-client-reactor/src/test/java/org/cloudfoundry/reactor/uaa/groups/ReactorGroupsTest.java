@@ -261,7 +261,7 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET)
-                .path("/Groups?count=50&filter=id%2Beq%2B%22f87c557a-8ddc-43d3-98fb-e420ebc7f0f1%22%2Bor%2BdisplayName%2Beq%2B%22Cooler%20Group%20Name%20for%20List%22" +
+                .path("/Groups?count=50&filter=id+eq+%22f87c557a-8ddc-43d3-98fb-e420ebc7f0f1%22+or+displayName+eq+%22Cooler%20Group%20Name%20for%20List%22" +
                     "&sortBy=email&sortOrder=ascending&startIndex=1")
                 .build())
             .response(TestResponse.builder()
@@ -312,7 +312,7 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET)
-                .path("/Groups/External?count=50&filter=group_id%2Beq%2B%220480db7f-d1bc-4d2b-b723-febc684c0ee9%22&startIndex=1")
+                .path("/Groups/External?count=50&filter=group_id+eq+%220480db7f-d1bc-4d2b-b723-febc684c0ee9%22&startIndex=1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)

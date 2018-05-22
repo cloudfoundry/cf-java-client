@@ -24,9 +24,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.spring.platform</groupId>
-        <artifactId>platform-bom</artifactId>
-        <version>Brussels-SR7</version>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-dependencies</artifactId>
+        <version>2.0.2.RELEASE</version>
     </parent>
 
     <groupId>org.cloudfoundry</groupId>
@@ -44,14 +44,15 @@
     </modules>
 
     <properties>
-        <assertj.version>3.9.0</assertj.version>
         <commons-compress.version>1.16.1</commons-compress.version>
+        <evo-inflector.version>1.2.2</evo-inflector.version>
         <immutables.version>2.5.6</immutables.version>
         <java-semver.version>0.9.0</java-semver.version>
         <jjwt.version>0.9.0</jjwt.version>
+        <okhttp3.version>3.10.0</okhttp3.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <reactor-core.version>3.1.5.RELEASE</reactor-core.version>
-        <reactor-netty.version>0.7.5.RELEASE</reactor-netty.version>
+        <reactor-core.version>3.1.7.RELEASE</reactor-core.version>
+        <reactor-netty.version>0.7.7.RELEASE</reactor-netty.version>
         <wire.version>2.2.0</wire.version>
     </properties>
 
@@ -98,9 +99,9 @@
                 <version>${commons-compress.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.assertj</groupId>
-                <artifactId>assertj-core</artifactId>
-                <version>${assertj.version}</version>
+                <groupId>org.atteo</groupId>
+                <artifactId>evo-inflector</artifactId>
+                <version>${evo-inflector.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.immutables</groupId>
