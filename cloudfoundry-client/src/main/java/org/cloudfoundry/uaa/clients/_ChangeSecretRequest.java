@@ -16,12 +16,14 @@
 
 package org.cloudfoundry.uaa.clients;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.cloudfoundry.uaa.IdentityZoned;
 import org.immutables.value.Value;
 
 /**
  * The request payload for Change Secret
  */
+@JsonSerialize
 @Value.Immutable
 abstract class _ChangeSecretRequest extends AbstractChangeSecret implements IdentityZoned {
 

@@ -58,7 +58,6 @@ import reactor.test.StepVerifier;
 
 import java.time.Duration;
 import java.util.Base64;
-import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.uaa.tokens.GrantType.CLIENT_CREDENTIALS;
@@ -86,7 +85,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
             .then(requestCreateClient(this.uaaClient, clientId2, clientSecret))
             .then(this.uaaClient.clients()
                 .batchChangeSecret(BatchChangeSecretRequest.builder()
-                    .changeSecret(ChangeSecret.builder()
+                    .changeSecrets(ChangeSecret.builder()
                             .clientId(clientId1)
                             .oldSecret(clientSecret)
                             .secret(newClientSecret1)
@@ -117,12 +116,12 @@ public final class ClientsTest extends AbstractIntegrationTest {
                     .authorizedGrantType(PASSWORD)
                     .clientId(clientId1)
                     .clientSecret(clientSecret)
-                    .scope("client.read", "client.write")
+                    .scopes("client.read", "client.write")
                     .tokenSalt("test-token-salt")
                     .build())
                 .client(CreateClient.builder()
                     .approvalsDeleted(true)
-                    .authorizedGrantType(PASSWORD, REFRESH_TOKEN)
+                    .authorizedGrantTypes(PASSWORD, REFRESH_TOKEN)
                     .clientId(clientId2)
                     .clientSecret(clientSecret)
                     .scope("client.write")
@@ -173,11 +172,11 @@ public final class ClientsTest extends AbstractIntegrationTest {
             .then(requestCreateClient(this.uaaClient, clientId2, clientSecret))
             .then(this.uaaClient.clients()
                 .batchUpdate(BatchUpdateClientsRequest.builder()
-                    .client(UpdateClient.builder()
-                            .authorizedGrantType(CLIENT_CREDENTIALS, IMPLICIT)
+                    .clients(UpdateClient.builder()
+                            .authorizedGrantTypes(CLIENT_CREDENTIALS, IMPLICIT)
                             .clientId(clientId1)
                             .name("test-name")
-                            .scope("client.read", "client.write")
+                            .scopes("client.read", "client.write")
                             .redirectUriPattern("https://test.com/*")
                             .tokenSalt("test-token-salt")
                             .build(),
@@ -238,7 +237,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
                 .authorizedGrantType(PASSWORD)
                 .clientId(clientId)
                 .clientSecret(clientSecret)
-                .scope("client.read", "client.write")
+                .scopes("client.read", "client.write")
                 .tokenSalt("test-token-salt")
                 .build())
             .as(StepVerifier::create)
@@ -443,12 +442,12 @@ public final class ClientsTest extends AbstractIntegrationTest {
                     .authorizedGrantType(PASSWORD)
                     .clientId(clientId1)
                     .clientSecret(clientSecret)
-                    .scope("client.read", "client.write")
+                    .scopes("client.read", "client.write")
                     .tokenSalt("test-token-salt")
                     .build())
                 .client(CreateClient.builder()
                     .approvalsDeleted(true)
-                    .authorizedGrantType(PASSWORD, REFRESH_TOKEN)
+                    .authorizedGrantTypes(PASSWORD, REFRESH_TOKEN)
                     .clientId(clientId2)
                     .clientSecret(clientSecret)
                     .scope("client.write")

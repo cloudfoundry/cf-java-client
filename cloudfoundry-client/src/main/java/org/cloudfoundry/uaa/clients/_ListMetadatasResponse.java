@@ -49,9 +49,10 @@ abstract class _ListMetadatasResponse {
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         public ListMetadatasResponse deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
             return ListMetadatasResponse.builder()
-                .metadatas(p.readValueAs(new TypeReference<List<Metadata>>() {
+                .metadatas((List<Metadata>) p.readValueAs(new TypeReference<List<Metadata>>() {
 
                 }))
                 .build();

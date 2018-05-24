@@ -18,12 +18,14 @@ package org.cloudfoundry.client.v2.organizations;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
  * The request payload for the Remove (Disassociate) Auditor with Organization by Username operation
  */
+@JsonSerialize
 @Value.Immutable
 abstract class _RemoveOrganizationAuditorByUsernameRequest {
 
@@ -39,7 +41,7 @@ abstract class _RemoveOrganizationAuditorByUsernameRequest {
     @JsonProperty("origin")
     @Nullable
     abstract String getOrigin();
-    
+
     /**
      * The username
      */

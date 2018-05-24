@@ -17,6 +17,7 @@
 package org.cloudfoundry.networking.v1.policies;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.immutables.value.Value;
 
 import java.util.List;
@@ -24,6 +25,7 @@ import java.util.List;
 /**
  * The request payload for the Delete Policies operation
  */
+@JsonSerialize
 @Value.Immutable
 abstract class _DeletePoliciesRequest {
 

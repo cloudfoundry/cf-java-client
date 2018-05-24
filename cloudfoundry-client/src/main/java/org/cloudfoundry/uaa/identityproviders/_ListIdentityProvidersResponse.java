@@ -48,9 +48,10 @@ abstract class _ListIdentityProvidersResponse {
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         public ListIdentityProvidersResponse deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
             return ListIdentityProvidersResponse.builder()
-                .identityProviders(p.readValueAs(new TypeReference<List<IdentityProvider>>() {
+                .identityProviders((List<IdentityProvider>) p.readValueAs(new TypeReference<List<IdentityProvider>>() {
 
                 }))
                 .build();

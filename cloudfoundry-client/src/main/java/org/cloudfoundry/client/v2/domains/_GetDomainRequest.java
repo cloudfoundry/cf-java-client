@@ -16,11 +16,13 @@
 
 package org.cloudfoundry.client.v2.domains;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.immutables.value.Value;
 
 /**
  * The request payload for the Get Domain operation
  */
+@JsonSerialize
 @Value.Immutable
 abstract class _GetDomainRequest {
 

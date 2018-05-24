@@ -18,11 +18,13 @@ package org.cloudfoundry.routing.v1.routergroups;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.immutables.value.Value;
 
 /**
  * The request payload for the Update Router Group operation
  */
+@JsonSerialize
 @Value.Immutable
 abstract class _UpdateRouterGroupRequest {
 

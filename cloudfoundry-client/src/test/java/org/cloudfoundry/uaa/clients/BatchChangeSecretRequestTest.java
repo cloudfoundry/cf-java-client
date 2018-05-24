@@ -23,7 +23,7 @@ public final class BatchChangeSecretRequestTest {
     @Test(expected = IllegalStateException.class)
     public void emptyChangeSecrets() {
         BatchChangeSecretRequest.builder()
-            .changeSecret()
+            .changeSecrets()
             .build();
     }
 

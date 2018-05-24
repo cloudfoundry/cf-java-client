@@ -18,12 +18,14 @@ package org.cloudfoundry.client.v2.organizationquotadefinitions;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
  * The request payload for the Updating an Organization Quota Definition operation
  */
+@JsonSerialize
 @Value.Immutable
 abstract class _UpdateOrganizationQuotaDefinitionRequest {
 

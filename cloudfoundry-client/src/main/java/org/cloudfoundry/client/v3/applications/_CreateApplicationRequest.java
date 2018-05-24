@@ -17,6 +17,7 @@
 package org.cloudfoundry.client.v3.applications;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.Lifecycle;
@@ -27,6 +28,7 @@ import java.util.Map;
 /**
  * The request payload for the Create Application operation
  */
+@JsonSerialize
 @Value.Immutable
 abstract class _CreateApplicationRequest {
 

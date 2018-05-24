@@ -18,6 +18,7 @@ package org.cloudfoundry.reactor.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.json.JsonObjectDecoder;
@@ -53,7 +54,7 @@ public final class JsonCodec {
     }
 
     static Function<Mono<HttpClientRequest>, Publisher<Void>> encode(ObjectMapper objectMapper, Object requestPayload) {
-        if (!objectMapper.canSerialize(requestPayload.getClass())) {
+        if (!AnnotationUtils.findAnnotation(requestPayload.getClass(), JsonSerialize.class).isPresent()) {
             return outbound -> outbound
                 .flatMap(HttpClientRequest::send);
         }

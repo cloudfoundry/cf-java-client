@@ -25,9 +25,9 @@ public final class AnnotationUtils {
     private AnnotationUtils() {
     }
 
-    public static <T extends Annotation> Optional<T> findAnnotation(Method method, Class<T> type) {
+    public static <T extends Annotation> Optional<T> findAnnotation(Method method, Class<T> annotationType) {
         Class<?> clazz = method.getDeclaringClass();
-        T annotation = method.getAnnotation(type);
+        T annotation = method.getAnnotation(annotationType);
 
         while (annotation == null) {
             clazz = clazz.getSuperclass();
@@ -37,10 +37,27 @@ public final class AnnotationUtils {
             }
 
             try {
-                annotation = clazz.getDeclaredMethod(method.getName(), method.getParameterTypes()).getAnnotation(type);
+                annotation = clazz.getDeclaredMethod(method.getName(), method.getParameterTypes()).getAnnotation(annotationType);
             } catch (NoSuchMethodException e) {
                 // No equivalent method found
             }
+        }
+
+        return Optional.ofNullable(annotation);
+    }
+
+    public static <T extends Annotation> Optional<T> findAnnotation(Class<?> type, Class<T> annotationType) {
+        Class<?> clazz = type;
+        T annotation = clazz.getAnnotation(annotationType);
+
+        while (annotation == null) {
+            clazz = clazz.getSuperclass();
+
+            if (clazz == null || Object.class == clazz) {
+                break;
+            }
+
+            annotation = clazz.getAnnotation(annotationType);
         }
 
         return Optional.ofNullable(annotation);

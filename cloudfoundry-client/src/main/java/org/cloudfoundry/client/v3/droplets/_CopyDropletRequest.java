@@ -17,12 +17,14 @@
 package org.cloudfoundry.client.v3.droplets;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.cloudfoundry.QueryParameter;
 import org.immutables.value.Value;
 
 /**
  * The request payload for the Copy Droplet operation
  */
+@JsonSerialize
 @Value.Immutable
 abstract class _CopyDropletRequest {
 

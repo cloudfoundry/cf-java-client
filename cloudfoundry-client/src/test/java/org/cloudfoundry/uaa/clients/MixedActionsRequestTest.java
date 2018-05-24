@@ -25,7 +25,7 @@ public final class MixedActionsRequestTest {
     @Test(expected = IllegalStateException.class)
     public void emptyAction() {
         MixedActionsRequest.builder()
-            .action()
+            .actions()
             .build();
     }
 
