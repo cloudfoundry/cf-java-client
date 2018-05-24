@@ -18,14 +18,14 @@ package org.cloudfoundry.uaa.groups;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.cloudfoundry.uaa.IdentityZoned;
 import org.immutables.value.Value;
 
 /**
  * The request payload to add a member to a group
  */
-@JsonDeserialize
+@JsonSerialize
 @Value.Immutable
 abstract class _AddMemberRequest implements IdentityZoned {
 

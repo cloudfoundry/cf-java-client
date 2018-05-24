@@ -25,7 +25,7 @@ public final class BatchCreateClientsRequestTest {
     @Test(expected = IllegalStateException.class)
     public void emptyClient() {
         BatchCreateClientsRequest.builder()
-            .client()
+            .clients()
             .build();
     }
 

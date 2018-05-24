@@ -177,7 +177,7 @@ public class IntegrationTestConfiguration {
     Mono<Tuple2<String, String>> client(@Qualifier("admin") UaaClient uaaClient, String clientId, String clientSecret) {
         return uaaClient.clients()
             .create(CreateClientRequest.builder()
-                .authorizedGrantType(AUTHORIZATION_CODE, CLIENT_CREDENTIALS, PASSWORD, REFRESH_TOKEN)
+                .authorizedGrantTypes(AUTHORIZATION_CODE, CLIENT_CREDENTIALS, PASSWORD, REFRESH_TOKEN)
                 .autoApprove(String.valueOf(true))
                 .clientId(clientId)
                 .clientSecret(clientSecret)

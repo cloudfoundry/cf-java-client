@@ -80,7 +80,7 @@ public final class TokensTest extends AbstractIntegrationTest {
                     .token(token)
                     .clientId(this.clientId)
                     .clientSecret(this.clientSecret)
-                    .scope("password.write", "scim.userids")
+                    .scopes("password.write", "scim.userids")
                     .build()))
             .as(StepVerifier::create)
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(UaaException.class).hasMessage("access_denied: Access is denied"))

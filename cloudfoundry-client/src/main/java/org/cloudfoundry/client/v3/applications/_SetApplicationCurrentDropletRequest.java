@@ -18,12 +18,14 @@ package org.cloudfoundry.client.v3.applications;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.cloudfoundry.client.v3.Relationship;
 import org.immutables.value.Value;
 
 /**
  * The request payload for the Assign Application Droplet operation
  */
+@JsonSerialize
 @Value.Immutable
 abstract class _SetApplicationCurrentDropletRequest {
 

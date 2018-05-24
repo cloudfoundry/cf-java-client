@@ -47,9 +47,10 @@ abstract class _ListMatchingResourcesResponse {
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         public ListMatchingResourcesResponse deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
             return ListMatchingResourcesResponse.builder()
-                .resources(p.readValueAs(new TypeReference<List<Resource>>() {
+                .resources((List<Resource>) p.readValueAs(new TypeReference<List<Resource>>() {
 
                 }))
                 .build();

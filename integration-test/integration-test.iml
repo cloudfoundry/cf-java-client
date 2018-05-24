@@ -55,6 +55,7 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.yaml:snakeyaml:1.17" level="project" />
     <orderEntry type="module" module-name="cloudfoundry-util" scope="TEST" />
     <orderEntry type="library" scope="TEST" name="Maven: org.atteo:evo-inflector:1.2.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.immutables:value:2.6.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.springframework.boot:spring-boot-starter:1.5.13.RELEASE" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.springframework.boot:spring-boot:1.5.13.RELEASE" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.springframework:spring-context:4.3.17.RELEASE" level="project" />

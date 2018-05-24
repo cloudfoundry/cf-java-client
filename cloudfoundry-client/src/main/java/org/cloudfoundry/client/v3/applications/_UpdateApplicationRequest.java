@@ -18,6 +18,7 @@ package org.cloudfoundry.client.v3.applications;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.Lifecycle;
 import org.immutables.value.Value;
@@ -25,6 +26,7 @@ import org.immutables.value.Value;
 /**
  * The request payload for the Update Application operation
  */
+@JsonSerialize
 @Value.Immutable
 abstract class _UpdateApplicationRequest {
 

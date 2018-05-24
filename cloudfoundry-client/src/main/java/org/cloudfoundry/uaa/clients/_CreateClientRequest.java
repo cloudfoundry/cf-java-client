@@ -16,12 +16,14 @@
 
 package org.cloudfoundry.uaa.clients;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.cloudfoundry.uaa.IdentityZoned;
 import org.immutables.value.Value;
 
 /**
  * The request payload for the create client
  */
+@JsonSerialize
 @Value.Immutable
 abstract class _CreateClientRequest extends AbstractCreateClient implements IdentityZoned {
 

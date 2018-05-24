@@ -26,6 +26,7 @@
     <orderEntry type="module" module-name="cloudfoundry-client" />
     <orderEntry type="library" name="Maven: com.squareup.wire:wire-runtime:2.2.0" level="project" />
     <orderEntry type="library" name="Maven: com.squareup.okio:okio:1.8.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.immutables:value:2.6.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.mockito:mockito-core:1.10.19" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-core:4.3.17.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter-logging:1.5.13.RELEASE" level="project" />

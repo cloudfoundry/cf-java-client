@@ -48,9 +48,10 @@ abstract class _ListRouterGroupsResponse {
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         public ListRouterGroupsResponse deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
             return ListRouterGroupsResponse.builder()
-                .routerGroups(p.readValueAs(new TypeReference<List<RouterGroup>>() {
+                .routerGroups((List<RouterGroup>) p.readValueAs(new TypeReference<List<RouterGroup>>() {
 
                 }))
                 .build();

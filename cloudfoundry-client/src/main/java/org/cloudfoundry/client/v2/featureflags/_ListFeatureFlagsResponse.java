@@ -47,9 +47,10 @@ abstract class _ListFeatureFlagsResponse {
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         public ListFeatureFlagsResponse deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
             return ListFeatureFlagsResponse.builder()
-                .featureFlags(p.readValueAs(new TypeReference<List<FeatureFlagEntity>>() {
+                .featureFlags((List<FeatureFlagEntity>) p.readValueAs(new TypeReference<List<FeatureFlagEntity>>() {
 
                 }))
                 .build();

@@ -29,7 +29,7 @@
     <orderEntry type="library" name="Maven: org.apache.commons:commons-compress:1.16.1" level="project" />
     <orderEntry type="library" name="Maven: org.atteo:evo-inflector:1.2.2" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-core:4.3.17.RELEASE" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.immutables:value:2.5.6" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.immutables:value:2.6.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.mockito:mockito-core:1.10.19" level="project" />
     <orderEntry type="library" name="Maven: org.objenesis:objenesis:2.5.1" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.25" level="project" />

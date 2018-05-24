@@ -47,9 +47,10 @@ abstract class _ListTcpRoutesResponse {
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         public ListTcpRoutesResponse deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
             return ListTcpRoutesResponse.builder()
-                .tcpRoutes(p.readValueAs(new TypeReference<List<TcpRoute>>() {
+                .tcpRoutes((List<TcpRoute>) p.readValueAs(new TypeReference<List<TcpRoute>>() {
 
                 }))
                 .build();

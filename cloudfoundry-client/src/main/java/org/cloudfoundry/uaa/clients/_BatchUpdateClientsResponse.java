@@ -48,9 +48,10 @@ abstract class _BatchUpdateClientsResponse {
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         public BatchUpdateClientsResponse deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
             return BatchUpdateClientsResponse.builder()
-                .clients(p.readValueAs(new TypeReference<List<Client>>() {
+                .clients((List<Client>) p.readValueAs(new TypeReference<List<Client>>() {
 
                 }))
                 .build();

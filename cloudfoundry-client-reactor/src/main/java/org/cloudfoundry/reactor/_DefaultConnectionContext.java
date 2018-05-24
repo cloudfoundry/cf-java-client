@@ -46,7 +46,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
-import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 import static io.netty.channel.ChannelOption.CONNECT_TIMEOUT_MILLIS;
 import static io.netty.channel.ChannelOption.SO_KEEPALIVE;
 import static io.netty.channel.ChannelOption.SO_RCVBUF;
@@ -120,7 +119,7 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
     @Value.Default
     public ObjectMapper getObjectMapper() {
         ObjectMapper objectMapper = new ObjectMapper()
-            .disable(FAIL_ON_UNKNOWN_PROPERTIES)
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             .enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
             .registerModule(new Jdk8Module())
             .setSerializationInclusion(NON_NULL);

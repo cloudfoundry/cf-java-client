@@ -17,6 +17,7 @@
 package org.cloudfoundry.client.v2.routes;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.QueryParameter;
 import org.immutables.value.Value;
@@ -24,6 +25,7 @@ import org.immutables.value.Value;
 /**
  * The request payload for the Creating a Route operation
  */
+@JsonSerialize
 @Value.Immutable
 abstract class _CreateRouteRequest {
 

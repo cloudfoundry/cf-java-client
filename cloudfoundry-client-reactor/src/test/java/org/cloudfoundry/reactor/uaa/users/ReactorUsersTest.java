@@ -426,7 +426,7 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
         this.users
             .invite(InviteUsersRequest.builder()
                 .clientId("u7ptqw")
-                .email("user1@pjy596.com", "user2@pjy596.com")
+                .emails("user1@pjy596.com", "user2@pjy596.com")
                 .redirectUri("example.com")
                 .build())
             .as(StepVerifier::create)
@@ -445,7 +445,6 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
                     .success(true)
                     .inviteLink("http://localhost/invitations/accept?code=n5X0hCsD3N")
                     .build())
-                .failedInvite()
                 .build())
             .expectComplete()
             .verify(Duration.ofSeconds(5));

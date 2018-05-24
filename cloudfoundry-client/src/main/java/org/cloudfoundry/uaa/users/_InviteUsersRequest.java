@@ -17,6 +17,7 @@
 package org.cloudfoundry.uaa.users;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.QueryParameter;
 import org.cloudfoundry.uaa.IdentityZoned;
@@ -27,6 +28,7 @@ import java.util.List;
 /**
  * The request payload for the change user password operation
  */
+@JsonSerialize
 @Value.Immutable
 abstract class _InviteUsersRequest implements IdentityZoned {
 

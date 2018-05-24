@@ -17,6 +17,7 @@
 package org.cloudfoundry.client.v2.environmentvariablegroups;
 
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
@@ -26,6 +27,7 @@ import java.util.Map;
 /**
  * The request payload for the update staging environment variable group
  */
+@JsonSerialize
 @Value.Immutable
 abstract class _UpdateStagingEnvironmentVariablesRequest {
 

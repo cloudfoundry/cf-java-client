@@ -23,7 +23,7 @@ public final class BatchDeleteClientsRequestTest {
     @Test(expected = IllegalStateException.class)
     public void emptyClientIds() {
         BatchDeleteClientsRequest.builder()
-            .clientId()
+            .clientIds()
             .build();
     }
 
