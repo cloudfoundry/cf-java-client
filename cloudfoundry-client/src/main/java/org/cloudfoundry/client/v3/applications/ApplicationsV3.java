@@ -104,6 +104,14 @@ public interface ApplicationsV3 {
     Mono<ListApplicationsResponse> list(ListApplicationsRequest request);
 
     /**
+     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.47.0/#list-builds-for-an-app">List Application Builds</a> request
+     *
+     * @param request the List Application Builds request
+     * @return the response from the List Application Builds request
+     */
+    Mono<ListApplicationBuildsResponse> listBuilds(ListApplicationBuildsRequest request);
+
+    /**
      * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#list-droplets-for-an-app">List Application Droplets</a> request
      *
      * @param request the List Application Droplets request

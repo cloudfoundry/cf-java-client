@@ -21,6 +21,8 @@ import org.cloudfoundry.client.v3.builds.CreateBuildRequest;
 import org.cloudfoundry.client.v3.builds.CreateBuildResponse;
 import org.cloudfoundry.client.v3.builds.GetBuildRequest;
 import org.cloudfoundry.client.v3.builds.GetBuildResponse;
+import org.cloudfoundry.client.v3.builds.ListBuildsRequest;
+import org.cloudfoundry.client.v3.builds.ListBuildsResponse;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
@@ -51,6 +53,12 @@ public final class ReactorBuilds extends AbstractClientV3Operations implements B
     @Override
     public Mono<GetBuildResponse> get(GetBuildRequest request) {
         return get(request, GetBuildResponse.class, builder -> builder.pathSegment("builds", request.getBuildId()))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<ListBuildsResponse> list(ListBuildsRequest request) {
+        return get(request, ListBuildsResponse.class, builder -> builder.pathSegment("builds"))
             .checkpoint();
     }
 

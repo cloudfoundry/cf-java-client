@@ -46,6 +46,8 @@ import org.cloudfoundry.client.v3.applications.GetApplicationProcessStatisticsRe
 import org.cloudfoundry.client.v3.applications.GetApplicationProcessStatisticsResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationResponse;
+import org.cloudfoundry.client.v3.applications.ListApplicationBuildsRequest;
+import org.cloudfoundry.client.v3.applications.ListApplicationBuildsResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationDropletsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationDropletsResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationPackagesRequest;
@@ -69,6 +71,9 @@ import org.cloudfoundry.client.v3.applications.UpdateApplicationEnvironmentVaria
 import org.cloudfoundry.client.v3.applications.UpdateApplicationEnvironmentVariablesResponse;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationResponse;
+import org.cloudfoundry.client.v3.builds.BuildResource;
+import org.cloudfoundry.client.v3.builds.BuildState;
+import org.cloudfoundry.client.v3.builds.CreatedBy;
 import org.cloudfoundry.client.v3.droplets.Buildpack;
 import org.cloudfoundry.client.v3.droplets.DropletResource;
 import org.cloudfoundry.client.v3.droplets.DropletState;
@@ -709,6 +714,67 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
                     .link("stop", Link.builder()
                         .href("https://api.example.org/v3/apps/02b4ec9b-94c7-4468-9c23-4e906191a0f8/actions/stop")
                         .method("POST")
+                        .build())
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void listBuilds() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/apps/test-application-id/builds")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v3/apps/GET_{id}_builds_response.json")
+                .build())
+            .build());
+
+        this.applications
+            .listBuilds(ListApplicationBuildsRequest.builder()
+                .applicationId("test-application-id")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ListApplicationBuildsResponse.builder()
+                .pagination(Pagination.builder()
+                    .totalResults(1)
+                    .totalPages(1)
+                    .first(Link.builder()
+                        .href("https://api.example.org/v3/apps/test-application-id/builds?states=STAGING&page=1&per_page=2")
+                        .build())
+                    .last(Link.builder()
+                        .href("https://api.example.org/v3/apps/test-application-id/builds?states=STAGING&page=1&per_page=2")
+                        .build())
+                    .build())
+                .resource(BuildResource.builder()
+                    .id("585bc3c1-3743-497d-88b0-403ad6b56d16")
+                    .createdAt("2016-03-28T23:39:34Z")
+                    .updatedAt("2016-06-08T16:41:26Z")
+                    .createdBy(CreatedBy.builder()
+                        .id("3cb4e243-bed4-49d5-8739-f8b45abdec1c")
+                        .name("bill")
+                        .email("bill@example.com")
+                        .build())
+                    .state(BuildState.STAGING)
+                    .error(null)
+                    .lifecycle(Lifecycle.builder()
+                        .type(LifecycleType.BUILDPACK)
+                        .data(BuildpackData.builder()
+                            .buildpack("ruby_buildpack")
+                            .stack("cflinuxfs2")
+                            .build())
+                        .build())
+                    .inputPackage(Relationship.builder()
+                        .id("8e4da443-f255-499c-8b47-b3729b5b7432")
+                        .build())
+                    .link("self", Link.builder()
+                        .href("https://api.example.org/v3/builds/585bc3c1-3743-497d-88b0-403ad6b56d16")
+                        .build())
+                    .link("app", Link.builder()
+                        .href("https://api.example.org/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058396")
                         .build())
                     .build())
                 .build())

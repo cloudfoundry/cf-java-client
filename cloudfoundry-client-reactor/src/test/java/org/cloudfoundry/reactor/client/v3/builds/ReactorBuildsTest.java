@@ -20,13 +20,17 @@ import org.cloudfoundry.client.v3.BuildpackData;
 import org.cloudfoundry.client.v3.Lifecycle;
 import org.cloudfoundry.client.v3.LifecycleType;
 import org.cloudfoundry.client.v3.Link;
+import org.cloudfoundry.client.v3.Pagination;
 import org.cloudfoundry.client.v3.Relationship;
+import org.cloudfoundry.client.v3.builds.BuildResource;
 import org.cloudfoundry.client.v3.builds.BuildState;
 import org.cloudfoundry.client.v3.builds.CreateBuildRequest;
 import org.cloudfoundry.client.v3.builds.CreateBuildResponse;
 import org.cloudfoundry.client.v3.builds.CreatedBy;
 import org.cloudfoundry.client.v3.builds.GetBuildRequest;
 import org.cloudfoundry.client.v3.builds.GetBuildResponse;
+import org.cloudfoundry.client.v3.builds.ListBuildsRequest;
+import org.cloudfoundry.client.v3.builds.ListBuildsResponse;
 import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
@@ -144,6 +148,66 @@ public final class ReactorBuildsTest extends AbstractClientApiTest {
                     .build())
                 .link("app", Link.builder()
                     .href("https://api.example.org/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058396")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void list() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/builds")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v3/builds/GET_response.json")
+                .build())
+            .build());
+
+        this.builds
+            .list(ListBuildsRequest.builder()
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ListBuildsResponse.builder()
+                .pagination(Pagination.builder()
+                    .totalResults(1)
+                    .totalPages(1)
+                    .first(Link.builder()
+                        .href("https://api.example.org/v3/builds?states=STAGING&page=1&per_page=2")
+                        .build())
+                    .last(Link.builder()
+                        .href("https://api.example.org/v3/builds?states=STAGING&page=1&per_page=2")
+                        .build())
+                    .build())
+                .resource(BuildResource.builder()
+                    .id("585bc3c1-3743-497d-88b0-403ad6b56d16")
+                    .createdAt("2016-03-28T23:39:34Z")
+                    .updatedAt("2016-06-08T16:41:26Z")
+                    .createdBy(CreatedBy.builder()
+                        .id("3cb4e243-bed4-49d5-8739-f8b45abdec1c")
+                        .name("bill")
+                        .email("bill@example.com")
+                        .build())
+                    .state(BuildState.STAGING)
+                    .error(null)
+                    .lifecycle(Lifecycle.builder()
+                        .type(LifecycleType.BUILDPACK)
+                        .data(BuildpackData.builder()
+                            .buildpack("ruby_buildpack")
+                            .stack("cflinuxfs2")
+                            .build())
+                        .build())
+                    .inputPackage(Relationship.builder()
+                        .id("8e4da443-f255-499c-8b47-b3729b5b7432")
+                        .build())
+                    .link("self", Link.builder()
+                        .href("https://api.example.org/v3/builds/585bc3c1-3743-497d-88b0-403ad6b56d16")
+                        .build())
+                    .link("app", Link.builder()
+                        .href("https://api.example.org/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058396")
+                        .build())
                     .build())
                 .build())
             .expectComplete()
