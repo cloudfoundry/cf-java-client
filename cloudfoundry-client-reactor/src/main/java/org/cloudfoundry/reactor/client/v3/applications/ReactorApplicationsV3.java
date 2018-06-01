@@ -34,6 +34,8 @@ import org.cloudfoundry.client.v3.applications.GetApplicationProcessStatisticsRe
 import org.cloudfoundry.client.v3.applications.GetApplicationProcessStatisticsResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationResponse;
+import org.cloudfoundry.client.v3.applications.ListApplicationBuildsRequest;
+import org.cloudfoundry.client.v3.applications.ListApplicationBuildsResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationDropletsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationDropletsResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationPackagesRequest;
@@ -135,6 +137,12 @@ public final class ReactorApplicationsV3 extends AbstractClientV3Operations impl
     @Override
     public Mono<ListApplicationsResponse> list(ListApplicationsRequest request) {
         return get(request, ListApplicationsResponse.class, builder -> builder.pathSegment("apps"))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<ListApplicationBuildsResponse> listBuilds(ListApplicationBuildsRequest request) {
+        return get(request, ListApplicationBuildsResponse.class, builder -> builder.pathSegment("apps", request.getApplicationId(), "builds"))
             .checkpoint();
     }
 

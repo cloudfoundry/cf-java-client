@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.Lifecycle;
 import org.cloudfoundry.client.v3.Resource;
-import org.cloudfoundry.client.v3.spaces.SpaceRelationships;
 
 /**
  * Base class for responses that are applications

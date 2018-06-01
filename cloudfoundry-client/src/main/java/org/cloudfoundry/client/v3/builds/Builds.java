@@ -39,4 +39,12 @@ public interface Builds {
      */
     Mono<GetBuildResponse> get(GetBuildRequest request);
 
+    /**
+     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.47.0/#list-builds">List Builds</a> request
+     *
+     * @param request the List Builds request
+     * @return the response from the List Builds request
+     */
+    Mono<ListBuildsResponse> list(ListBuildsRequest request);
+
 }
