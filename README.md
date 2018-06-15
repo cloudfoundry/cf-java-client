@@ -35,22 +35,22 @@ Most projects will need two dependencies; the Operations API and an implementati
     <dependency>
         <groupId>org.cloudfoundry</groupId>
         <artifactId>cloudfoundry-client-reactor</artifactId>
-        <version>3.9.0.RELEASE</version>
+        <version>3.11.0.RELEASE</version>
     </dependency>
     <dependency>
         <groupId>org.cloudfoundry</groupId>
         <artifactId>cloudfoundry-operations</artifactId>
-        <version>3.9.0.RELEASE</version>
+        <version>3.11.0.RELEASE</version>
     </dependency>
     <dependency>
         <groupId>io.projectreactor</groupId>
         <artifactId>reactor-core</artifactId>
-        <version>3.1.7.RELEASE</version>
+        <version>3.1.8.RELEASE</version>
     </dependency>
     <dependency>
         <groupId>io.projectreactor.ipc</groupId>
         <artifactId>reactor-netty</artifactId>
-        <version>0.7.7.RELEASE</version>
+        <version>0.7.8.RELEASE</version>
     </dependency>
     ...
 </dependencies>
@@ -76,10 +76,10 @@ For Gradle, the dependencies would be defined like this:
 
 ```groovy
 dependencies {
-    compile 'org.cloudfoundry:cloudfoundry-client-reactor:3.9.0.RELEASE'
-    compile 'org.cloudfoundry:cloudfoundry-operations:3.9.0.RELEASE'
-    compile 'io.projectreactor:reactor-core:3.1.7.RELEASE'
-    compile 'io.projectreactor.ipc:reactor-netty:0.7.7.RELEASE'
+    compile 'org.cloudfoundry:cloudfoundry-client-reactor:3.11.0.RELEASE'
+    compile 'org.cloudfoundry:cloudfoundry-operations:3.11.0.RELEASE'
+    compile 'io.projectreactor:reactor-core:3.1.8.RELEASE'
+    compile 'io.projectreactor.ipc:reactor-netty:0.7.8.RELEASE'
     ...
 }
 ```
