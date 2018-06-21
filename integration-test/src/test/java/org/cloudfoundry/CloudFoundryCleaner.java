@@ -162,10 +162,12 @@ final class CloudFoundryCleaner {
                 cleanServiceBrokers(this.cloudFoundryClient, this.nameFactory),
                 cleanSpaceQuotaDefinitions(this.cloudFoundryClient, this.nameFactory),
                 cleanStacks(this.cloudFoundryClient, this.nameFactory),
-                cleanUsers(this.cloudFoundryClient, this.nameFactory),
-                cleanUsers(this.uaaClient, this.nameFactory)
+                cleanUsers(this.cloudFoundryClient, this.nameFactory)
             ))
-            .thenMany(cleanApplicationsV2(this.cloudFoundryClient, this.nameFactory)) // After Routes, cannot run with other cleanApps
+            .thenMany(Mono.when(
+                cleanApplicationsV2(this.cloudFoundryClient, this.nameFactory), // After Routes, cannot run with other cleanApps
+                cleanUsers(this.uaaClient, this.nameFactory) // After CF Users
+            ))
             .thenMany(Mono.when( // After Routes/Applications
                 cleanPrivateDomains(this.cloudFoundryClient, this.nameFactory),
                 cleanSharedDomains(this.cloudFoundryClient, this.nameFactory),
@@ -552,8 +554,8 @@ final class CloudFoundryCleaner {
                     .async(true)
                     .userId(userId)
                     .build())
-                .doOnError(t -> LOGGER.error("Unable to delete user {}", userId, t)))
-            .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, Duration.ofMinutes(5), job));
+                .flatMapMany(job -> JobUtils.waitForCompletion(cloudFoundryClient, Duration.ofMinutes(5), job))
+                .doOnError(t -> LOGGER.error("Unable to delete user {}", userId, t)));
     }
 
     private static Flux<Void> cleanUsers(UaaClient uaaClient, NameFactory nameFactory) {
@@ -599,7 +601,7 @@ final class CloudFoundryCleaner {
     }
 
     private static boolean isCleanable(NameFactory nameFactory, UserResource resource) {
-        return nameFactory.isUserId(ResourceUtils.getId(resource)) || nameFactory.isUserId(ResourceUtils.getEntity(resource).getUsername());
+        return nameFactory.isUserId(ResourceUtils.getId(resource)) || nameFactory.isUserName(ResourceUtils.getEntity(resource).getUsername());
     }
 
     private static Flux<Void> removeApplicationServiceBindings(CloudFoundryClient cloudFoundryClient, ApplicationResource application) {
