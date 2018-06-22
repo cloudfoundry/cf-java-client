@@ -72,7 +72,10 @@ public final class ServiceBrokerUtils {
         return getSharedDomain(cloudFoundryClient)
             .flatMap(domain -> pushServiceBrokerApplication(cloudFoundryClient, application, domain, nameFactory, planName, serviceName, spaceId))
             .flatMap(applicationMetadata -> requestCreateServiceBroker(cloudFoundryClient, applicationMetadata, serviceBrokerName, spaceScoped)
-                .delayUntil(response -> makeServicePlanPubliclyVisible(cloudFoundryClient, serviceName, spaceScoped))
+                .delayUntil(response -> Mono.zip(
+                    makeServicePlanPubliclyVisible(cloudFoundryClient, serviceName, spaceScoped),
+                    makeServicePlanPubliclyVisible(cloudFoundryClient, serviceName + "-shareable", spaceScoped)
+                ))
                 .map(response -> new ServiceBrokerMetadata(applicationMetadata, ResourceUtils.getId(response))));
     }
 
@@ -83,8 +86,8 @@ public final class ServiceBrokerUtils {
                 .build());
     }
 
-    public static Mono<ApplicationMetadata> pushServiceBrokerApplication(CloudFoundryClient cloudFoundryClient, Path application, SharedDomainResource domain, NameFactory nameFactory,
-                                                                         String planName, String serviceName, String spaceId) {
+    public static Mono<ApplicationMetadata> pushServiceBrokerApplication(CloudFoundryClient cloudFoundryClient, Path application, SharedDomainResource domain, NameFactory nameFactory, String planName,
+                                                                         String serviceName, String spaceId) {
         String applicationName = nameFactory.getApplicationName();
         String hostName = nameFactory.getHostName();
 

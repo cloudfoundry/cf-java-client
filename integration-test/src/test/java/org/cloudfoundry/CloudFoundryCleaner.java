@@ -66,6 +66,10 @@ import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedS
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.RemoveUserProvidedServiceInstanceRouteRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstanceResource;
 import org.cloudfoundry.client.v2.users.UserResource;
+import org.cloudfoundry.client.v3.Relationship;
+import org.cloudfoundry.client.v3.serviceInstances.ListSharedSpacesRelationshipRequest;
+import org.cloudfoundry.client.v3.serviceInstances.ListSharedSpacesRelationshipResponse;
+import org.cloudfoundry.client.v3.serviceInstances.UnshareServiceInstanceRequest;
 import org.cloudfoundry.networking.NetworkingClient;
 import org.cloudfoundry.networking.v1.policies.DeletePoliciesRequest;
 import org.cloudfoundry.networking.v1.policies.Destination;
@@ -106,6 +110,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import static org.cloudfoundry.CloudFoundryVersion.PCF_1_12;
+import static org.cloudfoundry.CloudFoundryVersion.PCF_2_1;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 import static org.cloudfoundry.util.tuple.TupleUtils.predicate;
 
@@ -120,6 +125,7 @@ final class CloudFoundryCleaner {
         .entry("private_domain_creation", true)
         .entry("route_creation", true)
         .entry("service_instance_creation", true)
+        .entry("service_instance_sharing", true)
         .entry("set_roles_by_username", true)
         .entry("unset_roles_by_username", true)
         .entry("user_org_creation", false)
@@ -146,7 +152,7 @@ final class CloudFoundryCleaner {
     void clean() {
         Flux.empty()
             .thenMany(Mono.when( // Before Routes
-                cleanServiceInstances(this.cloudFoundryClient, this.nameFactory),
+                cleanServiceInstances(this.cloudFoundryClient, this.nameFactory, this.serverVersion),
                 cleanUserProvidedServiceInstances(this.cloudFoundryClient, this.nameFactory)
             ))
             .thenMany(Mono.when( // No prerequisites
@@ -424,7 +430,7 @@ final class CloudFoundryCleaner {
                 .doOnError(t -> LOGGER.error("Unable to delete service broker {}", ResourceUtils.getEntity(serviceBroker).getName(), t)));
     }
 
-    private static Flux<Void> cleanServiceInstances(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
+    private static Flux<Void> cleanServiceInstances(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory, Version serverVersion) {
         return PaginationUtils
             .requestClientV2Resources(page -> cloudFoundryClient.serviceInstances()
                 .list(ListServiceInstancesRequest.builder()
@@ -434,6 +440,7 @@ final class CloudFoundryCleaner {
             .delayUntil(serviceInstance -> removeRouteAssociations(cloudFoundryClient, serviceInstance))
             .delayUntil(serviceInstance -> removeServiceInstanceServiceBindings(cloudFoundryClient, serviceInstance))
             .delayUntil(serviceInstance -> removeServiceKeys(cloudFoundryClient, serviceInstance))
+            .delayUntil(serviceInstance -> removeServiceShares(cloudFoundryClient, serviceInstance, serverVersion))
             .flatMap(serviceInstance -> cloudFoundryClient.serviceInstances()
                 .delete(DeleteServiceInstanceRequest.builder()
                     .async(true)
@@ -664,6 +671,17 @@ final class CloudFoundryCleaner {
                 .doOnError(t -> LOGGER.error("Unable to remove service binding from {}", ResourceUtils.getEntity(serviceKey).getName(), t)));
     }
 
+    private static Flux<Void> removeServiceShares(CloudFoundryClient cloudFoundryClient, ServiceInstanceResource serviceInstance, Version serverVersion) {
+        return ifCfVersion(PCF_2_1, serverVersion, () -> cloudFoundryClient.serviceInstancesV3()
+            .listSharedSpacesRelationship(ListSharedSpacesRelationshipRequest.builder()
+                .serviceInstanceId(ResourceUtils.getId(serviceInstance))
+                .build())
+            .flatMapIterable(ListSharedSpacesRelationshipResponse::getData)
+            .map(Relationship::getId)
+            .flatMap(spaceId -> requestUnshareServiceInstance(cloudFoundryClient, serviceInstance, spaceId)
+                .doOnError(t -> LOGGER.error("Unable to remove service share from {}", ResourceUtils.getEntity(serviceInstance).getName(), t))));
+    }
+
     private static Flux<Void> removeUserProvidedServiceInstanceServiceBindings(CloudFoundryClient cloudFoundryClient, UserProvidedServiceInstanceResource serviceInstance) {
         return PaginationUtils
             .requestClientV2Resources(page -> cloudFoundryClient.userProvidedServiceInstances()
@@ -680,6 +698,14 @@ final class CloudFoundryCleaner {
             .removeServiceBinding(RemoveApplicationServiceBindingRequest.builder()
                 .applicationId(applicationId)
                 .serviceBindingId(serviceBindingId)
+                .build());
+    }
+
+    private static Mono<Void> requestUnshareServiceInstance(CloudFoundryClient cloudFoundryClient, ServiceInstanceResource serviceInstance, String spaceId) {
+        return cloudFoundryClient.serviceInstancesV3()
+            .unshare(UnshareServiceInstanceRequest.builder()
+                .serviceInstanceId(ResourceUtils.getId(serviceInstance))
+                .spaceId(spaceId)
                 .build());
     }
 

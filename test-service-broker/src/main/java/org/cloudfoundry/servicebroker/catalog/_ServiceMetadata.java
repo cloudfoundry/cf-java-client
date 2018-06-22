@@ -17,6 +17,7 @@
 package org.cloudfoundry.servicebroker.catalog;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.cloudfoundry.servicebroker.Nullable;
 import org.immutables.value.Value;
 
 @Value.Immutable
@@ -30,5 +31,9 @@ abstract class _ServiceMetadata {
 
     @JsonProperty("provider")
     abstract Provider getProvider();
+
+    @JsonProperty("shareable")
+    @Nullable
+    abstract Boolean getShareable();
 
 }

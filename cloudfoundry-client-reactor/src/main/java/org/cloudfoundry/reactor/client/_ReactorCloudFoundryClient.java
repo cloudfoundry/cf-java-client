@@ -56,6 +56,7 @@ import org.cloudfoundry.client.v3.jobs.JobsV3;
 import org.cloudfoundry.client.v3.organizations.OrganizationsV3;
 import org.cloudfoundry.client.v3.packages.Packages;
 import org.cloudfoundry.client.v3.processes.Processes;
+import org.cloudfoundry.client.v3.serviceInstances.ServiceInstancesV3;
 import org.cloudfoundry.client.v3.servicebindings.ServiceBindingsV3;
 import org.cloudfoundry.client.v3.spaces.SpacesV3;
 import org.cloudfoundry.client.v3.tasks.Tasks;
@@ -101,6 +102,7 @@ import org.cloudfoundry.reactor.client.v3.organizations.ReactorOrganizationsV3;
 import org.cloudfoundry.reactor.client.v3.packages.ReactorPackages;
 import org.cloudfoundry.reactor.client.v3.processes.ReactorProcesses;
 import org.cloudfoundry.reactor.client.v3.servicebindings.ReactorServiceBindingsV3;
+import org.cloudfoundry.reactor.client.v3.serviceinstances.ReactorServiceInstancesV3;
 import org.cloudfoundry.reactor.client.v3.spaces.ReactorSpacesV3;
 import org.cloudfoundry.reactor.client.v3.tasks.ReactorTasks;
 import org.immutables.value.Value;
@@ -291,6 +293,12 @@ abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
     @Value.Derived
     public ServiceInstances serviceInstances() {
         return new ReactorServiceInstances(getConnectionContext(), getRootV2(), getTokenProvider());
+    }
+
+    @Override
+    @Value.Derived
+    public ServiceInstancesV3 serviceInstancesV3() {
+        return new ReactorServiceInstancesV3(getConnectionContext(), getRootV3(), getTokenProvider());
     }
 
     @Override

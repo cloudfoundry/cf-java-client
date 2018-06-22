@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.servicebroker.instance;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.immutables.value.Value;
 
 @Value.Immutable

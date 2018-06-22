@@ -1,0 +1,15 @@
+{
+  "data": [
+    {
+      "guid": "68d54d31-9b3a-463b-ba94-e8e4c32edbac"
+    },
+    {
+      "guid": "b19f6525-cbd3-4155-b156-dc0c2a431b4c"
+    }
+  ],
+  "links": {
+    "self": {
+      "href": "https://api.example.org/v3/service_instances/bdeg4371-cbd3-4155-b156-dc0c2a431b4c/relationships/shared_spaces"
+    }
+  }
+}
