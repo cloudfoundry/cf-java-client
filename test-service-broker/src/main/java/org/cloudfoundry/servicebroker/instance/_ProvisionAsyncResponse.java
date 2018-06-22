@@ -20,8 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.cloudfoundry.servicebroker.Nullable;
 import org.immutables.value.Value;
 
-import java.util.UUID;
-
 @Value.Immutable
 abstract class _ProvisionAsyncResponse {
 
