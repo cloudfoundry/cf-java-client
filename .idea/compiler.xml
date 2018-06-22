@@ -2,7 +2,6 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
-      <profile default="true" name="Default" enabled="true" />
       <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
@@ -15,17 +14,5 @@
         <module name="test-service-broker" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="cloudfoundry-client" target="1.8" />
-      <module name="cloudfoundry-client-reactor" target="1.8" />
-      <module name="cloudfoundry-java-client" target="1.6" />
-      <module name="cloudfoundry-operations" target="1.8" />
-      <module name="cloudfoundry-util" target="1.8" />
-      <module name="integration-test" target="1.8" />
-      <module name="test-service-broker" target="1.8" />
-    </bytecodeTargetLevel>
-  </component>
-  <component name="JavacSettings">
-    <option name="ADDITIONAL_OPTIONS_STRING" value="-Werror -Xlint:all -Xlint:-options -Xlint:-processing -Xlint:-serial" />
   </component>
 </project>
