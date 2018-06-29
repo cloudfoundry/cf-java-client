@@ -387,6 +387,7 @@ public final class ServicePlanVisibilitiesTest extends AbstractIntegrationTest {
 
     private static Mono<String> getServicePlanId(CloudFoundryClient cloudFoundryClient, String serviceBrokerId) {
         return requestListServicePlans(cloudFoundryClient, serviceBrokerId)
+            .filter(resource -> "test-plan-description".equals(ResourceUtils.getEntity(resource).getDescription()))
             .map(ResourceUtils::getId)
             .single();
     }

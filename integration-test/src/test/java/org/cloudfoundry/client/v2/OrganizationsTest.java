@@ -1302,6 +1302,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             .map(response -> response.getEntity().getLabel())
             .as(StepVerifier::create)
             .expectNext(this.serviceName)
+            .expectNext(this.serviceName + "-shareable")
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -1315,6 +1316,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             .map(response -> response.getEntity().getLabel())
             .as(StepVerifier::create)
             .expectNext(this.serviceName)
+            .expectNext(this.serviceName + "-shareable")
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -1340,6 +1342,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             .map(response -> response.getEntity().getLabel())
             .as(StepVerifier::create)
             .expectNext(this.serviceName)
+            .expectNext(this.serviceName + "-shareable")
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }

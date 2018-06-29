@@ -187,8 +187,9 @@ public final class ServicePlansTest extends AbstractIntegrationTest {
                         .serviceBrokerId(serviceBrokerId)
                         .build())))
             .map(response -> ResourceUtils.getEntity(response).getName())
+            .filter(planName -> this.planName.equals(planName))
             .as(StepVerifier::create)
-            .expectNext(this.planName)
+            .expectNextCount(1)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -438,6 +439,7 @@ public final class ServicePlansTest extends AbstractIntegrationTest {
 
     private static Mono<String> getServicePlanId(CloudFoundryClient cloudFoundryClient, String serviceBrokerId) {
         return requestListServicePlans(cloudFoundryClient, serviceBrokerId)
+            .filter(resource -> "test-plan-description".equals(ResourceUtils.getEntity(resource).getDescription()))
             .map(ResourceUtils::getId)
             .single();
     }

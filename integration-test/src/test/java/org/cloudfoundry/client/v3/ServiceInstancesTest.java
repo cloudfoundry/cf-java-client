@@ -174,7 +174,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
 
     private static Mono<String> getPlanId(CloudFoundryClient cloudFoundryClient, String serviceBrokerId, String serviceName) {
         return requestListServices(cloudFoundryClient, serviceBrokerId)
-            .filter(resource -> serviceName.equals(resource.getEntity().getDescription()))
+            .filter(resource -> serviceName.equals(resource.getEntity().getLabel()))
             .single()
             .map(ResourceUtils::getId)
             .flatMapMany(serviceId -> requestListServicePlans(cloudFoundryClient, serviceId))
