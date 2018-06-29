@@ -367,6 +367,7 @@ public final class ServiceAdminTest extends AbstractIntegrationTest {
                 .listServiceAccessSettings(ListServiceAccessSettingsRequest.builder()
                     .brokerName(this.serviceBrokerName)
                     .build()))
+            .filter(serviceAccess -> this.serviceName.equals(serviceAccess.getServiceName()))
             .single()
             .as(StepVerifier::create)
             .expectNext(ServiceAccess.builder()

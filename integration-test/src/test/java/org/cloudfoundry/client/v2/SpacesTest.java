@@ -113,7 +113,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.Date;
-import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
@@ -1060,7 +1059,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     this.serviceBrokerId,
                     createSpaceId(this.cloudFoundryClient, organizationId, spaceName)
                 ))
-            .then(function((serviceBrokerId, spaceId) -> createServiceInstanceId(this.cloudFoundryClient, serviceBrokerId, serviceInstanceName, spaceId)
+            .then(function((serviceBrokerId, spaceId) -> createServiceInstanceId(this.cloudFoundryClient, serviceBrokerId, serviceInstanceName, this.serviceName, spaceId)
                 .then(Mono.just(spaceId))))
             .flatMapMany(spaceId -> requestListServiceInstances(this.cloudFoundryClient, spaceId))
             .filter(resource -> serviceInstanceName.equals(ResourceUtils.getEntity(resource).getName()))
@@ -1081,7 +1080,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     this.serviceBrokerId,
                     createSpaceId(this.cloudFoundryClient, organizationId, spaceName)
                 ))
-            .then(function((serviceBrokerId, spaceId) -> createServiceInstanceId(this.cloudFoundryClient, serviceBrokerId, serviceInstanceName, spaceId)
+            .then(function((serviceBrokerId, spaceId) -> createServiceInstanceId(this.cloudFoundryClient, serviceBrokerId, serviceInstanceName, this.serviceName, spaceId)
                 .then(Mono.just(spaceId))))
             .flatMapMany(spaceId -> requestListServiceInstances(this.cloudFoundryClient, spaceId, builder -> builder.gatewayName("")))
             .filter(resource -> serviceInstanceName.equals(ResourceUtils.getEntity(resource).getName()))
@@ -1102,7 +1101,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     this.serviceBrokerId,
                     createSpaceId(this.cloudFoundryClient, organizationId, spaceName)
                 ))
-            .then(function((serviceBrokerId, spaceId) -> createServiceInstanceId(this.cloudFoundryClient, serviceBrokerId, serviceInstanceName, spaceId)
+            .then(function((serviceBrokerId, spaceId) -> createServiceInstanceId(this.cloudFoundryClient, serviceBrokerId, serviceInstanceName, this.serviceName, spaceId)
                 .then(Mono.just(spaceId))))
             .flatMapMany(spaceId -> requestListServiceInstances(this.cloudFoundryClient, spaceId, builder -> builder.name(serviceInstanceName)))
             .as(StepVerifier::create)
@@ -1126,7 +1125,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     this.serviceBrokerId,
                     createSpaceId(this.cloudFoundryClient, organizationId, spaceName)
                 ))
-            .then(function((organizationId, serviceBrokerId, spaceId) -> createServiceInstanceId(this.cloudFoundryClient, serviceBrokerId, serviceInstanceName, spaceId)
+            .then(function((organizationId, serviceBrokerId, spaceId) -> createServiceInstanceId(this.cloudFoundryClient, serviceBrokerId, serviceInstanceName, this.serviceName, spaceId)
                 .then(Mono.just(Tuples.of(organizationId, spaceId)))))
             .flatMapMany(function((organizationId, spaceId) -> requestListServiceInstances(this.cloudFoundryClient, spaceId, builder -> builder.organizationId(organizationId))))
             .filter(resource -> serviceInstanceName.equals(ResourceUtils.getEntity(resource).getName()))
@@ -1151,7 +1150,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .then(function((serviceBrokerId, spaceId) -> Mono
                 .when(
                     createApplicationId(this.cloudFoundryClient, spaceId, applicationName),
-                    createServiceInstanceId(this.cloudFoundryClient, serviceBrokerId, serviceInstanceName, spaceId),
+                    createServiceInstanceId(this.cloudFoundryClient, serviceBrokerId, serviceInstanceName, this.serviceName, spaceId),
                     Mono.just(spaceId)
                 )))
             .then(function((applicationId, serviceInstanceId, spaceId) -> Mono
@@ -1180,7 +1179,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 ))
             .then(function((serviceBrokerId, spaceId) -> Mono
                 .when(
-                    createServiceInstanceId(this.cloudFoundryClient, serviceBrokerId, serviceInstanceName, spaceId),
+                    createServiceInstanceId(this.cloudFoundryClient, serviceBrokerId, serviceInstanceName, this.serviceName, spaceId),
                     Mono.just(spaceId)
                 )))
             .then(function((serviceInstanceId, spaceId) -> Mono
@@ -1208,8 +1207,8 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 ))
             .then(function((serviceBrokerId, spaceId) -> Mono
                 .when(
-                    createServiceInstanceId(this.cloudFoundryClient, serviceBrokerId, serviceInstanceName, spaceId),
-                    getServicePlanId(this.cloudFoundryClient, serviceBrokerId),
+                    createServiceInstanceId(this.cloudFoundryClient, serviceBrokerId, serviceInstanceName, this.serviceName, spaceId),
+                    getServicePlanId(this.cloudFoundryClient, serviceBrokerId, this.serviceName),
                     Mono.just(spaceId)
                 )))
             .flatMapMany(function((ignore, servicePlanId, spaceId) -> requestListServiceInstances(this.cloudFoundryClient, spaceId, builder -> builder.servicePlanId(servicePlanId))))
@@ -1221,24 +1220,23 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void listServices() {
-        Mono.when(this.serviceBrokerId, this.spaceId)
-            .flatMapMany(function((serviceBrokerId, spaceId) -> requestListSpaceServices(this.cloudFoundryClient, spaceId)
-                .filter(resource -> serviceBrokerId.equals(ResourceUtils.getEntity(resource).getServiceBrokerId()))))
-            .map(response -> response.getEntity().getLabel())
+        this.spaceId
+            .flatMapMany(spaceId -> requestListSpaceServices(this.cloudFoundryClient, spaceId)
+                .filter(resource -> this.serviceName.equals(ResourceUtils.getEntity(resource).getLabel())))
             .as(StepVerifier::create)
-            .expectNext(this.serviceName)
+            .expectNextCount(1)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void listServicesFilterByActive() {
-        Mono.when(this.serviceBrokerId, this.spaceId)
-            .flatMapMany(function((serviceBrokerId, spaceId) -> requestListSpaceServices(this.cloudFoundryClient, spaceId)
-                .filter(resource -> serviceBrokerId.equals(ResourceUtils.getEntity(resource).getServiceBrokerId()))))
+        this.spaceId
+            .flatMapMany(spaceId -> requestListSpaceServices(this.cloudFoundryClient, spaceId)
+                .filter(resource -> this.serviceName.equals(ResourceUtils.getEntity(resource).getLabel())))
             .map(response -> response.getEntity().getLabel())
             .as(StepVerifier::create)
-            .expectNext(this.serviceName)
+            .expectNextCount(1)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -1507,8 +1505,8 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .map(ResourceUtils::getId);
     }
 
-    private static Mono<String> createServiceInstanceId(CloudFoundryClient cloudFoundryClient, String serviceBrokerId, String serviceInstanceName, String spaceId) {
-        return getServicePlanId(cloudFoundryClient, serviceBrokerId)
+    private static Mono<String> createServiceInstanceId(CloudFoundryClient cloudFoundryClient, String serviceBrokerId, String serviceInstanceName, String serviceName, String spaceId) {
+        return getServicePlanId(cloudFoundryClient, serviceBrokerId, serviceName)
             .then(planId -> requestCreateServiceInstance(cloudFoundryClient, planId, serviceInstanceName, spaceId))
             .map(ResourceUtils::getId);
     }
@@ -1583,8 +1581,8 @@ public final class SpacesTest extends AbstractIntegrationTest {
         return DateUtils.formatToIso8601(past);
     }
 
-    private static Mono<String> getServicePlanId(CloudFoundryClient cloudFoundryClient, String serviceBrokerId) {
-        return requestListServices(cloudFoundryClient, serviceBrokerId)
+    private static Mono<String> getServicePlanId(CloudFoundryClient cloudFoundryClient, String serviceBrokerId, String serviceName) {
+        return requestListServices(cloudFoundryClient, serviceBrokerId, serviceName)
             .single()
             .map(ResourceUtils::getId)
             .flatMapMany(serviceId -> requestListServicePlans(cloudFoundryClient, serviceId))
@@ -1730,10 +1728,11 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .build()));
     }
 
-    private static Flux<ServiceResource> requestListServices(CloudFoundryClient cloudFoundryClient, String serviceBrokerId) {
+    private static Flux<ServiceResource> requestListServices(CloudFoundryClient cloudFoundryClient, String serviceBrokerId, String serviceName) {
         return PaginationUtils
             .requestClientV2Resources(page -> cloudFoundryClient.services()
                 .list(ListServicesRequest.builder()
+                    .label(serviceName)
                     .page(page)
                     .serviceBrokerId(serviceBrokerId)
                     .build()));

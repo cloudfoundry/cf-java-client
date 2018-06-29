@@ -52,6 +52,9 @@ public final class ServiceKeysTest extends AbstractIntegrationTest {
     private Mono<String> serviceBrokerId;
 
     @Autowired
+    private String serviceName;
+
+    @Autowired
     private Mono<String> spaceId;
 
     @SuppressWarnings("unchecked")
@@ -61,7 +64,7 @@ public final class ServiceKeysTest extends AbstractIntegrationTest {
         String serviceKeyName = this.nameFactory.getServiceKeyName();
 
         Mono.when(this.serviceBrokerId, this.spaceId)
-            .then(function((serviceBrokerId, spaceId) -> createServiceInstanceId(this.cloudFoundryClient, serviceBrokerId, serviceInstanceName, spaceId)))
+            .then(function((serviceBrokerId, spaceId) -> createServiceInstanceId(this.cloudFoundryClient, serviceBrokerId, serviceInstanceName, this.serviceName, spaceId)))
             .then(serviceInstanceId -> this.cloudFoundryClient.serviceKeys()
                 .create(CreateServiceKeyRequest.builder()
                     .parameter("test-key", "test-value")
@@ -83,7 +86,7 @@ public final class ServiceKeysTest extends AbstractIntegrationTest {
         String serviceKeyName = this.nameFactory.getServiceKeyName();
 
         Mono.when(this.serviceBrokerId, this.spaceId)
-            .then(function((serviceBrokerId, spaceId) -> createServiceInstanceId(this.cloudFoundryClient, serviceBrokerId, serviceInstanceName, spaceId)))
+            .then(function((serviceBrokerId, spaceId) -> createServiceInstanceId(this.cloudFoundryClient, serviceBrokerId, serviceInstanceName, this.serviceName, spaceId)))
             .then(serviceInstanceId -> createServiceKeyId(this.cloudFoundryClient, serviceInstanceId, serviceKeyName))
             .then(serviceKeyId -> this.cloudFoundryClient.serviceKeys()
                 .delete(DeleteServiceKeyRequest.builder()
@@ -102,7 +105,7 @@ public final class ServiceKeysTest extends AbstractIntegrationTest {
         String serviceKeyName = this.nameFactory.getServiceKeyName();
 
         Mono.when(this.serviceBrokerId, this.spaceId)
-            .then(function((serviceBrokerId, spaceId) -> createServiceInstanceId(this.cloudFoundryClient, serviceBrokerId, serviceInstanceName, spaceId)))
+            .then(function((serviceBrokerId, spaceId) -> createServiceInstanceId(this.cloudFoundryClient, serviceBrokerId, serviceInstanceName, this.serviceName, spaceId)))
             .then(serviceInstanceId -> createServiceKeyId(this.cloudFoundryClient, serviceInstanceId, serviceKeyName))
             .then(serviceKeyId -> this.cloudFoundryClient.serviceKeys()
                 .get(GetServiceKeyRequest.builder()
@@ -121,7 +124,7 @@ public final class ServiceKeysTest extends AbstractIntegrationTest {
         String serviceKeyName = this.nameFactory.getServiceKeyName();
 
         Mono.when(this.serviceBrokerId, this.spaceId)
-            .then(function((serviceBrokerId, spaceId) -> createServiceInstanceId(this.cloudFoundryClient, serviceBrokerId, serviceInstanceName, spaceId)))
+            .then(function((serviceBrokerId, spaceId) -> createServiceInstanceId(this.cloudFoundryClient, serviceBrokerId, serviceInstanceName, this.serviceName, spaceId)))
             .then(serviceInstanceId -> createServiceKeyId(this.cloudFoundryClient, serviceInstanceId, serviceKeyName))
             .thenMany(PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.serviceKeys()
@@ -142,7 +145,7 @@ public final class ServiceKeysTest extends AbstractIntegrationTest {
         String serviceKeyName = this.nameFactory.getServiceKeyName();
 
         Mono.when(this.serviceBrokerId, this.spaceId)
-            .then(function((serviceBrokerId, spaceId) -> createServiceInstanceId(this.cloudFoundryClient, serviceBrokerId, serviceInstanceName, spaceId)))
+            .then(function((serviceBrokerId, spaceId) -> createServiceInstanceId(this.cloudFoundryClient, serviceBrokerId, serviceInstanceName, this.serviceName, spaceId)))
             .then(serviceInstanceId -> createServiceKeyId(this.cloudFoundryClient, serviceInstanceId, serviceKeyName))
             .thenMany(PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.serviceKeys()
@@ -163,7 +166,7 @@ public final class ServiceKeysTest extends AbstractIntegrationTest {
         String serviceKeyName = this.nameFactory.getServiceKeyName();
 
         Mono.when(this.serviceBrokerId, this.spaceId)
-            .then(function((serviceBrokerId, spaceId) -> createServiceInstanceId(this.cloudFoundryClient, serviceBrokerId, serviceInstanceName, spaceId)))
+            .then(function((serviceBrokerId, spaceId) -> createServiceInstanceId(this.cloudFoundryClient, serviceBrokerId, serviceInstanceName, this.serviceName, spaceId)))
             .then(serviceInstanceId -> createServiceKeyId(this.cloudFoundryClient, serviceInstanceId, serviceKeyName)
                 .then(Mono.just(serviceInstanceId)))
             .flatMapMany(serviceInstanceId -> PaginationUtils
@@ -179,8 +182,8 @@ public final class ServiceKeysTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    private static Mono<String> createServiceInstanceId(CloudFoundryClient cloudFoundryClient, String serviceBrokerId, String serviceInstanceName, String spaceId) {
-        return getPlanId(cloudFoundryClient, serviceBrokerId)
+    private static Mono<String> createServiceInstanceId(CloudFoundryClient cloudFoundryClient, String serviceBrokerId, String serviceInstanceName, String serviceName, String spaceId) {
+        return getPlanId(cloudFoundryClient, serviceBrokerId, serviceName)
             .then(planId -> requestCreateServiceInstance(cloudFoundryClient, planId, serviceInstanceName, spaceId))
             .map(ResourceUtils::getId);
     }
@@ -190,8 +193,8 @@ public final class ServiceKeysTest extends AbstractIntegrationTest {
             .map(ResourceUtils::getId);
     }
 
-    private static Mono<String> getPlanId(CloudFoundryClient cloudFoundryClient, String serviceBrokerId) {
-        return requestListServices(cloudFoundryClient, serviceBrokerId)
+    private static Mono<String> getPlanId(CloudFoundryClient cloudFoundryClient, String serviceBrokerId, String serviceName) {
+        return requestListServices(cloudFoundryClient, serviceBrokerId, serviceName)
             .single()
             .map(ResourceUtils::getId)
             .flatMapMany(serviceId -> requestListServicePlans(cloudFoundryClient, serviceId))
@@ -239,11 +242,12 @@ public final class ServiceKeysTest extends AbstractIntegrationTest {
                     .build()));
     }
 
-    private static Flux<ServiceResource> requestListServices(CloudFoundryClient cloudFoundryClient, String serviceBrokerId) {
+    private static Flux<ServiceResource> requestListServices(CloudFoundryClient cloudFoundryClient, String serviceBrokerId, String serviceName) {
         return PaginationUtils
             .requestClientV2Resources(page -> cloudFoundryClient.services()
                 .list(ListServicesRequest.builder()
                     .page(page)
+                    .label(serviceName)
                     .serviceBrokerId(serviceBrokerId)
                     .build()));
     }
