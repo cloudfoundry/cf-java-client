@@ -16,6 +16,7 @@
 
 package org.cloudfoundry;
 
+import org.springframework.util.SocketUtils;
 import reactor.core.Exceptions;
 
 import java.math.BigInteger;
@@ -51,7 +52,7 @@ final class RandomNameFactory implements NameFactory {
 
     @Override
     public int getPort() {
-        return PORT_MINIMUM + this.random.nextInt(PORT_MAXIMUM - PORT_MINIMUM);
+        return SocketUtils.findAvailableTcpPort(PORT_MINIMUM, PORT_MAXIMUM);
     }
 
     @Override
