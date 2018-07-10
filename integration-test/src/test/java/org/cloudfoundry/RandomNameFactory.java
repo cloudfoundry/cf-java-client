@@ -16,13 +16,13 @@
 
 package org.cloudfoundry;
 
-import org.springframework.util.SocketUtils;
 import reactor.core.Exceptions;
 
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 final class RandomNameFactory implements NameFactory {
 
@@ -31,6 +31,8 @@ final class RandomNameFactory implements NameFactory {
     private static final int PORT_MINIMUM = 61_001;
 
     private final Random random;
+
+    private AtomicInteger port = new AtomicInteger(PORT_MINIMUM);
 
     RandomNameFactory(Random random) {
         this.random = random;
@@ -52,7 +54,11 @@ final class RandomNameFactory implements NameFactory {
 
     @Override
     public int getPort() {
-        return SocketUtils.findAvailableTcpPort(PORT_MINIMUM, PORT_MAXIMUM);
+        if (this.port.get() < PORT_MAXIMUM) {
+            return this.port.getAndIncrement();
+        } else {
+            throw new IllegalStateException("All suitable ports have been allocated");
+        }
     }
 
     @Override
