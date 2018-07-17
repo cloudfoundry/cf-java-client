@@ -54,8 +54,10 @@ final class RandomNameFactory implements NameFactory {
 
     @Override
     public int getPort() {
-        if (this.port.get() < PORT_MAXIMUM) {
-            return this.port.getAndIncrement();
+        int candidate = this.port.getAndIncrement();
+
+        if (candidate <= PORT_MAXIMUM) {
+            return candidate;
         } else {
             throw new IllegalStateException("All suitable ports have been allocated");
         }
