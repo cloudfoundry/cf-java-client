@@ -1099,11 +1099,6 @@ public final class DefaultApplications implements Applications {
             .collectList();
     }
 
-    private static Flux<org.cloudfoundry.client.v3.tasks.Task> listTasks(CloudFoundryClient cloudFoundryClient, String applicationId) {
-        return requestListTasks(cloudFoundryClient, applicationId)
-            .cast(org.cloudfoundry.client.v3.tasks.Task.class);
-    }
-
     private static Flux<org.cloudfoundry.client.v3.tasks.Task> listTasks(CloudFoundryClient cloudFoundryClient, String applicationId, Integer sequenceId) {
         return requestListTasks(cloudFoundryClient, applicationId, sequenceId)
             .cast(org.cloudfoundry.client.v3.tasks.Task.class);

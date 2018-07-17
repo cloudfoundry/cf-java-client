@@ -19,26 +19,39 @@ package org.cloudfoundry.operations;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.CloudFoundryVersion;
 import org.cloudfoundry.IfCloudFoundryVersion;
+import org.cloudfoundry.doppler.LogMessage;
+import org.cloudfoundry.doppler.MessageType;
 import org.cloudfoundry.operations.applications.ApplicationDetail;
 import org.cloudfoundry.operations.applications.ApplicationEnvironments;
 import org.cloudfoundry.operations.applications.ApplicationEvent;
 import org.cloudfoundry.operations.applications.ApplicationHealthCheck;
 import org.cloudfoundry.operations.applications.ApplicationManifest;
+import org.cloudfoundry.operations.applications.ApplicationSshEnabledRequest;
 import org.cloudfoundry.operations.applications.ApplicationSummary;
+import org.cloudfoundry.operations.applications.CopySourceApplicationRequest;
 import org.cloudfoundry.operations.applications.DeleteApplicationRequest;
+import org.cloudfoundry.operations.applications.DisableApplicationSshRequest;
+import org.cloudfoundry.operations.applications.EnableApplicationSshRequest;
 import org.cloudfoundry.operations.applications.GetApplicationEnvironmentsRequest;
 import org.cloudfoundry.operations.applications.GetApplicationEventsRequest;
 import org.cloudfoundry.operations.applications.GetApplicationHealthCheckRequest;
 import org.cloudfoundry.operations.applications.GetApplicationManifestRequest;
 import org.cloudfoundry.operations.applications.GetApplicationRequest;
 import org.cloudfoundry.operations.applications.ListApplicationTasksRequest;
+import org.cloudfoundry.operations.applications.LogsRequest;
 import org.cloudfoundry.operations.applications.PushApplicationManifestRequest;
 import org.cloudfoundry.operations.applications.PushApplicationRequest;
+import org.cloudfoundry.operations.applications.RenameApplicationRequest;
+import org.cloudfoundry.operations.applications.RestageApplicationRequest;
+import org.cloudfoundry.operations.applications.RestartApplicationInstanceRequest;
 import org.cloudfoundry.operations.applications.RestartApplicationRequest;
 import org.cloudfoundry.operations.applications.Route;
 import org.cloudfoundry.operations.applications.RunApplicationTaskRequest;
+import org.cloudfoundry.operations.applications.ScaleApplicationRequest;
+import org.cloudfoundry.operations.applications.SetApplicationHealthCheckRequest;
 import org.cloudfoundry.operations.applications.SetEnvironmentVariableApplicationRequest;
 import org.cloudfoundry.operations.applications.StartApplicationRequest;
+import org.cloudfoundry.operations.applications.StopApplicationRequest;
 import org.cloudfoundry.operations.applications.Task;
 import org.cloudfoundry.operations.applications.TaskState;
 import org.cloudfoundry.operations.applications.TerminateApplicationTaskRequest;
@@ -82,6 +95,29 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Autowired
     private String serviceName;
+
+    @Test
+    public void copySource() throws IOException {
+        String sourceName = this.nameFactory.getApplicationName();
+        String targetName = this.nameFactory.getApplicationName();
+
+        Mono.when(
+            createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), sourceName, false),
+            createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), targetName, true)
+        )
+            .then(this.cloudFoundryOperations.applications()
+                .copySource(CopySourceApplicationRequest.builder()
+                    .name(sourceName)
+                    .restart(true)
+                    .targetName(targetName)
+                    .build()))
+            .then(requestGetApplication(this.cloudFoundryOperations, targetName))
+            .map(ApplicationDetail::getRequestedState)
+            .as(StepVerifier::create)
+            .expectNext("STARTED")
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
 
     @Test
     public void deleteApplication() throws IOException {
@@ -134,6 +170,38 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
+    public void disableSsh() throws IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, false)
+            .then(this.cloudFoundryOperations.applications()
+                .disableSsh(DisableApplicationSshRequest.builder()
+                    .name(applicationName)
+                    .build()))
+            .then(requestSshEnabled(this.cloudFoundryOperations, applicationName))
+            .as(StepVerifier::create)
+            .expectNext(false)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void enableSsh() throws IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, false)
+            .then(this.cloudFoundryOperations.applications()
+                .enableSsh(EnableApplicationSshRequest.builder()
+                    .name(applicationName)
+                    .build()))
+            .then(requestSshEnabled(this.cloudFoundryOperations, applicationName))
+            .as(StepVerifier::create)
+            .expectNext(true)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
     public void get() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
@@ -176,7 +244,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .name(applicationName)
                     .build()))
             .as(StepVerifier::create)
-            .expectNext(ApplicationHealthCheck.PORT)
+            .expectNext(ApplicationHealthCheck.NONE)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -276,6 +344,24 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .map(Task::getName)
             .as(StepVerifier::create)
             .expectNext(taskName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void logs() throws IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, false)
+            .thenMany(this.cloudFoundryOperations.applications()
+                .logs(LogsRequest.builder()
+                    .name(applicationName)
+                    .recent(true)
+                    .build()))
+            .map(LogMessage::getMessageType)
+            .next()
+            .as(StepVerifier::create)
+            .expectNext(MessageType.OUT)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -702,10 +788,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                         .build())
                     .noStart(true)
                     .build()))
-            .then(this.cloudFoundryOperations.applications()
-                .get(GetApplicationRequest.builder()
-                    .name(applicationName)
-                    .build()))
+            .then(requestGetApplication(this.cloudFoundryOperations, applicationName))
             .map(ApplicationDetail::getUrls)
             .as(StepVerifier::create)
             .consumeNextWith(routes -> {
@@ -732,6 +815,53 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .memory(64)
                 .name(applicationName)
                 .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void rename() throws IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+        String newName = this.nameFactory.getApplicationName();
+
+        createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, false)
+            .then(this.cloudFoundryOperations.applications()
+                .rename(RenameApplicationRequest.builder()
+                    .name(applicationName)
+                    .newName(newName)
+                    .build()))
+            .then(requestGetApplication(this.cloudFoundryOperations, newName))
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void restage() throws IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, false)
+            .then(this.cloudFoundryOperations.applications()
+                .restage(RestageApplicationRequest.builder()
+                    .name(applicationName)
+                    .build()))
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void restartInstance() throws IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, false)
+            .then(this.cloudFoundryOperations.applications()
+                .restartInstance(RestartApplicationInstanceRequest.builder()
+                    .instanceIndex(0)
+                    .name(applicationName)
+                    .build()))
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
@@ -787,6 +917,25 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    @Test
+    public void scale() throws IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, false)
+            .then(this.cloudFoundryOperations.applications()
+                .scale(ScaleApplicationRequest.builder()
+                    .instances(2)
+                    .memoryLimit(65)
+                    .name(applicationName)
+                    .build()))
+            .then(requestGetApplication(this.cloudFoundryOperations, applicationName))
+            .map(ApplicationDetail::getRunningInstances)
+            .as(StepVerifier::create)
+            .expectNext(2)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
     @SuppressWarnings("unchecked")
     @Test
     public void setEnvironmentVariable() throws IOException {
@@ -826,6 +975,38 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
+    public void setHealthCheck() throws IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, false)
+            .then(this.cloudFoundryOperations.applications()
+                .setHealthCheck(SetApplicationHealthCheckRequest.builder()
+                    .name(applicationName)
+                    .type(ApplicationHealthCheck.PROCESS)
+                    .build()))
+            .then(requestGetHealthCheck(this.cloudFoundryOperations, applicationName))
+            .as(StepVerifier::create)
+            .expectNext(ApplicationHealthCheck.PROCESS)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void sshEnabled() throws IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, false)
+            .then(this.cloudFoundryOperations.applications()
+                .sshEnabled(ApplicationSshEnabledRequest.builder()
+                    .name(applicationName)
+                    .build()))
+            .as(StepVerifier::create)
+            .expectNext(true)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
     public void startNotStarted() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
@@ -849,6 +1030,23 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .name(applicationName)
                     .build()))
             .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void stop() throws IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, false)
+            .then(this.cloudFoundryOperations.applications()
+                .stop(StopApplicationRequest.builder()
+                    .name(applicationName)
+                    .build()))
+            .then(requestGetApplication(this.cloudFoundryOperations, applicationName))
+            .map(ApplicationDetail::getRequestedState)
+            .as(StepVerifier::create)
+            .expectNext("STOPPED")
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -974,13 +1172,13 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     private static Mono<Void> createApplication(CloudFoundryOperations cloudFoundryOperations, Path application, String name, Boolean noStart) {
         return cloudFoundryOperations.applications()
             .push(PushApplicationRequest.builder()
-                .path(application)
                 .buildpack("staticfile_buildpack")
                 .diskQuota(512)
-                .healthCheckType(ApplicationHealthCheck.PORT)
+                .healthCheckType(ApplicationHealthCheck.NONE)
                 .memory(64)
                 .name(name)
                 .noStart(noStart)
+                .path(application)
                 .build());
     }
 
@@ -988,12 +1186,12 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         return cloudFoundryOperations.applications()
             .pushManifest(PushApplicationManifestRequest.builder()
                 .manifest(ApplicationManifest.builder()
-                    .path(new ClassPathResource("test-application.zip").getFile().toPath())
                     .buildpack("staticfile_buildpack")
                     .disk(512)
                     .healthCheckType(ApplicationHealthCheck.PROCESS)
                     .memory(64)
                     .name(applicationName)
+                    .path(new ClassPathResource("test-application.zip").getFile().toPath())
                     .randomRoute(true)
                     .route(Route.builder()
                         .route(domainName)
@@ -1082,6 +1280,20 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .build());
     }
 
+    private static Mono<ApplicationDetail> requestGetApplication(CloudFoundryOperations cloudFoundryOperations, String applicationtName) {
+        return cloudFoundryOperations.applications()
+            .get(GetApplicationRequest.builder()
+                .name(applicationtName)
+                .build());
+    }
+
+    private static Mono<ApplicationHealthCheck> requestGetHealthCheck(CloudFoundryOperations cloudFoundryOperations, String applicationName) {
+        return cloudFoundryOperations.applications()
+            .getHealthCheck(GetApplicationHealthCheckRequest.builder()
+                .name(applicationName)
+                .build());
+    }
+
     private static Flux<ApplicationSummary> requestListApplications(CloudFoundryOperations cloudFoundryOperations) {
         return cloudFoundryOperations.applications()
             .list();
@@ -1096,6 +1308,13 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     private static Flux<Task> requestListTasks(CloudFoundryOperations cloudFoundryOperations, String applicationName) {
         return cloudFoundryOperations.applications()
             .listTasks(ListApplicationTasksRequest.builder()
+                .name(applicationName)
+                .build());
+    }
+
+    private static Mono<Boolean> requestSshEnabled(CloudFoundryOperations cloudFoundryOperations, String applicationName) {
+        return cloudFoundryOperations.applications()
+            .sshEnabled(ApplicationSshEnabledRequest.builder()
                 .name(applicationName)
                 .build());
     }
