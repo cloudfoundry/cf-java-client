@@ -87,7 +87,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 import java.util.zip.GZIPInputStream;
 
@@ -171,6 +170,30 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .then(spaceId -> Mono.when(
                 Mono.just(spaceId),
                 requestCreateApplication(this.cloudFoundryClient, spaceId, applicationName)
+                    .map(ResourceUtils::getEntity)
+            ))
+            .as(StepVerifier::create)
+            .consumeNextWith(consumer((spaceId, entity) -> {
+                assertThat(entity.getSpaceId()).isEqualTo(spaceId);
+                assertThat(entity.getName()).isEqualTo(applicationName);
+            }))
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void createDocker() {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        this.spaceId
+            .then(spaceId -> Mono.when(
+                Mono.just(spaceId),
+                this.cloudFoundryClient.applicationsV2()
+                    .create(CreateApplicationRequest.builder()
+                        .dockerImage("cloudfoundry/test-app")
+                        .name(applicationName)
+                        .spaceId(spaceId)
+                        .build())
                     .map(ResourceUtils::getEntity)
             ))
             .as(StepVerifier::create)
@@ -268,6 +291,24 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .readBasicData(true)
                 .readSensitiveData(true)
                 .build())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void instances() {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        this.spaceId
+            .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
+            .as(thenKeep(applicationId -> uploadAndStartApplication(this.cloudFoundryClient, applicationId)))
+            .then(applicationId -> this.cloudFoundryClient.applicationsV2()
+                .instances(ApplicationInstancesRequest.builder()
+                    .applicationId(applicationId)
+                    .build()))
+            .map(ApplicationInstancesResponse::getInstances)
+            .as(StepVerifier::create)
+            .expectNextCount(1)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -1006,8 +1047,8 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         return requestCreateApplication(cloudFoundryClient, spaceId, applicationName, null, null, null, null);
     }
 
-    private static Mono<CreateApplicationResponse> requestCreateApplication(CloudFoundryClient cloudFoundryClient, String spaceId, String applicationName, String buildpack, Boolean diego, Integer
-        diskQuota, Integer memory) {
+    private static Mono<CreateApplicationResponse> requestCreateApplication(CloudFoundryClient cloudFoundryClient, String spaceId, String applicationName, String buildpack, Boolean diego,
+                                                                            Integer diskQuota, Integer memory) {
         return cloudFoundryClient.applicationsV2()
             .create(CreateApplicationRequest.builder()
                 .buildpack(buildpack)
