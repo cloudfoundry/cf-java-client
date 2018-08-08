@@ -1,11 +1,12 @@
 {
-  "user_id": "3587ef54-6361-44d2-b8a1-4937674aa2b5",
-  "sub": "3587ef54-6361-44d2-b8a1-4937674aa2b5",
-  "user_name": "yH9Avc@test.org",
-  "given_name": "PasswordResetUserFirst",
-  "family_name": "PasswordResetUserLast",
-  "email": "yH9Avc@test.org",
-  "phone_number": "+15558880000",
-  "previous_logon_time": null,
-  "name": "PasswordResetUserFirst PasswordResetUserLast"
+  "user_id" : "ab485a4f-168a-4de8-b3ac-ab501767bfc9",
+  "user_name" : "anO0Lv@test.org",
+  "name" : "PasswordResetUserFirst PasswordResetUserLast",
+  "given_name" : "PasswordResetUserFirst",
+  "family_name" : "PasswordResetUserLast",
+  "phone_number" : "+15558880000",
+  "email" : "anO0Lv@test.org",
+  "email_verified" : true,
+  "previous_logon_time" : null,
+  "sub" : "ab485a4f-168a-4de8-b3ac-ab501767bfc9"
 }

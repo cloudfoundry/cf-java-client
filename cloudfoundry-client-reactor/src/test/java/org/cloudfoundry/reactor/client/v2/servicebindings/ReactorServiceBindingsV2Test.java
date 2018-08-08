@@ -25,6 +25,7 @@ import org.cloudfoundry.client.v2.servicebindings.DeleteServiceBindingRequest;
 import org.cloudfoundry.client.v2.servicebindings.DeleteServiceBindingResponse;
 import org.cloudfoundry.client.v2.servicebindings.GetServiceBindingRequest;
 import org.cloudfoundry.client.v2.servicebindings.GetServiceBindingResponse;
+import org.cloudfoundry.client.v2.servicebindings.LastOperation;
 import org.cloudfoundry.client.v2.servicebindings.ListServiceBindingsRequest;
 import org.cloudfoundry.client.v2.servicebindings.ListServiceBindingsResponse;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingEntity;
@@ -163,19 +164,28 @@ public final class ReactorServiceBindingsV2Test extends AbstractClientApiTest {
             .as(StepVerifier::create)
             .expectNext(GetServiceBindingResponse.builder()
                 .metadata(Metadata.builder()
-                    .createdAt("2015-11-03T00:53:50Z")
-                    .id("925d8848-4808-47cf-a3e8-049aa0163328")
-                    .updatedAt("2015-11-04T12:54:50Z")
-                    .url("/v2/service_bindings/925d8848-4808-47cf-a3e8-049aa0163328")
+                    .createdAt("2016-06-08T16:41:43Z")
+                    .id("ddd7fb26-c42d-4acf-a035-60fdd094a167")
+                    .updatedAt("2016-06-08T16:41:26Z")
+                    .url("/v2/service_bindings/ddd7fb26-c42d-4acf-a035-60fdd094a167")
                     .build())
                 .entity(ServiceBindingEntity.builder()
-                    .applicationId("56ae4265-4c1c-43a9-9069-2c1fee7fd42f")
-                    .serviceInstanceId("f99b3d23-55f9-48b5-add3-d7ab08b2ff0c")
+                    .applicationId("784bca1b-c4d9-4d99-9961-9f413620031a")
+                    .applicationUrl("/v2/apps/784bca1b-c4d9-4d99-9961-9f413620031a")
                     .bindingOptions(Collections.emptyMap())
-                    .credential("creds-key-108", "creds-val-108")
+                    .credential("creds-key-64", "creds-val-64")
                     .gatewayName("")
-                    .applicationUrl("/v2/apps/56ae4265-4c1c-43a9-9069-2c1fee7fd42f")
-                    .serviceInstanceUrl("/v2/service_instances/f99b3d23-55f9-48b5-add3-d7ab08b2ff0c")
+                    .lastOperation(LastOperation.builder()
+                        .createdAt("2018-02-28T16:25:19Z")
+                        .description("")
+                        .state("succeeded")
+                        .type("create")
+                        .updatedAt("2018-02-28T16:25:19Z")
+                        .build())
+                    .name("prod-db")
+                    .serviceBindingParametersUrl("/v2/service_bindings/ddd7fb26-c42d-4acf-a035-60fdd094a167/parameters")
+                    .serviceInstanceId("ada8700c-dd02-467c-937b-32ce498302f6")
+                    .serviceInstanceUrl("/v2/service_instances/ada8700c-dd02-467c-937b-32ce498302f6")
                     .build())
                 .build())
             .expectComplete()

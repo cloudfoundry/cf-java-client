@@ -29,10 +29,16 @@ import org.immutables.value.Value;
 abstract class _UserInfoResponse {
 
     /**
-     * The user's email
+     * The user's email address
      */
     @JsonProperty("email")
     abstract String getEmail();
+
+    /**
+     * Whether the user has verified their email address
+     */
+    @JsonProperty("email_verified")
+    abstract Boolean getEmailVerified();
 
     /**
      * The user's family name
@@ -60,14 +66,14 @@ abstract class _UserInfoResponse {
     abstract String getPhoneNumber();
 
     /**
-     * When the user last logged
+     * When the user last logged on
      */
     @JsonProperty("previous_logon_time")
     @Nullable
     abstract Long getPreviousLogonTime();
 
     /**
-     * The user sub
+     * The user subject identifier
      */
     @JsonProperty("sub")
     @Nullable

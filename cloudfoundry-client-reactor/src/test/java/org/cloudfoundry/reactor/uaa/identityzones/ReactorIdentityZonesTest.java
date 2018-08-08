@@ -20,10 +20,12 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.uaa.AbstractUaaApiTest;
+import org.cloudfoundry.uaa.identityproviders.Type;
 import org.cloudfoundry.uaa.identityzones.Banner;
 import org.cloudfoundry.uaa.identityzones.Branding;
 import org.cloudfoundry.uaa.identityzones.ClientLockoutPolicy;
 import org.cloudfoundry.uaa.identityzones.ClientSecretPolicy;
+import org.cloudfoundry.uaa.identityzones.Consent;
 import org.cloudfoundry.uaa.identityzones.CorsConfiguration;
 import org.cloudfoundry.uaa.identityzones.CorsPolicy;
 import org.cloudfoundry.uaa.identityzones.CreateIdentityZoneRequest;
@@ -52,6 +54,7 @@ import org.junit.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Collections;
 
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
@@ -351,23 +354,45 @@ public final class ReactorIdentityZonesTest extends AbstractUaaApiTest {
                 .id("twiglet-get")
                 .subdomain("twiglet-get")
                 .configuration(IdentityZoneConfiguration.builder()
-                    .clientLockoutPolicy(ClientLockoutPolicy.builder()
-                        .lockoutPeriodSeconds(-1)
-                        .lockoutAfterFailures(-1)
-                        .countFailuresWithin(-1)
+                    .clientSecretPolicy(ClientSecretPolicy.builder()
+                        .minimumLength(-1)
+                        .maximumLength(-1)
+                        .requireDigit(-1)
+                        .requireLowerCaseCharacter(-1)
+                        .requireSpecialCharacter(-1)
+                        .requireUpperCaseCharacter(-1)
                         .build())
                     .tokenPolicy(TokenPolicy.builder()
-                        .accessTokenValidity(-1)
-                        .refreshTokenValidity(-1)
+                        .accessTokenValidity(3600)
+                        .activeKeyId("active-key-1")
                         .jwtRevocable(false)
-                        .keys(Collections.emptyMap())
+                        .refreshTokenFormat(RefreshTokenFormat.JWT)
+                        .refreshTokenUnique(false)
+                        .refreshTokenValidity(7200)
                         .build())
                     .samlConfiguration(SamlConfiguration.builder()
+                        .activeKeyId("legacy-saml-key")
                         .assertionSigned(true)
+                        .assertionTimeToLive(600)
+                        .certificate("-----BEGIN CERTIFICATE-----\nMIICEjCCAXsCAg36MA0GCSqGSIb3DQEBBQUAMIGbMQswCQYDVQQGEwJKUDEOMAwG\nA1UECBMFVG9reW8xEDAOBgNVBAcTB0NodW8ta3UxETAPBgNVBAoTCEZyYW5rNERE" +
+                            "\nMRgwFgYDVQQLEw9XZWJDZXJ0IFN1cHBvcnQxGDAWBgNVBAMTD0ZyYW5rNEREIFdl\nYiBDQTEjMCEGCSqGSIb3DQEJARYUc3VwcG9ydEBmcmFuazRkZC5jb20wHhcNMTIw" +
+                            "\nODIyMDUyNjU0WhcNMTcwODIxMDUyNjU0WjBKMQswCQYDVQQGEwJKUDEOMAwGA1UE\nCAwFVG9reW8xETAPBgNVBAoMCEZyYW5rNEREMRgwFgYDVQQDDA93d3cuZXhhbXBs" +
+                            "\nZS5jb20wXDANBgkqhkiG9w0BAQEFAANLADBIAkEAm/xmkHmEQrurE/0re/jeFRLl\n8ZPjBop7uLHhnia7lQG/5zDtZIUC3RVpqDSwBuw/NTweGyuP+o8AG98HxqxTBwID" +
+                            "\nAQABMA0GCSqGSIb3DQEBBQUAA4GBABS2TLuBeTPmcaTaUW/LCB2NYOy8GMdzR1mx\n8iBIu2H6/E2tiY3RIevV2OW61qY2/XRQg7YPxx3ffeUugX9F4J/iPnnu1zAxxyBy" +
+                            "\n2VguKv4SWjRFoRkIfIlHX0qVviMhSlNy2ioFLy7JcPZb+v3ftDGywUqcBiVDoea0\nHn+GmxZA\n-----END CERTIFICATE-----\n")
+                        .disableInResponseToCheck(false)
+                        .entityId("cloudfoundry-saml-login")
+                        .key("legacy-saml-key", Key.builder()
+                            .certificate("-----BEGIN CERTIFICATE-----\nMIICEjCCAXsCAg36MA0GCSqGSIb3DQEBBQUAMIGbMQswCQYDVQQGEwJKUDEOMAwG" +
+                                "\nA1UECBMFVG9reW8xEDAOBgNVBAcTB0NodW8ta3UxETAPBgNVBAoTCEZyYW5rNERE\nMRgwFgYDVQQLEw9XZWJDZXJ0IFN1cHBvcnQxGDAWBgNVBAMTD0ZyYW5rNEREIFdl" +
+                                "\nYiBDQTEjMCEGCSqGSIb3DQEJARYUc3VwcG9ydEBmcmFuazRkZC5jb20wHhcNMTIw\nODIyMDUyNjU0WhcNMTcwODIxMDUyNjU0WjBKMQswCQYDVQQGEwJKUDEOMAwGA1UE" +
+                                "\nCAwFVG9reW8xETAPBgNVBAoMCEZyYW5rNEREMRgwFgYDVQQDDA93d3cuZXhhbXBs\nZS5jb20wXDANBgkqhkiG9w0BAQEFAANLADBIAkEAm/xmkHmEQrurE/0re/jeFRLl\n8ZPjBop7uLHhnia7lQG" +
+                                "/5zDtZIUC3RVpqDSwBuw/NTweGyuP+o8AG98HxqxTBwID\nAQABMA0GCSqGSIb3DQEBBQUAA4GBABS2TLuBeTPmcaTaUW/LCB2NYOy8GMdzR1mx\n8iBIu2H6/E2tiY3RIevV2OW61qY2/XRQg7YPxx3ffeUugX9F4J" +
+                                "/iPnnu1zAxxyBy\n2VguKv4SWjRFoRkIfIlHX0qVviMhSlNy2ioFLy7JcPZb+v3ftDGywUqcBiVDoea0\nHn+GmxZA\n-----END CERTIFICATE-----\n")
+                            .build())
                         .requestSigned(true)
                         .wantAssertionSigned(true)
                         .wantPartnerAuthenticationRequestSigned(false)
-                        .assertionTimeToLive(600)
                         .build())
                     .corsPolicy(CorsPolicy.builder()
                         .xhrConfiguration(CorsConfiguration.builder()
@@ -395,13 +420,11 @@ public final class ReactorIdentityZonesTest extends AbstractUaaApiTest {
                         .logout(LogoutLink.builder()
                             .redirectUrl("/login")
                             .redirectParameterName("redirect")
-                            .disableRedirectParameter(true)
+                            .disableRedirectParameter(false)
                             .build())
                         .homeRedirect("http://my.hosted.homepage.com/")
                         .selfService(SelfServiceLink.builder()
                             .selfServiceLinksEnabled(true)
-                            .signupLink("/create_account")
-                            .resetPasswordLink("/forgot_password")
                             .build())
                         .build())
                     .prompt(Prompt.builder()
@@ -417,22 +440,42 @@ public final class ReactorIdentityZonesTest extends AbstractUaaApiTest {
                     .prompt(Prompt.builder()
                         .fieldName("passcode")
                         .fieldType("password")
-                        .text("One Time Code (Get on at /passcode)")
+                        .text("Temporary Authentication Code (Get on at /passcode)")
                         .build())
                     .ldapDiscoveryEnabled(false)
                     .branding(Branding.builder()
+                        .banner(Banner.builder()
+                            .backgroundColor("#89cff0")
+                            .link("http://announce.example.com")
+                            .logo("VGVzdFByb2R1Y3RMb2dv")
+                            .text("Announcement")
+                            .textColor("#000000")
+                            .build())
                         .companyName("Test Company")
-                        .productLogo("VGVzdFByb2R1Y3RMb2dv")
-                        .squareLogo("VGVzdFNxdWFyZUxvZ28=")
+                        .consent(Consent.builder()
+                            .link("http://policy.example.com")
+                            .text("Some Policy")
+                            .build())
                         .footerLegalText("Test footer legal text")
                         .footerLink("Support", "http://support.example.com")
+                        .productLogo("VGVzdFByb2R1Y3RMb2dv")
+                        .squareLogo("VGVzdFNxdWFyZUxvZ28=")
                         .build())
                     .accountChooserEnabled(false)
+                    .issuer("http://localhost:8080/uaa")
+                    .mfaConfig(MfaConfig.builder()
+                        .enabled(false)
+                        .identityProvider(Type.INTERNAL)
+                        .identityProvider(Type.LDAP)
+                        .build())
+                    .userConfig(UserConfig.builder()
+                        .defaultGroups(Arrays.asList("openid", "password.write", "uaa.user", "approvals.me", "profile", "roles", "user_attributes", "uaa.offline_token"))
+                        .build())
                     .build())
                 .name("The Twiglet Zone")
                 .version(0)
-                .createdAt(1481728057382L)
-                .lastModified(1481728057382L)
+                .createdAt(1529690486268L)
+                .lastModified(1529690486268L)
                 .build())
             .expectComplete()
             .verify(Duration.ofSeconds(5));

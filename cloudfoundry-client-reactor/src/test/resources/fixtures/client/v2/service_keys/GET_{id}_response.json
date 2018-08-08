@@ -1,16 +1,17 @@
 {
   "metadata": {
-    "guid": "7f1f30d3-bed3-4ba7-bf88-fd3a678ff4f5",
-    "url": "/v2/service_keys/7f1f30d3-bed3-4ba7-bf88-fd3a678ff4f5",
-    "created_at": "2015-07-27T22:43:22Z",
-    "updated_at": null
+    "guid": "6ad2cc9b-1996-49a3-9538-dfc0da3b1f32",
+    "url": "/v2/service_keys/6ad2cc9b-1996-49a3-9538-dfc0da3b1f32",
+    "created_at": "2016-06-08T16:41:23Z",
+    "updated_at": "2016-06-08T16:41:26Z"
   },
   "entity": {
-    "name": "name-947",
-    "service_instance_guid": "011457da-c205-4415-a578-de5df82b15a8",
+    "name": "name-140",
+    "service_instance_guid": "ca567b3d-e142-4139-94e3-1e0c010ba728",
     "credentials": {
-      "creds-key-388": "creds-val-388"
+      "creds-key-7": "creds-val-7"
     },
-    "service_instance_url": "/v2/service_instances/011457da-c205-4415-a578-de5df82b15a8"
+    "service_instance_url": "/v2/service_instances/ca567b3d-e142-4139-94e3-1e0c010ba728",
+    "service_key_parameters_url": "/v2/service_keys/6ad2cc9b-1996-49a3-9538-dfc0da3b1f32/parameters"
   }
 }

@@ -14,60 +14,30 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.buildpacks;
+package org.cloudfoundry.uaa.identityzones;
+
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
- * The entity response payload for the buildpack resource
+ * The payload for the identity zone consent configuration
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _BuildpackEntity {
+abstract class _Consent {
 
     /**
-     * Whether the buildpack is enabled
+     * The consent link
      */
-    @JsonProperty("enabled")
-    @Nullable
-    abstract Boolean getEnabled();
+    @JsonProperty("link")
+    abstract String getLink();
 
     /**
-     * The filename
+     * The consent text
      */
-    @JsonProperty("filename")
-    @Nullable
-    abstract String getFilename();
-
-    /**
-     * Whether the buildpack is locked
-     */
-    @JsonProperty("locked")
-    @Nullable
-    abstract Boolean getLocked();
-
-    /**
-     * The name
-     */
-    @JsonProperty("name")
-    @Nullable
-    abstract String getName();
-
-    /**
-     * The position
-     */
-    @JsonProperty("position")
-    @Nullable
-    abstract Integer getPosition();
-
-    /**
-     * The stack
-     */
-    @JsonProperty("stack")
-    @Nullable
-    abstract String getStack();
+    @JsonProperty("text")
+    abstract String getText();
 
 }

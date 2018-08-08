@@ -2,17 +2,21 @@
   "id": "twiglet-get",
   "subdomain": "twiglet-get",
   "config": {
-    "clientLockoutPolicy": {
-      "lockoutPeriodSeconds": -1,
-      "lockoutAfterFailures": -1,
-      "countFailuresWithin": -1
+    "clientSecretPolicy": {
+      "minLength": -1,
+      "maxLength": -1,
+      "requireUpperCaseCharacter": -1,
+      "requireLowerCaseCharacter": -1,
+      "requireDigit": -1,
+      "requireSpecialCharacter": -1
     },
     "tokenPolicy": {
-      "accessTokenValidity": -1,
-      "refreshTokenValidity": -1,
+      "accessTokenValidity": 3600,
+      "refreshTokenValidity": 7200,
       "jwtRevocable": false,
-      "activeKeyId": null,
-      "keys": {}
+      "refreshTokenUnique": false,
+      "refreshTokenFormat": "jwt",
+      "activeKeyId": "active-key-1"
     },
     "samlConfig": {
       "assertionSigned": true,
@@ -20,9 +24,15 @@
       "wantAssertionSigned": true,
       "wantAuthnRequestSigned": false,
       "assertionTimeToLiveSeconds": 600,
-      "certificate": null,
-      "privateKey": null,
-      "privateKeyPassword": null
+      "activeKeyId": "legacy-saml-key",
+      "keys": {
+        "legacy-saml-key": {
+          "certificate": "-----BEGIN CERTIFICATE-----\nMIICEjCCAXsCAg36MA0GCSqGSIb3DQEBBQUAMIGbMQswCQYDVQQGEwJKUDEOMAwG\nA1UECBMFVG9reW8xEDAOBgNVBAcTB0NodW8ta3UxETAPBgNVBAoTCEZyYW5rNERE\nMRgwFgYDVQQLEw9XZWJDZXJ0IFN1cHBvcnQxGDAWBgNVBAMTD0ZyYW5rNEREIFdl\nYiBDQTEjMCEGCSqGSIb3DQEJARYUc3VwcG9ydEBmcmFuazRkZC5jb20wHhcNMTIw\nODIyMDUyNjU0WhcNMTcwODIxMDUyNjU0WjBKMQswCQYDVQQGEwJKUDEOMAwGA1UE\nCAwFVG9reW8xETAPBgNVBAoMCEZyYW5rNEREMRgwFgYDVQQDDA93d3cuZXhhbXBs\nZS5jb20wXDANBgkqhkiG9w0BAQEFAANLADBIAkEAm/xmkHmEQrurE/0re/jeFRLl\n8ZPjBop7uLHhnia7lQG/5zDtZIUC3RVpqDSwBuw/NTweGyuP+o8AG98HxqxTBwID\nAQABMA0GCSqGSIb3DQEBBQUAA4GBABS2TLuBeTPmcaTaUW/LCB2NYOy8GMdzR1mx\n8iBIu2H6/E2tiY3RIevV2OW61qY2/XRQg7YPxx3ffeUugX9F4J/iPnnu1zAxxyBy\n2VguKv4SWjRFoRkIfIlHX0qVviMhSlNy2ioFLy7JcPZb+v3ftDGywUqcBiVDoea0\nHn+GmxZA\n-----END CERTIFICATE-----\n"
+        }
+      },
+      "entityID": "cloudfoundry-saml-login",
+      "disableInResponseToCheck": false,
+      "certificate": "-----BEGIN CERTIFICATE-----\nMIICEjCCAXsCAg36MA0GCSqGSIb3DQEBBQUAMIGbMQswCQYDVQQGEwJKUDEOMAwG\nA1UECBMFVG9reW8xEDAOBgNVBAcTB0NodW8ta3UxETAPBgNVBAoTCEZyYW5rNERE\nMRgwFgYDVQQLEw9XZWJDZXJ0IFN1cHBvcnQxGDAWBgNVBAMTD0ZyYW5rNEREIFdl\nYiBDQTEjMCEGCSqGSIb3DQEJARYUc3VwcG9ydEBmcmFuazRkZC5jb20wHhcNMTIw\nODIyMDUyNjU0WhcNMTcwODIxMDUyNjU0WjBKMQswCQYDVQQGEwJKUDEOMAwGA1UE\nCAwFVG9reW8xETAPBgNVBAoMCEZyYW5rNEREMRgwFgYDVQQDDA93d3cuZXhhbXBs\nZS5jb20wXDANBgkqhkiG9w0BAQEFAANLADBIAkEAm/xmkHmEQrurE/0re/jeFRLl\n8ZPjBop7uLHhnia7lQG/5zDtZIUC3RVpqDSwBuw/NTweGyuP+o8AG98HxqxTBwID\nAQABMA0GCSqGSIb3DQEBBQUAA4GBABS2TLuBeTPmcaTaUW/LCB2NYOy8GMdzR1mx\n8iBIu2H6/E2tiY3RIevV2OW61qY2/XRQg7YPxx3ffeUugX9F4J/iPnnu1zAxxyBy\n2VguKv4SWjRFoRkIfIlHX0qVviMhSlNy2ioFLy7JcPZb+v3ftDGywUqcBiVDoea0\nHn+GmxZA\n-----END CERTIFICATE-----\n"
     },
     "corsPolicy": {
       "xhrConfiguration": {
@@ -70,14 +80,14 @@
       "logout": {
         "redirectUrl": "/login",
         "redirectParameterName": "redirect",
-        "disableRedirectParameter": true,
+        "disableRedirectParameter": false,
         "whitelist": null
       },
       "homeRedirect": "http://my.hosted.homepage.com/",
       "selfService": {
         "selfServiceLinksEnabled": true,
-        "signup": "/create_account",
-        "passwd": "/forgot_password"
+        "signup": null,
+        "passwd": null
       }
     },
     "prompts": [
@@ -94,7 +104,7 @@
       {
         "name": "passcode",
         "type": "password",
-        "text": "One Time Code (Get on at /passcode)"
+        "text": "Temporary Authentication Code (Get on at /passcode)"
       }
     ],
     "idpDiscoveryEnabled": false,
@@ -105,12 +115,43 @@
       "footerLegalText": "Test footer legal text",
       "footerLinks": {
         "Support": "http://support.example.com"
+      },
+      "banner": {
+        "logo": "VGVzdFByb2R1Y3RMb2dv",
+        "text": "Announcement",
+        "textColor": "#000000",
+        "backgroundColor": "#89cff0",
+        "link": "http://announce.example.com"
+      },
+      "consent": {
+        "text": "Some Policy",
+        "link": "http://policy.example.com"
       }
     },
-    "accountChooserEnabled": false
+    "accountChooserEnabled": false,
+    "userConfig": {
+      "defaultGroups": [
+        "openid",
+        "password.write",
+        "uaa.user",
+        "approvals.me",
+        "profile",
+        "roles",
+        "user_attributes",
+        "uaa.offline_token"
+      ]
+    },
+    "mfaConfig": {
+      "enabled": false,
+      "identityProviders": [
+        "uaa",
+        "ldap"
+      ]
+    },
+    "issuer": "http://localhost:8080/uaa"
   },
   "name": "The Twiglet Zone",
   "version": 0,
-  "created": 1481728057382,
-  "last_modified": 1481728057382
+  "created": 1529690486268,
+  "last_modified": 1529690486268
 }

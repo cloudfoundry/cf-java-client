@@ -14,58 +14,53 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.servicekeys;
-
+package org.cloudfoundry.client.v2.servicebindings;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
-import java.util.Map;
-
 /**
- * The entity response payload for Service Keys
+ * The last operation payload for Service Bindings
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _ServiceKeyEntity {
+abstract class _LastOperation {
 
     /**
-     * The credentials
+     * When the entity was created
      */
-    @AllowNulls
-    @JsonProperty("credentials")
+    @JsonProperty("created_at")
     @Nullable
-    abstract Map<String, Object> getCredentials();
+    abstract String getCreatedAt();
 
     /**
-     * The name
+     * The description
      */
-    @JsonProperty("name")
+    @JsonProperty("description")
     @Nullable
-    abstract String getName();
+    abstract String getDescription();
 
     /**
-     * The service instance id
+     * The state
      */
-    @JsonProperty("service_instance_guid")
+    @JsonProperty("state")
     @Nullable
-    abstract String getServiceInstanceId();
+    abstract String getState();
 
     /**
-     * The service instance url
+     * The type
      */
-    @JsonProperty("service_instance_url")
+    @JsonProperty("type")
     @Nullable
-    abstract String getServiceInstanceUrl();
+    abstract String getType();
 
     /**
-     * The service key parameters url
+     * When the entity was last updated
      */
-    @JsonProperty("service_key_parameters_url")
+    @JsonProperty("updated_at")
     @Nullable
-    abstract String getServiceKeyParametersUrl();
+    abstract String getUpdatedAt();
 
 }

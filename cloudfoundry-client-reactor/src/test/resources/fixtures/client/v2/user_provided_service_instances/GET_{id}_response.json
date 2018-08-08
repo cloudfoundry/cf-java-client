@@ -1,21 +1,24 @@
 {
   "metadata": {
-    "guid": "8c12fd06-6639-4844-b5e7-a6831cadbbcc",
-    "url": "/v2/user_provided_service_instances/8c12fd06-6639-4844-b5e7-a6831cadbbcc",
-    "created_at": "2015-07-27T22:43:34Z",
-    "updated_at": null
+    "guid": "e9358711-0ad9-4f2a-b3dc-289d47c17c87",
+    "url": "/v2/user_provided_service_instances/e9358711-0ad9-4f2a-b3dc-289d47c17c87",
+    "created_at": "2016-06-08T16:41:33Z",
+    "updated_at": "2016-06-08T16:41:26Z"
   },
   "entity": {
-    "name": "name-2361",
+    "name": "name-1700",
     "credentials": {
-      "creds-key-662": "creds-val-662"
+      "creds-key-58": "creds-val-58"
     },
-    "space_guid": "cebb3962-4e5b-4204-b117-3140ec4a62d9",
+    "space_guid": "22236d1a-d9c7-44b7-bdad-2bb079a6c4a1",
     "type": "user_provided_service_instance",
-    "syslog_drain_url": "https://foo.com/url-89",
-    "route_service_url": null,
-    "space_url": "/v2/spaces/cebb3962-4e5b-4204-b117-3140ec4a62d9",
-    "service_bindings_url": "/v2/user_provided_service_instances/8c12fd06-6639-4844-b5e7-a6831cadbbcc/service_bindings",
-    "routes_url": "/v2/user_provided_service_instances/8c12fd06-6639-4844-b5e7-a6831cadbbcc/routes"
+    "syslog_drain_url": "https://foo.com/url-104",
+    "tags": [
+      "accounting",
+      "mongodb"
+    ],
+    "space_url": "/v2/spaces/22236d1a-d9c7-44b7-bdad-2bb079a6c4a1",
+    "service_bindings_url": "/v2/user_provided_service_instances/e9358711-0ad9-4f2a-b3dc-289d47c17c87/service_bindings",
+    "routes_url": "/v2/user_provided_service_instances/e9358711-0ad9-4f2a-b3dc-289d47c17c87/routes"
   }
 }
