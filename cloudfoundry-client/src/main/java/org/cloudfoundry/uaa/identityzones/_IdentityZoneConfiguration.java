@@ -66,6 +66,13 @@ abstract class _IdentityZoneConfiguration {
     abstract CorsPolicy getCorsPolicy();
 
     /**
+     * The issuer of this zone
+     */
+    @JsonProperty("issuer")
+    @Nullable
+    abstract String getIssuer();
+
+    /**
      * IDP Discovery should be set to true if you have configured more than one identity provider for UAA. The discovery relies on email domain being set for each additional provider.
      */
     @JsonProperty("idpDiscoveryEnabled")

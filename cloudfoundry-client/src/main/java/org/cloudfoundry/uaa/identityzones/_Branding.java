@@ -46,6 +46,13 @@ abstract class _Branding {
     abstract String getCompanyName();
 
     /**
+     * The consent configuration
+     */
+    @JsonProperty("consent")
+    @Nullable
+    abstract Consent getConsent();
+
+    /**
      * This text appears on the footer of all UAA pages
      */
     @JsonProperty("footerLegalText")

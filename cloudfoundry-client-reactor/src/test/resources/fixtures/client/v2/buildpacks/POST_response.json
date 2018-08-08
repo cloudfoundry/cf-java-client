@@ -1,12 +1,13 @@
 {
   "metadata": {
-    "guid": "9c38753c-960c-44aa-ac46-37ad61b87e35",
-    "url": "/v2/buildpacks/9c38753c-960c-44aa-ac46-37ad61b87e35",
-    "created_at": "2016-03-17T21:41:28Z",
-    "updated_at": null
+    "guid": "11bd4dd1-134e-4d15-b8fe-dd9f36bae66a",
+    "url": "/v2/buildpacks/11bd4dd1-134e-4d15-b8fe-dd9f36bae66a",
+    "created_at": "2016-06-08T16:41:31Z",
+    "updated_at": "2016-06-08T16:41:26Z"
   },
   "entity": {
     "name": "Golang_buildpack",
+    "stack": "cflinuxfs2",
     "position": 1,
     "enabled": true,
     "locked": false,

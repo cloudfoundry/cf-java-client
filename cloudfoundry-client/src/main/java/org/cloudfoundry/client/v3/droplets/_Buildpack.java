@@ -26,16 +26,30 @@ import org.immutables.value.Value;
 abstract class _Buildpack {
 
     /**
-     * The detect output from staging
+     * The name reported by buildpack
+     */
+    @JsonProperty("buildpack_name")
+    @Nullable
+    abstract String getBuildpackName();
+
+    /**
+     * The output during buildpack detect process
      */
     @JsonProperty("detect_output")
     @Nullable
     abstract String getDetectOutput();
 
     /**
-     * The name of the buildpack
+     * The system buildpack name
      */
     @JsonProperty("name")
     abstract String getName();
+
+    /**
+     * The version of the buildpack
+     */
+    @JsonProperty("version")
+    @Nullable
+    abstract String getVersion();
 
 }

@@ -79,11 +79,25 @@ abstract class _ServiceBindingEntity {
     abstract String getGatewayName();
 
     /**
+     * The last operation
+     */
+    @JsonProperty("last_operation")
+    @Nullable
+    abstract LastOperation getLastOperation();
+
+    /**
      * The service binding name
      */
     @JsonProperty("name")
     @Nullable
     abstract String getName();
+
+    /**
+     * The service binding parameters url
+     */
+    @JsonProperty("service_binding_parameters_url")
+    @Nullable
+    abstract String getServiceBindingParametersUrl();
 
     /**
      * The service instance id

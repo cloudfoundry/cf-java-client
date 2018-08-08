@@ -22,8 +22,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
-import java.util.List;
-
 /**
  * The entity response payload for Service Instances
  */
@@ -61,6 +59,13 @@ abstract class _ServiceInstanceEntity extends BaseServiceInstanceEntity {
     abstract String getServiceId();
 
     /**
+     * The service instance parameters url
+     */
+    @JsonProperty("service_instance_parameters_url")
+    @Nullable
+    abstract String getServiceInstanceParametersUrl();
+
+    /**
      * The service keys url
      */
     @JsonProperty("service_keys_url")
@@ -87,12 +92,5 @@ abstract class _ServiceInstanceEntity extends BaseServiceInstanceEntity {
     @JsonProperty("service_url")
     @Nullable
     abstract String getServiceUrl();
-
-    /**
-     * The tags
-     */
-    @JsonProperty("tags")
-    @Nullable
-    abstract List<String> getTags();
 
 }
