@@ -59,7 +59,8 @@ public final class PoliciesTest extends AbstractIntegrationTest {
     public void create() {
         String destinationApplicationName = this.nameFactory.getApplicationName();
         String sourceApplicationName = this.nameFactory.getApplicationName();
-        Integer port = this.nameFactory.getPort();
+        Integer startPort = this.nameFactory.getPort();
+        Integer endPort = this.nameFactory.getPort();
 
         this.spaceId
             .then(spaceId -> Mono.when(
@@ -72,8 +73,8 @@ public final class PoliciesTest extends AbstractIntegrationTest {
                         .destination(Destination.builder()
                             .id(destinationApplicationId)
                             .ports(Ports.builder()
-                                .end(port + 1)
-                                .start(port)
+                                .end(endPort)
+                                .start(startPort)
                                 .build())
                             .protocol("tcp")
                             .build())
@@ -89,7 +90,7 @@ public final class PoliciesTest extends AbstractIntegrationTest {
                 .single())
             .map(policy -> policy.getDestination().getPorts().getStart())
             .as(StepVerifier::create)
-            .expectNext(port)
+            .expectNext(startPort)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
