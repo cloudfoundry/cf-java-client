@@ -38,6 +38,7 @@ abstract class _UserInfoResponse {
      * Whether the user has verified their email address
      */
     @JsonProperty("email_verified")
+    @Nullable
     abstract Boolean getEmailVerified();
 
     /**
