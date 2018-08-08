@@ -139,7 +139,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     @Test
     public void createRouteTcpAssignedPort() {
         String domainName = this.nameFactory.getDomainName();
-        Integer port = 61002;
+        Integer port = this.nameFactory.getPort();
 
         requestCreateSharedDomain(this.cloudFoundryOperations, domainName, DEFAULT_ROUTER_GROUP)
             .then(requestCreateRoute(this.cloudFoundryOperations, this.spaceName, domainName, port))
