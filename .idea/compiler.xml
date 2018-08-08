@@ -15,4 +15,14 @@
       </profile>
     </annotationProcessing>
   </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="cloudfoundry-client" options="-Werror -Xlint:all -Xlint:-options -Xlint:-processing -Xlint:-serial" />
+      <module name="cloudfoundry-client-reactor" options="-Werror -Xlint:all -Xlint:-options -Xlint:-processing -Xlint:-serial" />
+      <module name="cloudfoundry-operations" options="-Werror -Xlint:all -Xlint:-options -Xlint:-processing -Xlint:-serial" />
+      <module name="cloudfoundry-util" options="-Werror -Xlint:all -Xlint:-options -Xlint:-processing -Xlint:-serial" />
+      <module name="integration-test" options="-Werror -Xlint:all -Xlint:-options -Xlint:-processing -Xlint:-serial" />
+      <module name="test-service-broker" options="-Werror -Xlint:all -Xlint:-options -Xlint:-processing -Xlint:-serial" />
+    </option>
+  </component>
 </project>
