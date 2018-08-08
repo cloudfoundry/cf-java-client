@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * The type of Identity provider in paylaod
+ * The type of Identity provider in payload
  */
 public enum Type {
 

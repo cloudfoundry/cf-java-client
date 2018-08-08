@@ -1,22 +1,29 @@
 {
   "metadata": {
-    "guid": "925d8848-4808-47cf-a3e8-049aa0163328",
-    "url": "/v2/service_bindings/925d8848-4808-47cf-a3e8-049aa0163328",
-    "created_at": "2015-11-03T00:53:50Z",
-    "updated_at": "2015-11-04T12:54:50Z"
+    "guid": "ddd7fb26-c42d-4acf-a035-60fdd094a167",
+    "url": "/v2/service_bindings/ddd7fb26-c42d-4acf-a035-60fdd094a167",
+    "created_at": "2016-06-08T16:41:43Z",
+    "updated_at": "2016-06-08T16:41:26Z"
   },
   "entity": {
-    "app_guid": "56ae4265-4c1c-43a9-9069-2c1fee7fd42f",
-    "service_instance_guid": "f99b3d23-55f9-48b5-add3-d7ab08b2ff0c",
+    "app_guid": "784bca1b-c4d9-4d99-9961-9f413620031a",
+    "service_instance_guid": "ada8700c-dd02-467c-937b-32ce498302f6",
     "credentials": {
-      "creds-key-108": "creds-val-108"
+      "creds-key-64": "creds-val-64"
     },
     "binding_options": {
     },
-    "gateway_data": null,
     "gateway_name": "",
-    "syslog_drain_url": null,
-    "app_url": "/v2/apps/56ae4265-4c1c-43a9-9069-2c1fee7fd42f",
-    "service_instance_url": "/v2/service_instances/f99b3d23-55f9-48b5-add3-d7ab08b2ff0c"
+    "name": "prod-db",
+    "last_operation": {
+      "type": "create",
+      "state": "succeeded",
+      "description": "",
+      "updated_at": "2018-02-28T16:25:19Z",
+      "created_at": "2018-02-28T16:25:19Z"
+    },
+    "app_url": "/v2/apps/784bca1b-c4d9-4d99-9961-9f413620031a",
+    "service_instance_url": "/v2/service_instances/ada8700c-dd02-467c-937b-32ce498302f6",
+    "service_binding_parameters_url": "/v2/service_bindings/ddd7fb26-c42d-4acf-a035-60fdd094a167/parameters"
   }
 }

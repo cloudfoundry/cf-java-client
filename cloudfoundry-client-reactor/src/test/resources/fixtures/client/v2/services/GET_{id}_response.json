@@ -1,26 +1,27 @@
 {
   "metadata": {
-    "guid": "58eb36ad-0636-428b-b4ed-afc14e48d926",
-    "url": "/v2/services/58eb36ad-0636-428b-b4ed-afc14e48d926",
-    "created_at": "2015-07-27T22:43:35Z",
-    "updated_at": null
+    "guid": "53f52780-e93c-4af7-a96c-6958311c40e5",
+    "url": "/v2/services/53f52780-e93c-4af7-a96c-6958311c40e5",
+    "created_at": "2016-06-08T16:41:32Z",
+    "updated_at": "2016-06-08T16:41:26Z"
   },
   "entity": {
-    "label": "label-86",
+    "label": "label-58",
     "provider": null,
     "url": null,
-    "description": "desc-219",
+    "description": "desc-135",
     "long_description": null,
     "version": null,
     "info_url": null,
     "active": true,
     "bindable": true,
-    "unique_id": "8fbdd3bc-3eee-4b03-97a3-57929484649b",
+    "unique_id": "c181996b-f233-43d1-8901-3a43eafcaacf",
     "extra": null,
-    "tags": null,
     "documentation_url": null,
-    "service_broker_guid": "fe6e3f23-7b92-4855-aaa7-56f515d678c5",
+    "service_broker_guid": "0e7250aa-364f-42c2-8fd2-808b0224376f",
     "plan_updateable": false,
-    "service_plans_url": "/v2/services/58eb36ad-0636-428b-b4ed-afc14e48d926/service_plans"
+    "instances_retrievable": false,
+    "bindings_retrievable": false,
+    "service_plans_url": "/v2/services/53f52780-e93c-4af7-a96c-6958311c40e5/service_plans"
   }
 }

@@ -46,6 +46,13 @@ abstract class _ServiceEntity {
     abstract Boolean getBindable();
 
     /**
+     * The bindings retrievable status
+     */
+    @JsonProperty("bindings_retrievable")
+    @Nullable
+    abstract Boolean getBindingsRetrievable();
+
+    /**
      * The description
      */
     @JsonProperty("description")
@@ -74,6 +81,13 @@ abstract class _ServiceEntity {
     @JsonProperty("info_url")
     @Nullable
     abstract String getInfoUrl();
+
+    /**
+     * The instances retrievable status
+     */
+    @JsonProperty("instances_retrievable")
+    @Nullable
+    abstract Boolean getInstancesRetrievable();
 
     /**
      * The name of the service

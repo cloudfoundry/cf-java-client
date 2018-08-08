@@ -19,7 +19,10 @@ package org.cloudfoundry.uaa.identityzones;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.Nullable;
+import org.cloudfoundry.uaa.identityproviders.Type;
 import org.immutables.value.Value;
+
+import java.util.List;
 
 /**
  * The payload for the Multi-factor Authentication configuration
@@ -41,6 +44,13 @@ abstract class _MfaConfig {
     @JsonProperty("enabled")
     @Nullable
     abstract Boolean getEnabled();
+
+    /**
+     * The identity providers
+     */
+    @JsonProperty("identityProviders")
+    @Nullable
+    abstract List<Type> getIdentityProviders();
 
     /**
      * The XHR configuration

@@ -1,17 +1,18 @@
 {
   "metadata": {
-    "guid": "24ec15f9-f6c7-434a-8893-51baab8408d8",
-    "url": "/v2/service_instances/24ec15f9-f6c7-434a-8893-51baab8408d8",
-    "created_at": "2015-07-27T22:43:08Z",
-    "updated_at": null
+    "guid": "0d632575-bb06-4ea5-bb19-a451a9644d92",
+    "url": "/v2/service_instances/0d632575-bb06-4ea5-bb19-a451a9644d92",
+    "created_at": "2016-06-08T16:41:29Z",
+    "updated_at": "2016-06-08T16:41:26Z"
   },
   "entity": {
-    "name": "name-133",
+    "name": "name-1508",
     "credentials": {
-      "creds-key-72": "creds-val-72"
+      "creds-key-38": "creds-val-38"
     },
-    "service_plan_guid": "2b53255a-8b40-4671-803d-21d3f5d4183a",
-    "space_guid": "83b3e705-49fd-4c40-8adf-f5e34f622a19",
+    "service_guid": "a14baddf-1ccc-5299-0152-ab9s49de4422",
+    "service_plan_guid": "779d2df0-9cdd-48e8-9781-ea05301cedb1",
+    "space_guid": "38511660-89d9-4a6e-a889-c32c7e94f139",
     "gateway_data": null,
     "dashboard_url": null,
     "type": "managed_service_instance",
@@ -19,16 +20,21 @@
       "type": "create",
       "state": "succeeded",
       "description": "service broker-provided description",
-      "updated_at": "2015-07-27T22:43:08Z",
-      "created_at": "2015-07-27T22:43:08Z"
+      "updated_at": "2016-06-08T16:41:29Z",
+      "created_at": "2016-06-08T16:41:29Z"
     },
     "tags": [
       "accounting",
       "mongodb"
     ],
-    "space_url": "/v2/spaces/83b3e705-49fd-4c40-8adf-f5e34f622a19",
-    "service_plan_url": "/v2/service_plans/2b53255a-8b40-4671-803d-21d3f5d4183a",
-    "service_bindings_url": "/v2/service_instances/24ec15f9-f6c7-434a-8893-51baab8408d8/service_bindings",
-    "service_keys_url": "/v2/service_instances/24ec15f9-f6c7-434a-8893-51baab8408d8/service_keys"
+    "space_url": "/v2/spaces/38511660-89d9-4a6e-a889-c32c7e94f139",
+    "service_url": "/v2/services/a14baddf-1ccc-5299-0152-ab9s49de4422",
+    "service_plan_url": "/v2/service_plans/779d2df0-9cdd-48e8-9781-ea05301cedb1",
+    "service_bindings_url": "/v2/service_instances/0d632575-bb06-4ea5-bb19-a451a9644d92/service_bindings",
+    "service_keys_url": "/v2/service_instances/0d632575-bb06-4ea5-bb19-a451a9644d92/service_keys",
+    "routes_url": "/v2/service_instances/0d632575-bb06-4ea5-bb19-a451a9644d92/routes",
+    "shared_from_url": "/v2/service_instances/0d632575-bb06-4ea5-bb19-a451a9644d92/shared_from",
+    "shared_to_url": "/v2/service_instances/0d632575-bb06-4ea5-bb19-a451a9644d92/shared_to",
+    "service_instance_parameters_url": "/v2/service_instances/0d632575-bb06-4ea5-bb19-a451a9644d92/parameters"
   }
 }

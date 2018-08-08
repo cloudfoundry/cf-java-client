@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -84,6 +85,13 @@ public abstract class BaseServiceInstanceEntity {
     @JsonProperty("space_url")
     @Nullable
     public abstract String getSpaceUrl();
+
+    /**
+     * A list of tags for the service instance
+     */
+    @JsonProperty("tags")
+    @Nullable
+    public abstract List<String> getTags();
 
     /**
      * The type
