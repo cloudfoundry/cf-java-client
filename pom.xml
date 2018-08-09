@@ -46,9 +46,9 @@
     <properties>
         <assertj.version>3.10.0</assertj.version>
         <commons-compress.version>1.17</commons-compress.version>
-        <immutables.version>2.6.1</immutables.version>
+        <immutables.version>2.6.3</immutables.version>
         <java-semver.version>0.9.0</java-semver.version>
-        <jjwt.version>0.9.0</jjwt.version>
+        <jjwt.version>0.9.1</jjwt.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <reactor-addons.version>3.0.7.RELEASE</reactor-addons.version>
         <reactor-core.version>3.0.7.RELEASE</reactor-core.version>
