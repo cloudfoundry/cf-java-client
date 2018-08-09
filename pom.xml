@@ -46,10 +46,10 @@
     <properties>
         <commons-compress.version>1.17</commons-compress.version>
         <evo-inflector.version>1.2.2</evo-inflector.version>
-        <immutables.version>2.6.1</immutables.version>
+        <immutables.version>2.6.3</immutables.version>
         <java-semver.version>0.9.0</java-semver.version>
-        <jjwt.version>0.9.0</jjwt.version>
-        <okhttp3.version>3.10.0</okhttp3.version>
+        <jjwt.version>0.9.1</jjwt.version>
+        <okhttp3.version>3.11.0</okhttp3.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <reactor-core.version>3.1.8.RELEASE</reactor-core.version>
         <reactor-netty.version>0.7.8.RELEASE</reactor-netty.version>
