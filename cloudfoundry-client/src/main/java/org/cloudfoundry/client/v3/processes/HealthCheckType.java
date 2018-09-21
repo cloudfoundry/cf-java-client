@@ -30,6 +30,12 @@ public enum HealthCheckType {
     HTTP("http"),
 
     /**
+     * No health check (deprecated, backwards compatibility only)
+     */
+    @Deprecated
+    NONE("none"),
+
+    /**
      * A port health check
      */
     PORT("port"),

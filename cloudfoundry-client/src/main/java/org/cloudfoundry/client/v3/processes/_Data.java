@@ -33,6 +33,13 @@ abstract class _Data {
     abstract String getEndpoint();
 
     /**
+     * The invocation timeout
+     */
+    @JsonProperty("invocation_timeout")
+    @Nullable
+    abstract Integer getInvocationTimeout();
+
+    /**
      * The timeout
      */
     @JsonProperty("timeout")
