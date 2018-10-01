@@ -26,7 +26,7 @@
     <parent>
         <groupId>io.spring.platform</groupId>
         <artifactId>platform-bom</artifactId>
-        <version>Brussels-SR10</version>
+        <version>Brussels-SR13</version>
     </parent>
 
     <groupId>org.cloudfoundry</groupId>
@@ -44,9 +44,9 @@
     </modules>
 
     <properties>
-        <assertj.version>3.10.0</assertj.version>
-        <commons-compress.version>1.17</commons-compress.version>
-        <immutables.version>2.6.3</immutables.version>
+        <assertj.version>3.11.1</assertj.version>
+        <commons-compress.version>1.18</commons-compress.version>
+        <immutables.version>2.7.1</immutables.version>
         <java-semver.version>0.9.0</java-semver.version>
         <jjwt.version>0.9.1</jjwt.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
