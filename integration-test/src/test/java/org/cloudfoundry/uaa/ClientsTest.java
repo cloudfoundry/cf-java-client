@@ -38,7 +38,6 @@ import org.cloudfoundry.uaa.clients.GetClientRequest;
 import org.cloudfoundry.uaa.clients.GetMetadataRequest;
 import org.cloudfoundry.uaa.clients.GetMetadataResponse;
 import org.cloudfoundry.uaa.clients.ListClientsRequest;
-import org.cloudfoundry.uaa.clients.ListClientsResponse;
 import org.cloudfoundry.uaa.clients.ListMetadatasRequest;
 import org.cloudfoundry.uaa.clients.ListMetadatasResponse;
 import org.cloudfoundry.uaa.clients.MixedActionsRequest;
@@ -309,10 +308,10 @@ public final class ClientsTest extends AbstractIntegrationTest {
         String clientSecret = this.nameFactory.getClientSecret();
 
         requestCreateClient(this.uaaClient, clientId, clientSecret)
-            .then(this.uaaClient.clients()
+            .thenMany(PaginationUtils.requestUaaResources(startIndex -> this.uaaClient.clients()
                 .list(ListClientsRequest.builder()
-                    .build()))
-            .flatMapIterable(ListClientsResponse::getResources)
+                    .startIndex(startIndex)
+                    .build())))
             .filter(client -> clientId.equals(client.getClientId()))
             .as(StepVerifier::create)
             .expectNextCount(1)
