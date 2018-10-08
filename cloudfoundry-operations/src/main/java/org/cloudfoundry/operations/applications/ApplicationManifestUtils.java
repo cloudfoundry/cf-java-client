@@ -28,6 +28,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.Collections;
@@ -226,14 +227,14 @@ public final class ApplicationManifestUtils {
     private static List<ApplicationManifest> doRead(Path path) {
         Map<String, Object> root = deserialize(path);
 
-        ApplicationManifest template = getTemplate(path, root);
+        ApplicationManifest template = getTemplate(root);
 
         return Optional.ofNullable(root.get("applications"))
             .map(value -> ((List<Map<String, Object>>) value).stream())
             .orElseGet(Stream::empty)
             .map(application -> {
                 String name = getName(application);
-                return toApplicationManifest(application, ApplicationManifest.builder().from(template), path)
+                return toApplicationManifest(application, ApplicationManifest.builder().from(template))
                     .name(name)
                     .build();
             })
@@ -265,8 +266,8 @@ public final class ApplicationManifestUtils {
         return Route.builder().route(route).build();
     }
 
-    private static ApplicationManifest getTemplate(Path path, Map<String, Object> root) {
-        return toApplicationManifest(root, ApplicationManifest.builder(), path)
+    private static ApplicationManifest getTemplate(Map<String, Object> root) {
+        return toApplicationManifest(root, ApplicationManifest.builder())
             .name("template")
             .build();
     }
@@ -322,7 +323,7 @@ public final class ApplicationManifestUtils {
     }
 
     @SuppressWarnings("unchecked")
-    private static ApplicationManifest.Builder toApplicationManifest(Map<String, Object> application, ApplicationManifest.Builder builder, Path root) {
+    private static ApplicationManifest.Builder toApplicationManifest(Map<String, Object> application, ApplicationManifest.Builder builder) {
         asString(application, "buildpack", builder::buildpack);
         asString(application, "command", builder::command);
         asMemoryInteger(application, "disk_quota", builder::disk);
@@ -339,7 +340,7 @@ public final class ApplicationManifestUtils {
         asString(application, "name", builder::name);
         asBoolean(application, "no-hostname", builder::noHostname);
         asBoolean(application, "no-route", builder::noRoute);
-        asString(application, "path", path -> builder.path(root.getParent().resolve(path)));
+        asString(application, "path", path -> builder.path(Paths.get(path)));
         asBoolean(application, "random-route", builder::randomRoute);
         asList(application, "routes", raw -> getRoute((Map<String, Object>) raw), builder::route);
         asListOfString(application, "services", builder::service);
@@ -360,7 +361,7 @@ public final class ApplicationManifestUtils {
 
         putIfPresent(yaml, "buildpack", applicationManifest.getBuildpack());
         putIfPresent(yaml, "command", applicationManifest.getCommand());
-        putIfPresent(yaml, "disk_quota", applicationManifest.getDisk());
+        putIfPresent(yaml, "disk_quota", applicationManifest.getDisk().toString() + "M");
         putIfPresent(yaml, "docker", applicationManifest.getDocker());
         putIfPresent(yaml, "domains", applicationManifest.getDomains());
         putIfPresent(yaml, "env", applicationManifest.getEnvironmentVariables());
@@ -368,7 +369,7 @@ public final class ApplicationManifestUtils {
         putIfPresent(yaml, "health-check-type", applicationManifest.getHealthCheckType(), protectApplicationHealthCheck());
         putIfPresent(yaml, "hosts", applicationManifest.getHosts());
         putIfPresent(yaml, "instances", applicationManifest.getInstances());
-        putIfPresent(yaml, "memory", applicationManifest.getMemory());
+        putIfPresent(yaml, "memory", applicationManifest.getMemory().toString() + "M");
         putIfPresent(yaml, "name", applicationManifest.getName());
         putIfPresent(yaml, "no-hostname", applicationManifest.getNoHostname());
         putIfPresent(yaml, "no-route", applicationManifest.getNoRoute());
