@@ -2,13 +2,13 @@
 applications:
 - buildpack: alpha-buildpack
   command: alpha-command
-  disk_quota: -1
+  disk_quota: 512M
   env:
     ALPHA_KEY_1: alpha-value-1
     ALPHA_KEY_2: alpha-value-2
   health-check-http-endpoint: alpha-health-check-http-endpoint
   instances: -1
-  memory: -1
+  memory: 512M
   name: alpha-application-1
   no-route: true
   path: /alpha-path
@@ -23,7 +23,7 @@ applications:
   timeout: -1
 - buildpack: alpha-buildpack
   command: alpha-command
-  disk_quota: -1
+  disk_quota: 1024M
   domains:
   - alpha-domain
   - alpha-domains-1
@@ -38,10 +38,11 @@ applications:
   - alpha-hosts-1
   - alpha-hosts-2
   instances: -1
-  memory: -1
+  memory: 1024M
   name: alpha-application-2
   no-hostname: true
   no-route: true
+  path: c:\alpha-path
   random-route: true
   services:
   - alpha-instance-1

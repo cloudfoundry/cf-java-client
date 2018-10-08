@@ -47,26 +47,6 @@ public final class ApplicationManifestUtilsTest {
     }
 
     @Test
-    public void readDocker() throws IOException {
-        List<ApplicationManifest> expected = Collections.singletonList(
-            ApplicationManifest.builder()
-                .name("lima-application-1")
-                .docker(Docker.builder()
-                    .image("lima-docker-image")
-                    .password("lima-docker-password")
-                    .username("lima-docker-username")
-                    .build())
-                .healthCheckHttpEndpoint("lima-health-check-http-endpoint")
-                .healthCheckType(NONE)
-                .noRoute(false)
-                .build());
-
-        List<ApplicationManifest> actual = ApplicationManifestUtils.read(new ClassPathResource("fixtures/manifest-lima.yml").getFile().toPath());
-
-        assertThat(actual).isEqualTo(expected);
-    }
-
-    @Test
     public void read() throws IOException {
         List<ApplicationManifest> expected = Arrays.asList(
             ApplicationManifest.builder()
@@ -111,7 +91,7 @@ public final class ApplicationManifestUtilsTest {
                 .memory(1024)
                 .noHostname(true)
                 .noRoute(true)
-                .path(Paths.get("/alpha-path"))
+                .path(Paths.get("c:\\alpha-path"))
                 .randomRoute(true)
                 .stack("alpha-stack")
                 .timeout(-1)
@@ -285,6 +265,26 @@ public final class ApplicationManifestUtilsTest {
     }
 
     @Test
+    public void readDocker() throws IOException {
+        List<ApplicationManifest> expected = Collections.singletonList(
+            ApplicationManifest.builder()
+                .name("lima-application-1")
+                .docker(Docker.builder()
+                    .image("lima-docker-image")
+                    .password("lima-docker-password")
+                    .username("lima-docker-username")
+                    .build())
+                .healthCheckHttpEndpoint("lima-health-check-http-endpoint")
+                .healthCheckType(NONE)
+                .noRoute(false)
+                .build());
+
+        List<ApplicationManifest> actual = ApplicationManifestUtils.read(new ClassPathResource("fixtures/manifest-lima.yml").getFile().toPath());
+
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
     public void readInherit() throws IOException {
         List<ApplicationManifest> expected = Arrays.asList(
             ApplicationManifest.builder()
@@ -339,7 +339,7 @@ public final class ApplicationManifestUtilsTest {
                 .memory(1024)
                 .noHostname(true)
                 .noRoute(true)
-                .path(Paths.get("/alpha-path"))
+                .path(Paths.get("c:\\alpha-path"))
                 .randomRoute(true)
                 .stack("alpha-stack")
                 .timeout(-1)
@@ -520,10 +520,10 @@ public final class ApplicationManifestUtilsTest {
                 .name("alpha-application-1")
                 .buildpack("alpha-buildpack")
                 .command("alpha-command")
-                .disk(-1)
+                .disk(512)
                 .healthCheckHttpEndpoint("alpha-health-check-http-endpoint")
                 .instances(-1)
-                .memory(-1)
+                .memory(512)
                 .noRoute(true)
                 .path(Paths.get("/alpha-path"))
                 .randomRoute(true)
@@ -544,7 +544,7 @@ public final class ApplicationManifestUtilsTest {
                 .name("alpha-application-2")
                 .buildpack("alpha-buildpack")
                 .command("alpha-command")
-                .disk(-1)
+                .disk(1024)
                 .domain("alpha-domain")
                 .domain("alpha-domains-1")
                 .domain("alpha-domains-2")
@@ -554,9 +554,10 @@ public final class ApplicationManifestUtilsTest {
                 .host("alpha-hosts-1")
                 .host("alpha-hosts-2")
                 .instances(-1)
-                .memory(-1)
+                .memory(1024)
                 .noHostname(true)
                 .noRoute(true)
+                .path(Paths.get("c:\\alpha-path"))
                 .randomRoute(true)
                 .stack("alpha-stack")
                 .timeout(-1)
@@ -571,4 +572,5 @@ public final class ApplicationManifestUtilsTest {
 
         assertThat(actual).isEqualTo(expected);
     }
+
 }

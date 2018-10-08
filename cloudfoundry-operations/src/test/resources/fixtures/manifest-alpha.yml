@@ -41,7 +41,7 @@ applications:
   memory: 1G
   no-hostname: true
   no-route: true
-  path: /alpha-path
+  path: c:\alpha-path
   random-route: true
   stack: alpha-stack
   timeout: -1

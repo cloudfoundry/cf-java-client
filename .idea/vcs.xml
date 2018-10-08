@@ -3,5 +3,6 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/vendor/dropsonde-protocol" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/vendor/loggregator-api" vcs="Git" />
   </component>
 </project>
