@@ -152,6 +152,7 @@ public final class ServiceBrokerUtils {
 
     private static Mono<SharedDomainResource> getSharedDomain(CloudFoundryClient cloudFoundryClient) {
         return requestListSharedDomains(cloudFoundryClient)
+            .filter(resource -> !ResourceUtils.getEntity(resource).getInternal())
             .next();
     }
 

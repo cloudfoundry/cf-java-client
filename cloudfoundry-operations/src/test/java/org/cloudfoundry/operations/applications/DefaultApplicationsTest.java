@@ -3808,6 +3808,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                             .id(domainId)
                             .build())
                         .entity(fill(SharedDomainEntity.builder())
+                            .internal(false)
                             .name(domain)
                             .build())
                         .build())
