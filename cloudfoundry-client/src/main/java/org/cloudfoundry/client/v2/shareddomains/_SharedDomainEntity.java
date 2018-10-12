@@ -29,6 +29,13 @@ import org.immutables.value.Value;
 abstract class _SharedDomainEntity {
 
     /**
+     * Whether this is an internal domain
+     */
+    @JsonProperty("internal")
+    @Nullable
+    abstract Boolean getInternal();
+
+    /**
      * The name
      */
     @JsonProperty("name")

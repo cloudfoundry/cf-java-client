@@ -18,6 +18,7 @@ package org.cloudfoundry.networking.v1.tags;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
@@ -38,5 +39,12 @@ abstract class _Tag {
      */
     @JsonProperty("tag")
     abstract String getTag();
+
+    /**
+     * Type for the policy group
+     */
+    @JsonProperty("type")
+    @Nullable
+    abstract String getType();
 
 }

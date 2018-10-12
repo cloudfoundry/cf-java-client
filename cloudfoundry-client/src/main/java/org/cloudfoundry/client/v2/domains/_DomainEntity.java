@@ -31,6 +31,13 @@ import java.util.List;
 abstract class _DomainEntity {
 
     /**
+     * Whether this is an internal domain
+     */
+    @JsonProperty("internal")
+    @Nullable
+    abstract Boolean getInternal();
+
+    /**
      * The name
      */
     @JsonProperty("name")

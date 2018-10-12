@@ -449,8 +449,7 @@ public final class DefaultServices implements Services {
                     if (entity instanceof JobEntity) {
                         return JobUtils.waitForCompletion(cloudFoundryClient, completionTimeout, (JobEntity) response.getEntity());
                     } else {
-                        return LastOperationUtils
-                            .waitForCompletion(completionTimeout, () -> requestGetServiceInstance(cloudFoundryClient, ResourceUtils.getId(serviceInstance))
+                        return LastOperationUtils.waitForCompletion(completionTimeout, () -> requestGetServiceInstance(cloudFoundryClient, ResourceUtils.getId(serviceInstance))
                                 .map(r -> ResourceUtils.getEntity(r).getLastOperation()));
                     }
                 });

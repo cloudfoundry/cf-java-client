@@ -203,6 +203,7 @@ public final class ServiceBrokersTest extends AbstractIntegrationTest {
 
     private static Mono<SharedDomainResource> getSharedDomain(CloudFoundryClient cloudFoundryClient) {
         return requestListSharedDomains(cloudFoundryClient)
+            .filter(resource -> !ResourceUtils.getEntity(resource).getInternal())
             .next();
     }
 
