@@ -47,6 +47,7 @@ final class InstanceController {
 
             return ResponseEntity.accepted()
                 .body(DeprovisionAsyncResponse.builder()
+                    .operation("test-operation")
                     .build());
         }
 

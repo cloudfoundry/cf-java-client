@@ -87,5 +87,12 @@ public abstract class ProcessStatistics {
     @JsonProperty("usage")
     public abstract ProcessUsage getUsage();
 
+    /**
+     * The isolation segment
+     */
+    @JsonProperty("isolation_segment")
+    @Nullable
+    abstract String getIsolationSegment();
+
 }
 

@@ -29,6 +29,13 @@ import org.immutables.value.Value;
 abstract class _CreateSharedDomainRequest {
 
     /**
+     * Whether this is an internal domain
+     */
+    @JsonProperty("internal")
+    @Nullable
+    abstract Boolean getInternal();
+
+    /**
      * The domain name
      */
     @JsonProperty("name")

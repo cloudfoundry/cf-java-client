@@ -36,6 +36,13 @@ abstract class _Domain {
     abstract String getId();
 
     /**
+     * Whether this is an internal domain
+     */
+    @JsonProperty("internal")
+    @Nullable
+    abstract Boolean getInternal();
+
+    /**
      * The name
      */
     @JsonProperty("name")
