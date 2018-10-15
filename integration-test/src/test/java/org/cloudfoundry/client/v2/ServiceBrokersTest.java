@@ -41,6 +41,7 @@ import reactor.test.StepVerifier;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.ServiceBrokerUtils.createServiceBroker;
@@ -204,7 +205,7 @@ public final class ServiceBrokersTest extends AbstractIntegrationTest {
 
     private static Mono<SharedDomainResource> getSharedDomain(CloudFoundryClient cloudFoundryClient) {
         return requestListSharedDomains(cloudFoundryClient)
-            .filter(resource -> !ResourceUtils.getEntity(resource).getInternal())
+            .filter(resource -> !Optional.ofNullable(ResourceUtils.getEntity(resource).getInternal()).orElse(false))
             .next();
     }
 
