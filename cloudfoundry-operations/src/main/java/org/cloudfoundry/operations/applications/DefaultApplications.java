@@ -842,7 +842,7 @@ public final class DefaultApplications implements Applications {
 
     private static Mono<String> getDefaultDomainId(CloudFoundryClient cloudFoundryClient) {
         return requestSharedDomains(cloudFoundryClient)
-            .filter(resource -> !ResourceUtils.getEntity(resource).getInternal())
+            .filter(resource -> !Optional.ofNullable(ResourceUtils.getEntity(resource).getInternal()).orElse(false))
             .map(ResourceUtils::getId)
             .next()
             .switchIfEmpty(ExceptionUtils.illegalArgument("No default domain found"));
