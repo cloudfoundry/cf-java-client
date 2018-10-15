@@ -54,6 +54,7 @@ import reactor.core.publisher.Mono;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.Optional;
 
 import static org.cloudfoundry.util.DelayUtils.exponentialBackOff;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
@@ -151,7 +152,7 @@ public final class ServiceBrokerUtils {
 
     private static Mono<SharedDomainResource> getSharedDomain(CloudFoundryClient cloudFoundryClient) {
         return requestListSharedDomains(cloudFoundryClient)
-            .filter(resource -> !ResourceUtils.getEntity(resource).getInternal())
+            .filter(resource -> !Optional.ofNullable(ResourceUtils.getEntity(resource).getInternal()).orElse(false))
             .next();
     }
 
