@@ -2158,7 +2158,7 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		if (hostName != null) {
 			urlPath = urlPath + "/routes?inline-relations-depth=1&q=host:" + hostName;
 		} else {
-			urlPath = urlPath + "/routes?inline-relations-depth=1";
+			urlPath = urlPath + "/routes?inline-relations-depth=1&q=domain_guid:" + domainGuid.toString();
 		}
 
 		List<Map<String, Object>> allRoutes = getAllResources(urlPath, urlVars);
