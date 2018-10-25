@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.cloudfoundry</groupId>
 	<artifactId>cloudfoundry-client-lib</artifactId>
-	<version>1.1.4.BUILD-11-SNAPSHOT</version>
+	<version>1.1.5.BUILD-14-2018102300</version>
 	<packaging>jar</packaging>
 	<name>Cloud Foundry Java Client Library</name>
 	<description>A Cloud Foundry client library for Java</description>
