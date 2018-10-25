@@ -18,6 +18,7 @@ package org.cloudfoundry.uaa.tokens;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 import java.util.List;
@@ -45,6 +46,7 @@ abstract class _CheckTokenResponse {
      * The auth time
      */
     @JsonProperty("auth_time")
+    @Nullable
     abstract Long getAuthorizationTime();
 
     /**
@@ -69,6 +71,7 @@ abstract class _CheckTokenResponse {
      * The email
      */
     @JsonProperty("email")
+    @Nullable
     abstract String getEmail();
 
     /**
@@ -105,6 +108,7 @@ abstract class _CheckTokenResponse {
      * The origin
      */
     @JsonProperty("origin")
+    @Nullable
     abstract String getOrigin();
 
     /**
@@ -135,12 +139,14 @@ abstract class _CheckTokenResponse {
      * The user id
      */
     @JsonProperty("user_id")
+    @Nullable
     abstract String getUserId();
 
     /**
      * The user name
      */
     @JsonProperty("user_name")
+    @Nullable
     abstract String getUserName();
 
     /**
