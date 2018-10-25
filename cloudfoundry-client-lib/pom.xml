@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.cloudfoundry</groupId>
 	<artifactId>cloudfoundry-client-lib</artifactId>
-	<version>1.1.5.BUILD-14-2018102300</version>
+	<version>1.1.5.BUILD-15-2018102500</version>
 	<packaging>jar</packaging>
 	<name>Cloud Foundry Java Client Library</name>
 	<description>A Cloud Foundry client library for Java</description>
@@ -345,7 +345,7 @@
 			<plugin>
 				<groupId>com.github.igor-petruk.protobuf</groupId>
 				<artifactId>protobuf-maven-plugin</artifactId>
-				<version>0.6.3</version>
+				<version>0.6.1</version>
 				<executions>
 					<execution>
 						<goals>

@@ -20,34 +20,33 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.text.ParseException;
-
 import org.cloudfoundry.client.lib.archive.ApplicationArchive;
 import org.cloudfoundry.client.lib.domain.ApplicationLog;
 import org.cloudfoundry.client.lib.domain.ApplicationStats;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
 import org.cloudfoundry.client.lib.domain.CloudApplication.DebugMode;
-import org.cloudfoundry.client.lib.domain.CloudSecurityGroup;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
 import org.cloudfoundry.client.lib.domain.CloudEvent;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudOrganization;
 import org.cloudfoundry.client.lib.domain.CloudQuota;
 import org.cloudfoundry.client.lib.domain.CloudRoute;
+import org.cloudfoundry.client.lib.domain.CloudSecurityGroup;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.CloudServiceBroker;
 import org.cloudfoundry.client.lib.domain.CloudServiceInstance;
 import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.domain.CloudStack;
+import org.cloudfoundry.client.lib.domain.CloudUser;
 import org.cloudfoundry.client.lib.domain.CrashesInfo;
 import org.cloudfoundry.client.lib.domain.InstancesInfo;
-import org.cloudfoundry.client.lib.domain.Staging;
-import org.cloudfoundry.client.lib.domain.CloudUser;
 import org.cloudfoundry.client.lib.domain.LastOperation;
+import org.cloudfoundry.client.lib.domain.Staging;
 import org.cloudfoundry.client.lib.rest.CloudControllerClient;
 import org.cloudfoundry.client.lib.rest.CloudControllerClientFactory;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
@@ -602,9 +601,18 @@ public class CloudFoundryClient implements CloudFoundryOperations {
 		cc.deleteSpace(spaceName);
 	}
 
-	@Override
+        @Override
+	public LastOperation getLastOperationForService(String serviceName) throws ParseException
+        {
+            return cc.getLastOperationForService(serviceName);
+        }
+
+        @Override
+        @Deprecated
 	public LastOperation getLastOperationForAServiceInSpace(String spaceName, String serviceName) throws ParseException
-    { return cc.getLastOperationForAServiceInSpace(spaceName, serviceName); }
+        {
+            return cc.getLastOperationForAServiceInSpace(spaceName, serviceName);
+        }
 
 	@Override
 	public CloudSpace getSpace(String spaceName) {

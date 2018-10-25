@@ -24,7 +24,6 @@ import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
 import org.cloudfoundry.client.lib.ApplicationLogListener;
 import org.cloudfoundry.client.lib.ClientHttpResponseCallback;
 import org.cloudfoundry.client.lib.CloudCredentials;
@@ -36,24 +35,24 @@ import org.cloudfoundry.client.lib.archive.ApplicationArchive;
 import org.cloudfoundry.client.lib.domain.ApplicationLog;
 import org.cloudfoundry.client.lib.domain.ApplicationStats;
 import org.cloudfoundry.client.lib.domain.CloudApplication;
-import org.cloudfoundry.client.lib.domain.CloudSecurityGroup;
 import org.cloudfoundry.client.lib.domain.CloudDomain;
 import org.cloudfoundry.client.lib.domain.CloudEvent;
 import org.cloudfoundry.client.lib.domain.CloudInfo;
 import org.cloudfoundry.client.lib.domain.CloudOrganization;
 import org.cloudfoundry.client.lib.domain.CloudQuota;
 import org.cloudfoundry.client.lib.domain.CloudRoute;
+import org.cloudfoundry.client.lib.domain.CloudSecurityGroup;
 import org.cloudfoundry.client.lib.domain.CloudService;
 import org.cloudfoundry.client.lib.domain.CloudServiceBroker;
 import org.cloudfoundry.client.lib.domain.CloudServiceInstance;
 import org.cloudfoundry.client.lib.domain.CloudServiceOffering;
 import org.cloudfoundry.client.lib.domain.CloudSpace;
 import org.cloudfoundry.client.lib.domain.CloudStack;
+import org.cloudfoundry.client.lib.domain.CloudUser;
 import org.cloudfoundry.client.lib.domain.CrashesInfo;
 import org.cloudfoundry.client.lib.domain.InstancesInfo;
-import org.cloudfoundry.client.lib.domain.Staging;
-import org.cloudfoundry.client.lib.domain.CloudUser;
 import org.cloudfoundry.client.lib.domain.LastOperation;
+import org.cloudfoundry.client.lib.domain.Staging;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.web.client.ResponseErrorHandler;
 
@@ -218,6 +217,26 @@ public interface CloudControllerClient {
 
 	void deleteSpace(String spaceName);
 
+        /**
+         * Return the last operation entity on given service name.
+         *
+         * Deprecates getLastOperationForAServiceInSpace(String, String) as the required service will live in the same space.
+         *
+         * @param serviceName The service name required
+         * @return LastOperation entity.
+         * @throws ParseException
+         */
+        LastOperation getLastOperationForService(String serviceName) throws ParseException;
+
+        /**
+         *
+         * @param spaceName
+         * @param serviceName
+         * @return
+         * @throws ParseException
+         * @deprecated See CloudControllerClient.getLastOperationForService(String)
+         */
+        @Deprecated
 	LastOperation getLastOperationForAServiceInSpace(String spaceName, String serviceName) throws ParseException;
 
 	// Domains and routes management

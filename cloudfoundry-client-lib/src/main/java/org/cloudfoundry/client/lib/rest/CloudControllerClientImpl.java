@@ -16,6 +16,13 @@
 
 package org.cloudfoundry.client.lib.rest;
 
+import java.io.*;
+import java.net.*;
+import java.text.ParseException;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.zip.ZipFile;
+import javax.websocket.ClientEndpointConfig;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.cloudfoundry.client.lib.*;
@@ -40,14 +47,6 @@ import org.springframework.util.FileCopyUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.*;
-
-import javax.websocket.ClientEndpointConfig;
-import java.io.*;
-import java.net.*;
-import java.text.ParseException;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.zip.ZipFile;
 
 /**
  * Abstract implementation of the CloudControllerClient intended to serve as the base.
@@ -546,40 +545,53 @@ public class CloudControllerClientImpl implements CloudControllerClient {
 		return space;
 	}
 
+        @Override
+        public LastOperation getLastOperationForService(String serviceName) throws ParseException {
+            return getLastOperationForASerivceInSpaceGuid(sessionSpace.getMeta().getGuid().toString(), serviceName);
+        }
+
 	@Override
 	public LastOperation getLastOperationForAServiceInSpace(String spaceName, String serviceName) throws ParseException {
-		/*
-		Provides support for the following GET
-		GET /v2/spaces/4aac4aa9-fa1b-478f-b277-0ea1f8c8e127/service_instances?return_user_provided_service_instances=true&q=name%3Abd3bc418-5e54-48d9-8fda-e8def5fb010d-database&inline-relations-depth=1
-		 */
-		LastOperation result = new LastOperation();
-		Map<String, Object> urlVars = new HashMap<String, Object>();
-		String urlPath = "/v2/spaces/{spaceGuid}/service_instances?return_user_provided_service_instances=true&q=name:{serviceName}&inline-relations-depth=1";
-		CloudSpace space = getSpace(spaceName);
-		urlVars.put("spaceGuid", space.getMeta().getGuid().toString());
-		urlVars.put("serviceName", serviceName);
-		// there will be a single resource because of inline relations depth
-		List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
-		//response["resources"][0]["entity"]["last_operation"]
-		if (resourceList.size() > 0) {
-			Map<String, Object> resource = resourceList.get(0);
-			Map<String, Object> entity = (Map<String, Object>) resource.get("entity");
-			Object lastOperation = entity.get("last_operation");
-
-			if (lastOperation != null){
-				Map<String, String>  lastOperationMap = (Map<String, String>) lastOperation;
-				result.setCreatedAt(lastOperationMap.get("created_at"));
-				result.setDescription(lastOperationMap.get("description"));
-				result.setState(lastOperationMap.get("state"));
-				result.setType(lastOperationMap.get("type"));
-				result.setUpdatedAt(lastOperationMap.get("updated_at"));
-				return result;
-			}else {
-				return null;
-			}
-		}
-		return null;
+            CloudSpace space = getSpace(spaceName);
+            return getLastOperationForASerivceInSpaceGuid(space.getMeta().getGuid().toString(), serviceName);
 	}
+
+        /**
+         *  Provides support for the following GET
+         *   GET /v2/spaces/4aac4aa9-fa1b-478f-b277-0ea1f8c8e127/service_instances?return_user_provided_service_instances=true&q=name%3Abd3bc418-5e54-48d9-8fda-e8def5fb010d-database&inline-relations-depth=1
+         * @param spaceGuid
+         * @param serviceName
+         * @return
+         * @throws ParseException
+         */
+        private LastOperation getLastOperationForASerivceInSpaceGuid(String spaceGuid, String serviceName) throws ParseException {
+            LastOperation result = new LastOperation();
+            Map<String, Object> urlVars = new HashMap<String, Object>();
+            String urlPath = "/v2/spaces/{spaceGuid}/service_instances?return_user_provided_service_instances=true&q=name:{serviceName}&inline-relations-depth=1";
+            urlVars.put("spaceGuid", spaceGuid);
+            urlVars.put("serviceName", serviceName);
+            // there will be a single resource because of inline relations depth
+            List<Map<String, Object>> resourceList = getAllResources(urlPath, urlVars);
+            //response["resources"][0]["entity"]["last_operation"]
+            if (resourceList.size() > 0) {
+                Map<String, Object> resource = resourceList.get(0);
+                Map<String, Object> entity = (Map<String, Object>) resource.get("entity");
+                Object lastOperation = entity.get("last_operation");
+
+                if (lastOperation != null) {
+                    Map<String, String> lastOperationMap = (Map<String, String>) lastOperation;
+                    result.setCreatedAt(lastOperationMap.get("created_at"));
+                    result.setDescription(lastOperationMap.get("description"));
+                    result.setState(lastOperationMap.get("state"));
+                    result.setType(lastOperationMap.get("type"));
+                    result.setUpdatedAt(lastOperationMap.get("updated_at"));
+                    return result;
+                } else {
+                    return null;
+                }
+            }
+            return null;
+        }
 
 	@Override
 	public void deleteSpace(String spaceName) {
