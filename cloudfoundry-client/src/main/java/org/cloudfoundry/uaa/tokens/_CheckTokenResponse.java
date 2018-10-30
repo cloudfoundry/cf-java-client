@@ -40,6 +40,7 @@ abstract class _CheckTokenResponse {
      * The authorities
      */
     @JsonProperty("authorities")
+    @Nullable
     abstract List<String> getAuthorities();
 
     /**
