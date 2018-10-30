@@ -361,7 +361,10 @@ public final class ApplicationManifestUtils {
 
         putIfPresent(yaml, "buildpack", applicationManifest.getBuildpack());
         putIfPresent(yaml, "command", applicationManifest.getCommand());
-        putIfPresent(yaml, "disk_quota", applicationManifest.getDisk().toString() + "M");
+        Integer disk = applicationManifest.getDisk();
+        if (null != disk) {
+            putIfPresent(yaml, "disk_quota", applicationManifest.getDisk().toString() + "M");
+        }
         putIfPresent(yaml, "docker", applicationManifest.getDocker());
         putIfPresent(yaml, "domains", applicationManifest.getDomains());
         putIfPresent(yaml, "env", applicationManifest.getEnvironmentVariables());
@@ -369,7 +372,10 @@ public final class ApplicationManifestUtils {
         putIfPresent(yaml, "health-check-type", applicationManifest.getHealthCheckType(), protectApplicationHealthCheck());
         putIfPresent(yaml, "hosts", applicationManifest.getHosts());
         putIfPresent(yaml, "instances", applicationManifest.getInstances());
-        putIfPresent(yaml, "memory", applicationManifest.getMemory().toString() + "M");
+        Integer memory = applicationManifest.getMemory();
+        if (null != memory) {
+            putIfPresent(yaml, "memory", memory + "M");
+        }
         putIfPresent(yaml, "name", applicationManifest.getName());
         putIfPresent(yaml, "no-hostname", applicationManifest.getNoHostname());
         putIfPresent(yaml, "no-route", applicationManifest.getNoRoute());
