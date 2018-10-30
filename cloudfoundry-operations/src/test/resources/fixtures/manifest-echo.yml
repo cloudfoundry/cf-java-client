@@ -23,7 +23,6 @@ applications:
   timeout: -1
 - buildpack: alpha-buildpack
   command: alpha-command
-  disk_quota: 1024M
   domains:
   - alpha-domain
   - alpha-domains-1
@@ -38,7 +37,6 @@ applications:
   - alpha-hosts-1
   - alpha-hosts-2
   instances: -1
-  memory: 1024M
   name: alpha-application-2
   no-hostname: true
   no-route: true
