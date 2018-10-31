@@ -202,7 +202,7 @@ public final class DefaultServices implements Services {
         return Mono
             .when(this.cloudFoundryClient, this.spaceId)
             .then(function((cloudFoundryClient, spaceId) -> requestCreateUserProvidedServiceInstance(cloudFoundryClient, request.getName(), request.getCredentials(), request.getRouteServiceUrl(),
-                spaceId, request.getSyslogDrainUrl())))
+                spaceId, request.getSyslogDrainUrl(), request.getTags())))
             .then()
             .transform(OperationsLogging.log("Create User Provided Service Instance"))
             .checkpoint();
@@ -719,7 +719,7 @@ public final class DefaultServices implements Services {
     }
 
     private static Mono<CreateUserProvidedServiceInstanceResponse> requestCreateUserProvidedServiceInstance(CloudFoundryClient cloudFoundryClient, String name, Map<String, Object> credentials,
-                                                                                                            String routeServiceUrl, String spaceId, String syslogDrainUrl) {
+                                                                                                            String routeServiceUrl, String spaceId, String syslogDrainUrl, List<String> tags) {
         return cloudFoundryClient.userProvidedServiceInstances()
             .create(org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceRequest.builder()
                 .name(name)
@@ -727,6 +727,7 @@ public final class DefaultServices implements Services {
                 .routeServiceUrl(routeServiceUrl)
                 .spaceId(spaceId)
                 .syslogDrainUrl(syslogDrainUrl)
+                .tags(tags)
                 .build());
     }
 
@@ -1060,6 +1061,7 @@ public final class DefaultServices implements Services {
             .update(org.cloudfoundry.client.v2.userprovidedserviceinstances.UpdateUserProvidedServiceInstanceRequest.builder()
                 .credentials(request.getCredentials())
                 .syslogDrainUrl(request.getSyslogDrainUrl())
+                .tags(request.getTags())
                 .userProvidedServiceInstanceId(userProvidedServiceInstanceId)
                 .build());
     }

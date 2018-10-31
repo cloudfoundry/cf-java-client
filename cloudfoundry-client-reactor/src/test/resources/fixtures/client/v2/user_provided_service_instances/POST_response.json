@@ -16,6 +16,7 @@
     "route_service_url": "https://logger.example.com",
     "space_url": "/v2/spaces/0d45d43f-7d50-43c6-9981-b32ce8d5a373",
     "service_bindings_url": "/v2/user_provided_service_instances/34d5500e-712d-49ef-8bbe-c9ac349532da/service_bindings",
-    "routes_url": "/v2/user_provided_service_instances/34d5500e-712d-49ef-8bbe-c9ac349532da/routes"
+    "routes_url": "/v2/user_provided_service_instances/34d5500e-712d-49ef-8bbe-c9ac349532da/routes",
+    "tags":["tag1","tag2"]
   }
 }

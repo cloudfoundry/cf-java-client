@@ -11,6 +11,7 @@
       "somekey": "somenewvalue"
     },
     "space_guid": "438b5923-fe7a-4459-bbcd-a7c27332bad3",
+    "tags": ["tag1"],
     "type": "user_provided_service_instance",
     "syslog_drain_url": "https://foo.com/url-91",
     "route_service_url": null,

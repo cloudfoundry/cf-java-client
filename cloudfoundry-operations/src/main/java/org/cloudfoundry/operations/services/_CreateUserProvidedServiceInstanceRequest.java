@@ -20,6 +20,7 @@ import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -51,5 +52,11 @@ abstract class _CreateUserProvidedServiceInstanceRequest {
      */
     @Nullable
     abstract String getSyslogDrainUrl();
+
+    /**
+     * The tags of the user provided service instance
+     */
+    @Nullable
+    abstract List<String> getTags();
 
 }
