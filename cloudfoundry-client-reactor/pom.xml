@@ -155,7 +155,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
-                    <additionalparam>-Xdoclint:-missing</additionalparam>
+                    <doclint>-missing</doclint>
                     <excludePackageNames>org.cloudfoundry.reactor.client.*,org.cloudfoundry.reactor.doppler.*,org.cloudfoundry.reactor.uaa.*,org.cloudfoundry.reactor.util</excludePackageNames>
                 </configuration>
             </plugin>
