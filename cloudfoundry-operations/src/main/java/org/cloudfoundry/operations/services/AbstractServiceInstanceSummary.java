@@ -59,6 +59,12 @@ public abstract class AbstractServiceInstanceSummary {
     abstract String getService();
 
     /**
+     * The tags
+     */
+    @Nullable
+    abstract List<String> getTags();
+
+    /**
      * The type of the service instance
      */
     abstract ServiceInstanceType getType();

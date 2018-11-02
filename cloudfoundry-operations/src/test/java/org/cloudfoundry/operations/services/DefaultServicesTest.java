@@ -346,7 +346,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     @Test
     public void createUserProvidedServiceInstance() {
         requestCreateUserProvidedServiceInstance(this.cloudFoundryClient, TEST_SPACE_ID, "test-user-provided-service-instance",
-            Collections.singletonMap("test-credential-key", "test-credential-value"), "test-route-url", "test-syslog-url", "test-user-provided-service-instance-id");
+            Collections.singletonMap("test-credential-key", "test-credential-value"), "test-route-url", "test-syslog-url", "test-tag", "test-user-provided-service-instance-id");
 
         this.services
             .createUserProvidedInstance(CreateUserProvidedServiceInstanceRequest.builder()
@@ -354,6 +354,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
                 .name("test-user-provided-service-instance")
                 .routeServiceUrl("test-route-url")
                 .syslogDrainUrl("test-syslog-url")
+                .tags("test-tag")
                 .build())
             .as(StepVerifier::create)
             .expectComplete()
@@ -1025,13 +1026,14 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     @Test
     public void updateUserProvidedService() {
         requestListSpaceServiceInstancesUserProvided(this.cloudFoundryClient, "test-service", TEST_SPACE_ID);
-        requestUpdateUserProvidedServiceInstance(this.cloudFoundryClient, Collections.singletonMap("test-credential-key", "test-credential-value"), "syslog-url",
-            "test-service-instance-id");
+        requestUpdateUserProvidedServiceInstance(this.cloudFoundryClient, Collections.singletonMap("test-credential-key", "test-credential-value"),
+            "syslog-url", Collections.singletonList("tag1"),"test-service-instance-id");
 
         this.services
             .updateUserProvidedInstance(UpdateUserProvidedServiceInstanceRequest.builder()
                 .credential("test-credential-key", "test-credential-value")
                 .syslogDrainUrl("syslog-url")
+                .tags("tag1")
                 .userProvidedServiceInstanceName("test-service")
                 .build())
             .as(StepVerifier::create)
@@ -1180,7 +1182,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     private static void requestCreateUserProvidedServiceInstance(CloudFoundryClient cloudFoundryClient, String spaceId, String name, Map<String, Object> credentials, String routeServiceUrl,
-                                                                 String syslogDrainUrl, String userProvidedServiceInstanceId) {
+                                                                 String syslogDrainUrl, String tag, String userProvidedServiceInstanceId) {
         when(cloudFoundryClient.userProvidedServiceInstances()
             .create(org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceRequest.builder()
                 .credentials(credentials)
@@ -1188,6 +1190,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
                 .routeServiceUrl(routeServiceUrl)
                 .spaceId(spaceId)
                 .syslogDrainUrl(syslogDrainUrl)
+                .tag(tag)
                 .build()))
             .thenReturn(Mono
                 .just(fill(CreateUserProvidedServiceInstanceResponse.builder())
@@ -1956,11 +1959,12 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
                     .build()));
     }
 
-    private static void requestUpdateUserProvidedServiceInstance(CloudFoundryClient cloudFoundryClient, Map<String, Object> credentials, String syslogDrainUrl, String userProvidedServiceInstanceId) {
+    private static void requestUpdateUserProvidedServiceInstance(CloudFoundryClient cloudFoundryClient, Map<String, Object> credentials, String syslogDrainUrl, List<String> tags, String userProvidedServiceInstanceId) {
         when(cloudFoundryClient.userProvidedServiceInstances()
             .update(org.cloudfoundry.client.v2.userprovidedserviceinstances.UpdateUserProvidedServiceInstanceRequest.builder()
                 .credentials(credentials)
                 .syslogDrainUrl(syslogDrainUrl)
+                .tags(tags)
                 .userProvidedServiceInstanceId(userProvidedServiceInstanceId)
                 .build()))
             .thenReturn(Mono

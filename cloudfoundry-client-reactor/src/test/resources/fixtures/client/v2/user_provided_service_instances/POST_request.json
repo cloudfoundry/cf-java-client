@@ -5,5 +5,6 @@
   "name": "my-user-provided-instance",
   "space_guid": "0d45d43f-7d50-43c6-9981-b32ce8d5a373",
   "syslog_drain_url": "syslog://example.com",
-  "route_service_url": "https://logger.example.com"
+  "route_service_url": "https://logger.example.com",
+  "tags": ["tag1", "tag2"]
 }
