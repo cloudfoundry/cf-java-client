@@ -56,7 +56,6 @@ import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.LastOperationUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
@@ -582,44 +581,6 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
                         .build()))
                     .map(resource -> ResourceUtils.getEntity(resource).getServiceInstanceId())
                     .single()))
-            .as(StepVerifier::create)
-            .consumeNextWith(tupleEquality())
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
-    }
-
-    //TODO: Await https://github.com/cloudfoundry/cloud_controller_ng/issues/900
-    @Ignore("Await https://github.com/cloudfoundry/cloud_controller_ng/issues/900")
-    @Test
-    public void listRoutesFilterByOrganizationId() {
-        String domainName = this.nameFactory.getDomainName();
-        String hostName = this.nameFactory.getHostName();
-        String serviceInstanceName = this.nameFactory.getServiceInstanceName();
-
-        Mono.zip(this.organizationId, this.spaceId)
-            .flatMap(function((organizationId, spaceId) -> Mono.zip(
-                createPrivateDomainId(this.cloudFoundryClient, domainName, organizationId),
-                Mono.just(organizationId),
-                createServiceInstanceId(this.cloudFoundryClient, this.serviceBrokerId, serviceInstanceName, this.serviceName, spaceId),
-                Mono.just(spaceId)
-            )))
-            .flatMap(function((domainId, organizationId, serviceInstanceId, spaceId) -> Mono.zip(
-                createRouteId(this.cloudFoundryClient, domainId, hostName, null, spaceId),
-                Mono.just(organizationId),
-                Mono.just(serviceInstanceId))
-            ))
-            .flatMap(function((routeId, organizationId, serviceInstanceId) -> requestBindServiceInstanceRoute(this.cloudFoundryClient, routeId, serviceInstanceId)
-                .thenReturn(Tuples.of(organizationId, serviceInstanceId))))
-            .flatMapMany(function((organizationId, serviceInstanceId) -> Mono.zip(
-                Mono.just(serviceInstanceId),
-                PaginationUtils.requestClientV2Resources(page -> this.cloudFoundryClient.serviceInstances()
-                    .listRoutes(ListServiceInstanceRoutesRequest.builder()
-                        .organizationId(organizationId)
-                        .page(page)
-                        .serviceInstanceId(serviceInstanceId)
-                        .build()))
-                    .map(resource -> ResourceUtils.getEntity(resource).getServiceInstanceId())
-                    .single())))
             .as(StepVerifier::create)
             .consumeNextWith(tupleEquality())
             .expectComplete()

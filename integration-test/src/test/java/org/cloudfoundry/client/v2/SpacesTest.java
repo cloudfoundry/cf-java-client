@@ -1101,29 +1101,6 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-
-    // TODO: Await https://github.com/cloudfoundry/cloud_controller_ng/issues/855 to decide whether this parameter should exist
-    @Ignore("Await https://github.com/cloudfoundry/cloud_controller_ng/issues/855 to decide whether this parameter should exist")
-    @Test
-    public void listServiceInstancesFilterByOrganizationId() {
-        String serviceInstanceName = this.nameFactory.getServiceInstanceName();
-        String spaceName = this.nameFactory.getSpaceName();
-
-        this.organizationId
-            .flatMap(organizationId -> Mono.zip(
-                Mono.just(organizationId),
-                this.serviceBrokerId,
-                createSpaceId(this.cloudFoundryClient, organizationId, spaceName)
-            ))
-            .delayUntil(function((organizationId, serviceBrokerId, spaceId) -> createServiceInstanceId(this.cloudFoundryClient, serviceBrokerId, serviceInstanceName, this.serviceName, spaceId)))
-            .flatMapMany(function((organizationId, ignore, spaceId) -> requestListServiceInstances(this.cloudFoundryClient, spaceId, builder -> builder.organizationId(organizationId))))
-            .filter(resource -> serviceInstanceName.equals(ResourceUtils.getEntity(resource).getName()))
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
-    }
-
     @Test
     public void listServiceInstancesFilterByServiceBindingId() {
         String applicationName = this.nameFactory.getApplicationName();
