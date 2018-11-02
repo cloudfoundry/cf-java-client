@@ -24,6 +24,7 @@ import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -61,6 +62,13 @@ abstract class _UpdateUserProvidedServiceInstanceRequest {
     @JsonProperty("syslog_drain_url")
     @Nullable
     abstract String getSyslogDrainUrl();
+
+    /**
+     * The tags
+     */
+    @JsonProperty
+    @Nullable
+    abstract List<String> getTags();
 
     /**
      * The user provided service instance id

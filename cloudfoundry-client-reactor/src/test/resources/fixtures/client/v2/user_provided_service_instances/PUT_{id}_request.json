@@ -1,5 +1,6 @@
 {
   "credentials": {
     "somekey": "somenewvalue"
-  }
+  },
+  "tags": ["tag1"]
 }

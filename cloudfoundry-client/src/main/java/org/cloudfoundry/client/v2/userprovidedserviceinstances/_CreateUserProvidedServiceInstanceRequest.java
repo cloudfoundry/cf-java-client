@@ -23,6 +23,7 @@ import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -65,5 +66,12 @@ abstract class _CreateUserProvidedServiceInstanceRequest {
     @JsonProperty("syslog_drain_url")
     @Nullable
     abstract String getSyslogDrainUrl();
+
+    /**
+     * The tags
+     */
+    @JsonProperty("tags")
+    @Nullable
+    abstract List<String> getTags();
 
 }
