@@ -107,7 +107,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import reactor.util.function.Tuple2;
-import reactor.util.function.Tuples;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -1104,31 +1103,6 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .then(function((serviceBrokerId, spaceId) -> createServiceInstanceId(this.cloudFoundryClient, serviceBrokerId, serviceInstanceName, this.serviceName, spaceId)
                 .then(Mono.just(spaceId))))
             .flatMapMany(spaceId -> requestListServiceInstances(this.cloudFoundryClient, spaceId, builder -> builder.name(serviceInstanceName)))
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
-    }
-
-
-    // TODO: Await https://github.com/cloudfoundry/cloud_controller_ng/issues/855 to decide whether this parameter should exist
-    @Ignore("Await https://github.com/cloudfoundry/cloud_controller_ng/issues/855 to decide whether this parameter should exist")
-    @Test
-    public void listServiceInstancesFilterByOrganizationId() {
-        String serviceInstanceName = this.nameFactory.getServiceInstanceName();
-        String spaceName = this.nameFactory.getSpaceName();
-
-        this.organizationId
-            .then(organizationId -> Mono
-                .when(
-                    Mono.just(organizationId),
-                    this.serviceBrokerId,
-                    createSpaceId(this.cloudFoundryClient, organizationId, spaceName)
-                ))
-            .then(function((organizationId, serviceBrokerId, spaceId) -> createServiceInstanceId(this.cloudFoundryClient, serviceBrokerId, serviceInstanceName, this.serviceName, spaceId)
-                .then(Mono.just(Tuples.of(organizationId, spaceId)))))
-            .flatMapMany(function((organizationId, spaceId) -> requestListServiceInstances(this.cloudFoundryClient, spaceId, builder -> builder.organizationId(organizationId))))
-            .filter(resource -> serviceInstanceName.equals(ResourceUtils.getEntity(resource).getName()))
             .as(StepVerifier::create)
             .expectNextCount(1)
             .expectComplete()
