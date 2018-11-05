@@ -53,18 +53,11 @@ abstract class _UserOrganizationEntity {
     abstract String getName();
 
     /**
-     * The quota definition id
-     */
-    @JsonProperty("quota_definition_guid")
-    @Nullable
-    abstract String getQuotaDefinitionId();
-
-    /**
      * The spaces
      */
     @JsonProperty("quota_definition")
     @Nullable
-    abstract List<OrganizationQuotaDefinitionResource> getQuotaDefinitions();
+    abstract OrganizationQuotaDefinitionResource getQuotaDefinition();
 
     /**
      * The spaces
