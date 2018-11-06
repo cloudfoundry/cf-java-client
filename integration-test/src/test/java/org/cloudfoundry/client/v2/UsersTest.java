@@ -1537,16 +1537,19 @@ public final class UsersTest extends AbstractIntegrationTest {
 
     @Test
     public void summary() {
+        String organizationName = this.nameFactory.getOrganizationName();
         String userId = this.nameFactory.getUserId();
 
-        requestCreateUser(this.cloudFoundryClient, userId)
+        createOrganizationId(this.cloudFoundryClient, organizationName)
+            .flatMap(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
+                .then(requestAssociateOrganization(this.cloudFoundryClient, organizationId, userId)))
             .then(this.cloudFoundryClient.users()
                 .summary(SummaryUserRequest.builder()
                     .userId(userId)
                     .build()))
-            .map(response -> response.getEntity().getOrganizations().size())
+            .map(response -> ResourceUtils.getEntity(response).getOrganizations())
             .as(StepVerifier::create)
-            .expectNext(0)
+            .expectNextCount(1)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
