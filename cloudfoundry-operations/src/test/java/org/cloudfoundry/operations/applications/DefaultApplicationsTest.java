@@ -1539,20 +1539,20 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
-        requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
+        requestApplicationsEmpty(this.cloudFoundryClient, "test.name", TEST_SPACE_ID);
         requestCreateApplication(this.cloudFoundryClient, ApplicationManifest.builder()
             .path(testApplication)
             .environmentVariable("test-key", "test-value")
             .domain("test-shared-domain")
-            .name("test-name")
+            .name("test.name")
             .build(), TEST_SPACE_ID, null, "test-application-id");
         requestListMatchingResources(this.cloudFoundryClient, Arrays.asList(new ResourceMatchingUtils.ArtifactMetadata("da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "100644", 0),
             new ResourceMatchingUtils.ArtifactMetadata("45044a6ddbfe11415a8f8a6219de68a2c66b496b", "index.html", "100644", 178)));
         requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
         requestSharedDomains(this.cloudFoundryClient, "test-shared-domain", "test-shared-domain-id");
         requestApplicationRoutes(this.cloudFoundryClient, "test-application-id", "test-route-id");
-        requestRoutesEmpty(this.cloudFoundryClient, "test-shared-domain-id", "test-name", null, null);
-        requestCreateRoute(this.cloudFoundryClient, "test-shared-domain-id", "test-name", null, null, TEST_SPACE_ID, "test-route-id");
+        requestRoutesEmpty(this.cloudFoundryClient, "test-shared-domain-id", "testname", null, null);
+        requestCreateRoute(this.cloudFoundryClient, "test-shared-domain-id", "testname", null, null, TEST_SPACE_ID, "test-route-id");
         requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
         requestUpload(this.cloudFoundryClient, "test-application-id", testApplication, "test-job-id");
         requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
@@ -1567,7 +1567,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                     .path(testApplication)
                     .domain("test-shared-domain")
                     .environmentVariable("test-key", "test-value")
-                    .name("test-name")
+                    .name("test.name")
                     .build())
                 .build()))
             .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
@@ -1924,11 +1924,11 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     public void pushRandomRoute() throws IOException {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
-        requestApplicationsEmpty(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
+        requestApplicationsEmpty(this.cloudFoundryClient, "test-application.name", TEST_SPACE_ID);
         requestCreateApplication(this.cloudFoundryClient, ApplicationManifest.builder()
             .path(testApplication)
             .domain("test-shared-domain")
-            .name("test-application-name")
+            .name("test-application.name")
             .randomRoute(true)
             .build(), TEST_SPACE_ID, null, "test-application-id");
         requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
@@ -1936,11 +1936,11 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestSharedDomains(this.cloudFoundryClient, "test-shared-domain", "test-shared-domain-id");
         provideRandomWords(this.randomWords);
         requestApplicationRoutes(this.cloudFoundryClient, "test-application-id", "test-route-id");
-        requestRoutesEmpty(this.cloudFoundryClient, "test-shared-domain-id", "test-application-name-test-adjective-test-noun", null, null);
+        requestRoutesEmpty(this.cloudFoundryClient, "test-shared-domain-id", "test-applicationname-test-adjective-test-noun", null, null);
         requestListMatchingResources(this.cloudFoundryClient, Arrays.asList(
             new ResourceMatchingUtils.ArtifactMetadata("da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "100644", 0),
             new ResourceMatchingUtils.ArtifactMetadata("45044a6ddbfe11415a8f8a6219de68a2c66b496b", "index.html", "100644", 178)));
-        requestCreateRoute(this.cloudFoundryClient, "test-shared-domain-id", "test-application-name-test-adjective-test-noun", null, null, TEST_SPACE_ID, "test-route-id");
+        requestCreateRoute(this.cloudFoundryClient, "test-shared-domain-id", "test-applicationname-test-adjective-test-noun", null, null, TEST_SPACE_ID, "test-route-id");
         requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
         requestUpload(this.cloudFoundryClient, "test-application-id", testApplication, "test-job-id");
         requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
@@ -1953,7 +1953,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
             .push(PushApplicationRequest.builder()
                 .path(testApplication)
                 .domain("test-shared-domain")
-                .name("test-application-name")
+                .name("test-application.name")
                 .randomRoute(true)
                 .build()))
             .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))

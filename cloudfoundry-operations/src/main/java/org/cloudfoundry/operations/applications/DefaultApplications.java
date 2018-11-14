@@ -645,6 +645,10 @@ public final class DefaultApplications implements Applications {
             .then();
     }
 
+    private static String cleanName(ApplicationManifest manifest) {
+        return manifest.getName().replaceAll("\\.", "");
+    }
+
     private static BiFunction<String, String, String> collectStates() {
         return (totalState, instanceState) -> {
             if ("RUNNING".equals(instanceState) || "RUNNING".equals(totalState)) {
@@ -701,9 +705,9 @@ public final class DefaultApplications implements Applications {
         } else if (host != null) {
             return host;
         } else if (Optional.ofNullable(manifest.getRandomRoute()).orElse(false)) {
-            return String.join("-", manifest.getName(), randomWords.getAdjective(), randomWords.getNoun());
+            return String.join("-", cleanName(manifest), randomWords.getAdjective(), randomWords.getNoun());
         } else {
-            return manifest.getName();
+            return cleanName(manifest);
         }
     }
 
@@ -942,9 +946,9 @@ public final class DefaultApplications implements Applications {
         if (Optional.ofNullable(manifest.getNoHostname()).orElse(false)) {
             hosts = Collections.singletonList("");
         } else if (Optional.ofNullable(manifest.getRandomRoute()).orElse(false) && manifest.getHosts() == null) {
-            hosts = Collections.singletonList(String.join("-", manifest.getName(), randomWords.getAdjective(), randomWords.getNoun()));
+            hosts = Collections.singletonList(String.join("-", cleanName(manifest), randomWords.getAdjective(), randomWords.getNoun()));
         } else if (manifest.getHosts() == null || manifest.getHosts().isEmpty()) {
-            hosts = Collections.singletonList(manifest.getName());
+            hosts = Collections.singletonList(cleanName(manifest));
         } else {
             hosts = manifest.getHosts();
         }
