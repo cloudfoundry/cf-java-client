@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.tokenprovider;
 
+import org.cloudfoundry.Nullable;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.immutables.value.Value;
 import reactor.core.publisher.Mono;
@@ -36,6 +37,12 @@ abstract class _PasswordGrantTokenProvider extends AbstractUaaTokenProvider {
      * The username
      */
     abstract String getUsername();
+    
+    /**
+     * The login hint
+     */
+    @Nullable
+    abstract String getLoginHint();
 
     @Override
     Mono<Void> tokenRequestTransformer(Mono<HttpClientRequest> outbound) {
@@ -47,8 +54,8 @@ abstract class _PasswordGrantTokenProvider extends AbstractUaaTokenProvider {
                     .attr("client_secret", getClientSecret())
                     .attr("grant_type", "password")
                     .attr("password", getPassword())
-                    .attr("username", getUsername()))
-                .then());
-    }
+                    .attr("username", getUsername())
+                	.attr("login_hint", getLoginHint()))
+                .then());}
 
 }
