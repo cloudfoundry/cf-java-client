@@ -36,6 +36,11 @@ abstract class _PasswordGrantTokenProvider extends AbstractUaaTokenProvider {
      * The username
      */
     abstract String getUsername();
+    
+    /**
+     * The login_hint
+     */
+    abstract String getLoginHint();
 
     @Override
     Mono<Void> tokenRequestTransformer(Mono<HttpClientRequest> outbound) {
@@ -47,8 +52,8 @@ abstract class _PasswordGrantTokenProvider extends AbstractUaaTokenProvider {
                     .attr("client_secret", getClientSecret())
                     .attr("grant_type", "password")
                     .attr("password", getPassword())
-                    .attr("username", getUsername()))
-                .then());
-    }
+                    .attr("username", getUsername())
+                	.attr("login_hint", getLoginHint()))
+                .then());}
 
 }
