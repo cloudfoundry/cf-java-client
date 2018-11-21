@@ -38,7 +38,7 @@ abstract class _PasswordGrantTokenProvider extends AbstractUaaTokenProvider {
     abstract String getUsername();
     
     /**
-     * The login_hint
+     * The login hint
      */
     abstract String getLoginHint();
 
