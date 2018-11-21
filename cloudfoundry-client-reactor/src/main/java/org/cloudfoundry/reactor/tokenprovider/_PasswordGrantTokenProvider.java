@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.tokenprovider;
 
+import org.cloudfoundry.Nullable;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.immutables.value.Value;
 import reactor.core.publisher.Mono;
@@ -40,6 +41,7 @@ abstract class _PasswordGrantTokenProvider extends AbstractUaaTokenProvider {
     /**
      * The login hint
      */
+    @Nullable
     abstract String getLoginHint();
 
     @Override
