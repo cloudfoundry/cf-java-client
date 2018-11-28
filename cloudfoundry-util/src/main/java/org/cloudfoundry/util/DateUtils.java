@@ -27,7 +27,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
  */
 public final class DateUtils {
 
-    private static final SimpleDateFormat ISO8601 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX");
+    private static final SimpleDateFormat ISO8601 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
 
     private static final Object MONITOR = new Object();
 
