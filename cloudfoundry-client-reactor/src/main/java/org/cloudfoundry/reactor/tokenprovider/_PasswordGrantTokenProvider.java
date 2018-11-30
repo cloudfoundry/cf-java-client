@@ -29,6 +29,12 @@ import reactor.ipc.netty.http.client.HttpClientRequest;
 abstract class _PasswordGrantTokenProvider extends AbstractUaaTokenProvider {
 
     /**
+     * The login hint
+     */
+    @Nullable
+    abstract String getLoginHint();
+
+    /**
      * The password
      */
     abstract String getPassword();
@@ -37,12 +43,6 @@ abstract class _PasswordGrantTokenProvider extends AbstractUaaTokenProvider {
      * The username
      */
     abstract String getUsername();
-    
-    /**
-     * The login hint
-     */
-    @Nullable
-    abstract String getLoginHint();
 
     @Override
     Mono<Void> tokenRequestTransformer(Mono<HttpClientRequest> outbound) {
@@ -55,7 +55,8 @@ abstract class _PasswordGrantTokenProvider extends AbstractUaaTokenProvider {
                     .attr("grant_type", "password")
                     .attr("password", getPassword())
                     .attr("username", getUsername())
-                	.attr("login_hint", getLoginHint()))
-                .then());}
+                    .attr("login_hint", getLoginHint()))
+                .then());
+    }
 
 }
