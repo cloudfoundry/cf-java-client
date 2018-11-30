@@ -16,6 +16,8 @@
 
 package org.cloudfoundry.uaa.authorizations;
 
+import org.cloudfoundry.Nullable;
+import org.cloudfoundry.QueryParameter;
 import org.immutables.value.Value;
 
 /**
@@ -23,5 +25,12 @@ import org.immutables.value.Value;
  */
 @Value.Immutable
 abstract class _AuthorizeByOpenIdWithAuthorizationCodeGrantRequest extends AbstractAuthorizationRequest {
+
+    /**
+     * The login hint
+     */
+    @Nullable
+    @QueryParameter("login_hint")
+    abstract String getLoginHint();
 
 }
