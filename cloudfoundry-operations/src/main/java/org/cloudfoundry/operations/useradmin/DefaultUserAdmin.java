@@ -369,18 +369,21 @@ public final class DefaultUserAdmin implements UserAdmin {
 
     private static Mono<List<String>> listSpaceAuditorNames(CloudFoundryClient cloudFoundryClient, String spaceId) {
         return requestListSpaceAuditors(cloudFoundryClient, spaceId)
+            .filter(resource -> null != ResourceUtils.getEntity(resource).getUsername())
             .map(resource -> ResourceUtils.getEntity(resource).getUsername())
             .collectList();
     }
 
     private static Mono<List<String>> listSpaceDeveloperNames(CloudFoundryClient cloudFoundryClient, String spaceId) {
         return requestListSpaceDevelopers(cloudFoundryClient, spaceId)
+            .filter(resource -> null != ResourceUtils.getEntity(resource).getUsername())
             .map(resource -> ResourceUtils.getEntity(resource).getUsername())
             .collectList();
     }
 
     private static Mono<List<String>> listSpaceManagerNames(CloudFoundryClient cloudFoundryClient, String spaceId) {
         return requestListSpaceManagers(cloudFoundryClient, spaceId)
+            .filter(resource -> null != ResourceUtils.getEntity(resource).getUsername())
             .map(resource -> ResourceUtils.getEntity(resource).getUsername())
             .collectList();
     }
