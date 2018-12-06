@@ -213,6 +213,19 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
     }
 
     @Test
+    public void listOrganizationUsersOrganizationNotFound() {
+        requestOrganizationEmpty(this.cloudFoundryClient);
+
+        this.userAdmin
+            .listOrganizationUsers(ListOrganizationUsersRequest.builder()
+                .organizationName("unknown-organization-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectErrorMessage("Organization unknown-organization-name not found")
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
     public void listSpaceUsersAllFound() {
         requestOrganization(this.cloudFoundryClient);
         requestSpace(this.cloudFoundryClient);
@@ -256,15 +269,22 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void listOrganizationUsersOrganizationNotFound() {
-        requestOrganizationEmpty(this.cloudFoundryClient);
+    public void listSpaceUsersNullsFound() {
+        requestOrganization(this.cloudFoundryClient);
+        requestSpace(this.cloudFoundryClient);
+        requestListSpaceAuditorsNulls(this.cloudFoundryClient);
+        requestListSpaceDevelopersNulls(this.cloudFoundryClient);
+        requestListSpaceManagersNulls(this.cloudFoundryClient);
 
         this.userAdmin
-            .listOrganizationUsers(ListOrganizationUsersRequest.builder()
-                .organizationName("unknown-organization-name")
+            .listSpaceUsers(ListSpaceUsersRequest.builder()
+                .organizationName("test-organization-name")
+                .spaceName("test-space-name")
                 .build())
             .as(StepVerifier::create)
-            .expectErrorMessage("Organization unknown-organization-name not found")
+            .expectNext(SpaceUsers.builder()
+                .build())
+            .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
 
@@ -905,6 +925,22 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
                     .build()));
     }
 
+    private static void requestListSpaceAuditorsNulls(CloudFoundryClient cloudFoundryClient) {
+        when(cloudFoundryClient.spaces()
+            .listAuditors(ListSpaceAuditorsRequest.builder()
+                .spaceId("test-space-id")
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(ListSpaceAuditorsResponse.builder())
+                    .resource(fill(UserResource.builder())
+                        .entity(fill(UserEntity.builder())
+                            .username(null)
+                            .build())
+                        .build())
+                    .build()));
+    }
+
     private static void requestListSpaceDevelopers(CloudFoundryClient cloudFoundryClient) {
         when(cloudFoundryClient.spaces()
             .listDevelopers(ListSpaceDevelopersRequest.builder()
@@ -932,6 +968,22 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
                     .build()));
     }
 
+    private static void requestListSpaceDevelopersNulls(CloudFoundryClient cloudFoundryClient) {
+        when(cloudFoundryClient.spaces()
+            .listDevelopers(ListSpaceDevelopersRequest.builder()
+                .spaceId("test-space-id")
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(ListSpaceDevelopersResponse.builder())
+                    .resource(fill(UserResource.builder())
+                        .entity(fill(UserEntity.builder())
+                            .username(null)
+                            .build())
+                        .build())
+                    .build()));
+    }
+
     private static void requestListSpaceManagers(CloudFoundryClient cloudFoundryClient) {
         when(cloudFoundryClient.spaces()
             .listManagers(ListSpaceManagersRequest.builder()
@@ -956,6 +1008,22 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
                 .build()))
             .thenReturn(Mono
                 .just(fill(ListSpaceManagersResponse.builder())
+                    .build()));
+    }
+
+    private static void requestListSpaceManagersNulls(CloudFoundryClient cloudFoundryClient) {
+        when(cloudFoundryClient.spaces()
+            .listManagers(ListSpaceManagersRequest.builder()
+                .spaceId("test-space-id")
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(ListSpaceManagersResponse.builder())
+                    .resource(fill(UserResource.builder())
+                        .entity(fill(UserEntity.builder())
+                            .username(null)
+                            .build())
+                        .build())
                     .build()));
     }
 
