@@ -177,7 +177,7 @@ public final class DefaultServices implements Services {
                     Mono.just(request.getCompletionTimeout()),
                     createServiceInstance(cloudFoundryClient, spaceId, planId, request)
                 )))
-            .then(function(DefaultServices::waitForCreateInstance))
+            .then(function(DefaultServices::waitForInstanceAction))
             .transform(OperationsLogging.log("Create Service Instance"))
             .checkpoint();
     }
@@ -408,7 +408,13 @@ public final class DefaultServices implements Services {
                     Mono.just(ResourceUtils.getId(serviceInstance)),
                     getOptionalValidatedServicePlanId(cloudFoundryClient, request.getPlanName(), serviceInstance, organizationId)
                 )))
-            .then(function((cloudFoundryClient, serviceInstanceId, servicePlanId) -> updateServiceInstance(cloudFoundryClient, request, serviceInstanceId, servicePlanId.orElse(null))))
+            .then(function((cloudFoundryClient, serviceInstanceId, servicePlanId) -> Mono
+                .when(
+                    Mono.just(cloudFoundryClient),
+                    Mono.just(request.getCompletionTimeout()),
+                    requestUpdateServiceInstance(cloudFoundryClient, request, serviceInstanceId, servicePlanId.orElse(null))))
+            )
+            .then(function(DefaultServices::waitForInstanceAction))
             .then()
             .transform(OperationsLogging.log("Update Service Instance"))
             .checkpoint();
@@ -474,7 +480,7 @@ public final class DefaultServices implements Services {
                         return JobUtils.waitForCompletion(cloudFoundryClient, completionTimeout, (JobEntity) response.getEntity());
                     } else {
                         return LastOperationUtils.waitForCompletion(completionTimeout, () -> requestGetServiceInstance(cloudFoundryClient, ResourceUtils.getId(serviceInstance))
-                                .map(r -> ResourceUtils.getEntity(r).getLastOperation()));
+                            .map(r -> ResourceUtils.getEntity(r).getLastOperation()));
                     }
                 });
         }
@@ -941,6 +947,19 @@ public final class DefaultServices implements Services {
                     .build()));
     }
 
+    private static Mono<UpdateServiceInstanceResponse> requestUpdateServiceInstance(CloudFoundryClient cloudFoundryClient, UpdateServiceInstanceRequest request, String serviceInstanceId,
+                                                                                    String servicePlanId) {
+        return cloudFoundryClient.serviceInstances()
+            .update(org.cloudfoundry.client.v2.serviceinstances
+                .UpdateServiceInstanceRequest.builder()
+                .acceptsIncomplete(true)
+                .parameters(request.getParameters())
+                .serviceInstanceId(serviceInstanceId)
+                .servicePlanId(servicePlanId)
+                .tags(request.getTags())
+                .build());
+    }
+
     private static Mono<UpdateUserProvidedServiceInstanceResponse> requestUserProvidedServiceInstanceUpdate(CloudFoundryClient cloudFoundryClient, String serviceInstanceId, String newName) {
         return cloudFoundryClient.userProvidedServiceInstances()
             .update(org.cloudfoundry.client.v2.userprovidedserviceinstances.UpdateUserProvidedServiceInstanceRequest.builder()
@@ -1041,19 +1060,6 @@ public final class DefaultServices implements Services {
             .collect(Collectors.toList());
     }
 
-    private static Mono<UpdateServiceInstanceResponse> updateServiceInstance(CloudFoundryClient cloudFoundryClient, UpdateServiceInstanceRequest request, String serviceInstanceId,
-                                                                             String servicePlanId) {
-        return cloudFoundryClient.serviceInstances()
-            .update(org.cloudfoundry.client.v2.serviceinstances
-                .UpdateServiceInstanceRequest.builder()
-                .acceptsIncomplete(true)
-                .parameters(request.getParameters())
-                .serviceInstanceId(serviceInstanceId)
-                .servicePlanId(servicePlanId)
-                .tags(request.getTags())
-                .build());
-    }
-
     private static Mono<UpdateUserProvidedServiceInstanceResponse> updateUserProvidedServiceInstance(CloudFoundryClient cloudFoundryClient,
                                                                                                      UpdateUserProvidedServiceInstanceRequest request,
                                                                                                      String userProvidedServiceInstanceId) {
@@ -1066,7 +1072,7 @@ public final class DefaultServices implements Services {
                 .build());
     }
 
-    private static Mono<Void> waitForCreateInstance(CloudFoundryClient cloudFoundryClient, Duration completionTimeout, AbstractServiceInstanceResource serviceInstance) {
+    private static Mono<Void> waitForInstanceAction(CloudFoundryClient cloudFoundryClient, Duration completionTimeout, AbstractServiceInstanceResource serviceInstance) {
         return LastOperationUtils
             .waitForCompletion(completionTimeout, () -> requestGetServiceInstance(cloudFoundryClient, ResourceUtils.getId(serviceInstance))
                 .map(response -> ResourceUtils.getEntity(response).getLastOperation()));

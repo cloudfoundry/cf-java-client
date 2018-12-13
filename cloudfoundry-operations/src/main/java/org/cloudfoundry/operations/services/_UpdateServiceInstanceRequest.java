@@ -20,6 +20,7 @@ import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +29,14 @@ import java.util.Map;
  */
 @Value.Immutable
 abstract class _UpdateServiceInstanceRequest {
+
+    /**
+     * How long to wait for update
+     */
+    @Value.Default
+    Duration getCompletionTimeout() {
+        return Duration.ofMinutes(5);
+    }
 
     /**
      * The parameters of the service instance
