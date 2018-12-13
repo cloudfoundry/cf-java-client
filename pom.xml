@@ -32,7 +32,7 @@
     <groupId>org.cloudfoundry</groupId>
     <artifactId>cloudfoundry-java-client</artifactId>
     <name>Cloud Foundry Java Client Parent</name>
-    <version>3.14.0.BUILD-SNAPSHOT</version>
+    <version>3.15.0.BUILD-SNAPSHOT</version>
     <packaging>pom</packaging>
     <url>https://github.com/cloudfoundry/cf-java-client</url>
 
