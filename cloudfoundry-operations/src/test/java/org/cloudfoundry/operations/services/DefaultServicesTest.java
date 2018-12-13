@@ -860,6 +860,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
         requestListSpaceServicePlans(this.cloudFoundryClient, "test-service-id", "test-plan", "test-plan-id");
         requestUpdateServiceInstance(this.cloudFoundryClient, Collections.singletonMap("test-parameter-key", "test-parameter-value"), "test-service-instance-id", "test-plan-id",
             Collections.singletonList("test-tag"));
+        requestGetServiceInstance(this.cloudFoundryClient, "test-id", "successful");
 
         this.services
             .updateInstance(UpdateServiceInstanceRequest.builder()
@@ -899,6 +900,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
         requestGetService(this.cloudFoundryClient, "test-service-id", "test-service");
         requestListSpaceServicePlans(this.cloudFoundryClient, "test-service-id", "test-plan", "test-service-plan-id");
         requestUpdateServiceInstance(this.cloudFoundryClient, null, "test-service-instance-id", "test-service-plan-id", Collections.singletonList("test-tag"));
+        requestGetServiceInstance(this.cloudFoundryClient, "test-id", "successful");
 
         this.services
             .updateInstance(UpdateServiceInstanceRequest.builder()
@@ -916,6 +918,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
         requestListSpaceServiceInstances(this.cloudFoundryClient, "test-service", TEST_SPACE_ID);
         requestUpdateServiceInstance(this.cloudFoundryClient, Collections.singletonMap("test-parameter-key", "test-parameter-value"), "test-service-instance-id", null,
             Collections.singletonList("test-tag"));
+        requestGetServiceInstance(this.cloudFoundryClient, "test-id", "successful");
 
         this.services
             .updateInstance(UpdateServiceInstanceRequest.builder()
@@ -951,6 +954,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
         requestGetService(this.cloudFoundryClient, "test-service-id", "test-service");
         requestListSpaceServicePlans(this.cloudFoundryClient, "test-service-id", "test-plan", "test-plan-id");
         requestUpdateServiceInstance(this.cloudFoundryClient, Collections.singletonMap("test-parameter-key", "test-parameter-value"), "test-service-instance-id", "test-plan-id", null);
+        requestGetServiceInstance(this.cloudFoundryClient, "test-id", "successful");
 
         this.services
             .updateInstance(UpdateServiceInstanceRequest.builder()
@@ -972,6 +976,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
         requestListSpaceServicePlanVisibilities(this.cloudFoundryClient, "test-organization-id", "test-plan-id");
         requestUpdateServiceInstance(this.cloudFoundryClient, Collections.singletonMap("test-parameter-key", "test-parameter-value"), "test-service-instance-id", "test-plan-id",
             Collections.singletonList("test-tag"));
+        requestGetServiceInstance(this.cloudFoundryClient, "test-id", "successful");
 
         this.services
             .updateInstance(UpdateServiceInstanceRequest.builder()
@@ -1027,7 +1032,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     public void updateUserProvidedService() {
         requestListSpaceServiceInstancesUserProvided(this.cloudFoundryClient, "test-service", TEST_SPACE_ID);
         requestUpdateUserProvidedServiceInstance(this.cloudFoundryClient, Collections.singletonMap("test-credential-key", "test-credential-value"),
-            "syslog-url", Collections.singletonList("tag1"),"test-service-instance-id");
+            "syslog-url", Collections.singletonList("tag1"), "test-service-instance-id");
 
         this.services
             .updateUserProvidedInstance(UpdateUserProvidedServiceInstanceRequest.builder()
@@ -1959,7 +1964,8 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
                     .build()));
     }
 
-    private static void requestUpdateUserProvidedServiceInstance(CloudFoundryClient cloudFoundryClient, Map<String, Object> credentials, String syslogDrainUrl, List<String> tags, String userProvidedServiceInstanceId) {
+    private static void requestUpdateUserProvidedServiceInstance(CloudFoundryClient cloudFoundryClient, Map<String, Object> credentials, String syslogDrainUrl, List<String> tags,
+                                                                 String userProvidedServiceInstanceId) {
         when(cloudFoundryClient.userProvidedServiceInstances()
             .update(org.cloudfoundry.client.v2.userprovidedserviceinstances.UpdateUserProvidedServiceInstanceRequest.builder()
                 .credentials(credentials)
