@@ -27,6 +27,7 @@ import org.cloudfoundry.client.v3.builds.BuildState;
 import org.cloudfoundry.client.v3.builds.CreateBuildRequest;
 import org.cloudfoundry.client.v3.builds.CreateBuildResponse;
 import org.cloudfoundry.client.v3.builds.CreatedBy;
+import org.cloudfoundry.client.v3.builds.Droplet;
 import org.cloudfoundry.client.v3.builds.GetBuildRequest;
 import org.cloudfoundry.client.v3.builds.GetBuildResponse;
 import org.cloudfoundry.client.v3.builds.ListBuildsRequest;
@@ -140,7 +141,7 @@ public final class ReactorBuildsTest extends AbstractClientApiTest {
                 .inputPackage(Relationship.builder()
                     .id("8e4da443-f255-499c-8b47-b3729b5b7432")
                     .build())
-                .droplet(Relationship.builder()
+                .droplet(Droplet.builder()
                     .id("1e1186e7-d803-4c46-b9d6-5c81e50fe55a")
                     .build())
                 .link("self", Link.builder()
