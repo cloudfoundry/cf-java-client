@@ -50,6 +50,7 @@ import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServi
 import org.cloudfoundry.client.v2.users.Users;
 import org.cloudfoundry.client.v3.applications.ApplicationsV3;
 import org.cloudfoundry.client.v3.builds.Builds;
+import org.cloudfoundry.client.v3.deployments.DeploymentsV3;
 import org.cloudfoundry.client.v3.droplets.Droplets;
 import org.cloudfoundry.client.v3.isolationsegments.IsolationSegments;
 import org.cloudfoundry.client.v3.jobs.JobsV3;
@@ -95,6 +96,7 @@ import org.cloudfoundry.reactor.client.v2.userprovidedserviceinstances.ReactorUs
 import org.cloudfoundry.reactor.client.v2.users.ReactorUsers;
 import org.cloudfoundry.reactor.client.v3.applications.ReactorApplicationsV3;
 import org.cloudfoundry.reactor.client.v3.builds.ReactorBuilds;
+import org.cloudfoundry.reactor.client.v3.deployments.ReactorDeploymentsV3;
 import org.cloudfoundry.reactor.client.v3.droplets.ReactorDroplets;
 import org.cloudfoundry.reactor.client.v3.isolationsegments.ReactorIsolationSegments;
 import org.cloudfoundry.reactor.client.v3.jobs.ReactorJobsV3;
@@ -155,6 +157,12 @@ abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
     @PostConstruct
     public void checkCompatibility() {
         new CloudFoundryClientCompatibilityChecker(info()).check();
+    }
+
+    @Override
+    @Value.Derived
+    public DeploymentsV3 deploymentsV3() {
+        return new ReactorDeploymentsV3(getConnectionContext(), getRootV3(), getTokenProvider());
     }
 
     @Override
