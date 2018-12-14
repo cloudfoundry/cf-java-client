@@ -1,0 +1,12 @@
+{
+  "droplet": {
+    "guid": "44ccfa61-dbcf-4a0d-82fe-f668e9d2a962"
+  },
+  "relationships": {
+    "app": {
+      "data": {
+        "guid": "305cea31-5a44-45ca-b51b-e89c7a8ef8b2"
+      }
+    }
+  }
+}

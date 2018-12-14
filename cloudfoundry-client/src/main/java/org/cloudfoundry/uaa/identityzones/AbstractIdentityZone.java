@@ -25,6 +25,13 @@ import org.cloudfoundry.Nullable;
 public abstract class AbstractIdentityZone {
 
     /**
+     * If the identity zone is active
+     */
+    @JsonProperty("active")
+    @Nullable
+    abstract Boolean getActive();
+
+    /**
      * The configuration
      */
     @JsonProperty("config")

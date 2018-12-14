@@ -134,6 +134,13 @@ abstract class _ServiceEntity {
     abstract String getServiceBrokerId();
 
     /**
+     * The service broker name
+     */
+    @JsonProperty("service_broker_name")
+    @Nullable
+    abstract String getServiceBrokerName();
+
+    /**
      * The service plans url
      */
     @JsonProperty("service_plans_url")
