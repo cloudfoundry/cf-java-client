@@ -25,6 +25,7 @@ import org.cloudfoundry.client.v3.deployments.CreateDeploymentRequest;
 import org.cloudfoundry.client.v3.deployments.CreateDeploymentResponse;
 import org.cloudfoundry.client.v3.deployments.DeploymentRelationships;
 import org.cloudfoundry.client.v3.deployments.DeploymentResource;
+import org.cloudfoundry.client.v3.deployments.DeploymentState;
 import org.cloudfoundry.client.v3.deployments.GetDeploymentRequest;
 import org.cloudfoundry.client.v3.deployments.GetDeploymentResponse;
 import org.cloudfoundry.client.v3.deployments.ListDeploymentsRequest;
@@ -77,7 +78,7 @@ public class ReactorDeploymentsV3Test extends AbstractClientApiTest {
 
             .expectNext(CreateDeploymentResponse.builder()
                 .id("59c3d133-2b83-46f3-960e-7765a129aea4")
-                .state("DEPLOYING")
+                .state(DeploymentState.DEPLOYING)
                 .droplet(Relationship.builder()
                     .id("44ccfa61-dbcf-4a0d-82fe-f668e9d2a962")
                     .build())
@@ -112,7 +113,6 @@ public class ReactorDeploymentsV3Test extends AbstractClientApiTest {
             .verify(Duration.ofSeconds(5));
     }
 
-
     @Test
     public void get() {
         mockRequest(InteractionContext.builder()
@@ -133,7 +133,7 @@ public class ReactorDeploymentsV3Test extends AbstractClientApiTest {
 
             .expectNext(GetDeploymentResponse.builder()
                 .id("59c3d133-2b83-46f3-960e-7765a129aea4")
-                .state("DEPLOYING")
+                .state(DeploymentState.DEPLOYING)
                 .droplet(Relationship.builder()
                     .id("44ccfa61-dbcf-4a0d-82fe-f668e9d2a962")
                     .build())
@@ -197,7 +197,7 @@ public class ReactorDeploymentsV3Test extends AbstractClientApiTest {
                     .build())
                 .resource(DeploymentResource.builder()
                     .id("59c3d133-2b83-46f3-960e-7765a129aea4")
-                    .state("DEPLOYING")
+                    .state(DeploymentState.DEPLOYING)
                     .droplet(Relationship.builder()
                         .id("44ccfa61-dbcf-4a0d-82fe-f668e9d2a962")
                         .build())

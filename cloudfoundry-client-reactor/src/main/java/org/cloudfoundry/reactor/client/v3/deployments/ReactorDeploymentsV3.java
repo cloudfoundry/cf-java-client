@@ -47,6 +47,12 @@ public final class ReactorDeploymentsV3 extends AbstractClientV3Operations imple
     }
 
     @Override
+    public Mono<CancelDeploymentResponse> cancel(CancelDeploymentRequest request) {
+        return post(request, CancelDeploymentResponse.class, builder -> builder.pathSegment("deployments", request.getDeploymentId(), "actions", "cancel"))
+            .checkpoint();
+    }
+
+    @Override
     public Mono<CreateDeploymentResponse> create(CreateDeploymentRequest request) {
         return post(request, CreateDeploymentResponse.class, builder -> builder.pathSegment("deployments"))
             .checkpoint();
@@ -61,12 +67,6 @@ public final class ReactorDeploymentsV3 extends AbstractClientV3Operations imple
     @Override
     public Mono<ListDeploymentsResponse> list(ListDeploymentsRequest request) {
         return get(request, ListDeploymentsResponse.class, builder -> builder.pathSegment("deployments"))
-            .checkpoint();
-    }
-
-    @Override
-    public Mono<CancelDeploymentResponse> cancel(CancelDeploymentRequest request) {
-        return post(request, CancelDeploymentResponse.class, builder -> builder.pathSegment("deployments", request.getDeploymentId(), "actions", "cancel"))
             .checkpoint();
     }
 
