@@ -55,62 +55,62 @@ public final class DeploymentsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, applicationName)
-                .then(getApplicationId(this.cloudFoundryClient, applicationName))
-                .flatMap(applicationId -> Mono.zip(
-                        Mono.just(applicationId),
-                        getDropletId(this.cloudFoundryClient, applicationId)))
-                .flatMap(this::createDeployment)
-                .map(CreateDeploymentResponse::getId)
-                .as(StepVerifier::create)
-                .expectNextCount(1)
-                .expectComplete()
-                .verify(Duration.ofMinutes(5));
+            .then(getApplicationId(this.cloudFoundryClient, applicationName))
+            .flatMap(applicationId -> Mono.zip(
+                Mono.just(applicationId),
+                getDropletId(this.cloudFoundryClient, applicationId)))
+            .flatMap(this::createDeployment)
+            .map(CreateDeploymentResponse::getId)
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
     }
 
     private Mono<? extends CreateDeploymentResponse> createDeployment(Tuple2<String, String> tuple) {
         String applicationId = tuple.getT1();
         String dropletId = tuple.getT2();
         return this.cloudFoundryClient.deploymentsV3()
-                .create(CreateDeploymentRequest.builder()
-                        .droplet(Relationship.builder().id(dropletId).build())
-                        .relationships(DeploymentRelationships.builder()
-                                .app(ToOneRelationship.builder()
-                                        .data(Relationship.builder()
-                                                .id(applicationId)
-                                                .build())
-                                        .build())
-                                .build())
-                        .build());
+            .create(CreateDeploymentRequest.builder()
+                .droplet(Relationship.builder().id(dropletId).build())
+                .relationships(DeploymentRelationships.builder()
+                    .app(ToOneRelationship.builder()
+                        .data(Relationship.builder()
+                            .id(applicationId)
+                            .build())
+                        .build())
+                    .build())
+                .build());
     }
 
     private static Mono<Void> createApplication(CloudFoundryOperations cloudFoundryOperations, String name) throws IOException {
         return cloudFoundryOperations.applications()
-                .push(PushApplicationRequest.builder()
-                        .path(new ClassPathResource("test-application.zip").getFile().toPath())
-                        .buildpack("staticfile_buildpack")
-                        .diskQuota(256)
-                        .healthCheckType(ApplicationHealthCheck.PORT)
-                        .memory(64)
-                        .name(name)
-                        .noStart(false)
-                        .build());
+            .push(PushApplicationRequest.builder()
+                .path(new ClassPathResource("test-application.zip").getFile().toPath())
+                .buildpack("staticfile_buildpack")
+                .diskQuota(256)
+                .healthCheckType(ApplicationHealthCheck.PORT)
+                .memory(64)
+                .name(name)
+                .noStart(false)
+                .build());
     }
 
 
     private static Mono<String> getApplicationId(CloudFoundryClient cloudFoundryClient, String applicationName) {
         return PaginationUtils.requestClientV3Resources(page -> cloudFoundryClient.applicationsV3()
-                .list(ListApplicationsRequest.builder()
-                        .name(applicationName)
-                        .build()))
-                .single()
-                .map(ApplicationResource::getId);
+            .list(ListApplicationsRequest.builder()
+                .name(applicationName)
+                .build()))
+            .single()
+            .map(ApplicationResource::getId);
     }
 
     private static Mono<String> getDropletId(CloudFoundryClient cloudFoundryClient, String applicationId) {
         return cloudFoundryClient.applicationsV3()
-                .getCurrentDroplet(GetApplicationCurrentDropletRequest.builder()
-                        .applicationId(applicationId)
-                        .build())
-                .map(GetApplicationCurrentDropletResponse::getId);
+            .getCurrentDroplet(GetApplicationCurrentDropletRequest.builder()
+                .applicationId(applicationId)
+                .build())
+            .map(GetApplicationCurrentDropletResponse::getId);
     }
 }

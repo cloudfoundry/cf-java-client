@@ -30,10 +30,10 @@ import java.util.List;
 public abstract class Deployment extends Resource {
 
     /**
-     * The state of the deployment. Valid values are DEPLOYING, DEPLOYED, CANCELING, or CANCELED.
+     * The state of the deployment
      */
     @JsonProperty("state")
-    public abstract String getState();
+    public abstract DeploymentState getState();
 
     /**
      * The relationships
