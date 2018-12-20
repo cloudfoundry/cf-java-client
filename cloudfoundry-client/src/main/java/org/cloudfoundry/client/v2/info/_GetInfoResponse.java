@@ -113,6 +113,13 @@ abstract class _GetInfoResponse {
     abstract String getName();
 
     /**
+     * The version of the supported Open Service Broker API
+     */
+    @JsonProperty("osbapi_version")
+    @Nullable
+    abstract String getOsbapiVersion();
+
+    /**
      * The routing endpoint
      */
     @JsonProperty("routing_endpoint")

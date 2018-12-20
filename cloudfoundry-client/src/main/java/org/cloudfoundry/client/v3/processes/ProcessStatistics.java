@@ -27,6 +27,13 @@ import java.util.List;
 public abstract class ProcessStatistics {
 
     /**
+     * Information about errors placing the instance
+     */
+    @JsonProperty("details")
+    @Nullable
+    public abstract String getDetails();
+
+    /**
      * The disk quota
      */
     @JsonProperty("disk_quota")
@@ -55,6 +62,13 @@ public abstract class ProcessStatistics {
      */
     @JsonProperty("instance_ports")
     public abstract List<PortMapping> getInstancePorts();
+
+    /**
+     * The isolation segment
+     */
+    @JsonProperty("isolation_segment")
+    @Nullable
+    public abstract String getIsolationSegment();
 
     /**
      * The memory quota
@@ -86,13 +100,6 @@ public abstract class ProcessStatistics {
      */
     @JsonProperty("usage")
     public abstract ProcessUsage getUsage();
-
-    /**
-     * The isolation segment
-     */
-    @JsonProperty("isolation_segment")
-    @Nullable
-    abstract String getIsolationSegment();
 
 }
 

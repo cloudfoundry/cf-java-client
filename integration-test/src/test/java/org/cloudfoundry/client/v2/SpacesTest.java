@@ -27,7 +27,6 @@ import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorRequ
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationBillingManagerRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserRequest;
-import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserResponse;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationResponse;
 import org.cloudfoundry.client.v2.routes.CreateRouteRequest;
@@ -87,7 +86,6 @@ import org.cloudfoundry.client.v2.spaces.RemoveSpaceManagerRequest;
 import org.cloudfoundry.client.v2.spaces.RemoveSpaceSecurityGroupRequest;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.client.v2.spaces.UpdateSpaceRequest;
-import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
 import org.cloudfoundry.client.v2.users.CreateUserRequest;
 import org.cloudfoundry.client.v2.users.UserEntity;
 import org.cloudfoundry.client.v2.users.UserResource;
@@ -137,7 +135,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     private Mono<String> spaceId;
 
     @Autowired
-    private String stackName;
+    private Mono<String> stackId;
 
     @Autowired
     private UaaClient uaaClient;
@@ -484,20 +482,12 @@ public final class SpacesTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
         String spaceName = this.nameFactory.getSpaceName();
 
-        this.organizationId
-            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .delayUntil(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .flatMap(spaceId -> Mono.zip(
-                Mono.just(spaceId),
-                PaginationUtils
-                    .requestClientV2Resources(page -> this.cloudFoundryClient.stacks()
-                        .list(ListStacksRequest.builder()
-                            .name(this.stackName)
-                            .page(page)
-                            .build()))
-                    .single()
-                    .map(ResourceUtils::getId)
-            ))
+        Mono.zip(this.organizationId, this.stackId)
+            .flatMap(function((organizationId, stackId) -> Mono.zip(
+                createSpaceId(this.cloudFoundryClient, organizationId, spaceName),
+                Mono.just(stackId)
+            )))
+            .delayUntil(function((spaceId, stackId) -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName, stackId)))
             .flatMapMany(function((spaceId, stackId) -> requestListSpaceApplications(this.cloudFoundryClient, spaceId, builder -> builder.stackId(stackId))))
             .map(response -> ResourceUtils.getEntity(response).getName())
             .as(StepVerifier::create)
@@ -1436,6 +1426,11 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .map(ResourceUtils::getId);
     }
 
+    private static Mono<String> createApplicationId(CloudFoundryClient cloudFoundryClient, String spaceId, String applicationName, String stackId) {
+        return requestCreateApplication(cloudFoundryClient, spaceId, applicationName, stackId)
+            .map(ResourceUtils::getId);
+    }
+
     private static Mono<String> createOrganizationId(CloudFoundryClient cloudFoundryClient, String organization) {
         return requestCreateOrganization(cloudFoundryClient, organization)
             .map(ResourceUtils::getId);
@@ -1588,20 +1583,22 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 .build());
     }
 
-    private static Mono<AssociateOrganizationUserResponse> requestAssociateUser(CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
-        return cloudFoundryClient.organizations()
-            .associateUser(AssociateOrganizationUserRequest.builder()
-                .userId(userId)
-                .organizationId(organizationId)
-                .build());
-    }
-
     private static Mono<CreateApplicationResponse> requestCreateApplication(CloudFoundryClient cloudFoundryClient, String spaceId, String applicationName) {
         return cloudFoundryClient.applicationsV2()
             .create(CreateApplicationRequest.builder()
                 .diego(true)
                 .name(applicationName)
                 .spaceId(spaceId)
+                .build());
+    }
+
+    private static Mono<CreateApplicationResponse> requestCreateApplication(CloudFoundryClient cloudFoundryClient, String spaceId, String applicationName, String stackId) {
+        return cloudFoundryClient.applicationsV2()
+            .create(CreateApplicationRequest.builder()
+                .diego(true)
+                .name(applicationName)
+                .spaceId(spaceId)
+                .stackId(stackId)
                 .build());
     }
 
