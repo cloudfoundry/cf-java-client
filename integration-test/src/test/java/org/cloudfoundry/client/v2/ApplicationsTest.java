@@ -442,12 +442,11 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     public void listFilterByStackId() {
         String applicationName = this.nameFactory.getApplicationName();
 
-        Mono.when(
-            this.stackId,
-            this.spaceId
-                .then(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-        )
-            .then(function((stackId, applicationId) -> Mono.when(
+        Mono.when(this.spaceId, this.stackId)
+            .then(function((spaceId, stackId) -> Mono.when(
+                createApplicationId(this.cloudFoundryClient, spaceId, applicationName, stackId),
+                Mono.just(stackId))))
+            .then(function((applicationId, stackId) -> Mono.when(
                 Mono.just(applicationId),
                 PaginationUtils
                     .requestClientV2Resources(page -> this.cloudFoundryClient.applicationsV2()
@@ -951,7 +950,12 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     private static Mono<String> createApplicationId(CloudFoundryClient cloudFoundryClient, String spaceId, String applicationName) {
-        return requestCreateApplication(cloudFoundryClient, spaceId, applicationName, "staticfile_buildpack", true, 512, 64)
+        return requestCreateApplication(cloudFoundryClient, spaceId, applicationName, "staticfile_buildpack", true, 512, 64, null)
+            .map(ResourceUtils::getId);
+    }
+
+    private static Mono<String> createApplicationId(CloudFoundryClient cloudFoundryClient, String spaceId, String applicationName, String stackId) {
+        return requestCreateApplication(cloudFoundryClient, spaceId, applicationName, "staticfile_buildpack", true, 512, 64, stackId)
             .map(ResourceUtils::getId);
     }
 
@@ -1044,11 +1048,11 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     private static Mono<CreateApplicationResponse> requestCreateApplication(CloudFoundryClient cloudFoundryClient, String spaceId, String applicationName) {
-        return requestCreateApplication(cloudFoundryClient, spaceId, applicationName, null, null, null, null);
+        return requestCreateApplication(cloudFoundryClient, spaceId, applicationName, null, null, null, null, null);
     }
 
     private static Mono<CreateApplicationResponse> requestCreateApplication(CloudFoundryClient cloudFoundryClient, String spaceId, String applicationName, String buildpack, Boolean diego,
-                                                                            Integer diskQuota, Integer memory) {
+                                                                            Integer diskQuota, Integer memory, String stackId) {
         return cloudFoundryClient.applicationsV2()
             .create(CreateApplicationRequest.builder()
                 .buildpack(buildpack)
@@ -1057,6 +1061,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .memory(memory)
                 .name(applicationName)
                 .spaceId(spaceId)
+                .stackId(stackId)
                 .build());
     }
 
