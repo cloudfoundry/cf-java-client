@@ -36,6 +36,20 @@ abstract class _ServiceUsageEventEntity {
     abstract String getOrganizationId();
 
     /**
+     * The service broker id
+     */
+    @JsonProperty("service_broker_guid")
+    @Nullable
+    abstract String getServiceBrokerId();
+
+    /**
+     * The service broker name
+     */
+    @JsonProperty("service_broker_name")
+    @Nullable
+    abstract String getServiceBrokerName();
+
+    /**
      * The service id
      */
     @JsonProperty("service_guid")
