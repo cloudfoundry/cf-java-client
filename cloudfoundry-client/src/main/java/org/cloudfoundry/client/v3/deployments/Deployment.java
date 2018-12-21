@@ -30,11 +30,11 @@ import java.util.List;
 public abstract class Deployment extends Resource {
 
     /**
-     * The app the deployment is updating
+     * The application the deployment is updating
      */
     @JsonProperty("app")
     @Nullable
-    public abstract ToOneRelationship getApp();
+    public abstract ToOneRelationship getApplication();
 
     /**
      * The droplet the deployment is transitioning the app to

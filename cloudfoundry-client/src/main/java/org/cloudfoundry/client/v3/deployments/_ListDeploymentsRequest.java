@@ -38,6 +38,6 @@ abstract class _ListDeploymentsRequest extends PaginatedRequest {
      * List of states to filter by
      */
     @FilterParameter("states")
-    abstract List<String> getStates();
+    abstract List<DeploymentState> getStates();
 
 }

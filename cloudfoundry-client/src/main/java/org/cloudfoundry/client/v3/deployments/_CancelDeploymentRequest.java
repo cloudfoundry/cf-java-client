@@ -17,10 +17,7 @@
 package org.cloudfoundry.client.v3.deployments;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v3.Relationship;
 import org.immutables.value.Value;
 
 /**
