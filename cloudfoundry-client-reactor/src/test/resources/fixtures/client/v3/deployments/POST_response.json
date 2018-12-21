@@ -1,0 +1,37 @@
+{
+  "guid": "59c3d133-2b83-46f3-960e-7765a129aea4",
+  "state": "DEPLOYING",
+  "created_at": "2018-04-25T22:42:10Z",
+  "updated_at": "2018-04-25T22:42:10Z",
+  "droplet": {
+    "guid": "44ccfa61-dbcf-4a0d-82fe-f668e9d2a962"
+  },
+  "previous_droplet": {
+    "guid": "cc6bc315-bd06-49ce-92c2-bc3ad45268c2"
+  },
+  "relationships": {
+    "app": {
+      "data": {
+        "guid": "305cea31-5a44-45ca-b51b-e89c7a8ef8b2"
+      }
+    }
+  },
+  "new_processes": [
+    {
+      "guid": "fd5d3e60-f88c-4c37-b1ae-667cfc65a856",
+      "type": "web-deployment-59c3d133-2b83-46f3-960e-7765a129aea4"
+    }
+  ],
+  "revision": {
+    "guid": "56126cba-656a-4eba-a81e-7e9951b2df57",
+    "version": 1
+  },
+  "links": {
+    "self": {
+      "href": "https://api.example.org/v3/deployments/59c3d133-2b83-46f3-960e-7765a129aea4"
+    },
+    "app": {
+      "href": "https://api.example.org/v3/apps/305cea31-5a44-45ca-b51b-e89c7a8ef8b2"
+    }
+  }
+}
