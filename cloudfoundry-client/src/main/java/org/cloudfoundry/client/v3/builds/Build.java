@@ -38,7 +38,7 @@ public abstract class Build extends Resource {
      */
     @JsonProperty("droplet")
     @Nullable
-    public abstract Relationship getDroplet();
+    public abstract Droplet getDroplet();
 
     /**
      * Describes errors during the build process
