@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.cloudfoundry</groupId>
 	<artifactId>cloudfoundry-client-lib</artifactId>
-	<version>1.1.5.BUILD-SNAPSHOT</version>
+	<version>1.1.6</version>
 	<packaging>jar</packaging>
 	<name>Cloud Foundry Java Client Library</name>
 	<description>A Cloud Foundry client library for Java</description>
@@ -330,7 +330,7 @@
 			<plugin>
 				<groupId>org.jfrog.buildinfo</groupId>
 				<artifactId>artifactory-maven-plugin</artifactId>
-				<version>2.4.0</version>
+				<version>2.2.1</version>
 				<inherited>false</inherited>
 				<executions>
 					<execution>
