@@ -49,6 +49,8 @@ component. A `protoc` Protocol Buffer compiler is required at build time to comp
 
 On Linux with `apt`, run the [install-protoc-apt.sh](./bin/install-protoc-apt.sh) script in this repository to compile `protoc` from source.
 
+NOTE: In case of error try to fix it with: `sudo ldconfig`
+
 On OSX, run the [install-protoc-osx.sh](./bin/install-protoc-osx.sh) script to install `protoc`. Alternatively you can install `protobuf` using [homebrew](http://brew.sh/) if homebrew supports the appropriate version.
 
 On Windows, download the `protoc` binary zip file from the [releases page](https://github.com/google/protobuf/releases),
