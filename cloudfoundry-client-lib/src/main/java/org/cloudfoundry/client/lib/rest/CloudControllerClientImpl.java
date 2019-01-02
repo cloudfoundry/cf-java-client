@@ -337,6 +337,26 @@ public class CloudControllerClientImpl implements CloudControllerClient {
     }
 
     @Override
+    public void createService(CloudService service, Map<String, Object> additionalParams) {
+        assertSpaceProvided("create service");
+        Assert.notNull(service, "Service must not be null");
+        Assert.notNull(service.getName(), "Service name must not be null");
+        Assert.notNull(service.getLabel(), "Service label must not be null");
+        Assert.notNull(service.getPlan(), "Service plan must not be null");
+        Assert.notNull(additionalParams, "Additional parameters must not be null");
+
+        CloudServicePlan cloudServicePlan = findPlanForService(service);
+
+        HashMap<String, Object> serviceRequest = new HashMap<String, Object>();
+        serviceRequest.put("space_guid", sessionSpace.getMeta().getGuid());
+        serviceRequest.put("name", service.getName());
+        serviceRequest.put("service_plan_guid", cloudServicePlan.getMeta().getGuid());
+        serviceRequest.put("parameters", additionalParams);
+        
+        getRestTemplate().postForObject(getUrl("/v2/service_instances"), serviceRequest, String.class);
+    }
+
+    @Override
     public void createServiceBroker(CloudServiceBroker serviceBroker) {
         Assert.notNull(serviceBroker, "Service Broker must not be null");
         Assert.notNull(serviceBroker.getName(), "Service Broker name must not be null");

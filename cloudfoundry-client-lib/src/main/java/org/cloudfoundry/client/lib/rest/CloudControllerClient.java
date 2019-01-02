@@ -98,6 +98,8 @@ public interface CloudControllerClient {
 
     void createService(CloudService service);
 
+    void createService(CloudService service, Map<String, Object> additionalParams);
+
     void createServiceBroker(CloudServiceBroker serviceBroker);
 
     void createSpace(String spaceName);

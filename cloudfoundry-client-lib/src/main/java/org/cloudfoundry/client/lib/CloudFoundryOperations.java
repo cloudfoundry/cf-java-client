@@ -257,6 +257,14 @@ public interface CloudFoundryOperations {
     void createService(CloudService service);
 
     /**
+     * Create a service.
+     *
+     * @param service cloud service info
+     * @param additionalParams service additional parameters
+     */
+    void createService(CloudService service, Map<String, Object> additionalParams);
+
+    /**
      * Create a service broker.
      *
      * @param serviceBroker cloud service broker info

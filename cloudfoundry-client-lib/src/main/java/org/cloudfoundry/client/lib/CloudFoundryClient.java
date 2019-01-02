@@ -271,6 +271,10 @@ public class CloudFoundryClient implements CloudFoundryOperations {
         cc.createService(service);
     }
 
+    public void createService(CloudService service, Map<String, Object> additionalParams) {
+        cc.createService(service, additionalParams);
+    }
+
     public void createServiceBroker(CloudServiceBroker serviceBroker) {
         cc.createServiceBroker(serviceBroker);
     }
