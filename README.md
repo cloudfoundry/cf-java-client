@@ -60,7 +60,7 @@ Snapshot artifacts can be found in the Spring snapshot repository:
     <repository>
         <id>spring-snapshots</id>
         <name>Spring Snapshots</name>
-        <url>http://repo.spring.io/snapshot</url>
+        <url>https://repo.spring.io/snapshot</url>
         <snapshots>
             <enabled>true</enabled>
         </snapshots>
