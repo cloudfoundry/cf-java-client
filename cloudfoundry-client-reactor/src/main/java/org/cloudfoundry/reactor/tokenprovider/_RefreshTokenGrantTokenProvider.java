@@ -45,4 +45,8 @@ abstract class _RefreshTokenGrantTokenProvider extends AbstractUaaTokenProvider 
                 .then());
     }
 
+	@Override
+	String getIdentityZoneSubdomain() {
+		return "client_id";
+	}
 }
