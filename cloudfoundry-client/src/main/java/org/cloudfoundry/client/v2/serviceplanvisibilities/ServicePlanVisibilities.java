@@ -49,7 +49,7 @@ public interface ServicePlanVisibilities {
     Mono<GetServicePlanVisibilityResponse> get(GetServicePlanVisibilityRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/service_bindings/list_all_service_bindings.html">List all Service Plan Visibilities</a> request
+     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/service_plan_visibilities/list_all_service_plan_visibilities.html">List all Service Plan Visibilities</a> request
      *
      * @param request the List Service Plan Visibilities request
      * @return the response from the List Service Plan Visibilities request
