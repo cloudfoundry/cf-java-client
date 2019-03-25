@@ -79,11 +79,11 @@ public final class ReactorPackagesTest extends AbstractClientApiTest {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(POST).path("/packages?source_guid=test-source-package-id")
-                .payload("fixtures/client/v3/packages/POST_?source_guid={id}_request.json")
+                .payload("fixtures/client/v3/packages/POST_source_guid={id}_request.json")
                 .build())
             .response(TestResponse.builder()
                 .status(CREATED)
-                .payload("fixtures/client/v3/packages/POST_?source_guid={id}_response.json")
+                .payload("fixtures/client/v3/packages/POST_source_guid={id}_response.json")
                 .build())
             .build());
 
