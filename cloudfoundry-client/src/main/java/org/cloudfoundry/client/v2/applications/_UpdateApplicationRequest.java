@@ -86,9 +86,9 @@ abstract class _UpdateApplicationRequest {
      * Docker credentials for pulling docker image
      */
     @AllowNulls
-    @JsonProperty("docker_credentials_json")
+    @JsonProperty("docker_credentials")
     @Nullable
-    abstract Map<String, Object> getDockerCredentialsJsons();
+    abstract DockerCredentials getDockerCredentials();
 
     /**
      * Name of the Docker image containing the application

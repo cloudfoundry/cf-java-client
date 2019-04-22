@@ -38,8 +38,9 @@
         "package_updated_at": "2016-06-08T16:41:28Z",
         "detected_start_command": "",
         "enable_ssh": true,
-        "docker_credentials_json": {
-          "redacted_message": "[PRIVATE DATA HIDDEN]"
+        "docker_credentials": {
+          "username": null,
+          "password": null
         },
         "ports": null,
         "space_url": "/v2/spaces/93e43758-13fe-4751-8edc-caf225e27647",

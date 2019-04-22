@@ -32,6 +32,7 @@ import org.cloudfoundry.client.v2.applications.CopyApplicationRequest;
 import org.cloudfoundry.client.v2.applications.CopyApplicationResponse;
 import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
+import org.cloudfoundry.client.v2.applications.DockerCredentials;
 import org.cloudfoundry.client.v2.applications.InstanceStatistics;
 import org.cloudfoundry.client.v2.applications.ListApplicationRoutesRequest;
 import org.cloudfoundry.client.v2.applications.ListApplicationServiceBindingsRequest;
@@ -1287,9 +1288,11 @@ public final class DefaultApplications implements Applications {
                         .diego(true)
                         .dockerImage(image);
 
-                    Optional.ofNullable(manifest.getDocker().getUsername())
-                        .ifPresent(username -> builder
-                            .dockerCredentialsJson(username, manifest.getDocker().getPassword()));
+                    String username = manifest.getDocker().getUsername();
+                    String password = manifest.getDocker().getPassword();
+                    builder
+                        .dockerCredentials(DockerCredentials.builder().username(username).password(password).build());
+
                 });
         }
 
@@ -1582,9 +1585,10 @@ public final class DefaultApplications implements Applications {
                             .diego(true)
                             .dockerImage(image);
 
-                        Optional.ofNullable(manifest.getDocker().getUsername())
-                            .ifPresent(username -> builder
-                                .dockerCredentialsJson(username, manifest.getDocker().getPassword()));
+                        String username = manifest.getDocker().getUsername();
+                        String password = manifest.getDocker().getPassword();
+                        builder
+                            .dockerCredentials(DockerCredentials.builder().username(username).password(password).build());
                     });
             }
 

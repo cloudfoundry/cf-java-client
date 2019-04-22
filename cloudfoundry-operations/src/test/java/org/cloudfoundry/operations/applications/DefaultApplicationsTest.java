@@ -34,6 +34,7 @@ import org.cloudfoundry.client.v2.applications.CopyApplicationRequest;
 import org.cloudfoundry.client.v2.applications.CopyApplicationResponse;
 import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
+import org.cloudfoundry.client.v2.applications.DockerCredentials;
 import org.cloudfoundry.client.v2.applications.GetApplicationResponse;
 import org.cloudfoundry.client.v2.applications.InstanceStatistics;
 import org.cloudfoundry.client.v2.applications.ListApplicationRoutesRequest;
@@ -3274,7 +3275,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     private static void requestCreateDockerApplication(CloudFoundryClient cloudFoundryClient, PushApplicationRequest request, String spaceId, String stackId, String applicationId) {
         CreateApplicationRequest.Builder requestBuilder = CreateApplicationRequest.builder();
-        Optional.ofNullable(request.getDockerUsername()).ifPresent(username -> requestBuilder.dockerCredentialsJson(username, request.getDockerPassword()));
+        requestBuilder.dockerCredentials(DockerCredentials.builder().username(request.getDockerUsername()).password(request.getDockerPassword()).build());
 
         when(cloudFoundryClient.applicationsV2()
             .create(requestBuilder
@@ -3904,8 +3905,10 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestUpdateApplication(CloudFoundryClient cloudFoundryClient, String applicationId, ApplicationManifest manifest, String stackId) {
         UpdateApplicationRequest.Builder requestBuilder = UpdateApplicationRequest.builder();
         if (manifest.getDocker() != null) {
-            Optional.ofNullable(manifest.getDocker().getUsername()).ifPresent(username -> requestBuilder.dockerCredentialsJson(username, manifest.getDocker().getPassword()));
             Optional.ofNullable(manifest.getDocker().getImage()).ifPresent(requestBuilder::dockerImage);
+            String dockerUsername = manifest.getDocker().getUsername();
+            String dockerPassword = manifest.getDocker().getPassword();
+            requestBuilder.dockerCredentials(DockerCredentials.builder().username(dockerUsername).password(dockerPassword).build());
         }
 
         when(cloudFoundryClient.applicationsV2()

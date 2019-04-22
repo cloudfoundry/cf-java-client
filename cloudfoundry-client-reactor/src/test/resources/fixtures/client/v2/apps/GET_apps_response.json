@@ -38,8 +38,9 @@
         "package_updated_at": "2015-07-27T22:43:20Z",
         "detected_start_command": "",
         "enable_ssh": true,
-        "docker_credentials_json": {
-          "redacted_message": "[PRIVATE DATA HIDDEN]"
+        "docker_credentials": {
+          "username": null,
+          "password": null
         },
         "space_url": "/v2/spaces/30d5165d-0bef-4103-97cd-72269b9d7a4c",
         "stack_url": "/v2/stacks/d3476df6-534d-4140-b85b-401fa4923234",
@@ -84,8 +85,9 @@
         "package_updated_at": "2015-07-27T22:43:20Z",
         "detected_start_command": "",
         "enable_ssh": true,
-        "docker_credentials_json": {
-          "redacted_message": "[PRIVATE DATA HIDDEN]"
+        "docker_credentials": {
+          "username": null,
+          "password": null
         },
         "space_url": "/v2/spaces/cf929611-97ab-4c42-93e5-9ec26e26f456",
         "stack_url": "/v2/stacks/14b4a0b7-7c7b-4cf2-99f0-cc3ed1473f09",
@@ -130,8 +132,9 @@
         "package_updated_at": "2015-07-27T22:43:20Z",
         "detected_start_command": "",
         "enable_ssh": true,
-        "docker_credentials_json": {
-          "redacted_message": "[PRIVATE DATA HIDDEN]"
+        "docker_credentials": {
+          "username": null,
+          "password": null
         },
         "space_url": "/v2/spaces/e438b2bf-17d6-4265-8813-18e0ab95c029",
         "stack_url": "/v2/stacks/8d42ba27-60df-420e-9208-535e753b706a",

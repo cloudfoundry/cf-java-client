@@ -86,14 +86,6 @@ public abstract class AbstractApplicationEntity {
     public abstract DockerCredentials getDockerCredentials();
 
     /**
-     * The docker credentials JSONs
-     */
-    @AllowNulls
-    @JsonProperty("docker_credentials_json")
-    @Nullable
-    public abstract Map<String, Object> getDockerCredentialsJsons();
-
-    /**
      * The docker image
      */
     @JsonProperty("docker_image")

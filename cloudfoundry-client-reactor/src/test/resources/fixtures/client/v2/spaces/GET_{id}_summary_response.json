@@ -50,8 +50,9 @@
       "package_updated_at": "2016-04-22T19:33:13Z",
       "detected_start_command": "",
       "enable_ssh": true,
-      "docker_credentials_json": {
-        "redacted_message": "[PRIVATE DATA HIDDEN]"
+      "docker_credentials": {
+        "username": null,
+        "password": null
       },
       "ports": []
     }
