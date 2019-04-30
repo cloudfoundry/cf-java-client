@@ -19,6 +19,7 @@ package org.cloudfoundry.reactor.client.v2.routes;
 import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
+import org.cloudfoundry.client.v2.applications.DockerCredentials;
 import org.cloudfoundry.client.v2.jobs.JobEntity;
 import org.cloudfoundry.client.v2.routemappings.RouteMappingEntity;
 import org.cloudfoundry.client.v2.routemappings.RouteMappingResource;
@@ -342,7 +343,7 @@ public final class ReactorRoutesTest extends AbstractClientApiTest {
                         .detectedStartCommand("")
                         .diego(false)
                         .diskQuota(1024)
-                        .dockerCredentialsJson("redacted_message", "[PRIVATE DATA HIDDEN]")
+                        .dockerCredentials(DockerCredentials.builder().build())
                         .enableSsh(true)
                         .eventsUrl("/v2/apps/6141e57e-7636-480b-8f17-78c6049813f6/events")
                         .memory(1024)

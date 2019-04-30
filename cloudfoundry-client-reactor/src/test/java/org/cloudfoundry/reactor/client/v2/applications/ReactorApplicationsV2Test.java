@@ -33,6 +33,7 @@ import org.cloudfoundry.client.v2.applications.CopyApplicationResponse;
 import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
 import org.cloudfoundry.client.v2.applications.DeleteApplicationRequest;
+import org.cloudfoundry.client.v2.applications.DockerCredentials;
 import org.cloudfoundry.client.v2.applications.DownloadApplicationDropletRequest;
 import org.cloudfoundry.client.v2.applications.DownloadApplicationRequest;
 import org.cloudfoundry.client.v2.applications.GetApplicationPermissionsRequest;
@@ -132,7 +133,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                     .detectedStartCommand("")
                     .diego(false)
                     .diskQuota(1024)
-                    .dockerCredentialsJson("redacted_message", "[PRIVATE DATA HIDDEN]")
+                    .dockerCredentials(DockerCredentials.builder().build())
                     .enableSsh(true)
                     .environmentJsons(Collections.emptyMap())
                     .eventsUrl("/v2/apps/638e90b6-502f-47a8-a3bf-b18fdf3fb70a/events")
@@ -226,7 +227,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                     .detectedStartCommand("")
                     .diego(true)
                     .diskQuota(1024)
-                    .dockerCredentialsJson("redacted_message", "[PRIVATE DATA HIDDEN]")
+                    .dockerCredentials(DockerCredentials.builder().build())
                     .dockerImage("cloudfoundry/hello:latest")
                     .enableSsh(true)
                     .environmentJsons(Collections.emptyMap())
@@ -394,7 +395,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                     .detectedStartCommand("")
                     .diego(false)
                     .diskQuota(1024)
-                    .dockerCredentialsJson("redacted_message", "[PRIVATE DATA HIDDEN]")
+                    .dockerCredentials(DockerCredentials.builder().build())
                     .enableSsh(true)
                     .eventsUrl("/v2/apps/03f286bb-f17c-42b4-8dcd-b818b0b798af/events")
                     .healthCheckType("port")
@@ -505,7 +506,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                         .detectedStartCommand("")
                         .diego(false)
                         .diskQuota(1024)
-                        .dockerCredentialsJson("redacted_message", "[PRIVATE DATA HIDDEN]")
+                        .dockerCredentials(DockerCredentials.builder().build())
                         .enableSsh(true)
                         .eventsUrl("/v2/apps/3d294ed0-105c-4ccd-8f79-5605d6b7198c/events")
                         .healthCheckType("port")
@@ -539,7 +540,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                         .detectedStartCommand("")
                         .diego(false)
                         .diskQuota(1024)
-                        .dockerCredentialsJson("redacted_message", "[PRIVATE DATA HIDDEN]")
+                        .dockerCredentials(DockerCredentials.builder().build())
                         .enableSsh(true)
                         .eventsUrl("/v2/apps/522c5382-29e9-48aa-9db0-9f6cfa643ec1/events")
                         .healthCheckType("port")
@@ -573,7 +574,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                         .detectedStartCommand("")
                         .diego(false)
                         .diskQuota(1024)
-                        .dockerCredentialsJson("redacted_message", "[PRIVATE DATA HIDDEN]")
+                        .dockerCredentials(DockerCredentials.builder().build())
                         .enableSsh(true)
                         .eventsUrl("/v2/apps/ec31bfbd-ab5c-490d-8e83-3c1ea5d1bedf/events")
                         .healthCheckType("port")
@@ -773,7 +774,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                     .packageUpdatedAt("2015-07-27T22:43:33Z")
                     .detectedStartCommand("")
                     .enableSsh(true)
-                    .dockerCredentialsJson("redacted_message", "[PRIVATE DATA HIDDEN]")
+                    .dockerCredentials(DockerCredentials.builder().build())
                     .build())
                 .build())
             .expectComplete()
@@ -896,7 +897,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                 .ports(Collections.emptyList())
                 .detectedStartCommand("")
                 .enableSsh(true)
-                .dockerCredentialsJson("redacted_message", "[PRIVATE DATA HIDDEN]")
+                .dockerCredentials(DockerCredentials.builder().build())
                 .build())
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -964,7 +965,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                     .detectedStartCommand("")
                     .ports(Collections.emptyList())
                     .enableSsh(true)
-                    .dockerCredentialsJson("redacted_message", "[PRIVATE DATA HIDDEN]")
+                    .dockerCredentials(DockerCredentials.builder().build())
                     .spaceUrl("/v2/spaces/701aebe5-92fd-44cf-a7e6-bc54685c32ea")
                     .stackUrl("/v2/stacks/2cdc06a4-cb6e-4191-9ce8-b6bca4a16aaf")
                     .eventsUrl("/v2/apps/0c71909b-3d44-49c3-b65d-13894d70972c/events")

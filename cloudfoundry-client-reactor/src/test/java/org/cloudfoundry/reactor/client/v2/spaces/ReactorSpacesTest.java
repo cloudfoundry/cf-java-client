@@ -19,6 +19,7 @@ package org.cloudfoundry.reactor.client.v2.spaces;
 import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
+import org.cloudfoundry.client.v2.applications.DockerCredentials;
 import org.cloudfoundry.client.v2.domains.Domain;
 import org.cloudfoundry.client.v2.domains.DomainEntity;
 import org.cloudfoundry.client.v2.domains.DomainResource;
@@ -549,22 +550,22 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     @Test
     public void deleteRecursive() {
         mockRequest(InteractionContext.builder()
-                .request(TestRequest.builder()
-                        .method(DELETE).path("/spaces/test-space-id?recursive=true")
-                        .build())
-                .response(TestResponse.builder()
-                        .status(NO_CONTENT)
-                        .build())
-                .build());
+            .request(TestRequest.builder()
+                .method(DELETE).path("/spaces/test-space-id?recursive=true")
+                .build())
+            .response(TestResponse.builder()
+                .status(NO_CONTENT)
+                .build())
+            .build());
 
         this.spaces
-                .delete(DeleteSpaceRequest.builder()
-                        .recursive(true)
-                        .spaceId("test-space-id")
-                        .build())
-                .as(StepVerifier::create)
-                .expectComplete()
-                .verify(Duration.ofSeconds(5));
+            .delete(DeleteSpaceRequest.builder()
+                .recursive(true)
+                .spaceId("test-space-id")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -665,7 +666,7 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
                     .packageUpdatedAt("2016-04-22T19:33:13Z")
                     .detectedStartCommand("")
                     .enableSsh(true)
-                    .dockerCredentialsJson("redacted_message", "[PRIVATE DATA HIDDEN]")
+                    .dockerCredentials(DockerCredentials.builder().build())
                     .build())
                 .service(builder()
                     .id("a049e5e8-8597-469e-b1c6-ddb8eb2c0af0")
@@ -788,7 +789,7 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
                         .packageUpdatedAt("2015-07-27T22:43:08Z")
                         .detectedStartCommand("")
                         .enableSsh(true)
-                        .dockerCredentialsJson("redacted_message", "[PRIVATE DATA HIDDEN]")
+                        .dockerCredentials(DockerCredentials.builder().build())
                         .spaceUrl("/v2/spaces/ca816a1b-ed3e-4ea8-bda2-2031d2e5b89f")
                         .stackUrl("/v2/stacks/e458a99f-53a4-4da4-b78a-5f2eb212cc47")
                         .eventsUrl("/v2/apps/4ee31730-3c0e-4ec6-8329-26e727ab8ccd/events")
