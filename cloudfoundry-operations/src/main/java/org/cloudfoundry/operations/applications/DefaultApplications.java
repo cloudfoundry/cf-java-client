@@ -1291,7 +1291,10 @@ public final class DefaultApplications implements Applications {
                     String username = manifest.getDocker().getUsername();
                     String password = manifest.getDocker().getPassword();
                     builder
-                        .dockerCredentials(DockerCredentials.builder().username(username).password(password).build());
+                        .dockerCredentials(DockerCredentials.builder()
+                            .username(username)
+                            .password(password)
+                            .build());
 
                 });
         }
@@ -1588,7 +1591,10 @@ public final class DefaultApplications implements Applications {
                         String username = manifest.getDocker().getUsername();
                         String password = manifest.getDocker().getPassword();
                         builder
-                            .dockerCredentials(DockerCredentials.builder().username(username).password(password).build());
+                            .dockerCredentials(DockerCredentials.builder()
+                                .username(username)
+                                .password(password)
+                                .build());
                     });
             }
 

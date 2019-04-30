@@ -550,22 +550,22 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     @Test
     public void deleteRecursive() {
         mockRequest(InteractionContext.builder()
-                .request(TestRequest.builder()
-                        .method(DELETE).path("/spaces/test-space-id?recursive=true")
-                        .build())
-                .response(TestResponse.builder()
-                        .status(NO_CONTENT)
-                        .build())
-                .build());
+            .request(TestRequest.builder()
+                .method(DELETE).path("/spaces/test-space-id?recursive=true")
+                .build())
+            .response(TestResponse.builder()
+                .status(NO_CONTENT)
+                .build())
+            .build());
 
         this.spaces
-                .delete(DeleteSpaceRequest.builder()
-                        .recursive(true)
-                        .spaceId("test-space-id")
-                        .build())
-                .as(StepVerifier::create)
-                .expectComplete()
-                .verify(Duration.ofSeconds(5));
+            .delete(DeleteSpaceRequest.builder()
+                .recursive(true)
+                .spaceId("test-space-id")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
     }
 
     @Test
