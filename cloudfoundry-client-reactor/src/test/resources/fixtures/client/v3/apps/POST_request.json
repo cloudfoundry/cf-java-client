@@ -1,10 +1,18 @@
 {
-  "name": "my_app",
-  "relationships": {
-    "space": {
-      "data": {
-        "guid": "2f35885d-0c9d-4423-83ad-fd05066f8576"
-      }
-    }
-  }
+	"name": "my_app",
+	"relationships": {
+		"space": {
+			"data": {
+				"guid": "2f35885d-0c9d-4423-83ad-fd05066f8576"
+			}
+		}
+	},
+	"metadata": {
+		"labels": {
+			"isLive": "true"
+		},
+		"annotations": {
+			"version": "1.2.3"
+		}
+	}
 }

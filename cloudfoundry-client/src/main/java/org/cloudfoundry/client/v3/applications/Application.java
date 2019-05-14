@@ -19,6 +19,7 @@ package org.cloudfoundry.client.v3.applications;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.Lifecycle;
+import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.Resource;
 
 /**
@@ -50,5 +51,12 @@ public abstract class Application extends Resource {
      */
     @JsonProperty("state")
     public abstract ApplicationState getState();
+    
+    /**
+     * The metadata
+     */
+    @JsonProperty("metadata")
+    @Nullable
+    public abstract Metadata getMetadata();
 
 }

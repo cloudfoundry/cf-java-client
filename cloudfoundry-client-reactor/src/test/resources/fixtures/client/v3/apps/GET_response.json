@@ -36,6 +36,14 @@
           }
         }
       },
+      "metadata": {
+        "labels": {
+          "isLive": true
+        },
+        "annotations": {
+          "version": "1.2.3"
+        }
+      },
       "links": {
         "self": {
           "href": "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446"

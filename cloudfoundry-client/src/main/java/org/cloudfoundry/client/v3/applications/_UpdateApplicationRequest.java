@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.Lifecycle;
+import org.cloudfoundry.client.v3.Metadata;
 import org.immutables.value.Value;
 
 /**
@@ -49,5 +50,12 @@ abstract class _UpdateApplicationRequest {
     @JsonProperty("name")
     @Nullable
     abstract String getName();
+    
+    /**
+     * The metadata
+     */
+    @JsonProperty("metadata")
+    @Nullable
+    abstract Metadata getMetadata();
 
 }

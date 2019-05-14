@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.Lifecycle;
+import org.cloudfoundry.client.v3.Metadata;
 import org.immutables.value.Value;
 
 import java.util.Map;
@@ -58,5 +59,12 @@ abstract class _CreateApplicationRequest {
      */
     @JsonProperty("relationships")
     abstract ApplicationRelationships getRelationships();
+    
+    /**
+     * The metadata
+     */
+    @JsonProperty("metadata")
+    @Nullable
+    abstract Metadata getMetadata();
 
 }

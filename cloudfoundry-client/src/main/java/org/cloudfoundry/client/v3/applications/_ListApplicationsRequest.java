@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.client.v3.applications;
 
+import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.FilterParameter;
 import org.cloudfoundry.client.v3.PaginatedRequest;
 import org.immutables.value.Value;
@@ -51,5 +52,12 @@ abstract class _ListApplicationsRequest extends PaginatedRequest {
      */
     @FilterParameter("space_guids")
     abstract List<String> getSpaceIds();
-
+    
+    /**
+     * The metadata query
+     */
+    @FilterParameter("label_selector")
+    @Nullable
+    abstract String getLabelSelector();
+    
 }
