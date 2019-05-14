@@ -17,6 +17,7 @@
 package org.cloudfoundry.reactor.client.v3.serviceInstances;
 
 import org.cloudfoundry.client.v3.Link;
+import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.Pagination;
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.ToOneRelationship;
@@ -29,6 +30,8 @@ import org.cloudfoundry.client.v3.serviceInstances.ServiceInstanceResource;
 import org.cloudfoundry.client.v3.serviceInstances.ShareServiceInstanceRequest;
 import org.cloudfoundry.client.v3.serviceInstances.ShareServiceInstanceResponse;
 import org.cloudfoundry.client.v3.serviceInstances.UnshareServiceInstanceRequest;
+import org.cloudfoundry.client.v3.serviceInstances.UpdateServiceInstanceRequest;
+import org.cloudfoundry.client.v3.serviceInstances.UpdateServiceInstanceResponse;
 import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
@@ -42,6 +45,7 @@ import java.time.Duration;
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpMethod.PATCH;
 import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
@@ -221,6 +225,41 @@ public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest {
                 .spaceId("test-space-id")
                 .build())
             .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+    
+    @Test
+    public void update() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(PATCH).path("/service_instances/68d54d31-9b3a-463b-ba94-e8e4c32edbac")
+                .payload("fixtures/client/v3/serviceinstances/PATCH_request.json")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v3/serviceinstances/PATCH_response.json")
+                .build())
+            .build());
+
+        this.serviceInstances
+            .update(UpdateServiceInstanceRequest.builder()
+                .serviceInstanceId("68d54d31-9b3a-463b-ba94-e8e4c32edbac")
+                .metadata(Metadata.builder()
+                          .label("test", "yes")
+                          .annotation("data", "potato")
+                          .build())
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(UpdateServiceInstanceResponse.builder()
+                        .id("68d54d31-9b3a-463b-ba94-e8e4c32edbac")
+                        .metadata(Metadata.builder()
+                                  .label("test", "yes")
+                                  .annotation("data", "potato")
+                                  .build())
+                        .name("my_service_instance1")
+                        .createdAt("2017-11-17T13:54:21Z")
+                        .build())
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }

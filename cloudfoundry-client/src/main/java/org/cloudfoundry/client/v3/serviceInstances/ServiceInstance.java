@@ -18,6 +18,7 @@ package org.cloudfoundry.client.v3.serviceInstances;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.cloudfoundry.Nullable;
+import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.Resource;
 
 /**
@@ -37,5 +38,12 @@ public abstract class ServiceInstance extends Resource {
     @JsonProperty("relationships")
     @Nullable
     public abstract ServiceInstanceRelationships getRelationships();
+    
+    /**
+     * The metadata
+     */
+    @JsonProperty("metadata")
+    @Nullable
+    public abstract Metadata getMetadata();
 
 }

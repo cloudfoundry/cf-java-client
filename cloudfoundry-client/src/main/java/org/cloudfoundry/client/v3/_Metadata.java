@@ -18,6 +18,7 @@ package org.cloudfoundry.client.v3;
 
 import java.util.Map;
 
+import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
@@ -35,6 +36,7 @@ abstract class _Metadata {
      * The metadata lables
      */
     @JsonProperty("labels")
+    @AllowNulls
     @Nullable
     abstract Map<String, String> getLabels();
 
@@ -42,6 +44,7 @@ abstract class _Metadata {
      * The metadata annotations
      */
     @JsonProperty("annotations")
+    @AllowNulls
     @Nullable
     abstract Map<String, String> getAnnotations();
 

@@ -1,0 +1,13 @@
+{
+	"guid": "68d54d31-9b3a-463b-ba94-e8e4c32edbac",
+	"created_at": "2017-11-17T13:54:21Z",
+    "name": "my_service_instance1",
+	"metadata": {
+	   "labels": {
+	       "test": "yes"
+	   },
+	   "annotations": {
+	       "data": "potato"
+	   }
+	}
+}
