@@ -66,7 +66,6 @@ public final class QueryBuilder {
         processValue(builder, queryParameter.value(),
             ((Collection<?>) value).stream()
                 .map(o -> o.toString().trim())
-                .filter(s -> !s.isEmpty())
                 .collect(Collectors.joining(queryParameter.delimiter())));
     }
 
@@ -76,9 +75,7 @@ public final class QueryBuilder {
     }
 
     private static void processValue(UriComponentsBuilder builder, String name, String value) {
-        if (!value.isEmpty()) {
-            builder.queryParam(name, value);
-        }
+        builder.queryParam(name, value);
     }
 
     private static Consumer<Object> processValue(UriComponentsBuilder builder, QueryParameter queryParameter) {

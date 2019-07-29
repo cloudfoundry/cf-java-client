@@ -64,8 +64,7 @@ final class FilterBuilder {
         processValue(builder, name,
             ((Collection<?>) value).stream()
                 .map(o -> o.toString().trim())
-                .filter(s -> !s.isEmpty())
-                .collect(Collectors.joining(",")));
+                .collect(Collectors.toList()));
     }
 
     private static Consumer<Method> processMethod(UriComponentsBuilder builder, Object instance) {
@@ -73,10 +72,15 @@ final class FilterBuilder {
             .ifPresent(processAnnotation(builder, method, instance));
     }
 
-    private static void processValue(UriComponentsBuilder builder, String name, String value) {
+    private static void processValue(UriComponentsBuilder builder, String name, Collection<String> collection) {
+        String value = String.join(",", collection);
         if (!value.isEmpty()) {
-            builder.queryParam(name, value);
+            processValue(builder, name, value);
         }
+    }
+
+    private static void processValue(UriComponentsBuilder builder, String name, String value) {
+        builder.queryParam(name, value);
     }
 
     private static Consumer<Object> processValue(UriComponentsBuilder builder, FilterParameter filterParameter) {
