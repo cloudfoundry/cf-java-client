@@ -471,10 +471,10 @@ public final class ReactorPackagesTest extends AbstractClientApiTest {
                     assertThat(body.readString(Charset.defaultCharset()))
                         .isEqualTo("\r\n--" + boundary + "\r\n" +
                             "content-disposition: form-data; name=\"bits\"; filename=\"application.zip\"\r\n" +
-                            "content-length: 13\r\n" +
+                            "content-length: 12\r\n" +
                             "content-type: application/zip\r\n" +
                             "\r\n" +
-                            "test-content\n" +
+                            "test-content" +
                             "\r\n" +
                             "--" + boundary + "--");
                 }))

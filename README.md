@@ -254,12 +254,14 @@ The above example is more complicated:
 1. `.map(...)` – Maps the `Resource` to an `OrganizationSummary` type.
 
 ## Development
-The project depends on Java 8.  To build from source and install to your local Maven cache, run the following:
+The project depends on Java 8. To build from source and install to your local Maven cache, run the following:
 
 ```shell
 $ git submodule update --init --recursive
 $ ./mvnw clean install
 ```
+
+It also depends on [Immutables](https://immutables.github.io/) and won't compile in IDEs like Eclipse or IntelliJ unless you also have an enabled annotation processor. See [this guide](https://immutables.github.io/apt.html) for instructions on how to configure your IDE.
 
 To run the integration tests, run the following:
 
