@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.operations.applications;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 
@@ -30,6 +31,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.operations.applications.ApplicationHealthCheck.NONE;
 import static org.cloudfoundry.operations.applications.ApplicationHealthCheck.PORT;
+import static org.junit.Assume.assumeTrue;
 
 public final class ApplicationManifestUtilsTest {
 
@@ -512,7 +514,18 @@ public final class ApplicationManifestUtilsTest {
     }
 
     @Test
-    public void write() throws IOException {
+    public void windowsWrite() throws IOException {
+        assumeTrue(SystemUtils.IS_OS_WINDOWS);
+        write("c:\\alpha-path", "fixtures/manifest-echo-windows.yml");
+    }
+
+    @Test
+    public void unixWrite() throws IOException {
+        assumeTrue(SystemUtils.IS_OS_UNIX);
+        write("/alpha-path", "fixtures/manifest-echo-unix.yml");
+    }
+
+    private void write(String path, String expectedManifest) throws IOException {
         Path out = Files.createTempFile("test-manifest-", ".yml");
 
         ApplicationManifestUtils.write(out, Arrays.asList(
@@ -525,7 +538,7 @@ public final class ApplicationManifestUtilsTest {
                 .instances(-1)
                 .memory(512)
                 .noRoute(true)
-                .path(Paths.get("/alpha-path"))
+                .path(Paths.get(path))
                 .randomRoute(true)
                 .route(Route.builder()
                     .route("alpha-route-1")
@@ -555,7 +568,7 @@ public final class ApplicationManifestUtilsTest {
                 .instances(-1)
                 .noHostname(true)
                 .noRoute(true)
-                .path(Paths.get("c:\\alpha-path"))
+                .path(Paths.get(path))
                 .randomRoute(true)
                 .stack("alpha-stack")
                 .timeout(-1)
@@ -565,7 +578,7 @@ public final class ApplicationManifestUtilsTest {
                 .service("alpha-instance-2")
                 .build()));
 
-        List<String> expected = Files.readAllLines(new ClassPathResource("fixtures/manifest-echo.yml").getFile().toPath());
+        List<String> expected = Files.readAllLines(new ClassPathResource(expectedManifest).getFile().toPath());
         List<String> actual = Files.readAllLines(out);
 
         assertThat(actual).isEqualTo(expected);
