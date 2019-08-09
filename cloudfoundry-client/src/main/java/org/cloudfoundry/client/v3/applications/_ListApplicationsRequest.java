@@ -36,6 +36,13 @@ abstract class _ListApplicationsRequest extends PaginatedRequest {
     abstract List<String> getApplicationIds();
 
     /**
+     * The metadata query
+     */
+    @FilterParameter("label_selector")
+    @Nullable
+    abstract String getLabelSelector();
+
+    /**
      * The names
      */
     @FilterParameter("names")
@@ -52,12 +59,5 @@ abstract class _ListApplicationsRequest extends PaginatedRequest {
      */
     @FilterParameter("space_guids")
     abstract List<String> getSpaceIds();
-    
-    /**
-     * The metadata query
-     */
-    @FilterParameter("label_selector")
-    @Nullable
-    abstract String getLabelSelector();
-    
+
 }

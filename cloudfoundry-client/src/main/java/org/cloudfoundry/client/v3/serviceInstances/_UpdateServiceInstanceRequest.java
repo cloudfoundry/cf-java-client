@@ -16,12 +16,11 @@
 
 package org.cloudfoundry.client.v3.serviceInstances;
 
-import org.cloudfoundry.client.v3.Metadata;
-import org.immutables.value.Value;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.cloudfoundry.client.v3.Metadata;
+import org.immutables.value.Value;
 
 /**
  * The request payload for the Update Application operation
@@ -29,17 +28,17 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 @JsonSerialize
 @Value.Immutable
 abstract class _UpdateServiceInstanceRequest {
-    
-    /**
-     * The service instance id
-     */
-    @JsonIgnore
-    abstract String getServiceInstanceId();
-    
+
     /**
      * The metadata
      */
     @JsonProperty("metadata")
     abstract Metadata getMetadata();
+
+    /**
+     * The service instance id
+     */
+    @JsonIgnore
+    abstract String getServiceInstanceId();
 
 }

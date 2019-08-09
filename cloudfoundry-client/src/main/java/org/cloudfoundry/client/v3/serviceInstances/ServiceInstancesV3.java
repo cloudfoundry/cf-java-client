@@ -57,7 +57,7 @@ public interface ServiceInstancesV3 {
      * @return the response from the Unshare Service Instance From Another Space request
      */
     Mono<Void> unshare(UnshareServiceInstanceRequest request);
-    
+
     /**
      * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#update-a-service-instance">
      * Update a service instance</a> request

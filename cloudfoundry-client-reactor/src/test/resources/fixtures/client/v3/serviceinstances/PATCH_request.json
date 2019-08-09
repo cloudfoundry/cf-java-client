@@ -1,10 +1,10 @@
 {
-	"metadata": {
-	   "labels": {
-	       "test": "yes"
-	   },
-	   "annotations": {
-	       "data": "potato"
-	   }
-	}
+  "metadata": {
+    "labels": {
+      "key": "value"
+    },
+    "annotations": {
+      "note": "detailed information"
+    }
+  }
 }

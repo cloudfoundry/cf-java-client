@@ -34,6 +34,13 @@ public abstract class Application extends Resource {
     public abstract Lifecycle getLifecycle();
 
     /**
+     * The metadata
+     */
+    @JsonProperty("metadata")
+    @Nullable
+    public abstract Metadata getMetadata();
+
+    /**
      * The name
      */
     @JsonProperty("name")
@@ -51,12 +58,5 @@ public abstract class Application extends Resource {
      */
     @JsonProperty("state")
     public abstract ApplicationState getState();
-    
-    /**
-     * The metadata
-     */
-    @JsonProperty("metadata")
-    @Nullable
-    public abstract Metadata getMetadata();
 
 }

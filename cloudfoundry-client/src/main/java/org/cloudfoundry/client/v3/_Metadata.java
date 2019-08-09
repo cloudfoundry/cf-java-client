@@ -16,14 +16,13 @@
 
 package org.cloudfoundry.client.v3;
 
-import java.util.Map;
-
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import java.util.Map;
 
 /**
  * The metadata payload for a resource
@@ -33,19 +32,19 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 abstract class _Metadata {
 
     /**
-     * The metadata lables
-     */
-    @JsonProperty("labels")
-    @AllowNulls
-    @Nullable
-    abstract Map<String, String> getLabels();
-
-    /**
      * The metadata annotations
      */
     @JsonProperty("annotations")
     @AllowNulls
     @Nullable
     abstract Map<String, String> getAnnotations();
+
+    /**
+     * The metadata labels
+     */
+    @JsonProperty("labels")
+    @AllowNulls
+    @Nullable
+    abstract Map<String, String> getLabels();
 
 }

@@ -30,6 +30,13 @@ import java.util.List;
 abstract class _ListServiceInstancesRequest extends PaginatedRequest {
 
     /**
+     * The metadata query
+     */
+    @FilterParameter("label_selector")
+    @Nullable
+    abstract String getLabelSelector();
+
+    /**
      * The service instance names
      */
     @FilterParameter("names")
@@ -40,11 +47,4 @@ abstract class _ListServiceInstancesRequest extends PaginatedRequest {
      */
     @FilterParameter("space_guids")
     abstract List<String> getSpaceIds();
-    
-    /**
-     * The metadata query
-     */
-    @FilterParameter("label_selector")
-    @Nullable
-    abstract String getLabelSelector();
 }

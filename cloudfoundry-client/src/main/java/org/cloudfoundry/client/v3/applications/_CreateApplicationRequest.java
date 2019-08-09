@@ -49,6 +49,13 @@ abstract class _CreateApplicationRequest {
     abstract Lifecycle getLifecycle();
 
     /**
+     * The metadata
+     */
+    @JsonProperty("metadata")
+    @Nullable
+    abstract Metadata getMetadata();
+
+    /**
      * The name
      */
     @JsonProperty("name")
@@ -59,12 +66,5 @@ abstract class _CreateApplicationRequest {
      */
     @JsonProperty("relationships")
     abstract ApplicationRelationships getRelationships();
-    
-    /**
-     * The metadata
-     */
-    @JsonProperty("metadata")
-    @Nullable
-    abstract Metadata getMetadata();
 
 }

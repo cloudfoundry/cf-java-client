@@ -45,17 +45,16 @@ abstract class _UpdateApplicationRequest {
     abstract Lifecycle getLifecycle();
 
     /**
-     * The name
-     */
-    @JsonProperty("name")
-    @Nullable
-    abstract String getName();
-    
-    /**
      * The metadata
      */
     @JsonProperty("metadata")
     @Nullable
     abstract Metadata getMetadata();
 
+    /**
+     * The name
+     */
+    @JsonProperty("name")
+    @Nullable
+    abstract String getName();
 }

@@ -44,8 +44,8 @@ import java.time.Duration;
 
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
-import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpMethod.PATCH;
+import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
@@ -228,7 +228,7 @@ public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest {
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
-    
+
     @Test
     public void update() {
         mockRequest(InteractionContext.builder()
@@ -246,20 +246,31 @@ public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest {
             .update(UpdateServiceInstanceRequest.builder()
                 .serviceInstanceId("68d54d31-9b3a-463b-ba94-e8e4c32edbac")
                 .metadata(Metadata.builder()
-                          .label("test", "yes")
-                          .annotation("data", "potato")
-                          .build())
+                    .annotation("note", "detailed information")
+                    .label("key", "value")
+                    .build())
                 .build())
             .as(StepVerifier::create)
             .expectNext(UpdateServiceInstanceResponse.builder()
-                        .id("68d54d31-9b3a-463b-ba94-e8e4c32edbac")
-                        .metadata(Metadata.builder()
-                                  .label("test", "yes")
-                                  .annotation("data", "potato")
-                                  .build())
-                        .name("my_service_instance1")
-                        .createdAt("2017-11-17T13:54:21Z")
+                .createdAt("2017-11-17T13:54:21Z")
+                .id("85ccdcad-d725-4109-bca4-fd6ba062b5c8")
+                .link("space", Link.builder()
+                    .href("https://api.example.org/v3/spaces/ae0031f9-dd49-461c-a945-df40e77c39cb")
+                    .build())
+                .metadata(Metadata.builder()
+                    .annotation("note", "detailed information")
+                    .label("key", "value")
+                    .build())
+                .name("my_service_instance")
+                .relationships(ServiceInstanceRelationships.builder()
+                    .space(ToOneRelationship.builder()
+                        .data(Relationship.builder()
+                            .id("ae0031f9-dd49-461c-a945-df40e77c39cb")
+                            .build())
                         .build())
+                    .build())
+                .updatedAt("2017-11-17T13:54:21Z")
+                .build())
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }

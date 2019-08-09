@@ -27,6 +27,13 @@ import org.cloudfoundry.client.v3.Resource;
 public abstract class ServiceInstance extends Resource {
 
     /**
+     * The metadata
+     */
+    @JsonProperty("metadata")
+    @Nullable
+    public abstract Metadata getMetadata();
+
+    /**
      * The name
      */
     @JsonProperty("name")
@@ -38,12 +45,5 @@ public abstract class ServiceInstance extends Resource {
     @JsonProperty("relationships")
     @Nullable
     public abstract ServiceInstanceRelationships getRelationships();
-    
-    /**
-     * The metadata
-     */
-    @JsonProperty("metadata")
-    @Nullable
-    public abstract Metadata getMetadata();
 
 }
