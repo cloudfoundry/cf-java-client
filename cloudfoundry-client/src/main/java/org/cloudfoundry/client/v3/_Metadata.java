@@ -14,57 +14,37 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.applications;
+package org.cloudfoundry.client.v3;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v3.Lifecycle;
-import org.cloudfoundry.client.v3.Metadata;
 import org.immutables.value.Value;
 
 import java.util.Map;
 
 /**
- * The request payload for the Create Application operation
+ * The metadata payload for a resource
  */
-@JsonSerialize
+@JsonDeserialize
 @Value.Immutable
-abstract class _CreateApplicationRequest {
+abstract class _Metadata {
 
     /**
-     * The environment variables
+     * The metadata annotations
      */
+    @JsonProperty("annotations")
     @AllowNulls
-    @JsonProperty("environment_variables")
     @Nullable
-    abstract Map<String, String> getEnvironmentVariables();
+    abstract Map<String, String> getAnnotations();
 
     /**
-     * The lifecycle
+     * The metadata labels
      */
-    @JsonProperty("lifecycle")
+    @JsonProperty("labels")
+    @AllowNulls
     @Nullable
-    abstract Lifecycle getLifecycle();
-
-    /**
-     * The metadata
-     */
-    @JsonProperty("metadata")
-    @Nullable
-    abstract Metadata getMetadata();
-
-    /**
-     * The name
-     */
-    @JsonProperty("name")
-    abstract String getName();
-
-    /**
-     * The relationships
-     */
-    @JsonProperty("relationships")
-    abstract ApplicationRelationships getRelationships();
+    abstract Map<String, String> getLabels();
 
 }

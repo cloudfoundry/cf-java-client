@@ -18,12 +18,20 @@ package org.cloudfoundry.client.v3.serviceInstances;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.cloudfoundry.Nullable;
+import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.Resource;
 
 /**
  * Base class for responses that are service instances
  */
 public abstract class ServiceInstance extends Resource {
+
+    /**
+     * The metadata
+     */
+    @JsonProperty("metadata")
+    @Nullable
+    public abstract Metadata getMetadata();
 
     /**
      * The name

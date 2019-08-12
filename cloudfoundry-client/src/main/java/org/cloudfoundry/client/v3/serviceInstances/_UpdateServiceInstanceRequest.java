@@ -14,57 +14,31 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.applications;
+package org.cloudfoundry.client.v3.serviceInstances;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.cloudfoundry.AllowNulls;
-import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v3.Lifecycle;
 import org.cloudfoundry.client.v3.Metadata;
 import org.immutables.value.Value;
 
-import java.util.Map;
-
 /**
- * The request payload for the Create Application operation
+ * The request payload for the Update Application operation
  */
 @JsonSerialize
 @Value.Immutable
-abstract class _CreateApplicationRequest {
-
-    /**
-     * The environment variables
-     */
-    @AllowNulls
-    @JsonProperty("environment_variables")
-    @Nullable
-    abstract Map<String, String> getEnvironmentVariables();
-
-    /**
-     * The lifecycle
-     */
-    @JsonProperty("lifecycle")
-    @Nullable
-    abstract Lifecycle getLifecycle();
+abstract class _UpdateServiceInstanceRequest {
 
     /**
      * The metadata
      */
     @JsonProperty("metadata")
-    @Nullable
     abstract Metadata getMetadata();
 
     /**
-     * The name
+     * The service instance id
      */
-    @JsonProperty("name")
-    abstract String getName();
-
-    /**
-     * The relationships
-     */
-    @JsonProperty("relationships")
-    abstract ApplicationRelationships getRelationships();
+    @JsonIgnore
+    abstract String getServiceInstanceId();
 
 }

@@ -24,6 +24,8 @@ import org.cloudfoundry.client.v3.serviceInstances.ServiceInstancesV3;
 import org.cloudfoundry.client.v3.serviceInstances.ShareServiceInstanceRequest;
 import org.cloudfoundry.client.v3.serviceInstances.ShareServiceInstanceResponse;
 import org.cloudfoundry.client.v3.serviceInstances.UnshareServiceInstanceRequest;
+import org.cloudfoundry.client.v3.serviceInstances.UpdateServiceInstanceRequest;
+import org.cloudfoundry.client.v3.serviceInstances.UpdateServiceInstanceResponse;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
@@ -69,4 +71,8 @@ public final class ReactorServiceInstancesV3 extends AbstractClientV3Operations 
             .checkpoint();
     }
 
+    @Override
+    public Mono<UpdateServiceInstanceResponse> update(UpdateServiceInstanceRequest request) {
+        return patch(request, UpdateServiceInstanceResponse.class, builder -> builder.pathSegment("service_instances", request.getServiceInstanceId()));
+    }
 }

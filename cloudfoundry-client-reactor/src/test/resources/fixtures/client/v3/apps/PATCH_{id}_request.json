@@ -7,5 +7,14 @@
         "java_buildpack"
       ]
     }
+  },
+  "metadata": {
+    "labels": {
+        "isLive": "false",
+        "maintenance": "true"
+    },
+    "annotations": {
+        "version": "1.2.4"
+    }
   }
 }

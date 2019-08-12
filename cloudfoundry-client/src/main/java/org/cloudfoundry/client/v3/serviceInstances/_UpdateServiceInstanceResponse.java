@@ -16,35 +16,14 @@
 
 package org.cloudfoundry.client.v3.serviceInstances;
 
-import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v3.FilterParameter;
-import org.cloudfoundry.client.v3.PaginatedRequest;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.immutables.value.Value;
 
-import java.util.List;
-
 /**
- * The request payload for the List Service Instances operation.
+ * The response payload for the Update Application operation
  */
+@JsonDeserialize
 @Value.Immutable
-abstract class _ListServiceInstancesRequest extends PaginatedRequest {
+abstract class _UpdateServiceInstanceResponse extends ServiceInstance {
 
-    /**
-     * The metadata query
-     */
-    @FilterParameter("label_selector")
-    @Nullable
-    abstract String getLabelSelector();
-
-    /**
-     * The service instance names
-     */
-    @FilterParameter("names")
-    abstract List<String> getServiceInstanceNames();
-
-    /**
-     * The space ids
-     */
-    @FilterParameter("space_guids")
-    abstract List<String> getSpaceIds();
 }
