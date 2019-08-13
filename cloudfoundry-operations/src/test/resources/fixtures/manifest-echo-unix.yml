@@ -40,7 +40,7 @@ applications:
   name: alpha-application-2
   no-hostname: true
   no-route: true
-  path: c:\alpha-path
+  path: /alpha-path
   random-route: true
   services:
   - alpha-instance-1

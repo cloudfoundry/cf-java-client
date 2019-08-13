@@ -1002,10 +1002,10 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                             "{\"sha1\":\"ff84f89760317996b9dd180ab996b079f418396f\",\"fn\":\"path/to/code.jar\",\"size\":123}]" +
                             "\r\n" + "--" + boundary + "\r\n" +
                             "content-disposition: form-data; name=\"application\"; filename=\"application.zip\"\r\n" +
-                            "content-length: 13\r\n" +
+                            "content-length: 12\r\n" +
                             "content-type: application/zip\r\n" +
                             "\r\n" +
-                            "test-content\n" +
+                            "test-content" +
                             "\r\n" +
                             "--" + boundary + "--");
                 }))
@@ -1058,9 +1058,9 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                     assertThat(body.readString(Charset.defaultCharset()))
                         .isEqualTo("\r\n" + "--" + boundary + "\r\n" +
                             "content-disposition: form-data; name=\"droplet\"; filename=\"test-droplet.tgz\"\r\n" +
-                            "content-length: 13\r\n" +
+                            "content-length: 12\r\n" +
                             "\r\n" +
-                            "test-content\n" +
+                            "test-content" +
                             "\r\n" +
                             "--" + boundary + "--");
                 }))
