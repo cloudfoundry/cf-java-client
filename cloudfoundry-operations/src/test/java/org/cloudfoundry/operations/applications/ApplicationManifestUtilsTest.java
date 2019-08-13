@@ -514,15 +514,15 @@ public final class ApplicationManifestUtilsTest {
     }
 
     @Test
-    public void windowsWrite() throws IOException {
-        assumeTrue(SystemUtils.IS_OS_WINDOWS);
-        write("c:\\alpha-path", "fixtures/manifest-echo-windows.yml");
-    }
-
-    @Test
     public void unixWrite() throws IOException {
         assumeTrue(SystemUtils.IS_OS_UNIX);
         write("/alpha-path", "fixtures/manifest-echo-unix.yml");
+    }
+
+    @Test
+    public void windowsWrite() throws IOException {
+        assumeTrue(SystemUtils.IS_OS_WINDOWS);
+        write("c:\\alpha-path", "fixtures/manifest-echo-windows.yml");
     }
 
     private void write(String path, String expectedManifest) throws IOException {
