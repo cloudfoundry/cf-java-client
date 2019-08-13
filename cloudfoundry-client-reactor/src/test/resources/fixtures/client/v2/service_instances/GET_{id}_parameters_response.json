@@ -1,0 +1,7 @@
+{
+  "foo": "abc",
+  "bar": 12345,
+  "baz": false,
+  "qux": 3.141,
+  "quux": null
+}
