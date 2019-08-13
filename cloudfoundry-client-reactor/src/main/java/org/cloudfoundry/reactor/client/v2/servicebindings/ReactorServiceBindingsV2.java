@@ -20,6 +20,8 @@ import org.cloudfoundry.client.v2.servicebindings.CreateServiceBindingRequest;
 import org.cloudfoundry.client.v2.servicebindings.CreateServiceBindingResponse;
 import org.cloudfoundry.client.v2.servicebindings.DeleteServiceBindingRequest;
 import org.cloudfoundry.client.v2.servicebindings.DeleteServiceBindingResponse;
+import org.cloudfoundry.client.v2.servicebindings.GetServiceBindingParametersRequest;
+import org.cloudfoundry.client.v2.servicebindings.GetServiceBindingParametersResponse;
 import org.cloudfoundry.client.v2.servicebindings.GetServiceBindingRequest;
 import org.cloudfoundry.client.v2.servicebindings.GetServiceBindingResponse;
 import org.cloudfoundry.client.v2.servicebindings.ListServiceBindingsRequest;
@@ -28,6 +30,7 @@ import org.cloudfoundry.client.v2.servicebindings.ServiceBindingsV2;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v2.AbstractClientV2Operations;
+
 import reactor.core.publisher.Mono;
 
 /**
@@ -61,6 +64,12 @@ public final class ReactorServiceBindingsV2 extends AbstractClientV2Operations i
     @Override
     public Mono<GetServiceBindingResponse> get(GetServiceBindingRequest request) {
         return get(request, GetServiceBindingResponse.class, builder -> builder.pathSegment("service_bindings", request.getServiceBindingId()))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<GetServiceBindingParametersResponse> getParameters(GetServiceBindingParametersRequest request) {
+        return get(request, GetServiceBindingParametersResponse.class, builder -> builder.pathSegment("service_bindings", request.getServiceBindingId(), "parameters"))
             .checkpoint();
     }
 
