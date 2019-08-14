@@ -1293,6 +1293,7 @@ public final class DefaultApplications implements Applications {
             .instances(manifest.getInstances())
             .memory(manifest.getMemory())
             .name(manifest.getName())
+            .ports(manifest.getPorts())
             .spaceId(spaceId)
             .stackId(stackId);
 
@@ -1594,6 +1595,7 @@ public final class DefaultApplications implements Applications {
                 .instances(manifest.getInstances())
                 .memory(manifest.getMemory())
                 .name(manifest.getName())
+                .ports(manifest.getPorts())
                 .stackId(stackId);
 
             if (manifest.getDocker() != null) {
@@ -1751,6 +1753,7 @@ public final class DefaultApplications implements Applications {
             .memory(response.getMemory())
             .docker(toDocker(response))
             .name(response.getName())
+            .ports(response.getPorts())
             .stack(stackName)
             .timeout(response.getHealthCheckTimeout());
 

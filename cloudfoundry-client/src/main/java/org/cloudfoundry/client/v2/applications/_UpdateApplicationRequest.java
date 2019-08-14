@@ -23,6 +23,7 @@ import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -153,6 +154,13 @@ abstract class _UpdateApplicationRequest {
     @JsonProperty("name")
     @Nullable
     abstract String getName();
+
+    /**
+     * The ports on which application may listen
+     */
+    @JsonProperty("ports")
+    @Nullable
+    abstract List<Integer> getPorts();
 
     /**
      * Whether the application is production

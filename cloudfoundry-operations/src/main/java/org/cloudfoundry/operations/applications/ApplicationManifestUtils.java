@@ -161,6 +161,10 @@ public final class ApplicationManifestUtils {
                 .forEach(consumer));
     }
 
+    private static void asListOfInteger(Map<String, Object> payload, String key, Consumer<Integer> consumer) {
+        asList(payload, key, Integer.class::cast, consumer);
+    }
+
     private static void asListOfString(Map<String, Object> payload, String key, Consumer<String> consumer) {
         asList(payload, key, String.class::cast, consumer);
     }
@@ -341,6 +345,7 @@ public final class ApplicationManifestUtils {
         asBoolean(application, "no-hostname", builder::noHostname);
         asBoolean(application, "no-route", builder::noRoute);
         asString(application, "path", path -> builder.path(Paths.get(path)));
+        asListOfInteger(application, "ports", builder::port);
         asBoolean(application, "random-route", builder::randomRoute);
         asList(application, "routes", raw -> getRoute((Map<String, Object>) raw), builder::route);
         asListOfString(application, "services", builder::service);
@@ -380,6 +385,7 @@ public final class ApplicationManifestUtils {
         putIfPresent(yaml, "no-hostname", applicationManifest.getNoHostname());
         putIfPresent(yaml, "no-route", applicationManifest.getNoRoute());
         putIfPresent(yaml, "path", applicationManifest.getPath(), pathToString());
+        putIfPresent(yaml, "ports", applicationManifest.getPorts());
         putIfPresent(yaml, "random-route", applicationManifest.getRandomRoute());
         putIfPresent(yaml, "route-path", applicationManifest.getRoutePath());
         putIfPresent(yaml, "routes", applicationManifest.getRoutes(), ApplicationManifestUtils::toRoutesYaml);
