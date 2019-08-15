@@ -44,13 +44,15 @@ public class ReactorPolicies extends AbstractNetworkingOperations implements Pol
 
     @Override
     public Mono<Void> create(CreatePoliciesRequest request) {
-        return post(request, Void.class, builder -> builder.pathSegment("policies"))
+        return post(request, Object.class, builder -> builder.pathSegment("policies"))
+            .then()
             .checkpoint();
     }
 
     @Override
     public Mono<Void> delete(DeletePoliciesRequest request) {
-        return post(request, Void.class, builder -> builder.pathSegment("policies", "delete"))
+        return post(request, Object.class, builder -> builder.pathSegment("policies", "delete"))
+            .then()
             .checkpoint();
     }
 

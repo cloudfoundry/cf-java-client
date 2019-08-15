@@ -49,6 +49,7 @@ public final class ReactorPoliciesClientTest extends AbstractNetworkingApiTest {
                 .payload("fixtures/networking/policies/POST_request.json")
                 .build())
             .response(TestResponse.builder()
+                .payload("fixtures/networking/policies/POST_response.json")
                 .status(OK)
                 .build())
             .build());
@@ -95,6 +96,7 @@ public final class ReactorPoliciesClientTest extends AbstractNetworkingApiTest {
                 .payload("fixtures/networking/policies/POST_delete_request.json")
                 .build())
             .response(TestResponse.builder()
+                .payload("fixtures/networking/policies/POST_delete_response.json")
                 .status(OK)
                 .build())
             .build());
