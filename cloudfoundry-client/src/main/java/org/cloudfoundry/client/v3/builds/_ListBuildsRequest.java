@@ -35,6 +35,12 @@ abstract class _ListBuildsRequest extends PaginatedRequest {
     abstract List<String> getApplicationIds();
 
     /**
+     * The package ids
+     */
+    @FilterParameter("package_guids")
+    abstract List<String> getPackageIds();
+
+    /**
      * The build states
      */
     @FilterParameter("states")
