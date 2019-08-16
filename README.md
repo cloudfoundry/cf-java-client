@@ -42,12 +42,12 @@ Most projects will need two dependencies; the Operations API and an implementati
     <dependency>
         <groupId>io.projectreactor</groupId>
         <artifactId>reactor-core</artifactId>
-        <version>3.1.8.RELEASE</version>
+        <version>3.2.3.RELEASE</version>
     </dependency>
     <dependency>
         <groupId>io.projectreactor.ipc</groupId>
         <artifactId>reactor-netty</artifactId>
-        <version>0.7.8.RELEASE</version>
+        <version>0.7.12.RELEASE</version>
     </dependency>
     ...
 </dependencies>
