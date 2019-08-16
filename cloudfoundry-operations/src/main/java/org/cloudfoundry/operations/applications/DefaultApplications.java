@@ -19,6 +19,7 @@ package org.cloudfoundry.operations.applications;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.OrderDirection;
 import org.cloudfoundry.client.v2.applications.AbstractApplicationResource;
+import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.applications.ApplicationEnvironmentRequest;
 import org.cloudfoundry.client.v2.applications.ApplicationEnvironmentResponse;
 import org.cloudfoundry.client.v2.applications.ApplicationInstanceInfo;
@@ -1677,8 +1678,20 @@ public final class DefaultApplications implements Applications {
 
     private static Mono<Void> stopAndStartApplication(CloudFoundryClient cloudFoundryClient, String applicationId, String name, PushApplicationManifestRequest request) {
         return stopApplication(cloudFoundryClient, applicationId)
-            .filter(resource -> !Optional.ofNullable(request.getNoStart()).orElse(false))
+            .filter(resource -> shouldStartApplication(request, resource))
             .flatMap(resource -> startApplicationAndWait(cloudFoundryClient, name, applicationId, request.getStagingTimeout(), request.getStartupTimeout()));
+    }
+
+    private static boolean shouldStartApplication(PushApplicationManifestRequest request, AbstractApplicationResource resource) {
+        return shouldStartApplication(request) && getInstances(resource) > 0;
+    }
+
+    private static boolean shouldStartApplication(PushApplicationManifestRequest request) {
+        return !Optional.ofNullable(request.getNoStart()).orElse(false);
+    }
+
+    private static int getInstances(AbstractApplicationResource resource) {
+        return Optional.ofNullable(resource.getEntity()).map(ApplicationEntity::getInstances).orElse(0);
     }
 
     private static Mono<AbstractApplicationResource> stopApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
