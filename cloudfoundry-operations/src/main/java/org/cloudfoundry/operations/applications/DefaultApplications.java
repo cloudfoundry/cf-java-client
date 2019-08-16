@@ -1741,6 +1741,7 @@ public final class DefaultApplications implements Applications {
             .healthCheckType(ApplicationHealthCheck.from(response.getHealthCheckType()))
             .instances(response.getInstances())
             .memory(response.getMemory())
+            .docker(toDocker(response))
             .name(response.getName())
             .stack(stackName)
             .timeout(response.getHealthCheckTimeout());
@@ -1762,6 +1763,25 @@ public final class DefaultApplications implements Applications {
         return Mono
             .just(manifestBuilder
                 .build());
+    }
+
+    private static Docker toDocker(SummaryApplicationResponse response) {
+        if (response.getDockerImage() == null) {
+            return null;
+        }
+        return Docker.builder()
+            .image(response.getDockerImage())
+            .username(getUsername(response.getDockerCredentials()))
+            .password(getPassword(response.getDockerCredentials()))
+            .build();
+    }
+
+    private static String getUsername(DockerCredentials dockerCredentials) {
+        return Optional.ofNullable(dockerCredentials).map(DockerCredentials::getUsername).orElse(null);
+    }
+
+    private static String getPassword(DockerCredentials dockerCredentials) {
+        return Optional.ofNullable(dockerCredentials).map(DockerCredentials::getPassword).orElse(null);
     }
 
     private static ApplicationSummary toApplicationSummary(SpaceApplicationSummary spaceApplicationSummary) {
