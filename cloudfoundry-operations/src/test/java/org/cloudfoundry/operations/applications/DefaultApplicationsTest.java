@@ -1507,6 +1507,8 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
             .path(testApplication)
             .domain("test-shared-domain")
             .name("test-name")
+            .healthCheckHttpEndpoint("/health")
+            .healthCheckType(ApplicationHealthCheck.HTTP)
             .build(), TEST_SPACE_ID, null, "test-application-id");
         requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
         requestListMatchingResources(this.cloudFoundryClient, Arrays.asList(new ResourceMatchingUtils.ArtifactMetadata("da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "100644", 0),
@@ -1529,6 +1531,8 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .path(testApplication)
                 .domain("test-shared-domain")
                 .name("test-name")
+                .healthCheckHttpEndpoint("/health")
+                .healthCheckType(ApplicationHealthCheck.HTTP)
                 .build()))
             .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .expectComplete()
@@ -3258,6 +3262,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .diskQuota(manifest.getDisk())
                 .environmentJsons(manifest.getEnvironmentVariables())
                 .healthCheckTimeout(manifest.getTimeout())
+                .healthCheckHttpEndpoint(manifest.getHealthCheckHttpEndpoint())
                 .healthCheckType(Optional.ofNullable(manifest.getHealthCheckType()).map(ApplicationHealthCheck::getValue).orElse(null))
                 .instances(manifest.getInstances())
                 .memory(manifest.getMemory())
