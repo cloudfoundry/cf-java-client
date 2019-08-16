@@ -473,6 +473,42 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
+    public void getApplicationManifestDocker() {
+        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
+        requestApplicationSummaryDocker(this.cloudFoundryClient, "test-metadata-id");
+        requestStack(this.cloudFoundryClient, "test-application-summary-stackId");
+
+        this.applications
+            .getApplicationManifest(GetApplicationManifestRequest.builder()
+                .name("test-app")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ApplicationManifest.builder()
+                .command("test-application-summary-command")
+                .disk(1)
+                .docker(Docker.builder()
+                    .image("cloudfoundry/test-app")
+                    .username("admin")
+                    .password("Abcd5")
+                    .build())
+                .environmentVariables(Collections.emptyMap())
+                .healthCheckHttpEndpoint("test-application-summary-healthCheckHttpEndpoint")
+                .healthCheckType(ApplicationHealthCheck.PORT)
+                .instances(1)
+                .memory(1)
+                .name("test-application-summary-name")
+                .route(Route.builder()
+                    .route("test-route-host.test-domain-name/test-path")
+                    .build())
+                .service("test-service-instance-name")
+                .stack("test-stack-entity-name")
+                .timeout(1)
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
     public void getApplicationManifestNoRoutes() {
         requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
         requestApplicationSummaryNoRoutes(this.cloudFoundryClient, "test-metadata-id");
@@ -3048,6 +3084,34 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                         .path("/test-path")
                         .port(null)
                         .build())
+                    .dockerImage(null)
+                    .dockerCredentials(null)
+                    .service(ServiceInstance.builder()
+                        .name("test-service-instance-name")
+                        .build())
+                    .build()));
+    }
+
+    private static void requestApplicationSummaryDocker(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        when(cloudFoundryClient.applicationsV2()
+            .summary(SummaryApplicationRequest.builder()
+                .applicationId(applicationId)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(SummaryApplicationResponse.builder(), "application-summary-")
+                    .buildpack(null)
+                    .healthCheckType("port")
+                    .packageUpdatedAt(DateUtils.formatToIso8601(new Date(0)))
+                    .route(fill(org.cloudfoundry.client.v2.routes.Route.builder(), "route-")
+                        .domain(fill(org.cloudfoundry.client.v2.domains.Domain.builder(), "domain-").build())
+                        .path("/test-path")
+                        .port(null)
+                        .build())
+                    .dockerImage("cloudfoundry/test-app")
+                    .dockerCredentials(DockerCredentials.builder()
+                        .username("admin")
+                        .password("Abcd5")
+                        .build())
                     .service(ServiceInstance.builder()
                         .name("test-service-instance-name")
                         .build())
@@ -3095,6 +3159,8 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
             .thenReturn(Mono
                 .just(fill(SummaryApplicationResponse.builder(), "application-summary-")
                     .healthCheckType("port")
+                    .dockerImage(null)
+                    .dockerCredentials(null)
                     .packageUpdatedAt(DateUtils.formatToIso8601(new Date(0)))
                     .build()));
     }
@@ -3112,6 +3178,8 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                         .domain(fill(org.cloudfoundry.client.v2.domains.Domain.builder(), "domain-").build())
                         .port(999)
                         .build())
+                    .dockerImage(null)
+                    .dockerCredentials(null)
                     .service(ServiceInstance.builder()
                         .name("test-service-instance-name")
                         .build())
