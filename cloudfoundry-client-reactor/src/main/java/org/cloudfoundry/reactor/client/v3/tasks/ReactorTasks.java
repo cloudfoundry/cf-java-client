@@ -47,7 +47,7 @@ public final class ReactorTasks extends AbstractClientV3Operations implements Ta
     }
 
     @Override
-    public Mono<CancelTaskResponse> cancel(CancelTaskRequest request) {  // TODO: Modify once support has aged out http://v3-apidocs.cloudfoundry.org/version/3.27.0/#cancel-a-task
+    public Mono<CancelTaskResponse> cancel(CancelTaskRequest request) {  // TODO: Modify once support has aged out https://v3-apidocs.cloudfoundry.org/version/3.27.0/#cancel-a-task
         return put(request, CancelTaskResponse.class, builder -> builder.pathSegment("tasks", request.getTaskId(), "cancel"))
             .checkpoint();
     }

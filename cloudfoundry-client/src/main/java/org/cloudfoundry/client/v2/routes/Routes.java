@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 public interface Routes {
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/routes/associate_app_with_the_route.html">Associate Application with the Route</a> request
+     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/routes/associate_app_with_the_route.html">Associate Application with the Route</a> request
      *
      * @param request the Associate an Application with the Route request
      * @return the response from the Associate an Application with the Route request
@@ -32,7 +32,7 @@ public interface Routes {
     Mono<AssociateRouteApplicationResponse> associateApplication(AssociateRouteApplicationRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/routes/creating_a_route.html">Creating a Route</a> request
+     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/routes/creating_a_route.html">Creating a Route</a> request
      *
      * @param request the Creating a Route request
      * @return the response from the Creating a Route request
@@ -40,7 +40,7 @@ public interface Routes {
     Mono<CreateRouteResponse> create(CreateRouteRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/routes/delete_a_particular_route.html">Delete a Particular Route</a> request
+     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/routes/delete_a_particular_route.html">Delete a Particular Route</a> request
      *
      * @param request the Delete a Particular Route request
      * @return the response from the Delete a Particular Route request
@@ -48,7 +48,7 @@ public interface Routes {
     Mono<DeleteRouteResponse> delete(DeleteRouteRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/routes/check_a_route_exists.html">Check a Route exists</a> request
+     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/routes/check_a_route_exists.html">Check a Route exists</a> request
      *
      * @param request the Check a Route exists request
      * @return the response from the Check a Route exists request
@@ -56,7 +56,7 @@ public interface Routes {
     Mono<Boolean> exists(RouteExistsRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/routes/retrieve_a_particular_route.html">Retrieve a Particular Route</a> request
+     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/routes/retrieve_a_particular_route.html">Retrieve a Particular Route</a> request
      *
      * @param request the Retrieve a Particular Route request
      * @return the response from the Retrieve a Particular Route request
@@ -64,7 +64,7 @@ public interface Routes {
     Mono<GetRouteResponse> get(GetRouteRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/routes/list_all_routes.html">List all Routes</a> request
+     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/routes/list_all_routes.html">List all Routes</a> request
      *
      * @param request the List all Applications for the Route request
      * @return the response from the List all Applications for the Route request
@@ -72,7 +72,7 @@ public interface Routes {
     Mono<ListRoutesResponse> list(ListRoutesRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/routes/list_all_apps_for_the_route.html">List all Applications for the Route</a> request
+     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/routes/list_all_apps_for_the_route.html">List all Applications for the Route</a> request
      *
      * @param request the List all Applications for the Route request
      * @return the response from the List all Applications for the Route request
@@ -80,7 +80,7 @@ public interface Routes {
     Mono<ListRouteApplicationsResponse> listApplications(ListRouteApplicationsRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/routes/list_all_route_mappings_for_the_route.html">List all Route Mappings for the Route</a> request
+     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/routes/list_all_route_mappings_for_the_route.html">List all Route Mappings for the Route</a> request
      *
      * @param request the List all Route Mappings for the Route request
      * @return the response from the List all Route Mappings for the Route request
@@ -88,7 +88,7 @@ public interface Routes {
     Mono<ListRouteMappingsResponse> listMappings(ListRouteMappingsRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/routes/remove_app_from_the_route.html">Remove Application from the Route</a> request
+     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/routes/remove_app_from_the_route.html">Remove Application from the Route</a> request
      *
      * @param request the Remove Application from the Route request
      * @return the response from the Remove Application from the Route request
@@ -96,7 +96,7 @@ public interface Routes {
     Mono<Void> removeApplication(RemoveRouteApplicationRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/routes/update_a_route.html">Update a Route</a> request
+     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/routes/update_a_route.html">Update a Route</a> request
      *
      * @param request the Update a Route request
      * @return the response from the Update a Route request

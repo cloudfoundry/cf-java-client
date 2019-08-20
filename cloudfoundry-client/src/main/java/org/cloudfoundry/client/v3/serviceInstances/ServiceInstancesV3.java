@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 public interface ServiceInstancesV3 {
 
     /**
-     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#list-service-instances">List service instances</a> request
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#list-service-instances">List service instances</a> request
      *
      * @param request the List Service Instances request
      * @return the response from the List Service Instances request
@@ -32,7 +32,7 @@ public interface ServiceInstancesV3 {
     Mono<ListServiceInstancesResponse> list(ListServiceInstancesRequest request);
 
     /**
-     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#ist-shared-spaces-relationship">
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#ist-shared-spaces-relationship">
      * List shared spaces relationship</a> request
      *
      * @param request the List Shared Spaces Relationship request
@@ -41,7 +41,7 @@ public interface ServiceInstancesV3 {
     Mono<ListSharedSpacesRelationshipResponse> listSharedSpacesRelationship(ListSharedSpacesRelationshipRequest request);
 
     /**
-     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#share-a-service-instance-to-other-spaces">
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#share-a-service-instance-to-other-spaces">
      * Share a service instance to other spaces</a> request
      *
      * @param request the Share Service Instance To Other Spaces request
@@ -50,7 +50,7 @@ public interface ServiceInstancesV3 {
     Mono<ShareServiceInstanceResponse> share(ShareServiceInstanceRequest request);
 
     /**
-     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#unshare-a-service-instance-from-another-space">
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#unshare-a-service-instance-from-another-space">
      * Unshare a service instance from another space</a> request
      *
      * @param request the Unshare Service Instance From Another Space request
@@ -59,7 +59,7 @@ public interface ServiceInstancesV3 {
     Mono<Void> unshare(UnshareServiceInstanceRequest request);
 
     /**
-     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#update-a-service-instance">
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#update-a-service-instance">
      * Update a service instance</a> request
      *
      * @param request the Update Service Instance request

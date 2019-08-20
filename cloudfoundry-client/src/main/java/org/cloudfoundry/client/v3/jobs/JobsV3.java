@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 public interface JobsV3 {
 
     /**
-     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#get-a-job">Get Job</a> request
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#get-a-job">Get Job</a> request
      *
      * @param request the Get Job request
      * @return the response from the Get Job request

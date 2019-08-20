@@ -25,7 +25,7 @@ import reactor.core.publisher.Mono;
 public interface Packages {
 
     /**
-     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#copy-a-package">Copy Package</a> request
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#copy-a-package">Copy Package</a> request
      *
      * @param request the Copy Package request
      * @return the response from the Copy Package request
@@ -33,7 +33,7 @@ public interface Packages {
     Mono<CopyPackageResponse> copy(CopyPackageRequest request);
 
     /**
-     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#create-a-package">Create Package</a> request
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#create-a-package">Create Package</a> request
      *
      * @param request the Create Package request
      * @return the response from the Create Package request
@@ -41,7 +41,7 @@ public interface Packages {
     Mono<CreatePackageResponse> create(CreatePackageRequest request);
 
     /**
-     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#delete-a-package">Delete Package</a> request
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#delete-a-package">Delete Package</a> request
      *
      * @param request the Delete Package request
      * @return the response from the Delete Package request
@@ -49,7 +49,7 @@ public interface Packages {
     Mono<String> delete(DeletePackageRequest request);
 
     /**
-     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#download-package-bits">Download the bits for a package</a> request
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#download-package-bits">Download the bits for a package</a> request
      *
      * @param request the Download Package request
      * @return the response from the Download Package request
@@ -57,7 +57,7 @@ public interface Packages {
     Flux<byte[]> download(DownloadPackageRequest request);
 
     /**
-     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#get-a-package">Get Package</a> request
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#get-a-package">Get Package</a> request
      *
      * @param request the Get Package request
      * @return the response from the Get Package request
@@ -65,7 +65,7 @@ public interface Packages {
     Mono<GetPackageResponse> get(GetPackageRequest request);
 
     /**
-     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#list-packages">List Packages</a> request
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#list-packages">List Packages</a> request
      *
      * @param request the List Packages request
      * @return the response from the List Packages request
@@ -73,7 +73,7 @@ public interface Packages {
     Mono<ListPackagesResponse> list(ListPackagesRequest request);
 
     /**
-     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.27.0/#list-droplets-for-a-package">List Droplets</a> request
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/#list-droplets-for-a-package">List Droplets</a> request
      *
      * @param request the List Droplets request
      * @return the response from the List Droplets request
@@ -81,7 +81,7 @@ public interface Packages {
     Mono<ListPackageDropletsResponse> listDroplets(ListPackageDropletsRequest request);
 
     /**
-     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#upload-package-bits"> Upload Package</a> request
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#upload-package-bits"> Upload Package</a> request
      *
      * @param request the Upload Package request
      * @return the response from the Upload Package request

@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 public interface Tasks {
 
     /**
-     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#cancel-a-task">Cancel a Task</a> request
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#cancel-a-task">Cancel a Task</a> request
      *
      * @param request the Cancel Task request
      * @return the response from the Cancel Task request
@@ -32,7 +32,7 @@ public interface Tasks {
     Mono<CancelTaskResponse> cancel(CancelTaskRequest request);
 
     /**
-     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#create-a-task">Create A Task</a> request
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#create-a-task">Create A Task</a> request
      *
      * @param request the Create Task request
      * @return the response from the Create Task request
@@ -40,7 +40,7 @@ public interface Tasks {
     Mono<CreateTaskResponse> create(CreateTaskRequest request);
 
     /**
-     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#get-a-task">Get A Task</a> request
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#get-a-task">Get A Task</a> request
      *
      * @param request the Get Task request
      * @return the response from the Get Task request
@@ -48,7 +48,7 @@ public interface Tasks {
     Mono<GetTaskResponse> get(GetTaskRequest request);
 
     /**
-     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#list-tasks">List Tasks</a> request
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#list-tasks">List Tasks</a> request
      *
      * @param request the List Tasks request
      * @return the response from the List Tasks request

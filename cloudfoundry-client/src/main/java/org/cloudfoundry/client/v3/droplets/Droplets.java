@@ -24,14 +24,14 @@ import reactor.core.publisher.Mono;
 public interface Droplets {
 
     /**
-     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.27.0/#copy-a-droplet">Copy Droplet</a> request
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/#copy-a-droplet">Copy Droplet</a> request
      *
      * @param request the Copy Droplet request
      */
     Mono<CopyDropletResponse> copy(CopyDropletRequest request);
 
     /**
-     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#delete-a-droplet">Delete Droplet</a> request
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#delete-a-droplet">Delete Droplet</a> request
      *
      * @param request the Delete Droplet request
      * @return the response from the Delete Droplet request
@@ -39,7 +39,7 @@ public interface Droplets {
     Mono<String> delete(DeleteDropletRequest request);
 
     /**
-     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.27.0/#get-a-droplet">Get Droplet</a> request
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/#get-a-droplet">Get Droplet</a> request
      *
      * @param request the Get Droplet request
      * @return the response from the Get Droplet request
@@ -47,7 +47,7 @@ public interface Droplets {
     Mono<GetDropletResponse> get(GetDropletRequest request);
 
     /**
-     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#list-droplets">List Droplets</a> request
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#list-droplets">List Droplets</a> request
      *
      * @param request the List Droplets request
      * @return the response from the List Droplets request

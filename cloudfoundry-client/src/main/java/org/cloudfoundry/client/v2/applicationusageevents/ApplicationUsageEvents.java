@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 public interface ApplicationUsageEvents {
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/app_usage_events/retrieve_a_particular_app_usage_event.html">Get an Application Usage Event</a> request
+     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/app_usage_events/retrieve_a_particular_app_usage_event.html">Get an Application Usage Event</a> request
      *
      * @param request the Get Application Usage Event request
      * @return the response from the Get all Application Usage Event request
@@ -32,7 +32,7 @@ public interface ApplicationUsageEvents {
     Mono<GetApplicationUsageEventResponse> get(GetApplicationUsageEventRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/app_usage_events/list_all_app_usage_events.html">List all Application Usage Events</a> request
+     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/app_usage_events/list_all_app_usage_events.html">List all Application Usage Events</a> request
      *
      * @param request the List all Application Usage Events request
      * @return the response from the List all Application Usage Events request
@@ -40,7 +40,7 @@ public interface ApplicationUsageEvents {
     Mono<ListApplicationUsageEventsResponse> list(ListApplicationUsageEventsRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/app_usage_events/purge_and_reseed_app_usage_events.html">Purge and Reseed Application Usage Events</a> request
+     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/app_usage_events/purge_and_reseed_app_usage_events.html">Purge and Reseed Application Usage Events</a> request
      *
      * @param request the Purge and Reseed Application Usage Events
      * @return the response from the Purge and Reseed Application Usage Events request
