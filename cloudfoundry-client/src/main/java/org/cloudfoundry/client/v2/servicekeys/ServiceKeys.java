@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 public interface ServiceKeys {
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/service_keys/create_a_service_key.html">Create Service Key</a> request
+     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/service_keys/create_a_service_key.html">Create Service Key</a> request
      *
      * @param request the Create Service Key request
      * @return the response from the Create Service Key request
@@ -32,7 +32,7 @@ public interface ServiceKeys {
     Mono<CreateServiceKeyResponse> create(CreateServiceKeyRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/service_keys/delete_a_particular_service_key.html">Delete the Service Key</a> request
+     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/service_keys/delete_a_particular_service_key.html">Delete the Service Key</a> request
      *
      * @param request the Delete Service Key request
      * @return the response from the Delete Service Key request
@@ -40,7 +40,7 @@ public interface ServiceKeys {
     Mono<Void> delete(DeleteServiceKeyRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/service_keys/retrieve_a_particular_service_key.html">Retrieve a Particular Service Key</a> request
+     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/service_keys/retrieve_a_particular_service_key.html">Retrieve a Particular Service Key</a> request
      *
      * @param request the Get Service Key request
      * @return the response from the Get Service Key request
@@ -48,7 +48,7 @@ public interface ServiceKeys {
     Mono<GetServiceKeyResponse> get(GetServiceKeyRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/service_keys/list_all_service_keys.html">List Service Keys</a> request
+     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/service_keys/list_all_service_keys.html">List Service Keys</a> request
      *
      * @param request the List Service Keys request
      * @return the response from the List Service Keys request

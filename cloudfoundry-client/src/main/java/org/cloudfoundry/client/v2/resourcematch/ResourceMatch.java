@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 public interface ResourceMatch {
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/resource_match/list_all_matching_resources.html">List Matching Resources</a> request
+     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/resource_match/list_all_matching_resources.html">List Matching Resources</a> request
      *
      * @param request the List Matching Resources request
      * @return the response from the List Matching Resources request

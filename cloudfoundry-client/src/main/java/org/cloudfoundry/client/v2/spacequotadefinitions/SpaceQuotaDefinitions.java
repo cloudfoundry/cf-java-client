@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 public interface SpaceQuotaDefinitions {
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/space_quota_definitions/associate_space_with_the_space_quota_definition.html">Associate a Space with a Space Quota
+     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/space_quota_definitions/associate_space_with_the_space_quota_definition.html">Associate a Space with a Space Quota
      * Definition</a> request
      *
      * @param request the Associate a Space with a Space Quota Definition request
@@ -33,7 +33,7 @@ public interface SpaceQuotaDefinitions {
     Mono<AssociateSpaceQuotaDefinitionResponse> associateSpace(AssociateSpaceQuotaDefinitionRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/space_quota_definitions/creating_a_space_quota_definition.html">Creating a Space Quota Definition</a> request
+     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/space_quota_definitions/creating_a_space_quota_definition.html">Creating a Space Quota Definition</a> request
      *
      * @param request the Create a Space Quota Definition request
      * @return the response from the Create a Space Quota Definition request
@@ -41,7 +41,7 @@ public interface SpaceQuotaDefinitions {
     Mono<CreateSpaceQuotaDefinitionResponse> create(CreateSpaceQuotaDefinitionRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/space_quota_definitions/delete_a_particular_space_quota_definition.html">Delete a Particular Space Quota Definition</a> request
+     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/space_quota_definitions/delete_a_particular_space_quota_definition.html">Delete a Particular Space Quota Definition</a> request
      *
      * @param request the Delete a Particular Space Quota Definition request
      * @return the response from the Delete a Particular Space Quota Definition request
@@ -49,7 +49,7 @@ public interface SpaceQuotaDefinitions {
     Mono<DeleteSpaceQuotaDefinitionResponse> delete(DeleteSpaceQuotaDefinitionRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/space_quota_definitions/retrieve_a_particular_space_quota_definition.html">Retrieve a Particular Space Quota Definition</a>
+     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/space_quota_definitions/retrieve_a_particular_space_quota_definition.html">Retrieve a Particular Space Quota Definition</a>
      * request
      *
      * @param request the Retrieve a Particular Space Quota Definition request
@@ -58,7 +58,7 @@ public interface SpaceQuotaDefinitions {
     Mono<GetSpaceQuotaDefinitionResponse> get(GetSpaceQuotaDefinitionRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/space_quota_definitions/list_all_space_quota_definitions.html">List all Space Quota Definitions</a> request
+     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/space_quota_definitions/list_all_space_quota_definitions.html">List all Space Quota Definitions</a> request
      *
      * @param request the List Space Quota Definitions request
      * @return the response from the List Space Quota Definitions request
@@ -66,7 +66,7 @@ public interface SpaceQuotaDefinitions {
     Mono<ListSpaceQuotaDefinitionsResponse> list(ListSpaceQuotaDefinitionsRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/space_quota_definitions/list_all_spaces_for_the_space_quota_definition.html">List all Spaces for the Space Quota Definition</a>
+     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/space_quota_definitions/list_all_spaces_for_the_space_quota_definition.html">List all Spaces for the Space Quota Definition</a>
      * request
      *
      * @param request the List all Spaces for the Space Quota Definition request
@@ -75,7 +75,7 @@ public interface SpaceQuotaDefinitions {
     Mono<ListSpaceQuotaDefinitionSpacesResponse> listSpaces(ListSpaceQuotaDefinitionSpacesRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/space_quota_definitions/remove_space_from_the_space_quota_definition.html">Remove a Space from a Space Quota Definition</a>
+     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/space_quota_definitions/remove_space_from_the_space_quota_definition.html">Remove a Space from a Space Quota Definition</a>
      * request
      *
      * @param request the Remove a Space from a Space Quota Definition request
@@ -84,7 +84,7 @@ public interface SpaceQuotaDefinitions {
     Mono<Void> removeSpace(RemoveSpaceQuotaDefinitionRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/space_quota_definitions/updating_a_space_quota_definition.html">Updating a Space Quota Definition</a> request
+     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/space_quota_definitions/updating_a_space_quota_definition.html">Updating a Space Quota Definition</a> request
      *
      * @param request the Update Space Quota Definitions request
      * @return the response from the Update Space Quota Definitions request

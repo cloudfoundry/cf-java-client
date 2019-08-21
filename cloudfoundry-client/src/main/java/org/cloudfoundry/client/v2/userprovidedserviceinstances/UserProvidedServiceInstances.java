@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 public interface UserProvidedServiceInstances {
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/user_provided_service_instances/associate_route_with_the_user_provided_service_instance.html">Associate Route with the User
+     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/user_provided_service_instances/associate_route_with_the_user_provided_service_instance.html">Associate Route with the User
      * Provided Service Instance</a> request
      *
      * @param request the Associate Route With User Provided Service Instance request
@@ -33,7 +33,7 @@ public interface UserProvidedServiceInstances {
     Mono<AssociateUserProvidedServiceInstanceRouteResponse> associateRoute(AssociateUserProvidedServiceInstanceRouteRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/user_provided_service_instances/creating_a_user_provided_service_instance.html">Create User Provided Service Instance</a>
+     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/user_provided_service_instances/creating_a_user_provided_service_instance.html">Create User Provided Service Instance</a>
      * request
      *
      * @param request the Create User Provided Service Instance request
@@ -42,7 +42,7 @@ public interface UserProvidedServiceInstances {
     Mono<CreateUserProvidedServiceInstanceResponse> create(CreateUserProvidedServiceInstanceRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/user_provided_service_instances/delete_a_particular_user_provided_service_instance.html">Delete the User Provided Service
+     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/user_provided_service_instances/delete_a_particular_user_provided_service_instance.html">Delete the User Provided Service
      * Instance</a> request
      *
      * @param request the Delete User Provided Service Instance request
@@ -51,7 +51,7 @@ public interface UserProvidedServiceInstances {
     Mono<Void> delete(DeleteUserProvidedServiceInstanceRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/user_provided_service_instances/retrieve_a_particular_user_provided_service_instance.html">Retrieve a Particular User Provided
+     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/user_provided_service_instances/retrieve_a_particular_user_provided_service_instance.html">Retrieve a Particular User Provided
      * Service Instance</a> request
      *
      * @param request the Get User Provided Service Instance request
@@ -60,7 +60,7 @@ public interface UserProvidedServiceInstances {
     Mono<GetUserProvidedServiceInstanceResponse> get(GetUserProvidedServiceInstanceRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/user_provided_service_instances/list_all_user_provided_service_instances.html">List User Provided Service Instances</a>
+     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/user_provided_service_instances/list_all_user_provided_service_instances.html">List User Provided Service Instances</a>
      * request
      *
      * @param request the List User Provided Service Instances request
@@ -69,7 +69,7 @@ public interface UserProvidedServiceInstances {
     Mono<ListUserProvidedServiceInstancesResponse> list(ListUserProvidedServiceInstancesRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/user_provided_service_instances/list_all_routes_for_the_user_provided_service_instance.html">List all Routes for the User
+     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/user_provided_service_instances/list_all_routes_for_the_user_provided_service_instance.html">List all Routes for the User
      * Provided Service Instance</a> request
      *
      * @param request the List User Provided Service Instance Routes request
@@ -78,7 +78,7 @@ public interface UserProvidedServiceInstances {
     Mono<ListUserProvidedServiceInstanceRoutesResponse> listRoutes(ListUserProvidedServiceInstanceRoutesRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/user_provided_service_instances/list_all_service_bindings_for_the_user_provided_service_instance.html">List all Service
+     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/user_provided_service_instances/list_all_service_bindings_for_the_user_provided_service_instance.html">List all Service
      * Bindings for the User Provided Service Instance</a> request
      *
      * @param request the List Service Bindings request
@@ -87,7 +87,7 @@ public interface UserProvidedServiceInstances {
     Mono<ListUserProvidedServiceInstanceServiceBindingsResponse> listServiceBindings(ListUserProvidedServiceInstanceServiceBindingsRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/user_provided_service_instances/remove_route_from_the_user_provided_service_instance.html">Remove Route from the User Provided
+     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/user_provided_service_instances/remove_route_from_the_user_provided_service_instance.html">Remove Route from the User Provided
      * Service Instance</a> request
      *
      * @param request the Remove Route from the User Provided Service Instance request
@@ -96,7 +96,7 @@ public interface UserProvidedServiceInstances {
     Mono<Void> removeRoute(RemoveUserProvidedServiceInstanceRouteRequest request);
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/user_provided_service_instances/updating_a_user_provided_service_instance.html">Update User Provided Service Instance</a>
+     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/user_provided_service_instances/updating_a_user_provided_service_instance.html">Update User Provided Service Instance</a>
      * request
      *
      * @param request the Update User Provided Service Instance request

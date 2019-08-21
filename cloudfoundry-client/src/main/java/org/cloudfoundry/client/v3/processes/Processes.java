@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 public interface Processes {
 
     /**
-     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#get-a-process">Get Process</a> request
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#get-a-process">Get Process</a> request
      *
      * @param request the Get Process request
      * @return the response from the Get Process request
@@ -32,7 +32,7 @@ public interface Processes {
     Mono<GetProcessResponse> get(GetProcessRequest request);
 
     /**
-     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#get-stats-for-a-process">Get stats for a process</a> request
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#get-stats-for-a-process">Get stats for a process</a> request
      *
      * @param request the Get Statistics for a Process request
      * @return the response from the Get Statistics for a Process request
@@ -40,7 +40,7 @@ public interface Processes {
     Mono<GetProcessStatisticsResponse> getStatistics(GetProcessStatisticsRequest request);
 
     /**
-     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#list-processes">List Process</a> request
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#list-processes">List Process</a> request
      *
      * @param request the List Processes request
      * @return the response from the List Processes request
@@ -48,7 +48,7 @@ public interface Processes {
     Mono<ListProcessesResponse> list(ListProcessesRequest request);
 
     /**
-     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#scale-a-process">Scale Application</a> request
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#scale-a-process">Scale Application</a> request
      *
      * @param request the Scale Process request
      * @return the response from the Scale Process request
@@ -56,7 +56,7 @@ public interface Processes {
     Mono<ScaleProcessResponse> scale(ScaleProcessRequest request);
 
     /**
-     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#terminate-a-process-instance">Terminate Process Instance</a> request
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#terminate-a-process-instance">Terminate Process Instance</a> request
      *
      * @param request the Terminate Process Instance request
      * @return the response from the Terminate Process Instance request
@@ -64,7 +64,7 @@ public interface Processes {
     Mono<Void> terminateInstance(TerminateProcessInstanceRequest request);
 
     /**
-     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#update-a-process">Update Process</a> request
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#update-a-process">Update Process</a> request
      *
      * @param request the Update Process request
      * @return the response from the Update Process request

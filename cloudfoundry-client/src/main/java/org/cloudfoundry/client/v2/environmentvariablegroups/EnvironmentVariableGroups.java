@@ -51,7 +51,7 @@ public interface EnvironmentVariableGroups {
     Mono<UpdateRunningEnvironmentVariablesResponse> updateRunningEnvironmentVariables(UpdateRunningEnvironmentVariablesRequest request);
 
     /**
-     * Makes the <a href="apidocs.cloudfoundry.org/latest-releasehttp://apidocs.cloudfoundry.org/latest-release/environment_variable_groups/updating_the_contents_of_the_staging_environment_variable_group.html">Update
+     * Makes the <a href="apidocs.cloudfoundry.org/latest-releasehttps://apidocs.cloudfoundry.org/latest-release/environment_variable_groups/updating_the_contents_of_the_staging_environment_variable_group.html">Update
      * the Staging Environment Variables</a> request
      *
      * @param request the Update Staging Environment Variables request

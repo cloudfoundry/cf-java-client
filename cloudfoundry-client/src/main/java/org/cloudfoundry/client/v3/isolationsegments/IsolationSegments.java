@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 public interface IsolationSegments {
 
     /**
-     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#entitle-organizations-for-an-isolation-segment">
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#entitle-organizations-for-an-isolation-segment">
      * Add an Isolation Segment Organization Entitlement</a> request
      *
      * @param request the Add an Isolation Segment Organization Entitlement request
@@ -33,7 +33,7 @@ public interface IsolationSegments {
     Mono<AddIsolationSegmentOrganizationEntitlementResponse> addOrganizationEntitlement(AddIsolationSegmentOrganizationEntitlementRequest request);
 
     /**
-     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#create-an-isolation-segment">Create an Isolation Segment</a> request
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#create-an-isolation-segment">Create an Isolation Segment</a> request
      *
      * @param request the Create Isolation Segment request
      * @return the response from the Create Isolation Segment request
@@ -41,7 +41,7 @@ public interface IsolationSegments {
     Mono<CreateIsolationSegmentResponse> create(CreateIsolationSegmentRequest request);
 
     /**
-     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#delete-an-isolation-segment">Delete an Isolation Segment</a> request
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#delete-an-isolation-segment">Delete an Isolation Segment</a> request
      *
      * @param request the Delete Isolation Segment request
      * @return the response from the Delete Isolation Segment request
@@ -49,7 +49,7 @@ public interface IsolationSegments {
     Mono<Void> delete(DeleteIsolationSegmentRequest request);
 
     /**
-     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#get-an-isolation-segment">Get an Isolation Segment</a> request
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#get-an-isolation-segment">Get an Isolation Segment</a> request
      *
      * @param request the Get Isolation Segment request
      * @return the response from the Get Isolation Segment request
@@ -57,7 +57,7 @@ public interface IsolationSegments {
     Mono<GetIsolationSegmentResponse> get(GetIsolationSegmentRequest request);
 
     /**
-     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#list-isolation-segments">List Isolation Segments</a> request
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#list-isolation-segments">List Isolation Segments</a> request
      *
      * @param request the List Isolation Segments request
      * @return the response from the List Isolation Segments request
@@ -65,7 +65,7 @@ public interface IsolationSegments {
     Mono<ListIsolationSegmentsResponse> list(ListIsolationSegmentsRequest request);
 
     /**
-     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#list-organizations-for-isolation-segment">List Organizations for Isolation Segment</a> request
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#list-organizations-for-isolation-segment">List Organizations for Isolation Segment</a> request
      *
      * @param request the List Organizations for Isolation Segment request
      * @return the response from the List Organizations for Isolation Segment request
@@ -73,7 +73,7 @@ public interface IsolationSegments {
     Mono<ListIsolationSegmentEntitledOrganizationsResponse> listEntitledOrganizations(ListIsolationSegmentEntitledOrganizationsRequest request);
 
     /**
-     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#list-organizations-relationship">List Organizations Relationship</a> request
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#list-organizations-relationship">List Organizations Relationship</a> request
      *
      * @param request the List Organizations Relationship request
      * @return the response from the List Organizations Relationship request
@@ -81,7 +81,7 @@ public interface IsolationSegments {
     Mono<ListIsolationSegmentOrganizationsRelationshipResponse> listOrganizationsRelationship(ListIsolationSegmentOrganizationsRelationshipRequest request);
 
     /**
-     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#list-spaces-relationship">List Spaces Relationship</a> request
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#list-spaces-relationship">List Spaces Relationship</a> request
      *
      * @param request the List Spaces Relationship request
      * @return the response from the List Spaces Relationship request
@@ -89,7 +89,7 @@ public interface IsolationSegments {
     Mono<ListIsolationSegmentSpacesRelationshipResponse> listSpacesRelationship(ListIsolationSegmentSpacesRelationshipRequest request);
 
     /**
-     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#revoke-entitlement-to-isolation-segment-for-an-organization">
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#revoke-entitlement-to-isolation-segment-for-an-organization">
      * Remove an Isolation Segment Organization Entitlement</a> request
      *
      * @param request the Remove an Isolation Segment Organization Entitlement request
@@ -98,7 +98,7 @@ public interface IsolationSegments {
     Mono<Void> removeOrganizationEntitlement(RemoveIsolationSegmentOrganizationEntitlementRequest request);
 
     /**
-     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#update-an-isolation-segment">Update an Isolation Segment</a> request
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#update-an-isolation-segment">Update an Isolation Segment</a> request
      *
      * @param request the Update Isolation Segment request
      * @return the response from the Update Isolation Segment request

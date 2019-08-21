@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 public interface Blobstores {
 
     /**
-     * Makes the <a href="http://apidocs.cloudfoundry.org/latest-release/blobstores/delete_all_blobs_in_the_buildpack_cache_blobstore.html">Delete Buildpack Caches</a> request
+     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/blobstores/delete_all_blobs_in_the_buildpack_cache_blobstore.html">Delete Buildpack Caches</a> request
      *
      * @param request the Delete Buildpack Caches request
      * @return the response from the Delete Buildpack Caches request

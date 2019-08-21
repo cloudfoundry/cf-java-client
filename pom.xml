@@ -155,7 +155,7 @@
                     <version>3.0.1</version>
                     <configuration>
                         <links>
-                            <link>http://projectreactor.io/docs/core/release/api/</link>
+                            <link>https://projectreactor.io/docs/core/release/api/</link>
                         </links>
                         <quiet>true</quiet>
                     </configuration>
