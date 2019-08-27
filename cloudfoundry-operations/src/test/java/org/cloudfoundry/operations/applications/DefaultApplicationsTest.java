@@ -1781,6 +1781,40 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
+    public void pushNoInstances() throws IOException {
+        Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
+
+        requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
+        requestCreateApplication(this.cloudFoundryClient, ApplicationManifest.builder()
+            .path(testApplication)
+            .name("test-name")
+            .instances(0)
+            .build(), TEST_SPACE_ID, null, "test-application-id");
+        requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
+        requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
+        requestSharedDomains(this.cloudFoundryClient, "test-shared-domain", "test-shared-domain-id");
+        requestRoutesEmpty(this.cloudFoundryClient, "test-shared-domain-id", "test-name", null, null);
+        requestListMatchingResources(this.cloudFoundryClient, Arrays.asList(new ResourceMatchingUtils.ArtifactMetadata("da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "100644", 0),
+            new ResourceMatchingUtils.ArtifactMetadata("45044a6ddbfe11415a8f8a6219de68a2c66b496b", "index.html", "100644", 178)));
+        requestApplicationRoutesEmpty(this.cloudFoundryClient, "test-application-id");
+        requestCreateRoute(this.cloudFoundryClient, "test-shared-domain-id", "test-name", null, null, TEST_SPACE_ID, "test-route-id");
+        requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
+        requestUpload(this.cloudFoundryClient, "test-application-id", testApplication, "test-job-id");
+        requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED", 0);
+
+        StepVerifier.withVirtualTime(() -> this.applications
+            .push(PushApplicationRequest.builder()
+                .path(testApplication)
+                .name("test-name")
+                .instances(0)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
     public void pushNoRoute() throws IOException {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
@@ -4001,6 +4035,10 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     private static void requestUpdateApplicationState(CloudFoundryClient cloudFoundryClient, String applicationId, String state) {
+        requestUpdateApplicationState(cloudFoundryClient, applicationId, state, 1);
+    }
+
+    private static void requestUpdateApplicationState(CloudFoundryClient cloudFoundryClient, String applicationId, String state, int instances) {
         when(cloudFoundryClient.applicationsV2()
             .update(UpdateApplicationRequest.builder()
                 .applicationId(applicationId)
@@ -4013,6 +4051,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                         .build())
                     .entity(fill(ApplicationEntity.builder())
                         .state(state)
+                        .instances(instances)
                         .build())
                     .build()));
     }
