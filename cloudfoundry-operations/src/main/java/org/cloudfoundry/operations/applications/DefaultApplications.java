@@ -125,6 +125,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
@@ -870,6 +871,10 @@ public final class DefaultApplications implements Applications {
         return ResourceUtils.getEntity(resource).getEnvironmentJsons();
     }
 
+    private static int getInstances(AbstractApplicationResource resource) {
+        return Optional.ofNullable(resource.getEntity()).map(ApplicationEntity::getInstances).orElse(0);
+    }
+
     private static Flux<LogMessage> getLogs(Mono<DopplerClient> dopplerClient, String applicationId, Boolean recent) {
         if (Optional.ofNullable(recent).orElse(false)) {
             return requestLogsRecent(dopplerClient, applicationId)
@@ -1057,7 +1062,7 @@ public final class DefaultApplications implements Applications {
     }
 
     private static boolean isIdentical(String s, String t) {
-        return s == null ? t == null : s.equals(t);
+        return Objects.equals(s, t);
     }
 
     private static Predicate<String> isInstanceComplete() {
@@ -1666,6 +1671,14 @@ public final class DefaultApplications implements Applications {
             .then(startApplicationAndWait(cloudFoundryClient, application, applicationId, stagingTimeout, startupTimeout));
     }
 
+    private static boolean shouldStartApplication(PushApplicationManifestRequest request, AbstractApplicationResource resource) {
+        return shouldStartApplication(request) && getInstances(resource) > 0;
+    }
+
+    private static boolean shouldStartApplication(PushApplicationManifestRequest request) {
+        return !Optional.ofNullable(request.getNoStart()).orElse(false);
+    }
+
     private static Predicate<AbstractApplicationResource> sshEnabled(Boolean enabled) {
         return resource -> enabled.equals(ResourceUtils.getEntity(resource).getEnableSsh());
     }
@@ -1680,18 +1693,6 @@ public final class DefaultApplications implements Applications {
         return stopApplication(cloudFoundryClient, applicationId)
             .filter(resource -> shouldStartApplication(request, resource))
             .flatMap(resource -> startApplicationAndWait(cloudFoundryClient, name, applicationId, request.getStagingTimeout(), request.getStartupTimeout()));
-    }
-
-    private static boolean shouldStartApplication(PushApplicationManifestRequest request, AbstractApplicationResource resource) {
-        return shouldStartApplication(request) && getInstances(resource) > 0;
-    }
-
-    private static boolean shouldStartApplication(PushApplicationManifestRequest request) {
-        return !Optional.ofNullable(request.getNoStart()).orElse(false);
-    }
-
-    private static int getInstances(AbstractApplicationResource resource) {
-        return Optional.ofNullable(resource.getEntity()).map(ApplicationEntity::getInstances).orElse(0);
     }
 
     private static Mono<AbstractApplicationResource> stopApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
