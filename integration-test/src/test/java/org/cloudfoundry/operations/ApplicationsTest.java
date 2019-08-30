@@ -654,6 +654,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .path(new ClassPathResource("test-application.zip").getFile().toPath())
                 .buildpack("staticfile_buildpack")
                 .diskQuota(512)
+                .healthCheckHttpEndpoint("/health")
                 .healthCheckType(ApplicationHealthCheck.PORT)
                 .memory(64)
                 .name(applicationName)

@@ -106,6 +106,12 @@ abstract class _PushApplicationRequest {
     abstract String getDomain();
 
     /**
+     * The HTTP health check endpoint
+     */
+    @Nullable
+    abstract String getHealthCheckHttpEndpoint();
+
+    /**
      * The health check type for the application
      */
     @Nullable

@@ -366,6 +366,7 @@ public final class DefaultApplications implements Applications {
                 .password(request.getDockerPassword())
                 .username(request.getDockerUsername())
                 .build())
+            .healthCheckHttpEndpoint(request.getHealthCheckHttpEndpoint())
             .healthCheckType(request.getHealthCheckType())
             .instances(request.getInstances())
             .memory(request.getMemory())
