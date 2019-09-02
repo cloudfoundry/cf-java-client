@@ -3130,6 +3130,22 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                     .build()));
     }
 
+    private static void requestApplicationSummaryDetectedBuildpack(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        when(cloudFoundryClient.applicationsV2()
+            .summary(SummaryApplicationRequest.builder()
+                .applicationId(applicationId)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(SummaryApplicationResponse.builder(), "application-summary-")
+                    .route(fill(org.cloudfoundry.client.v2.routes.Route.builder(), "route-")
+                        .domain(fill(org.cloudfoundry.client.v2.domains.Domain.builder(), "domain-")
+                            .build())
+                        .build())
+                    .buildpack(null)
+                    .packageUpdatedAt(DateUtils.formatToIso8601(new Date(0)))
+                    .build()));
+    }
+
     private static void requestApplicationSummaryDocker(CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient.applicationsV2()
             .summary(SummaryApplicationRequest.builder()
@@ -3153,22 +3169,6 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                     .service(ServiceInstance.builder()
                         .name("test-service-instance-name")
                         .build())
-                    .build()));
-    }
-
-    private static void requestApplicationSummaryDetectedBuildpack(CloudFoundryClient cloudFoundryClient, String applicationId) {
-        when(cloudFoundryClient.applicationsV2()
-            .summary(SummaryApplicationRequest.builder()
-                .applicationId(applicationId)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(SummaryApplicationResponse.builder(), "application-summary-")
-                    .route(fill(org.cloudfoundry.client.v2.routes.Route.builder(), "route-")
-                        .domain(fill(org.cloudfoundry.client.v2.domains.Domain.builder(), "domain-")
-                            .build())
-                        .build())
-                    .buildpack(null)
-                    .packageUpdatedAt(DateUtils.formatToIso8601(new Date(0)))
                     .build()));
     }
 
