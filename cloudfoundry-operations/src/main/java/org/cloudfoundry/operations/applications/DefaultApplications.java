@@ -942,6 +942,10 @@ public final class DefaultApplications implements Applications {
             .onErrorResume(NoSuchElementException.class, t -> ExceptionUtils.illegalArgument("Space %s not found", space));
     }
 
+    private static String getPassword(DockerCredentials dockerCredentials) {
+        return Optional.ofNullable(dockerCredentials).map(DockerCredentials::getPassword).orElse(null);
+    }
+
     private static Flux<String> getPushRouteIdFromDomain(CloudFoundryClient cloudFoundryClient, List<DomainSummary> availableDomains, String domainId, ApplicationManifest manifest,
                                                          RandomWords randomWords, String spaceId) {
         if (isTcpDomain(availableDomains, domainId)) {
@@ -1060,6 +1064,10 @@ public final class DefaultApplications implements Applications {
         return requestRoutes(cloudFoundryClient, domainId, null, port, null)
             .singleOrEmpty()
             .map(ResourceUtils::getId);
+    }
+
+    private static String getUsername(DockerCredentials dockerCredentials) {
+        return Optional.ofNullable(dockerCredentials).map(DockerCredentials::getUsername).orElse(null);
     }
 
     private static boolean isIdentical(String s, String t) {
@@ -1741,6 +1749,7 @@ public final class DefaultApplications implements Applications {
             .healthCheckType(ApplicationHealthCheck.from(response.getHealthCheckType()))
             .instances(response.getInstances())
             .memory(response.getMemory())
+            .docker(toDocker(response))
             .name(response.getName())
             .stack(stackName)
             .timeout(response.getHealthCheckTimeout());
@@ -1783,6 +1792,17 @@ public final class DefaultApplications implements Applications {
 
     private static Date toDate(Double date) {
         return date == null ? null : DateUtils.parseSecondsFromEpoch(date);
+    }
+
+    private static Docker toDocker(SummaryApplicationResponse response) {
+        if (response.getDockerImage() == null) {
+            return null;
+        }
+        return Docker.builder()
+            .image(response.getDockerImage())
+            .username(getUsername(response.getDockerCredentials()))
+            .password(getPassword(response.getDockerCredentials()))
+            .build();
     }
 
     private static DomainSummary toDomain(SharedDomainResource resource) {
