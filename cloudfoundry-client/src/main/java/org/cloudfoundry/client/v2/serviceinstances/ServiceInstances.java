@@ -57,7 +57,8 @@ public interface ServiceInstances {
 
     /**
      * Makes the
-     * <a href="https://apidocs.cloudfoundry.org/latest-release/service_instances/retrieve_a_particular_service_instance_parameters.html">Retrieve a Particular Service Instance's Parameters</a> request
+     * <a href="https://apidocs.cloudfoundry.org/latest-release/service_instances/retrieve_a_particular_service_instance_parameters.html">Retrieve a Particular Service Instance's Parameters</a>
+     * request
      *
      * @param request the Get Parameters request
      * @return the response from the Get Parameters request

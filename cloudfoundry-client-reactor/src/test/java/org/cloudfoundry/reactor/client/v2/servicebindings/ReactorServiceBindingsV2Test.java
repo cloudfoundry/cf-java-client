@@ -16,17 +16,6 @@
 
 package org.cloudfoundry.reactor.client.v2.servicebindings;
 
-import static io.netty.handler.codec.http.HttpMethod.DELETE;
-import static io.netty.handler.codec.http.HttpMethod.GET;
-import static io.netty.handler.codec.http.HttpMethod.POST;
-import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
-import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
-import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
-import static io.netty.handler.codec.http.HttpResponseStatus.OK;
-
-import java.time.Duration;
-import java.util.Collections;
-
 import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.jobs.JobEntity;
 import org.cloudfoundry.client.v2.servicebindings.CreateServiceBindingRequest;
@@ -47,8 +36,18 @@ import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import org.junit.Test;
-
 import reactor.test.StepVerifier;
+
+import java.time.Duration;
+import java.util.Collections;
+
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
+import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
+import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorServiceBindingsV2Test extends AbstractClientApiTest {
 
@@ -68,12 +67,13 @@ public final class ReactorServiceBindingsV2Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.serviceBindings.create(CreateServiceBindingRequest.builder()
-            .applicationId("26ddc1de-3eeb-424b-82f3-f7f30a38b610")
-            .serviceInstanceId("650d0eb7-3b83-414a-82a0-d503d1c8eb5f")
-            .parameters(Collections.singletonMap("the_service_broker",
-                (Object) "wants this object"))
-            .build())
+        this.serviceBindings
+            .create(CreateServiceBindingRequest.builder()
+                .applicationId("26ddc1de-3eeb-424b-82f3-f7f30a38b610")
+                .serviceInstanceId("650d0eb7-3b83-414a-82a0-d503d1c8eb5f")
+                .parameters(Collections.singletonMap("the_service_broker",
+                    (Object) "wants this object"))
+                .build())
             .as(StepVerifier::create)
             .expectNext(CreateServiceBindingResponse.builder()
                 .metadata(Metadata.builder()
@@ -85,8 +85,7 @@ public final class ReactorServiceBindingsV2Test extends AbstractClientApiTest {
                     .applicationId("26ddc1de-3eeb-424b-82f3-f7f30a38b610")
                     .serviceInstanceId("650d0eb7-3b83-414a-82a0-d503d1c8eb5f")
                     .bindingOptions(Collections.emptyMap())
-                    .credential("creds-key-356",
-                        "creds-val-356")
+                    .credential("creds-key-356", "creds-val-356")
                     .gatewayName("")
                     .applicationUrl("/v2/apps/26ddc1de-3eeb-424b-82f3-f7f30a38b610")
                     .serviceInstanceUrl("/v2/service_instances/650d0eb7-3b83-414a-82a0-d503d1c8eb5f")
@@ -108,9 +107,10 @@ public final class ReactorServiceBindingsV2Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.serviceBindings.delete(DeleteServiceBindingRequest.builder()
-            .serviceBindingId("test-service-binding-id")
-            .build())
+        this.serviceBindings
+            .delete(DeleteServiceBindingRequest.builder()
+                .serviceBindingId("test-service-binding-id")
+                .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -129,10 +129,11 @@ public final class ReactorServiceBindingsV2Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.serviceBindings.delete(DeleteServiceBindingRequest.builder()
-            .async(true)
-            .serviceBindingId("test-service-binding-id")
-            .build())
+        this.serviceBindings
+            .delete(DeleteServiceBindingRequest.builder()
+                .async(true)
+                .serviceBindingId("test-service-binding-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(DeleteServiceBindingResponse.builder()
                 .metadata(Metadata.builder()
@@ -162,9 +163,10 @@ public final class ReactorServiceBindingsV2Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.serviceBindings.get(GetServiceBindingRequest.builder()
-            .serviceBindingId("test-service-binding-id")
-            .build())
+        this.serviceBindings
+            .get(GetServiceBindingRequest.builder()
+                .serviceBindingId("test-service-binding-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(GetServiceBindingResponse.builder()
                 .metadata(Metadata.builder()
@@ -209,16 +211,17 @@ public final class ReactorServiceBindingsV2Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.serviceBindings.getParameters(GetServiceBindingParametersRequest.builder()
-            .serviceBindingId("test-service-binding-id")
-            .build())
+        this.serviceBindings
+            .getParameters(GetServiceBindingParametersRequest.builder()
+                .serviceBindingId("test-service-binding-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(GetServiceBindingParametersResponse.builder()
-                .parameter("foo", "abc")
-                .parameter("bar", 12345)
-                .parameter("baz", false)
-                .parameter("qux", 3.141)
-                .parameter("quux", null)
+                .parameter("test-param-key-1", "test-param-value-1")
+                .parameter("test-param-key-2", 12345)
+                .parameter("test-param-key-3", false)
+                .parameter("test-param-key-4", 3.141)
+                .parameter("test-param-key-5", null)
                 .build())
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -237,10 +240,11 @@ public final class ReactorServiceBindingsV2Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.serviceBindings.list(ListServiceBindingsRequest.builder()
-            .applicationId("dd44fd4f-5e20-4c52-b66d-7af6e201f01e")
-            .page(-1)
-            .build())
+        this.serviceBindings
+            .list(ListServiceBindingsRequest.builder()
+                .applicationId("dd44fd4f-5e20-4c52-b66d-7af6e201f01e")
+                .page(-1)
+                .build())
             .as(StepVerifier::create)
             .expectNext(ListServiceBindingsResponse.builder()
                 .totalResults(3)
@@ -255,8 +259,7 @@ public final class ReactorServiceBindingsV2Test extends AbstractClientApiTest {
                         .applicationId("dd44fd4f-5e20-4c52-b66d-7af6e201f01e")
                         .serviceInstanceId("bbd1f170-bb1f-481d-bcf7-def2bbe6a3a2")
                         .bindingOptions(Collections.emptyMap())
-                        .credential("creds-key-3",
-                            "creds-val-3")
+                        .credential("creds-key-3", "creds-val-3")
                         .gatewayName("")
                         .applicationUrl("/v2/apps/dd44fd4f-5e20-4c52-b66d-7af6e201f01e")
                         .serviceInstanceUrl("/v2/service_instances/bbd1f170-bb1f-481d-bcf7-def2bbe6a3a2")
@@ -273,8 +276,7 @@ public final class ReactorServiceBindingsV2Test extends AbstractClientApiTest {
                         .applicationId("dd44fd4f-5e20-4c52-b66d-7af6e201f01e")
                         .serviceInstanceId("f99b3d23-55f9-48b5-add3-d7ab08b2ff0c")
                         .bindingOptions(Collections.emptyMap())
-                        .credential("creds-key-108",
-                            "creds-val-108")
+                        .credential("creds-key-108", "creds-val-108")
                         .gatewayName("")
                         .applicationUrl("/v2/apps/dd44fd4f-5e20-4c52-b66d-7af6e201f01e")
                         .serviceInstanceUrl("/v2/service_instances/f99b3d23-55f9-48b5-add3-d7ab08b2ff0c")
@@ -290,8 +292,7 @@ public final class ReactorServiceBindingsV2Test extends AbstractClientApiTest {
                         .applicationId("dd44fd4f-5e20-4c52-b66d-7af6e201f01e")
                         .serviceInstanceId("650d0eb7-3b83-414a-82a0-d503d1c8eb5f")
                         .bindingOptions(Collections.emptyMap())
-                        .credential("creds-key-356",
-                            "creds-val-356")
+                        .credential("creds-key-356", "creds-val-356")
                         .gatewayName("")
                         .applicationUrl("/v2/apps/dd44fd4f-5e20-4c52-b66d-7af6e201f01e")
                         .serviceInstanceUrl("/v2/service_instances/650d0eb7-3b83-414a-82a0-d503d1c8eb5f")

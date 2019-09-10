@@ -1,16 +1,15 @@
 package org.cloudfoundry.client.v2.servicebindings;
 
-import java.io.IOException;
-import java.util.Map;
-
-import org.cloudfoundry.AllowNulls;
-import org.immutables.value.Value;
-
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import org.cloudfoundry.AllowNulls;
+import org.immutables.value.Value;
+
+import java.io.IOException;
+import java.util.Map;
 
 /**
  * The response payload for the Get Service Binding Parameters operation
@@ -27,7 +26,7 @@ abstract class _GetServiceBindingParametersResponse {
 
     static final class ServiceBindingParametersResponseDeserializer extends StdDeserializer<GetServiceBindingParametersResponse> {
 
-        private static final long serialVersionUID = -2925663073415059473L;
+        private static final long serialVersionUID = 2428493373917623001L;
 
         ServiceBindingParametersResponseDeserializer() {
             super(GetServiceBindingParametersResponse.class);

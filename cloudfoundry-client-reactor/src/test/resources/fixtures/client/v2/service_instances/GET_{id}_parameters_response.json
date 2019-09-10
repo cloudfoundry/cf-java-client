@@ -1,7 +1,7 @@
 {
-  "foo": "abc",
-  "bar": 12345,
-  "baz": false,
-  "qux": 3.141,
-  "quux": null
+  "test-param-key-1": "test-param-value-1",
+  "test-param-key-2": 12345,
+  "test-param-key-3": false,
+  "test-param-key-4": 3.141,
+  "test-param-key-5": null
 }

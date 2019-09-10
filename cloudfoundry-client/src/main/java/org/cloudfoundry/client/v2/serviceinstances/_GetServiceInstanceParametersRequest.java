@@ -1,8 +1,7 @@
 package org.cloudfoundry.client.v2.serviceinstances;
 
-import org.immutables.value.Value;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.immutables.value.Value;
 
 /**
  * The request payload for the Get Parameters operation
