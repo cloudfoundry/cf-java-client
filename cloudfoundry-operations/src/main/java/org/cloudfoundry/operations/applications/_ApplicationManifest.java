@@ -162,7 +162,7 @@ abstract class _ApplicationManifest {
     abstract Path getPath();
 
     /**
-     * The ports on which application may listen
+     * The ports on which the application may listen
      */
     @Nullable
     abstract List<Integer> getPorts();

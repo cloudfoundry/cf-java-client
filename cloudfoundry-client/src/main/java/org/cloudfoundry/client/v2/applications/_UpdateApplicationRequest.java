@@ -156,7 +156,7 @@ abstract class _UpdateApplicationRequest {
     abstract String getName();
 
     /**
-     * The ports on which application may listen
+     * The ports on which the application may listen
      */
     @JsonProperty("ports")
     @Nullable
