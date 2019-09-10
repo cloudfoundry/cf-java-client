@@ -12,6 +12,8 @@ applications:
   name: alpha-application-1
   no-route: true
   path: c:\alpha-path
+  ports:
+  - 8080
   random-route: true
   routes:
   - route: alpha-route-1
@@ -41,6 +43,9 @@ applications:
   no-hostname: true
   no-route: true
   path: c:\alpha-path
+  ports:
+  - 8080
+  - 8081
   random-route: true
   services:
   - alpha-instance-1

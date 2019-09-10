@@ -461,6 +461,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .instances(1)
                 .memory(1)
                 .name("test-application-summary-name")
+                .ports(Collections.emptyList())
                 .route(Route.builder()
                     .route("test-route-host.test-domain-name/test-path")
                     .build())
@@ -497,6 +498,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .instances(1)
                 .memory(1)
                 .name("test-application-summary-name")
+                .ports()
                 .route(Route.builder()
                     .route("test-route-host.test-domain-name/test-path")
                     .build())
@@ -530,6 +532,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .memory(1)
                 .name("test-application-summary-name")
                 .noRoute(true)
+                .ports(Collections.emptyList())
                 .stack("test-stack-entity-name")
                 .timeout(1)
                 .build())
@@ -558,6 +561,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .instances(1)
                 .memory(1)
                 .name("test-application-summary-name")
+                .ports(Collections.emptyList())
                 .route(Route.builder()
                     .route("test-route-host.test-domain-name:999")
                     .build())
@@ -1392,6 +1396,46 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
+    public void pushExistingApplicationWithPorts() throws IOException {
+        Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
+
+        requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
+        requestApplications(this.cloudFoundryClient, "test-name", TEST_SPACE_ID, "test-application-id");
+        requestUpdateApplication(this.cloudFoundryClient, "test-application-id", ApplicationManifest.builder()
+            .path(testApplication)
+            .environmentVariable("test-var", "test-value")
+            .name("test-name")
+            .ports(8080, 8081)
+            .build(), null);
+        requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
+        requestSharedDomains(this.cloudFoundryClient, "test-shared-domain", "test-shared-domain-id");
+        requestApplicationRoutes(this.cloudFoundryClient, "test-application-id", "test-route-id");
+        requestRoutesEmpty(this.cloudFoundryClient, "test-shared-domain-id", "test-name", null, null);
+        requestListMatchingResources(this.cloudFoundryClient, Arrays.asList(new ResourceMatchingUtils.ArtifactMetadata("da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "100644", 0),
+            new ResourceMatchingUtils.ArtifactMetadata("45044a6ddbfe11415a8f8a6219de68a2c66b496b", "index.html", "100644", 178)));
+        requestCreateRoute(this.cloudFoundryClient, "test-shared-domain-id", "test-name", null, null, TEST_SPACE_ID, "test-route-id");
+        requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
+        requestUpload(this.cloudFoundryClient, "test-application-id", testApplication, "test-job-id");
+        requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+        requestGetApplication(this.cloudFoundryClient, "test-application-id");
+        requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
+
+        StepVerifier.withVirtualTime(() -> this.applications
+            .pushManifest(PushApplicationManifestRequest.builder()
+                .manifest(ApplicationManifest.builder()
+                    .path(testApplication)
+                    .name("test-name")
+                    .ports(8080, 8081)
+                    .build())
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
     public void pushExistingRouteWithHost() throws IOException {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
@@ -1952,6 +1996,47 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .path(testApplication)
                 .name("test-name")
                 .noStart(true)
+                .build()))
+            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void pushPorts() throws IOException {
+        Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
+
+        requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
+        requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
+        requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
+        requestCreateApplication(this.cloudFoundryClient, ApplicationManifest.builder()
+            .path(testApplication)
+            .ports(8080, 8081)
+            .name("test-name")
+            .build(), TEST_SPACE_ID, null, "test-application-id");
+        requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
+        requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
+        requestSharedDomains(this.cloudFoundryClient, "test-shared-domain", "test-shared-domain-id");
+        requestRoutesEmpty(this.cloudFoundryClient, "test-shared-domain-id", "test-name", null, null);
+        requestListMatchingResources(this.cloudFoundryClient, Arrays.asList(new ResourceMatchingUtils.ArtifactMetadata("da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "100644", 0),
+            new ResourceMatchingUtils.ArtifactMetadata("45044a6ddbfe11415a8f8a6219de68a2c66b496b", "index.html", "100644", 178)));
+        requestApplicationRoutesEmpty(this.cloudFoundryClient, "test-application-id");
+        requestCreateRoute(this.cloudFoundryClient, "test-shared-domain-id", "test-name", null, null, TEST_SPACE_ID, "test-route-id");
+        requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
+        requestUpload(this.cloudFoundryClient, "test-application-id", testApplication, "test-job-id");
+        requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
+        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+        requestGetApplication(this.cloudFoundryClient, "test-application-id");
+        requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
+
+        StepVerifier.withVirtualTime(() -> this.applications
+            .pushManifest(PushApplicationManifestRequest.builder()
+                .manifest(ApplicationManifest.builder()
+                    .path(testApplication)
+                    .ports(8080, 8081)
+                    .name("test-name")
+                    .build())
                 .build()))
             .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
             .expectComplete()
@@ -3369,6 +3454,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .instances(manifest.getInstances())
                 .memory(manifest.getMemory())
                 .name(manifest.getName())
+                .ports(manifest.getPorts())
                 .spaceId(spaceId)
                 .stackId(stackId)
                 .build()))
@@ -4030,6 +4116,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .instances(manifest.getInstances())
                 .memory(manifest.getMemory())
                 .name(manifest.getName())
+                .ports(manifest.getPorts())
                 .stackId(stackId)
                 .build()))
             .thenReturn(Mono

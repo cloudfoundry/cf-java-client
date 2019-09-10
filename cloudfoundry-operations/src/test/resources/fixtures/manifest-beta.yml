@@ -12,6 +12,8 @@ applications:
   memory: 2M
   no-route: false
   path: /beta-path
+  ports:
+  - 7070
   random-route: false
   routes:
   - route: beta-route-1
@@ -35,6 +37,8 @@ applications:
   memory: 2G
   no-route: true
   path: /beta-path
+  ports:
+  - 8080
   random-route: true
   routes:
   - route: beta-route-1
