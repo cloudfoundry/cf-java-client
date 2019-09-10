@@ -8,8 +8,6 @@ instances: -1
 memory: -1
 no-route: true
 path: /indigo-path
-ports:
-- 8080
 random-route: true
 routes:
 - route: indigo-route-1

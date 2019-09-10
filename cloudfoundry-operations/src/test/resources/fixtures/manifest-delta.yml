@@ -10,8 +10,6 @@ instances: -3
 memory: -3
 no-route: true
 path: /delta-path
-ports:
-- 8080
 random-route: true
 routes:
 - route: delta-route-1

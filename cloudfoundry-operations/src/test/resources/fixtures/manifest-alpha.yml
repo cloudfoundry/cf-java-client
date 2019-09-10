@@ -9,8 +9,6 @@ applications:
   instances: -1
   memory: 1M
   path: /alpha-path
-  ports:
-  - 8080
   no-route: true
   random-route: true
   routes:
@@ -44,9 +42,6 @@ applications:
   no-hostname: true
   no-route: true
   path: c:\alpha-path
-  ports:
-  - 8080
-  - 8081
   random-route: true
   stack: alpha-stack
   timeout: -1
