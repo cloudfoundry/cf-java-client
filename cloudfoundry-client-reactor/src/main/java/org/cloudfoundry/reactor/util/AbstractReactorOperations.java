@@ -256,7 +256,13 @@ public abstract class AbstractReactorOperations {
     private Mono<HttpClientRequest> addAuthorization(Mono<HttpClientRequest> outbound) {
         return Mono
             .zip(outbound, this.tokenProvider.getToken(this.connectionContext))
-            .map(function((request, token) -> request.header(AUTHORIZATION, token)));
+            .map(function((request, token) -> {
+                if (request.redirectedFrom().length == 0) {
+                    request.header(AUTHORIZATION, token);
+                }
+
+                return request;
+            }));
     }
 
     private <T> Function<Mono<HttpClientResponse>, Mono<T>> deserializedResponse(Class<T> responseType) {
