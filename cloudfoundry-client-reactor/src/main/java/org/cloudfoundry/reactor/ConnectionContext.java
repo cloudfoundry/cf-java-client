@@ -18,7 +18,7 @@ package org.cloudfoundry.reactor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import reactor.core.publisher.Mono;
-import reactor.ipc.netty.http.client.HttpClient;
+import reactor.netty.http.client.HttpClient;
 
 import java.time.Duration;
 import java.util.Optional;

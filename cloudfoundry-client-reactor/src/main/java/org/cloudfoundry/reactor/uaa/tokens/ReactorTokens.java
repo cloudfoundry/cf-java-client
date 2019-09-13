@@ -16,7 +16,16 @@
 
 package org.cloudfoundry.reactor.uaa.tokens;
 
-import io.netty.util.AsciiString;
+import static io.netty.handler.codec.http.HttpHeaderNames.AUTHORIZATION;
+import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
+import static io.netty.handler.codec.http.HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED;
+import static org.cloudfoundry.uaa.tokens.GrantType.AUTHORIZATION_CODE;
+import static org.cloudfoundry.uaa.tokens.GrantType.CLIENT_CREDENTIALS;
+import static org.cloudfoundry.uaa.tokens.GrantType.PASSWORD;
+import static org.cloudfoundry.uaa.tokens.GrantType.REFRESH_TOKEN;
+
+import java.util.Base64;
+
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.uaa.AbstractUaaOperations;
@@ -40,19 +49,10 @@ import org.cloudfoundry.uaa.tokens.ListTokenKeysResponse;
 import org.cloudfoundry.uaa.tokens.RefreshTokenRequest;
 import org.cloudfoundry.uaa.tokens.RefreshTokenResponse;
 import org.cloudfoundry.uaa.tokens.Tokens;
+
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.util.AsciiString;
 import reactor.core.publisher.Mono;
-import reactor.ipc.netty.http.client.HttpClientRequest;
-
-import java.util.Base64;
-
-import static io.netty.handler.codec.http.HttpHeaderNames.AUTHORIZATION;
-import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
-import static io.netty.handler.codec.http.HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED;
-import static org.cloudfoundry.uaa.tokens.GrantType.AUTHORIZATION_CODE;
-import static org.cloudfoundry.uaa.tokens.GrantType.CLIENT_CREDENTIALS;
-import static org.cloudfoundry.uaa.tokens.GrantType.PASSWORD;
-import static org.cloudfoundry.uaa.tokens.GrantType.REFRESH_TOKEN;
-
 
 public final class ReactorTokens extends AbstractUaaOperations implements Tokens {
 
@@ -62,7 +62,7 @@ public final class ReactorTokens extends AbstractUaaOperations implements Tokens
      * Creates an instance
      *
      * @param connectionContext the {@link ConnectionContext} to use when communicating with the server
-     * @param root              the root URI of the server.  Typically something like {@code https://uaa.run.pivotal.io}.
+     * @param root              the root URI of the server. Typically something like {@code https://uaa.run.pivotal.io}.
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      */
     public ReactorTokens(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
@@ -71,95 +71,96 @@ public final class ReactorTokens extends AbstractUaaOperations implements Tokens
 
     @Override
     public Mono<CheckTokenResponse> check(CheckTokenRequest request) {
-        return post(request, CheckTokenResponse.class, builder -> builder.pathSegment("check_token"),
-            outbound -> outbound
-                .map(r -> {
-                    String encoded = Base64.getEncoder().encodeToString(new AsciiString(request.getClientId()).concat(":").concat(request.getClientSecret()).toByteArray());
-                    r.requestHeaders().set(AUTHORIZATION, BASIC_PREAMBLE + encoded);
-                    return r;
-                }))
-            .checkpoint();
+        return post(request, CheckTokenResponse.class, builder -> builder.pathSegment("check_token"), outbound -> {
+            String encoded = Base64.getEncoder()
+                .encodeToString(new AsciiString(request.getClientId()).concat(":")
+                    .concat(request.getClientSecret())
+                    .toByteArray());
+            outbound.set(AUTHORIZATION, BASIC_PREAMBLE + encoded);
+        }).checkpoint();
     }
 
     @Override
     public Mono<GetTokenByAuthorizationCodeResponse> getByAuthorizationCode(GetTokenByAuthorizationCodeRequest request) {
-        return post(request, GetTokenByAuthorizationCodeResponse.class,
-            builder -> builder.pathSegment("oauth", "token").queryParam("grant_type", AUTHORIZATION_CODE).queryParam("response_type", ResponseType.TOKEN),
-            outbound -> outbound
-                .map(ReactorTokens::removeAuthorization)
-                .map(ReactorTokens::setUrlEncoded))
-            .checkpoint();
+        return post(request, GetTokenByAuthorizationCodeResponse.class, builder -> builder.pathSegment("oauth", "token")
+                .queryParam("grant_type", AUTHORIZATION_CODE)
+                .queryParam("response_type", ResponseType.TOKEN),
+            outbound -> {
+                ReactorTokens.removeAuthorization(outbound);
+                ReactorTokens.setUrlEncoded(outbound);
+            }).checkpoint();
     }
 
     @Override
     public Mono<GetTokenByClientCredentialsResponse> getByClientCredentials(GetTokenByClientCredentialsRequest request) {
-        return post(request, GetTokenByClientCredentialsResponse.class,
-            builder -> builder.pathSegment("oauth", "token").queryParam("grant_type", CLIENT_CREDENTIALS).queryParam("response_type", ResponseType.TOKEN),
-            outbound -> outbound
-                .map(ReactorTokens::removeAuthorization)
-                .map(ReactorTokens::setUrlEncoded))
-            .checkpoint();
+        return post(request, GetTokenByClientCredentialsResponse.class, builder -> builder.pathSegment("oauth", "token")
+                .queryParam("grant_type", CLIENT_CREDENTIALS)
+                .queryParam("response_type", ResponseType.TOKEN),
+            outbound -> {
+                ReactorTokens.removeAuthorization(outbound);
+                ReactorTokens.setUrlEncoded(outbound);
+            }).checkpoint();
     }
 
     @Override
     public Mono<GetTokenByOneTimePasscodeResponse> getByOneTimePasscode(GetTokenByOneTimePasscodeRequest request) {
-        return post(request, GetTokenByOneTimePasscodeResponse.class,
-            builder -> builder.pathSegment("oauth", "token").queryParam("grant_type", PASSWORD).queryParam("response_type", ResponseType.TOKEN),
-            outbound -> outbound
-                .map(ReactorTokens::removeAuthorization)
-                .map(ReactorTokens::setUrlEncoded))
-            .checkpoint();
+        return post(request, GetTokenByOneTimePasscodeResponse.class, builder -> builder.pathSegment("oauth", "token")
+                .queryParam("grant_type", PASSWORD)
+                .queryParam("response_type", ResponseType.TOKEN),
+            outbound -> {
+                ReactorTokens.removeAuthorization(outbound);
+                ReactorTokens.setUrlEncoded(outbound);
+            }).checkpoint();
     }
 
     @Override
     public Mono<GetTokenByOpenIdResponse> getByOpenId(GetTokenByOpenIdRequest request) {
-        return post(request, GetTokenByOpenIdResponse.class,
-            builder -> builder.pathSegment("oauth", "token").queryParam("grant_type", AUTHORIZATION_CODE).queryParam("response_type", ResponseType.ID_TOKEN),
-            outbound -> outbound
-                .map(ReactorTokens::removeAuthorization)
-                .map(ReactorTokens::setUrlEncoded))
-            .checkpoint();
+        return post(request, GetTokenByOpenIdResponse.class, builder -> builder.pathSegment("oauth", "token")
+                .queryParam("grant_type", AUTHORIZATION_CODE)
+                .queryParam("response_type", ResponseType.ID_TOKEN),
+            outbound -> {
+                ReactorTokens.removeAuthorization(outbound);
+                ReactorTokens.setUrlEncoded(outbound);
+            }).checkpoint();
     }
 
     @Override
     public Mono<GetTokenByPasswordResponse> getByPassword(GetTokenByPasswordRequest request) {
-        return post(request, GetTokenByPasswordResponse.class, builder -> builder.pathSegment("oauth", "token").queryParam("grant_type", PASSWORD).queryParam("response_type", ResponseType.TOKEN),
-            outbound -> outbound
-                .map(ReactorTokens::removeAuthorization)
-                .map(ReactorTokens::setUrlEncoded))
-            .checkpoint();
+        return post(request, GetTokenByPasswordResponse.class, builder -> builder.pathSegment("oauth", "token")
+                .queryParam("grant_type", PASSWORD)
+                .queryParam("response_type", ResponseType.TOKEN),
+            outbound -> {
+                ReactorTokens.removeAuthorization(outbound);
+                ReactorTokens.setUrlEncoded(outbound);
+            }).checkpoint();
     }
 
     @Override
     public Mono<GetTokenKeyResponse> getKey(GetTokenKeyRequest request) {
-        return get(request, GetTokenKeyResponse.class, builder -> builder.pathSegment("token_key"))
-            .checkpoint();
+        return get(request, GetTokenKeyResponse.class, builder -> builder.pathSegment("token_key")).checkpoint();
     }
 
     @Override
     public Mono<ListTokenKeysResponse> listKeys(ListTokenKeysRequest request) {
-        return get(request, ListTokenKeysResponse.class, builder -> builder.pathSegment("token_keys"))
-            .checkpoint();
+        return get(request, ListTokenKeysResponse.class, builder -> builder.pathSegment("token_keys")).checkpoint();
     }
 
     @Override
     public Mono<RefreshTokenResponse> refresh(RefreshTokenRequest request) {
-        return post(request, RefreshTokenResponse.class, builder -> builder.pathSegment("oauth", "token").queryParam("grant_type", REFRESH_TOKEN),
-            outbound -> outbound
-                .map(ReactorTokens::removeAuthorization)
-                .map(ReactorTokens::setUrlEncoded))
-            .checkpoint();
+        return post(request, RefreshTokenResponse.class, builder -> builder.pathSegment("oauth", "token")
+                .queryParam("grant_type", REFRESH_TOKEN),
+            outbound -> {
+                ReactorTokens.removeAuthorization(outbound);
+                ReactorTokens.setUrlEncoded(outbound);
+            }).checkpoint();
     }
 
-    private static HttpClientRequest removeAuthorization(HttpClientRequest request) {
-        request.requestHeaders().remove(AUTHORIZATION);
-        return request;
+    private static void removeAuthorization(HttpHeaders request) {
+        request.remove(AUTHORIZATION);
     }
 
-    private static HttpClientRequest setUrlEncoded(HttpClientRequest request) {
-        return request
-            .chunkedTransfer(false)
-            .header(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED);
+    private static void setUrlEncoded(HttpHeaders request) {
+        request.set(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED);
     }
 
 }
