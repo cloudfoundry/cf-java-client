@@ -16,62 +16,69 @@
 
 package org.cloudfoundry.reactor.util;
 
+import java.nio.charset.Charset;
+import java.util.function.BiFunction;
+
+import org.reactivestreams.Publisher;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
+import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.json.JsonObjectDecoder;
-import org.reactivestreams.Publisher;
 import reactor.core.Exceptions;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.ipc.netty.http.client.HttpClientRequest;
-import reactor.ipc.netty.http.client.HttpClientResponse;
-
-import java.nio.charset.Charset;
-import java.util.function.Function;
+import reactor.netty.ByteBufFlux;
+import reactor.netty.NettyOutbound;
+import reactor.netty.http.client.HttpClientRequest;
+import reactor.netty.http.client.HttpClientResponse;
 
 public final class JsonCodec {
 
     private static final int MAX_PAYLOAD_SIZE = 100 * 1024 * 1024;
 
-    public static HttpClientRequest addDecodeHeaders(HttpClientRequest request) {
-        return request
-            .header(HttpHeaderNames.ACCEPT, HttpHeaderValues.APPLICATION_JSON);
+    public static void setDecodeHeaders(HttpHeaders httpHeaders) {
+        httpHeaders.set(HttpHeaderNames.ACCEPT, HttpHeaderValues.APPLICATION_JSON);
     }
 
-    public static <T> Function<Mono<HttpClientResponse>, Flux<T>> decode(ObjectMapper objectMapper, Class<T> responseType) {
-        return inbound -> inbound
-            .flatMapMany(response -> response.addHandler(new JsonObjectDecoder(MAX_PAYLOAD_SIZE)).receive().asByteArray()
-                .map(payload -> {
-                    try {
-                        return objectMapper.readValue(payload, responseType);
-                    } catch (Throwable t) {
-                        throw new JsonParsingException(t.getMessage(), t, new String(payload, Charset.defaultCharset()));
-                    }
-                }));
+    static JsonObjectDecoder createDecoder(HttpClientResponse response) {
+        return new JsonObjectDecoder(MAX_PAYLOAD_SIZE);
     }
 
-    static Function<Mono<HttpClientRequest>, Publisher<Void>> encode(ObjectMapper objectMapper, Object requestPayload) {
-        if (!AnnotationUtils.findAnnotation(requestPayload.getClass(), JsonSerialize.class).isPresent()) {
-            return outbound -> outbound
-                .flatMap(HttpClientRequest::send);
-        }
-
-        return outbound -> outbound
-            .flatMapMany(request -> {
+    public static <T> Mono<T> decode(ObjectMapper objectMapper, ByteBufFlux responseBody, Class<T> responseType) {
+        return responseBody.aggregate()
+            .asByteArray()
+            .map(payload -> {
                 try {
-                    byte[] bytes = objectMapper.writeValueAsBytes(requestPayload);
-
-                    return request
-                        .header(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON)
-                        .header(HttpHeaderNames.CONTENT_LENGTH, String.valueOf(bytes.length))
-                        .sendByteArray(Mono.just(bytes));
-                } catch (JsonProcessingException e) {
-                    throw Exceptions.propagate(e);
+                    return objectMapper.readValue(payload, responseType);
+                } catch (Throwable t) {
+                    throw new JsonParsingException(t.getMessage(), t, new String(payload, Charset.defaultCharset()));
                 }
             });
+    }
+
+    static BiFunction<HttpClientRequest, NettyOutbound, Publisher<Void>> encode(ObjectMapper objectMapper, Object requestPayload) {
+        if (!AnnotationUtils.findAnnotation(requestPayload.getClass(), JsonSerialize.class)
+            .isPresent()) {
+            return (request, outbound) -> Mono.empty();
+        }
+
+        return (request, outbound) -> {
+            try {
+                byte[] bytes = objectMapper.writeValueAsBytes(requestPayload);
+                String contentLength = String.valueOf(bytes.length);
+
+                Mono<byte[]> body = Mono.just(bytes);
+                request.header(HttpHeaderNames.CONTENT_LENGTH, contentLength);
+                request.header(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON);
+                return outbound.sendByteArray(body);
+            } catch (JsonProcessingException e) {
+                throw Exceptions.propagate(e);
+            }
+        };
     }
 
 }

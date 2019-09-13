@@ -24,7 +24,6 @@ import java.util.function.Function;
 
 /**
  * A utility class to provide functions for handling PaginatedResponse and those containing lists of Resources.
- *
  */
 public final class PaginationUtils {
 

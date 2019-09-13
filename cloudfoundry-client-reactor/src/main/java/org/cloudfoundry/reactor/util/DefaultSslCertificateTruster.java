@@ -16,18 +16,6 @@
 
 package org.cloudfoundry.reactor.util;
 
-import org.cloudfoundry.reactor.ProxyConfiguration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import reactor.core.publisher.Mono;
-import reactor.ipc.netty.resources.LoopResources;
-import reactor.ipc.netty.tcp.TcpClient;
-import reactor.util.function.Tuple2;
-import reactor.util.function.Tuples;
-
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -40,6 +28,22 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
+
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
+
+import org.cloudfoundry.reactor.ProxyConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import io.netty.handler.ssl.SslContextBuilder;
+import reactor.core.publisher.Mono;
+import reactor.netty.resources.LoopResources;
+import reactor.netty.tcp.SslProvider.SslContextSpec;
+import reactor.netty.tcp.TcpClient;
+import reactor.util.function.Tuple2;
+import reactor.util.function.Tuples;
 
 public final class DefaultSslCertificateTruster implements SslCertificateTruster {
 
@@ -62,17 +66,20 @@ public final class DefaultSslCertificateTruster implements SslCertificateTruster
 
     @Override
     public void checkClientTrusted(X509Certificate[] x509Certificates, String authType) throws CertificateException {
-        this.delegate.get().checkClientTrusted(x509Certificates, authType);
+        this.delegate.get()
+            .checkClientTrusted(x509Certificates, authType);
     }
 
     @Override
     public void checkServerTrusted(X509Certificate[] x509Certificates, String authType) throws CertificateException {
-        this.delegate.get().checkServerTrusted(x509Certificates, authType);
+        this.delegate.get()
+            .checkServerTrusted(x509Certificates, authType);
     }
 
     @Override
     public X509Certificate[] getAcceptedIssuers() {
-        return this.delegate.get().getAcceptedIssuers();
+        return this.delegate.get()
+            .getAcceptedIssuers();
     }
 
     @Override
@@ -86,11 +93,11 @@ public final class DefaultSslCertificateTruster implements SslCertificateTruster
 
         X509TrustManager trustManager = this.delegate.get();
 
-        return getUntrustedCertificates(duration, host, port, this.proxyConfiguration, this.threadPool, trustManager)
-            .doOnNext(untrustedCertificates -> {
-                KeyStore trustStore = addToTrustStore(untrustedCertificates, trustManager);
-                this.delegate.set(getTrustManager(getTrustManagerFactory(trustStore)));
-            })
+        return getUntrustedCertificates(duration, host, port, this.proxyConfiguration, this.threadPool,
+            trustManager).doOnNext(untrustedCertificates -> {
+            KeyStore trustStore = addToTrustStore(untrustedCertificates, trustManager);
+            this.delegate.set(getTrustManager(getTrustManagerFactory(trustStore)));
+        })
             .doOnSuccess(untrustedCertificates -> {
                 this.trustedHostsAndPorts.add(hostAndPort);
                 this.logger.debug("Trusted SSL Certificate for {}:{}", host, port);
@@ -117,17 +124,20 @@ public final class DefaultSslCertificateTruster implements SslCertificateTruster
         }
     }
 
-    private static TcpClient getTcpClient(Optional<ProxyConfiguration> proxyConfiguration, LoopResources threadPool, CertificateCollectingTrustManager collector, String host, int port) {
-        return TcpClient.create(options -> {
-            options
-                .host(host)
-                .port(port)
-                .loopResources(threadPool)
-                .disablePool()
-                .sslSupport(ssl -> ssl.trustManager(new StaticTrustManagerFactory(collector)));
+    private static TcpClient getTcpClient(Optional<ProxyConfiguration> proxyConfiguration, LoopResources threadPool,
+                                          CertificateCollectingTrustManager collector, String host, int port) {
+        TcpClient tcpClient = TcpClient.create()
+            .runOn(threadPool)
+            .host(host)
+            .port(port)
+            .secure(spec -> configureSsl(spec, collector));
+        return proxyConfiguration.map(configuration -> configuration.configure(tcpClient))
+            .orElse(tcpClient);
+    }
 
-            proxyConfiguration.ifPresent(c -> c.configure(options));
-        });
+    private static void configureSsl(SslContextSpec sslContextSpec, CertificateCollectingTrustManager collector) {
+        sslContextSpec.sslContext(SslContextBuilder.forClient()
+            .trustManager(new StaticTrustManagerFactory(collector)));
     }
 
     private static X509TrustManager getTrustManager(TrustManagerFactory trustManagerFactory) {
@@ -151,15 +161,18 @@ public final class DefaultSslCertificateTruster implements SslCertificateTruster
         }
     }
 
-    private static Mono<X509Certificate[]> getUntrustedCertificates(Duration duration, String host, int port, Optional<ProxyConfiguration> proxyConfiguration, LoopResources threadPool,
-                                                                    X509TrustManager delegate) {
+    private static Mono<X509Certificate[]> getUntrustedCertificates(Duration duration, String host, int port,
+                                                                    Optional<ProxyConfiguration> proxyConfiguration,
+                                                                    LoopResources threadPool, X509TrustManager delegate) {
 
         CertificateCollectingTrustManager collector = new CertificateCollectingTrustManager(delegate);
-
-        return getTcpClient(proxyConfiguration, threadPool, collector, host, port)
-            .newHandler((inbound, outbound) -> inbound.receive().then())
+        TcpClient tcpClient = getTcpClient(proxyConfiguration, threadPool, collector, host, port);
+        return tcpClient.handle((inbound, outbound) -> inbound.receive()
+            .then())
+            .connect()
             .timeout(duration)
-            .handle((c, sink) -> {
+            .handle((connection, sink) -> {
+
                 X509Certificate[] chain = collector.getCollectedCertificateChain();
 
                 if (chain == null) {
@@ -171,6 +184,9 @@ public final class DefaultSslCertificateTruster implements SslCertificateTruster
                 } else {
                     sink.next(chain);
                 }
+
+                connection.dispose();
+
             });
     }
 

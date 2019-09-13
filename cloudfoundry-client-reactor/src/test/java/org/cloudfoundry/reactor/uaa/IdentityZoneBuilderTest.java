@@ -16,24 +16,25 @@
 
 package org.cloudfoundry.reactor.uaa;
 
-import org.cloudfoundry.uaa.IdentityZoned;
-import org.junit.Test;
-import reactor.ipc.netty.http.client.HttpClientRequest;
-
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
+import org.cloudfoundry.uaa.IdentityZoned;
+import org.junit.Test;
+
+import io.netty.handler.codec.http.HttpHeaders;
+
 public final class IdentityZoneBuilderTest {
 
-    private final HttpClientRequest outbound = mock(HttpClientRequest.class);
+    private final HttpHeaders outbound = mock(HttpHeaders.class);
 
     @Test
     public void augment() {
         IdentityZoneBuilder.augment(this.outbound, new StubIdentityZoned());
 
-        verify(this.outbound).header("X-Identity-Zone-Id", "test-identity-zone-id");
-        verify(this.outbound).header("X-Identity-Zone-Subdomain", "test-identity-zone-subdomain");
+        verify(this.outbound).set("X-Identity-Zone-Id", "test-identity-zone-id");
+        verify(this.outbound).set("X-Identity-Zone-Subdomain", "test-identity-zone-subdomain");
     }
 
     @Test

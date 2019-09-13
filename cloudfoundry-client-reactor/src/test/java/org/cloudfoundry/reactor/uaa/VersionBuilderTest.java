@@ -16,23 +16,24 @@
 
 package org.cloudfoundry.reactor.uaa;
 
-import org.cloudfoundry.uaa.Versioned;
-import org.junit.Test;
-import reactor.ipc.netty.http.client.HttpClientRequest;
-
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
+import org.cloudfoundry.uaa.Versioned;
+import org.junit.Test;
+
+import io.netty.handler.codec.http.HttpHeaders;
+
 
 public final class VersionBuilderTest {
 
-    private final HttpClientRequest outbound = mock(HttpClientRequest.class);
+    private final HttpHeaders outbound = mock(HttpHeaders.class);
 
     @Test
     public void augment() {
         VersionBuilder.augment(this.outbound, new StubVersioned("test-version"));
-        verify(this.outbound).header("If-Match", "test-version");
+        verify(this.outbound).set("If-Match", "test-version");
     }
 
     @Test

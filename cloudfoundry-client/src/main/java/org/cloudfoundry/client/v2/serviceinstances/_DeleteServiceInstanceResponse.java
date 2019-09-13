@@ -28,8 +28,6 @@ import org.cloudfoundry.client.v2.Resource;
 import org.cloudfoundry.client.v2.jobs.JobEntity;
 import org.immutables.value.Value;
 
-import java.io.IOException;
-
 /**
  * The response for the Delete Service Instance operation
  */

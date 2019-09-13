@@ -38,5 +38,5 @@ public abstract class ServiceBinding extends Resource {
     @JsonProperty("type")
     @Nullable
     public abstract String getType();
-    
+
 }

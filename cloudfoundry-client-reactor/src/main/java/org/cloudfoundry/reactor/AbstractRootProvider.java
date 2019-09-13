@@ -16,10 +16,17 @@
 
 package org.cloudfoundry.reactor;
 
+import org.cloudfoundry.reactor.util.JsonCodec;
+import org.cloudfoundry.reactor.util.Operator;
+import org.cloudfoundry.reactor.util.OperatorContext;
+import org.cloudfoundry.reactor.util.UserAgent;
 import org.immutables.value.Value;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import io.netty.handler.codec.http.HttpHeaders;
 import reactor.core.publisher.Mono;
+import reactor.netty.http.client.HttpClient;
 
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -41,19 +48,19 @@ abstract class AbstractRootProvider implements RootProvider {
         Matcher matcher = HOSTNAME_PATTERN.matcher(getApiHost());
 
         if (!matcher.matches()) {
-            throw new IllegalArgumentException(String.format("API hostname %s is not correctly formatted (e.g. 'api.local.pcfdev.io')", getApiHost()));
+            throw new IllegalArgumentException(String.format("API hostname %s is not correctly formatted (e.g. 'api.local.pcfdev.io')",
+                getApiHost()));
         }
     }
 
     /**
-     * The hostname of the API root.  Typically something like {@code api.run.pivotal.io}.
+     * The hostname of the API root. Typically something like {@code api.run.pivotal.io}.
      */
     public abstract String getApiHost();
 
     @Override
     public final Mono<String> getRoot(ConnectionContext connectionContext) {
-        Mono<String> cached = doGetRoot(connectionContext)
-            .delayUntil(uri -> trust(uri.getHost(), uri.getPort(), connectionContext))
+        Mono<String> cached = doGetRoot(connectionContext).delayUntil(uri -> trust(uri.getHost(), uri.getPort(), connectionContext))
             .map(UriComponents::toUriString);
 
         return connectionContext.getCacheDuration()
@@ -63,8 +70,7 @@ abstract class AbstractRootProvider implements RootProvider {
 
     @Override
     public final Mono<String> getRoot(String key, ConnectionContext connectionContext) {
-        Mono<String> cached = doGetRoot(key, connectionContext)
-            .delayUntil(uri -> trust(uri.getHost(), uri.getPort(), connectionContext))
+        Mono<String> cached = doGetRoot(key, connectionContext).delayUntil(uri -> trust(uri.getHost(), uri.getPort(), connectionContext))
             .map(UriComponents::toUriString);
 
         return connectionContext.getCacheDuration()
@@ -77,7 +83,9 @@ abstract class AbstractRootProvider implements RootProvider {
     protected abstract Mono<UriComponents> doGetRoot(String key, ConnectionContext connectionContext);
 
     protected final UriComponents getRoot() {
-        UriComponentsBuilder builder = UriComponentsBuilder.newInstance().scheme("https").host(getApiHost());
+        UriComponentsBuilder builder = UriComponentsBuilder.newInstance()
+            .scheme("https")
+            .host(getApiHost());
         getPort().ifPresent(builder::port);
 
         return normalize(builder);
@@ -92,7 +100,8 @@ abstract class AbstractRootProvider implements RootProvider {
             builder.port(getPort().orElse(DEFAULT_PORT));
         }
 
-        return builder.build().encode();
+        return builder.build()
+            .encode();
     }
 
     /**
@@ -101,7 +110,7 @@ abstract class AbstractRootProvider implements RootProvider {
     abstract Optional<Integer> getPort();
 
     /**
-     * Whether the connection to the root API should be secure (i.e. using HTTPS).  Defaults to {@code true}.
+     * Whether the connection to the root API should be secure (i.e. using HTTPS). Defaults to {@code true}.
      */
     abstract Optional<Boolean> getSecure();
 
@@ -115,6 +124,18 @@ abstract class AbstractRootProvider implements RootProvider {
 
     private Mono<Void> trust(String host, int port, ConnectionContext connectionContext) {
         return connectionContext.trust(host, port);
+    }
+
+    public Mono<Operator> createOperator(ConnectionContext connectionContext) {
+        HttpClient httpClient = connectionContext.getHttpClient();
+        return getRoot(connectionContext).map(root -> OperatorContext.of(connectionContext, root))
+            .map(operatorContext -> new Operator(operatorContext, httpClient))
+            .map(operator -> operator.headers(this::addHeaders));
+    }
+
+    private void addHeaders(HttpHeaders httpHeaders) {
+        UserAgent.setUserAgent(httpHeaders);
+        JsonCodec.setDecodeHeaders(httpHeaders);
     }
 
 }
