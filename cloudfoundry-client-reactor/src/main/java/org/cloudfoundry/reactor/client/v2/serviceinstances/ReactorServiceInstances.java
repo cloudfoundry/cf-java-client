@@ -22,6 +22,8 @@ import org.cloudfoundry.client.v2.serviceinstances.CreateServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.CreateServiceInstanceResponse;
 import org.cloudfoundry.client.v2.serviceinstances.DeleteServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.DeleteServiceInstanceResponse;
+import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceParametersRequest;
+import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceParametersResponse;
 import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstancePermissionsRequest;
 import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstancePermissionsResponse;
 import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceRequest;
@@ -80,6 +82,12 @@ public final class ReactorServiceInstances extends AbstractClientV2Operations im
     @Override
     public Mono<GetServiceInstanceResponse> get(GetServiceInstanceRequest request) {
         return get(request, GetServiceInstanceResponse.class, builder -> builder.pathSegment("service_instances", request.getServiceInstanceId()))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<GetServiceInstanceParametersResponse> getParameters(GetServiceInstanceParametersRequest request) {
+        return get(request, GetServiceInstanceParametersResponse.class, builder -> builder.pathSegment("service_instances", request.getServiceInstanceId(), "parameters"))
             .checkpoint();
     }
 

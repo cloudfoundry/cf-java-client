@@ -16,13 +16,14 @@
 
 package org.cloudfoundry.reactor.client.v2.servicebindings;
 
-
 import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.jobs.JobEntity;
 import org.cloudfoundry.client.v2.servicebindings.CreateServiceBindingRequest;
 import org.cloudfoundry.client.v2.servicebindings.CreateServiceBindingResponse;
 import org.cloudfoundry.client.v2.servicebindings.DeleteServiceBindingRequest;
 import org.cloudfoundry.client.v2.servicebindings.DeleteServiceBindingResponse;
+import org.cloudfoundry.client.v2.servicebindings.GetServiceBindingParametersRequest;
+import org.cloudfoundry.client.v2.servicebindings.GetServiceBindingParametersResponse;
 import org.cloudfoundry.client.v2.servicebindings.GetServiceBindingRequest;
 import org.cloudfoundry.client.v2.servicebindings.GetServiceBindingResponse;
 import org.cloudfoundry.client.v2.servicebindings.LastOperation;
@@ -56,7 +57,8 @@ public final class ReactorServiceBindingsV2Test extends AbstractClientApiTest {
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/service_bindings")
+                .method(POST)
+                .path("/service_bindings")
                 .payload("fixtures/client/v2/service_bindings/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -69,7 +71,8 @@ public final class ReactorServiceBindingsV2Test extends AbstractClientApiTest {
             .create(CreateServiceBindingRequest.builder()
                 .applicationId("26ddc1de-3eeb-424b-82f3-f7f30a38b610")
                 .serviceInstanceId("650d0eb7-3b83-414a-82a0-d503d1c8eb5f")
-                .parameters(Collections.singletonMap("the_service_broker", (Object) "wants this object"))
+                .parameters(Collections.singletonMap("the_service_broker",
+                    (Object) "wants this object"))
                 .build())
             .as(StepVerifier::create)
             .expectNext(CreateServiceBindingResponse.builder()
@@ -96,7 +99,8 @@ public final class ReactorServiceBindingsV2Test extends AbstractClientApiTest {
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/service_bindings/test-service-binding-id")
+                .method(DELETE)
+                .path("/service_bindings/test-service-binding-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
@@ -116,7 +120,8 @@ public final class ReactorServiceBindingsV2Test extends AbstractClientApiTest {
     public void deleteAsync() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/service_bindings/test-service-binding-id?async=true")
+                .method(DELETE)
+                .path("/service_bindings/test-service-binding-id?async=true")
                 .build())
             .response(TestResponse.builder()
                 .status(ACCEPTED)
@@ -149,7 +154,8 @@ public final class ReactorServiceBindingsV2Test extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/service_bindings/test-service-binding-id")
+                .method(GET)
+                .path("/service_bindings/test-service-binding-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -193,10 +199,40 @@ public final class ReactorServiceBindingsV2Test extends AbstractClientApiTest {
     }
 
     @Test
+    public void getParameters() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET)
+                .path("/service_bindings/test-service-binding-id/parameters")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v2/service_bindings/GET_{id}_parameters_response.json")
+                .build())
+            .build());
+
+        this.serviceBindings
+            .getParameters(GetServiceBindingParametersRequest.builder()
+                .serviceBindingId("test-service-binding-id")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(GetServiceBindingParametersResponse.builder()
+                .parameter("test-param-key-1", "test-param-value-1")
+                .parameter("test-param-key-2", 12345)
+                .parameter("test-param-key-3", false)
+                .parameter("test-param-key-4", 3.141)
+                .parameter("test-param-key-5", null)
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/service_bindings?q=app_guid:dd44fd4f-5e20-4c52-b66d-7af6e201f01e&page=-1")
+                .method(GET)
+                .path("/service_bindings?q=app_guid:dd44fd4f-5e20-4c52-b66d-7af6e201f01e&page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
