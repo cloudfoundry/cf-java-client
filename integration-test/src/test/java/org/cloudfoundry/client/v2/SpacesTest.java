@@ -1064,10 +1064,9 @@ public final class SpacesTest extends AbstractIntegrationTest {
             ))
             .flatMap(function((serviceBrokerId, spaceId) -> createServiceInstanceId(this.cloudFoundryClient, serviceBrokerId, serviceInstanceName, this.serviceName, spaceId)
                 .thenReturn(spaceId)))
-            .flatMapMany(spaceId -> requestListServiceInstances(this.cloudFoundryClient, spaceId, builder -> builder.gatewayName("")))
-            .filter(resource -> serviceInstanceName.equals(ResourceUtils.getEntity(resource).getName()))
+            .flatMapMany(spaceId -> requestListServiceInstances(this.cloudFoundryClient, spaceId, builder -> builder.gatewayName("test-gateway-name")))
             .as(StepVerifier::create)
-            .expectNextCount(1)
+            .expectNextCount(0)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }

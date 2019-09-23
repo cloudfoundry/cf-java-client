@@ -43,8 +43,9 @@ public final class FilterBuilderTest {
         List<String> q = queryParams.get("q");
 
         assertThat(q)
-            .hasSize(8)
-            .containsOnly("test-greater-than%3Etest-value-1",
+            .hasSize(9)
+            .containsOnly("test-empty-value:",
+                "test-greater-than%3Etest-value-1",
                 "test-greater-than-or-equal-to%3E%3Dtest-value-2",
                 "test-in%20IN%20test-value-3,test-value-4",
                 "test-is:test-value-5",

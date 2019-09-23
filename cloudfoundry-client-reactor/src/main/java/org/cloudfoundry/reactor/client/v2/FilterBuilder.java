@@ -67,15 +67,12 @@ final class FilterBuilder {
     private static void processCollection(UriComponentsBuilder builder, FilterParameter filterParameter, Object value) {
         List<String> collection = ((Collection<?>) value).stream()
             .map(o -> o.toString().trim())
-            .filter(s -> !s.isEmpty())
             .collect(Collectors.toList());
 
         if (collection.size() == 1) {
             processValue(builder, filterParameter.value(), filterParameter.operation(), collection.get(0));
         } else if (collection.size() > 1) {
-            processValue(builder, filterParameter.value(), filterParameter.collectionOperation(),
-                collection.stream()
-                    .collect(Collectors.joining(",")));
+            processValue(builder, filterParameter.value(), filterParameter.collectionOperation(), collection);
         }
     }
 
@@ -94,10 +91,15 @@ final class FilterBuilder {
         };
     }
 
-    private static void processValue(UriComponentsBuilder builder, String name, FilterParameter.Operation operation, String value) {
+    private static void processValue(UriComponentsBuilder builder, String name, FilterParameter.Operation operation, Collection<String> collection) {
+        String value = String.join(",", collection);
         if (!value.isEmpty()) {
-            builder.queryParam("q", String.format("%s%s%s", name, operation, value));
+            processValue(builder, name, operation, value);
         }
+    }
+
+    private static void processValue(UriComponentsBuilder builder, String name, FilterParameter.Operation operation, String value) {
+        builder.queryParam("q", String.format("%s%s%s", name, operation, value));
     }
 
 }

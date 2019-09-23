@@ -37,7 +37,7 @@ public final class FilterBuilderTest {
 
         MultiValueMap<String, String> queryParams = builder.build().encode().getQueryParams();
 
-        assertThat(queryParams).hasSize(4);
+        assertThat(queryParams).hasSize(5);
         assertThat(queryParams.getFirst("test-single")).isEqualTo("test-value-1");
         assertThat(queryParams.getFirst("test-collection")).isEqualTo("test-value-2,test-value-3");
         assertThat(queryParams.getFirst("test-subclass")).isEqualTo("test-value-4");
