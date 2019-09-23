@@ -44,7 +44,7 @@ public final class QueryBuilderTest {
         assertThat(queryParams.getFirst("test-subclass")).isEqualTo("test-value-6");
         assertThat(queryParams.getFirst("test-override")).isEqualTo("test-value-7");
     }
-    
+
     public static abstract class StubQueryParams {
 
         @QueryParameter("test-collection")
