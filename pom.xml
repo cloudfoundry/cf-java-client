@@ -44,15 +44,15 @@
     </modules>
 
     <properties>
-        <commons-compress.version>1.18</commons-compress.version>
+        <commons-compress.version>1.19</commons-compress.version>
         <evo-inflector.version>1.2.2</evo-inflector.version>
-        <immutables.version>2.7.3</immutables.version>
+        <immutables.version>2.7.4</immutables.version>
         <java-semver.version>0.9.0</java-semver.version>
         <jjwt.version>0.9.1</jjwt.version>
-        <okhttp3.version>3.12.0</okhttp3.version>
+        <okhttp3.version>3.14.3</okhttp3.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <reactor-core.version>3.2.3.RELEASE</reactor-core.version>
-        <reactor-netty.version>0.7.12.RELEASE</reactor-netty.version>
+        <reactor-core.version>3.2.12.RELEASE</reactor-core.version>
+        <reactor-netty.version>0.7.15.RELEASE</reactor-netty.version>
         <wire.version>2.2.0</wire.version>
     </properties>
 
