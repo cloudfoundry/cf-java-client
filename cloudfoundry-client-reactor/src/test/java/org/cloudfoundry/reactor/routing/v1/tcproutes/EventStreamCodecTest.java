@@ -16,22 +16,21 @@
 
 package org.cloudfoundry.reactor.routing.v1.tcproutes;
 
-import static io.netty.handler.codec.http.HttpMethod.GET;
-import static io.netty.handler.codec.http.HttpResponseStatus.OK;
-
-import java.time.Duration;
-
 import org.cloudfoundry.reactor.AbstractRestTest;
 import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.junit.Test;
-
 import reactor.core.publisher.Flux;
 import reactor.netty.ByteBufFlux;
 import reactor.netty.Connection;
 import reactor.netty.http.client.HttpClientResponse;
 import reactor.test.StepVerifier;
+
+import java.time.Duration;
+
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class EventStreamCodecTest extends AbstractRestTest {
 
@@ -220,8 +219,8 @@ public final class EventStreamCodecTest extends AbstractRestTest {
 
     private static Flux<ServerSentEvent> toEventsFlux(HttpClientResponse response, Connection connection) {
         connection.addHandler(EventStreamCodec.createDecoder(response));
-        ByteBufFlux body = connection.inbound()
-            .receive();
+        ByteBufFlux body = connection.inbound().receive();
+
         return EventStreamCodec.decode(body);
     }
 

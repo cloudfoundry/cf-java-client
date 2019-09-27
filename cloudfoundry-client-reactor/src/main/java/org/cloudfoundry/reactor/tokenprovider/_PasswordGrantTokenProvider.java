@@ -19,7 +19,6 @@ package org.cloudfoundry.reactor.tokenprovider;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.immutables.value.Value;
-
 import reactor.netty.http.client.HttpClientForm;
 import reactor.netty.http.client.HttpClientRequest;
 

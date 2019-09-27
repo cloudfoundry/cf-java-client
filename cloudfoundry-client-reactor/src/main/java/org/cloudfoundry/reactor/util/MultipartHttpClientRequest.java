@@ -16,6 +16,13 @@
 
 package org.cloudfoundry.reactor.util;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.netty.handler.codec.http.HttpHeaderNames;
+import reactor.core.Exceptions;
+import reactor.netty.http.client.HttpClientForm;
+import reactor.netty.http.client.HttpClientRequest;
+
 import java.io.ByteArrayInputStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -23,23 +30,15 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import io.netty.handler.codec.http.HttpHeaderNames;
-import reactor.core.Exceptions;
-import reactor.netty.http.client.HttpClientForm;
-import reactor.netty.http.client.HttpClientRequest;
-
 public final class MultipartHttpClientRequest {
+
+    private final HttpClientForm form;
 
     private final ObjectMapper objectMapper;
 
     private final List<Consumer<PartHttpClientRequest>> partConsumers = new ArrayList<>();
 
     private final HttpClientRequest request;
-
-    private final HttpClientForm form;
 
     public MultipartHttpClientRequest(ObjectMapper objectMapper, HttpClientRequest request, HttpClientForm form) {
         this.objectMapper = objectMapper;
@@ -60,13 +59,15 @@ public final class MultipartHttpClientRequest {
                 return part;
             })
             .collect(Collectors.toList());
-        
+
         this.request.requestHeaders()
             .remove(HttpHeaderNames.TRANSFER_ENCODING);
 
-        form.multipart(true);
+        this.form.multipart(true);
+
+        HttpClientForm intermediateForm = this.form;
         for (PartHttpClientRequest part : parts) {
-            part.send(form);
+            intermediateForm = part.send(intermediateForm);
         }
     }
 
@@ -74,33 +75,18 @@ public final class MultipartHttpClientRequest {
 
         private final ObjectMapper objectMapper;
 
+        private String contentType;
+
         private Path file;
-
-        private ByteArrayInputStream payload;
-
-        private String name;
 
         private String filename;
 
-        private String contentType;
+        private String name;
+
+        private ByteArrayInputStream payload;
 
         private PartHttpClientRequest(ObjectMapper objectMapper) {
             this.objectMapper = objectMapper;
-        }
-
-        public PartHttpClientRequest setName(String name) {
-            this.name = name;
-            return this;
-        }
-
-        public PartHttpClientRequest setFilename(String filename) {
-            this.filename = filename;
-            return this;
-        }
-
-        public PartHttpClientRequest setContentType(String contentType) {
-            this.contentType = contentType;
-            return this;
         }
 
         public void send(Object source) {
@@ -116,17 +102,32 @@ public final class MultipartHttpClientRequest {
             this.file = file;
         }
 
-        private HttpClientForm send(HttpClientForm form) {
-            if (this.file != null) {
-                return form.file(name, getFilenameOrDefault(), this.file.toFile(), contentType);
-            } else if (this.payload != null) {
-                return form.file(name, this.payload, contentType);
-            }
-            return form;
+        public PartHttpClientRequest setContentType(String contentType) {
+            this.contentType = contentType;
+            return this;
+        }
+
+        public PartHttpClientRequest setFilename(String filename) {
+            this.filename = filename;
+            return this;
+        }
+
+        public PartHttpClientRequest setName(String name) {
+            this.name = name;
+            return this;
         }
 
         private String getFilenameOrDefault() {
-            return filename != null ? filename : this.file.getFileName().toString();
+            return this.filename != null ? this.filename : this.file.getFileName().toString();
+        }
+
+        private HttpClientForm send(HttpClientForm form) {
+            if (this.file != null) {
+                return form.file(this.name, getFilenameOrDefault(), this.file.toFile(), this.contentType);
+            } else if (this.payload != null) {
+                return form.file(this.name, this.payload, this.contentType);
+            }
+            return form;
         }
 
     }

@@ -16,14 +16,13 @@
 
 package org.cloudfoundry.reactor.uaa;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
-
+import io.netty.handler.codec.http.HttpHeaders;
 import org.cloudfoundry.uaa.IdentityZoned;
 import org.junit.Test;
 
-import io.netty.handler.codec.http.HttpHeaders;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 
 public final class IdentityZoneBuilderTest {
 

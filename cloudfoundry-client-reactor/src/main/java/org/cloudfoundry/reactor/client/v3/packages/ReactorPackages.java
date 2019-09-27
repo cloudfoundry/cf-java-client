@@ -16,10 +16,6 @@
 
 package org.cloudfoundry.reactor.client.v3.packages;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-
 import org.cloudfoundry.client.v3.packages.CopyPackageRequest;
 import org.cloudfoundry.client.v3.packages.CopyPackageResponse;
 import org.cloudfoundry.client.v3.packages.CreatePackageRequest;
@@ -40,11 +36,14 @@ import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
 import org.cloudfoundry.reactor.util.MultipartHttpClientRequest;
 import org.cloudfoundry.util.FileUtils;
-
 import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.netty.ByteBufFlux;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
  * The Reactor-based implementation of {@link Packages}
@@ -64,46 +63,51 @@ public final class ReactorPackages extends AbstractClientV3Operations implements
 
     @Override
     public Mono<CopyPackageResponse> copy(CopyPackageRequest request) {
-        return post(request, CopyPackageResponse.class, builder -> builder.pathSegment("packages")).checkpoint();
+        return post(request, CopyPackageResponse.class, builder -> builder.pathSegment("packages"))
+            .checkpoint();
     }
 
     @Override
     public Mono<CreatePackageResponse> create(CreatePackageRequest request) {
-        return post(request, CreatePackageResponse.class, builder -> builder.pathSegment("packages")).checkpoint();
+        return post(request, CreatePackageResponse.class, builder -> builder.pathSegment("packages"))
+            .checkpoint();
     }
 
     @Override
     public Mono<String> delete(DeletePackageRequest request) {
-        return delete(request, builder -> builder.pathSegment("packages", request.getPackageId())).checkpoint();
+        return delete(request, builder -> builder.pathSegment("packages", request.getPackageId()))
+            .checkpoint();
     }
 
     @Override
     public Flux<byte[]> download(DownloadPackageRequest request) {
-        return get(request, builder -> builder.pathSegment("packages", request.getPackageId(), "download"),
-            ByteBufFlux::asByteArray).checkpoint();
+        return get(request, builder -> builder.pathSegment("packages", request.getPackageId(), "download"), ByteBufFlux::asByteArray)
+            .checkpoint();
     }
 
     @Override
     public Mono<GetPackageResponse> get(GetPackageRequest request) {
-        return get(request, GetPackageResponse.class, builder -> builder.pathSegment("packages", request.getPackageId())).checkpoint();
+        return get(request, GetPackageResponse.class, builder -> builder.pathSegment("packages", request.getPackageId()))
+            .checkpoint();
     }
 
     @Override
     public Mono<ListPackagesResponse> list(ListPackagesRequest request) {
-        return get(request, ListPackagesResponse.class, builder -> builder.pathSegment("packages")).checkpoint();
+        return get(request, ListPackagesResponse.class, builder -> builder.pathSegment("packages"))
+            .checkpoint();
     }
 
     @Override
     public Mono<ListPackageDropletsResponse> listDroplets(ListPackageDropletsRequest request) {
-        return get(request, ListPackageDropletsResponse.class,
-            builder -> builder.pathSegment("packages", request.getPackageId(), "droplets")).checkpoint();
+        return get(request, ListPackageDropletsResponse.class, builder -> builder.pathSegment("packages", request.getPackageId(), "droplets"))
+            .checkpoint();
     }
 
     @Override
     public Mono<UploadPackageResponse> upload(UploadPackageRequest request) {
         Path bits = request.getBits();
-        if (bits.toFile()
-            .isDirectory()) {
+
+        if (bits.toFile().isDirectory()) {
             return FileUtils.compress(bits)
                 .map(temporaryFile -> UploadPackageRequest.builder()
                     .from(request)
@@ -123,13 +127,13 @@ public final class ReactorPackages extends AbstractClientV3Operations implements
     }
 
     private Mono<UploadPackageResponse> upload(UploadPackageRequest request, Runnable onTerminate) {
-        return post(request, UploadPackageResponse.class, builder -> builder.pathSegment("packages", request.getPackageId(), "upload"),
-            outbound -> upload(request.getBits(), outbound), onTerminate).checkpoint();
+        return post(request, UploadPackageResponse.class, builder -> builder.pathSegment("packages", request.getPackageId(), "upload"), outbound -> upload(request.getBits(), outbound), onTerminate)
+            .checkpoint();
     }
 
     private void upload(Path bits, MultipartHttpClientRequest r) {
         r.addPart(part -> part.setName("bits")
-            .setContentType(APPLICATION_ZIP.toString())
+            .setContentType(APPLICATION_ZIP)
             .sendFile(bits))
             .done();
     }

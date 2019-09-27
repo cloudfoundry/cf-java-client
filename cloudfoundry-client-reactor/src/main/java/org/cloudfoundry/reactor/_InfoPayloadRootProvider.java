@@ -16,15 +16,13 @@
 
 package org.cloudfoundry.reactor;
 
-import java.util.Map;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.immutables.value.Value;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import reactor.core.publisher.Mono;
+
+import java.util.Map;
 
 /**
  * A {@link RootProvider} that returns endpoints extracted from the `/v2/info` API for the configured endpoint.
@@ -37,31 +35,33 @@ abstract class _InfoPayloadRootProvider extends AbstractRootProvider {
     }
 
     protected Mono<UriComponents> doGetRoot(String key, ConnectionContext connectionContext) {
-        return getInfo(connectionContext).map(info -> {
-            if (!info.containsKey(key)) {
-                throw new IllegalArgumentException(String.format("Info payload does not contain key '%s'", key));
-            }
+        return getInfo(connectionContext)
+            .map(info -> {
+                if (!info.containsKey(key)) {
+                    throw new IllegalArgumentException(String.format("Info payload does not contain key '%s'", key));
+                }
 
-            return normalize(UriComponentsBuilder.fromUriString(info.get(key)));
-        });
+                return normalize(UriComponentsBuilder.fromUriString(info.get(key)));
+            });
     }
 
     abstract ObjectMapper getObjectMapper();
 
+    private UriComponentsBuilder buildInfoUri(UriComponentsBuilder root) {
+        return root.pathSegment("v2", "info");
+    }
+
     @SuppressWarnings("unchecked")
     @Value.Derived
     private Mono<Map<String, String>> getInfo(ConnectionContext connectionContext) {
-        return createOperator(connectionContext).flatMap(operator -> operator.get()
-            .uri(this::buildInfoUri)
-            .response()
-            .parseBody(Map.class))
+        return createOperator(connectionContext)
+            .flatMap(operator -> operator.get()
+                .uri(this::buildInfoUri)
+                .response()
+                .parseBody(Map.class))
             .map(payload -> (Map<String, String>) payload)
             .switchIfEmpty(Mono.error(new IllegalArgumentException("Info endpoint does not contain a payload")))
             .checkpoint();
-    }
-
-    private UriComponentsBuilder buildInfoUri(UriComponentsBuilder root) {
-        return root.pathSegment("v2", "info");
     }
 
 }

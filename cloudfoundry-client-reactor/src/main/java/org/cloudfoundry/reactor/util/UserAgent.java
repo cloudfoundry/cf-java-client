@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.reactor.util;
 
-import java.util.Optional;
-
 import io.netty.bootstrap.Bootstrap;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaders;
 import reactor.netty.http.client.HttpClient;
+
+import java.util.Optional;
 
 /**
  * Utilities for working with the {@Code User-Agent}

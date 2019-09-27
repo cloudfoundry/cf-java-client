@@ -16,15 +16,13 @@
 
 package org.cloudfoundry.reactor.util;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.cloudfoundry.util.TimeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import reactor.netty.http.client.HttpClientRequest;
 import reactor.netty.http.client.HttpClientResponse;
+
+import java.util.List;
 
 public class RequestLogger {
 
@@ -40,28 +38,23 @@ public class RequestLogger {
         request(String.format("%-5s {}", request.method()), request.uri());
     }
 
-    public void websocketRequest(String uri) {
-        request("WS     {}", uri);
-    }
-
     public void response(HttpClientResponse response) {
         if (!RESPONSE_LOGGER.isDebugEnabled()) {
             return;
         }
-        String elapsed = TimeUtils.asTime(System.currentTimeMillis() - requestSentTime);
-        List<String> warnings = response.responseHeaders()
-            .getAll(CF_WARNINGS);
+
+        String elapsed = TimeUtils.asTime(System.currentTimeMillis() - this.requestSentTime);
+        List<String> warnings = response.responseHeaders().getAll(CF_WARNINGS);
 
         if (warnings.isEmpty()) {
-            RESPONSE_LOGGER.debug("{}    {} ({})", response.status()
-                    .code(),
-                response.uri(), elapsed);
+            RESPONSE_LOGGER.debug("{}    {} ({})", response.status().code(), response.uri(), elapsed);
         } else {
-            RESPONSE_LOGGER.warn("{}    {} ({}) [{}]", response.status()
-                    .code(),
-                response.uri(), elapsed, warnings.stream()
-                    .collect(Collectors.joining(", ")));
+            RESPONSE_LOGGER.warn("{}    {} ({}) [{}]", response.status().code(), response.uri(), elapsed, String.join(", ", warnings));
         }
+    }
+
+    public void websocketRequest(String uri) {
+        request("WS     {}", uri);
     }
 
     private void request(String message, String uri) {

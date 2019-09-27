@@ -1,7 +1,6 @@
 package org.cloudfoundry.reactor;
 
 import org.immutables.value.Value;
-
 import reactor.netty.ByteBufFlux;
 import reactor.netty.http.client.HttpClientResponse;
 
@@ -9,9 +8,9 @@ import reactor.netty.http.client.HttpClientResponse;
 public interface _HttpClientResponseWithBody {
 
     @Value.Parameter
-    HttpClientResponse getResponse();
+    ByteBufFlux getBody();
 
     @Value.Parameter
-    ByteBufFlux getBody();
+    HttpClientResponse getResponse();
 
 }

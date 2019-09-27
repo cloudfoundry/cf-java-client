@@ -16,21 +16,6 @@
 
 package org.cloudfoundry.reactor.uaa.users;
 
-import static io.netty.handler.codec.http.HttpMethod.DELETE;
-import static io.netty.handler.codec.http.HttpMethod.GET;
-import static io.netty.handler.codec.http.HttpMethod.PATCH;
-import static io.netty.handler.codec.http.HttpMethod.POST;
-import static io.netty.handler.codec.http.HttpMethod.PUT;
-import static io.netty.handler.codec.http.HttpResponseStatus.OK;
-import static org.cloudfoundry.uaa.SortOrder.ASCENDING;
-import static org.cloudfoundry.uaa.SortOrder.DESCENDING;
-import static org.cloudfoundry.uaa.users.ApprovalStatus.APPROVED;
-import static org.cloudfoundry.uaa.users.ApprovalStatus.DENIED;
-import static org.cloudfoundry.uaa.users.MembershipType.DIRECT;
-
-import java.time.Duration;
-import java.util.Collections;
-
 import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
@@ -67,8 +52,22 @@ import org.cloudfoundry.uaa.users.UserInfoResponse;
 import org.cloudfoundry.uaa.users.VerifyUserRequest;
 import org.cloudfoundry.uaa.users.VerifyUserResponse;
 import org.junit.Test;
-
 import reactor.test.StepVerifier;
+
+import java.time.Duration;
+import java.util.Collections;
+
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.PATCH;
+import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpMethod.PUT;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+import static org.cloudfoundry.uaa.SortOrder.ASCENDING;
+import static org.cloudfoundry.uaa.SortOrder.DESCENDING;
+import static org.cloudfoundry.uaa.users.ApprovalStatus.APPROVED;
+import static org.cloudfoundry.uaa.users.ApprovalStatus.DENIED;
+import static org.cloudfoundry.uaa.users.MembershipType.DIRECT;
 
 public final class ReactorUsersTest extends AbstractUaaApiTest {
 
@@ -244,7 +243,6 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
                 .payload("fixtures/uaa/users/DELETE_response.json")
                 .build())
             .build());
-
 
         this.users
             .delete(DeleteUserRequest.builder()

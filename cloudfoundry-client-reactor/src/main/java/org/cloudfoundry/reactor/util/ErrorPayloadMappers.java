@@ -16,102 +16,90 @@
 
 package org.cloudfoundry.reactor.util;
 
-import static io.netty.handler.codec.http.HttpStatusClass.CLIENT_ERROR;
-import static io.netty.handler.codec.http.HttpStatusClass.SERVER_ERROR;
-
-import java.util.Map;
-import java.util.function.Function;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.netty.handler.codec.http.HttpStatusClass;
 import org.cloudfoundry.UnknownCloudFoundryException;
 import org.cloudfoundry.client.v2.ClientV2Exception;
 import org.cloudfoundry.client.v3.ClientV3Exception;
 import org.cloudfoundry.client.v3.Errors;
 import org.cloudfoundry.reactor.HttpClientResponseWithBody;
 import org.cloudfoundry.uaa.UaaException;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import io.netty.handler.codec.http.HttpStatusClass;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClientResponse;
 
-public final class ErrorPayloadMappers {
+import java.util.Map;
+import java.util.function.Function;
 
-    public static ErrorPayloadMapper fallback() {
-        return inbound -> inbound.flatMap(responseWithBody -> {
-            HttpClientResponse response = responseWithBody.getResponse();
-            if (isError(response)) {
-                return responseWithBody.getBody()
-                    .aggregate()
-                    .asString()
-                    .flatMap(payload -> Mono.error(new UnknownCloudFoundryException(response.status()
-                        .code(),
-                        payload)));
-            }
-            return Mono.just(responseWithBody);
-        });
-    }
+import static io.netty.handler.codec.http.HttpStatusClass.CLIENT_ERROR;
+import static io.netty.handler.codec.http.HttpStatusClass.SERVER_ERROR;
+
+public final class ErrorPayloadMappers {
 
     @SuppressWarnings("unchecked")
     public static ErrorPayloadMapper clientV2(ObjectMapper objectMapper) {
-        return inbound -> inbound.flatMap(mapToError((statusCode, payload) -> {
-            Map<String, Object> map = objectMapper.readValue(payload, Map.class);
-            Integer code = (Integer) map.get("code");
-            String description = (String) map.get("description");
-            String errorCode = (String) map.get("error_code");
+        return inbound -> inbound
+            .flatMap(mapToError((statusCode, payload) -> {
+                Map<String, Object> map = objectMapper.readValue(payload, Map.class);
+                Integer code = (Integer) map.get("code");
+                String description = (String) map.get("description");
+                String errorCode = (String) map.get("error_code");
 
-            return new ClientV2Exception(statusCode, code, description, errorCode);
-        }));
+                return new ClientV2Exception(statusCode, code, description, errorCode);
+            }));
     }
 
     public static ErrorPayloadMapper clientV3(ObjectMapper objectMapper) {
-        return inbound -> inbound.flatMap(mapToError((statusCode, payload) -> {
-            Errors errors = objectMapper.readValue(payload, Errors.class);
-            return new ClientV3Exception(statusCode, errors.getErrors());
-        }));
+        return inbound -> inbound
+            .flatMap(mapToError((statusCode, payload) -> {
+                Errors errors = objectMapper.readValue(payload, Errors.class);
+                return new ClientV3Exception(statusCode, errors.getErrors());
+            }));
+    }
+
+    public static ErrorPayloadMapper fallback() {
+        return inbound -> inbound
+            .flatMap(responseWithBody -> {
+                HttpClientResponse response = responseWithBody.getResponse();
+
+                if (isError(response)) {
+                    return responseWithBody.getBody().aggregate().asString()
+                        .flatMap(payload -> Mono.error(new UnknownCloudFoundryException(response.status().code(), payload)));
+                }
+
+                return Mono.just(responseWithBody);
+            });
     }
 
     @SuppressWarnings("unchecked")
     public static ErrorPayloadMapper uaa(ObjectMapper objectMapper) {
-        return inbound -> inbound.flatMap(mapToError((statusCode, payload) -> {
-            Map<String, Object> map = objectMapper.readValue(payload, Map.class);
-            String error = (String) map.get("error");
-            String errorDescription = (String) map.get("error_description");
+        return inbound -> inbound
+            .flatMap(mapToError((statusCode, payload) -> {
+                Map<String, Object> map = objectMapper.readValue(payload, Map.class);
+                String error = (String) map.get("error");
+                String errorDescription = (String) map.get("error_description");
 
-            return new UaaException(statusCode, error, errorDescription);
-        }));
+                return new UaaException(statusCode, error, errorDescription);
+            }));
     }
 
     private static boolean isError(HttpClientResponse response) {
-        HttpStatusClass statusClass = response.status()
-            .codeClass();
+        HttpStatusClass statusClass = response.status().codeClass();
         return statusClass == CLIENT_ERROR || statusClass == SERVER_ERROR;
     }
 
-    private static Function<HttpClientResponseWithBody, Mono<HttpClientResponseWithBody>>
-    mapToError(ExceptionGenerator exceptionGenerator) {
+    private static Function<HttpClientResponseWithBody, Mono<HttpClientResponseWithBody>> mapToError(ExceptionGenerator exceptionGenerator) {
         return response -> {
             if (!isError(response.getResponse())) {
                 return Mono.just(response);
             }
 
-            return response.getBody()
-                .aggregate()
-                .asString()
-                .switchIfEmpty(Mono.error(new UnknownCloudFoundryException(response.getResponse()
-                    .status()
-                    .code())))
+            return response.getBody().aggregate().asString()
+                .switchIfEmpty(Mono.error(new UnknownCloudFoundryException(response.getResponse().status().code())))
                 .flatMap(payload -> {
                     try {
-                        return Mono.error(exceptionGenerator.apply(response.getResponse()
-                                .status()
-                                .code(),
-                            payload));
+                        return Mono.error(exceptionGenerator.apply(response.getResponse().status().code(), payload));
                     } catch (Exception e) {
-                        return Mono.error(new UnknownCloudFoundryException(response.getResponse()
-                            .status()
-                            .code(),
-                            payload));
+                        return Mono.error(new UnknownCloudFoundryException(response.getResponse().status().code(), payload));
                     }
                 });
         };

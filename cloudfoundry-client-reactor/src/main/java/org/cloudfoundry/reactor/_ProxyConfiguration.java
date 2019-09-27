@@ -16,14 +16,13 @@
 
 package org.cloudfoundry.reactor;
 
-import java.util.Optional;
-import java.util.function.Function;
-
 import org.immutables.value.Value;
-
 import reactor.netty.tcp.ProxyProvider.Builder;
 import reactor.netty.tcp.ProxyProvider.Proxy;
 import reactor.netty.tcp.TcpClient;
+
+import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * Proxy configuration
@@ -33,12 +32,10 @@ abstract class _ProxyConfiguration {
 
     public TcpClient configure(TcpClient tcpClient) {
         return tcpClient.proxy(proxyOptions -> {
-            Builder builder = proxyOptions.type(Proxy.HTTP)
-                .host(getHost());
+            Builder builder = proxyOptions.type(Proxy.HTTP).host(getHost());
             getPort().ifPresent(builder::port);
             getUsername().ifPresent(builder::username);
-            getPassword().map(password -> (Function<String, String>) s -> password)
-                .ifPresent(builder::password);
+            getPassword().map(password -> (Function<String, String>) s -> password).ifPresent(builder::password);
         });
     }
 

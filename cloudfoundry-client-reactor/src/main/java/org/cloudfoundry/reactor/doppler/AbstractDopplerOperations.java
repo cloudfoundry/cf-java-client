@@ -16,19 +16,18 @@
 
 package org.cloudfoundry.reactor.doppler;
 
-import java.io.InputStream;
-import java.util.function.Function;
-
+import io.netty.channel.ChannelHandler;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.util.AbstractReactorOperations;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import io.netty.channel.ChannelHandler;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.netty.ByteBufFlux;
 import reactor.netty.http.client.HttpClientResponse;
+
+import java.io.InputStream;
+import java.util.function.Function;
 
 abstract class AbstractDopplerOperations extends AbstractReactorOperations {
 
@@ -36,8 +35,7 @@ abstract class AbstractDopplerOperations extends AbstractReactorOperations {
         super(connectionContext, root, tokenProvider);
     }
 
-    final <T> Flux<T> get(Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
-                          Function<HttpClientResponse, ChannelHandler> channelHandlerBuilder,
+    final <T> Flux<T> get(Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer, Function<HttpClientResponse, ChannelHandler> channelHandlerBuilder,
                           Function<ByteBufFlux, Flux<T>> bodyTransformer) {
         return createOperator().flatMapMany(operator -> operator.get()
             .uri(uriTransformer)

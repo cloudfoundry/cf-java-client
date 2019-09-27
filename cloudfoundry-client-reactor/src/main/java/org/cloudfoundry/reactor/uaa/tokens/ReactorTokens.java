@@ -16,16 +16,8 @@
 
 package org.cloudfoundry.reactor.uaa.tokens;
 
-import static io.netty.handler.codec.http.HttpHeaderNames.AUTHORIZATION;
-import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
-import static io.netty.handler.codec.http.HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED;
-import static org.cloudfoundry.uaa.tokens.GrantType.AUTHORIZATION_CODE;
-import static org.cloudfoundry.uaa.tokens.GrantType.CLIENT_CREDENTIALS;
-import static org.cloudfoundry.uaa.tokens.GrantType.PASSWORD;
-import static org.cloudfoundry.uaa.tokens.GrantType.REFRESH_TOKEN;
-
-import java.util.Base64;
-
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.util.AsciiString;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.uaa.AbstractUaaOperations;
@@ -49,10 +41,17 @@ import org.cloudfoundry.uaa.tokens.ListTokenKeysResponse;
 import org.cloudfoundry.uaa.tokens.RefreshTokenRequest;
 import org.cloudfoundry.uaa.tokens.RefreshTokenResponse;
 import org.cloudfoundry.uaa.tokens.Tokens;
-
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.util.AsciiString;
 import reactor.core.publisher.Mono;
+
+import java.util.Base64;
+
+import static io.netty.handler.codec.http.HttpHeaderNames.AUTHORIZATION;
+import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
+import static io.netty.handler.codec.http.HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED;
+import static org.cloudfoundry.uaa.tokens.GrantType.AUTHORIZATION_CODE;
+import static org.cloudfoundry.uaa.tokens.GrantType.CLIENT_CREDENTIALS;
+import static org.cloudfoundry.uaa.tokens.GrantType.PASSWORD;
+import static org.cloudfoundry.uaa.tokens.GrantType.REFRESH_TOKEN;
 
 public final class ReactorTokens extends AbstractUaaOperations implements Tokens {
 
@@ -72,12 +71,10 @@ public final class ReactorTokens extends AbstractUaaOperations implements Tokens
     @Override
     public Mono<CheckTokenResponse> check(CheckTokenRequest request) {
         return post(request, CheckTokenResponse.class, builder -> builder.pathSegment("check_token"), outbound -> {
-            String encoded = Base64.getEncoder()
-                .encodeToString(new AsciiString(request.getClientId()).concat(":")
-                    .concat(request.getClientSecret())
-                    .toByteArray());
+            String encoded = Base64.getEncoder().encodeToString(new AsciiString(request.getClientId()).concat(":").concat(request.getClientSecret()).toByteArray());
             outbound.set(AUTHORIZATION, BASIC_PREAMBLE + encoded);
-        }).checkpoint();
+        })
+            .checkpoint();
     }
 
     @Override
@@ -88,7 +85,8 @@ public final class ReactorTokens extends AbstractUaaOperations implements Tokens
             outbound -> {
                 ReactorTokens.removeAuthorization(outbound);
                 ReactorTokens.setUrlEncoded(outbound);
-            }).checkpoint();
+            })
+            .checkpoint();
     }
 
     @Override
@@ -99,7 +97,8 @@ public final class ReactorTokens extends AbstractUaaOperations implements Tokens
             outbound -> {
                 ReactorTokens.removeAuthorization(outbound);
                 ReactorTokens.setUrlEncoded(outbound);
-            }).checkpoint();
+            })
+            .checkpoint();
     }
 
     @Override
@@ -110,7 +109,8 @@ public final class ReactorTokens extends AbstractUaaOperations implements Tokens
             outbound -> {
                 ReactorTokens.removeAuthorization(outbound);
                 ReactorTokens.setUrlEncoded(outbound);
-            }).checkpoint();
+            })
+            .checkpoint();
     }
 
     @Override
@@ -121,7 +121,8 @@ public final class ReactorTokens extends AbstractUaaOperations implements Tokens
             outbound -> {
                 ReactorTokens.removeAuthorization(outbound);
                 ReactorTokens.setUrlEncoded(outbound);
-            }).checkpoint();
+            })
+            .checkpoint();
     }
 
     @Override
@@ -132,17 +133,20 @@ public final class ReactorTokens extends AbstractUaaOperations implements Tokens
             outbound -> {
                 ReactorTokens.removeAuthorization(outbound);
                 ReactorTokens.setUrlEncoded(outbound);
-            }).checkpoint();
+            })
+            .checkpoint();
     }
 
     @Override
     public Mono<GetTokenKeyResponse> getKey(GetTokenKeyRequest request) {
-        return get(request, GetTokenKeyResponse.class, builder -> builder.pathSegment("token_key")).checkpoint();
+        return get(request, GetTokenKeyResponse.class, builder -> builder.pathSegment("token_key"))
+            .checkpoint();
     }
 
     @Override
     public Mono<ListTokenKeysResponse> listKeys(ListTokenKeysRequest request) {
-        return get(request, ListTokenKeysResponse.class, builder -> builder.pathSegment("token_keys")).checkpoint();
+        return get(request, ListTokenKeysResponse.class, builder -> builder.pathSegment("token_keys"))
+            .checkpoint();
     }
 
     @Override
@@ -152,7 +156,8 @@ public final class ReactorTokens extends AbstractUaaOperations implements Tokens
             outbound -> {
                 ReactorTokens.removeAuthorization(outbound);
                 ReactorTokens.setUrlEncoded(outbound);
-            }).checkpoint();
+            })
+            .checkpoint();
     }
 
     private static void removeAuthorization(HttpHeaders request) {

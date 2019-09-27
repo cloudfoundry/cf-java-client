@@ -16,22 +16,11 @@
 
 package org.cloudfoundry.reactor.tokenprovider;
 
-import static io.netty.handler.codec.http.HttpHeaderNames.AUTHORIZATION;
-import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
-import static io.netty.handler.codec.http.HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED;
-
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Base64;
-import java.util.Date;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Function;
-
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.util.AsciiString;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
@@ -45,12 +34,6 @@ import org.immutables.value.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.util.AsciiString;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
@@ -58,6 +41,22 @@ import reactor.core.publisher.ReplayProcessor;
 import reactor.netty.ByteBufFlux;
 import reactor.netty.http.client.HttpClientForm;
 import reactor.netty.http.client.HttpClientRequest;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Base64;
+import java.util.Date;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Function;
+
+import static io.netty.handler.codec.http.HttpHeaderNames.AUTHORIZATION;
+import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
+import static io.netty.handler.codec.http.HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED;
 
 /**
  * An abstract base class for all token providers that interact with the UAA. It encapsulates the logic to refresh the token before
@@ -133,10 +132,6 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
      */
     abstract void tokenRequestTransformer(HttpClientRequest request, HttpClientForm form);
 
-    private static void setContentType(HttpHeaders httpHeaders) {
-        httpHeaders.set(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED);
-    }
-
     private static String extractAccessToken(Map<String, String> payload) {
         String accessToken = payload.get(ACCESS_TOKEN);
 
@@ -152,38 +147,44 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
         return String.format("%s %s", payload.get(TOKEN_TYPE), accessToken);
     }
 
-    private static Function<UriComponentsBuilder, UriComponentsBuilder> tokenUriTransformer(String identityZoneId) {
-        return root -> {
-            if (identityZoneId != null) {
-                root.host(String.format("%s.%s", identityZoneId, root.build()
-                    .getHost()));
-            }
-            return root.pathSegment("oauth", "token");
-        };
-    }
-
     private static Optional<Claims> parseToken(String token) {
         try {
             String jws = token.substring(0, token.lastIndexOf('.') + 1);
-            return Optional.of(Jwts.parser()
-                .parseClaimsJwt(jws)
-                .getBody());
+
+            return Optional.of(Jwts.parser().parseClaimsJwt(jws).getBody());
         } catch (Exception e) {
             return Optional.empty();
         }
     }
 
-    private static LocalDateTime toLocalDateTime(Date date) {
-        return LocalDateTime.from(date.toInstant()
-            .atZone(UTC));
+    private static void setContentType(HttpHeaders httpHeaders) {
+        httpHeaders.set(CONTENT_TYPE, APPLICATION_X_WWW_FORM_URLENCODED);
     }
 
-    private void setAuthorization(HttpHeaders headers) {
-        String encoded = Base64.getEncoder()
-            .encodeToString(new AsciiString(getClientId()).concat(":")
-                .concat(getClientSecret())
-                .toByteArray());
-        headers.set(AUTHORIZATION, String.format("Basic %s", encoded));
+    private static LocalDateTime toLocalDateTime(Date date) {
+        return LocalDateTime.from(date.toInstant().atZone(UTC));
+    }
+
+    private static Function<UriComponentsBuilder, UriComponentsBuilder> tokenUriTransformer(String identityZoneId) {
+        return root -> {
+            if (identityZoneId != null) {
+                root.host(String.format("%s.%s", identityZoneId, root.build().getHost()));
+            }
+
+            return root.pathSegment("oauth", "token");
+        };
+    }
+
+    private void addHeaders(HttpHeaders httpHeaders) {
+        setContentType(httpHeaders);
+        setAuthorization(httpHeaders);
+        UserAgent.setUserAgent(httpHeaders);
+        JsonCodec.setDecodeHeaders(httpHeaders);
+    }
+
+    private Operator createOperator(ConnectionContext connectionContext, String root) {
+        OperatorContext context = OperatorContext.of(connectionContext, root);
+        return new Operator(context, connectionContext.getHttpClient()).withErrorPayloadMapper(ErrorPayloadMappers.uaa(connectionContext.getObjectMapper()));
     }
 
     private Consumer<Map<String, String>> extractRefreshToken(ConnectionContext connectionContext) {
@@ -203,14 +204,6 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
             });
     }
 
-    @SuppressWarnings("unchecked")
-    private Function<ByteBufFlux, Mono<String>> tokensExtractor(ConnectionContext connectionContext) {
-        return body -> JsonCodec.decode(connectionContext.getObjectMapper(), body, Map.class)
-            .map(payload -> (Map<String, String>) payload)
-            .doOnNext(extractRefreshToken(connectionContext))
-            .map(AbstractUaaTokenProvider::extractAccessToken);
-    }
-
     private RefreshToken getRefreshTokenStream(ConnectionContext connectionContext) {
         return this.refreshTokenStreams.computeIfAbsent(connectionContext, c -> new RefreshToken());
     }
@@ -220,8 +213,8 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
     }
 
     private Mono<String> refreshToken(ConnectionContext connectionContext, String refreshToken) {
-        return requestToken(connectionContext, refreshTokenGrantTokenRequestTransformer(refreshToken),
-            tokensExtractor(connectionContext)).onErrorResume(t -> t instanceof UaaException && ((UaaException) t).getStatusCode() == HttpResponseStatus.UNAUTHORIZED.code(), t -> Mono.empty());
+        return requestToken(connectionContext, refreshTokenGrantTokenRequestTransformer(refreshToken), tokensExtractor(connectionContext))
+            .onErrorResume(t -> t instanceof UaaException && ((UaaException) t).getStatusCode() == HttpResponseStatus.UNAUTHORIZED.code(), t -> Mono.empty());
     }
 
     private BiConsumer<HttpClientRequest, HttpClientForm> refreshTokenGrantTokenRequestTransformer(String refreshToken) {
@@ -232,9 +225,7 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
             .attr("refresh_token", refreshToken);
     }
 
-    private Mono<String> requestToken(ConnectionContext connectionContext,
-                                      BiConsumer<HttpClientRequest, HttpClientForm> tokenRequestTransformer,
-                                      Function<ByteBufFlux, Mono<String>> tokenExtractor) {
+    private Mono<String> requestToken(ConnectionContext connectionContext, BiConsumer<HttpClientRequest, HttpClientForm> tokenRequestTransformer, Function<ByteBufFlux, Mono<String>> tokenExtractor) {
         return connectionContext.getRootProvider()
             .getRoot(AUTHORIZATION_ENDPOINT, connectionContext)
             .map(root -> createOperator(connectionContext, root))
@@ -246,29 +237,30 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
                 .parseBodyToMono(responseWithBody -> tokenExtractor.apply(responseWithBody.getBody())));
     }
 
-    private Operator createOperator(ConnectionContext connectionContext, String root) {
-        OperatorContext context = OperatorContext.of(connectionContext, root);
-        return new Operator(context,
-            connectionContext.getHttpClient()).withErrorPayloadMapper(ErrorPayloadMappers.uaa(connectionContext.getObjectMapper()));
-    }
-
-    private void addHeaders(HttpHeaders httpHeaders) {
-        setContentType(httpHeaders);
-        setAuthorization(httpHeaders);
-        UserAgent.setUserAgent(httpHeaders);
-        JsonCodec.setDecodeHeaders(httpHeaders);
+    private void setAuthorization(HttpHeaders headers) {
+        String encoded = Base64.getEncoder().encodeToString(new AsciiString(getClientId()).concat(":").concat(getClientSecret()).toByteArray());
+        headers.set(AUTHORIZATION, String.format("Basic %s", encoded));
     }
 
     private Mono<String> token(ConnectionContext connectionContext) {
         Mono<String> cached = this.refreshTokens.getOrDefault(connectionContext, Mono.empty())
-            .flatMap(refreshToken -> refreshToken(connectionContext,
-                refreshToken).doOnSubscribe(s -> LOGGER.debug("Negotiating using refresh token")))
-            .switchIfEmpty(primaryToken(connectionContext).doOnSubscribe(s -> LOGGER.debug("Negotiating using token provider")));
+            .flatMap(refreshToken -> refreshToken(connectionContext, refreshToken)
+                .doOnSubscribe(s -> LOGGER.debug("Negotiating using refresh token")))
+            .switchIfEmpty(primaryToken(connectionContext)
+                .doOnSubscribe(s -> LOGGER.debug("Negotiating using token provider")));
 
         return connectionContext.getCacheDuration()
             .map(cached::cache)
             .orElseGet(cached::cache)
             .checkpoint();
+    }
+
+    @SuppressWarnings("unchecked")
+    private Function<ByteBufFlux, Mono<String>> tokensExtractor(ConnectionContext connectionContext) {
+        return body -> JsonCodec.decode(connectionContext.getObjectMapper(), body, Map.class)
+            .map(payload -> (Map<String, String>) payload)
+            .doOnNext(extractRefreshToken(connectionContext))
+            .map(AbstractUaaTokenProvider::extractAccessToken);
     }
 
     private static final class RefreshToken {

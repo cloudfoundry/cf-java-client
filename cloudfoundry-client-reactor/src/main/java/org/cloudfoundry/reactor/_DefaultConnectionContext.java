@@ -16,24 +16,12 @@
 
 package org.cloudfoundry.reactor;
 
-import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
-import static io.netty.channel.ChannelOption.CONNECT_TIMEOUT_MILLIS;
-import static io.netty.channel.ChannelOption.SO_KEEPALIVE;
-import static io.netty.channel.ChannelOption.SO_RCVBUF;
-import static io.netty.channel.ChannelOption.SO_SNDBUF;
-
-import java.lang.management.ManagementFactory;
-import java.time.Duration;
-import java.util.List;
-import java.util.Optional;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.management.JMException;
-import javax.management.MalformedObjectNameException;
-import javax.management.ObjectName;
-import javax.net.ssl.TrustManagerFactory;
-
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import io.netty.buffer.PooledByteBufAllocator;
+import io.netty.handler.ssl.SslContextBuilder;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.reactor.util.ByteBufAllocatorMetricProviderWrapper;
 import org.cloudfoundry.reactor.util.DefaultSslCertificateTruster;
@@ -42,14 +30,6 @@ import org.cloudfoundry.reactor.util.StaticTrustManagerFactory;
 import org.immutables.value.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-
-import io.netty.buffer.PooledByteBufAllocator;
-import io.netty.handler.ssl.SslContextBuilder;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.resources.ConnectionProvider;
@@ -58,9 +38,25 @@ import reactor.netty.tcp.SslProvider;
 import reactor.netty.tcp.SslProvider.DefaultConfigurationType;
 import reactor.netty.tcp.TcpClient;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.management.JMException;
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
+import javax.net.ssl.TrustManagerFactory;
+import java.lang.management.ManagementFactory;
+import java.time.Duration;
+import java.util.List;
+import java.util.Optional;
+
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static io.netty.channel.ChannelOption.CONNECT_TIMEOUT_MILLIS;
+import static io.netty.channel.ChannelOption.SO_KEEPALIVE;
+import static io.netty.channel.ChannelOption.SO_RCVBUF;
+import static io.netty.channel.ChannelOption.SO_SNDBUF;
+
 /**
- * The default implementation of the {@link ConnectionContext} interface. This is the implementation that should be used for most
- * non-testing cases.
+ * The default implementation of the {@link ConnectionContext} interface. This is the implementation that should be used for most non-testing cases.
  */
 @Value.Immutable
 abstract class _DefaultConnectionContext implements ConnectionContext {
@@ -82,10 +78,8 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
         try {
             ObjectName name = getByteBufAllocatorObjectName();
 
-            if (ManagementFactory.getPlatformMBeanServer()
-                .isRegistered(name)) {
-                ManagementFactory.getPlatformMBeanServer()
-                    .unregisterMBean(name);
+            if (ManagementFactory.getPlatformMBeanServer().isRegistered(name)) {
+                ManagementFactory.getPlatformMBeanServer().unregisterMBean(name);
             }
         } catch (JMException e) {
             this.logger.error("Unable to register ByteBufAllocator MBean", e);
@@ -110,54 +104,6 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
         return createHttpClient().compress(true)
             .tcpConfiguration(this::configureTcpClient)
             .secure(this::configureSsl);
-    }
-
-    private HttpClient createHttpClient() {
-        return getConnectionProvider().map(HttpClient::create)
-            .orElse(HttpClient.create());
-    }
-
-    private TcpClient configureTcpClient(TcpClient tcpClient) {
-        tcpClient = configureProxy(tcpClient);
-        tcpClient = tcpClient.runOn(getThreadPool())
-            .option(SO_SNDBUF, SEND_RECEIVE_BUFFER_SIZE)
-            .option(SO_RCVBUF, SEND_RECEIVE_BUFFER_SIZE);
-        tcpClient = configureKeepAlive(tcpClient);
-        return configureConnectTimeout(tcpClient);
-    }
-
-    private TcpClient configureProxy(TcpClient tcpClient) {
-        return getProxyConfiguration().map(proxyConfiguration -> proxyConfiguration.configure(tcpClient))
-            .orElse(tcpClient);
-    }
-
-    private TcpClient configureKeepAlive(TcpClient tcpClient) {
-        return getKeepAlive().map(keepAlive -> tcpClient.option(SO_KEEPALIVE, keepAlive))
-            .orElse(tcpClient);
-    }
-
-    private TcpClient configureConnectTimeout(TcpClient tcpClient) {
-        return getConnectTimeout().map(connectTimeout -> tcpClient.option(CONNECT_TIMEOUT_MILLIS, (int) connectTimeout.toMillis()))
-            .orElse(tcpClient);
-    }
-
-    private void configureSsl(SslProvider.SslContextSpec ssl) {
-        SslProvider.Builder builder = ssl.sslContext(createSslContextBuilder())
-            .defaultConfiguration(DefaultConfigurationType.TCP);
-        getSslCloseNotifyReadTimeout().ifPresent(builder::closeNotifyReadTimeout);
-        getSslHandshakeTimeout().ifPresent(builder::handshakeTimeout);
-        getSslCloseNotifyFlushTimeout().ifPresent(builder::closeNotifyFlushTimeout);
-    }
-
-    private SslContextBuilder createSslContextBuilder() {
-        SslContextBuilder sslContextBuilder = SslContextBuilder.forClient();
-        getSslCertificateTruster().map(this::createTrustManagerFactory)
-            .ifPresent(sslContextBuilder::trustManager);
-        return sslContextBuilder;
-    }
-
-    private TrustManagerFactory createTrustManagerFactory(SslCertificateTruster sslCertificateTruster) {
-        return new StaticTrustManagerFactory(sslCertificateTruster);
     }
 
     @Override
@@ -194,7 +140,8 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
 
     @Override
     public Mono<Void> trust(String host, int port) {
-        return getSslCertificateTruster().map(t -> t.trust(host, port, Duration.ofSeconds(30)))
+        return getSslCertificateTruster()
+            .map(t -> t.trust(host, port, Duration.ofSeconds(30)))
             .orElse(Mono.empty());
     }
 
@@ -278,24 +225,75 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
         try {
             ObjectName name = getByteBufAllocatorObjectName();
 
-            if (ManagementFactory.getPlatformMBeanServer()
-                .isRegistered(name)) {
-                this.logger.warn("MBean '{}' is already registered and will be removed. You should only have a single DefaultConnectionContext per endpoint.",
-                    name);
-                ManagementFactory.getPlatformMBeanServer()
-                    .unregisterMBean(name);
+            if (ManagementFactory.getPlatformMBeanServer().isRegistered(name)) {
+                this.logger.warn("MBean '{}' is already registered and will be removed. You should only have a single DefaultConnectionContext per endpoint.", name);
+                ManagementFactory.getPlatformMBeanServer().unregisterMBean(name);
             }
 
-            ManagementFactory.getPlatformMBeanServer()
-                .registerMBean(new ByteBufAllocatorMetricProviderWrapper(PooledByteBufAllocator.DEFAULT), name);
+            ManagementFactory.getPlatformMBeanServer().registerMBean(new ByteBufAllocatorMetricProviderWrapper(PooledByteBufAllocator.DEFAULT), name);
         } catch (JMException e) {
             this.logger.error("Unable to register ByteBufAllocator MBean", e);
         }
     }
 
+    private TcpClient configureConnectTimeout(TcpClient tcpClient) {
+        return getConnectTimeout()
+            .map(connectTimeout -> tcpClient.option(CONNECT_TIMEOUT_MILLIS, (int) connectTimeout.toMillis()))
+            .orElse(tcpClient);
+    }
+
+    private TcpClient configureKeepAlive(TcpClient tcpClient) {
+        return getKeepAlive()
+            .map(keepAlive -> tcpClient.option(SO_KEEPALIVE, keepAlive))
+            .orElse(tcpClient);
+    }
+
+    private TcpClient configureProxy(TcpClient tcpClient) {
+        return getProxyConfiguration()
+            .map(proxyConfiguration -> proxyConfiguration.configure(tcpClient))
+            .orElse(tcpClient);
+    }
+
+    private void configureSsl(SslProvider.SslContextSpec ssl) {
+        SslProvider.Builder builder = ssl.sslContext(createSslContextBuilder()).defaultConfiguration(DefaultConfigurationType.TCP);
+
+        getSslCloseNotifyReadTimeout().ifPresent(builder::closeNotifyReadTimeout);
+        getSslHandshakeTimeout().ifPresent(builder::handshakeTimeout);
+        getSslCloseNotifyFlushTimeout().ifPresent(builder::closeNotifyFlushTimeout);
+    }
+
+    private TcpClient configureTcpClient(TcpClient tcpClient) {
+        tcpClient = configureProxy(tcpClient);
+        tcpClient = tcpClient.runOn(getThreadPool())
+            .option(SO_SNDBUF, SEND_RECEIVE_BUFFER_SIZE)
+            .option(SO_RCVBUF, SEND_RECEIVE_BUFFER_SIZE);
+        tcpClient = configureKeepAlive(tcpClient);
+
+        return configureConnectTimeout(tcpClient);
+    }
+
+    private HttpClient createHttpClient() {
+        return getConnectionProvider()
+            .map(HttpClient::create)
+            .orElse(HttpClient.create());
+    }
+
+    private SslContextBuilder createSslContextBuilder() {
+        SslContextBuilder sslContextBuilder = SslContextBuilder.forClient();
+
+        getSslCertificateTruster()
+            .map(this::createTrustManagerFactory)
+            .ifPresent(sslContextBuilder::trustManager);
+
+        return sslContextBuilder;
+    }
+
+    private TrustManagerFactory createTrustManagerFactory(SslCertificateTruster sslCertificateTruster) {
+        return new StaticTrustManagerFactory(sslCertificateTruster);
+    }
+
     private ObjectName getByteBufAllocatorObjectName() throws MalformedObjectNameException {
-        return ObjectName.getInstance(String.format("org.cloudfoundry.reactor:type=ByteBufAllocator,endpoint=%s/%d", getApiHost(),
-            getPort().orElse(DEFAULT_PORT)));
+        return ObjectName.getInstance(String.format("org.cloudfoundry.reactor:type=ByteBufAllocator,endpoint=%s/%d", getApiHost(), getPort().orElse(DEFAULT_PORT)));
     }
 
 }

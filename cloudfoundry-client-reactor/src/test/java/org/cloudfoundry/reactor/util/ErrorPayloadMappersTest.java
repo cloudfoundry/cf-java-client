@@ -16,17 +16,7 @@
 
 package org.cloudfoundry.reactor.util;
 
-import static io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST;
-import static io.netty.handler.codec.http.HttpResponseStatus.INTERNAL_SERVER_ERROR;
-import static io.netty.handler.codec.http.HttpResponseStatus.OK;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.RETURNS_SMART_NULLS;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.io.IOException;
-import java.time.Duration;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cloudfoundry.UnknownCloudFoundryException;
 import org.cloudfoundry.client.v2.ClientV2Exception;
 import org.cloudfoundry.client.v3.ClientV3Exception;
@@ -34,14 +24,22 @@ import org.cloudfoundry.reactor.HttpClientResponseWithBody;
 import org.cloudfoundry.uaa.UaaException;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.netty.ByteBufFlux;
 import reactor.netty.http.client.HttpClientResponse;
 import reactor.test.StepVerifier;
+
+import java.io.IOException;
+import java.time.Duration;
+
+import static io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST;
+import static io.netty.handler.codec.http.HttpResponseStatus.INTERNAL_SERVER_ERROR;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.RETURNS_SMART_NULLS;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public final class ErrorPayloadMappersTest {
 
@@ -52,8 +50,7 @@ public final class ErrorPayloadMappersTest {
     @Test
     public void clientV2BadPayload() throws IOException {
         when(this.response.status()).thenReturn(BAD_REQUEST);
-        HttpClientResponseWithBody responseWithBody = buildResponseWithBody(ByteBufFlux.fromPath(new ClassPathResource("fixtures/invalid_error_response.json").getFile()
-            .toPath()));
+        HttpClientResponseWithBody responseWithBody = buildResponseWithBody(ByteBufFlux.fromPath(new ClassPathResource("fixtures/invalid_error_response.json").getFile().toPath()));
 
         Mono.just(responseWithBody)
             .transform(ErrorPayloadMappers.clientV2(this.objectMapper))
@@ -68,8 +65,7 @@ public final class ErrorPayloadMappersTest {
     @Test
     public void clientV2ClientError() throws IOException {
         when(this.response.status()).thenReturn(BAD_REQUEST);
-        HttpClientResponseWithBody responseWithBody = buildResponseWithBody(ByteBufFlux.fromPath(new ClassPathResource("fixtures/client/v2/error_response.json").getFile()
-            .toPath()));
+        HttpClientResponseWithBody responseWithBody = buildResponseWithBody(ByteBufFlux.fromPath(new ClassPathResource("fixtures/client/v2/error_response.json").getFile().toPath()));
 
         Mono.just(responseWithBody)
             .transform(ErrorPayloadMappers.clientV2(this.objectMapper))
@@ -99,8 +95,7 @@ public final class ErrorPayloadMappersTest {
     @Test
     public void clientV2ServerError() throws IOException {
         when(this.response.status()).thenReturn(INTERNAL_SERVER_ERROR);
-        HttpClientResponseWithBody responseWithBody = buildResponseWithBody(ByteBufFlux.fromPath(new ClassPathResource("fixtures/client/v2/error_response.json").getFile()
-            .toPath()));
+        HttpClientResponseWithBody responseWithBody = buildResponseWithBody(ByteBufFlux.fromPath(new ClassPathResource("fixtures/client/v2/error_response.json").getFile().toPath()));
 
         Mono.just(responseWithBody)
             .transform(ErrorPayloadMappers.clientV2(this.objectMapper))
@@ -117,8 +112,7 @@ public final class ErrorPayloadMappersTest {
     @Test
     public void clientV3BadPayload() throws IOException {
         when(this.response.status()).thenReturn(BAD_REQUEST);
-        HttpClientResponseWithBody responseWithBody = buildResponseWithBody(ByteBufFlux.fromPath(new ClassPathResource("fixtures/invalid_error_response.json").getFile()
-            .toPath()));
+        HttpClientResponseWithBody responseWithBody = buildResponseWithBody(ByteBufFlux.fromPath(new ClassPathResource("fixtures/invalid_error_response.json").getFile().toPath()));
 
         Mono.just(responseWithBody)
             .transform(ErrorPayloadMappers.clientV3(this.objectMapper))
@@ -133,8 +127,7 @@ public final class ErrorPayloadMappersTest {
     @Test
     public void clientV3ClientError() throws IOException {
         when(this.response.status()).thenReturn(BAD_REQUEST);
-        HttpClientResponseWithBody responseWithBody = buildResponseWithBody(ByteBufFlux.fromPath(new ClassPathResource("fixtures/client/v3/error_response.json").getFile()
-            .toPath()));
+        HttpClientResponseWithBody responseWithBody = buildResponseWithBody(ByteBufFlux.fromPath(new ClassPathResource("fixtures/client/v3/error_response.json").getFile().toPath()));
 
         Mono.just(responseWithBody)
             .transform(ErrorPayloadMappers.clientV3(this.objectMapper))
@@ -169,8 +162,7 @@ public final class ErrorPayloadMappersTest {
     @Test
     public void clientV3ServerError() throws IOException {
         when(this.response.status()).thenReturn(INTERNAL_SERVER_ERROR);
-        HttpClientResponseWithBody responseWithBody = buildResponseWithBody(ByteBufFlux.fromPath(new ClassPathResource("fixtures/client/v3/error_response.json").getFile()
-            .toPath()));
+        HttpClientResponseWithBody responseWithBody = buildResponseWithBody(ByteBufFlux.fromPath(new ClassPathResource("fixtures/client/v3/error_response.json").getFile().toPath()));
 
         Mono.just(responseWithBody)
             .transform(ErrorPayloadMappers.clientV3(this.objectMapper))
@@ -192,8 +184,7 @@ public final class ErrorPayloadMappersTest {
     @Test
     public void uaaBadPayload() throws IOException {
         when(this.response.status()).thenReturn(BAD_REQUEST);
-        HttpClientResponseWithBody responseWithBody = buildResponseWithBody(ByteBufFlux.fromPath(new ClassPathResource("fixtures/invalid_error_response.json").getFile()
-            .toPath()));
+        HttpClientResponseWithBody responseWithBody = buildResponseWithBody(ByteBufFlux.fromPath(new ClassPathResource("fixtures/invalid_error_response.json").getFile().toPath()));
 
         Mono.just(responseWithBody)
             .transform(ErrorPayloadMappers.uaa(this.objectMapper))
@@ -208,8 +199,7 @@ public final class ErrorPayloadMappersTest {
     @Test
     public void uaaClientError() throws IOException {
         when(this.response.status()).thenReturn(BAD_REQUEST);
-        HttpClientResponseWithBody responseWithBody = buildResponseWithBody(ByteBufFlux.fromPath(new ClassPathResource("fixtures/uaa/error_response.json").getFile()
-            .toPath()));
+        HttpClientResponseWithBody responseWithBody = buildResponseWithBody(ByteBufFlux.fromPath(new ClassPathResource("fixtures/uaa/error_response.json").getFile().toPath()));
 
         Mono.just(responseWithBody)
             .transform(ErrorPayloadMappers.uaa(this.objectMapper))
@@ -237,8 +227,7 @@ public final class ErrorPayloadMappersTest {
     @Test
     public void uaaServerError() throws IOException {
         when(this.response.status()).thenReturn(INTERNAL_SERVER_ERROR);
-        HttpClientResponseWithBody responseWithBody = buildResponseWithBody(ByteBufFlux.fromPath(new ClassPathResource("fixtures/uaa/error_response.json").getFile()
-            .toPath()));
+        HttpClientResponseWithBody responseWithBody = buildResponseWithBody(ByteBufFlux.fromPath(new ClassPathResource("fixtures/uaa/error_response.json").getFile().toPath()));
 
         Mono.just(responseWithBody)
             .transform(ErrorPayloadMappers.uaa(this.objectMapper))
@@ -255,7 +244,7 @@ public final class ErrorPayloadMappersTest {
     }
 
     private HttpClientResponseWithBody buildResponseWithBody(ByteBufFlux body) {
-        return HttpClientResponseWithBody.of(this.response, body);
+        return HttpClientResponseWithBody.of(body, this.response);
     }
 
 }

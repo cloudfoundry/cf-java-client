@@ -16,18 +16,16 @@
 
 package org.cloudfoundry.reactor.util;
 
-import static io.netty.handler.codec.http.HttpHeaderNames.AUTHORIZATION;
-
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
-
-import io.netty.util.AsciiString;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 
+import static io.netty.handler.codec.http.HttpHeaderNames.AUTHORIZATION;
+
 public abstract class AbstractReactorOperations {
 
-    protected static final AsciiString APPLICATION_ZIP = new AsciiString("application/zip");
+    protected static final String APPLICATION_ZIP = "application/zip";
 
     protected final ConnectionContext connectionContext;
 
@@ -42,18 +40,19 @@ public abstract class AbstractReactorOperations {
     }
 
     protected Mono<Operator> createOperator() {
-        HttpClient httpClient = connectionContext.getHttpClient();
-        return root.map(this::buildOperatorContext)
+        HttpClient httpClient = this.connectionContext.getHttpClient();
+
+        return this.root.map(this::buildOperatorContext)
             .map(context -> new Operator(context, httpClient))
-            .flatMap(operator -> tokenProvider.getToken(connectionContext)
+            .flatMap(operator -> this.tokenProvider.getToken(this.connectionContext)
                 .map(token -> setHeaders(operator, token)));
     }
 
     private OperatorContext buildOperatorContext(String root) {
         return OperatorContext.builder()
-            .connectionContext(connectionContext)
+            .connectionContext(this.connectionContext)
             .root(root)
-            .tokenProvider(tokenProvider)
+            .tokenProvider(this.tokenProvider)
             .build();
     }
 

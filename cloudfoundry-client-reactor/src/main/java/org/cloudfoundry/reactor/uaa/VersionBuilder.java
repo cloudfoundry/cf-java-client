@@ -16,11 +16,10 @@
 
 package org.cloudfoundry.reactor.uaa;
 
-import java.util.Optional;
-
+import io.netty.handler.codec.http.HttpHeaders;
 import org.cloudfoundry.uaa.Versioned;
 
-import io.netty.handler.codec.http.HttpHeaders;
+import java.util.Optional;
 
 final class VersionBuilder {
 

@@ -16,17 +16,17 @@
 
 package org.cloudfoundry.reactor.doppler;
 
-import java.io.InputStream;
-import java.nio.charset.Charset;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import reactor.core.publisher.Flux;
 import reactor.netty.ByteBufFlux;
 import reactor.netty.http.client.HttpClientResponse;
+
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 final class MultipartCodec {
 
@@ -35,11 +35,6 @@ final class MultipartCodec {
     private static final int MAX_PAYLOAD_SIZE = 1024 * 1024;
 
     private MultipartCodec() {
-    }
-
-    static Flux<InputStream> decode(ByteBufFlux body) {
-        return body.asInputStream()
-            .skip(1);
     }
 
     static DelimiterBasedFrameDecoder createDecoder(HttpClientResponse response) {
@@ -52,10 +47,15 @@ final class MultipartCodec {
             Unpooled.copiedBuffer(String.format("\r\n--%s--\r\n", boundary), Charset.defaultCharset()));
     }
 
+    static Flux<InputStream> decode(ByteBufFlux body) {
+        return body.asInputStream()
+            .skip(1);
+    }
+
     private static String extractMultipartBoundary(HttpClientResponse response) {
-        String contentType = response.responseHeaders()
-            .get(HttpHeaderNames.CONTENT_TYPE);
+        String contentType = response.responseHeaders().get(HttpHeaderNames.CONTENT_TYPE);
         Matcher matcher = BOUNDARY_PATTERN.matcher(contentType);
+
         if (matcher.matches()) {
             return matcher.group(1);
         } else {
