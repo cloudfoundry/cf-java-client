@@ -20,7 +20,7 @@ import org.junit.Test;
 
 public final class ToOneRelationshipTest {
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void noData() {
         ToOneRelationship.builder()
             .build();
