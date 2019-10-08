@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.uaa.authorizations;
 
+import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.util.AsciiString;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
@@ -34,7 +35,6 @@ import org.cloudfoundry.uaa.authorizations.GetOpenIdProviderConfigurationRespons
 import org.cloudfoundry.util.ExceptionUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
-import reactor.ipc.netty.http.client.HttpClientRequest;
 
 import java.util.Optional;
 
@@ -51,7 +51,7 @@ public final class ReactorAuthorizations extends AbstractUaaOperations implement
      * Creates an instance
      *
      * @param connectionContext the {@link ConnectionContext} to use when communicating with the server
-     * @param root              the root URI of the server.  Typically something like {@code https://uaa.run.pivotal.io}.
+     * @param root              the root URI of the server. Typically something like {@code https://uaa.run.pivotal.io}.
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      */
     public ReactorAuthorizations(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
@@ -74,18 +74,14 @@ public final class ReactorAuthorizations extends AbstractUaaOperations implement
 
     @Override
     public Mono<String> authorizationCodeGrantBrowser(AuthorizeByAuthorizationCodeGrantBrowserRequest request) {
-        return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.CODE),
-            outbound -> outbound
-                .map(ReactorAuthorizations::removeAuthorization))
+        return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.CODE), ReactorAuthorizations::removeAuthorization)
             .map(inbound -> inbound.responseHeaders().get(LOCATION))
             .checkpoint();
     }
 
     @Override
     public Mono<String> authorizationCodeGrantHybrid(AuthorizeByAuthorizationCodeGrantHybridRequest request) {
-        return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.CODE_AND_ID_TOKEN),
-            outbound -> outbound
-                .map(ReactorAuthorizations::removeAuthorization))
+        return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.CODE_AND_ID_TOKEN), ReactorAuthorizations::removeAuthorization)
             .map(inbound -> inbound.responseHeaders().get(LOCATION))
             .checkpoint();
     }
@@ -98,18 +94,14 @@ public final class ReactorAuthorizations extends AbstractUaaOperations implement
 
     @Override
     public Mono<String> implicitGrantBrowser(AuthorizeByImplicitGrantBrowserRequest request) {
-        return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.TOKEN),
-            outbound -> outbound
-                .map(ReactorAuthorizations::removeAuthorization))
+        return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.TOKEN), ReactorAuthorizations::removeAuthorization)
             .map(inbound -> inbound.responseHeaders().get(LOCATION))
             .checkpoint();
     }
 
     @Override
     public Mono<String> openIdWithAuthorizationCodeAndIdToken(AuthorizeByOpenIdWithAuthorizationCodeGrantRequest request) {
-        return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.CODE_AND_ID_TOKEN),
-            outbound -> outbound
-                .map(ReactorAuthorizations::removeAuthorization))
+        return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.CODE_AND_ID_TOKEN), ReactorAuthorizations::removeAuthorization)
             .map(inbound -> inbound.responseHeaders().get(LOCATION))
             .checkpoint();
     }
@@ -128,9 +120,8 @@ public final class ReactorAuthorizations extends AbstractUaaOperations implement
             .checkpoint();
     }
 
-    private static HttpClientRequest removeAuthorization(HttpClientRequest request) {
-        request.requestHeaders().remove(AUTHORIZATION);
-        return request;
+    private static void removeAuthorization(HttpHeaders httpHeaders) {
+        httpHeaders.remove(AUTHORIZATION);
     }
 
 }

@@ -20,7 +20,8 @@ import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import reactor.core.publisher.Flux;
-import reactor.ipc.netty.http.client.HttpClientResponse;
+import reactor.netty.ByteBufFlux;
+import reactor.netty.http.client.HttpClientResponse;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -36,28 +37,25 @@ final class MultipartCodec {
     private MultipartCodec() {
     }
 
-    static Flux<InputStream> decode(HttpClientResponse response) {
-        return response
-            .addHandler(createDecoder(response))
-            .receive()
-            .asInputStream()
-            .skip(1);
-    }
-
-    private static DelimiterBasedFrameDecoder createDecoder(HttpClientResponse response) {
+    static DelimiterBasedFrameDecoder createDecoder(HttpClientResponse response) {
         String boundary = extractMultipartBoundary(response);
 
         return new DelimiterBasedFrameDecoder(MAX_PAYLOAD_SIZE,
             Unpooled.copiedBuffer(String.format("--%s\r\n\r\n", boundary), Charset.defaultCharset()),
             Unpooled.copiedBuffer(String.format("\r\n--%s\r\n\r\n", boundary), Charset.defaultCharset()),
             Unpooled.copiedBuffer(String.format("\r\n--%s--", boundary), Charset.defaultCharset()),
-            Unpooled.copiedBuffer(String.format("\r\n--%s--\r\n", boundary), Charset.defaultCharset())
-        );
+            Unpooled.copiedBuffer(String.format("\r\n--%s--\r\n", boundary), Charset.defaultCharset()));
+    }
+
+    static Flux<InputStream> decode(ByteBufFlux body) {
+        return body.asInputStream()
+            .skip(1);
     }
 
     private static String extractMultipartBoundary(HttpClientResponse response) {
         String contentType = response.responseHeaders().get(HttpHeaderNames.CONTENT_TYPE);
         Matcher matcher = BOUNDARY_PATTERN.matcher(contentType);
+
         if (matcher.matches()) {
             return matcher.group(1);
         } else {

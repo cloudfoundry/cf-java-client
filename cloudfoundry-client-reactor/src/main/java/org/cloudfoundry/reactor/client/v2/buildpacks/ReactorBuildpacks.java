@@ -41,8 +41,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
-
 /**
  * The Reactor-based implementation of {@link Buildpacks}
  */
@@ -52,7 +50,7 @@ public final class ReactorBuildpacks extends AbstractClientV2Operations implemen
      * Creates an instance
      *
      * @param connectionContext the {@link ConnectionContext} to use when communicating with the server
-     * @param root              the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
+     * @param root              the root URI of the server. Typically something like {@code https://api.run.pivotal.io}.
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      */
     public ReactorBuildpacks(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
@@ -89,35 +87,40 @@ public final class ReactorBuildpacks extends AbstractClientV2Operations implemen
             .checkpoint();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Mono<UploadBuildpackResponse> upload(UploadBuildpackRequest request) {
-        return put(request, UploadBuildpackResponse.class, builder -> builder.pathSegment("buildpacks", request.getBuildpackId(), "bits"),
-            outbound -> outbound
-                .flatMap(r -> {
-                    if (Files.isDirectory(request.getBuildpack())) {
-                        return FileUtils.compress(request.getBuildpack())
-                            .flatMap(buildpack -> upload(buildpack, r, request.getFilename() + ".zip")
-                                .doOnTerminate(() -> {
-                                    try {
-                                        Files.delete(buildpack);
-                                    } catch (IOException e) {
-                                        throw Exceptions.propagate(e);
-                                    }
-                                }));
-                    } else {
-                        return upload(request.getBuildpack(), r, request.getFilename());
+        Path buildpack = request.getBuildpack();
+
+        if (buildpack.toFile().isDirectory()) {
+            return FileUtils.compress(buildpack)
+                .map(temporaryFile -> UploadBuildpackRequest.builder()
+                    .from(request)
+                    .buildpack(temporaryFile)
+                    .build())
+                .flatMap(requestWithTemporaryFile -> upload(requestWithTemporaryFile, request.getFilename() + ".zip", () -> {
+                    try {
+                        Files.delete(requestWithTemporaryFile.getBuildpack());
+                    } catch (IOException e) {
+                        throw Exceptions.propagate(e);
                     }
-                }))
+                }));
+        } else {
+            return upload(request, request.getFilename(), () -> {
+            });
+        }
+    }
+
+    private Mono<UploadBuildpackResponse> upload(UploadBuildpackRequest request, String filename, Runnable onTerminate) {
+        return put(request, UploadBuildpackResponse.class, builder -> builder.pathSegment("buildpacks", request.getBuildpackId(), "bits"),
+            multipartRequest -> upload(request.getBuildpack(), multipartRequest, filename), onTerminate)
             .checkpoint();
     }
 
-    private Mono<Void> upload(Path buildpack, MultipartHttpClientRequest r, String filename) {
-        return r
-            .addPart(part -> part
-                .setContentDispositionFormData("buildpack", filename)
-                .setHeader(CONTENT_TYPE, APPLICATION_ZIP)
-                .sendFile(buildpack))
+    private void upload(Path buildpack, MultipartHttpClientRequest multipartRequest, String filename) {
+        multipartRequest.addPart(part -> part.setName("buildpack")
+            .setFilename(filename)
+            .setContentType(APPLICATION_ZIP)
+            .sendFile(buildpack))
             .done();
     }
 

@@ -18,8 +18,8 @@ package org.cloudfoundry.reactor.util;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.handler.codec.http.HttpHeaderNames;
-import reactor.ipc.netty.http.client.HttpClient;
-import reactor.ipc.netty.http.client.HttpClientRequest;
+import io.netty.handler.codec.http.HttpHeaders;
+import reactor.netty.http.client.HttpClient;
 
 import java.util.Optional;
 
@@ -40,11 +40,10 @@ public final class UserAgent {
     /**
      * Add the {@code User-Agent} to a request.  Typically used with `.map`
      *
-     * @param request The request to transform
-     * @return the transformed request
+     * @param httpHeaders The headers to transform
      */
-    public static HttpClientRequest addUserAgent(HttpClientRequest request) {
-        return request.header(HttpHeaderNames.USER_AGENT, USER_AGENT);
+    public static void setUserAgent(HttpHeaders httpHeaders) {
+        httpHeaders.set(HttpHeaderNames.USER_AGENT, USER_AGENT);
     }
 
     private static String javaClientVersion() {

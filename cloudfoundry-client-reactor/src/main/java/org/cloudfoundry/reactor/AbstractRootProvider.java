@@ -16,10 +16,16 @@
 
 package org.cloudfoundry.reactor;
 
+import io.netty.handler.codec.http.HttpHeaders;
+import org.cloudfoundry.reactor.util.JsonCodec;
+import org.cloudfoundry.reactor.util.Operator;
+import org.cloudfoundry.reactor.util.OperatorContext;
+import org.cloudfoundry.reactor.util.UserAgent;
 import org.immutables.value.Value;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
+import reactor.netty.http.client.HttpClient;
 
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -45,14 +51,22 @@ abstract class AbstractRootProvider implements RootProvider {
         }
     }
 
+    public Mono<Operator> createOperator(ConnectionContext connectionContext) {
+        HttpClient httpClient = connectionContext.getHttpClient();
+        return getRoot(connectionContext)
+            .map(root -> OperatorContext.of(connectionContext, root))
+            .map(operatorContext -> new Operator(operatorContext, httpClient))
+            .map(operator -> operator.headers(this::addHeaders));
+    }
+
     /**
-     * The hostname of the API root.  Typically something like {@code api.run.pivotal.io}.
+     * The hostname of the API root. Typically something like {@code api.run.pivotal.io}.
      */
     public abstract String getApiHost();
 
     @Override
-    public final Mono<String> getRoot(ConnectionContext connectionContext) {
-        Mono<String> cached = doGetRoot(connectionContext)
+    public final Mono<String> getRoot(String key, ConnectionContext connectionContext) {
+        Mono<String> cached = doGetRoot(key, connectionContext)
             .delayUntil(uri -> trust(uri.getHost(), uri.getPort(), connectionContext))
             .map(UriComponents::toUriString);
 
@@ -62,8 +76,8 @@ abstract class AbstractRootProvider implements RootProvider {
     }
 
     @Override
-    public final Mono<String> getRoot(String key, ConnectionContext connectionContext) {
-        Mono<String> cached = doGetRoot(key, connectionContext)
+    public final Mono<String> getRoot(ConnectionContext connectionContext) {
+        Mono<String> cached = doGetRoot(connectionContext)
             .delayUntil(uri -> trust(uri.getHost(), uri.getPort(), connectionContext))
             .map(UriComponents::toUriString);
 
@@ -101,9 +115,14 @@ abstract class AbstractRootProvider implements RootProvider {
     abstract Optional<Integer> getPort();
 
     /**
-     * Whether the connection to the root API should be secure (i.e. using HTTPS).  Defaults to {@code true}.
+     * Whether the connection to the root API should be secure (i.e. using HTTPS). Defaults to {@code true}.
      */
     abstract Optional<Boolean> getSecure();
+
+    private void addHeaders(HttpHeaders httpHeaders) {
+        UserAgent.setUserAgent(httpHeaders);
+        JsonCodec.setDecodeHeaders(httpHeaders);
+    }
 
     private String getScheme() {
         if (getSecure().orElse(true)) {

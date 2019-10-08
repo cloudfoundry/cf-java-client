@@ -469,14 +469,15 @@ public final class ReactorPackagesTest extends AbstractClientApiTest {
                     String boundary = extractBoundary(headers);
 
                     assertThat(body.readString(Charset.defaultCharset()))
-                        .isEqualTo("\r\n--" + boundary + "\r\n" +
-                            "content-disposition: form-data; name=\"bits\"; filename=\"application.zip\"\r\n" +
+                        .isEqualTo("--" + boundary + "\r\n" +
+                            "content-disposition: form-data; name=\"bits\"; filename=\"test-package.zip\"\r\n" +
                             "content-length: 12\r\n" +
                             "content-type: application/zip\r\n" +
+                            "content-transfer-encoding: binary\r\n" +
                             "\r\n" +
                             "test-content" +
                             "\r\n" +
-                            "--" + boundary + "--");
+                            "--" + boundary + "--\r\n");
                 }))
                 .build())
             .response(TestResponse.builder()

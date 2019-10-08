@@ -33,7 +33,7 @@
     <logger name="cloudfoundry-client.token"             level="${CLIENT_LOGGING_LEVEL:-INFO}"/>
     <logger name="cloudfoundry-client.trust"             level="${CLIENT_LOGGING_LEVEL:-WARN}"/>
     <logger name="example"                               level="DEBUG"/>
-    <logger name="reactor.ipc.netty"                     level="INFO"/>
+    <logger name="reactor.netty"                         level="INFO"/>
     <logger name="stream"                                level="INFO"/>
 
     <root level="WARN">

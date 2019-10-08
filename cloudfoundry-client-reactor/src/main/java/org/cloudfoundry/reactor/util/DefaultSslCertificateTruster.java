@@ -16,12 +16,14 @@
 
 package org.cloudfoundry.reactor.util;
 
+import io.netty.handler.ssl.SslContextBuilder;
 import org.cloudfoundry.reactor.ProxyConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
-import reactor.ipc.netty.resources.LoopResources;
-import reactor.ipc.netty.tcp.TcpClient;
+import reactor.netty.resources.LoopResources;
+import reactor.netty.tcp.SslProvider.SslContextSpec;
+import reactor.netty.tcp.TcpClient;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
@@ -117,17 +119,19 @@ public final class DefaultSslCertificateTruster implements SslCertificateTruster
         }
     }
 
-    private static TcpClient getTcpClient(Optional<ProxyConfiguration> proxyConfiguration, LoopResources threadPool, CertificateCollectingTrustManager collector, String host, int port) {
-        return TcpClient.create(options -> {
-            options
-                .host(host)
-                .port(port)
-                .loopResources(threadPool)
-                .disablePool()
-                .sslSupport(ssl -> ssl.trustManager(new StaticTrustManagerFactory(collector)));
+    private static void configureSsl(SslContextSpec sslContextSpec, CertificateCollectingTrustManager collector) {
+        sslContextSpec.sslContext(SslContextBuilder.forClient().trustManager(new StaticTrustManagerFactory(collector)));
+    }
 
-            proxyConfiguration.ifPresent(c -> c.configure(options));
-        });
+    private static TcpClient getTcpClient(Optional<ProxyConfiguration> proxyConfiguration, LoopResources threadPool, CertificateCollectingTrustManager collector, String host, int port) {
+        TcpClient tcpClient = TcpClient.create()
+            .runOn(threadPool)
+            .host(host)
+            .port(port)
+            .secure(spec -> configureSsl(spec, collector));
+
+        return proxyConfiguration.map(configuration -> configuration.configure(tcpClient))
+            .orElse(tcpClient);
     }
 
     private static X509TrustManager getTrustManager(TrustManagerFactory trustManagerFactory) {
@@ -151,15 +155,17 @@ public final class DefaultSslCertificateTruster implements SslCertificateTruster
         }
     }
 
-    private static Mono<X509Certificate[]> getUntrustedCertificates(Duration duration, String host, int port, Optional<ProxyConfiguration> proxyConfiguration, LoopResources threadPool,
-                                                                    X509TrustManager delegate) {
+    private static Mono<X509Certificate[]> getUntrustedCertificates(Duration duration, String host, int port,
+                                                                    Optional<ProxyConfiguration> proxyConfiguration,
+                                                                    LoopResources threadPool, X509TrustManager delegate) {
 
         CertificateCollectingTrustManager collector = new CertificateCollectingTrustManager(delegate);
-
-        return getTcpClient(proxyConfiguration, threadPool, collector, host, port)
-            .newHandler((inbound, outbound) -> inbound.receive().then())
+        TcpClient tcpClient = getTcpClient(proxyConfiguration, threadPool, collector, host, port);
+        return tcpClient.handle((inbound, outbound) -> inbound.receive()
+            .then())
+            .connect()
             .timeout(duration)
-            .handle((c, sink) -> {
+            .handle((connection, sink) -> {
                 X509Certificate[] chain = collector.getCollectedCertificateChain();
 
                 if (chain == null) {
@@ -171,6 +177,8 @@ public final class DefaultSslCertificateTruster implements SslCertificateTruster
                 } else {
                     sink.next(chain);
                 }
+
+                connection.dispose();
             });
     }
 

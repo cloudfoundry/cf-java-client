@@ -39,18 +39,15 @@ import java.io.IOException;
  */
 public class ReactorTcpRoutes extends AbstractRoutingV1Operations implements TcpRoutes {
 
-    private final ConnectionContext connectionContext;
-
     /**
      * Creates an instance
      *
      * @param connectionContext the {@link ConnectionContext} to use when communicating with the server
-     * @param root              the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
+     * @param root              the root URI of the server. Typically something like {@code https://api.run.pivotal.io}.
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      */
     public ReactorTcpRoutes(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
         super(connectionContext, root, tokenProvider);
-        this.connectionContext = connectionContext;
     }
 
     @Override
@@ -67,11 +64,11 @@ public class ReactorTcpRoutes extends AbstractRoutingV1Operations implements Tcp
 
     @Override
     public Flux<TcpRouteEvent> events(EventsRequest request) {
-        return get(builder -> builder.pathSegment("v1", "tcp_routes", "events"))
-            .flatMapMany(EventStreamCodec::decode)
+        return get(EventStreamCodec::createDecoder, builder -> builder.pathSegment("v1", "tcp_routes", "events"), EventStreamCodec::decode)
             .map(event -> {
                 try {
-                    return this.connectionContext.getObjectMapper().readValue(event.getData(), TcpRouteEvent.Builder.class)
+                    return this.connectionContext.getObjectMapper()
+                        .readValue(event.getData(), TcpRouteEvent.Builder.class)
                         .eventType(EventType.from(event.getEventType()))
                         .build();
                 } catch (IOException e) {

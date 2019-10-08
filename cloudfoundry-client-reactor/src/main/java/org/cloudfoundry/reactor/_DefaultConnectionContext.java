@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import io.netty.buffer.PooledByteBufAllocator;
+import io.netty.handler.ssl.SslContextBuilder;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.reactor.util.ByteBufAllocatorMetricProviderWrapper;
 import org.cloudfoundry.reactor.util.DefaultSslCertificateTruster;
@@ -30,15 +31,19 @@ import org.immutables.value.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
-import reactor.ipc.netty.http.client.HttpClient;
-import reactor.ipc.netty.resources.LoopResources;
-import reactor.ipc.netty.resources.PoolResources;
+import reactor.netty.http.client.HttpClient;
+import reactor.netty.resources.ConnectionProvider;
+import reactor.netty.resources.LoopResources;
+import reactor.netty.tcp.SslProvider;
+import reactor.netty.tcp.SslProvider.DefaultConfigurationType;
+import reactor.netty.tcp.TcpClient;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.management.JMException;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
+import javax.net.ssl.TrustManagerFactory;
 import java.lang.management.ManagementFactory;
 import java.time.Duration;
 import java.util.List;
@@ -51,16 +56,14 @@ import static io.netty.channel.ChannelOption.SO_RCVBUF;
 import static io.netty.channel.ChannelOption.SO_SNDBUF;
 
 /**
- * The default implementation of the {@link ConnectionContext} interface.  This is the implementation that should be used for most non-testing cases.
+ * The default implementation of the {@link ConnectionContext} interface. This is the implementation that should be used for most non-testing cases.
  */
 @Value.Immutable
 abstract class _DefaultConnectionContext implements ConnectionContext {
 
     private static final int DEFAULT_PORT = 443;
 
-    private static final int RECEIVE_BUFFER_SIZE = 10 * 1024 * 1024;
-
-    private static final int SEND_BUFFER_SIZE = 10 * 1024 * 1024;
+    private static final int SEND_RECEIVE_BUFFER_SIZE = 10 * 1024 * 1024;
 
     private final Logger logger = LoggerFactory.getLogger("cloudfoundry-client");
 
@@ -69,7 +72,7 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
      */
     @PreDestroy
     public final void dispose() {
-        getConnectionPool().ifPresent(PoolResources::dispose);
+        getConnectionProvider().ifPresent(ConnectionProvider::dispose);
         getThreadPool().dispose();
 
         try {
@@ -87,42 +90,26 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
     public abstract Optional<Duration> getCacheDuration();
 
     /**
-     * The number of connections to use when processing requests and responses.  Setting this to {@code null} disables connection pooling.
+     * The number of connections to use when processing requests and responses. Setting this to {@code null} disables connection pooling.
      */
     @Nullable
     @Value.Default
     public Integer getConnectionPoolSize() {
-        return PoolResources.DEFAULT_POOL_MAX_CONNECTION;
+        return ConnectionProvider.DEFAULT_POOL_MAX_CONNECTIONS;
     }
 
     @Override
     @Value.Default
     public HttpClient getHttpClient() {
-        return HttpClient.create(options -> {
-            options
-                .compression(true)
-                .loopResources(getThreadPool())
-                .option(SO_SNDBUF, SEND_BUFFER_SIZE)
-                .option(SO_RCVBUF, RECEIVE_BUFFER_SIZE)
-                .disablePool();
-
-            options.sslSupport(ssl -> getSslCertificateTruster().ifPresent(trustManager -> ssl.trustManager(new StaticTrustManagerFactory(trustManager))));
-
-            getConnectionPool().ifPresent(options::poolResources);
-            getConnectTimeout().ifPresent(socketTimeout -> options.option(CONNECT_TIMEOUT_MILLIS, (int) socketTimeout.toMillis()));
-            getKeepAlive().ifPresent(keepAlive -> options.option(SO_KEEPALIVE, keepAlive));
-            getSslHandshakeTimeout().ifPresent(options::sslHandshakeTimeout);
-            getSslCloseNotifyFlushTimeout().ifPresent(options::sslCloseNotifyFlushTimeout);
-            getSslCloseNotifyReadTimeout().ifPresent(options::sslCloseNotifyReadTimeout);
-            getProxyConfiguration().ifPresent(c -> c.configure(options));
-        });
+        return createHttpClient().compress(true)
+            .tcpConfiguration(this::configureTcpClient)
+            .secure(this::configureSsl);
     }
 
     @Override
     @Value.Default
     public ObjectMapper getObjectMapper() {
-        ObjectMapper objectMapper = new ObjectMapper()
-            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+        ObjectMapper objectMapper = new ObjectMapper().disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             .enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
             .registerModule(new Jdk8Module())
             .setSerializationInclusion(NON_NULL);
@@ -159,7 +146,7 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
     }
 
     /**
-     * The hostname of the API root.  Typically something like {@code api.run.pivotal.io}.
+     * The hostname of the API root. Typically something like {@code api.run.pivotal.io}.
      */
     abstract String getApiHost();
 
@@ -169,9 +156,9 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
     abstract Optional<Duration> getConnectTimeout();
 
     @Value.Derived
-    Optional<PoolResources> getConnectionPool() {
+    Optional<ConnectionProvider> getConnectionProvider() {
         return Optional.ofNullable(getConnectionPoolSize())
-            .map(connectionPoolSize -> PoolResources.fixed("cloudfoundry-client", connectionPoolSize));
+            .map(connectionPoolSize -> ConnectionProvider.fixed("cloudfoundry-client", connectionPoolSize));
     }
 
     /**
@@ -185,7 +172,7 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
     abstract Optional<Integer> getPort();
 
     /**
-     * Jackson deserialization problem handlers.  Typically only used for testing.
+     * Jackson deserialization problem handlers. Typically only used for testing.
      */
     abstract List<DeserializationProblemHandler> getProblemHandlers();
 
@@ -195,12 +182,12 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
     abstract Optional<ProxyConfiguration> getProxyConfiguration();
 
     /**
-     * Whether the connection to the root API should be secure (i.e. using HTTPS).  Defaults to {@code true}.
+     * Whether the connection to the root API should be secure (i.e. using HTTPS). Defaults to {@code true}.
      */
     abstract Optional<Boolean> getSecure();
 
     /**
-     * Whether to skip SSL certificate validation for all hosts reachable from the API host.  Defaults to {@code false}.
+     * Whether to skip SSL certificate validation for all hosts reachable from the API host. Defaults to {@code false}.
      */
     abstract Optional<Boolean> getSkipSslValidation();
 
@@ -247,6 +234,62 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
         } catch (JMException e) {
             this.logger.error("Unable to register ByteBufAllocator MBean", e);
         }
+    }
+
+    private TcpClient configureConnectTimeout(TcpClient tcpClient) {
+        return getConnectTimeout()
+            .map(connectTimeout -> tcpClient.option(CONNECT_TIMEOUT_MILLIS, (int) connectTimeout.toMillis()))
+            .orElse(tcpClient);
+    }
+
+    private TcpClient configureKeepAlive(TcpClient tcpClient) {
+        return getKeepAlive()
+            .map(keepAlive -> tcpClient.option(SO_KEEPALIVE, keepAlive))
+            .orElse(tcpClient);
+    }
+
+    private TcpClient configureProxy(TcpClient tcpClient) {
+        return getProxyConfiguration()
+            .map(proxyConfiguration -> proxyConfiguration.configure(tcpClient))
+            .orElse(tcpClient);
+    }
+
+    private void configureSsl(SslProvider.SslContextSpec ssl) {
+        SslProvider.Builder builder = ssl.sslContext(createSslContextBuilder()).defaultConfiguration(DefaultConfigurationType.TCP);
+
+        getSslCloseNotifyReadTimeout().ifPresent(builder::closeNotifyReadTimeout);
+        getSslHandshakeTimeout().ifPresent(builder::handshakeTimeout);
+        getSslCloseNotifyFlushTimeout().ifPresent(builder::closeNotifyFlushTimeout);
+    }
+
+    private TcpClient configureTcpClient(TcpClient tcpClient) {
+        tcpClient = configureProxy(tcpClient);
+        tcpClient = tcpClient.runOn(getThreadPool())
+            .option(SO_SNDBUF, SEND_RECEIVE_BUFFER_SIZE)
+            .option(SO_RCVBUF, SEND_RECEIVE_BUFFER_SIZE);
+        tcpClient = configureKeepAlive(tcpClient);
+
+        return configureConnectTimeout(tcpClient);
+    }
+
+    private HttpClient createHttpClient() {
+        return getConnectionProvider()
+            .map(HttpClient::create)
+            .orElse(HttpClient.create());
+    }
+
+    private SslContextBuilder createSslContextBuilder() {
+        SslContextBuilder sslContextBuilder = SslContextBuilder.forClient();
+
+        getSslCertificateTruster()
+            .map(this::createTrustManagerFactory)
+            .ifPresent(sslContextBuilder::trustManager);
+
+        return sslContextBuilder;
+    }
+
+    private TrustManagerFactory createTrustManagerFactory(SslCertificateTruster sslCertificateTruster) {
+        return new StaticTrustManagerFactory(sslCertificateTruster);
     }
 
     private ObjectName getByteBufAllocatorObjectName() throws MalformedObjectNameException {

@@ -17,16 +17,13 @@
 package org.cloudfoundry.reactor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.cloudfoundry.reactor.util.JsonCodec;
-import org.cloudfoundry.reactor.util.NetworkLogging;
-import org.cloudfoundry.reactor.util.UserAgent;
 import org.immutables.value.Value;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
-import reactor.ipc.netty.http.client.HttpClientRequest;
 
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -57,21 +54,18 @@ abstract class _RootPayloadRootProvider extends AbstractRootProvider {
     @SuppressWarnings("unchecked")
     @Value.Derived
     private Mono<Map<String, String>> getPayload(ConnectionContext connectionContext) {
-        return getRoot(connectionContext)
-            .flatMap(uri -> connectionContext.getHttpClient()
-                .get(uri, request -> Mono.just(request)
-                    .map(UserAgent::addUserAgent)
-                    .map(JsonCodec::addDecodeHeaders)
-                    .flatMapMany(HttpClientRequest::send))
-                .doOnSubscribe(NetworkLogging.get(uri))
-                .transform(NetworkLogging.response(uri)))
-            .transform(JsonCodec.decode(getObjectMapper(), Map.class))
+        return createOperator(connectionContext)
+            .flatMap(operator -> operator.get()
+                .uri(Function.identity())
+                .response()
+                .parseBody(Map.class))
+            .map(payload -> (Map<String, Map<String, Map<String, String>>>) payload)
+            .map(this::processPayload)
             .switchIfEmpty(Mono.error(new IllegalArgumentException("Root endpoint does not contain a payload")))
-            .map(this::parsePayload)
             .checkpoint();
     }
 
-    private Map<String, String> parsePayload(Map<String, Map<String, Map<String, String>>> payload) {
+    private Map<String, String> processPayload(Map<String, Map<String, Map<String, String>>> payload) {
         return payload.get("links").entrySet().stream()
             .filter(item -> null != item.getValue())
             .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().get("href")));

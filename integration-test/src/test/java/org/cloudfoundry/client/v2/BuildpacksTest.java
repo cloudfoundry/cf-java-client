@@ -40,7 +40,6 @@ import reactor.test.StepVerifier;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Duration;
-import java.util.concurrent.TimeoutException;
 
 public final class BuildpacksTest extends AbstractIntegrationTest {
 
@@ -196,19 +195,20 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
     public void upload() throws IOException {
         Path buildpack = new ClassPathResource("test-buildpack.zip").getFile().toPath();
         String buildpackName = this.nameFactory.getBuildpackName();
+        String filename = buildpack.getFileName().toString();
 
         createBuildpackId(this.cloudFoundryClient, buildpackName)
             .flatMap(buildpackId -> this.cloudFoundryClient.buildpacks()
                 .upload(UploadBuildpackRequest.builder()
                     .buildpack(buildpack)
                     .buildpackId(buildpackId)
-                    .filename(buildpack.getFileName().toString())
+                    .filename(filename)
                     .build()))
             .map(ResourceUtils::getEntity)
             .as(StepVerifier::create)
             .expectNext(BuildpackEntity.builder()
                 .enabled(false)
-                .filename(buildpack.getFileName().toString())
+                .filename(filename)
                 .locked(false)
                 .name(buildpackName)
                 .position(3)

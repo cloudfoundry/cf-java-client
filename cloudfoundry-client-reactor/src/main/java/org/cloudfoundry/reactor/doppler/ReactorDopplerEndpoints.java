@@ -37,30 +37,22 @@ final class ReactorDopplerEndpoints extends AbstractDopplerOperations {
     }
 
     Flux<Envelope> containerMetrics(ContainerMetricsRequest request) {
-        return get(builder -> builder.pathSegment("apps", request.getApplicationId(), "containermetrics"))
-            .flatMapMany(response -> MultipartCodec.decode(response)
-                .map(ReactorDopplerEndpoints::toEnvelope))
+        return get(builder -> builder.pathSegment("apps", request.getApplicationId(), "containermetrics"), MultipartCodec::createDecoder, MultipartCodec::decode).map(ReactorDopplerEndpoints::toEnvelope)
             .checkpoint();
     }
 
     Flux<Envelope> firehose(FirehoseRequest request) {
-        return ws(builder -> builder.pathSegment("firehose", request.getSubscriptionId()))
-            .flatMapMany(response -> response.receiveWebsocket().aggregateFrames().receive().asInputStream()
-                .map(ReactorDopplerEndpoints::toEnvelope))
+        return ws(builder -> builder.pathSegment("firehose", request.getSubscriptionId())).map(ReactorDopplerEndpoints::toEnvelope)
             .checkpoint();
     }
 
     Flux<Envelope> recentLogs(RecentLogsRequest request) {
-        return get(builder -> builder.pathSegment("apps", request.getApplicationId(), "recentlogs"))
-            .flatMapMany(response -> MultipartCodec.decode(response)
-                .map(ReactorDopplerEndpoints::toEnvelope))
+        return get(builder -> builder.pathSegment("apps", request.getApplicationId(), "recentlogs"), MultipartCodec::createDecoder, MultipartCodec::decode).map(ReactorDopplerEndpoints::toEnvelope)
             .checkpoint();
     }
 
     Flux<Envelope> stream(StreamRequest request) {
-        return ws(builder -> builder.pathSegment("apps", request.getApplicationId(), "stream"))
-            .flatMapMany(response -> response.receiveWebsocket().aggregateFrames().receive().asInputStream()
-                .map(ReactorDopplerEndpoints::toEnvelope))
+        return ws(builder -> builder.pathSegment("apps", request.getApplicationId(), "stream")).map(ReactorDopplerEndpoints::toEnvelope)
             .checkpoint();
     }
 

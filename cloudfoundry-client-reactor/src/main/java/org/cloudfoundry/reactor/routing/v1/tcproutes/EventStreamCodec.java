@@ -18,7 +18,8 @@ package org.cloudfoundry.reactor.routing.v1.tcproutes;
 
 import io.netty.handler.codec.LineBasedFrameDecoder;
 import reactor.core.publisher.Flux;
-import reactor.ipc.netty.http.client.HttpClientResponse;
+import reactor.netty.ByteBufFlux;
+import reactor.netty.http.client.HttpClientResponse;
 
 final class EventStreamCodec {
 
@@ -27,17 +28,17 @@ final class EventStreamCodec {
     private EventStreamCodec() {
     }
 
-    static Flux<ServerSentEvent> decode(HttpClientResponse response) {
-        return response.addHandler(createDecoder()).receive().asString()
+    static LineBasedFrameDecoder createDecoder(HttpClientResponse response) {
+        return new LineBasedFrameDecoder(MAX_PAYLOAD_SIZE);
+    }
+
+    static Flux<ServerSentEvent> decode(ByteBufFlux body) {
+        return body.asString()
             .windowWhile(s -> !s.isEmpty())
             .concatMap(window -> window
                 .reduce(ServerSentEvent.builder(), EventStreamCodec::parseLine))
             .map(ServerSentEvent.Builder::build)
             .filter(sse -> sse.getData() != null || sse.getEventType() != null || sse.getId() != null || sse.getRetry() != null);
-    }
-
-    private static LineBasedFrameDecoder createDecoder() {
-        return new LineBasedFrameDecoder(MAX_PAYLOAD_SIZE);
     }
 
     private static Field parseField(String line) {

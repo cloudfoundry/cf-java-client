@@ -17,7 +17,7 @@
 package org.cloudfoundry.uaa.clients;
 
 /*
-* An interface that indicates the type of a UAA mixed action
+ * An interface that indicates the type of a UAA mixed action
  */
 public interface Action {
 

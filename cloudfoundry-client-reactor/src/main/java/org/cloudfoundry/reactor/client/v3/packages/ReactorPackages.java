@@ -39,12 +39,11 @@ import org.cloudfoundry.util.FileUtils;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.netty.ByteBufFlux;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
 
 /**
  * The Reactor-based implementation of {@link Packages}
@@ -55,7 +54,7 @@ public final class ReactorPackages extends AbstractClientV3Operations implements
      * Creates an instance
      *
      * @param connectionContext the {@link ConnectionContext} to use when communicating with the server
-     * @param root              the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
+     * @param root              the root URI of the server. Typically something like {@code https://api.run.pivotal.io}.
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      */
     public ReactorPackages(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
@@ -82,8 +81,7 @@ public final class ReactorPackages extends AbstractClientV3Operations implements
 
     @Override
     public Flux<byte[]> download(DownloadPackageRequest request) {
-        return get(request, builder -> builder.pathSegment("packages", request.getPackageId(), "download"))
-            .flatMapMany(response -> response.receive().aggregate().asByteArray())
+        return get(request, builder -> builder.pathSegment("packages", request.getPackageId(), "download"), ByteBufFlux::asByteArray)
             .checkpoint();
     }
 
@@ -107,33 +105,36 @@ public final class ReactorPackages extends AbstractClientV3Operations implements
 
     @Override
     public Mono<UploadPackageResponse> upload(UploadPackageRequest request) {
-        return post(request, UploadPackageResponse.class, builder -> builder.pathSegment("packages", request.getPackageId(), "upload"),
-            outbound -> outbound
-                .flatMap(r -> {
-                    if (Files.isDirectory(request.getBits())) {
-                        return FileUtils.compress(request.getBits())
-                            .flatMap(bits -> upload(bits, r)
-                                .doOnTerminate(() -> {
-                                    try {
-                                        Files.delete(bits);
-                                    } catch (IOException e) {
-                                        throw Exceptions.propagate(e);
-                                    }
-                                })
-                            );
-                    } else {
-                        return upload(request.getBits(), r);
+        Path bits = request.getBits();
+
+        if (bits.toFile().isDirectory()) {
+            return FileUtils.compress(bits)
+                .map(temporaryFile -> UploadPackageRequest.builder()
+                    .from(request)
+                    .bits(temporaryFile)
+                    .build())
+                .flatMap(requestWithTemporaryFile -> upload(requestWithTemporaryFile, () -> {
+                    try {
+                        Files.delete(requestWithTemporaryFile.getBits());
+                    } catch (IOException e) {
+                        throw Exceptions.propagate(e);
                     }
-                }))
+                }));
+        } else {
+            return upload(request, () -> {
+            });
+        }
+    }
+
+    private Mono<UploadPackageResponse> upload(UploadPackageRequest request, Runnable onTerminate) {
+        return post(request, UploadPackageResponse.class, builder -> builder.pathSegment("packages", request.getPackageId(), "upload"), outbound -> upload(request.getBits(), outbound), onTerminate)
             .checkpoint();
     }
 
-    private Mono<Void> upload(Path bits, MultipartHttpClientRequest r) {
-        return r
-            .addPart(part -> part
-                .setContentDispositionFormData("bits", "application.zip")
-                .setHeader(CONTENT_TYPE, APPLICATION_ZIP)
-                .sendFile(bits))
+    private void upload(Path bits, MultipartHttpClientRequest r) {
+        r.addPart(part -> part.setName("bits")
+            .setContentType(APPLICATION_ZIP)
+            .sendFile(bits))
             .done();
     }
 
