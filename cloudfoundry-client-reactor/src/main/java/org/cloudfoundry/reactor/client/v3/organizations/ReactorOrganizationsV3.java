@@ -20,6 +20,8 @@ import org.cloudfoundry.client.v3.organizations.AssignOrganizationDefaultIsolati
 import org.cloudfoundry.client.v3.organizations.AssignOrganizationDefaultIsolationSegmentResponse;
 import org.cloudfoundry.client.v3.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v3.organizations.CreateOrganizationResponse;
+import org.cloudfoundry.client.v3.organizations.GetOrganizationDefaultDomainRequest;
+import org.cloudfoundry.client.v3.organizations.GetOrganizationDefaultDomainResponse;
 import org.cloudfoundry.client.v3.organizations.GetOrganizationDefaultIsolationSegmentRequest;
 import org.cloudfoundry.client.v3.organizations.GetOrganizationDefaultIsolationSegmentResponse;
 import org.cloudfoundry.client.v3.organizations.GetOrganizationRequest;
@@ -82,6 +84,12 @@ public final class ReactorOrganizationsV3 extends AbstractClientV3Operations imp
     @Override
     public Mono<ListOrganizationsResponse> list(ListOrganizationsRequest request) {
         return get(request, ListOrganizationsResponse.class, builder -> builder.pathSegment("organizations"))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<GetOrganizationDefaultDomainResponse> getDefaultDomain(GetOrganizationDefaultDomainRequest request) {
+        return get(request, GetOrganizationDefaultDomainResponse.class, builder -> builder.pathSegment("organizations", request.getOrganizationId(), "domains", "default"))
             .checkpoint();
     }
 

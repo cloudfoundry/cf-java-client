@@ -63,4 +63,12 @@ public interface OrganizationsV3 {
      */
     Mono<ListOrganizationsResponse> list(ListOrganizationsRequest request);
 
+    /**
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.76.0/index.html#get-default-domain">List Organizations</a> request
+     *
+     * @param request the List Organizations request
+     * @return the response from the List Organizations request
+     */
+    Mono<GetOrganizationDefaultDomainResponse> getDefaultDomain(GetOrganizationDefaultDomainRequest request);
+
 }
