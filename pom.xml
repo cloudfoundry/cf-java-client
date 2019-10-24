@@ -46,6 +46,7 @@
         <netty.version>4.1.42.Final</netty.version>
         <okhttp3.version>3.14.4</okhttp3.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <reactor.version>Californium-BUILD-SNAPSHOT</reactor.version>
         <wire.version>2.2.0</wire.version>
     </properties>
 
@@ -55,6 +56,13 @@
                 <groupId>io.netty</groupId>
                 <artifactId>netty-bom</artifactId>
                 <version>${netty.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.projectreactor</groupId>
+                <artifactId>reactor-bom</artifactId>
+                <version>${reactor.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -223,6 +231,18 @@
             <url>https://jcenter.bintray.com</url>
         </pluginRepository>
     </pluginRepositories>
+
+    <!--TODO: Remove once testing against Reactor Snapshots is complete -->
+    <repositories>
+        <repository>
+            <id>spring-snapshot</id>
+            <name>Spring Snapshots</name>
+            <url>https://repo.spring.io/snapshot</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 
     <profiles>
         <profile>
