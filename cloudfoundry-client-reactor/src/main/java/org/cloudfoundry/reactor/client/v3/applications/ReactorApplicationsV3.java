@@ -62,6 +62,7 @@ import org.cloudfoundry.client.v3.applications.UpdateApplicationResponse;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
+
 import reactor.core.publisher.Mono;
 
 /**
@@ -172,7 +173,7 @@ public final class ReactorApplicationsV3 extends AbstractClientV3Operations impl
 
     @Override
     public Mono<ScaleApplicationResponse> scale(ScaleApplicationRequest request) {
-        return put(request, ScaleApplicationResponse.class, builder -> builder.pathSegment("apps", request.getApplicationId(), "processes", request.getType(), "actions", "scale"))
+        return post(request, ScaleApplicationResponse.class, builder -> builder.pathSegment("apps", request.getApplicationId(), "processes", request.getType(), "actions", "scale"))
             .checkpoint();
     }
 
