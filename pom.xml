@@ -38,34 +38,18 @@
 
     <properties>
         <commons-compress.version>1.19</commons-compress.version>
-        <dependencies.version>2.1.9.RELEASE</dependencies.version>
+        <dependencies.version>2.1.10.BUILD-SNAPSHOT</dependencies.version>
         <evo-inflector.version>1.2.2</evo-inflector.version>
         <immutables.version>2.7.4</immutables.version>
         <java-semver.version>0.9.0</java-semver.version>
         <jjwt.version>0.9.1</jjwt.version>
-        <netty.version>4.1.42.Final</netty.version>
         <okhttp3.version>3.14.4</okhttp3.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <reactor.version>Californium-BUILD-SNAPSHOT</reactor.version>
         <wire.version>2.2.0</wire.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>io.netty</groupId>
-                <artifactId>netty-bom</artifactId>
-                <version>${netty.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>io.projectreactor</groupId>
-                <artifactId>reactor-bom</artifactId>
-                <version>${reactor.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
@@ -232,7 +216,7 @@
         </pluginRepository>
     </pluginRepositories>
 
-    <!--TODO: Remove once testing against Reactor Snapshots is complete -->
+    <!--TODO: Remove once testing against Boot Snapshots is complete -->
     <repositories>
         <repository>
             <id>spring-snapshot</id>
