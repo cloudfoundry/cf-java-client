@@ -136,7 +136,7 @@ public final class ErrorPayloadMappersTest {
                 assertThat(t).isInstanceOf(ClientV3Exception.class)
                     .hasMessage("CF-UnprocessableEntity(10008): something went wrong")
                     .extracting("statusCode")
-                    .containsExactly(BAD_REQUEST.code());
+                    .isEqualTo(BAD_REQUEST.code());
 
                 assertThat(((ClientV3Exception) t).getErrors()).flatExtracting(org.cloudfoundry.client.v3.Error::getCode,
                     org.cloudfoundry.client.v3.Error::getDetail,
@@ -171,7 +171,7 @@ public final class ErrorPayloadMappersTest {
                 assertThat(t).isInstanceOf(ClientV3Exception.class)
                     .hasMessage("CF-UnprocessableEntity(10008): something went wrong")
                     .extracting("statusCode")
-                    .containsExactly(INTERNAL_SERVER_ERROR.code());
+                    .isEqualTo(INTERNAL_SERVER_ERROR.code());
 
                 assertThat(((ClientV3Exception) t).getErrors()).flatExtracting(org.cloudfoundry.client.v3.Error::getCode,
                     org.cloudfoundry.client.v3.Error::getDetail,

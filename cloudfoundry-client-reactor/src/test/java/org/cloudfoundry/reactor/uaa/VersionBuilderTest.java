@@ -22,7 +22,7 @@ import org.junit.Test;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 
 public final class VersionBuilderTest {
@@ -38,13 +38,13 @@ public final class VersionBuilderTest {
     @Test
     public void augmentNotVersioned() {
         VersionBuilder.augment(this.outbound, new Object());
-        verifyZeroInteractions(this.outbound);
+        verifyNoInteractions(this.outbound);
     }
 
     @Test
     public void augmentNullVersion() {
         VersionBuilder.augment(this.outbound, new StubVersioned(null));
-        verifyZeroInteractions(this.outbound);
+        verifyNoInteractions(this.outbound);
     }
 
     private static final class StubVersioned implements Versioned {

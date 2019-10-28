@@ -2,16 +2,16 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
-      <profile name="Annotation profile for Cloud Foundry Java Client Parent" enabled="true">
-        <sourceOutputDir name="../target/generated-sources/annotations" />
-        <sourceTestOutputDir name="../target/generated-test-sources/test-annotations" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="cloudfoundry-client" />
-        <module name="cloudfoundry-operations" />
-        <module name="integration-test" />
-        <module name="cloudfoundry-util" />
         <module name="cloudfoundry-client-reactor" />
         <module name="test-service-broker" />
+        <module name="integration-test" />
+        <module name="cloudfoundry-operations" />
+        <module name="cloudfoundry-client" />
+        <module name="cloudfoundry-util" />
       </profile>
     </annotationProcessing>
   </component>

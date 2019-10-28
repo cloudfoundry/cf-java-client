@@ -42,7 +42,7 @@ public final class ClientV3ExceptionTest {
         assertThat(exception)
             .hasNoCause()
             .hasMessage("test-title-1(-2): test-detail-1, test-title-2(-3): test-detail-2")
-            .extracting("statusCode").containsExactly(-1);
+            .extracting("statusCode").isEqualTo(-1);
 
         assertThat(exception.getErrors())
             .flatExtracting(Error::getCode, Error::getDetail, Error::getTitle)
