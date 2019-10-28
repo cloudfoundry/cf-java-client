@@ -22,7 +22,7 @@ import org.junit.Test;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 public final class IdentityZoneBuilderTest {
 
@@ -40,7 +40,7 @@ public final class IdentityZoneBuilderTest {
     public void augmentNotIdentityZoned() {
         IdentityZoneBuilder.augment(this.outbound, new Object());
 
-        verifyZeroInteractions(this.outbound);
+        verifyNoInteractions(this.outbound);
     }
 
     private static final class StubIdentityZoned implements IdentityZoned {
