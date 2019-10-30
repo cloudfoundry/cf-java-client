@@ -1,0 +1,38 @@
+{
+  "guid": "cbad697f-cac1-48f4-9017-ac08f39dfb31",
+  "host": "test-host",
+  "path": "/some_path",
+  "url": "test-host.a-domain.com/some_path",
+  "created_at": "2019-11-01T17:17:48Z",
+  "updated_at": "2019-11-01T17:17:48Z",
+  "metadata": {
+    "labels": { },
+    "annotations": { }
+  },
+  "relationships": {
+    "space": {
+      "data": {
+        "guid": "test-space-id"
+      }
+    },
+    "domain": {
+      "data": {
+        "guid": "test-domain-id"
+      }
+    }
+  },
+  "links": {
+    "self": {
+      "href": "https://api.example.org/v3/routes/cbad697f-cac1-48f4-9017-ac08f39dfb31"
+    },
+    "space": {
+      "href": "https://api.example.org/v3/spaces/test-space-id"
+    },
+    "domain": {
+      "href": "https://api.example.org/v3/domains/test-domain-id"
+    },
+    "destinations": {
+      "href": "https://api.example.org/v3/routes/cbad697f-cac1-48f4-9017-ac08f39dfb31/destinations"
+    }
+  }
+}

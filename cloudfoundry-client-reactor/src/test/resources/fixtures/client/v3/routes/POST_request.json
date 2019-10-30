@@ -1,0 +1,16 @@
+{
+	"host": "test-hostname",
+	"path": "/some_path",
+	"relationships": {
+		"domain": {
+			"data": { "guid": "domain-guid" }
+		},
+		"space": {
+			"data": { "guid": "space-guid" }
+		}
+	},
+	"metadata": {
+		"labels": { "test-label": "test-label-value" },
+		"annotations": { "note": "detailed information"}
+	}
+}

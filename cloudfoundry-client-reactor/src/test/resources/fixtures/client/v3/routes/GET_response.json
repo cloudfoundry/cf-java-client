@@ -1,0 +1,56 @@
+{
+  "pagination": {
+    "total_results": 3,
+    "total_pages": 2,
+    "first": {
+      "href": "https://api.example.org/v3/routes?page=1&per_page=2"
+    },
+    "last": {
+      "href": "https://api.example.org/v3/routes?page=2&per_page=2"
+    },
+    "next": {
+      "href": "https://api.example.org/v3/routes?page=2&per_page=2"
+    },
+    "previous": null
+  },
+  "resources": [
+    {
+      "guid": "cbad697f-cac1-48f4-9017-ac08f39dfb31",
+      "host": "test-hostname",
+      "path": "/some_path",
+      "url": "test-hostname.a-domain.com/some_path",
+      "created_at": "2019-11-01T17:17:48Z",
+      "updated_at": "2019-11-01T17:17:48Z",
+      "metadata": {
+        "labels": { "test-label": "test-label-value" },
+        "annotations": { "note": "detailed information"}
+      },
+      "relationships": {
+        "space": {
+          "data": {
+            "guid": "space-guid"
+          }
+        },
+        "domain": {
+          "data": {
+            "guid": "domain-guid"
+          }
+        }
+      },
+      "links": {
+        "self": {
+          "href": "https://api.example.org/v3/routes/cbad697f-cac1-48f4-9017-ac08f39dfb31"
+        },
+        "space": {
+          "href": "https://api.example.org/v3/spaces/space-guid"
+        },
+        "domain": {
+          "href": "https://api.example.org/v3/domains/domain-guid"
+        },
+        "destinations": {
+          "href": "https://api.example.org/v3/routes/cbad697f-cac1-48f4-9017-ac08f39dfb31/destinations"
+        }
+      }
+    }
+  ]
+}

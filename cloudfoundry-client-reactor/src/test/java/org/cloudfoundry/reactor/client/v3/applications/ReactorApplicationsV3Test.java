@@ -55,6 +55,8 @@ import org.cloudfoundry.client.v3.applications.ListApplicationPackagesRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationPackagesResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationProcessesRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationProcessesResponse;
+import org.cloudfoundry.client.v3.applications.ListApplicationRoutesRequest;
+import org.cloudfoundry.client.v3.applications.ListApplicationRoutesResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationTasksRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationTasksResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
@@ -91,6 +93,9 @@ import org.cloudfoundry.client.v3.processes.ProcessResource;
 import org.cloudfoundry.client.v3.processes.ProcessState;
 import org.cloudfoundry.client.v3.processes.ProcessStatisticsResource;
 import org.cloudfoundry.client.v3.processes.ProcessUsage;
+import org.cloudfoundry.client.v3.routes.ListRoutesRequest;
+import org.cloudfoundry.client.v3.routes.RouteRelationships;
+import org.cloudfoundry.client.v3.routes.RouteResource;
 import org.cloudfoundry.client.v3.tasks.Result;
 import org.cloudfoundry.client.v3.tasks.TaskResource;
 import org.cloudfoundry.client.v3.tasks.TaskState;
@@ -1166,6 +1171,76 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
                         .build())
                     .link("droplet", Link.builder()
                         .href("https://api.example.org/v3/droplets/740ebd2b-162b-469a-bd72-3edb96fabd9a")
+                        .build())
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void listRoutes(){
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/apps/test-application-id/routes")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v3/apps/GET_{id}_routes_response.json")
+                .build())
+            .build());
+        this.applications
+            .listRoutes(ListApplicationRoutesRequest.builder()
+                .applicationId("test-application-id")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ListApplicationRoutesResponse.builder()
+                .pagination(Pagination.builder()
+                    .totalResults(3)
+                    .totalPages(2)
+                    .first(Link.builder()
+                        .href("https://api.example.org/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5/routes?page=1&per_page=2")
+                        .build())
+                    .last(Link.builder()
+                        .href("https://api.example.org/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5/routes?page=2&per_page=2")
+                        .build())
+                    .next(Link.builder()
+                        .href("https://api.example.org/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5/routes?page=2&per_page=2")
+                        .build())
+                    .build())
+                .resource(RouteResource.builder().host("test-hostname")
+                    .id("cbad697f-cac1-48f4-9017-ac08f39dfb31")
+                    .path("/some_path")
+                    .url("test-hostname.a-domain.com/some_path")
+                    .createdAt("2019-11-01T17:17:48Z")
+                    .updatedAt("2019-11-01T17:17:48Z")
+                    .metadata(Metadata.builder()
+                        .label("test-label", "test-label-value")
+                        .annotation("note", "detailed information")
+                        .build())
+                    .relationships(RouteRelationships.builder()
+                        .space(ToOneRelationship.builder()
+                            .data(Relationship.builder()
+                                .id("space-guid")
+                                .build())
+                            .build())
+                        .domain(ToOneRelationship.builder()
+                            .data(Relationship.builder()
+                                .id("domain-guid")
+                                .build())
+                            .build())
+                        .build())
+                    .link("self", Link.builder()
+                        .href("https://api.example.org/v3/routes/cbad697f-cac1-48f4-9017-ac08f39dfb31")
+                        .build())
+                    .link("space", Link.builder()
+                        .href("https://api.example.org/v3/spaces/space-guid")
+                        .build())
+                    .link("domain", Link.builder()
+                        .href("https://api.example.org/v3/domains/domain-guid")
+                        .build())
+                    .link("destinations", Link.builder()
+                        .href("https://api.example.org/v3/routes/cbad697f-cac1-48f4-9017-ac08f39dfb31/destinations")
                         .build())
                     .build())
                 .build())
