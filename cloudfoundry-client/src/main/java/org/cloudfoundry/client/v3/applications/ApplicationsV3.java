@@ -144,6 +144,14 @@ public interface ApplicationsV3 {
     Mono<ListApplicationTasksResponse> listTasks(ListApplicationTasksRequest request);
 
     /**
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.77.0/index.html#list-routes-for-an-app">List Application Routes</a> request
+     *
+     * @param request the List Application Routes request
+     * @return the response from the List Application Routes request
+     */
+       Mono<ListApplicationRoutesResponse> listRoutes(ListApplicationRoutesRequest request);
+
+    /**
      * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/#scale-a-process">Scale Application</a> request
      *
      * @param request the Scale Application request

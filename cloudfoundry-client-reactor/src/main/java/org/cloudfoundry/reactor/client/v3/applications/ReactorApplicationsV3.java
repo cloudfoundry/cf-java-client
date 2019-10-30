@@ -16,49 +16,8 @@
 
 package org.cloudfoundry.reactor.client.v3.applications;
 
-import org.cloudfoundry.client.v3.applications.ApplicationsV3;
-import org.cloudfoundry.client.v3.applications.CreateApplicationRequest;
-import org.cloudfoundry.client.v3.applications.CreateApplicationResponse;
-import org.cloudfoundry.client.v3.applications.DeleteApplicationRequest;
-import org.cloudfoundry.client.v3.applications.GetApplicationCurrentDropletRelationshipRequest;
-import org.cloudfoundry.client.v3.applications.GetApplicationCurrentDropletRelationshipResponse;
-import org.cloudfoundry.client.v3.applications.GetApplicationCurrentDropletRequest;
-import org.cloudfoundry.client.v3.applications.GetApplicationCurrentDropletResponse;
-import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentRequest;
-import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentResponse;
-import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentVariablesRequest;
-import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentVariablesResponse;
-import org.cloudfoundry.client.v3.applications.GetApplicationProcessRequest;
-import org.cloudfoundry.client.v3.applications.GetApplicationProcessResponse;
-import org.cloudfoundry.client.v3.applications.GetApplicationProcessStatisticsRequest;
-import org.cloudfoundry.client.v3.applications.GetApplicationProcessStatisticsResponse;
-import org.cloudfoundry.client.v3.applications.GetApplicationRequest;
-import org.cloudfoundry.client.v3.applications.GetApplicationResponse;
-import org.cloudfoundry.client.v3.applications.ListApplicationBuildsRequest;
-import org.cloudfoundry.client.v3.applications.ListApplicationBuildsResponse;
-import org.cloudfoundry.client.v3.applications.ListApplicationDropletsRequest;
-import org.cloudfoundry.client.v3.applications.ListApplicationDropletsResponse;
-import org.cloudfoundry.client.v3.applications.ListApplicationPackagesRequest;
-import org.cloudfoundry.client.v3.applications.ListApplicationPackagesResponse;
-import org.cloudfoundry.client.v3.applications.ListApplicationProcessesRequest;
-import org.cloudfoundry.client.v3.applications.ListApplicationProcessesResponse;
-import org.cloudfoundry.client.v3.applications.ListApplicationTasksRequest;
-import org.cloudfoundry.client.v3.applications.ListApplicationTasksResponse;
-import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
-import org.cloudfoundry.client.v3.applications.ListApplicationsResponse;
-import org.cloudfoundry.client.v3.applications.ScaleApplicationRequest;
-import org.cloudfoundry.client.v3.applications.ScaleApplicationResponse;
-import org.cloudfoundry.client.v3.applications.SetApplicationCurrentDropletRequest;
-import org.cloudfoundry.client.v3.applications.SetApplicationCurrentDropletResponse;
-import org.cloudfoundry.client.v3.applications.StartApplicationRequest;
-import org.cloudfoundry.client.v3.applications.StartApplicationResponse;
-import org.cloudfoundry.client.v3.applications.StopApplicationRequest;
-import org.cloudfoundry.client.v3.applications.StopApplicationResponse;
-import org.cloudfoundry.client.v3.applications.TerminateApplicationInstanceRequest;
-import org.cloudfoundry.client.v3.applications.UpdateApplicationEnvironmentVariablesRequest;
-import org.cloudfoundry.client.v3.applications.UpdateApplicationEnvironmentVariablesResponse;
-import org.cloudfoundry.client.v3.applications.UpdateApplicationRequest;
-import org.cloudfoundry.client.v3.applications.UpdateApplicationResponse;
+import org.cloudfoundry.client.v3.applications.ListApplicationRoutesRequest;
+import org.cloudfoundry.client.v3.applications.*;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
@@ -167,6 +126,12 @@ public final class ReactorApplicationsV3 extends AbstractClientV3Operations impl
     @Override
     public Mono<ListApplicationTasksResponse> listTasks(ListApplicationTasksRequest request) {
         return get(request, ListApplicationTasksResponse.class, builder -> builder.pathSegment("apps", request.getApplicationId(), "tasks"))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<ListApplicationRoutesResponse> listRoutes(ListApplicationRoutesRequest request) {
+        return get(request, ListApplicationRoutesResponse.class, builder -> builder.pathSegment("apps", request.getApplicationId(), "routes"))
             .checkpoint();
     }
 

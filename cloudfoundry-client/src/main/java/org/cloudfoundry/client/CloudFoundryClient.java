@@ -56,6 +56,7 @@ import org.cloudfoundry.client.v3.jobs.JobsV3;
 import org.cloudfoundry.client.v3.organizations.OrganizationsV3;
 import org.cloudfoundry.client.v3.packages.Packages;
 import org.cloudfoundry.client.v3.processes.Processes;
+import org.cloudfoundry.client.v3.routes.RoutesV3;
 import org.cloudfoundry.client.v3.serviceInstances.ServiceInstancesV3;
 import org.cloudfoundry.client.v3.servicebindings.ServiceBindingsV3;
 import org.cloudfoundry.client.v3.spaces.SpacesV3;
@@ -195,6 +196,11 @@ public interface CloudFoundryClient {
      * Main entry point to the Cloud Foundry Routes Client API
      */
     Routes routes();
+
+    /**
+     * Main entry point to the Cloud Foundry Routes V3 Client API
+     */
+    RoutesV3 routesV3();
 
     /**
      * Main entry point to the Cloud Foundry Security Groups Client API

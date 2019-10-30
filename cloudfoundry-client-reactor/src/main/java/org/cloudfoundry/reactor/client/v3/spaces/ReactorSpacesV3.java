@@ -16,17 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v3.spaces;
 
-import org.cloudfoundry.client.v3.spaces.AssignSpaceIsolationSegmentRequest;
-import org.cloudfoundry.client.v3.spaces.AssignSpaceIsolationSegmentResponse;
-import org.cloudfoundry.client.v3.spaces.CreateSpaceRequest;
-import org.cloudfoundry.client.v3.spaces.CreateSpaceResponse;
-import org.cloudfoundry.client.v3.spaces.GetSpaceIsolationSegmentRequest;
-import org.cloudfoundry.client.v3.spaces.GetSpaceIsolationSegmentResponse;
-import org.cloudfoundry.client.v3.spaces.GetSpaceRequest;
-import org.cloudfoundry.client.v3.spaces.GetSpaceResponse;
-import org.cloudfoundry.client.v3.spaces.ListSpacesRequest;
-import org.cloudfoundry.client.v3.spaces.ListSpacesResponse;
-import org.cloudfoundry.client.v3.spaces.SpacesV3;
+import org.cloudfoundry.client.v3.spaces.*;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
@@ -75,6 +65,11 @@ public final class ReactorSpacesV3 extends AbstractClientV3Operations implements
     @Override
     public Mono<ListSpacesResponse> list(ListSpacesRequest request) {
         return get(request, ListSpacesResponse.class, builder -> builder.pathSegment("spaces"))
+            .checkpoint();
+    }
+
+    @Override public Mono<String> deleteUnmappedRoutes(DeleteUnmappedRoutesRequest request) {
+        return delete(request, builder -> builder.pathSegment("spaces", request.getSpaceId(), "routes"))
             .checkpoint();
     }
 

@@ -24,6 +24,7 @@ import org.cloudfoundry.client.v3.spaces.AssignSpaceIsolationSegmentRequest;
 import org.cloudfoundry.client.v3.spaces.AssignSpaceIsolationSegmentResponse;
 import org.cloudfoundry.client.v3.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v3.spaces.CreateSpaceResponse;
+import org.cloudfoundry.client.v3.spaces.DeleteUnmappedRoutesRequest;
 import org.cloudfoundry.client.v3.spaces.GetSpaceIsolationSegmentRequest;
 import org.cloudfoundry.client.v3.spaces.GetSpaceIsolationSegmentResponse;
 import org.cloudfoundry.client.v3.spaces.GetSpaceRequest;
@@ -41,9 +42,11 @@ import reactor.test.StepVerifier;
 
 import java.time.Duration;
 
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.PATCH;
 import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public class ReactorSpacesV3Test extends AbstractClientApiTest {
@@ -242,6 +245,28 @@ public class ReactorSpacesV3Test extends AbstractClientApiTest {
                         .build())
                     .build())
                 .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void delete() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(DELETE).path("/spaces/test-space-id/routes?unmapped=true")
+                .build())
+            .response(TestResponse.builder()
+                .status(ACCEPTED)
+                .header("Location", "https://api.example.org/v3/jobs/test-space-id")
+                .build())
+            .build());
+
+        this.spaces
+            .deleteUnmappedRoutes(DeleteUnmappedRoutesRequest.builder()
+                .spaceId("test-space-id")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext("test-space-id")
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }

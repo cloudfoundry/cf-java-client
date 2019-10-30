@@ -63,4 +63,11 @@ public interface SpacesV3 {
      */
     Mono<ListSpacesResponse> list(ListSpacesRequest request);
 
+    /**
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.77.0/index.html#delete-unmapped-routes-for-a-space">Delete Unmapped Routes</a> request
+     *
+     * @param request the Delete Unmapped Routes in Space request
+     * @return the response from the Delete Unmapped Routes in Space request
+     */
+    Mono<String> deleteUnmappedRoutes(DeleteUnmappedRoutesRequest request);
 }
