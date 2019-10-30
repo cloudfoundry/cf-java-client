@@ -16,9 +16,11 @@
 
 package org.cloudfoundry.client.v3.packages;
 
+import org.cloudfoundry.Nullable;
+import org.immutables.value.Value;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.immutables.value.Value;
 
 /**
  * Data type for docker packages
@@ -37,12 +39,14 @@ abstract class _DockerData implements PackageData {
      * The password for the image's registry
      */
     @JsonProperty("password")
+    @Nullable
     abstract String getPassword();
 
     /**
      * The username for the image's registry
      */
     @JsonProperty("username")
+    @Nullable
     abstract String getUsername();
 
 }
