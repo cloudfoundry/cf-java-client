@@ -96,6 +96,7 @@ import org.cloudfoundry.reactor.client.v2.stacks.ReactorStacks;
 import org.cloudfoundry.reactor.client.v2.userprovidedserviceinstances.ReactorUserProvidedServiceInstances;
 import org.cloudfoundry.reactor.client.v2.users.ReactorUsers;
 import org.cloudfoundry.reactor.client.v3.applications.ReactorApplicationsV3;
+import org.cloudfoundry.reactor.client.v3.auditevents.ReactorAuditEventsV3;
 import org.cloudfoundry.reactor.client.v3.builds.ReactorBuilds;
 import org.cloudfoundry.reactor.client.v3.deployments.ReactorDeploymentsV3;
 import org.cloudfoundry.reactor.client.v3.domains.ReactorDomainsV3;
@@ -197,6 +198,12 @@ abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
     @Value.Derived
     public Events events() {
         return new ReactorEvents(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
+    }
+
+    @Override
+    @Value.Derived
+    public ReactorAuditEventsV3 eventsV3() {
+        return new ReactorAuditEventsV3(getConnectionContext(), getRootV2(), getTokenProvider());
     }
 
     @Override
