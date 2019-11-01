@@ -48,6 +48,7 @@ import org.cloudfoundry.client.v2.stacks.Stacks;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstances;
 import org.cloudfoundry.client.v2.users.Users;
 import org.cloudfoundry.client.v3.applications.ApplicationsV3;
+import org.cloudfoundry.client.v3.auditevents.AuditEventsV3;
 import org.cloudfoundry.client.v3.builds.Builds;
 import org.cloudfoundry.client.v3.deployments.DeploymentsV3;
 import org.cloudfoundry.client.v3.droplets.Droplets;
@@ -125,6 +126,11 @@ public interface CloudFoundryClient {
      * Main entry point to the Cloud Foundry Events Client API
      */
     Events events();
+
+    /**
+     * Main entry point to the Cloud Foundry Audit Events V3 Client API
+     */
+    AuditEventsV3 eventsV3();
 
     /**
      * Main entry point to the Cloud Foundry Feature Flags Client API
