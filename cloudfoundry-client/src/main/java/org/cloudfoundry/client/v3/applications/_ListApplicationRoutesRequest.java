@@ -1,12 +1,13 @@
 package org.cloudfoundry.client.v3.applications;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.FilterParameter;
 import org.cloudfoundry.client.v3.PaginatedRequest;
 import org.immutables.value.Value;
+import org.immutables.value.internal.$processor$.meta.$BuilderMirrors;
+
+import java.util.List;
 
 @Value.Immutable
 public abstract class _ListApplicationRoutesRequest extends PaginatedRequest {
@@ -29,13 +30,11 @@ public abstract class _ListApplicationRoutesRequest extends PaginatedRequest {
     @FilterParameter("paths")
     abstract List<String> getPaths();
 
-
     /**
      * The domain guids
      */
     @FilterParameter("domain_guids")
     abstract List<String> getDomainGuids();
-
 
     /**
      * The space guids

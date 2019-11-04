@@ -27,6 +27,12 @@ public class ReactorRoutesV3 extends AbstractClientV3Operations implements Route
     }
 
     @Override
+    public Mono<String> delete(DeleteRouteRequest request) {
+        return delete(request,
+            uriComponentsBuilder -> uriComponentsBuilder.pathSegment("routes", request.getRouteId())).checkpoint();
+    }
+
+    @Override
     public Mono<GetRouteResponse> get(GetRouteRequest request) {
         return get(request, GetRouteResponse.class,
             uriComponentsBuilder -> uriComponentsBuilder.pathSegment("routes", request.getRouteId())).checkpoint();
@@ -40,12 +46,6 @@ public class ReactorRoutesV3 extends AbstractClientV3Operations implements Route
     @Override
     public Mono<UpdateRouteResponse> update(UpdateRouteRequest request) {
         return patch(request, UpdateRouteResponse.class,
-            uriComponentsBuilder -> uriComponentsBuilder.pathSegment("routes", request.getRouteId())).checkpoint();
-    }
-
-    @Override
-    public Mono<String> delete(DeleteRouteRequest request) {
-        return delete(request,
             uriComponentsBuilder -> uriComponentsBuilder.pathSegment("routes", request.getRouteId())).checkpoint();
     }
 }

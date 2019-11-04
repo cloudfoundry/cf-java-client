@@ -22,8 +22,7 @@ public class GetRouteRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noRouteId() {
-        GetRouteRequest
-            .builder()
+        GetRouteRequest.builder()
             .build();
     }
 

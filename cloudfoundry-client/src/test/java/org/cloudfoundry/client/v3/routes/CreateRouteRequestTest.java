@@ -18,14 +18,40 @@ package org.cloudfoundry.client.v3.routes;
 
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.ToOneRelationship;
-import org.junit.Rule;
 import org.junit.Test;
 
 public final class CreateRouteRequestTest {
 
     @Test(expected = IllegalStateException.class)
-    public void invalid() {
+    public void invalidWithMissingRelationship() {
         CreateRouteRequest.builder().build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void invalidWithMissingSpaceRelationship() {
+        CreateRouteRequest.builder()
+            .relationships(RouteRelationships
+                .builder()
+                .domain(ToOneRelationship.builder()
+                    .data(Relationship.builder()
+                        .id("test-domain-id")
+                        .build()).build())
+                .build())
+            .build();
+    }
+
+
+    @Test(expected = IllegalStateException.class)
+    public void invalidWithMissingDomainRelationship() {
+        CreateRouteRequest.builder()
+            .relationships(RouteRelationships
+                .builder()
+                .space(ToOneRelationship.builder()
+                    .data(Relationship.builder()
+                        .id("test-space-id")
+                        .build()).build())
+                .build())
+            .build();
     }
 
     @Test
@@ -33,12 +59,12 @@ public final class CreateRouteRequestTest {
         CreateRouteRequest.builder().relationships(RouteRelationships.builder()
             .domain(ToOneRelationship.builder()
                 .data(Relationship.builder()
-                    .id("test")
+                    .id("test-domain-id")
                     .build())
                 .build())
             .space(ToOneRelationship.builder()
                 .data(Relationship.builder()
-                    .id("test-space")
+                    .id("test-space-id")
                     .build())
                 .build())
             .build());

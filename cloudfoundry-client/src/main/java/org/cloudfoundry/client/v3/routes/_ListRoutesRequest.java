@@ -1,11 +1,11 @@
 package org.cloudfoundry.client.v3.routes;
 
-import java.util.List;
-
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.FilterParameter;
 import org.cloudfoundry.client.v3.PaginatedRequest;
 import org.immutables.value.Value;
+
+import java.util.List;
 
 /**
  * The request payload for the List Routes operation
@@ -30,20 +30,20 @@ public abstract class _ListRoutesRequest extends PaginatedRequest {
      * The domain guids
      */
     @FilterParameter("domain_guids")
-    abstract List<String> getDomainGuids();
+    abstract List<String> getDomainIds();
 
 
     /**
      * The space guids
      */
     @FilterParameter("space_guids")
-    abstract List<String> getSpaceGuids();
+    abstract List<String> getSpaceIds();
 
     /**
      * The organization guids
      */
     @FilterParameter("organization_guids")
-    abstract List<String> getOrganizationGuids();
+    abstract List<String> getOrganizationIds();
 
     /**
      * The metadata query
