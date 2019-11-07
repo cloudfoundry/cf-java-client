@@ -29,6 +29,26 @@
     <packaging>pom</packaging>
     <url>https://github.com/cloudfoundry/cf-java-client</url>
 
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+        </license>
+    </licenses>
+
+    <scm>
+        <url>https://github.com/cloudfoundry/cf-java-client</url>
+    </scm>
+
+    <developers>
+        <developer>
+            <name>Pivotal</name>
+            <email>info@pivotal.io</email>
+            <organization>Pivotal Software, Inc.</organization>
+            <organizationUrl>https://www.cloudfoundry.org</organizationUrl>
+        </developer>
+    </developers>
+
     <modules>
         <module>cloudfoundry-client</module>
         <module>cloudfoundry-client-reactor</module>
