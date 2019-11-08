@@ -18,11 +18,14 @@
 | `deploy`                | [![deploy-master](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/java-client/jobs/deploy-master/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/java-client/jobs/deploy-master)
 
 
-The `cf-java-client` project is a Java language binding for interacting with a Cloud Foundry instance.  The project is broken up into a number of components which expose different levels of abstraction depending on need.
+The `cf-java-client` project is a Java language binding for interacting with a Cloud Foundry instance.  The project is broken up into a number of components that expose different levels of abstraction depending on need.
 
-* `cloudfoundry-client` – Interfaces, request, and response objects mapping to the [Cloud Foundry REST APIs][a].  This project has no implementation and therefore cannot connect a Cloud Foundry instance on its own.
+* `cloudfoundry-client` – Interfaces, request, and response objects mapping to the [Cloud Foundry REST APIs][a].  This project has no implementation and therefore cannot connect to a Cloud Foundry instance on its own.
 * `cloudfoundry-client-reactor` – The default implementation of the `cloudfoundry-client` project.  This implementation is based on the Reactor Netty [`HttpClient`][h].
 * `cloudfoundry-operations` – An API and implementation that corresponds to the [Cloud Foundry CLI][c] operations.  This project builds on the `cloudfoundry-client` and therefore has a single implementation.
+
+## Versions
+The Cloud Foundry Java Client has two active versions. The `4.x` line uses Spring Boot `2.2.x` just to manage its dependencies, while the `3.x` line uses Spring Boot `2.1.x`. Unless you have a specific dependency-related reason for using the older version we recommend you adopt the `4.x` line.
 
 ## Dependencies
 Most projects will need two dependencies; the Operations API and an implementation of the Client API.  For Maven, the dependencies would be defined like this:
@@ -32,22 +35,22 @@ Most projects will need two dependencies; the Operations API and an implementati
     <dependency>
         <groupId>org.cloudfoundry</groupId>
         <artifactId>cloudfoundry-client-reactor</artifactId>
-        <version>3.15.0.RELEASE</version>
+        <version>4.0.1.RELEASE</version>
     </dependency>
     <dependency>
         <groupId>org.cloudfoundry</groupId>
         <artifactId>cloudfoundry-operations</artifactId>
-        <version>3.15.0.RELEASE</version>
+        <version>4.0.1.RELEASE</version>
     </dependency>
     <dependency>
         <groupId>io.projectreactor</groupId>
         <artifactId>reactor-core</artifactId>
-        <version>3.2.12.RELEASE</version>
+        <version>3.3.0.RELEASE</version>
     </dependency>
     <dependency>
         <groupId>io.projectreactor.ipc</groupId>
         <artifactId>reactor-netty</artifactId>
-        <version>0.7.15.RELEASE</version>
+        <version>0.9.1.RELEASE</version>
     </dependency>
     ...
 </dependencies>
@@ -73,10 +76,10 @@ For Gradle, the dependencies would be defined like this:
 
 ```groovy
 dependencies {
-    compile 'org.cloudfoundry:cloudfoundry-client-reactor:3.15.0.RELEASE'
-    compile 'org.cloudfoundry:cloudfoundry-operations:3.15.0.RELEASE'
-    compile 'io.projectreactor:reactor-core:3.2.12.RELEASE'
-    compile 'io.projectreactor.ipc:reactor-netty:0.7.15.RELEASE'
+    compile 'org.cloudfoundry:cloudfoundry-client-reactor:4.0.1.RELEASE'
+    compile 'org.cloudfoundry:cloudfoundry-operations:4.0.1.RELEASE'
+    compile 'io.projectreactor:reactor-core:3.3.0.RELEASE'
+    compile 'io.projectreactor.ipc:reactor-netty:0.9.1.RELEASE'
     ...
 }
 ```
@@ -249,7 +252,7 @@ cloudFoundryClient.organizations()
 
 The above example is more complicated:
 
-1. `.list(...)` – Retrieves a page of Cloud Foundry organizations.
+1. `.list(...)` – Retrieves the first page of Cloud Foundry organizations.
 1. `.flatMapIterable(...)` – Substitutes the original `Mono` with a `Flux` of the `Resource`s returned by the requested page.
 1. `.map(...)` – Maps the `Resource` to an `OrganizationSummary` type.
 
@@ -261,7 +264,7 @@ $ git submodule update --init --recursive
 $ ./mvnw clean install
 ```
 
-It also depends on [Immutables](https://immutables.github.io/) and won't compile in IDEs like Eclipse or IntelliJ unless you also have an enabled annotation processor. See [this guide](https://immutables.github.io/apt.html) for instructions on how to configure your IDE.
+It also depends on [Immutables][i] and won't compile in IDEs like Eclipse or IntelliJ unless you also have an enabled annotation processor. See [this guide][j] for instructions on how to configure your IDE.
 
 To run the integration tests, run the following:
 
@@ -272,7 +275,7 @@ $ ./mvnw -Pintegration-test clean test
 **IMPORTANT**
 Integration tests should be run against an empty Cloud Foundry instance. The integration tests are destructive, affecting nearly everything on an instance given the chance.
 
-The integration tests require a running instance of Cloud Foundry to test against.  We recommend using [PCF Dev][i] to start a local instance to test with.  To configure the integration tests with the appropriate connection information use the following environment variables:
+The integration tests require a running instance of Cloud Foundry to test against. To configure the integration tests with the appropriate connection information use the following environment variables:
 
 Name | Description
 ---- | -----------
@@ -298,7 +301,8 @@ This project is released under version 2.0 of the [Apache License][l].
 [e]: https://github.com/cloudfoundry/java-client/issues
 [g]: https://gradle.org
 [h]: https://projectreactor.io/docs/netty/milestone/reference/index.html#http-client
-[i]: https://github.com/pivotal-cf/pcfdev
+[i]: https://immutables.github.io/
+[j]: https://immutables.github.io/apt.html
 [l]: https://www.apache.org/licenses/LICENSE-2.0
 [m]: https://maven.apache.org
 [p]: https://projectreactor.io
