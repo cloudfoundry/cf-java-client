@@ -164,7 +164,7 @@ public class Operator extends OperatorContextAware {
                 ByteBufFlux body = connection.inbound().receive();
 
                 return processResponse(response, body).flatMapMany(responseTransformer)
-                    .doOnTerminate(connection::dispose);
+                    .doFinally(signalType -> connection.dispose());
             });
         }
 
@@ -251,7 +251,7 @@ public class Operator extends OperatorContextAware {
             return inbound.aggregateFrames()
                 .receive()
                 .asInputStream()
-                .doOnTerminate(outbound::sendClose);
+                .doFinally(signalType -> outbound.sendClose());
         }
 
     }
