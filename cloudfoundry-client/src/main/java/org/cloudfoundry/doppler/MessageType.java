@@ -16,6 +16,8 @@
 
 package org.cloudfoundry.doppler;
 
+import org.cloudfoundry.loggregator.v2.LoggregatorEnvelope;
+
 import java.util.Objects;
 
 /**
@@ -41,6 +43,16 @@ public enum MessageType {
                 return OUT;
             default:
                 throw new IllegalArgumentException(String.format("Unknown message type: %s", dropsonde));
+        }
+    }
+    static MessageType from(LoggregatorEnvelope.Log.Type type) {
+        switch (Objects.requireNonNull(type, "log type")) {
+            case ERR:
+                return ERR;
+            case OUT:
+                return OUT;
+            default:
+                throw new IllegalArgumentException(String.format("Unknown message type: %s", type));
         }
     }
 

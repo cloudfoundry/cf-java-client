@@ -30,7 +30,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-final class FilterBuilder {
+public final class FilterBuilder {
 
     private FilterBuilder() {
     }

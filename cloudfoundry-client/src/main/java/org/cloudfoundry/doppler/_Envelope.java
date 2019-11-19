@@ -18,6 +18,7 @@ package org.cloudfoundry.doppler;
 
 import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
+import org.cloudfoundry.loggregator.v2.LoggregatorEnvelope;
 import org.immutables.value.Value;
 
 import java.util.Map;
@@ -51,6 +52,33 @@ abstract class _Envelope {
         Optional.ofNullable(dropsonde.valueMetric).ifPresent(d -> envelope.valueMetric(ValueMetric.from(d)));
 
         return envelope.build();
+    }
+
+    public static Envelope from(LoggregatorEnvelope.Envelope envelope) {
+        Objects.requireNonNull(envelope, "envelope");
+
+        Envelope.Builder envelopeBuilder = Envelope.builder()
+            .deployment(envelope.getTagsMap().get("deployment"))
+            .index(envelope.getTagsMap().get("index"))
+            .ip(envelope.getTagsMap().get("ip"))
+            .job(envelope.getTagsMap().get("job"))
+            .origin(envelope.getTagsMap().get("origin"))
+            .tags(envelope.getTagsMap())
+            .timestamp(envelope.getTimestamp());
+
+        if (envelope.hasGauge()) {
+            envelopeBuilder.containerMetric(ContainerMetric.from(envelope));
+            envelopeBuilder.eventType(EventType.CONTAINER_METRIC);
+        }
+        if (envelope.hasCounter()) {
+            envelopeBuilder.counterEvent(CounterEvent.from(envelope.getCounter()));
+            envelopeBuilder.eventType(EventType.COUNTER_EVENT);
+        }
+        if (envelope.hasLog()) {
+            envelopeBuilder.logMessage(LogMessage.from(envelope));
+            envelopeBuilder.eventType(EventType.LOG_MESSAGE);
+        }
+        return envelopeBuilder.build();
     }
 
     /**

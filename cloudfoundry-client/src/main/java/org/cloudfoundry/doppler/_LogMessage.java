@@ -17,8 +17,10 @@
 package org.cloudfoundry.doppler;
 
 import org.cloudfoundry.Nullable;
+import org.cloudfoundry.loggregator.v2.LoggregatorEnvelope;
 import org.immutables.value.Value;
 
+import java.nio.charset.Charset;
 import java.util.Objects;
 
 /**
@@ -37,6 +39,20 @@ abstract class _LogMessage {
             .sourceInstance(dropsonde.source_instance)
             .sourceType(dropsonde.source_type)
             .timestamp(dropsonde.timestamp)
+            .build();
+    }
+
+    public static LogMessage from(LoggregatorEnvelope.Envelope envelope) {
+        Objects.requireNonNull(envelope, "envelope");
+
+        LoggregatorEnvelope.Log log = envelope.getLog();
+        return LogMessage.builder()
+            .applicationId(envelope.getSourceId())
+            .message(log.getPayload().toString(Charset.defaultCharset()))
+            .messageType(MessageType.from(log.getType()))
+            .sourceInstance(envelope.getInstanceId())
+            .sourceType(envelope.getTagsMap().get("source_type"))
+            .timestamp(envelope.getTimestamp())
             .build();
     }
 

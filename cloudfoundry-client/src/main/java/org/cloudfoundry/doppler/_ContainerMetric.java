@@ -17,6 +17,7 @@
 package org.cloudfoundry.doppler;
 
 import org.cloudfoundry.Nullable;
+import org.cloudfoundry.loggregator.v2.LoggregatorEnvelope;
 import org.immutables.value.Value;
 
 import java.util.Objects;
@@ -39,6 +40,30 @@ abstract class _ContainerMetric {
             .memoryBytes(dropsonde.memoryBytes)
             .memoryBytesQuota(dropsonde.memoryBytesQuota)
             .build();
+    }
+
+    public static ContainerMetric from(LoggregatorEnvelope.Envelope envelope) {
+        Objects.requireNonNull(envelope.getGauge(), "envelope");
+
+        LoggregatorEnvelope.Gauge gauge = envelope.getGauge();
+        return ContainerMetric.builder()
+            .applicationId(envelope.getSourceId())
+            .instanceIndex(Integer.parseInt(envelope.getInstanceId()))
+            .cpuPercentage(getMetricsValue(gauge, "cpu"))
+            .diskBytes(getLongValue(gauge, "disk"))
+            .diskBytesQuota(getLongValue(gauge, "disk_quota"))
+            .memoryBytes(getLongValue(gauge, "memory"))
+            .memoryBytesQuota(getLongValue(gauge, "memory_quota"))
+            .build();
+    }
+
+    private static Long getLongValue(LoggregatorEnvelope.Gauge gauge, String property) {
+        double metricsValue = getMetricsValue(gauge, property);
+        return Double.valueOf(metricsValue).longValue();
+    }
+
+    private static double getMetricsValue(LoggregatorEnvelope.Gauge gauge, String property) {
+        return gauge.getMetricsMap().getOrDefault(property, LoggregatorEnvelope.GaugeValue.newBuilder().setValue(0.0).build()).getValue();
     }
 
     /**

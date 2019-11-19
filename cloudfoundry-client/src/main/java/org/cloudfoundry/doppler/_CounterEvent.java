@@ -17,6 +17,7 @@
 package org.cloudfoundry.doppler;
 
 import org.cloudfoundry.Nullable;
+import org.cloudfoundry.loggregator.v2.LoggregatorEnvelope;
 import org.immutables.value.Value;
 
 import java.util.Objects;
@@ -34,6 +35,15 @@ abstract class _CounterEvent {
             .delta(dropsonde.delta)
             .name(dropsonde.name)
             .total(dropsonde.total)
+            .build();
+    }
+    public static CounterEvent from(LoggregatorEnvelope.Counter counter) {
+        Objects.requireNonNull(counter, "counter");
+
+        return CounterEvent.builder()
+            .delta(counter.getDelta())
+            .name(counter.getName())
+            .total(counter.getTotal())
             .build();
     }
 

@@ -16,23 +16,30 @@
 
 package org.cloudfoundry.reactor.doppler;
 
+import com.google.protobuf.util.JsonFormat;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.http.HttpHeaderNames;
+import org.cloudfoundry.loggregator.v2.LoggregatorEnvelope;
+import org.springframework.http.codec.ServerSentEvent;
 import reactor.core.publisher.Flux;
 import reactor.netty.ByteBufFlux;
 import reactor.netty.http.client.HttpClientResponse;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-final class MultipartCodec {
+public final class MultipartCodec {
 
     private static final Pattern BOUNDARY_PATTERN = Pattern.compile("multipart/.+; boundary=(.*)");
 
     private static final int MAX_PAYLOAD_SIZE = 1024 * 1024;
+
+    private static final String SERVER_SENT_EVENT_DATA_STRING = "data: ";
 
     private MultipartCodec() {
     }
@@ -47,10 +54,6 @@ final class MultipartCodec {
             Unpooled.copiedBuffer(String.format("\r\n--%s--\r\n", boundary), Charset.defaultCharset()));
     }
 
-    static Flux<InputStream> decode(ByteBufFlux body) {
-        return body.asInputStream()
-            .skip(1);
-    }
 
     private static String extractMultipartBoundary(HttpClientResponse response) {
         String contentType = response.responseHeaders().get(HttpHeaderNames.CONTENT_TYPE);
@@ -62,5 +65,45 @@ final class MultipartCodec {
             throw new IllegalStateException(String.format("Content-Type %s does not contain a valid multipart boundary", contentType));
         }
     }
+
+    public static DelimiterBasedFrameDecoder createSimpleDecoder(HttpClientResponse response) {
+        return new DelimiterBasedFrameDecoder(MAX_PAYLOAD_SIZE,
+            Unpooled.copiedBuffer("\n\n", Charset.defaultCharset()));
+    }
+
+    public static Flux<InputStream> decode(ByteBufFlux body) {
+        return body.asInputStream().skip(1);
+    }
+
+    public static Flux<LoggregatorEnvelope.Envelope> decodeAsEnvelope(ByteBufFlux body) {
+        return body.asString().flatMap(bodyString -> Flux.fromIterable(parseBatch(bodyString).getBatchList()));
+    }
+
+    private static LoggregatorEnvelope.EnvelopeBatch parseBatch(String bodyString) {
+        if (bodyString.startsWith("event: ")) {
+            return emptyBatch();
+        }
+
+        if (bodyString.contains("heartbeat")) {
+            return emptyBatch();
+        }
+
+        if (bodyString.startsWith(SERVER_SENT_EVENT_DATA_STRING)) {
+            try {
+                ServerSentEvent<String> serverSentEvent = ServerSentEvent.builder(bodyString.substring(SERVER_SENT_EVENT_DATA_STRING.length())).build();
+                LoggregatorEnvelope.EnvelopeBatch.Builder builder = LoggregatorEnvelope.EnvelopeBatch.newBuilder();
+                JsonFormat.parser().merge(new StringReader(serverSentEvent.data()), builder);
+                return builder.build();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return emptyBatch();
+    }
+
+    private static LoggregatorEnvelope.EnvelopeBatch emptyBatch() {
+        return LoggregatorEnvelope.EnvelopeBatch.newBuilder().build();
+    }
+
 
 }
