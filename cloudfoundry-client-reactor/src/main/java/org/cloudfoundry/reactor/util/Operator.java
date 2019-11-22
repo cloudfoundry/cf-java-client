@@ -172,8 +172,8 @@ public class Operator extends OperatorContextAware {
             return parseBodyToFlux(responseTransformer).singleOrEmpty();
         }
 
-        private static boolean isUnauthorized(HttpClientResponse response) {
-            return response.status() == HttpResponseStatus.UNAUTHORIZED;
+        private static boolean isUnauthorized(HttpClientResponseWithBody response) {
+            return response.getResponse().status() == HttpResponseStatus.UNAUTHORIZED;
         }
 
         private void attachChannelHandlers(HttpClientResponse response, Connection connection) {
@@ -186,18 +186,24 @@ public class Operator extends OperatorContextAware {
             return JsonCodec.decode(this.context.getConnectionContext().getObjectMapper(), body, bodyType);
         }
 
-        private HttpClientResponseWithBody invalidateToken(HttpClientResponseWithBody response) {
-            if (isUnauthorized(response.getResponse())) {
-                this.context.getTokenProvider().ifPresent(tokenProvider -> tokenProvider.invalidate(this.context.getConnectionContext()));
-            }
-            return response;
+        private Mono<HttpClientResponseWithBody> invalidateToken(Mono<HttpClientResponseWithBody> inbound) {
+            return inbound
+                .flatMap(response -> {
+                    if (isUnauthorized(response)) {
+                        this.context.getTokenProvider().ifPresent(tokenProvider -> tokenProvider.invalidate(this.context.getConnectionContext()));
+                        return inbound
+                            .transform(this::invalidateToken);
+                    } else {
+                        return Mono.just(response);
+                    }
+                });
         }
 
         private Mono<HttpClientResponseWithBody> processResponse(HttpClientResponse response, ByteBufFlux body) {
             HttpClientResponseWithBody responseWithBody = HttpClientResponseWithBody.of(body, response);
 
             return Mono.just(responseWithBody)
-                .map(this::invalidateToken)
+                .transform(this::invalidateToken)
                 .transform(this.context.getErrorPayloadMapper()
                     .orElse(ErrorPayloadMappers.fallback()));
         }
