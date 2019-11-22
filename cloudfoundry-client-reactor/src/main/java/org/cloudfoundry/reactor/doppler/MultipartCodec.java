@@ -16,6 +16,9 @@
 
 package org.cloudfoundry.reactor.doppler;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.http.HttpHeaderNames;
@@ -23,12 +26,15 @@ import reactor.core.publisher.Flux;
 import reactor.netty.ByteBufFlux;
 import reactor.netty.http.client.HttpClientResponse;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 final class MultipartCodec {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MultipartCodec.class);
 
     private static final Pattern BOUNDARY_PATTERN = Pattern.compile("multipart/.+; boundary=(.*)");
 
@@ -49,7 +55,8 @@ final class MultipartCodec {
 
     static Flux<InputStream> decode(ByteBufFlux body) {
         return body.asInputStream()
-            .skip(1);
+            .skip(1)
+            .doOnDiscard(InputStream.class, MultipartCodec::close);
     }
 
     private static String extractMultipartBoundary(HttpClientResponse response) {
@@ -60,6 +67,14 @@ final class MultipartCodec {
             return matcher.group(1);
         } else {
             throw new IllegalStateException(String.format("Content-Type %s does not contain a valid multipart boundary", contentType));
+        }
+    }
+
+    private static void close(InputStream in) {
+        try {
+            in.close();
+        } catch (IOException e) {
+            LOGGER.warn("Could not close input stream. This will cause a direct memory leak.", e);
         }
     }
 
