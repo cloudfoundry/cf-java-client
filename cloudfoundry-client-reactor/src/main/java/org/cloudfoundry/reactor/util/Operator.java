@@ -68,6 +68,10 @@ public class Operator extends OperatorContextAware {
         return new Operator(this.context, this.httpClient.headers(headersTransformer));
     }
 
+    public Operator headersWhen(Function<HttpHeaders, Mono<? extends HttpHeaders>> headersWhenTransformer) {
+        return new Operator(this.context, this.httpClient.headersWhen(headersWhenTransformer));
+    }
+
     public UriConfiguration patch() {
         return request(HttpMethod.PATCH);
     }
@@ -148,8 +152,9 @@ public class Operator extends OperatorContextAware {
         }
 
         public Mono<HttpClientResponse> get() {
-            return this.responseReceiver.response((response, body) -> processResponse(response, body)
-                .map(HttpClientResponseWithBody::getResponse))
+            return this.responseReceiver.response((resp, body) -> Mono.just(HttpClientResponseWithBody.of(body, resp)))
+                .transform(this::processResponse)
+                .map(HttpClientResponseWithBody::getResponse)
                 .singleOrEmpty();
         }
 
@@ -163,9 +168,10 @@ public class Operator extends OperatorContextAware {
                 attachChannelHandlers(response, connection);
                 ByteBufFlux body = connection.inbound().receive();
 
-                return processResponse(response, body).flatMapMany(responseTransformer)
-                    .doFinally(signalType -> connection.dispose());
-            });
+                return Mono.just(HttpClientResponseWithBody.of(body, response));
+            })
+                .transform(this::processResponse)
+                .flatMap(responseTransformer);
         }
 
         public <T> Mono<T> parseBodyToMono(Function<HttpClientResponseWithBody, Publisher<T>> responseTransformer) {
@@ -186,26 +192,35 @@ public class Operator extends OperatorContextAware {
             return JsonCodec.decode(this.context.getConnectionContext().getObjectMapper(), body, bodyType);
         }
 
-        private Mono<HttpClientResponseWithBody> invalidateToken(Mono<HttpClientResponseWithBody> inbound) {
+        private Flux<HttpClientResponseWithBody> invalidateToken(Flux<HttpClientResponseWithBody> inbound) {
             return inbound
-                .flatMap(response -> {
+                .doOnNext(response -> {
                     if (isUnauthorized(response)) {
                         this.context.getTokenProvider().ifPresent(tokenProvider -> tokenProvider.invalidate(this.context.getConnectionContext()));
-                        return inbound
-                            .transform(this::invalidateToken);
-                    } else {
-                        return Mono.just(response);
+                        throw new InvalidTokenException();
                     }
                 });
         }
 
-        private Mono<HttpClientResponseWithBody> processResponse(HttpClientResponse response, ByteBufFlux body) {
-            HttpClientResponseWithBody responseWithBody = HttpClientResponseWithBody.of(body, response);
-
-            return Mono.just(responseWithBody)
+        private Flux<HttpClientResponseWithBody> processResponse(Flux<HttpClientResponseWithBody> inbound) {
+            return inbound
                 .transform(this::invalidateToken)
+                .retry(t -> t instanceof InvalidTokenException)
                 .transform(this.context.getErrorPayloadMapper()
                     .orElse(ErrorPayloadMappers.fallback()));
+        }
+
+        private static final class InvalidTokenException extends RuntimeException {
+
+            private static final long serialVersionUID = -3114034909507471614L;
+
+            private InvalidTokenException() {
+            }
+
+            @Override
+            public synchronized Throwable fillInStackTrace() {
+                return null;
+            }
         }
 
     }

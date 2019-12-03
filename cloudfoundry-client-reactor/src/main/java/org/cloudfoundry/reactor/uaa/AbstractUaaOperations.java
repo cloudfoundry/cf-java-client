@@ -108,6 +108,17 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
                 .parseBody(responseType));
     }
 
+    protected final <T> Mono<T> post(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer, Consumer<HttpHeaders> headersTransformer,
+                                     Function<HttpHeaders, Mono<? extends HttpHeaders>> headersWhenTransformer) {
+        return createOperator()
+            .flatMap(operator -> operator.headers(headers -> addHeaders(headers, requestPayload, headersTransformer)).headersWhen(headersWhenTransformer)
+                .post()
+                .uri(queryTransformer(requestPayload).andThen(uriTransformer))
+                .send(requestPayload)
+                .response()
+                .parseBody(responseType));
+    }
+
     protected final <T> Mono<T> post(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return createOperator()
             .flatMap(operator -> operator.headers(headers -> addHeaders(headers, requestPayload))

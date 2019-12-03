@@ -70,10 +70,13 @@ public final class ReactorTokens extends AbstractUaaOperations implements Tokens
 
     @Override
     public Mono<CheckTokenResponse> check(CheckTokenRequest request) {
-        return post(request, CheckTokenResponse.class, builder -> builder.pathSegment("check_token"), outbound -> {
-            String encoded = Base64.getEncoder().encodeToString(new AsciiString(request.getClientId()).concat(":").concat(request.getClientSecret()).toByteArray());
-            outbound.set(AUTHORIZATION, BASIC_PREAMBLE + encoded);
-        })
+        return post(request, CheckTokenResponse.class, builder -> builder.pathSegment("check_token"),
+            outbound -> {
+            },
+            outbound -> {
+                String encoded = Base64.getEncoder().encodeToString(new AsciiString(request.getClientId()).concat(":").concat(request.getClientSecret()).toByteArray());
+                return Mono.just(outbound.set(AUTHORIZATION, BASIC_PREAMBLE + encoded));
+            })
             .checkpoint();
     }
 
@@ -82,10 +85,8 @@ public final class ReactorTokens extends AbstractUaaOperations implements Tokens
         return post(request, GetTokenByAuthorizationCodeResponse.class, builder -> builder.pathSegment("oauth", "token")
                 .queryParam("grant_type", AUTHORIZATION_CODE)
                 .queryParam("response_type", ResponseType.TOKEN),
-            outbound -> {
-                ReactorTokens.removeAuthorization(outbound);
-                ReactorTokens.setUrlEncoded(outbound);
-            })
+            ReactorTokens::setUrlEncoded,
+            ReactorTokens::removeAuthorization)
             .checkpoint();
     }
 
@@ -94,10 +95,8 @@ public final class ReactorTokens extends AbstractUaaOperations implements Tokens
         return post(request, GetTokenByClientCredentialsResponse.class, builder -> builder.pathSegment("oauth", "token")
                 .queryParam("grant_type", CLIENT_CREDENTIALS)
                 .queryParam("response_type", ResponseType.TOKEN),
-            outbound -> {
-                ReactorTokens.removeAuthorization(outbound);
-                ReactorTokens.setUrlEncoded(outbound);
-            })
+            ReactorTokens::setUrlEncoded,
+            ReactorTokens::removeAuthorization)
             .checkpoint();
     }
 
@@ -106,10 +105,8 @@ public final class ReactorTokens extends AbstractUaaOperations implements Tokens
         return post(request, GetTokenByOneTimePasscodeResponse.class, builder -> builder.pathSegment("oauth", "token")
                 .queryParam("grant_type", PASSWORD)
                 .queryParam("response_type", ResponseType.TOKEN),
-            outbound -> {
-                ReactorTokens.removeAuthorization(outbound);
-                ReactorTokens.setUrlEncoded(outbound);
-            })
+            ReactorTokens::setUrlEncoded,
+            ReactorTokens::removeAuthorization)
             .checkpoint();
     }
 
@@ -118,10 +115,8 @@ public final class ReactorTokens extends AbstractUaaOperations implements Tokens
         return post(request, GetTokenByOpenIdResponse.class, builder -> builder.pathSegment("oauth", "token")
                 .queryParam("grant_type", AUTHORIZATION_CODE)
                 .queryParam("response_type", ResponseType.ID_TOKEN),
-            outbound -> {
-                ReactorTokens.removeAuthorization(outbound);
-                ReactorTokens.setUrlEncoded(outbound);
-            })
+            ReactorTokens::setUrlEncoded,
+            ReactorTokens::removeAuthorization)
             .checkpoint();
     }
 
@@ -130,10 +125,8 @@ public final class ReactorTokens extends AbstractUaaOperations implements Tokens
         return post(request, GetTokenByPasswordResponse.class, builder -> builder.pathSegment("oauth", "token")
                 .queryParam("grant_type", PASSWORD)
                 .queryParam("response_type", ResponseType.TOKEN),
-            outbound -> {
-                ReactorTokens.removeAuthorization(outbound);
-                ReactorTokens.setUrlEncoded(outbound);
-            })
+            ReactorTokens::setUrlEncoded,
+            ReactorTokens::removeAuthorization)
             .checkpoint();
     }
 
@@ -153,15 +146,13 @@ public final class ReactorTokens extends AbstractUaaOperations implements Tokens
     public Mono<RefreshTokenResponse> refresh(RefreshTokenRequest request) {
         return post(request, RefreshTokenResponse.class, builder -> builder.pathSegment("oauth", "token")
                 .queryParam("grant_type", REFRESH_TOKEN),
-            outbound -> {
-                ReactorTokens.removeAuthorization(outbound);
-                ReactorTokens.setUrlEncoded(outbound);
-            })
+            ReactorTokens::setUrlEncoded,
+            ReactorTokens::removeAuthorization)
             .checkpoint();
     }
 
-    private static void removeAuthorization(HttpHeaders request) {
-        request.remove(AUTHORIZATION);
+    private static Mono<HttpHeaders> removeAuthorization(HttpHeaders request) {
+        return Mono.just(request.remove(AUTHORIZATION));
     }
 
     private static void setUrlEncoded(HttpHeaders request) {
