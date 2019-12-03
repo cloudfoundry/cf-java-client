@@ -25,7 +25,6 @@ import org.cloudfoundry.uaa.UaaException;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 import reactor.netty.ByteBufFlux;
 import reactor.netty.http.client.HttpClientResponse;
 import reactor.test.StepVerifier;
@@ -52,7 +51,7 @@ public final class ErrorPayloadMappersTest {
         when(this.response.status()).thenReturn(BAD_REQUEST);
         HttpClientResponseWithBody responseWithBody = buildResponseWithBody(ByteBufFlux.fromPath(new ClassPathResource("fixtures/invalid_error_response.json").getFile().toPath()));
 
-        Mono.just(responseWithBody)
+        Flux.just(responseWithBody)
             .transform(ErrorPayloadMappers.clientV2(this.objectMapper))
             .as(StepVerifier::create)
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(UnknownCloudFoundryException.class)
@@ -67,7 +66,7 @@ public final class ErrorPayloadMappersTest {
         when(this.response.status()).thenReturn(BAD_REQUEST);
         HttpClientResponseWithBody responseWithBody = buildResponseWithBody(ByteBufFlux.fromPath(new ClassPathResource("fixtures/client/v2/error_response.json").getFile().toPath()));
 
-        Mono.just(responseWithBody)
+        Flux.just(responseWithBody)
             .transform(ErrorPayloadMappers.clientV2(this.objectMapper))
             .as(StepVerifier::create)
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class)
@@ -84,7 +83,7 @@ public final class ErrorPayloadMappersTest {
         when(this.response.status()).thenReturn(OK);
         HttpClientResponseWithBody responseWithBody = buildResponseWithBody();
 
-        Mono.just(responseWithBody)
+        Flux.just(responseWithBody)
             .transform(ErrorPayloadMappers.clientV2(this.objectMapper))
             .as(StepVerifier::create)
             .expectNext(responseWithBody)
@@ -97,7 +96,7 @@ public final class ErrorPayloadMappersTest {
         when(this.response.status()).thenReturn(INTERNAL_SERVER_ERROR);
         HttpClientResponseWithBody responseWithBody = buildResponseWithBody(ByteBufFlux.fromPath(new ClassPathResource("fixtures/client/v2/error_response.json").getFile().toPath()));
 
-        Mono.just(responseWithBody)
+        Flux.just(responseWithBody)
             .transform(ErrorPayloadMappers.clientV2(this.objectMapper))
             .as(StepVerifier::create)
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class)
@@ -114,7 +113,7 @@ public final class ErrorPayloadMappersTest {
         when(this.response.status()).thenReturn(BAD_REQUEST);
         HttpClientResponseWithBody responseWithBody = buildResponseWithBody(ByteBufFlux.fromPath(new ClassPathResource("fixtures/invalid_error_response.json").getFile().toPath()));
 
-        Mono.just(responseWithBody)
+        Flux.just(responseWithBody)
             .transform(ErrorPayloadMappers.clientV3(this.objectMapper))
             .as(StepVerifier::create)
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(UnknownCloudFoundryException.class)
@@ -129,7 +128,7 @@ public final class ErrorPayloadMappersTest {
         when(this.response.status()).thenReturn(BAD_REQUEST);
         HttpClientResponseWithBody responseWithBody = buildResponseWithBody(ByteBufFlux.fromPath(new ClassPathResource("fixtures/client/v3/error_response.json").getFile().toPath()));
 
-        Mono.just(responseWithBody)
+        Flux.just(responseWithBody)
             .transform(ErrorPayloadMappers.clientV3(this.objectMapper))
             .as(StepVerifier::create)
             .consumeErrorWith(t -> {
@@ -151,7 +150,7 @@ public final class ErrorPayloadMappersTest {
         when(this.response.status()).thenReturn(OK);
         HttpClientResponseWithBody responseWithBody = buildResponseWithBody();
 
-        Mono.just(responseWithBody)
+        Flux.just(responseWithBody)
             .transform(ErrorPayloadMappers.clientV3(this.objectMapper))
             .as(StepVerifier::create)
             .expectNext(responseWithBody)
@@ -164,7 +163,7 @@ public final class ErrorPayloadMappersTest {
         when(this.response.status()).thenReturn(INTERNAL_SERVER_ERROR);
         HttpClientResponseWithBody responseWithBody = buildResponseWithBody(ByteBufFlux.fromPath(new ClassPathResource("fixtures/client/v3/error_response.json").getFile().toPath()));
 
-        Mono.just(responseWithBody)
+        Flux.just(responseWithBody)
             .transform(ErrorPayloadMappers.clientV3(this.objectMapper))
             .as(StepVerifier::create)
             .consumeErrorWith(t -> {
@@ -186,7 +185,7 @@ public final class ErrorPayloadMappersTest {
         when(this.response.status()).thenReturn(BAD_REQUEST);
         HttpClientResponseWithBody responseWithBody = buildResponseWithBody(ByteBufFlux.fromPath(new ClassPathResource("fixtures/invalid_error_response.json").getFile().toPath()));
 
-        Mono.just(responseWithBody)
+        Flux.just(responseWithBody)
             .transform(ErrorPayloadMappers.uaa(this.objectMapper))
             .as(StepVerifier::create)
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(UnknownCloudFoundryException.class)
@@ -201,7 +200,7 @@ public final class ErrorPayloadMappersTest {
         when(this.response.status()).thenReturn(BAD_REQUEST);
         HttpClientResponseWithBody responseWithBody = buildResponseWithBody(ByteBufFlux.fromPath(new ClassPathResource("fixtures/uaa/error_response.json").getFile().toPath()));
 
-        Mono.just(responseWithBody)
+        Flux.just(responseWithBody)
             .transform(ErrorPayloadMappers.uaa(this.objectMapper))
             .as(StepVerifier::create)
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(UaaException.class)
@@ -216,7 +215,7 @@ public final class ErrorPayloadMappersTest {
         when(this.response.status()).thenReturn(OK);
         HttpClientResponseWithBody responseWithBody = buildResponseWithBody();
 
-        Mono.just(responseWithBody)
+        Flux.just(responseWithBody)
             .transform(ErrorPayloadMappers.uaa(this.objectMapper))
             .as(StepVerifier::create)
             .expectNext(responseWithBody)
@@ -229,7 +228,7 @@ public final class ErrorPayloadMappersTest {
         when(this.response.status()).thenReturn(INTERNAL_SERVER_ERROR);
         HttpClientResponseWithBody responseWithBody = buildResponseWithBody(ByteBufFlux.fromPath(new ClassPathResource("fixtures/uaa/error_response.json").getFile().toPath()));
 
-        Mono.just(responseWithBody)
+        Flux.just(responseWithBody)
             .transform(ErrorPayloadMappers.uaa(this.objectMapper))
             .as(StepVerifier::create)
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(UaaException.class)

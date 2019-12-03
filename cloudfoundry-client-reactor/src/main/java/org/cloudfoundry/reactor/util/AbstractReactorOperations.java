@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.util;
 
+import io.netty.handler.codec.http.HttpHeaders;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import reactor.core.publisher.Mono;
@@ -44,8 +45,18 @@ public abstract class AbstractReactorOperations {
 
         return this.root.map(this::buildOperatorContext)
             .map(context -> new Operator(context, httpClient))
-            .flatMap(operator -> this.tokenProvider.getToken(this.connectionContext)
-                .map(token -> setHeaders(operator, token)));
+            .map(operator -> operator.headers(this::addHeaders))
+            .map(operator -> operator.headersWhen(this::addHeadersWhen));
+    }
+
+    private void addHeaders(HttpHeaders httpHeaders) {
+        UserAgent.setUserAgent(httpHeaders);
+        JsonCodec.setDecodeHeaders(httpHeaders);
+    }
+
+    private Mono<? extends HttpHeaders> addHeadersWhen(HttpHeaders httpHeaders) {
+        return this.tokenProvider.getToken(this.connectionContext)
+            .map(token -> httpHeaders.set(AUTHORIZATION, token));
     }
 
     private OperatorContext buildOperatorContext(String root) {
@@ -54,14 +65,6 @@ public abstract class AbstractReactorOperations {
             .root(root)
             .tokenProvider(this.tokenProvider)
             .build();
-    }
-
-    private Operator setHeaders(Operator operator, String token) {
-        return operator.headers(httpHeaders -> {
-            httpHeaders.set(AUTHORIZATION, token);
-            UserAgent.setUserAgent(httpHeaders);
-            JsonCodec.setDecodeHeaders(httpHeaders);
-        });
     }
 
 }

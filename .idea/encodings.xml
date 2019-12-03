@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
-    <file url="file://$PROJECT_DIR$" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/cloudfoundry-client" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/cloudfoundry-client-reactor" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/cloudfoundry-operations" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/cloudfoundry-util" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/integration-test" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/test-service-broker" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cloudfoundry-client-reactor/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cloudfoundry-client/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cloudfoundry-operations/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cloudfoundry-operations/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/cloudfoundry-util/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/test-service-broker/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/test-service-broker/src/main/resources" charset="UTF-8" />
   </component>
 </project>

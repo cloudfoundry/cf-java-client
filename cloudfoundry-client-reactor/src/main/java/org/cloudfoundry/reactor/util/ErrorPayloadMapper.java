@@ -16,12 +16,11 @@
 
 package org.cloudfoundry.reactor.util;
 
+import org.cloudfoundry.reactor.HttpClientResponseWithBody;
+import reactor.core.publisher.Flux;
+
 import java.util.function.Function;
 
-import org.cloudfoundry.reactor.HttpClientResponseWithBody;
-
-import reactor.core.publisher.Mono;
-
-public interface ErrorPayloadMapper extends Function<Mono<HttpClientResponseWithBody>, Mono<HttpClientResponseWithBody>> {
+public interface ErrorPayloadMapper extends Function<Flux<HttpClientResponseWithBody>, Flux<HttpClientResponseWithBody>> {
 
 }

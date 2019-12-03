@@ -29,7 +29,6 @@ import reactor.core.publisher.Mono;
 import reactor.netty.ByteBufFlux;
 import reactor.netty.NettyOutbound;
 import reactor.netty.http.client.HttpClientRequest;
-import reactor.netty.http.client.HttpClientResponse;
 
 import java.nio.charset.Charset;
 import java.util.function.BiFunction;
