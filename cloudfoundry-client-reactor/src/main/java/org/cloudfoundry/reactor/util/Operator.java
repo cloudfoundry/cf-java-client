@@ -166,7 +166,8 @@ public class Operator extends OperatorContextAware {
         public <T> Flux<T> parseBodyToFlux(Function<HttpClientResponseWithBody, Publisher<T>> responseTransformer) {
             return this.responseReceiver.responseConnection((response, connection) -> {
                 attachChannelHandlers(response, connection);
-                ByteBufFlux body = connection.inbound().receive();
+                ByteBufFlux body = ByteBufFlux.fromInbound(connection.inbound().receive()
+                    .doFinally(signalType -> connection.dispose()));
 
                 return Mono.just(HttpClientResponseWithBody.of(body, response));
             })
