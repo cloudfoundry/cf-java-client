@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import io.netty.buffer.PooledByteBufAllocator;
+import io.netty.handler.logging.LogLevel;
 import io.netty.handler.ssl.SslContextBuilder;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.reactor.util.ByteBufAllocatorMetricProviderWrapper;
@@ -268,6 +269,7 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
             .option(SO_SNDBUF, SEND_RECEIVE_BUFFER_SIZE)
             .option(SO_RCVBUF, SEND_RECEIVE_BUFFER_SIZE);
         tcpClient = configureKeepAlive(tcpClient);
+        tcpClient = tcpClient.wiretap("cloudfoundry-client.wire", LogLevel.TRACE);
 
         return configureConnectTimeout(tcpClient);
     }

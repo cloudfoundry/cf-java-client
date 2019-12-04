@@ -61,8 +61,12 @@ public final class ReactorServerInformation extends AbstractUaaOperations implem
     public Mono<GetAutoLoginAuthenticationCodeResponse> getAuthenticationCode(GetAutoLoginAuthenticationCodeRequest request) {
         return post(request, GetAutoLoginAuthenticationCodeResponse.class, builder -> builder.pathSegment("autologin"),
             outbound -> {
+            },
+            outbound -> {
                 String encoded = Base64.getEncoder().encodeToString(new AsciiString(request.getClientId()).concat(":").concat(request.getClientSecret()).toByteArray());
                 outbound.set(AUTHORIZATION, BASIC_PREAMBLE + encoded);
+
+                return Mono.just(outbound);
             })
             .checkpoint();
     }

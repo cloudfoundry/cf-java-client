@@ -70,6 +70,16 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
                 .get());
     }
 
+    protected final Mono<HttpClientResponse> get(Object requestPayload, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer, Consumer<HttpHeaders> headersTransformer,
+                                                 Function<HttpHeaders, Mono<? extends HttpHeaders>> headersWhenTransformer) {
+        return createOperator()
+            .flatMap(operator -> operator.headers(headers -> addHeaders(headers, requestPayload, headersTransformer)).headersWhen(headersWhenTransformer)
+                .get()
+                .uri(queryTransformer(requestPayload).andThen(uriTransformer))
+                .response()
+                .get());
+    }
+
     protected final <T> Mono<T> get(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return createOperator()
             .flatMap(operator -> operator.headers(headers -> addHeaders(headers, requestPayload))
