@@ -74,14 +74,18 @@ public final class ReactorAuthorizations extends AbstractUaaOperations implement
 
     @Override
     public Mono<String> authorizationCodeGrantBrowser(AuthorizeByAuthorizationCodeGrantBrowserRequest request) {
-        return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.CODE), ReactorAuthorizations::removeAuthorization)
+        return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.CODE),
+            outbound -> {},
+            ReactorAuthorizations::removeAuthorization)
             .map(inbound -> inbound.responseHeaders().get(LOCATION))
             .checkpoint();
     }
 
     @Override
     public Mono<String> authorizationCodeGrantHybrid(AuthorizeByAuthorizationCodeGrantHybridRequest request) {
-        return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.CODE_AND_ID_TOKEN), ReactorAuthorizations::removeAuthorization)
+        return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.CODE_AND_ID_TOKEN),
+            outbound -> {},
+            ReactorAuthorizations::removeAuthorization)
             .map(inbound -> inbound.responseHeaders().get(LOCATION))
             .checkpoint();
     }
@@ -94,14 +98,18 @@ public final class ReactorAuthorizations extends AbstractUaaOperations implement
 
     @Override
     public Mono<String> implicitGrantBrowser(AuthorizeByImplicitGrantBrowserRequest request) {
-        return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.TOKEN), ReactorAuthorizations::removeAuthorization)
+        return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.TOKEN),
+            outbound -> {},
+            ReactorAuthorizations::removeAuthorization)
             .map(inbound -> inbound.responseHeaders().get(LOCATION))
             .checkpoint();
     }
 
     @Override
     public Mono<String> openIdWithAuthorizationCodeAndIdToken(AuthorizeByOpenIdWithAuthorizationCodeGrantRequest request) {
-        return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.CODE_AND_ID_TOKEN), ReactorAuthorizations::removeAuthorization)
+        return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.CODE_AND_ID_TOKEN),
+            outbound -> {},
+            ReactorAuthorizations::removeAuthorization)
             .map(inbound -> inbound.responseHeaders().get(LOCATION))
             .checkpoint();
     }
@@ -120,8 +128,9 @@ public final class ReactorAuthorizations extends AbstractUaaOperations implement
             .checkpoint();
     }
 
-    private static void removeAuthorization(HttpHeaders httpHeaders) {
-        httpHeaders.remove(AUTHORIZATION);
+    private static Mono<HttpHeaders> removeAuthorization(HttpHeaders request) {
+        return Mono.just(request.remove(AUTHORIZATION));
     }
+
 
 }

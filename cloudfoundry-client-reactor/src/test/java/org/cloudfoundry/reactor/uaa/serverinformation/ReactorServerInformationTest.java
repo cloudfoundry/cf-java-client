@@ -41,7 +41,7 @@ import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpResponseStatus.FOUND;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public final class ReactorInfoTest extends AbstractUaaApiTest {
+public final class ReactorServerInformationTest extends AbstractUaaApiTest {
 
     private final ReactorServerInformation info = new ReactorServerInformation(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
 

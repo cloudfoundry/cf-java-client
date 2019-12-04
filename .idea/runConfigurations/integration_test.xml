@@ -1,32 +1,26 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="integration-test" type="JUnit" factoryName="JUnit" singleton="true">
-    <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="jacoco" />
     <module name="integration-test" />
-    <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-    <option name="ALTERNATIVE_JRE_PATH" />
+    <extension name="coverage" runner="jacoco" />
     <option name="PACKAGE_NAME" value="org.cloudfoundry" />
     <option name="MAIN_CLASS_NAME" value="" />
     <option name="METHOD_NAME" value="" />
     <option name="TEST_OBJECT" value="package" />
     <option name="VM_PARAMETERS" value="-ea -Dio.netty.leakDetection.level=PARANOID -Dio.netty.leakDetection.maxRecords=32" />
     <option name="PARAMETERS" value="" />
-    <option name="WORKING_DIRECTORY" value="file://$MODULE_DIR$" />
-    <option name="ENV_VARIABLES" />
-    <option name="PASS_PARENT_ENVS" value="true" />
-    <option name="TEST_SEARCH_SCOPE">
-      <value defaultName="singleModule" />
-    </option>
+    <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
     <envs>
       <env name="TEST_ADMIN_CLIENTID" value="admin" />
       <env name="TEST_ADMIN_CLIENTSECRET" value="admin-client-secret" />
-      <env name="TEST_APIHOST" value="api.local.pcfdev.io" />
+      <env name="TEST_APIHOST" value="api.dev.cfdev.sh" />
       <env name="TEST_SKIPSSLVALIDATION" value="true" />
       <env name="TEST_ADMIN_USERNAME" value="admin" />
       <env name="TEST_ADMIN_PASSWORD" value="admin" />
       <env name="CLIENT_LOGGING_LEVEL" value="DEBUG" />
       <env name="TEST_LOGGING_LEVEL" value="DEBUG" />
     </envs>
-    <patterns />
-    <method />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
   </configuration>
 </component>
