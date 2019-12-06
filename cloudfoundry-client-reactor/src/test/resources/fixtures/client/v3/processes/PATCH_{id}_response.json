@@ -12,6 +12,13 @@
       "endpoint": null
     }
   },
+  "metadata": {
+    "annotations": {},
+    "labels": {}
+  },
+  "relationships": {
+
+  },
   "created_at": "2016-03-23T18:48:22Z",
   "updated_at": "2016-03-23T18:48:42Z",
   "links": {

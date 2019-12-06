@@ -14,6 +14,10 @@
   "resources": [
     {
       "guid": "885735b5-aea4-4cf5-8e44-961af0e41920",
+      "metadata": {
+        "annotations": {},
+        "labels": {}
+      },
       "created_at": "2017-02-01T01:33:58Z",
       "updated_at": "2017-02-01T01:33:58Z",
       "name": "org1",
@@ -21,6 +25,10 @@
     },
     {
       "guid": "d4c91047-7b29-4fda-b7f9-04033e5c9c9f",
+      "metadata": {
+        "annotations": {},
+        "labels": {}
+      },
       "created_at": "2017-02-02T00:14:30Z",
       "updated_at": "2017-02-02T00:14:30Z",
       "name": "org2",

@@ -14,7 +14,9 @@
       "instance_ports": [
         {
           "external": 64546,
-          "internal": 8080
+          "external_tls_proxy_port": 1234,
+          "internal": 8080,
+          "internal_tls_proxy_port": 5678
         }
       ],
       "uptime": 9042,

@@ -17,6 +17,7 @@
 package org.cloudfoundry.reactor.client.v3.processes;
 
 import org.cloudfoundry.client.v3.Link;
+import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.Pagination;
 import org.cloudfoundry.client.v3.processes.Data;
 import org.cloudfoundry.client.v3.processes.GetProcessRequest;
@@ -28,6 +29,7 @@ import org.cloudfoundry.client.v3.processes.HealthCheckType;
 import org.cloudfoundry.client.v3.processes.ListProcessesRequest;
 import org.cloudfoundry.client.v3.processes.ListProcessesResponse;
 import org.cloudfoundry.client.v3.processes.PortMapping;
+import org.cloudfoundry.client.v3.processes.ProcessRelationships;
 import org.cloudfoundry.client.v3.processes.ProcessResource;
 import org.cloudfoundry.client.v3.processes.ProcessState;
 import org.cloudfoundry.client.v3.processes.ProcessStatisticsResource;
@@ -45,6 +47,7 @@ import org.junit.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
+import java.util.Collections;
 
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
@@ -109,6 +112,12 @@ public final class ReactorProcessesTest extends AbstractClientApiTest {
                         .endpoint(null)
                         .build())
                     .build())
+                .metadata(Metadata.builder()
+                    .annotations(Collections.emptyMap())
+                    .labels(Collections.emptyMap())
+                    .build())
+                .relationships(ProcessRelationships.builder()
+                    .build())
                 .createdAt("2016-03-23T18:48:22Z")
                 .updatedAt("2016-03-23T18:48:42Z")
                 .link("self", Link.builder()
@@ -163,7 +172,9 @@ public final class ReactorProcessesTest extends AbstractClientApiTest {
                     .host("10.244.16.10")
                     .instancePort(PortMapping.builder()
                         .external(64546)
+                        .externalTlsProxyPort(1234)
                         .internal(8080)
+                        .internalTlsProxyPort(5678)
                         .build())
                     .uptime(9042)
                     .memoryQuota(268435456)
@@ -219,6 +230,12 @@ public final class ReactorProcessesTest extends AbstractClientApiTest {
                             .endpoint(null)
                             .build())
                         .build())
+                    .metadata(Metadata.builder()
+                        .annotations(Collections.emptyMap())
+                        .labels(Collections.emptyMap())
+                        .build())
+                    .relationships(ProcessRelationships.builder()
+                        .build())
                     .createdAt("2016-03-23T18:48:22Z")
                     .updatedAt("2016-03-23T18:48:42Z")
                     .link("self", Link.builder()
@@ -251,6 +268,12 @@ public final class ReactorProcessesTest extends AbstractClientApiTest {
                             .timeout(null)
                             .endpoint(null)
                             .build())
+                        .build())
+                    .metadata(Metadata.builder()
+                        .annotations(Collections.emptyMap())
+                        .labels(Collections.emptyMap())
+                        .build())
+                    .relationships(ProcessRelationships.builder()
                         .build())
                     .createdAt("2016-03-23T18:48:22Z")
                     .updatedAt("2016-03-23T18:48:42Z")
@@ -311,6 +334,12 @@ public final class ReactorProcessesTest extends AbstractClientApiTest {
                         .endpoint(null)
                         .build())
                     .build())
+                .metadata(Metadata.builder()
+                    .annotations(Collections.emptyMap())
+                    .labels(Collections.emptyMap())
+                    .build())
+                .relationships(ProcessRelationships.builder()
+                    .build())
                 .createdAt("2016-03-23T18:48:22Z")
                 .updatedAt("2016-03-23T18:48:42Z")
                 .link("self", Link.builder()
@@ -366,6 +395,12 @@ public final class ReactorProcessesTest extends AbstractClientApiTest {
                         .timeout(null)
                         .endpoint(null)
                         .build())
+                    .build())
+                .metadata(Metadata.builder()
+                    .annotations(Collections.emptyMap())
+                    .labels(Collections.emptyMap())
+                    .build())
+                .relationships(ProcessRelationships.builder()
                     .build())
                 .createdAt("2016-03-23T18:48:22Z")
                 .updatedAt("2016-03-23T18:48:42Z")
