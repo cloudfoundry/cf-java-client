@@ -18,6 +18,7 @@ package org.cloudfoundry.client.v3.processes;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
@@ -37,6 +38,7 @@ abstract class _PortMapping {
      * The external TLS proxy port
      */
     @JsonProperty("external_tls_proxy_port")
+    @Nullable
     abstract Integer getExternalTlsProxyPort();
 
     /**
@@ -49,6 +51,7 @@ abstract class _PortMapping {
      * The internal TLS proxy port
      */
     @JsonProperty("internal_tls_proxy_port")
+    @Nullable
     abstract Integer getInternalTlsProxyPort();
 
 }

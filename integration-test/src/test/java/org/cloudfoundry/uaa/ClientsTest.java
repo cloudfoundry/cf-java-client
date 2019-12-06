@@ -18,6 +18,8 @@ package org.cloudfoundry.uaa;
 
 import io.netty.util.AsciiString;
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.CloudFoundryVersion;
+import org.cloudfoundry.IfCloudFoundryVersion;
 import org.cloudfoundry.uaa.clients.BatchChangeSecretRequest;
 import org.cloudfoundry.uaa.clients.BatchChangeSecretResponse;
 import org.cloudfoundry.uaa.clients.BatchCreateClientsRequest;
@@ -201,8 +203,28 @@ public final class ClientsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    @IfCloudFoundryVersion(lessThan = CloudFoundryVersion.PCF_2_8)
     @Test
-    public void changeSecret() {
+    public void changeSecret27() {
+        String clientId = this.nameFactory.getClientId();
+        String newClientSecret = this.nameFactory.getClientSecret();
+        String oldClientSecret = this.nameFactory.getClientSecret();
+
+        requestCreateClient(this.uaaClient, clientId, oldClientSecret)
+            .then(this.uaaClient.clients()
+                .changeSecret(ChangeSecretRequest.builder()
+                    .clientId(clientId)
+                    .oldSecret(oldClientSecret)
+                    .secret(newClientSecret)
+                    .build()))
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(UaaException.class).hasMessage("invalid_client: Only a client can change client secret"))
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_8)
+    @Test
+    public void changeSecret28() {
         String clientId = this.nameFactory.getClientId();
         String newClientSecret = this.nameFactory.getClientSecret();
         String oldClientSecret = this.nameFactory.getClientSecret();
@@ -221,7 +243,6 @@ public final class ClientsTest extends AbstractIntegrationTest {
             })
             .expectComplete()
             .verify(Duration.ofMinutes(5));
-
     }
 
     @Test
