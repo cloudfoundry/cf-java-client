@@ -431,7 +431,7 @@ public class IntegrationTestConfiguration {
 
     @Bean
     String stackName() {
-        return "cflinuxfs2";
+        return "cflinuxfs3";
     }
 
     @Bean

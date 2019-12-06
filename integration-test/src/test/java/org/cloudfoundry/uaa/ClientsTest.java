@@ -215,12 +215,11 @@ public final class ClientsTest extends AbstractIntegrationTest {
                     .secret(newClientSecret)
                     .build()))
             .as(StepVerifier::create)
-//          TODO: Update test based on https://www.pivotaltracker.com/n/projects/997278/stories/130645469 to use the following
-//                .expectThat(response -> {
-//                    assertEquals("secret updated", response.getMessage());
-//                    assertEquals("ok", response.getStatus());
-//                }));
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(UaaException.class).hasMessage("invalid_client: Only a client can change client secret"))
+            .assertNext(response -> {
+                assertThat(response.getMessage()).isEqualTo("secret updated");
+                assertThat(response.getStatus()).isEqualTo("ok");
+            })
+            .expectComplete()
             .verify(Duration.ofMinutes(5));
 
     }

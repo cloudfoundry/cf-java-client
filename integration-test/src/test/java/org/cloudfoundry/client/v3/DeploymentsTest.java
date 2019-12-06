@@ -59,6 +59,7 @@ public final class DeploymentsTest extends AbstractIntegrationTest {
     @Autowired
     private CloudFoundryOperations cloudFoundryOperations;
 
+    @SuppressWarnings("deprecation")
     @Test
     public void cancel() throws Exception {
         String name = this.nameFactory.getApplicationName();

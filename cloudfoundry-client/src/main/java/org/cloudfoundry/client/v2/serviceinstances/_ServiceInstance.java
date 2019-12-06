@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
+import org.cloudfoundry.client.v2.MaintenanceInfo;
 import org.immutables.value.Value;
 
 import java.util.List;
@@ -60,11 +61,25 @@ abstract class _ServiceInstance {
     abstract LastOperation getLastOperation();
 
     /**
+     * The maintenance info
+     */
+    @JsonProperty("maintenance_info")
+    @Nullable
+    abstract MaintenanceInfo getMaintenanceInfo();
+
+    /**
      * The name
      */
     @JsonProperty("name")
     @Nullable
     abstract String getName();
+
+    /**
+     * The service broker name
+     */
+    @JsonProperty("service_broker_name")
+    @Nullable
+    abstract String getServiceBrokerName();
 
     /**
      * The service plan
@@ -87,5 +102,12 @@ abstract class _ServiceInstance {
     @JsonProperty("shared_to")
     @Nullable
     abstract List<Share> getSharedTo();
+
+    /**
+     * The type
+     */
+    @JsonProperty("type")
+    @Nullable
+    abstract String getType();
 
 }

@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.Checksum;
 import org.cloudfoundry.client.v3.Lifecycle;
+import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.Resource;
 
 import java.util.List;
@@ -71,11 +72,25 @@ public abstract class Droplet extends Resource {
     public abstract Lifecycle getLifecycle();
 
     /**
+     * The metadata
+     */
+    @JsonProperty("metadata")
+    @Nullable
+    public abstract Metadata getMetadata();
+
+    /**
      * The process types and associated start commands
      */
     @JsonProperty("process_types")
     @Nullable
     public abstract Map<String, String> getProcessTypes();
+
+    /**
+     * The relationships
+     */
+    @JsonProperty("relationships")
+    @Nullable
+    public abstract DropletRelationships getRelationships();
 
     /**
      * The stack
