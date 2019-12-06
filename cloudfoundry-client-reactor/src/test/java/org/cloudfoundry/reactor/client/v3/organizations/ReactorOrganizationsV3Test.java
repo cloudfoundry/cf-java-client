@@ -17,6 +17,7 @@
 package org.cloudfoundry.reactor.client.v3.organizations;
 
 import org.cloudfoundry.client.v3.Link;
+import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.Pagination;
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.organizations.AssignOrganizationDefaultIsolationSegmentRequest;
@@ -38,6 +39,7 @@ import org.junit.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
+import java.util.Collections;
 
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.PATCH;
@@ -108,6 +110,10 @@ public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
                 .link("self", Link.builder()
                     .href("https://api.example.org/v3/organizations/24637893-3b77-489d-bb79-8466f0d88b52")
                     .build())
+                .metadata(Metadata.builder()
+                    .annotations(Collections.emptyMap())
+                    .labels(Collections.emptyMap())
+                    .build())
                 .name("my-organization")
                 .updatedAt("2017-02-01T01:33:58Z")
                 .build())
@@ -137,6 +143,10 @@ public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
                 .id("24637893-3b77-489d-bb79-8466f0d88b52")
                 .link("self", Link.builder()
                     .href("https://api.example.org/v3/organizations/24637893-3b77-489d-bb79-8466f0d88b52")
+                    .build())
+                .metadata(Metadata.builder()
+                    .annotations(Collections.emptyMap())
+                    .labels(Collections.emptyMap())
                     .build())
                 .name("my-organization")
                 .updatedAt("2017-02-01T01:33:58Z")
@@ -206,12 +216,20 @@ public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
                     .build())
                 .resource(OrganizationResource.builder()
                     .id("885735b5-aea4-4cf5-8e44-961af0e41920")
+                    .metadata(Metadata.builder()
+                        .annotations(Collections.emptyMap())
+                        .labels(Collections.emptyMap())
+                        .build())
                     .createdAt("2017-02-01T01:33:58Z")
                     .updatedAt("2017-02-01T01:33:58Z")
                     .name("org1")
                     .build())
                 .resource(OrganizationResource.builder()
                     .id("d4c91047-7b29-4fda-b7f9-04033e5c9c9f")
+                    .metadata(Metadata.builder()
+                        .annotations(Collections.emptyMap())
+                        .labels(Collections.emptyMap())
+                        .build())
                     .createdAt("2017-02-02T00:14:30Z")
                     .updatedAt("2017-02-02T00:14:30Z")
                     .name("org2")

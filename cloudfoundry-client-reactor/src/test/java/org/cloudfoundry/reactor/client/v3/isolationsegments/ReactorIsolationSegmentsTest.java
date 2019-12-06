@@ -17,6 +17,7 @@
 package org.cloudfoundry.reactor.client.v3.isolationsegments;
 
 import org.cloudfoundry.client.v3.Link;
+import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.Pagination;
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.isolationsegments.AddIsolationSegmentOrganizationEntitlementRequest;
@@ -47,6 +48,7 @@ import org.junit.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
+import java.util.Collections;
 
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
@@ -314,12 +316,20 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
                     .build())
                 .resource(OrganizationResource.builder()
                     .id("885735b5-aea4-4cf5-8e44-961af0e41920")
+                    .metadata(Metadata.builder()
+                        .annotations(Collections.emptyMap())
+                        .labels(Collections.emptyMap())
+                        .build())
                     .createdAt("2017-02-01T01:33:58Z")
                     .updatedAt("2017-02-01T01:33:58Z")
                     .name("org1")
                     .build())
                 .resource(OrganizationResource.builder()
                     .id("d4c91047-7b29-4fda-b7f9-04033e5c9c9f")
+                    .metadata(Metadata.builder()
+                        .annotations(Collections.emptyMap())
+                        .labels(Collections.emptyMap())
+                        .build())
                     .createdAt("2017-02-02T00:14:30Z")
                     .updatedAt("2017-02-02T00:14:30Z")
                     .name("org2")
