@@ -34,9 +34,21 @@ abstract class _PortMapping {
     abstract Integer getExternal();
 
     /**
+     * The external TLS proxy port
+     */
+    @JsonProperty("external_tls_proxy_port")
+    abstract Integer getExternalTlsProxyPort();
+
+    /**
      * The internal port
      */
     @JsonProperty("internal")
     abstract Integer getInternal();
+
+    /**
+     * The internal TLS proxy port
+     */
+    @JsonProperty("internal_tls_proxy_port")
+    abstract Integer getInternalTlsProxyPort();
 
 }

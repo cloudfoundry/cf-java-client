@@ -71,6 +71,7 @@ public class ReactorDeploymentsV3Test extends AbstractClientApiTest {
             .verify(Duration.ofSeconds(5));
     }
 
+    @SuppressWarnings("deprecation")
     @Test
     public void create() {
         mockRequest(InteractionContext.builder()
@@ -134,6 +135,7 @@ public class ReactorDeploymentsV3Test extends AbstractClientApiTest {
             .verify(Duration.ofSeconds(5));
     }
 
+    @SuppressWarnings("deprecation")
     @Test
     public void get() {
         mockRequest(InteractionContext.builder()
@@ -189,6 +191,7 @@ public class ReactorDeploymentsV3Test extends AbstractClientApiTest {
             .verify(Duration.ofSeconds(5));
     }
 
+    @SuppressWarnings("deprecation")
     @Test
     public void list() {
         mockRequest(InteractionContext.builder()

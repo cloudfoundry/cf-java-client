@@ -14,36 +14,40 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.spaces;
+package org.cloudfoundry.client.v3.deployments;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v3.Metadata;
-import org.cloudfoundry.client.v3.Resource;
+import org.immutables.value.Value;
+
+import java.util.Map;
 
 /**
- * Base class for responses that are spaces
+ * The status payload for the Deployment entity
  */
-public abstract class Space extends Resource {
+@JsonDeserialize
+@Value.Immutable
+abstract class _Status {
 
     /**
-     * The metadata
+     * The details
      */
-    @JsonProperty("metadata")
+    @AllowNulls
+    @JsonProperty("details")
+    abstract Map<String, String> getDetails();
+
+    /**
+     * The reason
+     */
+    @JsonProperty("reason")
     @Nullable
-    public abstract Metadata getMetadata();
+    abstract DeploymentStatusReason getReason();
 
     /**
-     * The name
+     * The value
      */
-    @JsonProperty("name")
-    public abstract String getName();
-
-    /**
-     * The relationships
-     */
-    @JsonProperty("relationships")
-    @Nullable
-    public abstract SpaceRelationships getRelationships();
-
+    @JsonProperty("value")
+    abstract DeploymentStatusValue getValue();
 }

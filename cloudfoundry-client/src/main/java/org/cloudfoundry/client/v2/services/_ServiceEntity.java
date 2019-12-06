@@ -39,6 +39,13 @@ abstract class _ServiceEntity {
     abstract Boolean getActive();
 
     /**
+     * Whether to allow context updates
+     */
+    @JsonProperty("allow_context_updates")
+    @Nullable
+    abstract Boolean getAllowContextUpdates();
+
+    /**
      * The bindable status
      */
     @JsonProperty("bindable")

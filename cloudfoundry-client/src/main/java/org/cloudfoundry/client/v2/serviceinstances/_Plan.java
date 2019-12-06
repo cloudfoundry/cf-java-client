@@ -19,6 +19,7 @@ package org.cloudfoundry.client.v2.serviceinstances;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.Nullable;
+import org.cloudfoundry.client.v2.MaintenanceInfo;
 import org.immutables.value.Value;
 
 /**
@@ -34,6 +35,13 @@ abstract class _Plan {
     @JsonProperty("guid")
     @Nullable
     abstract String getId();
+
+    /**
+     * The maintenance info
+     */
+    @JsonProperty("maintenance_info")
+    @Nullable
+    abstract MaintenanceInfo getMaintenanceInfo();
 
     /**
      * The name

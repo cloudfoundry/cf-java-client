@@ -35,7 +35,7 @@ public class RequestLogger {
     private long requestSentTime;
 
     public void request(HttpClientRequest request) {
-        request(String.format("%-5s {}", request.method()), request.uri());
+        request(String.format("%-6s {}", request.method()), request.uri());
     }
 
     public void response(HttpClientResponse response) {
