@@ -20,6 +20,7 @@ package org.cloudfoundry.client.v2.serviceplans;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.Nullable;
+import org.cloudfoundry.client.v2.MaintenanceInfo;
 import org.immutables.value.Value;
 
 /**
@@ -65,11 +66,32 @@ abstract class _ServicePlanEntity {
     abstract Boolean getFree();
 
     /**
+     * The plan maintenance info
+     */
+    @JsonProperty("maintenance_info")
+    @Nullable
+    abstract MaintenanceInfo getMaintenanceInfo();
+
+    /**
+     * The maximum polling duration
+     */
+    @JsonProperty("maximum_polling_duration")
+    @Nullable
+    abstract Long getMaximumPollingDuration();
+
+    /**
      * The name
      */
     @JsonProperty("name")
     @Nullable
     abstract String getName();
+
+    /**
+     * Whether the plan is updatable
+     */
+    @JsonProperty("plan_updateable")
+    @Nullable
+    abstract Boolean getPlanUpdatable();
 
     /**
      * The public flag

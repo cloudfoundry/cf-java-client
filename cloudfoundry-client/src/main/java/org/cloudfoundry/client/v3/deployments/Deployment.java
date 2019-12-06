@@ -18,6 +18,7 @@ package org.cloudfoundry.client.v3.deployments;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.cloudfoundry.Nullable;
+import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.Resource;
 import org.cloudfoundry.client.v3.ToOneRelationship;
@@ -42,6 +43,13 @@ public abstract class Deployment extends Resource {
     @JsonProperty("droplet")
     @Nullable
     public abstract Relationship getDroplet();
+
+    /**
+     * The metadata
+     */
+    @JsonProperty("metadata")
+    @Nullable
+    public abstract Metadata getMetadata();
 
     /**
      * The revision the deployment is transitioning the app to
@@ -74,7 +82,16 @@ public abstract class Deployment extends Resource {
     /**
      * The state of the deployment
      */
+    @Deprecated
     @JsonProperty("state")
     public abstract DeploymentState getState();
+
+    /**
+     * The status of the deployment
+     */
+    @JsonProperty("status")
+    @Nullable
+    public abstract Status getStatus();
+
 
 }

@@ -25,6 +25,7 @@ import java.util.List;
 /**
  * The request payload for the List Deployments operation.
  */
+@SuppressWarnings("deprecation")
 @Value.Immutable
 abstract class _ListDeploymentsRequest extends PaginatedRequest {
 

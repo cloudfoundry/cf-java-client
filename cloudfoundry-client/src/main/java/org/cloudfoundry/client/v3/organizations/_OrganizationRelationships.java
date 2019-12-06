@@ -14,36 +14,26 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.spaces;
+package org.cloudfoundry.client.v3.organizations;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v3.Metadata;
-import org.cloudfoundry.client.v3.Resource;
+import org.cloudfoundry.client.v3.ToOneRelationship;
+import org.immutables.value.Value;
 
 /**
- * Base class for responses that are spaces
+ * The relationships for the Organization entity
  */
-public abstract class Space extends Resource {
+@Value.Immutable
+@JsonDeserialize
+abstract class _OrganizationRelationships {
 
     /**
-     * The metadata
+     * The quota relationship
      */
-    @JsonProperty("metadata")
+    @JsonProperty("quota")
     @Nullable
-    public abstract Metadata getMetadata();
-
-    /**
-     * The name
-     */
-    @JsonProperty("name")
-    public abstract String getName();
-
-    /**
-     * The relationships
-     */
-    @JsonProperty("relationships")
-    @Nullable
-    public abstract SpaceRelationships getRelationships();
+    abstract ToOneRelationship getQuota();
 
 }

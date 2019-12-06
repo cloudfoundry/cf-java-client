@@ -17,6 +17,7 @@
 package org.cloudfoundry.client.v3.processes;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.Resource;
 
 /**
@@ -25,16 +26,22 @@ import org.cloudfoundry.client.v3.Resource;
 public abstract class Process extends Resource {
 
     /**
-     * The type
-     */
-    @JsonProperty("type")
-    public abstract String getType();
-
-    /**
      * The command
      */
     @JsonProperty("command")
     public abstract String getCommand();
+
+    /**
+     * The disk in megabytes
+     */
+    @JsonProperty("disk_in_mb")
+    public abstract Integer getDiskInMb();
+
+    /**
+     * The health check
+     */
+    @JsonProperty("health_check")
+    public abstract HealthCheck getHealthCheck();
 
     /**
      * The instances
@@ -49,15 +56,21 @@ public abstract class Process extends Resource {
     public abstract Integer getMemoryInMb();
 
     /**
-     * The disk in megabytes
+     * The metadata
      */
-    @JsonProperty("disk_in_mb")
-    public abstract Integer getDiskInMb();
+    @JsonProperty("metadata")
+    public abstract Metadata getMetadata();
 
     /**
-     * The health check
+     * The relationships
      */
-    @JsonProperty("health_check")
-    public abstract HealthCheck getHealthCheck();
+    @JsonProperty("relationships")
+    public abstract ProcessRelationships getRelationships();
+
+    /**
+     * The type
+     */
+    @JsonProperty("type")
+    public abstract String getType();
 
 }

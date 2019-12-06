@@ -14,36 +14,32 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.spaces;
+package org.cloudfoundry.client.v2;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v3.Metadata;
-import org.cloudfoundry.client.v3.Resource;
+import org.immutables.value.Value;
 
 /**
- * Base class for responses that are spaces
+ * The entity representing service plan maintenance info
  */
-public abstract class Space extends Resource {
+@JsonDeserialize
+@Value.Immutable
+abstract class _MaintenanceInfo {
 
     /**
-     * The metadata
+     * The description
      */
-    @JsonProperty("metadata")
+    @JsonProperty("description")
     @Nullable
-    public abstract Metadata getMetadata();
+    abstract String getDescription();
 
     /**
-     * The name
+     * The version
      */
-    @JsonProperty("name")
-    public abstract String getName();
-
-    /**
-     * The relationships
-     */
-    @JsonProperty("relationships")
+    @JsonProperty("version")
     @Nullable
-    public abstract SpaceRelationships getRelationships();
+    abstract String getVersion();
 
 }

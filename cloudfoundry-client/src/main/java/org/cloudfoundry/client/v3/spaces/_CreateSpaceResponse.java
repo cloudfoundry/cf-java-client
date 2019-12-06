@@ -16,9 +16,7 @@
 
 package org.cloudfoundry.client.v3.spaces;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
@@ -27,12 +25,5 @@ import org.immutables.value.Value;
 @JsonDeserialize
 @Value.Immutable
 abstract class _CreateSpaceResponse extends Space {
-
-    /**
-     * The relationships
-     */
-    @JsonProperty("relationships")
-    @Nullable
-    abstract SpaceRelationships getRelationships();
 
 }
