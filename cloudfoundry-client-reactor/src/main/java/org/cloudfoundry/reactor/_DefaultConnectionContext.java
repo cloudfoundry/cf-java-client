@@ -49,6 +49,7 @@ import java.lang.management.ManagementFactory;
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.UnaryOperator;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static io.netty.channel.ChannelOption.CONNECT_TIMEOUT_MILLIS;
@@ -102,9 +103,11 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
     @Override
     @Value.Default
     public HttpClient getHttpClient() {
-        return createHttpClient().compress(true)
+        HttpClient client = createHttpClient().compress(true)
             .tcpConfiguration(this::configureTcpClient)
             .secure(this::configureSsl);
+        return getAdditionalHttpClientConfiguration().map(configuration -> configuration.apply(client))
+            .orElse(client);
     }
 
     @Override
@@ -221,6 +224,11 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
      * The timeout for the SSL handshake negotiation
      */
     abstract Optional<Duration> getSslHandshakeTimeout();
+    
+    /**
+     * Additional configuration to the underlying HttpClient 
+     */
+    abstract Optional<UnaryOperator<HttpClient>> getAdditionalHttpClientConfiguration();
 
     @Value.Derived
     LoopResources getThreadPool() {
