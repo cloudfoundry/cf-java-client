@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.reactor.uaa.identityproviders;
 
-
 import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
@@ -57,13 +56,17 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorIdentityProvidersTest extends AbstractUaaApiTest {
 
-    private final ReactorIdentityProviders identityProviders = new ReactorIdentityProviders(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    private final ReactorIdentityProviders identityProviders = new ReactorIdentityProviders(CONNECTION_CONTEXT,
+        this.root,
+        TOKEN_PROVIDER,
+        Collections.emptyMap());
 
     @Test
     public void createLdap() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/identity-providers?rawConfig=true")
+                .method(POST)
+                .path("/identity-providers?rawConfig=true")
                 .header("X-Identity-Zone-Id", "test-identity-zone-id")
                 .payload("fixtures/uaa/identity-providers/POST_request_ldap.json")
                 .build())
@@ -73,24 +76,23 @@ public final class ReactorIdentityProvidersTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.identityProviders
-            .create(CreateIdentityProviderRequest.builder()
-                .active(true)
-                .configuration(LdapConfiguration.builder()
-                    .attributeMappings(AttributeMappings.builder()
-                        .build())
-                    .ldapProfileFile(LdapProfileFile.SIMPLE_BIND)
-                    .ldapGroupFile(LdapGroupFile.NO_GROUP)
-                    .baseUrl("ldap://localhost:33389")
-                    .skipSSLVerification(false)
-                    .mailAttributeName("mail")
-                    .mailSubstituteOverridesLdap(false)
+        this.identityProviders.create(CreateIdentityProviderRequest.builder()
+            .active(true)
+            .configuration(LdapConfiguration.builder()
+                .attributeMappings(AttributeMappings.builder()
                     .build())
-                .name("ldap name")
-                .originKey("ldap")
-                .type(Type.LDAP)
-                .identityZoneId("test-identity-zone-id")
+                .ldapProfileFile(LdapProfileFile.SIMPLE_BIND)
+                .ldapGroupFile(LdapGroupFile.NO_GROUP)
+                .baseUrl("ldap://localhost:33389")
+                .skipSSLVerification(false)
+                .mailAttributeName("mail")
+                .mailSubstituteOverridesLdap(false)
                 .build())
+            .name("ldap name")
+            .originKey("ldap")
+            .type(Type.LDAP)
+            .identityZoneId("test-identity-zone-id")
+            .build())
             .as(StepVerifier::create)
             .expectNext(CreateIdentityProviderResponse.builder()
                 .active(true)
@@ -127,7 +129,8 @@ public final class ReactorIdentityProvidersTest extends AbstractUaaApiTest {
     public void createOauth() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/identity-providers?rawConfig=true")
+                .method(POST)
+                .path("/identity-providers?rawConfig=true")
                 .header("X-Identity-Zone-Id", "test-identity-zone-id")
                 .payload("fixtures/uaa/identity-providers/POST_request_oauth.json")
                 .build())
@@ -137,26 +140,25 @@ public final class ReactorIdentityProvidersTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.identityProviders
-            .create(CreateIdentityProviderRequest.builder()
-                .active(true)
-                .configuration(OAuth2Configuration.builder()
-                    .attributeMappings(AttributeMappings.builder()
-                        .build())
-                    .authUrl("http://auth.url")
-                    .tokenUrl("http://token.url")
-                    .tokenKey("token-key")
-                    .showLinkText(false)
-                    .skipSslVerification(false)
-                    .relyingPartyId("uaa")
-                    .relyingPartySecret("secret")
-                    .addShadowUserOnLogin(true)
+        this.identityProviders.create(CreateIdentityProviderRequest.builder()
+            .active(true)
+            .configuration(OAuth2Configuration.builder()
+                .attributeMappings(AttributeMappings.builder()
                     .build())
-                .name("UAA Provider")
-                .originKey("oauth2.0")
-                .type(Type.OAUTH2)
-                .identityZoneId("test-identity-zone-id")
+                .authUrl("http://auth.url")
+                .tokenUrl("http://token.url")
+                .tokenKey("token-key")
+                .showLinkText(false)
+                .skipSslVerification(false)
+                .relyingPartyId("uaa")
+                .relyingPartySecret("secret")
+                .addShadowUserOnLogin(true)
                 .build())
+            .name("UAA Provider")
+            .originKey("oauth2.0")
+            .type(Type.OAUTH2)
+            .identityZoneId("test-identity-zone-id")
+            .build())
             .as(StepVerifier::create)
             .expectNext(CreateIdentityProviderResponse.builder()
                 .active(true)
@@ -190,7 +192,8 @@ public final class ReactorIdentityProvidersTest extends AbstractUaaApiTest {
     public void createSaml() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/identity-providers?rawConfig=true")
+                .method(POST)
+                .path("/identity-providers?rawConfig=true")
                 .header("X-Identity-Zone-Id", "test-identity-zone-id")
                 .payload("fixtures/uaa/identity-providers/POST_request_saml.json")
                 .build())
@@ -200,40 +203,39 @@ public final class ReactorIdentityProvidersTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.identityProviders
-            .create(CreateIdentityProviderRequest.builder()
-                .active(true)
-                .configuration(SamlConfiguration.builder()
-                    .addShadowUserOnLogin(true)
-                    .assertionConsumerIndex(0)
-                    .attributeMappings(AttributeMappings.builder()
-                        .build())
-                    .groupMappingMode(ExternalGroupMappingMode.EXPLICITLY_MAPPED)
-                    .linkText("IDPEndpointsMockTests Saml Provider:SAML")
-                    .metaDataLocation("<?xml version=\"1.0\" encoding=\"UTF-8\"?><md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\" entityID=\"http://www.okta" +
-                        ".com/SAML\"><md:IDPSSODescriptor WantAuthnRequestsSigned=\"true\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\"><md:KeyDescriptor " +
-                        "use=\"signing\"><ds:KeyInfo xmlns:ds=\"http://www.w3" +
-                        ".org/2000/09/xmldsig#\"><ds:X509Data><ds:X509Certificate>MIICmTCCAgKgAwIBAgIGAUPATqmEMA0GCSqGSIb3DQEBBQUAMIGPMQswCQYDVQQGEwJVUzETMBEG" +
-                        "\nA1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UEBwwNU2FuIEZyYW5jaXNjbzENMAsGA1UECgwET2t0YTEU\nMBIGA1UECwwLU1NPUHJvdmlkZXIxEDAOBgNVBAMMB1Bpdm90YWwxHDAaBgkqhkiG9w0BCQEWDWlu" +
-                        "\nZm9Ab2t0YS5jb20wHhcNMTQwMTIzMTgxMjM3WhcNNDQwMTIzMTgxMzM3WjCBjzELMAkGA1UEBhMC\nVVMxEzARBgNVBAgMCkNhbGlmb3JuaWExFjAUBgNVBAcMDVNhbiBGcmFuY2lzY28xDTALBgNVBAoM" +
-                        "\nBE9rdGExFDASBgNVBAsMC1NTT1Byb3ZpZGVyMRAwDgYDVQQDDAdQaXZvdGFsMRwwGgYJKoZIhvcN\nAQkBFg1pbmZvQG9rdGEuY29tMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCeil67/TLOiTZU" +
-                        "\nWWgW2XEGgFZ94bVO90v5J1XmcHMwL8v5Z/8qjdZLpGdwI7Ph0CyXMMNklpaR/Ljb8fsls3amdT5O\nBw92Zo8ulcpjw2wuezTwL0eC0wY/GQDAZiXL59npE6U+fH1lbJIq92hx0HJSru/0O1q3+A/+jjZL\n3tL" +
-                        "/SwIDAQABMA0GCSqGSIb3DQEBBQUAA4GBAI5BoWZoH6Mz9vhypZPOJCEKa/K+biZQsA4Zqsuk\nvvphhSERhqk/Nv76Vkl8uvJwwHbQrR9KJx4L3PRkGCG24rix71jEuXVGZUsDNM3CUKnARx4MEab6\nGFHNkZ6DmoT" +
-                        "/PFagngecHu+EwmuDtaG0rEkFrARwe+d8Ru0BN558abFb</ds:X509Certificate></ds:X509Data></ds:KeyInfo></md:KeyDescriptor><md:NameIDFormat>urn:oasis:names:tc:SAML:1" +
-                        ".1:nameid-format:emailAddress</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat><md:SingleSignOnService " +
-                        "Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\" Location=\"https://pivotal.oktapreview" +
-                        ".com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml\"/><md:SingleSignOnService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect\" " +
-                        "Location=\"https://pivotal.oktapreview.com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml\"/></md:IDPSSODescriptor></md:EntityDescriptor>\n")
-                    .metadataTrustCheck(false)
-                    .nameId("urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress")
-                    .showSamlLink(false)
-                    .socketFactoryClassName("org.apache.commons.httpclient.protocol.DefaultProtocolSocketFactory")
+        this.identityProviders.create(CreateIdentityProviderRequest.builder()
+            .active(true)
+            .configuration(SamlConfiguration.builder()
+                .addShadowUserOnLogin(true)
+                .assertionConsumerIndex(0)
+                .attributeMappings(AttributeMappings.builder()
                     .build())
-                .name("SAML name")
-                .originKey("SAML")
-                .type(Type.SAML)
-                .identityZoneId("test-identity-zone-id")
+                .groupMappingMode(ExternalGroupMappingMode.EXPLICITLY_MAPPED)
+                .linkText("IDPEndpointsMockTests Saml Provider:SAML")
+                .metaDataLocation("<?xml version=\"1.0\" encoding=\"UTF-8\"?><md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\" entityID=\"http://www.okta"
+                    + ".com/SAML\"><md:IDPSSODescriptor WantAuthnRequestsSigned=\"true\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\"><md:KeyDescriptor "
+                    + "use=\"signing\"><ds:KeyInfo xmlns:ds=\"http://www.w3"
+                    + ".org/2000/09/xmldsig#\"><ds:X509Data><ds:X509Certificate>MIICmTCCAgKgAwIBAgIGAUPATqmEMA0GCSqGSIb3DQEBBQUAMIGPMQswCQYDVQQGEwJVUzETMBEG"
+                    + "\nA1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UEBwwNU2FuIEZyYW5jaXNjbzENMAsGA1UECgwET2t0YTEU\nMBIGA1UECwwLU1NPUHJvdmlkZXIxEDAOBgNVBAMMB1Bpdm90YWwxHDAaBgkqhkiG9w0BCQEWDWlu"
+                    + "\nZm9Ab2t0YS5jb20wHhcNMTQwMTIzMTgxMjM3WhcNNDQwMTIzMTgxMzM3WjCBjzELMAkGA1UEBhMC\nVVMxEzARBgNVBAgMCkNhbGlmb3JuaWExFjAUBgNVBAcMDVNhbiBGcmFuY2lzY28xDTALBgNVBAoM"
+                    + "\nBE9rdGExFDASBgNVBAsMC1NTT1Byb3ZpZGVyMRAwDgYDVQQDDAdQaXZvdGFsMRwwGgYJKoZIhvcN\nAQkBFg1pbmZvQG9rdGEuY29tMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCeil67/TLOiTZU"
+                    + "\nWWgW2XEGgFZ94bVO90v5J1XmcHMwL8v5Z/8qjdZLpGdwI7Ph0CyXMMNklpaR/Ljb8fsls3amdT5O\nBw92Zo8ulcpjw2wuezTwL0eC0wY/GQDAZiXL59npE6U+fH1lbJIq92hx0HJSru/0O1q3+A/+jjZL\n3tL"
+                    + "/SwIDAQABMA0GCSqGSIb3DQEBBQUAA4GBAI5BoWZoH6Mz9vhypZPOJCEKa/K+biZQsA4Zqsuk\nvvphhSERhqk/Nv76Vkl8uvJwwHbQrR9KJx4L3PRkGCG24rix71jEuXVGZUsDNM3CUKnARx4MEab6\nGFHNkZ6DmoT"
+                    + "/PFagngecHu+EwmuDtaG0rEkFrARwe+d8Ru0BN558abFb</ds:X509Certificate></ds:X509Data></ds:KeyInfo></md:KeyDescriptor><md:NameIDFormat>urn:oasis:names:tc:SAML:1"
+                    + ".1:nameid-format:emailAddress</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat><md:SingleSignOnService "
+                    + "Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\" Location=\"https://pivotal.oktapreview"
+                    + ".com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml\"/><md:SingleSignOnService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect\" "
+                    + "Location=\"https://pivotal.oktapreview.com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml\"/></md:IDPSSODescriptor></md:EntityDescriptor>\n")
+                .metadataTrustCheck(false)
+                .nameId("urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress")
+                .showSamlLink(false)
+                .socketFactoryClassName("org.apache.commons.httpclient.protocol.DefaultProtocolSocketFactory")
                 .build())
+            .name("SAML name")
+            .originKey("SAML")
+            .type(Type.SAML)
+            .identityZoneId("test-identity-zone-id")
+            .build())
             .as(StepVerifier::create)
             .expectNext(CreateIdentityProviderResponse.builder()
                 .active(true)
@@ -247,20 +249,20 @@ public final class ReactorIdentityProvidersTest extends AbstractUaaApiTest {
                     .groupMappingMode(ExternalGroupMappingMode.EXPLICITLY_MAPPED)
                     .idpEntityAlias("SAML")
                     .linkText("IDPEndpointsMockTests Saml Provider:SAML")
-                    .metaDataLocation("<?xml version=\"1.0\" encoding=\"UTF-8\"?><md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\" entityID=\"http://www.okta" +
-                        ".com/SAML\"><md:IDPSSODescriptor WantAuthnRequestsSigned=\"true\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\"><md:KeyDescriptor " +
-                        "use=\"signing\"><ds:KeyInfo xmlns:ds=\"http://www.w3" +
-                        ".org/2000/09/xmldsig#\"><ds:X509Data><ds:X509Certificate>MIICmTCCAgKgAwIBAgIGAUPATqmEMA0GCSqGSIb3DQEBBQUAMIGPMQswCQYDVQQGEwJVUzETMBEG" +
-                        "\nA1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UEBwwNU2FuIEZyYW5jaXNjbzENMAsGA1UECgwET2t0YTEU\nMBIGA1UECwwLU1NPUHJvdmlkZXIxEDAOBgNVBAMMB1Bpdm90YWwxHDAaBgkqhkiG9w0BCQEWDWlu" +
-                        "\nZm9Ab2t0YS5jb20wHhcNMTQwMTIzMTgxMjM3WhcNNDQwMTIzMTgxMzM3WjCBjzELMAkGA1UEBhMC\nVVMxEzARBgNVBAgMCkNhbGlmb3JuaWExFjAUBgNVBAcMDVNhbiBGcmFuY2lzY28xDTALBgNVBAoM" +
-                        "\nBE9rdGExFDASBgNVBAsMC1NTT1Byb3ZpZGVyMRAwDgYDVQQDDAdQaXZvdGFsMRwwGgYJKoZIhvcN\nAQkBFg1pbmZvQG9rdGEuY29tMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCeil67/TLOiTZU" +
-                        "\nWWgW2XEGgFZ94bVO90v5J1XmcHMwL8v5Z/8qjdZLpGdwI7Ph0CyXMMNklpaR/Ljb8fsls3amdT5O\nBw92Zo8ulcpjw2wuezTwL0eC0wY/GQDAZiXL59npE6U+fH1lbJIq92hx0HJSru/0O1q3+A/+jjZL\n3tL" +
-                        "/SwIDAQABMA0GCSqGSIb3DQEBBQUAA4GBAI5BoWZoH6Mz9vhypZPOJCEKa/K+biZQsA4Zqsuk\nvvphhSERhqk/Nv76Vkl8uvJwwHbQrR9KJx4L3PRkGCG24rix71jEuXVGZUsDNM3CUKnARx4MEab6\nGFHNkZ6DmoT" +
-                        "/PFagngecHu+EwmuDtaG0rEkFrARwe+d8Ru0BN558abFb</ds:X509Certificate></ds:X509Data></ds:KeyInfo></md:KeyDescriptor><md:NameIDFormat>urn:oasis:names:tc:SAML:1" +
-                        ".1:nameid-format:emailAddress</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat><md:SingleSignOnService " +
-                        "Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\" Location=\"https://pivotal.oktapreview" +
-                        ".com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml\"/><md:SingleSignOnService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect\" " +
-                        "Location=\"https://pivotal.oktapreview.com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml\"/></md:IDPSSODescriptor></md:EntityDescriptor>\n")
+                    .metaDataLocation("<?xml version=\"1.0\" encoding=\"UTF-8\"?><md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\" entityID=\"http://www.okta"
+                        + ".com/SAML\"><md:IDPSSODescriptor WantAuthnRequestsSigned=\"true\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\"><md:KeyDescriptor "
+                        + "use=\"signing\"><ds:KeyInfo xmlns:ds=\"http://www.w3"
+                        + ".org/2000/09/xmldsig#\"><ds:X509Data><ds:X509Certificate>MIICmTCCAgKgAwIBAgIGAUPATqmEMA0GCSqGSIb3DQEBBQUAMIGPMQswCQYDVQQGEwJVUzETMBEG"
+                        + "\nA1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UEBwwNU2FuIEZyYW5jaXNjbzENMAsGA1UECgwET2t0YTEU\nMBIGA1UECwwLU1NPUHJvdmlkZXIxEDAOBgNVBAMMB1Bpdm90YWwxHDAaBgkqhkiG9w0BCQEWDWlu"
+                        + "\nZm9Ab2t0YS5jb20wHhcNMTQwMTIzMTgxMjM3WhcNNDQwMTIzMTgxMzM3WjCBjzELMAkGA1UEBhMC\nVVMxEzARBgNVBAgMCkNhbGlmb3JuaWExFjAUBgNVBAcMDVNhbiBGcmFuY2lzY28xDTALBgNVBAoM"
+                        + "\nBE9rdGExFDASBgNVBAsMC1NTT1Byb3ZpZGVyMRAwDgYDVQQDDAdQaXZvdGFsMRwwGgYJKoZIhvcN\nAQkBFg1pbmZvQG9rdGEuY29tMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCeil67/TLOiTZU"
+                        + "\nWWgW2XEGgFZ94bVO90v5J1XmcHMwL8v5Z/8qjdZLpGdwI7Ph0CyXMMNklpaR/Ljb8fsls3amdT5O\nBw92Zo8ulcpjw2wuezTwL0eC0wY/GQDAZiXL59npE6U+fH1lbJIq92hx0HJSru/0O1q3+A/+jjZL\n3tL"
+                        + "/SwIDAQABMA0GCSqGSIb3DQEBBQUAA4GBAI5BoWZoH6Mz9vhypZPOJCEKa/K+biZQsA4Zqsuk\nvvphhSERhqk/Nv76Vkl8uvJwwHbQrR9KJx4L3PRkGCG24rix71jEuXVGZUsDNM3CUKnARx4MEab6\nGFHNkZ6DmoT"
+                        + "/PFagngecHu+EwmuDtaG0rEkFrARwe+d8Ru0BN558abFb</ds:X509Certificate></ds:X509Data></ds:KeyInfo></md:KeyDescriptor><md:NameIDFormat>urn:oasis:names:tc:SAML:1"
+                        + ".1:nameid-format:emailAddress</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat><md:SingleSignOnService "
+                        + "Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\" Location=\"https://pivotal.oktapreview"
+                        + ".com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml\"/><md:SingleSignOnService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect\" "
+                        + "Location=\"https://pivotal.oktapreview.com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml\"/></md:IDPSSODescriptor></md:EntityDescriptor>\n")
                     .metadataTrustCheck(false)
                     .nameId("urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress")
                     .showSamlLink(false)
@@ -283,7 +285,8 @@ public final class ReactorIdentityProvidersTest extends AbstractUaaApiTest {
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/identity-providers/test-identity-provider-id?rawConfig=true")
+                .method(DELETE)
+                .path("/identity-providers/test-identity-provider-id?rawConfig=true")
                 .header("X-Identity-Zone-Id", "test-identity-zone-id")
                 .build())
             .response(TestResponse.builder()
@@ -292,11 +295,10 @@ public final class ReactorIdentityProvidersTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.identityProviders
-            .delete(DeleteIdentityProviderRequest.builder()
-                .identityProviderId("test-identity-provider-id")
-                .identityZoneId("test-identity-zone-id")
-                .build())
+        this.identityProviders.delete(DeleteIdentityProviderRequest.builder()
+            .identityProviderId("test-identity-provider-id")
+            .identityZoneId("test-identity-zone-id")
+            .build())
             .as(StepVerifier::create)
             .expectNext(DeleteIdentityProviderResponse.builder()
                 .active(true)
@@ -310,20 +312,20 @@ public final class ReactorIdentityProvidersTest extends AbstractUaaApiTest {
                     .groupMappingMode(ExternalGroupMappingMode.EXPLICITLY_MAPPED)
                     .idpEntityAlias("saml-for-delete")
                     .linkText("IDPEndpointsMockTests Saml Provider:saml-for-delete")
-                    .metaDataLocation("<?xml version=\"1.0\" encoding=\"UTF-8\"?><md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\" entityID=\"http://www.okta" +
-                        ".com/saml-for-delete\"><md:IDPSSODescriptor WantAuthnRequestsSigned=\"true\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\"><md:KeyDescriptor " +
-                        "use=\"signing\"><ds:KeyInfo xmlns:ds=\"http://www.w3" +
-                        ".org/2000/09/xmldsig#\"><ds:X509Data><ds:X509Certificate>MIICmTCCAgKgAwIBAgIGAUPATqmEMA0GCSqGSIb3DQEBBQUAMIGPMQswCQYDVQQGEwJVUzETMBEG" +
-                        "\nA1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UEBwwNU2FuIEZyYW5jaXNjbzENMAsGA1UECgwET2t0YTEU\nMBIGA1UECwwLU1NPUHJvdmlkZXIxEDAOBgNVBAMMB1Bpdm90YWwxHDAaBgkqhkiG9w0BCQEWDWlu" +
-                        "\nZm9Ab2t0YS5jb20wHhcNMTQwMTIzMTgxMjM3WhcNNDQwMTIzMTgxMzM3WjCBjzELMAkGA1UEBhMC\nVVMxEzARBgNVBAgMCkNhbGlmb3JuaWExFjAUBgNVBAcMDVNhbiBGcmFuY2lzY28xDTALBgNVBAoM" +
-                        "\nBE9rdGExFDASBgNVBAsMC1NTT1Byb3ZpZGVyMRAwDgYDVQQDDAdQaXZvdGFsMRwwGgYJKoZIhvcN\nAQkBFg1pbmZvQG9rdGEuY29tMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCeil67/TLOiTZU" +
-                        "\nWWgW2XEGgFZ94bVO90v5J1XmcHMwL8v5Z/8qjdZLpGdwI7Ph0CyXMMNklpaR/Ljb8fsls3amdT5O\nBw92Zo8ulcpjw2wuezTwL0eC0wY/GQDAZiXL59npE6U+fH1lbJIq92hx0HJSru/0O1q3+A/+jjZL\n3tL" +
-                        "/SwIDAQABMA0GCSqGSIb3DQEBBQUAA4GBAI5BoWZoH6Mz9vhypZPOJCEKa/K+biZQsA4Zqsuk\nvvphhSERhqk/Nv76Vkl8uvJwwHbQrR9KJx4L3PRkGCG24rix71jEuXVGZUsDNM3CUKnARx4MEab6\nGFHNkZ6DmoT" +
-                        "/PFagngecHu+EwmuDtaG0rEkFrARwe+d8Ru0BN558abFb</ds:X509Certificate></ds:X509Data></ds:KeyInfo></md:KeyDescriptor><md:NameIDFormat>urn:oasis:names:tc:SAML:1" +
-                        ".1:nameid-format:emailAddress</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat><md:SingleSignOnService " +
-                        "Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\" Location=\"https://pivotal.oktapreview" +
-                        ".com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml\"/><md:SingleSignOnService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect\" " +
-                        "Location=\"https://pivotal.oktapreview.com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml\"/></md:IDPSSODescriptor></md:EntityDescriptor>\n")
+                    .metaDataLocation("<?xml version=\"1.0\" encoding=\"UTF-8\"?><md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\" entityID=\"http://www.okta"
+                        + ".com/saml-for-delete\"><md:IDPSSODescriptor WantAuthnRequestsSigned=\"true\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\"><md:KeyDescriptor "
+                        + "use=\"signing\"><ds:KeyInfo xmlns:ds=\"http://www.w3"
+                        + ".org/2000/09/xmldsig#\"><ds:X509Data><ds:X509Certificate>MIICmTCCAgKgAwIBAgIGAUPATqmEMA0GCSqGSIb3DQEBBQUAMIGPMQswCQYDVQQGEwJVUzETMBEG"
+                        + "\nA1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UEBwwNU2FuIEZyYW5jaXNjbzENMAsGA1UECgwET2t0YTEU\nMBIGA1UECwwLU1NPUHJvdmlkZXIxEDAOBgNVBAMMB1Bpdm90YWwxHDAaBgkqhkiG9w0BCQEWDWlu"
+                        + "\nZm9Ab2t0YS5jb20wHhcNMTQwMTIzMTgxMjM3WhcNNDQwMTIzMTgxMzM3WjCBjzELMAkGA1UEBhMC\nVVMxEzARBgNVBAgMCkNhbGlmb3JuaWExFjAUBgNVBAcMDVNhbiBGcmFuY2lzY28xDTALBgNVBAoM"
+                        + "\nBE9rdGExFDASBgNVBAsMC1NTT1Byb3ZpZGVyMRAwDgYDVQQDDAdQaXZvdGFsMRwwGgYJKoZIhvcN\nAQkBFg1pbmZvQG9rdGEuY29tMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCeil67/TLOiTZU"
+                        + "\nWWgW2XEGgFZ94bVO90v5J1XmcHMwL8v5Z/8qjdZLpGdwI7Ph0CyXMMNklpaR/Ljb8fsls3amdT5O\nBw92Zo8ulcpjw2wuezTwL0eC0wY/GQDAZiXL59npE6U+fH1lbJIq92hx0HJSru/0O1q3+A/+jjZL\n3tL"
+                        + "/SwIDAQABMA0GCSqGSIb3DQEBBQUAA4GBAI5BoWZoH6Mz9vhypZPOJCEKa/K+biZQsA4Zqsuk\nvvphhSERhqk/Nv76Vkl8uvJwwHbQrR9KJx4L3PRkGCG24rix71jEuXVGZUsDNM3CUKnARx4MEab6\nGFHNkZ6DmoT"
+                        + "/PFagngecHu+EwmuDtaG0rEkFrARwe+d8Ru0BN558abFb</ds:X509Certificate></ds:X509Data></ds:KeyInfo></md:KeyDescriptor><md:NameIDFormat>urn:oasis:names:tc:SAML:1"
+                        + ".1:nameid-format:emailAddress</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat><md:SingleSignOnService "
+                        + "Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\" Location=\"https://pivotal.oktapreview"
+                        + ".com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml\"/><md:SingleSignOnService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect\" "
+                        + "Location=\"https://pivotal.oktapreview.com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml\"/></md:IDPSSODescriptor></md:EntityDescriptor>\n")
                     .metadataTrustCheck(false)
                     .nameId("urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress")
                     .showSamlLink(false)
@@ -346,7 +348,8 @@ public final class ReactorIdentityProvidersTest extends AbstractUaaApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/identity-providers/test-identity-provider-id?rawConfig=true")
+                .method(GET)
+                .path("/identity-providers/test-identity-provider-id?rawConfig=true")
                 .header("X-Identity-Zone-Id", "test-identity-zone-id")
                 .build())
             .response(TestResponse.builder()
@@ -355,11 +358,10 @@ public final class ReactorIdentityProvidersTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.identityProviders
-            .get(GetIdentityProviderRequest.builder()
-                .identityProviderId("test-identity-provider-id")
-                .identityZoneId("test-identity-zone-id")
-                .build())
+        this.identityProviders.get(GetIdentityProviderRequest.builder()
+            .identityProviderId("test-identity-provider-id")
+            .identityZoneId("test-identity-zone-id")
+            .build())
             .as(StepVerifier::create)
             .expectNext(GetIdentityProviderResponse.builder()
                 .active(true)
@@ -373,20 +375,20 @@ public final class ReactorIdentityProvidersTest extends AbstractUaaApiTest {
                     .groupMappingMode(ExternalGroupMappingMode.EXPLICITLY_MAPPED)
                     .idpEntityAlias("saml-for-get")
                     .linkText("IDPEndpointsMockTests Saml Provider:saml-for-get")
-                    .metaDataLocation("<?xml version=\"1.0\" encoding=\"UTF-8\"?><md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\" entityID=\"http://www.okta" +
-                        ".com/saml-for-get\"><md:IDPSSODescriptor WantAuthnRequestsSigned=\"true\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\"><md:KeyDescriptor " +
-                        "use=\"signing\"><ds:KeyInfo xmlns:ds=\"http://www.w3" +
-                        ".org/2000/09/xmldsig#\"><ds:X509Data><ds:X509Certificate>MIICmTCCAgKgAwIBAgIGAUPATqmEMA0GCSqGSIb3DQEBBQUAMIGPMQswCQYDVQQGEwJVUzETMBEG" +
-                        "\nA1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UEBwwNU2FuIEZyYW5jaXNjbzENMAsGA1UECgwET2t0YTEU\nMBIGA1UECwwLU1NPUHJvdmlkZXIxEDAOBgNVBAMMB1Bpdm90YWwxHDAaBgkqhkiG9w0BCQEWDWlu" +
-                        "\nZm9Ab2t0YS5jb20wHhcNMTQwMTIzMTgxMjM3WhcNNDQwMTIzMTgxMzM3WjCBjzELMAkGA1UEBhMC\nVVMxEzARBgNVBAgMCkNhbGlmb3JuaWExFjAUBgNVBAcMDVNhbiBGcmFuY2lzY28xDTALBgNVBAoM" +
-                        "\nBE9rdGExFDASBgNVBAsMC1NTT1Byb3ZpZGVyMRAwDgYDVQQDDAdQaXZvdGFsMRwwGgYJKoZIhvcN\nAQkBFg1pbmZvQG9rdGEuY29tMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCeil67/TLOiTZU" +
-                        "\nWWgW2XEGgFZ94bVO90v5J1XmcHMwL8v5Z/8qjdZLpGdwI7Ph0CyXMMNklpaR/Ljb8fsls3amdT5O\nBw92Zo8ulcpjw2wuezTwL0eC0wY/GQDAZiXL59npE6U+fH1lbJIq92hx0HJSru/0O1q3+A/+jjZL\n3tL" +
-                        "/SwIDAQABMA0GCSqGSIb3DQEBBQUAA4GBAI5BoWZoH6Mz9vhypZPOJCEKa/K+biZQsA4Zqsuk\nvvphhSERhqk/Nv76Vkl8uvJwwHbQrR9KJx4L3PRkGCG24rix71jEuXVGZUsDNM3CUKnARx4MEab6\nGFHNkZ6DmoT" +
-                        "/PFagngecHu+EwmuDtaG0rEkFrARwe+d8Ru0BN558abFb</ds:X509Certificate></ds:X509Data></ds:KeyInfo></md:KeyDescriptor><md:NameIDFormat>urn:oasis:names:tc:SAML:1" +
-                        ".1:nameid-format:emailAddress</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat><md:SingleSignOnService " +
-                        "Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\" Location=\"https://pivotal.oktapreview" +
-                        ".com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml\"/><md:SingleSignOnService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect\" " +
-                        "Location=\"https://pivotal.oktapreview.com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml\"/></md:IDPSSODescriptor></md:EntityDescriptor>\n")
+                    .metaDataLocation("<?xml version=\"1.0\" encoding=\"UTF-8\"?><md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\" entityID=\"http://www.okta"
+                        + ".com/saml-for-get\"><md:IDPSSODescriptor WantAuthnRequestsSigned=\"true\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\"><md:KeyDescriptor "
+                        + "use=\"signing\"><ds:KeyInfo xmlns:ds=\"http://www.w3"
+                        + ".org/2000/09/xmldsig#\"><ds:X509Data><ds:X509Certificate>MIICmTCCAgKgAwIBAgIGAUPATqmEMA0GCSqGSIb3DQEBBQUAMIGPMQswCQYDVQQGEwJVUzETMBEG"
+                        + "\nA1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UEBwwNU2FuIEZyYW5jaXNjbzENMAsGA1UECgwET2t0YTEU\nMBIGA1UECwwLU1NPUHJvdmlkZXIxEDAOBgNVBAMMB1Bpdm90YWwxHDAaBgkqhkiG9w0BCQEWDWlu"
+                        + "\nZm9Ab2t0YS5jb20wHhcNMTQwMTIzMTgxMjM3WhcNNDQwMTIzMTgxMzM3WjCBjzELMAkGA1UEBhMC\nVVMxEzARBgNVBAgMCkNhbGlmb3JuaWExFjAUBgNVBAcMDVNhbiBGcmFuY2lzY28xDTALBgNVBAoM"
+                        + "\nBE9rdGExFDASBgNVBAsMC1NTT1Byb3ZpZGVyMRAwDgYDVQQDDAdQaXZvdGFsMRwwGgYJKoZIhvcN\nAQkBFg1pbmZvQG9rdGEuY29tMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCeil67/TLOiTZU"
+                        + "\nWWgW2XEGgFZ94bVO90v5J1XmcHMwL8v5Z/8qjdZLpGdwI7Ph0CyXMMNklpaR/Ljb8fsls3amdT5O\nBw92Zo8ulcpjw2wuezTwL0eC0wY/GQDAZiXL59npE6U+fH1lbJIq92hx0HJSru/0O1q3+A/+jjZL\n3tL"
+                        + "/SwIDAQABMA0GCSqGSIb3DQEBBQUAA4GBAI5BoWZoH6Mz9vhypZPOJCEKa/K+biZQsA4Zqsuk\nvvphhSERhqk/Nv76Vkl8uvJwwHbQrR9KJx4L3PRkGCG24rix71jEuXVGZUsDNM3CUKnARx4MEab6\nGFHNkZ6DmoT"
+                        + "/PFagngecHu+EwmuDtaG0rEkFrARwe+d8Ru0BN558abFb</ds:X509Certificate></ds:X509Data></ds:KeyInfo></md:KeyDescriptor><md:NameIDFormat>urn:oasis:names:tc:SAML:1"
+                        + ".1:nameid-format:emailAddress</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat><md:SingleSignOnService "
+                        + "Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\" Location=\"https://pivotal.oktapreview"
+                        + ".com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml\"/><md:SingleSignOnService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect\" "
+                        + "Location=\"https://pivotal.oktapreview.com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml\"/></md:IDPSSODescriptor></md:EntityDescriptor>\n")
                     .metadataTrustCheck(false)
                     .nameId("urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress")
                     .showSamlLink(false)
@@ -409,7 +411,8 @@ public final class ReactorIdentityProvidersTest extends AbstractUaaApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/identity-providers?rawConfig=true")
+                .method(GET)
+                .path("/identity-providers?rawConfig=true")
                 .header("X-Identity-Zone-Id", "test-identity-zone-id")
                 .build())
             .response(TestResponse.builder()
@@ -418,10 +421,9 @@ public final class ReactorIdentityProvidersTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.identityProviders
-            .list(ListIdentityProvidersRequest.builder()
-                .identityZoneId("test-identity-zone-id")
-                .build())
+        this.identityProviders.list(ListIdentityProvidersRequest.builder()
+            .identityZoneId("test-identity-zone-id")
+            .build())
             .as(StepVerifier::create)
             .expectNext(ListIdentityProvidersResponse.builder()
                 .identityProvider(IdentityProvider.builder()
@@ -436,20 +438,20 @@ public final class ReactorIdentityProvidersTest extends AbstractUaaApiTest {
                         .groupMappingMode(ExternalGroupMappingMode.EXPLICITLY_MAPPED)
                         .idpEntityAlias("SAML")
                         .linkText("IDPEndpointsMockTests Saml Provider:SAML")
-                        .metaDataLocation("<?xml version=\"1.0\" encoding=\"UTF-8\"?><md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\" entityID=\"http://www.okta" +
-                            ".com/SAML\"><md:IDPSSODescriptor WantAuthnRequestsSigned=\"true\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\"><md:KeyDescriptor " +
-                            "use=\"signing\"><ds:KeyInfo xmlns:ds=\"http://www.w3" +
-                            ".org/2000/09/xmldsig#\"><ds:X509Data><ds:X509Certificate>MIICmTCCAgKgAwIBAgIGAUPATqmEMA0GCSqGSIb3DQEBBQUAMIGPMQswCQYDVQQGEwJVUzETMBEG" +
-                            "\nA1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UEBwwNU2FuIEZyYW5jaXNjbzENMAsGA1UECgwET2t0YTEU\nMBIGA1UECwwLU1NPUHJvdmlkZXIxEDAOBgNVBAMMB1Bpdm90YWwxHDAaBgkqhkiG9w0BCQEWDWlu" +
-                            "\nZm9Ab2t0YS5jb20wHhcNMTQwMTIzMTgxMjM3WhcNNDQwMTIzMTgxMzM3WjCBjzELMAkGA1UEBhMC\nVVMxEzARBgNVBAgMCkNhbGlmb3JuaWExFjAUBgNVBAcMDVNhbiBGcmFuY2lzY28xDTALBgNVBAoM" +
-                            "\nBE9rdGExFDASBgNVBAsMC1NTT1Byb3ZpZGVyMRAwDgYDVQQDDAdQaXZvdGFsMRwwGgYJKoZIhvcN\nAQkBFg1pbmZvQG9rdGEuY29tMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCeil67/TLOiTZU" +
-                            "\nWWgW2XEGgFZ94bVO90v5J1XmcHMwL8v5Z/8qjdZLpGdwI7Ph0CyXMMNklpaR/Ljb8fsls3amdT5O\nBw92Zo8ulcpjw2wuezTwL0eC0wY/GQDAZiXL59npE6U+fH1lbJIq92hx0HJSru/0O1q3+A/+jjZL\n3tL" +
-                            "/SwIDAQABMA0GCSqGSIb3DQEBBQUAA4GBAI5BoWZoH6Mz9vhypZPOJCEKa/K+biZQsA4Zqsuk\nvvphhSERhqk/Nv76Vkl8uvJwwHbQrR9KJx4L3PRkGCG24rix71jEuXVGZUsDNM3CUKnARx4MEab6\nGFHNkZ6DmoT" +
-                            "/PFagngecHu+EwmuDtaG0rEkFrARwe+d8Ru0BN558abFb</ds:X509Certificate></ds:X509Data></ds:KeyInfo></md:KeyDescriptor><md:NameIDFormat>urn:oasis:names:tc:SAML:1" +
-                            ".1:nameid-format:emailAddress</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat><md:SingleSignOnService " +
-                            "Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\" Location=\"https://pivotal.oktapreview" +
-                            ".com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml\"/><md:SingleSignOnService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect\" " +
-                            "Location=\"https://pivotal.oktapreview.com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml\"/></md:IDPSSODescriptor></md:EntityDescriptor>\n")
+                        .metaDataLocation("<?xml version=\"1.0\" encoding=\"UTF-8\"?><md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\" entityID=\"http://www.okta"
+                            + ".com/SAML\"><md:IDPSSODescriptor WantAuthnRequestsSigned=\"true\" protocolSupportEnumeration=\"urn:oasis:names:tc:SAML:2.0:protocol\"><md:KeyDescriptor "
+                            + "use=\"signing\"><ds:KeyInfo xmlns:ds=\"http://www.w3"
+                            + ".org/2000/09/xmldsig#\"><ds:X509Data><ds:X509Certificate>MIICmTCCAgKgAwIBAgIGAUPATqmEMA0GCSqGSIb3DQEBBQUAMIGPMQswCQYDVQQGEwJVUzETMBEG"
+                            + "\nA1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UEBwwNU2FuIEZyYW5jaXNjbzENMAsGA1UECgwET2t0YTEU\nMBIGA1UECwwLU1NPUHJvdmlkZXIxEDAOBgNVBAMMB1Bpdm90YWwxHDAaBgkqhkiG9w0BCQEWDWlu"
+                            + "\nZm9Ab2t0YS5jb20wHhcNMTQwMTIzMTgxMjM3WhcNNDQwMTIzMTgxMzM3WjCBjzELMAkGA1UEBhMC\nVVMxEzARBgNVBAgMCkNhbGlmb3JuaWExFjAUBgNVBAcMDVNhbiBGcmFuY2lzY28xDTALBgNVBAoM"
+                            + "\nBE9rdGExFDASBgNVBAsMC1NTT1Byb3ZpZGVyMRAwDgYDVQQDDAdQaXZvdGFsMRwwGgYJKoZIhvcN\nAQkBFg1pbmZvQG9rdGEuY29tMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCeil67/TLOiTZU"
+                            + "\nWWgW2XEGgFZ94bVO90v5J1XmcHMwL8v5Z/8qjdZLpGdwI7Ph0CyXMMNklpaR/Ljb8fsls3amdT5O\nBw92Zo8ulcpjw2wuezTwL0eC0wY/GQDAZiXL59npE6U+fH1lbJIq92hx0HJSru/0O1q3+A/+jjZL\n3tL"
+                            + "/SwIDAQABMA0GCSqGSIb3DQEBBQUAA4GBAI5BoWZoH6Mz9vhypZPOJCEKa/K+biZQsA4Zqsuk\nvvphhSERhqk/Nv76Vkl8uvJwwHbQrR9KJx4L3PRkGCG24rix71jEuXVGZUsDNM3CUKnARx4MEab6\nGFHNkZ6DmoT"
+                            + "/PFagngecHu+EwmuDtaG0rEkFrARwe+d8Ru0BN558abFb</ds:X509Certificate></ds:X509Data></ds:KeyInfo></md:KeyDescriptor><md:NameIDFormat>urn:oasis:names:tc:SAML:1"
+                            + ".1:nameid-format:emailAddress</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat><md:SingleSignOnService "
+                            + "Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\" Location=\"https://pivotal.oktapreview"
+                            + ".com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml\"/><md:SingleSignOnService Binding=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect\" "
+                            + "Location=\"https://pivotal.oktapreview.com/app/pivotal_pivotalcfstaging_1/k2lw4l5bPODCMIIDBRYZ/sso/saml\"/></md:IDPSSODescriptor></md:EntityDescriptor>\n")
                         .metadataTrustCheck(false)
                         .nameId("urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress")
                         .showSamlLink(false)
@@ -530,7 +532,8 @@ public final class ReactorIdentityProvidersTest extends AbstractUaaApiTest {
     public void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/identity-providers/test-identity-provider-id?rawConfig=true")
+                .method(PUT)
+                .path("/identity-providers/test-identity-provider-id?rawConfig=true")
                 .header("X-Identity-Zone-Id", "test-identity-zone-id")
                 .payload("fixtures/uaa/identity-providers/PUT_{id}_request.json")
                 .build())
@@ -540,24 +543,23 @@ public final class ReactorIdentityProvidersTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.identityProviders
-            .update(UpdateIdentityProviderRequest.builder()
-                .active(true)
-                .configuration(InternalConfiguration.builder()
-                    .disableInternalUserManagement(false)
-                    .lockoutPolicy(LockoutPolicy.builder()
-                        .lockAccountPeriodInSecond(8)
-                        .lockoutPeriodInSecond(8)
-                        .numberOfAllowedFailures(8)
-                        .build())
+        this.identityProviders.update(UpdateIdentityProviderRequest.builder()
+            .active(true)
+            .configuration(InternalConfiguration.builder()
+                .disableInternalUserManagement(false)
+                .lockoutPolicy(LockoutPolicy.builder()
+                    .lockAccountPeriodInSecond(8)
+                    .lockoutPeriodInSecond(8)
+                    .numberOfAllowedFailures(8)
                     .build())
-                .name("uaa")
-                .originKey("uaa")
-                .type(Type.INTERNAL)
-                .version(1)
-                .identityZoneId("test-identity-zone-id")
-                .identityProviderId("test-identity-provider-id")
                 .build())
+            .name("uaa")
+            .originKey("uaa")
+            .type(Type.INTERNAL)
+            .version(1)
+            .identityZoneId("test-identity-zone-id")
+            .identityProviderId("test-identity-provider-id")
+            .build())
             .as(StepVerifier::create)
             .expectNext(UpdateIdentityProviderResponse.builder()
                 .active(true)

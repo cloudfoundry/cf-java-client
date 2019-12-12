@@ -29,19 +29,21 @@ import org.junit.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
+import java.util.Collections;
 
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorJobsV3Test extends AbstractClientApiTest {
 
-    private final ReactorJobsV3 jobs = new ReactorJobsV3(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    private final ReactorJobsV3 jobs = new ReactorJobsV3(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/jobs/test-job-id")
+                .method(GET)
+                .path("/jobs/test-job-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -49,10 +51,9 @@ public final class ReactorJobsV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.jobs
-            .get(GetJobRequest.builder()
-                .jobId("test-job-id")
-                .build())
+        this.jobs.get(GetJobRequest.builder()
+            .jobId("test-job-id")
+            .build())
             .as(StepVerifier::create)
             .expectNext(GetJobResponse.builder()
                 .id("b19ae525-cbd3-4155-b156-dc0c2a431b4c")

@@ -38,16 +38,19 @@ import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.PUT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-
 public class ReactorEnvironmentVariableGroupsTest extends AbstractClientApiTest {
 
-    private ReactorEnvironmentVariableGroups environmentVariableGroups = new ReactorEnvironmentVariableGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    private ReactorEnvironmentVariableGroups environmentVariableGroups = new ReactorEnvironmentVariableGroups(CONNECTION_CONTEXT,
+        this.root,
+        TOKEN_PROVIDER,
+        Collections.emptyMap());
 
     @Test
     public void getRunningEnvironmentVariables() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/config/environment_variable_groups/running")
+                .method(GET)
+                .path("/config/environment_variable_groups/running")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -55,9 +58,8 @@ public class ReactorEnvironmentVariableGroupsTest extends AbstractClientApiTest 
                 .build())
             .build());
 
-        this.environmentVariableGroups
-            .getRunningEnvironmentVariables(GetRunningEnvironmentVariablesRequest.builder()
-                .build())
+        this.environmentVariableGroups.getRunningEnvironmentVariables(GetRunningEnvironmentVariablesRequest.builder()
+            .build())
             .as(StepVerifier::create)
             .expectNext(GetRunningEnvironmentVariablesResponse.builder()
                 .environmentVariable("abc", 123)
@@ -71,7 +73,8 @@ public class ReactorEnvironmentVariableGroupsTest extends AbstractClientApiTest 
     public void getStagingEnvironmentVariables() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/config/environment_variable_groups/staging")
+                .method(GET)
+                .path("/config/environment_variable_groups/staging")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -79,9 +82,8 @@ public class ReactorEnvironmentVariableGroupsTest extends AbstractClientApiTest 
                 .build())
             .build());
 
-        this.environmentVariableGroups
-            .getStagingEnvironmentVariables(GetStagingEnvironmentVariablesRequest.builder()
-                .build())
+        this.environmentVariableGroups.getStagingEnvironmentVariables(GetStagingEnvironmentVariablesRequest.builder()
+            .build())
             .as(StepVerifier::create)
             .expectNext(GetStagingEnvironmentVariablesResponse.builder()
                 .environmentVariable("abc", 123)
@@ -95,7 +97,8 @@ public class ReactorEnvironmentVariableGroupsTest extends AbstractClientApiTest 
     public void updateRunningEnvironmentVariables() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/config/environment_variable_groups/running")
+                .method(PUT)
+                .path("/config/environment_variable_groups/running")
                 .payload("fixtures/client/v2/environment_variable_groups/PUT_running_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -104,11 +107,12 @@ public class ReactorEnvironmentVariableGroupsTest extends AbstractClientApiTest 
                 .build())
             .build());
 
-        this.environmentVariableGroups
-            .updateRunningEnvironmentVariables(UpdateRunningEnvironmentVariablesRequest.builder()
-                .environmentVariable("abc", 123)
-                .environmentVariable("do-re-me", "fa-so-la-tee")
-                .build())
+        this.environmentVariableGroups.updateRunningEnvironmentVariables(UpdateRunningEnvironmentVariablesRequest.builder()
+            .environmentVariable("abc",
+                123)
+            .environmentVariable("do-re-me",
+                "fa-so-la-tee")
+            .build())
             .as(StepVerifier::create)
             .expectNext(UpdateRunningEnvironmentVariablesResponse.builder()
                 .environmentVariable("abc", 123)
@@ -122,7 +126,8 @@ public class ReactorEnvironmentVariableGroupsTest extends AbstractClientApiTest 
     public void updateRunningEnvironmentVariablesEmpty() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/config/environment_variable_groups/running")
+                .method(PUT)
+                .path("/config/environment_variable_groups/running")
                 .payload("fixtures/client/v2/environment_variable_groups/PUT_running_request_empty.json")
                 .build())
             .response(TestResponse.builder()
@@ -131,10 +136,9 @@ public class ReactorEnvironmentVariableGroupsTest extends AbstractClientApiTest 
                 .build())
             .build());
 
-        this.environmentVariableGroups
-            .updateRunningEnvironmentVariables(UpdateRunningEnvironmentVariablesRequest.builder()
-                .environmentVariables(Collections.emptyMap())
-                .build())
+        this.environmentVariableGroups.updateRunningEnvironmentVariables(UpdateRunningEnvironmentVariablesRequest.builder()
+            .environmentVariables(Collections.emptyMap())
+            .build())
             .as(StepVerifier::create)
             .expectNext(UpdateRunningEnvironmentVariablesResponse.builder()
                 .environmentVariables(Collections.emptyMap())
@@ -147,7 +151,8 @@ public class ReactorEnvironmentVariableGroupsTest extends AbstractClientApiTest 
     public void updateStagingEnvironmentVariables() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/config/environment_variable_groups/staging")
+                .method(PUT)
+                .path("/config/environment_variable_groups/staging")
                 .payload("fixtures/client/v2/environment_variable_groups/PUT_staging_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -156,11 +161,12 @@ public class ReactorEnvironmentVariableGroupsTest extends AbstractClientApiTest 
                 .build())
             .build());
 
-        this.environmentVariableGroups
-            .updateStagingEnvironmentVariables(UpdateStagingEnvironmentVariablesRequest.builder()
-                .environmentVariable("abc", 123)
-                .environmentVariable("do-re-me", "far-so-la-tee")
-                .build())
+        this.environmentVariableGroups.updateStagingEnvironmentVariables(UpdateStagingEnvironmentVariablesRequest.builder()
+            .environmentVariable("abc",
+                123)
+            .environmentVariable("do-re-me",
+                "far-so-la-tee")
+            .build())
             .as(StepVerifier::create)
             .expectNext(UpdateStagingEnvironmentVariablesResponse.builder()
                 .environmentVariable("abc", 123)
@@ -174,7 +180,8 @@ public class ReactorEnvironmentVariableGroupsTest extends AbstractClientApiTest 
     public void updateStagingEnvironmentVariablesEmpty() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/config/environment_variable_groups/staging")
+                .method(PUT)
+                .path("/config/environment_variable_groups/staging")
                 .payload("fixtures/client/v2/environment_variable_groups/PUT_staging_request_empty.json")
                 .build())
             .response(TestResponse.builder()
@@ -183,10 +190,9 @@ public class ReactorEnvironmentVariableGroupsTest extends AbstractClientApiTest 
                 .build())
             .build());
 
-        this.environmentVariableGroups
-            .updateStagingEnvironmentVariables(UpdateStagingEnvironmentVariablesRequest.builder()
-                .environmentVariables(Collections.emptyMap())
-                .build())
+        this.environmentVariableGroups.updateStagingEnvironmentVariables(UpdateStagingEnvironmentVariablesRequest.builder()
+            .environmentVariables(Collections.emptyMap())
+            .build())
             .as(StepVerifier::create)
             .expectNext(UpdateStagingEnvironmentVariablesResponse.builder()
                 .environmentVariables(Collections.emptyMap())

@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.reactor.client.v2.serviceplans;
 
-
 import org.cloudfoundry.client.v2.serviceplans.DeleteServicePlanRequest;
 import org.cloudfoundry.client.v2.serviceplans.DeleteServicePlanResponse;
 import org.cloudfoundry.client.v2.serviceplans.GetServicePlanRequest;
@@ -33,6 +32,8 @@ import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v2.AbstractClientV2Operations;
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
+
 /**
  * The Reactor-based implementation of {@link ServicePlans}
  */
@@ -42,42 +43,42 @@ public final class ReactorServicePlans extends AbstractClientV2Operations implem
      * Creates an instance
      *
      * @param connectionContext the {@link ConnectionContext} to use when communicating with the server
-     * @param root              the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
+     * @param root              the root URI of the server. Typically something like {@code https://api.run.pivotal.io}.
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
+     * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorServicePlans(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
-        super(connectionContext, root, tokenProvider);
+    public ReactorServicePlans(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider,
+                               Map<String, String> requestTags) {
+        super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<DeleteServicePlanResponse> delete(DeleteServicePlanRequest request) {
-        return delete(request, DeleteServicePlanResponse.class, builder -> builder.pathSegment("service_plans", request.getServicePlanId()))
-            .checkpoint();
+        return delete(request, DeleteServicePlanResponse.class,
+            builder -> builder.pathSegment("service_plans", request.getServicePlanId())).checkpoint();
     }
 
     @Override
     public Mono<GetServicePlanResponse> get(GetServicePlanRequest request) {
-        return get(request, GetServicePlanResponse.class, builder -> builder.pathSegment("service_plans", request.getServicePlanId()))
-            .checkpoint();
+        return get(request, GetServicePlanResponse.class,
+            builder -> builder.pathSegment("service_plans", request.getServicePlanId())).checkpoint();
     }
 
     @Override
     public Mono<ListServicePlansResponse> list(ListServicePlansRequest request) {
-        return get(request, ListServicePlansResponse.class, builder -> builder.pathSegment("service_plans"))
-            .checkpoint();
+        return get(request, ListServicePlansResponse.class, builder -> builder.pathSegment("service_plans")).checkpoint();
     }
 
     @Override
     public Mono<ListServicePlanServiceInstancesResponse> listServiceInstances(ListServicePlanServiceInstancesRequest request) {
         return get(request, ListServicePlanServiceInstancesResponse.class,
-            builder -> builder.pathSegment("service_plans", request.getServicePlanId(), "service_instances"))
-            .checkpoint();
+            builder -> builder.pathSegment("service_plans", request.getServicePlanId(), "service_instances")).checkpoint();
     }
 
     @Override
     public Mono<UpdateServicePlanResponse> update(UpdateServicePlanRequest request) {
-        return put(request, UpdateServicePlanResponse.class, builder -> builder.pathSegment("service_plans", request.getServicePlanId()))
-            .checkpoint();
+        return put(request, UpdateServicePlanResponse.class,
+            builder -> builder.pathSegment("service_plans", request.getServicePlanId())).checkpoint();
     }
 
 }

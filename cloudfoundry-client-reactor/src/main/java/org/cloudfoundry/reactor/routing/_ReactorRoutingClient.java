@@ -26,6 +26,9 @@ import org.cloudfoundry.routing.v1.tcproutes.TcpRoutes;
 import org.immutables.value.Value;
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
+import java.util.Map;
+
 /**
  * The Reactor-based implementation of {@link RoutingClient}
  */
@@ -35,13 +38,13 @@ abstract class _ReactorRoutingClient implements RoutingClient {
     @Override
     @Value.Derived
     public RouterGroups routerGroups() {
-        return new ReactorRouterGroups(getConnectionContext(), getRoot(), getTokenProvider());
+        return new ReactorRouterGroups(getConnectionContext(), getRoot(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public TcpRoutes tcpRoutes() {
-        return new ReactorTcpRoutes(getConnectionContext(), getRoot(), getTokenProvider());
+        return new ReactorTcpRoutes(getConnectionContext(), getRoot(), getTokenProvider(), getRequestTags());
     }
 
     /**
@@ -50,8 +53,14 @@ abstract class _ReactorRoutingClient implements RoutingClient {
     abstract ConnectionContext getConnectionContext();
 
     @Value.Default
+    Map<String, String> getRequestTags() {
+        return Collections.emptyMap();
+    }
+
+    @Value.Default
     Mono<String> getRoot() {
-        return getConnectionContext().getRootProvider().getRoot("routing", getConnectionContext());
+        return getConnectionContext().getRootProvider()
+            .getRoot("routing", getConnectionContext());
     }
 
     /**

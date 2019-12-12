@@ -29,21 +29,25 @@ import org.junit.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
+import java.util.Collections;
 
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.PUT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-
 public final class ReactorRouterGroupsTest extends AbstractRoutingApiTest {
 
-    private final ReactorRouterGroups routerGroups = new ReactorRouterGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    private final ReactorRouterGroups routerGroups = new ReactorRouterGroups(CONNECTION_CONTEXT,
+        this.root,
+        TOKEN_PROVIDER,
+        Collections.emptyMap());
 
     @Test
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/v1/router_groups")
+                .method(GET)
+                .path("/v1/router_groups")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -51,9 +55,8 @@ public final class ReactorRouterGroupsTest extends AbstractRoutingApiTest {
                 .build())
             .build());
 
-        this.routerGroups
-            .list(ListRouterGroupsRequest.builder()
-                .build())
+        this.routerGroups.list(ListRouterGroupsRequest.builder()
+            .build())
             .as(StepVerifier::create)
             .expectNext(ListRouterGroupsResponse.builder()
                 .routerGroup(RouterGroup.builder()
@@ -71,7 +74,8 @@ public final class ReactorRouterGroupsTest extends AbstractRoutingApiTest {
     public void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/v1/router_groups/abc123")
+                .method(PUT)
+                .path("/v1/router_groups/abc123")
                 .payload("fixtures/routing/v1/routergroups/PUT_{id}_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -80,11 +84,10 @@ public final class ReactorRouterGroupsTest extends AbstractRoutingApiTest {
                 .build())
             .build());
 
-        this.routerGroups
-            .update(UpdateRouterGroupRequest.builder()
-                .reservablePorts("1024-65535")
-                .routerGroupId("abc123")
-                .build())
+        this.routerGroups.update(UpdateRouterGroupRequest.builder()
+            .reservablePorts("1024-65535")
+            .routerGroupId("abc123")
+            .build())
             .as(StepVerifier::create)
             .expectNext(UpdateRouterGroupResponse.builder()
                 .name("default-tcp")

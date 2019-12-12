@@ -31,6 +31,7 @@ import org.junit.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
+import java.util.Collections;
 
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.PUT;
@@ -38,13 +39,17 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorFeatureFlagsTest extends AbstractClientApiTest {
 
-    private final ReactorFeatureFlags featureFlags = new ReactorFeatureFlags(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    private final ReactorFeatureFlags featureFlags = new ReactorFeatureFlags(CONNECTION_CONTEXT,
+        this.root,
+        TOKEN_PROVIDER,
+        Collections.emptyMap());
 
     @Test
     public void getAppScaling() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/config/feature_flags/app_scaling")
+                .method(GET)
+                .path("/config/feature_flags/app_scaling")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -52,10 +57,9 @@ public final class ReactorFeatureFlagsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.featureFlags
-            .get(GetFeatureFlagRequest.builder()
-                .name("app_scaling")
-                .build())
+        this.featureFlags.get(GetFeatureFlagRequest.builder()
+            .name("app_scaling")
+            .build())
             .as(StepVerifier::create)
             .expectNext(GetFeatureFlagResponse.builder()
                 .name("app_scaling")
@@ -70,7 +74,8 @@ public final class ReactorFeatureFlagsTest extends AbstractClientApiTest {
     public void getUserRoles() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/config/feature_flags/set_roles_by_username")
+                .method(GET)
+                .path("/config/feature_flags/set_roles_by_username")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -78,10 +83,9 @@ public final class ReactorFeatureFlagsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.featureFlags
-            .get(GetFeatureFlagRequest.builder()
-                .name("set_roles_by_username")
-                .build())
+        this.featureFlags.get(GetFeatureFlagRequest.builder()
+            .name("set_roles_by_username")
+            .build())
             .as(StepVerifier::create)
             .expectNext(GetFeatureFlagResponse.builder()
                 .name("set_roles_by_username")
@@ -96,7 +100,8 @@ public final class ReactorFeatureFlagsTest extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/config/feature_flags")
+                .method(GET)
+                .path("/config/feature_flags")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -104,84 +109,71 @@ public final class ReactorFeatureFlagsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.featureFlags
-            .list(ListFeatureFlagsRequest.builder()
-                .build())
+        this.featureFlags.list(ListFeatureFlagsRequest.builder()
+            .build())
             .as(StepVerifier::create)
             .expectNext(ListFeatureFlagsResponse.builder()
                 .featureFlag(FeatureFlagEntity.builder()
                     .name("user_org_creation")
                     .enabled(false)
                     .url("/v2/config/feature_flags/user_org_creation")
-                    .build()
-                )
+                    .build())
                 .featureFlag(FeatureFlagEntity.builder()
                     .name("private_domain_creation")
                     .enabled(false)
                     .errorMessage("foobar")
                     .url("/v2/config/feature_flags/private_domain_creation")
-                    .build()
-                )
+                    .build())
                 .featureFlag(FeatureFlagEntity.builder()
                     .name("app_bits_upload")
                     .enabled(true)
                     .url("/v2/config/feature_flags/app_bits_upload")
-                    .build()
-                )
+                    .build())
                 .featureFlag(FeatureFlagEntity.builder()
                     .name("app_scaling")
                     .enabled(true)
                     .url("/v2/config/feature_flags/app_scaling")
-                    .build()
-                )
+                    .build())
                 .featureFlag(FeatureFlagEntity.builder()
                     .name("route_creation")
                     .enabled(true)
                     .url("/v2/config/feature_flags/route_creation")
-                    .build()
-                )
+                    .build())
                 .featureFlag(FeatureFlagEntity.builder()
                     .name("service_instance_creation")
                     .enabled(true)
                     .url("/v2/config/feature_flags/service_instance_creation")
-                    .build()
-                )
+                    .build())
                 .featureFlag(FeatureFlagEntity.builder()
                     .name("diego_docker")
                     .enabled(false)
                     .url("/v2/config/feature_flags/diego_docker")
-                    .build()
-                )
+                    .build())
                 .featureFlag(FeatureFlagEntity.builder()
                     .name("set_roles_by_username")
                     .enabled(true)
                     .url("/v2/config/feature_flags/set_roles_by_username")
-                    .build()
-                )
+                    .build())
                 .featureFlag(FeatureFlagEntity.builder()
                     .name("unset_roles_by_username")
                     .enabled(true)
                     .url("/v2/config/feature_flags/unset_roles_by_username")
-                    .build()
-                )
+                    .build())
                 .featureFlag(FeatureFlagEntity.builder()
                     .name("task_creation")
                     .enabled(false)
                     .url("/v2/config/feature_flags/task_creation")
-                    .build()
-                )
+                    .build())
                 .featureFlag(FeatureFlagEntity.builder()
                     .name("space_scoped_private_broker_creation")
                     .enabled(true)
                     .url("/v2/config/feature_flags/space_scoped_private_broker_creation")
-                    .build()
-                )
+                    .build())
                 .featureFlag(FeatureFlagEntity.builder()
                     .name("space_developer_env_var_visibility")
                     .enabled(true)
                     .url("/v2/config/feature_flags/space_developer_env_var_visibility")
-                    .build()
-                )
+                    .build())
                 .build())
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -191,7 +183,8 @@ public final class ReactorFeatureFlagsTest extends AbstractClientApiTest {
     public void set() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/config/feature_flags/user_org_creation")
+                .method(PUT)
+                .path("/config/feature_flags/user_org_creation")
                 .payload("fixtures/client/v2/feature_flags/PUT_user_org_creation_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -200,11 +193,10 @@ public final class ReactorFeatureFlagsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.featureFlags
-            .set(SetFeatureFlagRequest.builder()
-                .enabled(true)
-                .name("user_org_creation")
-                .build())
+        this.featureFlags.set(SetFeatureFlagRequest.builder()
+            .enabled(true)
+            .name("user_org_creation")
+            .build())
             .as(StepVerifier::create)
             .expectNext(SetFeatureFlagResponse.builder()
                 .name("user_org_creation")

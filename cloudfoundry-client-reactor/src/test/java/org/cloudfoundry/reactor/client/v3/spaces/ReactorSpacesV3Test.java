@@ -40,6 +40,7 @@ import org.junit.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
+import java.util.Collections;
 
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.PATCH;
@@ -48,13 +49,14 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public class ReactorSpacesV3Test extends AbstractClientApiTest {
 
-    private final ReactorSpacesV3 spaces = new ReactorSpacesV3(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    private final ReactorSpacesV3 spaces = new ReactorSpacesV3(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void assignDefaultIsolationSegment() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PATCH).path("/spaces/test-space-id/relationships/isolation_segment")
+                .method(PATCH)
+                .path("/spaces/test-space-id/relationships/isolation_segment")
                 .payload("fixtures/client/v3/spaces/PATCH_{id}_relationships_isolation_segment_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -63,13 +65,12 @@ public class ReactorSpacesV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.spaces
-            .assignIsolationSegment(AssignSpaceIsolationSegmentRequest.builder()
-                .data(Relationship.builder()
-                    .id("[iso-seg-guid]")
-                    .build())
-                .spaceId("test-space-id")
+        this.spaces.assignIsolationSegment(AssignSpaceIsolationSegmentRequest.builder()
+            .data(Relationship.builder()
+                .id("[iso-seg-guid]")
                 .build())
+            .spaceId("test-space-id")
+            .build())
             .as(StepVerifier::create)
             .expectNext(AssignSpaceIsolationSegmentResponse.builder()
                 .data(Relationship.builder()
@@ -90,7 +91,8 @@ public class ReactorSpacesV3Test extends AbstractClientApiTest {
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/spaces")
+                .method(POST)
+                .path("/spaces")
                 .payload("fixtures/client/v3/spaces/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -99,17 +101,16 @@ public class ReactorSpacesV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.spaces
-            .create(CreateSpaceRequest.builder()
-                .name("my-space")
-                .relationships(SpaceRelationships.builder()
-                    .organization(ToOneRelationship.builder()
-                        .data(Relationship.builder()
-                            .id("e00705b9-7b42-4561-ae97-2520399d2133")
-                            .build())
+        this.spaces.create(CreateSpaceRequest.builder()
+            .name("my-space")
+            .relationships(SpaceRelationships.builder()
+                .organization(ToOneRelationship.builder()
+                    .data(Relationship.builder()
+                        .id("e00705b9-7b42-4561-ae97-2520399d2133")
                         .build())
                     .build())
                 .build())
+            .build())
             .as(StepVerifier::create)
             .expectNext(CreateSpaceResponse.builder()
                 .createdAt("2017-02-01T01:33:58Z")
@@ -138,7 +139,8 @@ public class ReactorSpacesV3Test extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/spaces/test-space-id")
+                .method(GET)
+                .path("/spaces/test-space-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -146,10 +148,9 @@ public class ReactorSpacesV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.spaces
-            .get(GetSpaceRequest.builder()
-                .spaceId("test-space-id")
-                .build())
+        this.spaces.get(GetSpaceRequest.builder()
+            .spaceId("test-space-id")
+            .build())
             .as(StepVerifier::create)
             .expectNext(GetSpaceResponse.builder()
                 .id("885735b5-aea4-4cf5-8e44-961af0e41920")
@@ -168,7 +169,8 @@ public class ReactorSpacesV3Test extends AbstractClientApiTest {
     public void getDefaultIsolationSegment() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/spaces/test-space-id/relationships/isolation_segment")
+                .method(GET)
+                .path("/spaces/test-space-id/relationships/isolation_segment")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -176,10 +178,9 @@ public class ReactorSpacesV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.spaces
-            .getIsolationSegment(GetSpaceIsolationSegmentRequest.builder()
-                .spaceId("test-space-id")
-                .build())
+        this.spaces.getIsolationSegment(GetSpaceIsolationSegmentRequest.builder()
+            .spaceId("test-space-id")
+            .build())
             .as(StepVerifier::create)
             .expectNext(GetSpaceIsolationSegmentResponse.builder()
                 .data(Relationship.builder()
@@ -200,7 +201,8 @@ public class ReactorSpacesV3Test extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/spaces")
+                .method(GET)
+                .path("/spaces")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -208,9 +210,8 @@ public class ReactorSpacesV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.spaces
-            .list(ListSpacesRequest.builder()
-                .build())
+        this.spaces.list(ListSpacesRequest.builder()
+            .build())
             .as(StepVerifier::create)
             .expectNext(ListSpacesResponse.builder()
                 .pagination(Pagination.builder()

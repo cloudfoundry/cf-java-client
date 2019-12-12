@@ -68,6 +68,7 @@ import reactor.netty.ByteBufFlux;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 
 import static io.netty.handler.codec.http.HttpHeaderValues.APPLICATION_JSON;
 
@@ -82,136 +83,135 @@ public final class ReactorApplicationsV2 extends AbstractClientV2Operations impl
      * @param connectionContext the {@link ConnectionContext} to use when communicating with the server
      * @param root              the root URI of the server. Typically something like {@code https://api.run.pivotal.io}.
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
+     * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorApplicationsV2(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
-        super(connectionContext, root, tokenProvider);
+    public ReactorApplicationsV2(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider,
+                                 Map<String, String> requestTags) {
+        super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<AssociateApplicationRouteResponse> associateRoute(AssociateApplicationRouteRequest request) {
-        return put(request, AssociateApplicationRouteResponse.class, builder -> builder.pathSegment("apps", request.getApplicationId(), "routes", request.getRouteId()))
-            .checkpoint();
+        return put(request, AssociateApplicationRouteResponse.class,
+            builder -> builder.pathSegment("apps", request.getApplicationId(), "routes", request.getRouteId())).checkpoint();
     }
 
     @Override
     public Mono<CopyApplicationResponse> copy(CopyApplicationRequest request) {
-        return post(request, CopyApplicationResponse.class, builder -> builder.pathSegment("apps", request.getApplicationId(), "copy_bits"))
-            .checkpoint();
+        return post(request, CopyApplicationResponse.class,
+            builder -> builder.pathSegment("apps", request.getApplicationId(), "copy_bits")).checkpoint();
     }
 
     @Override
     public Mono<CreateApplicationResponse> create(CreateApplicationRequest request) {
-        return post(request, CreateApplicationResponse.class, builder -> builder.pathSegment("apps"))
-            .checkpoint();
+        return post(request, CreateApplicationResponse.class, builder -> builder.pathSegment("apps")).checkpoint();
     }
 
     @Override
     public Mono<Void> delete(DeleteApplicationRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("apps", request.getApplicationId()))
-            .checkpoint();
+        return delete(request, Void.class, builder -> builder.pathSegment("apps", request.getApplicationId())).checkpoint();
     }
 
     @Override
     public Flux<byte[]> download(DownloadApplicationRequest request) {
-        return get(request, builder -> builder.pathSegment("apps", request.getApplicationId(), "download"), ByteBufFlux::asByteArray)
-            .checkpoint();
+        return get(request, builder -> builder.pathSegment("apps", request.getApplicationId(), "download"),
+            ByteBufFlux::asByteArray).checkpoint();
     }
 
     @Override
     public Flux<byte[]> downloadDroplet(DownloadApplicationDropletRequest request) {
-        return get(request, builder -> builder.pathSegment("apps", request.getApplicationId(), "droplet", "download"), ByteBufFlux::asByteArray)
-            .checkpoint();
+        return get(request, builder -> builder.pathSegment("apps", request.getApplicationId(), "droplet", "download"),
+            ByteBufFlux::asByteArray).checkpoint();
     }
 
     @Override
     public Mono<ApplicationEnvironmentResponse> environment(ApplicationEnvironmentRequest request) {
-        return get(request, ApplicationEnvironmentResponse.class, builder -> builder.pathSegment("apps", request.getApplicationId(), "env"))
-            .checkpoint();
+        return get(request, ApplicationEnvironmentResponse.class,
+            builder -> builder.pathSegment("apps", request.getApplicationId(), "env")).checkpoint();
     }
 
     @Override
     public Mono<GetApplicationResponse> get(GetApplicationRequest request) {
-        return get(request, GetApplicationResponse.class, builder -> builder.pathSegment("apps", request.getApplicationId()))
-            .checkpoint();
+        return get(request, GetApplicationResponse.class, builder -> builder.pathSegment("apps", request.getApplicationId())).checkpoint();
     }
 
     @Override
     public Mono<GetApplicationPermissionsResponse> getPermissions(GetApplicationPermissionsRequest request) {
-        return get(request, GetApplicationPermissionsResponse.class, builder -> builder.pathSegment("apps", request.getApplicationId(), "permissions"))
-            .checkpoint();
+        return get(request, GetApplicationPermissionsResponse.class,
+            builder -> builder.pathSegment("apps", request.getApplicationId(), "permissions")).checkpoint();
     }
 
     @Override
     public Mono<ApplicationInstancesResponse> instances(ApplicationInstancesRequest request) {
-        return get(request, ApplicationInstancesResponse.class, builder -> builder.pathSegment("apps", request.getApplicationId(), "instances"))
-            .checkpoint();
+        return get(request, ApplicationInstancesResponse.class,
+            builder -> builder.pathSegment("apps", request.getApplicationId(), "instances")).checkpoint();
     }
 
     @Override
     public Mono<ListApplicationsResponse> list(ListApplicationsRequest request) {
-        return get(request, ListApplicationsResponse.class, builder -> builder.pathSegment("apps"))
-            .checkpoint();
+        return get(request, ListApplicationsResponse.class, builder -> builder.pathSegment("apps")).checkpoint();
     }
 
     @Override
     public Mono<ListApplicationRoutesResponse> listRoutes(ListApplicationRoutesRequest request) {
-        return get(request, ListApplicationRoutesResponse.class, builder -> builder.pathSegment("apps", request.getApplicationId(), "routes"))
-            .checkpoint();
+        return get(request, ListApplicationRoutesResponse.class,
+            builder -> builder.pathSegment("apps", request.getApplicationId(), "routes")).checkpoint();
     }
 
     @Override
     public Mono<ListApplicationServiceBindingsResponse> listServiceBindings(ListApplicationServiceBindingsRequest request) {
-        return get(request, ListApplicationServiceBindingsResponse.class, builder -> builder.pathSegment("apps", request.getApplicationId(), "service_bindings"))
-            .checkpoint();
+        return get(request, ListApplicationServiceBindingsResponse.class,
+            builder -> builder.pathSegment("apps", request.getApplicationId(), "service_bindings")).checkpoint();
     }
 
     @Override
     public Mono<Void> removeRoute(RemoveApplicationRouteRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("apps", request.getApplicationId(), "routes", request.getRouteId()))
-            .checkpoint();
+        return delete(request, Void.class,
+            builder -> builder.pathSegment("apps", request.getApplicationId(), "routes", request.getRouteId())).checkpoint();
     }
 
     @Override
     public Mono<Void> removeServiceBinding(RemoveApplicationServiceBindingRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("apps", request.getApplicationId(), "service_bindings", request.getServiceBindingId()))
-            .checkpoint();
+        return delete(request, Void.class, builder -> builder.pathSegment("apps", request.getApplicationId(), "service_bindings",
+            request.getServiceBindingId())).checkpoint();
     }
 
     @Override
     public Mono<RestageApplicationResponse> restage(RestageApplicationRequest request) {
-        return post(request, RestageApplicationResponse.class, builder -> builder.pathSegment("apps", request.getApplicationId(), "restage"))
-            .checkpoint();
+        return post(request, RestageApplicationResponse.class,
+            builder -> builder.pathSegment("apps", request.getApplicationId(), "restage")).checkpoint();
     }
 
     @Override
     public Mono<ApplicationStatisticsResponse> statistics(ApplicationStatisticsRequest request) {
-        return get(request, ApplicationStatisticsResponse.class, builder -> builder.pathSegment("apps", request.getApplicationId(), "stats"))
-            .checkpoint();
+        return get(request, ApplicationStatisticsResponse.class,
+            builder -> builder.pathSegment("apps", request.getApplicationId(), "stats")).checkpoint();
     }
 
     @Override
     public Mono<SummaryApplicationResponse> summary(SummaryApplicationRequest request) {
-        return get(request, SummaryApplicationResponse.class, builder -> builder.pathSegment("apps", request.getApplicationId(), "summary"))
-            .checkpoint();
+        return get(request, SummaryApplicationResponse.class,
+            builder -> builder.pathSegment("apps", request.getApplicationId(), "summary")).checkpoint();
     }
 
     @Override
     public Mono<Void> terminateInstance(TerminateApplicationInstanceRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("apps", request.getApplicationId(), "instances", request.getIndex()))
-            .checkpoint();
+        return delete(request, Void.class,
+            builder -> builder.pathSegment("apps", request.getApplicationId(), "instances", request.getIndex())).checkpoint();
     }
 
     @Override
     public Mono<UpdateApplicationResponse> update(UpdateApplicationRequest request) {
-        return put(request, UpdateApplicationResponse.class, builder -> builder.pathSegment("apps", request.getApplicationId()))
-            .checkpoint();
+        return put(request, UpdateApplicationResponse.class,
+            builder -> builder.pathSegment("apps", request.getApplicationId())).checkpoint();
     }
 
     @Override
     public Mono<UploadApplicationResponse> upload(UploadApplicationRequest request) {
         Path application = request.getApplication();
 
-        if (application.toFile().isDirectory()) {
+        if (application.toFile()
+            .isDirectory()) {
             return FileUtils.compress(application)
                 .map(temporaryFile -> UploadApplicationRequest.builder()
                     .from(request)

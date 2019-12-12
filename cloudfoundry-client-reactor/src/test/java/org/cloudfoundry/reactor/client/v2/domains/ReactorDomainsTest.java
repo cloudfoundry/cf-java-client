@@ -51,13 +51,14 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorDomainsTest extends AbstractClientApiTest {
 
-    private final ReactorDomains domains = new ReactorDomains(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    private final ReactorDomains domains = new ReactorDomains(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/domains")
+                .method(POST)
+                .path("/domains")
                 .payload("fixtures/client/v2/domains/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -66,12 +67,11 @@ public final class ReactorDomainsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.domains
-            .create(CreateDomainRequest.builder()
-                .name("exmaple.com")
-                .owningOrganizationId("09e0d56f-4e50-4bff-af83-9bd87a7d7f00")
-                .wildcard(true)
-                .build())
+        this.domains.create(CreateDomainRequest.builder()
+            .name("exmaple.com")
+            .owningOrganizationId("09e0d56f-4e50-4bff-af83-9bd87a7d7f00")
+            .wildcard(true)
+            .build())
             .as(StepVerifier::create)
             .expectNext(CreateDomainResponse.builder()
                 .metadata(Metadata.builder()
@@ -95,17 +95,17 @@ public final class ReactorDomainsTest extends AbstractClientApiTest {
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/domains/test-domain-id")
+                .method(DELETE)
+                .path("/domains/test-domain-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
                 .build())
             .build());
 
-        this.domains
-            .delete(DeleteDomainRequest.builder()
-                .domainId("test-domain-id")
-                .build())
+        this.domains.delete(DeleteDomainRequest.builder()
+            .domainId("test-domain-id")
+            .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -115,7 +115,8 @@ public final class ReactorDomainsTest extends AbstractClientApiTest {
     public void deleteAsync() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/domains/test-domain-id?async=true")
+                .method(DELETE)
+                .path("/domains/test-domain-id?async=true")
                 .build())
             .response(TestResponse.builder()
                 .status(ACCEPTED)
@@ -123,11 +124,10 @@ public final class ReactorDomainsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.domains
-            .delete(DeleteDomainRequest.builder()
-                .async(true)
-                .domainId("test-domain-id")
-                .build())
+        this.domains.delete(DeleteDomainRequest.builder()
+            .async(true)
+            .domainId("test-domain-id")
+            .build())
             .as(StepVerifier::create)
             .expectNext(DeleteDomainResponse.builder()
                 .metadata(Metadata.builder()
@@ -148,7 +148,8 @@ public final class ReactorDomainsTest extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/domains/test-domain-id")
+                .method(GET)
+                .path("/domains/test-domain-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -156,10 +157,9 @@ public final class ReactorDomainsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.domains
-            .get(GetDomainRequest.builder()
-                .domainId("test-domain-id")
-                .build())
+        this.domains.get(GetDomainRequest.builder()
+            .domainId("test-domain-id")
+            .build())
             .as(StepVerifier::create)
             .expectNext(GetDomainResponse.builder()
                 .metadata(Metadata.builder()
@@ -179,7 +179,8 @@ public final class ReactorDomainsTest extends AbstractClientApiTest {
     public void listDomains() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/domains?page=-1")
+                .method(GET)
+                .path("/domains?page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -187,10 +188,9 @@ public final class ReactorDomainsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.domains
-            .list(ListDomainsRequest.builder()
-                .page(-1)
-                .build())
+        this.domains.list(ListDomainsRequest.builder()
+            .page(-1)
+            .build())
             .as(StepVerifier::create)
             .expectNext(ListDomainsResponse.builder()
                 .totalResults(4)
@@ -247,7 +247,8 @@ public final class ReactorDomainsTest extends AbstractClientApiTest {
     public void listSpaces() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/domains/test-domain-id/spaces?page=-1")
+                .method(GET)
+                .path("/domains/test-domain-id/spaces?page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -255,11 +256,10 @@ public final class ReactorDomainsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.domains
-            .listSpaces(ListDomainSpacesRequest.builder()
-                .domainId("test-domain-id")
-                .page(-1)
-                .build())
+        this.domains.listSpaces(ListDomainSpacesRequest.builder()
+            .domainId("test-domain-id")
+            .page(-1)
+            .build())
             .as(StepVerifier::create)
             .expectNext(ListDomainSpacesResponse.builder()
                 .totalResults(1)

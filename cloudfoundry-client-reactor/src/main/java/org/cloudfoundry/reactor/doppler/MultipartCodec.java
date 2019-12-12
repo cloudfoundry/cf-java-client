@@ -16,12 +16,11 @@
 
 package org.cloudfoundry.reactor.doppler;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.http.HttpHeaderNames;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
 import reactor.netty.ByteBufFlux;
 import reactor.netty.http.client.HttpClientResponse;
@@ -59,6 +58,14 @@ final class MultipartCodec {
             .doOnDiscard(InputStream.class, MultipartCodec::close);
     }
 
+    private static void close(InputStream in) {
+        try {
+            in.close();
+        } catch (IOException e) {
+            LOGGER.warn("Could not close input stream. This will cause a direct memory leak.", e);
+        }
+    }
+
     private static String extractMultipartBoundary(HttpClientResponse response) {
         String contentType = response.responseHeaders().get(HttpHeaderNames.CONTENT_TYPE);
         Matcher matcher = BOUNDARY_PATTERN.matcher(contentType);
@@ -67,14 +74,6 @@ final class MultipartCodec {
             return matcher.group(1);
         } else {
             throw new IllegalStateException(String.format("Content-Type %s does not contain a valid multipart boundary", contentType));
-        }
-    }
-
-    private static void close(InputStream in) {
-        try {
-            in.close();
-        } catch (IOException e) {
-            LOGGER.warn("Could not close input stream. This will cause a direct memory leak.", e);
         }
     }
 

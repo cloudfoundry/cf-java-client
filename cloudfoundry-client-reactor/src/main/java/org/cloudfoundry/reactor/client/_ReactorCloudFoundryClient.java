@@ -111,6 +111,8 @@ import org.immutables.value.Value;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.PostConstruct;
+import java.util.Collections;
+import java.util.Map;
 
 /**
  * The Reactor-based implementation of {@link CloudFoundryClient}
@@ -121,37 +123,37 @@ abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
     @Override
     @Value.Derived
     public ApplicationUsageEvents applicationUsageEvents() {
-        return new ReactorApplicationUsageEvents(getConnectionContext(), getRootV2(), getTokenProvider());
+        return new ReactorApplicationUsageEvents(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public ApplicationsV2 applicationsV2() {
-        return new ReactorApplicationsV2(getConnectionContext(), getRootV2(), getTokenProvider());
+        return new ReactorApplicationsV2(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public ApplicationsV3 applicationsV3() {
-        return new ReactorApplicationsV3(getConnectionContext(), getRootV3(), getTokenProvider());
+        return new ReactorApplicationsV3(getConnectionContext(), getRootV3(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public Blobstores blobstores() {
-        return new ReactorBlobstores(getConnectionContext(), getRootV2(), getTokenProvider());
+        return new ReactorBlobstores(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public Buildpacks buildpacks() {
-        return new ReactorBuildpacks(getConnectionContext(), getRootV2(), getTokenProvider());
+        return new ReactorBuildpacks(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public Builds builds() {
-        return new ReactorBuilds(getConnectionContext(), getRootV3(), getTokenProvider());
+        return new ReactorBuilds(getConnectionContext(), getRootV3(), getTokenProvider(), getRequestTags());
     }
 
     @PostConstruct
@@ -162,229 +164,229 @@ abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
     @Override
     @Value.Derived
     public DeploymentsV3 deploymentsV3() {
-        return new ReactorDeploymentsV3(getConnectionContext(), getRootV3(), getTokenProvider());
+        return new ReactorDeploymentsV3(getConnectionContext(), getRootV3(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public Domains domains() {
-        return new ReactorDomains(getConnectionContext(), getRootV2(), getTokenProvider());
+        return new ReactorDomains(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public Droplets droplets() {
-        return new ReactorDroplets(getConnectionContext(), getRootV3(), getTokenProvider());
+        return new ReactorDroplets(getConnectionContext(), getRootV3(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public EnvironmentVariableGroups environmentVariableGroups() {
-        return new ReactorEnvironmentVariableGroups(getConnectionContext(), getRootV2(), getTokenProvider());
+        return new ReactorEnvironmentVariableGroups(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public Events events() {
-        return new ReactorEvents(getConnectionContext(), getRootV2(), getTokenProvider());
+        return new ReactorEvents(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public FeatureFlags featureFlags() {
-        return new ReactorFeatureFlags(getConnectionContext(), getRootV2(), getTokenProvider());
+        return new ReactorFeatureFlags(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public Info info() {
-        return new ReactorInfo(getConnectionContext(), getRootV2(), getTokenProvider());
+        return new ReactorInfo(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public IsolationSegments isolationSegments() {
-        return new ReactorIsolationSegments(getConnectionContext(), getRootV3(), getTokenProvider());
+        return new ReactorIsolationSegments(getConnectionContext(), getRootV3(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public Jobs jobs() {
-        return new ReactorJobs(getConnectionContext(), getRootV2(), getTokenProvider());
+        return new ReactorJobs(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public JobsV3 jobsV3() {
-        return new ReactorJobsV3(getConnectionContext(), getRootV3(), getTokenProvider());
+        return new ReactorJobsV3(getConnectionContext(), getRootV3(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public OrganizationQuotaDefinitions organizationQuotaDefinitions() {
-        return new ReactorOrganizationQuotaDefinitions(getConnectionContext(), getRootV2(), getTokenProvider());
+        return new ReactorOrganizationQuotaDefinitions(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public Organizations organizations() {
-        return new ReactorOrganizations(getConnectionContext(), getRootV2(), getTokenProvider());
+        return new ReactorOrganizations(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public OrganizationsV3 organizationsV3() {
-        return new ReactorOrganizationsV3(getConnectionContext(), getRootV3(), getTokenProvider());
+        return new ReactorOrganizationsV3(getConnectionContext(), getRootV3(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public Packages packages() {
-        return new ReactorPackages(getConnectionContext(), getRootV3(), getTokenProvider());
+        return new ReactorPackages(getConnectionContext(), getRootV3(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public PrivateDomains privateDomains() {
-        return new ReactorPrivateDomains(getConnectionContext(), getRootV2(), getTokenProvider());
+        return new ReactorPrivateDomains(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public Processes processes() {
-        return new ReactorProcesses(getConnectionContext(), getRootV3(), getTokenProvider());
+        return new ReactorProcesses(getConnectionContext(), getRootV3(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public ResourceMatch resourceMatch() {
-        return new ReactorResourceMatch(getConnectionContext(), getRootV2(), getTokenProvider());
+        return new ReactorResourceMatch(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public RouteMappings routeMappings() {
-        return new ReactorRouteMappings(getConnectionContext(), getRootV2(), getTokenProvider());
+        return new ReactorRouteMappings(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public Routes routes() {
-        return new ReactorRoutes(getConnectionContext(), getRootV2(), getTokenProvider());
+        return new ReactorRoutes(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public SecurityGroups securityGroups() {
-        return new ReactorSecurityGroups(getConnectionContext(), getRootV2(), getTokenProvider());
+        return new ReactorSecurityGroups(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public ServiceBindingsV2 serviceBindingsV2() {
-        return new ReactorServiceBindingsV2(getConnectionContext(), getRootV2(), getTokenProvider());
+        return new ReactorServiceBindingsV2(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public ServiceBindingsV3 serviceBindingsV3() {
-        return new ReactorServiceBindingsV3(getConnectionContext(), getRootV3(), getTokenProvider());
+        return new ReactorServiceBindingsV3(getConnectionContext(), getRootV3(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public ServiceBrokers serviceBrokers() {
-        return new ReactorServiceBrokers(getConnectionContext(), getRootV2(), getTokenProvider());
+        return new ReactorServiceBrokers(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public ServiceInstances serviceInstances() {
-        return new ReactorServiceInstances(getConnectionContext(), getRootV2(), getTokenProvider());
+        return new ReactorServiceInstances(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public ServiceInstancesV3 serviceInstancesV3() {
-        return new ReactorServiceInstancesV3(getConnectionContext(), getRootV3(), getTokenProvider());
+        return new ReactorServiceInstancesV3(getConnectionContext(), getRootV3(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public ServiceKeys serviceKeys() {
-        return new ReactorServiceKeys(getConnectionContext(), getRootV2(), getTokenProvider());
+        return new ReactorServiceKeys(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public ServicePlanVisibilities servicePlanVisibilities() {
-        return new ReactorServicePlanVisibilities(getConnectionContext(), getRootV2(), getTokenProvider());
+        return new ReactorServicePlanVisibilities(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public ServicePlans servicePlans() {
-        return new ReactorServicePlans(getConnectionContext(), getRootV2(), getTokenProvider());
+        return new ReactorServicePlans(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public ServiceUsageEvents serviceUsageEvents() {
-        return new ReactorServiceUsageEvents(getConnectionContext(), getRootV2(), getTokenProvider());
+        return new ReactorServiceUsageEvents(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public Services services() {
-        return new ReactorServices(getConnectionContext(), getRootV2(), getTokenProvider());
+        return new ReactorServices(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public SharedDomains sharedDomains() {
-        return new ReactorSharedDomains(getConnectionContext(), getRootV2(), getTokenProvider());
+        return new ReactorSharedDomains(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public SpaceQuotaDefinitions spaceQuotaDefinitions() {
-        return new ReactorSpaceQuotaDefinitions(getConnectionContext(), getRootV2(), getTokenProvider());
+        return new ReactorSpaceQuotaDefinitions(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public Spaces spaces() {
-        return new ReactorSpaces(getConnectionContext(), getRootV2(), getTokenProvider());
+        return new ReactorSpaces(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public SpacesV3 spacesV3() {
-        return new ReactorSpacesV3(getConnectionContext(), getRootV3(), getTokenProvider());
+        return new ReactorSpacesV3(getConnectionContext(), getRootV3(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public Stacks stacks() {
-        return new ReactorStacks(getConnectionContext(), getRootV2(), getTokenProvider());
+        return new ReactorStacks(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public Tasks tasks() {
-        return new ReactorTasks(getConnectionContext(), getRootV3(), getTokenProvider());
+        return new ReactorTasks(getConnectionContext(), getRootV3(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public UserProvidedServiceInstances userProvidedServiceInstances() {
-        return new ReactorUserProvidedServiceInstances(getConnectionContext(), getRootV2(), getTokenProvider());
+        return new ReactorUserProvidedServiceInstances(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public Users users() {
-        return new ReactorUsers(getConnectionContext(), getRootV2(), getTokenProvider());
+        return new ReactorUsers(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
     }
 
     /**
@@ -392,14 +394,24 @@ abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
      */
     abstract ConnectionContext getConnectionContext();
 
+    /**
+     * Map of http header name and value which will be added to every request to the controller
+     */
+    @Value.Default
+    Map<String, String> getRequestTags() {
+        return Collections.emptyMap();
+    }
+
     @Value.Default
     Mono<String> getRootV2() {
-        return getConnectionContext().getRootProvider().getRoot("cloud_controller_v2", getConnectionContext());
+        return getConnectionContext().getRootProvider()
+            .getRoot("cloud_controller_v2", getConnectionContext());
     }
 
     @Value.Default
     Mono<String> getRootV3() {
-        return getConnectionContext().getRootProvider().getRoot("cloud_controller_v3", getConnectionContext());
+        return getConnectionContext().getRootProvider()
+            .getRoot("cloud_controller_v3", getConnectionContext());
     }
 
     /**

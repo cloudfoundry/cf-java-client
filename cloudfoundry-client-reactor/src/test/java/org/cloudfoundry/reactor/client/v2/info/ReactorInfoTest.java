@@ -26,20 +26,21 @@ import org.junit.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
+import java.util.Collections;
 
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-
 public final class ReactorInfoTest extends AbstractClientApiTest {
 
-    private final ReactorInfo info = new ReactorInfo(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    private final ReactorInfo info = new ReactorInfo(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/info")
+                .method(GET)
+                .path("/info")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -47,9 +48,8 @@ public final class ReactorInfoTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.info
-            .get(GetInfoRequest.builder()
-                .build())
+        this.info.get(GetInfoRequest.builder()
+            .build())
             .as(StepVerifier::create)
             .expectNext(GetInfoResponse.builder()
                 .name("vcap")

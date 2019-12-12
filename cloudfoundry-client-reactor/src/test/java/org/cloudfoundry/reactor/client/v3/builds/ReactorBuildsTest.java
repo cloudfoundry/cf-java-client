@@ -40,6 +40,7 @@ import org.junit.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
+import java.util.Collections;
 
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.POST;
@@ -48,13 +49,14 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorBuildsTest extends AbstractClientApiTest {
 
-    private final ReactorBuilds builds = new ReactorBuilds(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    private final ReactorBuilds builds = new ReactorBuilds(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/builds")
+                .method(POST)
+                .path("/builds")
                 .payload("fixtures/client/v3/builds/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -63,12 +65,11 @@ public final class ReactorBuildsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.builds
-            .create(CreateBuildRequest.builder()
-                .getPackage(Relationship.builder()
-                    .id("[package-guid]")
-                    .build())
+        this.builds.create(CreateBuildRequest.builder()
+            .getPackage(Relationship.builder()
+                .id("[package-guid]")
                 .build())
+            .build())
             .as(StepVerifier::create)
             .expectNext(CreateBuildResponse.builder()
                 .id("585bc3c1-3743-497d-88b0-403ad6b56d16")
@@ -107,7 +108,8 @@ public final class ReactorBuildsTest extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/builds/test-build-id")
+                .method(GET)
+                .path("/builds/test-build-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -115,10 +117,9 @@ public final class ReactorBuildsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.builds
-            .get(GetBuildRequest.builder()
-                .buildId("test-build-id")
-                .build())
+        this.builds.get(GetBuildRequest.builder()
+            .buildId("test-build-id")
+            .build())
             .as(StepVerifier::create)
             .expectNext(GetBuildResponse.builder()
                 .id("585bc3c1-3743-497d-88b0-403ad6b56d16")
@@ -159,7 +160,8 @@ public final class ReactorBuildsTest extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/builds")
+                .method(GET)
+                .path("/builds")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -167,9 +169,8 @@ public final class ReactorBuildsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.builds
-            .list(ListBuildsRequest.builder()
-                .build())
+        this.builds.list(ListBuildsRequest.builder()
+            .build())
             .as(StepVerifier::create)
             .expectNext(ListBuildsResponse.builder()
                 .pagination(Pagination.builder()

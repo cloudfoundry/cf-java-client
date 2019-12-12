@@ -27,15 +27,18 @@ import reactor.netty.ByteBufFlux;
 import reactor.netty.http.client.HttpClientResponse;
 
 import java.io.InputStream;
+import java.util.Map;
 import java.util.function.Function;
 
 abstract class AbstractDopplerOperations extends AbstractReactorOperations {
 
-    AbstractDopplerOperations(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
-        super(connectionContext, root, tokenProvider);
+    AbstractDopplerOperations(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider,
+                              Map<String, String> requestTags) {
+        super(connectionContext, root, tokenProvider, requestTags);
     }
 
-    final <T> Flux<T> get(Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer, Function<HttpClientResponse, ChannelHandler> channelHandlerBuilder,
+    final <T> Flux<T> get(Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
+                          Function<HttpClientResponse, ChannelHandler> channelHandlerBuilder,
                           Function<ByteBufFlux, Flux<T>> bodyTransformer) {
         return createOperator().flatMapMany(operator -> operator.get()
             .uri(uriTransformer)

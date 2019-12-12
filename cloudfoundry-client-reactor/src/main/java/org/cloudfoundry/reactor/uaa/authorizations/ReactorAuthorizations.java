@@ -36,6 +36,7 @@ import org.cloudfoundry.util.ExceptionUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
 import java.util.Optional;
 
 import static io.netty.handler.codec.http.HttpHeaderNames.AUTHORIZATION;
@@ -54,20 +55,27 @@ public final class ReactorAuthorizations extends AbstractUaaOperations implement
      * @param root              the root URI of the server. Typically something like {@code https://uaa.run.pivotal.io}.
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      */
-    public ReactorAuthorizations(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
-        super(connectionContext, root, tokenProvider);
+    public ReactorAuthorizations(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider,
+                                 Map<String, String> requestTags) {
+        super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<String> authorizationCodeGrantApi(AuthorizeByAuthorizationCodeGrantApiRequest request) {
-        return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.CODE))
-            .map(inbound -> inbound.responseHeaders().get(LOCATION))
+        return get(request, builder -> builder.pathSegment("oauth", "authorize")
+            .queryParam("response_type", ResponseType.CODE)).map(inbound -> inbound.responseHeaders()
+            .get(LOCATION))
             .flatMap(location -> {
-                String candidate = UriComponentsBuilder.fromUriString(location).build().getQueryParams().getFirst("code");
+                String candidate = UriComponentsBuilder.fromUriString(location)
+                    .build()
+                    .getQueryParams()
+                    .getFirst("code");
 
                 return Optional.ofNullable(candidate)
                     .map(Mono::just)
-                    .orElse(ExceptionUtils.illegalState(String.format("Parameter %s not in URI %s", "code", location)));
+                    .orElse(ExceptionUtils.illegalState(String.format("Parameter %s not in URI %s",
+                        "code",
+                        location)));
             })
             .checkpoint();
     }
@@ -75,7 +83,8 @@ public final class ReactorAuthorizations extends AbstractUaaOperations implement
     @Override
     public Mono<String> authorizationCodeGrantBrowser(AuthorizeByAuthorizationCodeGrantBrowserRequest request) {
         return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.CODE),
-            outbound -> {},
+            outbound -> {
+            },
             ReactorAuthorizations::removeAuthorization)
             .map(inbound -> inbound.responseHeaders().get(LOCATION))
             .checkpoint();
@@ -84,7 +93,8 @@ public final class ReactorAuthorizations extends AbstractUaaOperations implement
     @Override
     public Mono<String> authorizationCodeGrantHybrid(AuthorizeByAuthorizationCodeGrantHybridRequest request) {
         return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.CODE_AND_ID_TOKEN),
-            outbound -> {},
+            outbound -> {
+            },
             ReactorAuthorizations::removeAuthorization)
             .map(inbound -> inbound.responseHeaders().get(LOCATION))
             .checkpoint();
@@ -92,14 +102,15 @@ public final class ReactorAuthorizations extends AbstractUaaOperations implement
 
     @Override
     public Mono<GetOpenIdProviderConfigurationResponse> getOpenIdProviderConfiguration(GetOpenIdProviderConfigurationRequest request) {
-        return get(request, GetOpenIdProviderConfigurationResponse.class, builder -> builder.pathSegment(".well-known", "openid-configuration"))
-            .checkpoint();
+        return get(request, GetOpenIdProviderConfigurationResponse.class,
+            builder -> builder.pathSegment(".well-known", "openid-configuration")).checkpoint();
     }
 
     @Override
     public Mono<String> implicitGrantBrowser(AuthorizeByImplicitGrantBrowserRequest request) {
         return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.TOKEN),
-            outbound -> {},
+            outbound -> {
+            },
             ReactorAuthorizations::removeAuthorization)
             .map(inbound -> inbound.responseHeaders().get(LOCATION))
             .checkpoint();
@@ -108,7 +119,8 @@ public final class ReactorAuthorizations extends AbstractUaaOperations implement
     @Override
     public Mono<String> openIdWithAuthorizationCodeAndIdToken(AuthorizeByOpenIdWithAuthorizationCodeGrantRequest request) {
         return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.CODE_AND_ID_TOKEN),
-            outbound -> {},
+            outbound -> {
+            },
             ReactorAuthorizations::removeAuthorization)
             .map(inbound -> inbound.responseHeaders().get(LOCATION))
             .checkpoint();
@@ -116,15 +128,18 @@ public final class ReactorAuthorizations extends AbstractUaaOperations implement
 
     @Override
     public Mono<String> openIdWithIdToken(AuthorizeByOpenIdWithIdTokenRequest request) {
-        return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.ID_TOKEN))
-            .map(inbound -> inbound.responseHeaders().get(LOCATION))
+        return get(request, builder -> builder.pathSegment("oauth", "authorize")
+            .queryParam("response_type", ResponseType.ID_TOKEN)).map(inbound -> inbound.responseHeaders()
+            .get(LOCATION))
             .checkpoint();
     }
 
     @Override
     public Mono<String> openIdWithTokenAndIdToken(AuthorizeByOpenIdWithImplicitGrantRequest request) {
-        return get(request, builder -> builder.pathSegment("oauth", "authorize").queryParam("response_type", ResponseType.TOKEN_AND_ID_TOKEN))
-            .map(inbound -> inbound.responseHeaders().get(LOCATION))
+        return get(request, builder -> builder.pathSegment("oauth", "authorize")
+            .queryParam("response_type", ResponseType.TOKEN_AND_ID_TOKEN))
+            .map(inbound -> inbound.responseHeaders()
+                .get(LOCATION))
             .checkpoint();
     }
 

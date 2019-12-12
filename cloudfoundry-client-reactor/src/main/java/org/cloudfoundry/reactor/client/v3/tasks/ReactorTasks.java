@@ -30,6 +30,8 @@ import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
+
 /**
  * The Reactor-based implementation of {@link Tasks}
  */
@@ -39,35 +41,35 @@ public final class ReactorTasks extends AbstractClientV3Operations implements Ta
      * Creates an instance
      *
      * @param connectionContext the {@link ConnectionContext} to use when communicating with the server
-     * @param root              the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
+     * @param root              the root URI of the server. Typically something like {@code https://api.run.pivotal.io}.
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
+     * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorTasks(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
-        super(connectionContext, root, tokenProvider);
+    public ReactorTasks(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider,
+                        Map<String, String> requestTags) {
+        super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
-    public Mono<CancelTaskResponse> cancel(CancelTaskRequest request) {  // TODO: Modify once support has aged out https://v3-apidocs.cloudfoundry.org/version/3.27.0/#cancel-a-task
-        return put(request, CancelTaskResponse.class, builder -> builder.pathSegment("tasks", request.getTaskId(), "cancel"))
-            .checkpoint();
+    public Mono<CancelTaskResponse> cancel(CancelTaskRequest request) { // TODO: Modify once support has aged out
+        // https://v3-apidocs.cloudfoundry.org/version/3.27.0/#cancel-a-task
+        return put(request, CancelTaskResponse.class, builder -> builder.pathSegment("tasks", request.getTaskId(), "cancel")).checkpoint();
     }
 
     @Override
     public Mono<CreateTaskResponse> create(CreateTaskRequest request) {
-        return post(request, CreateTaskResponse.class, builder -> builder.pathSegment("apps", request.getApplicationId(), "tasks"))
-            .checkpoint();
+        return post(request, CreateTaskResponse.class,
+            builder -> builder.pathSegment("apps", request.getApplicationId(), "tasks")).checkpoint();
     }
 
     @Override
     public Mono<GetTaskResponse> get(GetTaskRequest request) {
-        return get(request, GetTaskResponse.class, builder -> builder.pathSegment("tasks", request.getTaskId()))
-            .checkpoint();
+        return get(request, GetTaskResponse.class, builder -> builder.pathSegment("tasks", request.getTaskId())).checkpoint();
     }
 
     @Override
     public Mono<ListTasksResponse> list(ListTasksRequest request) {
-        return get(request, ListTasksResponse.class, builder -> builder.pathSegment("tasks"))
-            .checkpoint();
+        return get(request, ListTasksResponse.class, builder -> builder.pathSegment("tasks")).checkpoint();
     }
 
 }

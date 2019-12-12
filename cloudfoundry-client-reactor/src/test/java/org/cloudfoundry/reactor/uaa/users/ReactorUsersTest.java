@@ -71,13 +71,14 @@ import static org.cloudfoundry.uaa.users.MembershipType.DIRECT;
 
 public final class ReactorUsersTest extends AbstractUaaApiTest {
 
-    private final ReactorUsers users = new ReactorUsers(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    private final ReactorUsers users = new ReactorUsers(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void changePassword() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/Users/9140c37c-c5d9-4c4d-a265-b6fe2f9dd02d/password")
+                .method(PUT)
+                .path("/Users/9140c37c-c5d9-4c4d-a265-b6fe2f9dd02d/password")
                 .payload("fixtures/uaa/users/PUT_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -86,12 +87,11 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.users
-            .changePassword(ChangeUserPasswordRequest.builder()
-                .oldPassword("secret")
-                .password("newsecret")
-                .userId("9140c37c-c5d9-4c4d-a265-b6fe2f9dd02d")
-                .build())
+        this.users.changePassword(ChangeUserPasswordRequest.builder()
+            .oldPassword("secret")
+            .password("newsecret")
+            .userId("9140c37c-c5d9-4c4d-a265-b6fe2f9dd02d")
+            .build())
             .as(StepVerifier::create)
             .expectNext(ChangeUserPasswordResponse.builder()
                 .status("ok")
@@ -105,7 +105,8 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/Users")
+                .method(POST)
+                .path("/Users")
                 .payload("fixtures/uaa/users/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -114,26 +115,25 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.users
-            .create(CreateUserRequest.builder()
-                .externalId("test-user")
-                .userName("ZO6FEI@test.org")
-                .name(Name.builder()
-                    .familyName("family name")
-                    .givenName("given name")
-                    .build())
-                .email(Email.builder()
-                    .value("ZO6FEI@test.org")
-                    .primary(true)
-                    .build())
-                .phoneNumber(PhoneNumber.builder()
-                    .value("5555555555")
-                    .build())
-                .active(true)
-                .verified(true)
-                .origin("")
-                .password("secret")
+        this.users.create(CreateUserRequest.builder()
+            .externalId("test-user")
+            .userName("ZO6FEI@test.org")
+            .name(Name.builder()
+                .familyName("family name")
+                .givenName("given name")
                 .build())
+            .email(Email.builder()
+                .value("ZO6FEI@test.org")
+                .primary(true)
+                .build())
+            .phoneNumber(PhoneNumber.builder()
+                .value("5555555555")
+                .build())
+            .active(true)
+            .verified(true)
+            .origin("")
+            .password("secret")
+            .build())
             .as(StepVerifier::create)
             .expectNext(CreateUserResponse.builder()
                 .id("9d175c69-8f25-4460-82d7-be9657f87a68")
@@ -235,7 +235,8 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/Users/421225f4-318e-4a4d-9219-4b6a0ed3678a")
+                .method(DELETE)
+                .path("/Users/421225f4-318e-4a4d-9219-4b6a0ed3678a")
                 .header("If-Match", "*")
                 .build())
             .response(TestResponse.builder()
@@ -244,11 +245,10 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.users
-            .delete(DeleteUserRequest.builder()
-                .userId("421225f4-318e-4a4d-9219-4b6a0ed3678a")
-                .version("*")
-                .build())
+        this.users.delete(DeleteUserRequest.builder()
+            .userId("421225f4-318e-4a4d-9219-4b6a0ed3678a")
+            .version("*")
+            .build())
             .as(StepVerifier::create)
             .expectNext(DeleteUserResponse.builder()
                 .id("421225f4-318e-4a4d-9219-4b6a0ed3678a")
@@ -363,7 +363,8 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
     public void expirePassword() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PATCH).path("/Users/9022f2cf-2663-479e-82e6-d2ccc348a1e4/status")
+                .method(PATCH)
+                .path("/Users/9022f2cf-2663-479e-82e6-d2ccc348a1e4/status")
                 .payload("fixtures/uaa/users/PATCH_{id}_status_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -372,11 +373,10 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.users
-            .expirePassword(ExpirePasswordRequest.builder()
-                .passwordChangeRequired(true)
-                .userId("9022f2cf-2663-479e-82e6-d2ccc348a1e4")
-                .build())
+        this.users.expirePassword(ExpirePasswordRequest.builder()
+            .passwordChangeRequired(true)
+            .userId("9022f2cf-2663-479e-82e6-d2ccc348a1e4")
+            .build())
             .as(StepVerifier::create)
             .expectNext(ExpirePasswordResponse.builder()
                 .passwordChangeRequired(true)
@@ -389,7 +389,8 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
     public void getVerificationLink() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/Users/1faa46a0-0c6f-4e13-8334-d1f6e5f2e1dd/verify-link?redirect_uri=http://redirect.to/app")
+                .method(GET)
+                .path("/Users/1faa46a0-0c6f-4e13-8334-d1f6e5f2e1dd/verify-link?redirect_uri=http://redirect.to/app")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -397,11 +398,10 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.users
-            .getVerificationLink(GetUserVerificationLinkRequest.builder()
-                .redirectUri("http://redirect.to/app")
-                .userId("1faa46a0-0c6f-4e13-8334-d1f6e5f2e1dd")
-                .build())
+        this.users.getVerificationLink(GetUserVerificationLinkRequest.builder()
+            .redirectUri("http://redirect.to/app")
+            .userId("1faa46a0-0c6f-4e13-8334-d1f6e5f2e1dd")
+            .build())
             .as(StepVerifier::create)
             .expectNext(GetUserVerificationLinkResponse.builder()
                 .verifyLink("http://localhost/verify_user?code=nOGQWBqCx5")
@@ -414,7 +414,8 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
     public void inviteUsers() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/invite_users?client_id=u7ptqw&redirect_uri=example.com")
+                .method(POST)
+                .path("/invite_users?client_id=u7ptqw&redirect_uri=example.com")
                 .payload("fixtures/uaa/users/POST_invite_users_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -423,12 +424,11 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.users
-            .invite(InviteUsersRequest.builder()
-                .clientId("u7ptqw")
-                .emails("user1@pjy596.com", "user2@pjy596.com")
-                .redirectUri("example.com")
-                .build())
+        this.users.invite(InviteUsersRequest.builder()
+            .clientId("u7ptqw")
+            .emails("user1@pjy596.com", "user2@pjy596.com")
+            .redirectUri("example.com")
+            .build())
             .as(StepVerifier::create)
             .expectNext(InviteUsersResponse.builder()
                 .newInvite(Invite.builder()
@@ -454,8 +454,8 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path(
-                    "/Users?count=50&filter=id+eq+%22a94534d5-de08-41eb-8712-a51314e6a484%22+or+email+eq+%22Da63pG@test.org%22&sortBy=email&sortOrder=ascending&startIndex=1")
+                .method(GET)
+                .path("/Users?count=50&filter=id+eq+%22a94534d5-de08-41eb-8712-a51314e6a484%22+or+email+eq+%22Da63pG@test.org%22&sortBy=email&sortOrder=ascending&startIndex=1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -463,14 +463,13 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.users
-            .list(ListUsersRequest.builder()
-                .filter("id+eq+\"a94534d5-de08-41eb-8712-a51314e6a484\"+or+email+eq+\"Da63pG@test.org\"")
-                .count(50)
-                .startIndex(1)
-                .sortBy("email")
-                .sortOrder(ASCENDING)
-                .build())
+        this.users.list(ListUsersRequest.builder()
+            .filter("id+eq+\"a94534d5-de08-41eb-8712-a51314e6a484\"+or+email+eq+\"Da63pG@test.org\"")
+            .count(50)
+            .startIndex(1)
+            .sortBy("email")
+            .sortOrder(ASCENDING)
+            .build())
             .as(StepVerifier::create)
             .expectNext(ListUsersResponse.builder()
                 .resource(User.builder()
@@ -583,9 +582,9 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
     public void lookup() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path(
-                    "/ids/Users?count=10&filter=userName+eq+%22bobOu38vE@test.org%22+or+id+eq+%22c1476587-5ec9-4b7e-9ed2-381e3133f07a%22" +
-                        "&includeInactive=true&sortOrder=descending&startIndex=1")
+                .method(GET)
+                .path("/ids/Users?count=10&filter=userName+eq+%22bobOu38vE@test.org%22+or+id+eq+%22c1476587-5ec9-4b7e-9ed2-381e3133f07a%22"
+                    + "&includeInactive=true&sortOrder=descending&startIndex=1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -593,14 +592,13 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.users
-            .lookup(LookupUserIdsRequest.builder()
-                .filter("userName+eq+\"bobOu38vE@test.org\"+or+id+eq+\"c1476587-5ec9-4b7e-9ed2-381e3133f07a\"")
-                .count(10)
-                .startIndex(1)
-                .sortOrder(DESCENDING)
-                .includeInactive(true)
-                .build())
+        this.users.lookup(LookupUserIdsRequest.builder()
+            .filter("userName+eq+\"bobOu38vE@test.org\"+or+id+eq+\"c1476587-5ec9-4b7e-9ed2-381e3133f07a\"")
+            .count(10)
+            .startIndex(1)
+            .sortOrder(DESCENDING)
+            .includeInactive(true)
+            .build())
             .as(StepVerifier::create)
             .expectNext(LookupUserIdsResponse.builder()
                 .resource(UserId.builder()
@@ -626,7 +624,8 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
     public void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/Users/test-user-id")
+                .method(PUT)
+                .path("/Users/test-user-id")
                 .header("If-Match", "*")
                 .payload("fixtures/uaa/users/PUT_{id}_request.json")
                 .build())
@@ -636,27 +635,26 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.users
-            .update(UpdateUserRequest.builder()
-                .active(true)
-                .email(Email.builder()
-                    .primary(false)
-                    .value("oH4jON@test.org")
-                    .build())
-                .phoneNumber(PhoneNumber.builder()
-                    .value("5555555555")
-                    .build())
-                .externalId("test-user")
-                .id(("test-user-id"))
-                .version("*")
-                .name(Name.builder()
-                    .familyName("family name")
-                    .givenName("given name")
-                    .build())
-                .origin("uaa")
-                .userName("oH4jON@test.org")
-                .verified(true)
+        this.users.update(UpdateUserRequest.builder()
+            .active(true)
+            .email(Email.builder()
+                .primary(false)
+                .value("oH4jON@test.org")
                 .build())
+            .phoneNumber(PhoneNumber.builder()
+                .value("5555555555")
+                .build())
+            .externalId("test-user")
+            .id(("test-user-id"))
+            .version("*")
+            .name(Name.builder()
+                .familyName("family name")
+                .givenName("given name")
+                .build())
+            .origin("uaa")
+            .userName("oH4jON@test.org")
+            .verified(true)
+            .build())
             .as(StepVerifier::create)
             .expectNext(UpdateUserResponse.builder()
                 .active(true)
@@ -724,7 +722,8 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
     public void userInfo() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/userinfo")
+                .method(GET)
+                .path("/userinfo")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -732,9 +731,8 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.users
-            .userInfo(UserInfoRequest.builder()
-                .build())
+        this.users.userInfo(UserInfoRequest.builder()
+            .build())
             .as(StepVerifier::create)
             .expectNext(UserInfoResponse.builder()
                 .email("anO0Lv@test.org")
@@ -756,7 +754,8 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
     public void verifyUser() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/Users/c0d42e48-9b69-461d-a77b-f75d3a5948b6/verify")
+                .method(GET)
+                .path("/Users/c0d42e48-9b69-461d-a77b-f75d3a5948b6/verify")
                 .header("If-Match", "12")
                 .build())
             .response(TestResponse.builder()
@@ -765,11 +764,10 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.users
-            .verify(VerifyUserRequest.builder()
-                .userId("c0d42e48-9b69-461d-a77b-f75d3a5948b6")
-                .version("12")
-                .build())
+        this.users.verify(VerifyUserRequest.builder()
+            .userId("c0d42e48-9b69-461d-a77b-f75d3a5948b6")
+            .version("12")
+            .build())
             .as(StepVerifier::create)
             .expectNext(VerifyUserResponse.builder()
                 .id("c0d42e48-9b69-461d-a77b-f75d3a5948b6")

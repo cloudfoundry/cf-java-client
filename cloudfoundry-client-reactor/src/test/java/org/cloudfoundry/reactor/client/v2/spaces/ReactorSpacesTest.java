@@ -128,13 +128,14 @@ import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.builde
 
 public final class ReactorSpacesTest extends AbstractClientApiTest {
 
-    private final ReactorSpaces spaces = new ReactorSpaces(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    private final ReactorSpaces spaces = new ReactorSpaces(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void associateAuditor() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/spaces/test-space-id/auditors/test-auditor-id")
+                .method(PUT)
+                .path("/spaces/test-space-id/auditors/test-auditor-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -142,11 +143,10 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.spaces
-            .associateAuditor(AssociateSpaceAuditorRequest.builder()
-                .spaceId("test-space-id")
-                .auditorId("test-auditor-id")
-                .build())
+        this.spaces.associateAuditor(AssociateSpaceAuditorRequest.builder()
+            .spaceId("test-space-id")
+            .auditorId("test-auditor-id")
+            .build())
             .as(StepVerifier::create)
             .expectNext(AssociateSpaceAuditorResponse.builder()
                 .metadata(Metadata.builder()
@@ -179,7 +179,8 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     public void associateAuditorByUsername() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/spaces/test-space-id/auditors")
+                .method(PUT)
+                .path("/spaces/test-space-id/auditors")
                 .payload("fixtures/client/v2/spaces/PUT_{id}_auditors_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -188,11 +189,10 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.spaces
-            .associateAuditorByUsername(AssociateSpaceAuditorByUsernameRequest.builder()
-                .spaceId("test-space-id")
-                .username("user@example.com")
-                .build())
+        this.spaces.associateAuditorByUsername(AssociateSpaceAuditorByUsernameRequest.builder()
+            .spaceId("test-space-id")
+            .username("user@example.com")
+            .build())
             .as(StepVerifier::create)
             .expectNext(AssociateSpaceAuditorByUsernameResponse.builder()
                 .metadata(Metadata.builder()
@@ -225,7 +225,8 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     public void associateDeveloper() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/spaces/test-space-id/developers/test-developer-id")
+                .method(PUT)
+                .path("/spaces/test-space-id/developers/test-developer-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -233,11 +234,10 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.spaces
-            .associateDeveloper(AssociateSpaceDeveloperRequest.builder()
-                .spaceId("test-space-id")
-                .developerId("test-developer-id")
-                .build())
+        this.spaces.associateDeveloper(AssociateSpaceDeveloperRequest.builder()
+            .spaceId("test-space-id")
+            .developerId("test-developer-id")
+            .build())
             .as(StepVerifier::create)
             .expectNext(AssociateSpaceDeveloperResponse.builder()
                 .metadata(Metadata.builder()
@@ -270,7 +270,8 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     public void associateManager() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/spaces/test-space-id/managers/test-manager-id")
+                .method(PUT)
+                .path("/spaces/test-space-id/managers/test-manager-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -278,11 +279,10 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.spaces
-            .associateManager(AssociateSpaceManagerRequest.builder()
-                .spaceId("test-space-id")
-                .managerId("test-manager-id")
-                .build())
+        this.spaces.associateManager(AssociateSpaceManagerRequest.builder()
+            .spaceId("test-space-id")
+            .managerId("test-manager-id")
+            .build())
             .as(StepVerifier::create)
             .expectNext(AssociateSpaceManagerResponse.builder()
                 .metadata(Metadata.builder()
@@ -315,7 +315,8 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     public void associateSecurityGroup() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/spaces/test-space-id/security_groups/test-security-group-id")
+                .method(PUT)
+                .path("/spaces/test-space-id/security_groups/test-security-group-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -323,11 +324,10 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.spaces
-            .associateSecurityGroup(AssociateSpaceSecurityGroupRequest.builder()
-                .spaceId("test-space-id")
-                .securityGroupId("test-security-group-id")
-                .build())
+        this.spaces.associateSecurityGroup(AssociateSpaceSecurityGroupRequest.builder()
+            .spaceId("test-space-id")
+            .securityGroupId("test-security-group-id")
+            .build())
             .as(StepVerifier::create)
             .expectNext(AssociateSpaceSecurityGroupResponse.builder()
                 .metadata(Metadata.builder()
@@ -360,7 +360,8 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     public void associateSpaceDeveloperByUsername() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/spaces/test-space-id/developers")
+                .method(PUT)
+                .path("/spaces/test-space-id/developers")
                 .payload("fixtures/client/v2/spaces/PUT_{id}_developers_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -369,11 +370,10 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.spaces
-            .associateDeveloperByUsername(AssociateSpaceDeveloperByUsernameRequest.builder()
-                .spaceId("test-space-id")
-                .username("user@example.com")
-                .build())
+        this.spaces.associateDeveloperByUsername(AssociateSpaceDeveloperByUsernameRequest.builder()
+            .spaceId("test-space-id")
+            .username("user@example.com")
+            .build())
             .as(StepVerifier::create)
             .expectNext(AssociateSpaceDeveloperByUsernameResponse.builder()
                 .metadata(Metadata.builder()
@@ -406,7 +406,8 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     public void associateSpaceManagerByUsername() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/spaces/test-space-id/managers")
+                .method(PUT)
+                .path("/spaces/test-space-id/managers")
                 .payload("fixtures/client/v2/spaces/PUT_{id}_managers_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -415,11 +416,10 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.spaces
-            .associateManagerByUsername(AssociateSpaceManagerByUsernameRequest.builder()
-                .spaceId("test-space-id")
-                .username("user@example.com")
-                .build())
+        this.spaces.associateManagerByUsername(AssociateSpaceManagerByUsernameRequest.builder()
+            .spaceId("test-space-id")
+            .username("user@example.com")
+            .build())
             .as(StepVerifier::create)
             .expectNext(AssociateSpaceManagerByUsernameResponse.builder()
                 .metadata(Metadata.builder()
@@ -452,7 +452,8 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/spaces")
+                .method(POST)
+                .path("/spaces")
                 .payload("fixtures/client/v2/spaces/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -461,11 +462,10 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.spaces
-            .create(CreateSpaceRequest.builder()
-                .name("development")
-                .organizationId("c523070c-3006-4715-86dd-414afaecd949")
-                .build())
+        this.spaces.create(CreateSpaceRequest.builder()
+            .name("development")
+            .organizationId("c523070c-3006-4715-86dd-414afaecd949")
+            .build())
             .as(StepVerifier::create)
             .expectNext(CreateSpaceResponse.builder()
                 .metadata(Metadata.builder()
@@ -498,17 +498,17 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/spaces/test-space-id")
+                .method(DELETE)
+                .path("/spaces/test-space-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
                 .build())
             .build());
 
-        this.spaces
-            .delete(DeleteSpaceRequest.builder()
-                .spaceId("test-space-id")
-                .build())
+        this.spaces.delete(DeleteSpaceRequest.builder()
+            .spaceId("test-space-id")
+            .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -518,7 +518,8 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     public void deleteAsync() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/spaces/test-space-id?async=true")
+                .method(DELETE)
+                .path("/spaces/test-space-id?async=true")
                 .build())
             .response(TestResponse.builder()
                 .status(ACCEPTED)
@@ -526,11 +527,10 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.spaces
-            .delete(DeleteSpaceRequest.builder()
-                .async(true)
-                .spaceId("test-space-id")
-                .build())
+        this.spaces.delete(DeleteSpaceRequest.builder()
+            .async(true)
+            .spaceId("test-space-id")
+            .build())
             .as(StepVerifier::create)
             .expectNext(DeleteSpaceResponse.builder()
                 .metadata(Metadata.builder()
@@ -551,18 +551,18 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     public void deleteRecursive() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/spaces/test-space-id?recursive=true")
+                .method(DELETE)
+                .path("/spaces/test-space-id?recursive=true")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
                 .build())
             .build());
 
-        this.spaces
-            .delete(DeleteSpaceRequest.builder()
-                .recursive(true)
-                .spaceId("test-space-id")
-                .build())
+        this.spaces.delete(DeleteSpaceRequest.builder()
+            .recursive(true)
+            .spaceId("test-space-id")
+            .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -572,7 +572,8 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/spaces/test-space-id")
+                .method(GET)
+                .path("/spaces/test-space-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -580,10 +581,9 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.spaces
-            .get(GetSpaceRequest.builder()
-                .spaceId("test-space-id")
-                .build())
+        this.spaces.get(GetSpaceRequest.builder()
+            .spaceId("test-space-id")
+            .build())
             .as(StepVerifier::create)
             .expectNext(GetSpaceResponse.builder()
                 .metadata(Metadata.builder()
@@ -617,7 +617,8 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     public void getSummary() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/spaces/test-space-id/summary")
+                .method(GET)
+                .path("/spaces/test-space-id/summary")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -625,10 +626,9 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.spaces
-            .getSummary(GetSpaceSummaryRequest.builder()
-                .spaceId("test-space-id")
-                .build())
+        this.spaces.getSummary(GetSpaceSummaryRequest.builder()
+            .spaceId("test-space-id")
+            .build())
             .as(StepVerifier::create)
             .expectNext(GetSpaceSummaryResponse.builder()
                 .id("c6473a38-92f4-4595-9462-01af4c4b1893")
@@ -666,10 +666,10 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
                     .packageUpdatedAt("2016-04-22T19:33:13Z")
                     .detectedStartCommand("")
                     .enableSsh(true)
-                    .dockerCredentials(DockerCredentials.builder().build())
+                    .dockerCredentials(DockerCredentials.builder()
+                        .build())
                     .build())
-                .service(builder()
-                    .id("a049e5e8-8597-469e-b1c6-ddb8eb2c0af0")
+                .service(builder().id("a049e5e8-8597-469e-b1c6-ddb8eb2c0af0")
                     .name("name-162")
                     .boundApplicationCount(1)
                     .lastOperation(LastOperation.builder()
@@ -697,7 +697,8 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/spaces?q=name:test-name&page=-1")
+                .method(GET)
+                .path("/spaces?q=name:test-name&page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -705,11 +706,10 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.spaces
-            .list(ListSpacesRequest.builder()
-                .name("test-name")
-                .page(-1)
-                .build())
+        this.spaces.list(ListSpacesRequest.builder()
+            .name("test-name")
+            .page(-1)
+            .build())
             .as(StepVerifier::create)
             .expectNext(ListSpacesResponse.builder()
                 .totalResults(1)
@@ -747,7 +747,8 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     public void listApplications() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/spaces/test-space-id/apps?q=name:test-name&page=-1")
+                .method(GET)
+                .path("/spaces/test-space-id/apps?q=name:test-name&page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -755,12 +756,11 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.spaces
-            .listApplications(ListSpaceApplicationsRequest.builder()
-                .spaceId("test-space-id")
-                .name("test-name")
-                .page(-1)
-                .build())
+        this.spaces.listApplications(ListSpaceApplicationsRequest.builder()
+            .spaceId("test-space-id")
+            .name("test-name")
+            .page(-1)
+            .build())
             .as(StepVerifier::create)
             .expectNext(ListSpaceApplicationsResponse.builder()
                 .totalResults(1)
@@ -789,7 +789,8 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
                         .packageUpdatedAt("2015-07-27T22:43:08Z")
                         .detectedStartCommand("")
                         .enableSsh(true)
-                        .dockerCredentials(DockerCredentials.builder().build())
+                        .dockerCredentials(DockerCredentials.builder()
+                            .build())
                         .spaceUrl("/v2/spaces/ca816a1b-ed3e-4ea8-bda2-2031d2e5b89f")
                         .stackUrl("/v2/stacks/e458a99f-53a4-4da4-b78a-5f2eb212cc47")
                         .eventsUrl("/v2/apps/4ee31730-3c0e-4ec6-8329-26e727ab8ccd/events")
@@ -807,7 +808,8 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     public void listAuditors() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/spaces/test-space-id/auditors?page=-1")
+                .method(GET)
+                .path("/spaces/test-space-id/auditors?page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -815,11 +817,10 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.spaces
-            .listAuditors(ListSpaceAuditorsRequest.builder()
-                .spaceId("test-space-id")
-                .page(-1)
-                .build())
+        this.spaces.listAuditors(ListSpaceAuditorsRequest.builder()
+            .spaceId("test-space-id")
+            .page(-1)
+            .build())
             .as(StepVerifier::create)
             .expectNext(ListSpaceAuditorsResponse.builder()
                 .totalResults(1)
@@ -853,7 +854,8 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     public void listDevelopers() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/spaces/test-space-id/developers?page=-1")
+                .method(GET)
+                .path("/spaces/test-space-id/developers?page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -861,11 +863,10 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.spaces
-            .listDevelopers(ListSpaceDevelopersRequest.builder()
-                .spaceId("test-space-id")
-                .page(-1)
-                .build())
+        this.spaces.listDevelopers(ListSpaceDevelopersRequest.builder()
+            .spaceId("test-space-id")
+            .page(-1)
+            .build())
             .as(StepVerifier::create)
             .expectNext(ListSpaceDevelopersResponse.builder()
                 .totalResults(1)
@@ -899,7 +900,8 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     public void listDomains() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/spaces/test-space-id/domains?page=-1")
+                .method(GET)
+                .path("/spaces/test-space-id/domains?page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -907,11 +909,10 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.spaces
-            .listDomains(ListSpaceDomainsRequest.builder()
-                .spaceId("test-space-id")
-                .page(-1)
-                .build())
+        this.spaces.listDomains(ListSpaceDomainsRequest.builder()
+            .spaceId("test-space-id")
+            .page(-1)
+            .build())
             .as(StepVerifier::create)
             .expectNext(ListSpaceDomainsResponse.builder()
                 .totalResults(2)
@@ -945,7 +946,8 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     public void listEvents() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/spaces/test-space-id/events?page=-1")
+                .method(GET)
+                .path("/spaces/test-space-id/events?page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -953,11 +955,10 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.spaces
-            .listEvents(ListSpaceEventsRequest.builder()
-                .spaceId("test-space-id")
-                .page(-1)
-                .build())
+        this.spaces.listEvents(ListSpaceEventsRequest.builder()
+            .spaceId("test-space-id")
+            .page(-1)
+            .build())
             .as(StepVerifier::create)
             .expectNext(ListSpaceEventsResponse.builder()
                 .totalResults(1)
@@ -977,9 +978,11 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
                         .acteeType("space")
                         .acteeName("name-56")
                         .timestamp("2015-07-27T22:43:07Z")
-                        .metadata("request", Optional.of(FluentMap.builder()
-                            .entry("name", "new_name")
-                            .build()))
+                        .metadata("request",
+                            Optional.of(FluentMap.builder()
+                                .entry("name",
+                                    "new_name")
+                                .build()))
                         .spaceId("33d44b03-6203-47a7-b71c-9bf6fcaeb54a")
                         .organizationId("ab7dff90-0bc7-4ce0-be5b-b8ecc676bc4a")
                         .build())
@@ -993,7 +996,8 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     public void listManagers() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/spaces/test-space-id/managers?page=-1")
+                .method(GET)
+                .path("/spaces/test-space-id/managers?page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -1001,11 +1005,10 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.spaces
-            .listManagers(ListSpaceManagersRequest.builder()
-                .spaceId("test-space-id")
-                .page(-1)
-                .build())
+        this.spaces.listManagers(ListSpaceManagersRequest.builder()
+            .spaceId("test-space-id")
+            .page(-1)
+            .build())
             .as(StepVerifier::create)
             .expectNext(ListSpaceManagersResponse.builder()
                 .totalResults(1)
@@ -1039,7 +1042,8 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     public void listRoutes() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/spaces/test-space-id/routes?page=-1")
+                .method(GET)
+                .path("/spaces/test-space-id/routes?page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -1047,11 +1051,10 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.spaces
-            .listRoutes(ListSpaceRoutesRequest.builder()
-                .spaceId("test-space-id")
-                .page(-1)
-                .build())
+        this.spaces.listRoutes(ListSpaceRoutesRequest.builder()
+            .spaceId("test-space-id")
+            .page(-1)
+            .build())
             .as(StepVerifier::create)
             .expectNext(ListSpaceRoutesResponse.builder()
                 .totalResults(1)
@@ -1083,7 +1086,8 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     public void listSecurityGroups() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/spaces/test-space-id/security_groups?page=-1")
+                .method(GET)
+                .path("/spaces/test-space-id/security_groups?page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -1091,11 +1095,10 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.spaces
-            .listSecurityGroups(ListSpaceSecurityGroupsRequest.builder()
-                .spaceId("test-space-id")
-                .page(-1)
-                .build())
+        this.spaces.listSecurityGroups(ListSpaceSecurityGroupsRequest.builder()
+            .spaceId("test-space-id")
+            .page(-1)
+            .build())
             .as(StepVerifier::create)
             .expectNext(ListSpaceSecurityGroupsResponse.builder()
                 .totalResults(1)
@@ -1127,7 +1130,8 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     public void listServiceInstances() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/spaces/test-space-id/service_instances?page=-1&return_user_provided_service_instances=true")
+                .method(GET)
+                .path("/spaces/test-space-id/service_instances?page=-1&return_user_provided_service_instances=true")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -1135,12 +1139,11 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.spaces
-            .listServiceInstances(ListSpaceServiceInstancesRequest.builder()
-                .spaceId("test-space-id")
-                .returnUserProvidedServiceInstances(true)
-                .page(-1)
-                .build())
+        this.spaces.listServiceInstances(ListSpaceServiceInstancesRequest.builder()
+            .spaceId("test-space-id")
+            .returnUserProvidedServiceInstances(true)
+            .page(-1)
+            .build())
             .as(StepVerifier::create)
             .expectNext(ListSpaceServiceInstancesResponse.builder()
                 .totalResults(1)
@@ -1153,17 +1156,16 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
                         .build())
                     .entity(UnionServiceInstanceEntity.builder()
                         .name("name-97")
-                        .credential("creds-key-52", "creds-val-52")
+                        .credential("creds-key-52",
+                            "creds-val-52")
                         .servicePlanId("77157c85-203a-4fac-b9a3-003988ff879a")
                         .spaceId("aead50c9-0d45-410c-befd-431c8b7b3e30")
                         .type("managed_service_instance")
                         .tags(Collections.emptyList())
                         .spaceUrl("/v2/spaces/aead50c9-0d45-410c-befd-431c8b7b3e30")
                         .servicePlanUrl("/v2/service_plans/77157c85-203a-4fac-b9a3-003988ff879a")
-                        .serviceBindingsUrl
-                            ("/v2/service_instances/7046d37c-8a50-49d5-ba53-abb103a92142/service_bindings")
-                        .serviceKeysUrl
-                            ("/v2/service_instances/7046d37c-8a50-49d5-ba53-abb103a92142/service_keys")
+                        .serviceBindingsUrl("/v2/service_instances/7046d37c-8a50-49d5-ba53-abb103a92142/service_bindings")
+                        .serviceKeysUrl("/v2/service_instances/7046d37c-8a50-49d5-ba53-abb103a92142/service_keys")
                         .build())
                     .build())
                 .build())
@@ -1175,7 +1177,8 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     public void listServices() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/spaces/test-space-id/services?page=-1")
+                .method(GET)
+                .path("/spaces/test-space-id/services?page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -1183,11 +1186,10 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.spaces
-            .listServices(ListSpaceServicesRequest.builder()
-                .spaceId("test-space-id")
-                .page(-1)
-                .build())
+        this.spaces.listServices(ListSpaceServicesRequest.builder()
+            .spaceId("test-space-id")
+            .page(-1)
+            .build())
             .as(StepVerifier::create)
             .expectNext(ListSpaceServicesResponse.builder()
                 .totalResults(1)
@@ -1220,7 +1222,8 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     public void listUserRoles() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/spaces/test-space-id/user_roles?page=-1")
+                .method(GET)
+                .path("/spaces/test-space-id/user_roles?page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -1228,11 +1231,10 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.spaces
-            .listUserRoles(ListSpaceUserRolesRequest.builder()
-                .spaceId("test-space-id")
-                .page(-1)
-                .build())
+        this.spaces.listUserRoles(ListSpaceUserRolesRequest.builder()
+            .spaceId("test-space-id")
+            .page(-1)
+            .build())
             .as(StepVerifier::create)
             .expectNext(ListSpaceUserRolesResponse.builder()
                 .totalResults(1)
@@ -1269,18 +1271,18 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     public void removeAuditor() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/spaces/test-space-id/auditors/test-auditor-id")
+                .method(DELETE)
+                .path("/spaces/test-space-id/auditors/test-auditor-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
                 .build())
             .build());
 
-        this.spaces
-            .removeAuditor(RemoveSpaceAuditorRequest.builder()
-                .auditorId("test-auditor-id")
-                .spaceId("test-space-id")
-                .build())
+        this.spaces.removeAuditor(RemoveSpaceAuditorRequest.builder()
+            .auditorId("test-auditor-id")
+            .spaceId("test-space-id")
+            .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -1290,7 +1292,8 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     public void removeAuditorByUsername() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/spaces/test-space-id/auditors")
+                .method(DELETE)
+                .path("/spaces/test-space-id/auditors")
                 .payload("fixtures/client/v2/spaces/DELETE_{id}_auditors_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -1299,11 +1302,10 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.spaces
-            .removeAuditorByUsername(RemoveSpaceAuditorByUsernameRequest.builder()
-                .spaceId("test-space-id")
-                .username("auditor@example.com")
-                .build())
+        this.spaces.removeAuditorByUsername(RemoveSpaceAuditorByUsernameRequest.builder()
+            .spaceId("test-space-id")
+            .username("auditor@example.com")
+            .build())
             .as(StepVerifier::create)
             .expectNext(RemoveSpaceAuditorByUsernameResponse.builder()
                 .metadata(Metadata.builder()
@@ -1336,18 +1338,18 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     public void removeDeveloper() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/spaces/test-space-id/developers/test-developer-id")
+                .method(DELETE)
+                .path("/spaces/test-space-id/developers/test-developer-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
                 .build())
             .build());
 
-        this.spaces
-            .removeDeveloper(RemoveSpaceDeveloperRequest.builder()
-                .developerId("test-developer-id")
-                .spaceId("test-space-id")
-                .build())
+        this.spaces.removeDeveloper(RemoveSpaceDeveloperRequest.builder()
+            .developerId("test-developer-id")
+            .spaceId("test-space-id")
+            .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -1357,7 +1359,8 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     public void removeDeveloperByUsername() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/spaces/test-space-id/developers")
+                .method(DELETE)
+                .path("/spaces/test-space-id/developers")
                 .payload("fixtures/client/v2/spaces/DELETE_{id}_developers_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -1366,11 +1369,10 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.spaces
-            .removeDeveloperByUsername(RemoveSpaceDeveloperByUsernameRequest.builder()
-                .spaceId("test-space-id")
-                .username("developer@example.com")
-                .build())
+        this.spaces.removeDeveloperByUsername(RemoveSpaceDeveloperByUsernameRequest.builder()
+            .spaceId("test-space-id")
+            .username("developer@example.com")
+            .build())
             .as(StepVerifier::create)
             .expectNext(RemoveSpaceDeveloperByUsernameResponse.builder()
                 .metadata(Metadata.builder()
@@ -1403,18 +1405,18 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     public void removeManager() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/spaces/test-space-id/managers/test-manager-id")
+                .method(DELETE)
+                .path("/spaces/test-space-id/managers/test-manager-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
                 .build())
             .build());
 
-        this.spaces
-            .removeManager(RemoveSpaceManagerRequest.builder()
-                .spaceId("test-space-id")
-                .managerId("test-manager-id")
-                .build())
+        this.spaces.removeManager(RemoveSpaceManagerRequest.builder()
+            .spaceId("test-space-id")
+            .managerId("test-manager-id")
+            .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -1424,7 +1426,8 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     public void removeManagerByUsername() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/spaces/test-space-id/managers")
+                .method(DELETE)
+                .path("/spaces/test-space-id/managers")
                 .payload("fixtures/client/v2/spaces/DELETE_{id}_managers_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -1433,11 +1436,10 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.spaces
-            .removeManagerByUsername(RemoveSpaceManagerByUsernameRequest.builder()
-                .spaceId("test-space-id")
-                .username("manager@example.com")
-                .build())
+        this.spaces.removeManagerByUsername(RemoveSpaceManagerByUsernameRequest.builder()
+            .spaceId("test-space-id")
+            .username("manager@example.com")
+            .build())
             .as(StepVerifier::create)
             .expectNext(RemoveSpaceManagerByUsernameResponse.builder()
                 .metadata(Metadata.builder()
@@ -1470,18 +1472,18 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     public void removeSecurityGroup() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/spaces/test-space-id/security_groups/test-security-group-id")
+                .method(DELETE)
+                .path("/spaces/test-space-id/security_groups/test-security-group-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
                 .build())
             .build());
 
-        this.spaces
-            .removeSecurityGroup(RemoveSpaceSecurityGroupRequest.builder()
-                .spaceId("test-space-id")
-                .securityGroupId("test-security-group-id")
-                .build())
+        this.spaces.removeSecurityGroup(RemoveSpaceSecurityGroupRequest.builder()
+            .spaceId("test-space-id")
+            .securityGroupId("test-security-group-id")
+            .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -1491,7 +1493,8 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     public void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/spaces/test-space-id")
+                .method(PUT)
+                .path("/spaces/test-space-id")
                 .payload("fixtures/client/v2/spaces/PUT_{id}_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -1500,12 +1503,11 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.spaces
-            .update(UpdateSpaceRequest.builder()
-                .spaceId("test-space-id")
-                .name("New Space Name")
-                .auditorIds(Collections.emptyList())
-                .build())
+        this.spaces.update(UpdateSpaceRequest.builder()
+            .spaceId("test-space-id")
+            .name("New Space Name")
+            .auditorIds(Collections.emptyList())
+            .build())
             .as(StepVerifier::create)
             .expectNext(UpdateSpaceResponse.builder()
                 .metadata(Metadata.builder()
