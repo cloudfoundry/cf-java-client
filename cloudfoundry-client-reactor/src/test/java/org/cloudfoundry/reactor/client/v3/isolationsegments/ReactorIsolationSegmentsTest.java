@@ -60,13 +60,17 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
 
-    private final ReactorIsolationSegments isolationSegments = new ReactorIsolationSegments(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    private final ReactorIsolationSegments isolationSegments = new ReactorIsolationSegments(CONNECTION_CONTEXT,
+        this.root,
+        TOKEN_PROVIDER,
+        Collections.emptyMap());
 
     @Test
     public void addOrganizationEntitlement() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/isolation_segments/test-isolation-segment-id/relationships/organizations")
+                .method(POST)
+                .path("/isolation_segments/test-isolation-segment-id/relationships/organizations")
                 .payload("fixtures/client/v3/isolation_segments/POST_{id}_relationships_organizations_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -75,16 +79,15 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.isolationSegments
-            .addOrganizationEntitlement(AddIsolationSegmentOrganizationEntitlementRequest.builder()
-                .isolationSegmentId("test-isolation-segment-id")
-                .data(Relationship.builder()
-                    .id("org-guid-1")
-                    .build())
-                .data(Relationship.builder()
-                    .id("org-guid-2")
-                    .build())
+        this.isolationSegments.addOrganizationEntitlement(AddIsolationSegmentOrganizationEntitlementRequest.builder()
+            .isolationSegmentId("test-isolation-segment-id")
+            .data(Relationship.builder()
+                .id("org-guid-1")
                 .build())
+            .data(Relationship.builder()
+                .id("org-guid-2")
+                .build())
+            .build())
             .as(StepVerifier::create)
             .expectNext(AddIsolationSegmentOrganizationEntitlementResponse.builder()
                 .data(Relationship.builder()
@@ -108,7 +111,8 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/isolation_segments")
+                .method(POST)
+                .path("/isolation_segments")
                 .payload("fixtures/client/v3/isolation_segments/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -117,10 +121,9 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.isolationSegments
-            .create(CreateIsolationSegmentRequest.builder()
-                .name("my_segment")
-                .build())
+        this.isolationSegments.create(CreateIsolationSegmentRequest.builder()
+            .name("my_segment")
+            .build())
             .as(StepVerifier::create)
             .expectNext(CreateIsolationSegmentResponse.builder()
                 .id("b19f6525-cbd3-4155-b156-dc0c2a431b4c")
@@ -142,17 +145,17 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/isolation_segments/test-isolation-segment-id")
+                .method(DELETE)
+                .path("/isolation_segments/test-isolation-segment-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
                 .build())
             .build());
 
-        this.isolationSegments
-            .delete(DeleteIsolationSegmentRequest.builder()
-                .isolationSegmentId("test-isolation-segment-id")
-                .build())
+        this.isolationSegments.delete(DeleteIsolationSegmentRequest.builder()
+            .isolationSegmentId("test-isolation-segment-id")
+            .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -162,7 +165,8 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/isolation_segments/test-isolation-segment-id")
+                .method(GET)
+                .path("/isolation_segments/test-isolation-segment-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -170,10 +174,9 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.isolationSegments
-            .get(GetIsolationSegmentRequest.builder()
-                .isolationSegmentId("test-isolation-segment-id")
-                .build())
+        this.isolationSegments.get(GetIsolationSegmentRequest.builder()
+            .isolationSegmentId("test-isolation-segment-id")
+            .build())
             .as(StepVerifier::create)
             .expectNext(GetIsolationSegmentResponse.builder()
                 .id("b19f6525-cbd3-4155-b156-dc0c2a431b4c")
@@ -195,7 +198,8 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/isolation_segments")
+                .method(GET)
+                .path("/isolation_segments")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -203,9 +207,8 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.isolationSegments
-            .list(ListIsolationSegmentsRequest.builder()
-                .build())
+        this.isolationSegments.list(ListIsolationSegmentsRequest.builder()
+            .build())
             .as(StepVerifier::create)
             .expectNext(ListIsolationSegmentsResponse.builder()
                 .pagination(Pagination.builder()
@@ -229,9 +232,10 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
                     .link("self", Link.builder()
                         .href("https://api.example.org/v3/isolation_segments/b19f6525-cbd3-4155-b156-dc0c2a431b4c")
                         .build())
-                    .link("organizations", Link.builder()
-                        .href("https://api.example.org/v3/isolation_segments/b19f6525-cbd3-4155-b156-dc0c2a431b4c/organizations")
-                        .build())
+                    .link("organizations",
+                        Link.builder()
+                            .href("https://api.example.org/v3/isolation_segments/b19f6525-cbd3-4155-b156-dc0c2a431b4c/organizations")
+                            .build())
                     .build())
                 .resource(IsolationSegmentResource.builder()
                     .id("68d54d31-9b3a-463b-ba94-e8e4c32edbac")
@@ -241,9 +245,10 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
                     .link("self", Link.builder()
                         .href("https://api.example.org/v3/isolation_segments/68d54d31-9b3a-463b-ba94-e8e4c32edbac")
                         .build())
-                    .link("organizations", Link.builder()
-                        .href("https://api.example.org/v3/isolation_segments/68d54d31-9b3a-463b-ba94-e8e4c32edbac/organizations")
-                        .build())
+                    .link("organizations",
+                        Link.builder()
+                            .href("https://api.example.org/v3/isolation_segments/68d54d31-9b3a-463b-ba94-e8e4c32edbac/organizations")
+                            .build())
                     .build())
                 .resource(IsolationSegmentResource.builder()
                     .id("ecdc67c3-a71e-43ff-bddf-048930b8cd03")
@@ -253,9 +258,10 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
                     .link("self", Link.builder()
                         .href("https://api.example.org/v3/isolation_segments/ecdc67c3-a71e-43ff-bddf-048930b8cd03")
                         .build())
-                    .link("organizations", Link.builder()
-                        .href("https://api.example.org/v3/isolation_segments/ecdc67c3-a71e-43ff-bddf-048930b8cd03/organizations")
-                        .build())
+                    .link("organizations",
+                        Link.builder()
+                            .href("https://api.example.org/v3/isolation_segments/ecdc67c3-a71e-43ff-bddf-048930b8cd03/organizations")
+                            .build())
                     .build())
                 .resource(IsolationSegmentResource.builder()
                     .id("424c89e4-4353-46b7-9bf4-f90bd9bacac0")
@@ -265,9 +271,10 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
                     .link("self", Link.builder()
                         .href("https://api.example.org/v3/isolation_segments/424c89e4-4353-46b7-9bf4-f90bd9bacac0")
                         .build())
-                    .link("organizations", Link.builder()
-                        .href("https://api.example.org/v3/isolation_segments/424c89e4-4353-46b7-9bf4-f90bd9bacac0/organizations")
-                        .build())
+                    .link("organizations",
+                        Link.builder()
+                            .href("https://api.example.org/v3/isolation_segments/424c89e4-4353-46b7-9bf4-f90bd9bacac0/organizations")
+                            .build())
                     .build())
                 .resource(IsolationSegmentResource.builder()
                     .id("0a79fcec-a648-4eb8-a6c3-2b5be39047c7")
@@ -277,9 +284,10 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
                     .link("self", Link.builder()
                         .href("https://api.example.org/v3/isolation_segments/0a79fcec-a648-4eb8-a6c3-2b5be39047c7")
                         .build())
-                    .link("organizations", Link.builder()
-                        .href("https://api.example.org/v3/isolation_segments/0a79fcec-a648-4eb8-a6c3-2b5be39047c7/organizations")
-                        .build())
+                    .link("organizations",
+                        Link.builder()
+                            .href("https://api.example.org/v3/isolation_segments/0a79fcec-a648-4eb8-a6c3-2b5be39047c7/organizations")
+                            .build())
                     .build())
                 .build())
             .expectComplete()
@@ -290,7 +298,8 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
     public void listEntitledOrganizations() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/isolation_segments/test-isolation-segment-id/organizations")
+                .method(GET)
+                .path("/isolation_segments/test-isolation-segment-id/organizations")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -298,10 +307,9 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.isolationSegments
-            .listEntitledOrganizations(ListIsolationSegmentEntitledOrganizationsRequest.builder()
-                .isolationSegmentId("test-isolation-segment-id")
-                .build())
+        this.isolationSegments.listEntitledOrganizations(ListIsolationSegmentEntitledOrganizationsRequest.builder()
+            .isolationSegmentId("test-isolation-segment-id")
+            .build())
             .as(StepVerifier::create)
             .expectNext(ListIsolationSegmentEntitledOrganizationsResponse.builder()
                 .pagination(Pagination.builder()
@@ -343,7 +351,8 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
     public void listOrganizationsRelationship() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/isolation_segments/test-isolation-segment-id/relationships/organizations")
+                .method(GET)
+                .path("/isolation_segments/test-isolation-segment-id/relationships/organizations")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -351,10 +360,9 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.isolationSegments
-            .listOrganizationsRelationship(ListIsolationSegmentOrganizationsRelationshipRequest.builder()
-                .isolationSegmentId("test-isolation-segment-id")
-                .build())
+        this.isolationSegments.listOrganizationsRelationship(ListIsolationSegmentOrganizationsRelationshipRequest.builder()
+            .isolationSegmentId("test-isolation-segment-id")
+            .build())
             .as(StepVerifier::create)
             .expectNext(ListIsolationSegmentOrganizationsRelationshipResponse.builder()
                 .data(Relationship.builder()
@@ -378,7 +386,8 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
     public void listSpacesRelationship() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/isolation_segments/test-isolation-segment-id/relationships/spaces")
+                .method(GET)
+                .path("/isolation_segments/test-isolation-segment-id/relationships/spaces")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -386,10 +395,9 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.isolationSegments
-            .listSpacesRelationship(ListIsolationSegmentSpacesRelationshipRequest.builder()
-                .isolationSegmentId("test-isolation-segment-id")
-                .build())
+        this.isolationSegments.listSpacesRelationship(ListIsolationSegmentSpacesRelationshipRequest.builder()
+            .isolationSegmentId("test-isolation-segment-id")
+            .build())
             .as(StepVerifier::create)
             .expectNext(ListIsolationSegmentSpacesRelationshipResponse.builder()
                 .data(Relationship.builder()
@@ -410,18 +418,18 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
     public void removeOrganizationEntitlement() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/isolation_segments/test-isolation-segment-id/relationships/organizations/test-organization-id")
+                .method(DELETE)
+                .path("/isolation_segments/test-isolation-segment-id/relationships/organizations/test-organization-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
                 .build())
             .build());
 
-        this.isolationSegments
-            .removeOrganizationEntitlement(RemoveIsolationSegmentOrganizationEntitlementRequest.builder()
-                .isolationSegmentId("test-isolation-segment-id")
-                .organizationId("test-organization-id")
-                .build())
+        this.isolationSegments.removeOrganizationEntitlement(RemoveIsolationSegmentOrganizationEntitlementRequest.builder()
+            .isolationSegmentId("test-isolation-segment-id")
+            .organizationId("test-organization-id")
+            .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -431,7 +439,8 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
     public void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PATCH).path("/isolation_segments/test-isolation-segment-id")
+                .method(PATCH)
+                .path("/isolation_segments/test-isolation-segment-id")
                 .payload("fixtures/client/v3/isolation_segments/PATCH_{id}_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -440,11 +449,10 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.isolationSegments
-            .update(UpdateIsolationSegmentRequest.builder()
-                .isolationSegmentId("test-isolation-segment-id")
-                .name("my_isolation_segment")
-                .build())
+        this.isolationSegments.update(UpdateIsolationSegmentRequest.builder()
+            .isolationSegmentId("test-isolation-segment-id")
+            .name("my_isolation_segment")
+            .build())
             .as(StepVerifier::create)
             .expectNext(UpdateIsolationSegmentResponse.builder()
                 .id("b19f6525-cbd3-4155-b156-dc0c2a431b4c")

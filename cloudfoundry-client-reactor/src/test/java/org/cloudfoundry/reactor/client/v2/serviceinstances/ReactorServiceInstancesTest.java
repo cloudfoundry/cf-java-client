@@ -71,7 +71,10 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
 
-    private final ReactorServiceInstances serviceInstances = new ReactorServiceInstances(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    private final ReactorServiceInstances serviceInstances = new ReactorServiceInstances(CONNECTION_CONTEXT,
+        this.root,
+        TOKEN_PROVIDER,
+        Collections.emptyMap());
 
     @Test
     public void bindRoute() {
@@ -87,12 +90,11 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.serviceInstances
-            .bindRoute(BindServiceInstanceRouteRequest.builder()
-                .serviceInstanceId("test-service-instance-id")
-                .routeId("route-id")
-                .parameter("the_service_broker", "wants this object")
-                .build())
+        this.serviceInstances.bindRoute(BindServiceInstanceRouteRequest.builder()
+            .serviceInstanceId("test-service-instance-id")
+            .routeId("route-id")
+            .parameter("the_service_broker", "wants this object")
+            .build())
             .as(StepVerifier::create)
             .expectNext(BindServiceInstanceRouteResponse.builder()
                 .metadata(Metadata.builder()
@@ -102,7 +104,8 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
                     .build())
                 .entity(ServiceInstanceEntity.builder()
                     .name("name-160")
-                    .credential("creds-key-89", "creds-val-89")
+                    .credential("creds-key-89",
+                        "creds-val-89")
                     .servicePlanId("957307f5-6811-4eba-8667-ffee5a704a4a")
                     .spaceId("36b01ada-ef02-4ff5-9f78-cd9e704211d2")
                     .type("managed_service_instance")
@@ -132,16 +135,15 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.serviceInstances
-            .create(CreateServiceInstanceRequest.builder()
-                .acceptsIncomplete(true)
-                .name("my-service-instance")
-                .servicePlanId("2048a369-d2d3-48cf-bcfd-eaf9032fa0ab")
-                .spaceId("86b29f7e-721d-4eb8-b34f-3b1d1eccdf23")
-                .parameter("the_service_broker", "wants this object")
-                .tag("accounting")
-                .tag("mongodb")
-                .build())
+        this.serviceInstances.create(CreateServiceInstanceRequest.builder()
+            .acceptsIncomplete(true)
+            .name("my-service-instance")
+            .servicePlanId("2048a369-d2d3-48cf-bcfd-eaf9032fa0ab")
+            .spaceId("86b29f7e-721d-4eb8-b34f-3b1d1eccdf23")
+            .parameter("the_service_broker", "wants this object")
+            .tag("accounting")
+            .tag("mongodb")
+            .build())
             .as(StepVerifier::create)
             .expectNext(CreateServiceInstanceResponse.builder()
                 .metadata(Metadata.builder()
@@ -151,7 +153,8 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
                     .build())
                 .entity(ServiceInstanceEntity.builder()
                     .name("my-service-instance")
-                    .credential("creds-key-356", "creds-val-356")
+                    .credential("creds-key-356",
+                        "creds-val-356")
                     .servicePlanId("2048a369-d2d3-48cf-bcfd-eaf9032fa0ab")
                     .spaceId("86b29f7e-721d-4eb8-b34f-3b1d1eccdf23")
                     .type("managed_service_instance")
@@ -186,12 +189,11 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.serviceInstances
-            .delete(DeleteServiceInstanceRequest.builder()
-                .serviceInstanceId("test-service-instance-id")
-                .acceptsIncomplete(true)
-                .purge(true)
-                .build())
+        this.serviceInstances.delete(DeleteServiceInstanceRequest.builder()
+            .serviceInstanceId("test-service-instance-id")
+            .acceptsIncomplete(true)
+            .purge(true)
+            .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -210,11 +212,10 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.serviceInstances
-            .delete(DeleteServiceInstanceRequest.builder()
-                .serviceInstanceId("test-service-instance-id")
-                .acceptsIncomplete(true)
-                .build())
+        this.serviceInstances.delete(DeleteServiceInstanceRequest.builder()
+            .serviceInstanceId("test-service-instance-id")
+            .acceptsIncomplete(true)
+            .build())
             .as(StepVerifier::create)
             .expectNext(DeleteServiceInstanceResponse.builder()
                 .metadata(Metadata.builder()
@@ -260,12 +261,11 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.serviceInstances
-            .delete(DeleteServiceInstanceRequest.builder()
-                .async(true)
-                .serviceInstanceId("test-service-instance-id")
-                .purge(true)
-                .build())
+        this.serviceInstances.delete(DeleteServiceInstanceRequest.builder()
+            .async(true)
+            .serviceInstanceId("test-service-instance-id")
+            .purge(true)
+            .build())
             .as(StepVerifier::create)
             .expectNext(DeleteServiceInstanceResponse.builder()
                 .metadata(Metadata.builder()
@@ -295,10 +295,9 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.serviceInstances
-            .get(GetServiceInstanceRequest.builder()
-                .serviceInstanceId("test-service-instance-id")
-                .build())
+        this.serviceInstances.get(GetServiceInstanceRequest.builder()
+            .serviceInstanceId("test-service-instance-id")
+            .build())
             .as(StepVerifier::create)
             .expectNext(GetServiceInstanceResponse.builder()
                 .metadata(Metadata.builder()
@@ -351,10 +350,9 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.serviceInstances
-            .getParameters(GetServiceInstanceParametersRequest.builder()
-                .serviceInstanceId("test-service-instance-id")
-                .build())
+        this.serviceInstances.getParameters(GetServiceInstanceParametersRequest.builder()
+            .serviceInstanceId("test-service-instance-id")
+            .build())
             .as(StepVerifier::create)
             .expectNext(GetServiceInstanceParametersResponse.builder()
                 .parameter("test-param-key-1", "test-param-value-1")
@@ -380,10 +378,9 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.serviceInstances
-            .getPermissions(GetServiceInstancePermissionsRequest.builder()
-                .serviceInstanceId("test-service-instance-id")
-                .build())
+        this.serviceInstances.getPermissions(GetServiceInstancePermissionsRequest.builder()
+            .serviceInstanceId("test-service-instance-id")
+            .build())
             .as(StepVerifier::create)
             .expectNext(GetServiceInstancePermissionsResponse.builder()
                 .manage(true)
@@ -406,11 +403,10 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.serviceInstances
-            .list(ListServiceInstancesRequest.builder()
-                .name("test-name")
-                .page(-1)
-                .build())
+        this.serviceInstances.list(ListServiceInstancesRequest.builder()
+            .name("test-name")
+            .page(-1)
+            .build())
             .as(StepVerifier::create)
             .expectNext(ListServiceInstancesResponse.builder()
                 .totalResults(1)
@@ -423,7 +419,8 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
                         .build())
                     .entity(ServiceInstanceEntity.builder()
                         .name("name-133")
-                        .credential("creds-key-72", "creds-val-72")
+                        .credential("creds-key-72",
+                            "creds-val-72")
                         .servicePlanId("2b53255a-8b40-4671-803d-21d3f5d4183a")
                         .spaceId("83b3e705-49fd-4c40-8adf-f5e34f622a19")
                         .type("managed_service_instance")
@@ -460,10 +457,9 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.serviceInstances
-            .listRoutes(ListServiceInstanceRoutesRequest.builder()
-                .serviceInstanceId("26fae4d0-df82-42f3-ac67-da5873e3a277")
-                .build())
+        this.serviceInstances.listRoutes(ListServiceInstanceRoutesRequest.builder()
+            .serviceInstanceId("26fae4d0-df82-42f3-ac67-da5873e3a277")
+            .build())
             .as(StepVerifier::create)
             .expectNext(ListServiceInstanceRoutesResponse.builder()
                 .totalResults(1)
@@ -506,12 +502,11 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.serviceInstances
-            .listServiceBindings(ListServiceInstanceServiceBindingsRequest.builder()
-                .serviceInstanceId("test-service-instance-id")
-                .applicationId("test-application-id")
-                .page(-1)
-                .build())
+        this.serviceInstances.listServiceBindings(ListServiceInstanceServiceBindingsRequest.builder()
+            .serviceInstanceId("test-service-instance-id")
+            .applicationId("test-application-id")
+            .page(-1)
+            .build())
             .as(StepVerifier::create)
             .expectNext(ListServiceInstanceServiceBindingsResponse.builder()
                 .totalResults(1)
@@ -526,7 +521,8 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
                         .applicationId("8a50163b-a39d-4f44-aece-dc5a956da848")
                         .serviceInstanceId("a5a0567e-edbf-4da9-ae90-dce24af308a1")
                         .bindingOptions(Collections.emptyMap())
-                        .credential("creds-key-85", "creds-val-85")
+                        .credential("creds-key-85",
+                            "creds-val-85")
                         .gatewayName("")
                         .applicationUrl("/v2/apps/8a50163b-a39d-4f44-aece-dc5a956da848")
                         .serviceInstanceUrl("/v2/service_instances/a5a0567e-edbf-4da9-ae90-dce24af308a1")
@@ -550,11 +546,10 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.serviceInstances
-            .listServiceKeys(ListServiceInstanceServiceKeysRequest.builder()
-                .serviceInstanceId("test-service-instance-id")
-                .page(-1)
-                .build())
+        this.serviceInstances.listServiceKeys(ListServiceInstanceServiceKeysRequest.builder()
+            .serviceInstanceId("test-service-instance-id")
+            .page(-1)
+            .build())
             .as(StepVerifier::create)
             .expectNext(ListServiceInstanceServiceKeysResponse.builder()
                 .totalResults(1)
@@ -568,7 +563,8 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
                     .entity(ServiceKeyEntity.builder()
                         .name("a-service-key")
                         .serviceInstanceId("28120eae-4a44-42da-a3db-2a34aea8dcaa")
-                        .credential("creds-key-68", "creds-val-68")
+                        .credential("creds-key-68",
+                            "creds-val-68")
                         .serviceInstanceUrl("/v2/service_instances/28120eae-4a44-42da-a3db-2a34aea8dcaa")
                         .build())
                     .build())
@@ -589,11 +585,10 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.serviceInstances
-            .unbindRoute(UnbindServiceInstanceRouteRequest.builder()
-                .routeId("3bbd74b5-516d-409e-a107-19eaf9b2da18")
-                .serviceInstanceId("8fe97ac9-d53a-4858-b6a4-53c20f1fe409")
-                .build())
+        this.serviceInstances.unbindRoute(UnbindServiceInstanceRouteRequest.builder()
+            .routeId("3bbd74b5-516d-409e-a107-19eaf9b2da18")
+            .serviceInstanceId("8fe97ac9-d53a-4858-b6a4-53c20f1fe409")
+            .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -613,14 +608,13 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.serviceInstances
-            .update(UpdateServiceInstanceRequest.builder()
-                .acceptsIncomplete(true)
-                .serviceInstanceId("test-service-instance-id")
-                .servicePlanId("5b5e984f-bbf6-477b-9d3a-b6d5df941b50")
-                .parameter("the_service_broker", "wants this object")
-                .tags(Collections.emptyList())
-                .build())
+        this.serviceInstances.update(UpdateServiceInstanceRequest.builder()
+            .acceptsIncomplete(true)
+            .serviceInstanceId("test-service-instance-id")
+            .servicePlanId("5b5e984f-bbf6-477b-9d3a-b6d5df941b50")
+            .parameter("the_service_broker", "wants this object")
+            .tags(Collections.emptyList())
+            .build())
             .as(StepVerifier::create)
             .expectNext(UpdateServiceInstanceResponse.builder()
                 .metadata(Metadata.builder()
@@ -630,7 +624,8 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
                     .build())
                 .entity(ServiceInstanceEntity.builder()
                     .name("name-139")
-                    .credential("creds-key-75", "creds-val-75")
+                    .credential("creds-key-75",
+                        "creds-val-75")
                     .servicePlanId("b07ff29a-78b8-486f-87a8-3f695368b83d")
                     .spaceId("04219ffa-a817-459f-bbd7-c161bdca541b")
                     .type("managed_service_instance")

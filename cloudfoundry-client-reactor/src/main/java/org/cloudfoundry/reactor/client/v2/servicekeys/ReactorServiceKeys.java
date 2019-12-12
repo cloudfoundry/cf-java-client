@@ -30,6 +30,8 @@ import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v2.AbstractClientV2Operations;
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
+
 /**
  * The Reactor-based implementation of {@link ServiceInstances}
  */
@@ -39,35 +41,34 @@ public final class ReactorServiceKeys extends AbstractClientV2Operations impleme
      * Creates an instance
      *
      * @param connectionContext the {@link ConnectionContext} to use when communicating with the server
-     * @param root              the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
+     * @param root              the root URI of the server. Typically something like {@code https://api.run.pivotal.io}.
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
+     * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorServiceKeys(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
-        super(connectionContext, root, tokenProvider);
+    public ReactorServiceKeys(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider,
+                              Map<String, String> requestTags) {
+        super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<CreateServiceKeyResponse> create(CreateServiceKeyRequest request) {
-        return post(request, CreateServiceKeyResponse.class, builder -> builder.pathSegment("service_keys"))
-            .checkpoint();
+        return post(request, CreateServiceKeyResponse.class, builder -> builder.pathSegment("service_keys")).checkpoint();
     }
 
     @Override
     public Mono<Void> delete(DeleteServiceKeyRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("service_keys", request.getServiceKeyId()))
-            .checkpoint();
+        return delete(request, Void.class, builder -> builder.pathSegment("service_keys", request.getServiceKeyId())).checkpoint();
     }
 
     @Override
     public Mono<GetServiceKeyResponse> get(GetServiceKeyRequest request) {
-        return get(request, GetServiceKeyResponse.class, builder -> builder.pathSegment("service_keys", request.getServiceKeyId()))
-            .checkpoint();
+        return get(request, GetServiceKeyResponse.class,
+            builder -> builder.pathSegment("service_keys", request.getServiceKeyId())).checkpoint();
     }
 
     @Override
     public Mono<ListServiceKeysResponse> list(ListServiceKeysRequest request) {
-        return get(request, ListServiceKeysResponse.class, builder -> builder.pathSegment("service_keys"))
-            .checkpoint();
+        return get(request, ListServiceKeysResponse.class, builder -> builder.pathSegment("service_keys")).checkpoint();
     }
 
 }

@@ -36,6 +36,7 @@ import org.junit.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
+import java.util.Collections;
 
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
@@ -47,14 +48,18 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorOrganizationQuotaDefinitionsTest extends AbstractClientApiTest {
 
-    private final ReactorOrganizationQuotaDefinitions quotaDefinitions = new ReactorOrganizationQuotaDefinitions(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    private final ReactorOrganizationQuotaDefinitions quotaDefinitions = new ReactorOrganizationQuotaDefinitions(CONNECTION_CONTEXT,
+        this.root,
+        TOKEN_PROVIDER,
+        Collections.emptyMap());
 
     @SuppressWarnings("deprecation")
     @Test
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/quota_definitions")
+                .method(POST)
+                .path("/quota_definitions")
                 .payload("fixtures/client/v2/quota_definitions/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -63,18 +68,17 @@ public final class ReactorOrganizationQuotaDefinitionsTest extends AbstractClien
                 .build())
             .build());
 
-        this.quotaDefinitions
-            .create(CreateOrganizationQuotaDefinitionRequest.builder()
-                .applicationInstanceLimit(10)
-                .applicationTaskLimit(5)
-                .instanceMemoryLimit(10240)
-                .memoryLimit(5120)
-                .name("gold_quota")
-                .nonBasicServicesAllowed(true)
-                .totalReservedRoutePorts(3)
-                .totalRoutes(4)
-                .totalServices(-1)
-                .build())
+        this.quotaDefinitions.create(CreateOrganizationQuotaDefinitionRequest.builder()
+            .applicationInstanceLimit(10)
+            .applicationTaskLimit(5)
+            .instanceMemoryLimit(10240)
+            .memoryLimit(5120)
+            .name("gold_quota")
+            .nonBasicServicesAllowed(true)
+            .totalReservedRoutePorts(3)
+            .totalRoutes(4)
+            .totalServices(-1)
+            .build())
             .as(StepVerifier::create)
             .expectNext(CreateOrganizationQuotaDefinitionResponse.builder()
                 .metadata(Metadata.builder()
@@ -106,17 +110,17 @@ public final class ReactorOrganizationQuotaDefinitionsTest extends AbstractClien
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/quota_definitions/test-quota-definition-id")
+                .method(DELETE)
+                .path("/quota_definitions/test-quota-definition-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
                 .build())
             .build());
 
-        this.quotaDefinitions
-            .delete(DeleteOrganizationQuotaDefinitionRequest.builder()
-                .organizationQuotaDefinitionId("test-quota-definition-id")
-                .build())
+        this.quotaDefinitions.delete(DeleteOrganizationQuotaDefinitionRequest.builder()
+            .organizationQuotaDefinitionId("test-quota-definition-id")
+            .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -127,7 +131,8 @@ public final class ReactorOrganizationQuotaDefinitionsTest extends AbstractClien
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/quota_definitions/test-quota-definition-id")
+                .method(GET)
+                .path("/quota_definitions/test-quota-definition-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -135,10 +140,9 @@ public final class ReactorOrganizationQuotaDefinitionsTest extends AbstractClien
                 .build())
             .build());
 
-        this.quotaDefinitions
-            .get(GetOrganizationQuotaDefinitionRequest.builder()
-                .organizationQuotaDefinitionId("test-quota-definition-id")
-                .build())
+        this.quotaDefinitions.get(GetOrganizationQuotaDefinitionRequest.builder()
+            .organizationQuotaDefinitionId("test-quota-definition-id")
+            .build())
             .as(StepVerifier::create)
             .expectNext(GetOrganizationQuotaDefinitionResponse.builder()
                 .metadata(Metadata.builder()
@@ -169,7 +173,8 @@ public final class ReactorOrganizationQuotaDefinitionsTest extends AbstractClien
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/quota_definitions?page=-1")
+                .method(GET)
+                .path("/quota_definitions?page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -177,10 +182,9 @@ public final class ReactorOrganizationQuotaDefinitionsTest extends AbstractClien
                 .build())
             .build());
 
-        this.quotaDefinitions
-            .list(ListOrganizationQuotaDefinitionsRequest.builder()
-                .page(-1)
-                .build())
+        this.quotaDefinitions.list(ListOrganizationQuotaDefinitionsRequest.builder()
+            .page(-1)
+            .build())
             .as(StepVerifier::create)
             .expectNext(ListOrganizationQuotaDefinitionsResponse.builder()
                 .totalPages(1)
@@ -215,7 +219,8 @@ public final class ReactorOrganizationQuotaDefinitionsTest extends AbstractClien
     public void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/quota_definitions/test-quota-definition-id")
+                .method(PUT)
+                .path("/quota_definitions/test-quota-definition-id")
                 .payload("fixtures/client/v2/quota_definitions/PUT_{id}_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -224,10 +229,9 @@ public final class ReactorOrganizationQuotaDefinitionsTest extends AbstractClien
                 .build())
             .build());
 
-        this.quotaDefinitions
-            .update(UpdateOrganizationQuotaDefinitionRequest.builder()
-                .organizationQuotaDefinitionId("test-quota-definition-id")
-                .build())
+        this.quotaDefinitions.update(UpdateOrganizationQuotaDefinitionRequest.builder()
+            .organizationQuotaDefinitionId("test-quota-definition-id")
+            .build())
             .as(StepVerifier::create)
             .expectNext(UpdateOrganizationQuotaDefinitionResponse.builder()
                 .metadata(Metadata.builder()

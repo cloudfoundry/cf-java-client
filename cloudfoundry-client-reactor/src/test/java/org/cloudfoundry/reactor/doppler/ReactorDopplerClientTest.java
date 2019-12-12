@@ -30,19 +30,24 @@ import org.junit.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
+import java.util.Collections;
 
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorDopplerClientTest extends AbstractDopplerApiTest {
 
-    private final ReactorDopplerEndpoints dopplerEndpoints = new ReactorDopplerEndpoints(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    private final ReactorDopplerEndpoints dopplerEndpoints = new ReactorDopplerEndpoints(CONNECTION_CONTEXT,
+        this.root,
+        TOKEN_PROVIDER,
+        Collections.emptyMap());
 
     @Test
     public void containerMetrics() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/apps/test-application-id/containermetrics")
+                .method(GET)
+                .path("/apps/test-application-id/containermetrics")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -51,10 +56,9 @@ public final class ReactorDopplerClientTest extends AbstractDopplerApiTest {
                 .build())
             .build());
 
-        this.dopplerEndpoints
-            .containerMetrics(ContainerMetricsRequest.builder()
-                .applicationId("test-application-id")
-                .build())
+        this.dopplerEndpoints.containerMetrics(ContainerMetricsRequest.builder()
+            .applicationId("test-application-id")
+            .build())
             .as(StepVerifier::create)
             .expectNext(Envelope.builder()
                     .containerMetric(ContainerMetric.builder()
@@ -96,7 +100,8 @@ public final class ReactorDopplerClientTest extends AbstractDopplerApiTest {
     public void containerMetricsLarge() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/apps/test-application-id/containermetrics")
+                .method(GET)
+                .path("/apps/test-application-id/containermetrics")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -105,10 +110,9 @@ public final class ReactorDopplerClientTest extends AbstractDopplerApiTest {
                 .build())
             .build());
 
-        this.dopplerEndpoints
-            .containerMetrics(ContainerMetricsRequest.builder()
-                .applicationId("test-application-id")
-                .build())
+        this.dopplerEndpoints.containerMetrics(ContainerMetricsRequest.builder()
+            .applicationId("test-application-id")
+            .build())
             .as(StepVerifier::create)
             .expectNextCount(3093)
             .expectComplete()
@@ -119,7 +123,8 @@ public final class ReactorDopplerClientTest extends AbstractDopplerApiTest {
     public void recentLogs() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/apps/test-application-id/recentlogs")
+                .method(GET)
+                .path("/apps/test-application-id/recentlogs")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -128,10 +133,9 @@ public final class ReactorDopplerClientTest extends AbstractDopplerApiTest {
                 .build())
             .build());
 
-        this.dopplerEndpoints
-            .recentLogs(RecentLogsRequest.builder()
-                .applicationId("test-application-id")
-                .build())
+        this.dopplerEndpoints.recentLogs(RecentLogsRequest.builder()
+            .applicationId("test-application-id")
+            .build())
             .as(StepVerifier::create)
             .expectNext(Envelope.builder()
                     .deployment("cf-cfapps-io2-diego")
@@ -141,9 +145,9 @@ public final class ReactorDopplerClientTest extends AbstractDopplerApiTest {
                     .job("cell_z2")
                     .logMessage(LogMessage.builder()
                         .applicationId("1a95eadc-95c6-4675-aa07-8c02f80ea8a4")
-                        .message("2016-04-21 22:36:28.035  INFO 24 --- [           main] o.s.j.e.a.AnnotationMBeanExporter        : Located managed bean 'rabbitConnectionFactory': registering " +
-                            "with " +
-                            "JMX server as MBean [org.springframework.amqp.rabbit.connection:name=rabbitConnectionFactory,type=CachingConnectionFactory]")
+                        .message("2016-04-21 22:36:28.035  INFO 24 --- [           main] o.s.j.e.a.AnnotationMBeanExporter        : Located managed bean 'rabbitConnectionFactory': registering "
+                            + "with "
+                            + "JMX server as MBean [org.springframework.amqp.rabbit.connection:name=rabbitConnectionFactory,type=CachingConnectionFactory]")
                         .messageType(MessageType.OUT)
                         .sourceInstance("0")
                         .sourceType("APP")
@@ -177,7 +181,8 @@ public final class ReactorDopplerClientTest extends AbstractDopplerApiTest {
     public void recentLogsLarge() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/apps/test-application-id/recentlogs")
+                .method(GET)
+                .path("/apps/test-application-id/recentlogs")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -186,10 +191,9 @@ public final class ReactorDopplerClientTest extends AbstractDopplerApiTest {
                 .build())
             .build());
 
-        this.dopplerEndpoints
-            .recentLogs(RecentLogsRequest.builder()
-                .applicationId("test-application-id")
-                .build())
+        this.dopplerEndpoints.recentLogs(RecentLogsRequest.builder()
+            .applicationId("test-application-id")
+            .build())
             .as(StepVerifier::create)
             .expectNextCount(3093)
             .expectComplete()

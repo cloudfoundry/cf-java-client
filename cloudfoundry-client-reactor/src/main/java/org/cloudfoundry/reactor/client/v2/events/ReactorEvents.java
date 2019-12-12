@@ -26,6 +26,8 @@ import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v2.AbstractClientV2Operations;
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
+
 /**
  * The Reactor-based implementation of {@link Events}
  */
@@ -35,23 +37,23 @@ public final class ReactorEvents extends AbstractClientV2Operations implements E
      * Creates an instance
      *
      * @param connectionContext the {@link ConnectionContext} to use when communicating with the server
-     * @param root              the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
+     * @param root              the root URI of the server. Typically something like {@code https://api.run.pivotal.io}.
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
+     * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorEvents(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
-        super(connectionContext, root, tokenProvider);
+    public ReactorEvents(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider,
+                         Map<String, String> requestTags) {
+        super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<GetEventResponse> get(GetEventRequest request) {
-        return get(request, GetEventResponse.class, builder -> builder.pathSegment("events", request.getEventId()))
-            .checkpoint();
+        return get(request, GetEventResponse.class, builder -> builder.pathSegment("events", request.getEventId())).checkpoint();
     }
 
     @Override
     public Mono<ListEventsResponse> list(ListEventsRequest request) {
-        return get(request, ListEventsResponse.class, builder -> builder.pathSegment("events"))
-            .checkpoint();
+        return get(request, ListEventsResponse.class, builder -> builder.pathSegment("events")).checkpoint();
     }
 
 }

@@ -60,6 +60,7 @@ import reactor.test.StepVerifier;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.time.Duration;
+import java.util.Collections;
 
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
@@ -72,13 +73,14 @@ import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 
 public final class ReactorPackagesTest extends AbstractClientApiTest {
 
-    private final ReactorPackages packages = new ReactorPackages(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    private final ReactorPackages packages = new ReactorPackages(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void copy() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/packages?source_guid=test-source-package-id")
+                .method(POST)
+                .path("/packages?source_guid=test-source-package-id")
                 .payload("fixtures/client/v3/packages/POST_source_guid={id}_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -87,17 +89,16 @@ public final class ReactorPackagesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.packages
-            .copy(CopyPackageRequest.builder()
-                .sourcePackageId("test-source-package-id")
-                .relationships(PackageRelationships.builder()
-                    .application(ToOneRelationship.builder()
-                        .data(Relationship.builder()
-                            .id("[destination-app-guid]")
-                            .build())
+        this.packages.copy(CopyPackageRequest.builder()
+            .sourcePackageId("test-source-package-id")
+            .relationships(PackageRelationships.builder()
+                .application(ToOneRelationship.builder()
+                    .data(Relationship.builder()
+                        .id("[destination-app-guid]")
                         .build())
                     .build())
                 .build())
+            .build())
             .as(StepVerifier::create)
             .expectNext(CopyPackageResponse.builder()
                 .id("44f7c078-0934-470f-9883-4fcddc5b8f13")
@@ -135,7 +136,8 @@ public final class ReactorPackagesTest extends AbstractClientApiTest {
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/packages")
+                .method(POST)
+                .path("/packages")
                 .payload("fixtures/client/v3/packages/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -144,17 +146,16 @@ public final class ReactorPackagesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.packages
-            .create(CreatePackageRequest.builder()
-                .type(PackageType.BITS)
-                .relationships(PackageRelationships.builder()
-                    .application(ToOneRelationship.builder()
-                        .data(Relationship.builder()
-                            .id("[guid]")
-                            .build())
+        this.packages.create(CreatePackageRequest.builder()
+            .type(PackageType.BITS)
+            .relationships(PackageRelationships.builder()
+                .application(ToOneRelationship.builder()
+                    .data(Relationship.builder()
+                        .id("[guid]")
                         .build())
                     .build())
                 .build())
+            .build())
             .as(StepVerifier::create)
             .expectNext(CreatePackageResponse.builder()
                 .id("44f7c078-0934-470f-9883-4fcddc5b8f13")
@@ -192,7 +193,8 @@ public final class ReactorPackagesTest extends AbstractClientApiTest {
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/packages/test-package-id")
+                .method(DELETE)
+                .path("/packages/test-package-id")
                 .build())
             .response(TestResponse.builder()
                 .status(ACCEPTED)
@@ -200,10 +202,9 @@ public final class ReactorPackagesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.packages
-            .delete(DeletePackageRequest.builder()
-                .packageId("test-package-id")
-                .build())
+        this.packages.delete(DeletePackageRequest.builder()
+            .packageId("test-package-id")
+            .build())
             .as(StepVerifier::create)
             .expectNext("[guid]")
             .expectComplete()
@@ -214,7 +215,8 @@ public final class ReactorPackagesTest extends AbstractClientApiTest {
     public void download() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/packages/test-package-id/download")
+                .method(GET)
+                .path("/packages/test-package-id/download")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -222,10 +224,9 @@ public final class ReactorPackagesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.packages
-            .download(DownloadPackageRequest.builder()
-                .packageId("test-package-id")
-                .build())
+        this.packages.download(DownloadPackageRequest.builder()
+            .packageId("test-package-id")
+            .build())
             .as(OperationUtils::collectByteArray)
             .as(StepVerifier::create)
             .consumeNextWith(actual -> assertThat(actual).isEqualTo(getBytes("fixtures/client/v3/packages/GET_{id}_download_response.bin")))
@@ -237,7 +238,8 @@ public final class ReactorPackagesTest extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/packages/test-package-id")
+                .method(GET)
+                .path("/packages/test-package-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -245,10 +247,9 @@ public final class ReactorPackagesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.packages
-            .get(GetPackageRequest.builder()
-                .packageId("test-package-id")
-                .build())
+        this.packages.get(GetPackageRequest.builder()
+            .packageId("test-package-id")
+            .build())
             .as(StepVerifier::create)
             .expectNext(GetPackageResponse.builder()
                 .id("44f7c078-0934-470f-9883-4fcddc5b8f13")
@@ -286,7 +287,8 @@ public final class ReactorPackagesTest extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/packages")
+                .method(GET)
+                .path("/packages")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -294,9 +296,8 @@ public final class ReactorPackagesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.packages
-            .list(ListPackagesRequest.builder()
-                .build())
+        this.packages.list(ListPackagesRequest.builder()
+            .build())
             .as(StepVerifier::create)
             .expectNext(ListPackagesResponse.builder()
                 .pagination(Pagination.builder()
@@ -364,7 +365,8 @@ public final class ReactorPackagesTest extends AbstractClientApiTest {
     public void listDroplets() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/packages/test-package-id/droplets")
+                .method(GET)
+                .path("/packages/test-package-id/droplets")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -372,10 +374,9 @@ public final class ReactorPackagesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.packages
-            .listDroplets(ListPackageDropletsRequest.builder()
-                .packageId("test-package-id")
-                .build())
+        this.packages.listDroplets(ListPackageDropletsRequest.builder()
+            .packageId("test-package-id")
+            .build())
             .as(StepVerifier::create)
             .expectNext(ListPackageDropletsResponse.builder()
                 .pagination(Pagination.builder()
@@ -399,7 +400,8 @@ public final class ReactorPackagesTest extends AbstractClientApiTest {
                         .build())
                     .image(null)
                     .executionMetadata("PRIVATE DATA HIDDEN")
-                    .processType("redacted_message", "[PRIVATE DATA HIDDEN IN LISTS]")
+                    .processType("redacted_message",
+                        "[PRIVATE DATA HIDDEN IN LISTS]")
                     .checksum(Checksum.builder()
                         .type(ChecksumType.SHA256)
                         .value("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855")
@@ -435,7 +437,8 @@ public final class ReactorPackagesTest extends AbstractClientApiTest {
                             .build())
                         .build())
                     .executionMetadata("[PRIVATE DATA HIDDEN IN LISTS]")
-                    .processType("redacted_message", "[PRIVATE DATA HIDDEN IN LISTS]")
+                    .processType("redacted_message",
+                        "[PRIVATE DATA HIDDEN IN LISTS]")
                     .image("cloudfoundry/diego-docker-app-custom:latest")
                     .checksum(null)
                     .stack(null)
@@ -464,20 +467,17 @@ public final class ReactorPackagesTest extends AbstractClientApiTest {
     public void upload() throws IOException {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/packages/test-package-id/upload")
+                .method(POST)
+                .path("/packages/test-package-id/upload")
                 .contents(consumer((headers, body) -> {
                     String boundary = extractBoundary(headers);
 
-                    assertThat(body.readString(Charset.defaultCharset()))
-                        .isEqualTo("--" + boundary + "\r\n" +
-                            "content-disposition: form-data; name=\"bits\"; filename=\"test-package.zip\"\r\n" +
-                            "content-length: 12\r\n" +
-                            "content-type: application/zip\r\n" +
-                            "content-transfer-encoding: binary\r\n" +
-                            "\r\n" +
-                            "test-content" +
-                            "\r\n" +
-                            "--" + boundary + "--\r\n");
+                    assertThat(body.readString(Charset.defaultCharset())).isEqualTo("--"
+                        + boundary + "\r\n"
+                        + "content-disposition: form-data; name=\"bits\"; filename=\"test-package.zip\"\r\n"
+                        + "content-length: 12\r\n" + "content-type: application/zip\r\n"
+                        + "content-transfer-encoding: binary\r\n" + "\r\n" + "test-content"
+                        + "\r\n" + "--" + boundary + "--\r\n");
                 }))
                 .build())
             .response(TestResponse.builder()
@@ -486,11 +486,11 @@ public final class ReactorPackagesTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.packages
-            .upload(UploadPackageRequest.builder()
-                .bits(new ClassPathResource("fixtures/client/v3/packages/test-package.zip").getFile().toPath())
-                .packageId("test-package-id")
-                .build())
+        this.packages.upload(UploadPackageRequest.builder()
+            .bits(new ClassPathResource("fixtures/client/v3/packages/test-package.zip").getFile()
+                .toPath())
+            .packageId("test-package-id")
+            .build())
             .as(StepVerifier::create)
             .expectNext(UploadPackageResponse.builder()
                 .id("44f7c078-0934-470f-9883-4fcddc5b8f13")

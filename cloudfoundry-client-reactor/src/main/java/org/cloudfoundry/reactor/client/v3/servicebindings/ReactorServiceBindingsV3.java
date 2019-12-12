@@ -29,6 +29,8 @@ import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
+
 /**
  * The Reactor-based implementation of {@link ServiceBindingsV3}
  */
@@ -38,35 +40,34 @@ public final class ReactorServiceBindingsV3 extends AbstractClientV3Operations i
      * Creates an instance
      *
      * @param connectionContext the {@link ConnectionContext} to use when communicating with the server
-     * @param root              the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
+     * @param root              the root URI of the server. Typically something like {@code https://api.run.pivotal.io}.
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
+     * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorServiceBindingsV3(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
-        super(connectionContext, root, tokenProvider);
+    public ReactorServiceBindingsV3(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider,
+                                    Map<String, String> requestTags) {
+        super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<CreateServiceBindingResponse> create(CreateServiceBindingRequest request) {
-        return post(request, CreateServiceBindingResponse.class, builder -> builder.pathSegment("service_bindings"))
-            .checkpoint();
+        return post(request, CreateServiceBindingResponse.class, builder -> builder.pathSegment("service_bindings")).checkpoint();
     }
 
     @Override
     public Mono<Void> delete(DeleteServiceBindingRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("service_bindings", request.getServiceBindingId()))
-            .checkpoint();
+        return delete(request, Void.class, builder -> builder.pathSegment("service_bindings", request.getServiceBindingId())).checkpoint();
     }
 
     @Override
     public Mono<GetServiceBindingResponse> get(GetServiceBindingRequest request) {
-        return get(request, GetServiceBindingResponse.class, builder -> builder.pathSegment("service_bindings", request.getServiceBindingId()))
-            .checkpoint();
+        return get(request, GetServiceBindingResponse.class,
+            builder -> builder.pathSegment("service_bindings", request.getServiceBindingId())).checkpoint();
     }
 
     @Override
     public Mono<ListServiceBindingsResponse> list(ListServiceBindingsRequest request) {
-        return get(request, ListServiceBindingsResponse.class, builder -> builder.pathSegment("service_bindings"))
-            .checkpoint();
+        return get(request, ListServiceBindingsResponse.class, builder -> builder.pathSegment("service_bindings")).checkpoint();
     }
 
 }

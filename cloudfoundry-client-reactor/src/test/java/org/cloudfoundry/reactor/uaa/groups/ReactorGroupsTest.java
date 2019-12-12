@@ -60,6 +60,7 @@ import org.junit.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
+import java.util.Collections;
 
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
@@ -69,16 +70,16 @@ import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static org.cloudfoundry.uaa.SortOrder.ASCENDING;
 
-
 public final class ReactorGroupsTest extends AbstractUaaApiTest {
 
-    private final ReactorGroups groups = new ReactorGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    private final ReactorGroups groups = new ReactorGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void addMember() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/Groups/test-group-id/members")
+                .method(POST)
+                .path("/Groups/test-group-id/members")
                 .payload("fixtures/uaa/groups/POST_{id}_members_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -87,13 +88,12 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.groups
-            .addMember(AddMemberRequest.builder()
-                .groupId("test-group-id")
-                .origin("uaa")
-                .type(MemberType.USER)
-                .memberId("40bc8ef1-0719-4a0c-9f60-e9f843cd4af2")
-                .build())
+        this.groups.addMember(AddMemberRequest.builder()
+            .groupId("test-group-id")
+            .origin("uaa")
+            .type(MemberType.USER)
+            .memberId("40bc8ef1-0719-4a0c-9f60-e9f843cd4af2")
+            .build())
             .as(StepVerifier::create)
             .expectNext(AddMemberResponse.builder()
                 .origin("uaa")
@@ -108,7 +108,8 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
     public void checkMember() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/Groups/test-group-id/members/test-member-id")
+                .method(GET)
+                .path("/Groups/test-group-id/members/test-member-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -116,11 +117,10 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.groups
-            .checkMembership(CheckMembershipRequest.builder()
-                .groupId("test-group-id")
-                .memberId("test-member-id")
-                .build())
+        this.groups.checkMembership(CheckMembershipRequest.builder()
+            .groupId("test-group-id")
+            .memberId("test-member-id")
+            .build())
             .as(StepVerifier::create)
             .expectNext(CheckMembershipResponse.builder()
                 .origin("uaa")
@@ -136,7 +136,8 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .header("X-Identity-Zone-Id", "uaa")
-                .method(POST).path("/Groups")
+                .method(POST)
+                .path("/Groups")
                 .payload("fixtures/uaa/groups/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -145,17 +146,16 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.groups
-            .create(CreateGroupRequest.builder()
-                .description("the cool group")
-                .displayName("Cool Group Name")
-                .identityZoneId("uaa")
-                .member(MemberSummary.builder()
-                    .origin("uaa")
-                    .type(MemberType.USER)
-                    .memberId("f0e6a061-6e3a-4be9-ace5-142ee24e20b7")
-                    .build())
+        this.groups.create(CreateGroupRequest.builder()
+            .description("the cool group")
+            .displayName("Cool Group Name")
+            .identityZoneId("uaa")
+            .member(MemberSummary.builder()
+                .origin("uaa")
+                .type(MemberType.USER)
+                .memberId("f0e6a061-6e3a-4be9-ace5-142ee24e20b7")
                 .build())
+            .build())
             .as(StepVerifier::create)
             .expectNext(CreateGroupResponse.builder()
                 .id("46081184-7ca9-453d-9bf8-74da7113bec6")
@@ -183,7 +183,8 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .header("If-Match", "*")
-                .method(DELETE).path("/Groups/test-group-id")
+                .method(DELETE)
+                .path("/Groups/test-group-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -191,11 +192,10 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.groups
-            .delete(DeleteGroupRequest.builder()
-                .groupId("test-group-id")
-                .version("*")
-                .build())
+        this.groups.delete(DeleteGroupRequest.builder()
+            .groupId("test-group-id")
+            .version("*")
+            .build())
             .as(StepVerifier::create)
             .expectNext(DeleteGroupResponse.builder()
                 .id("test-group-id")
@@ -222,7 +222,8 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/Groups/test-group-id")
+                .method(GET)
+                .path("/Groups/test-group-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -230,10 +231,9 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.groups
-            .get(GetGroupRequest.builder()
-                .groupId("test-group-id")
-                .build())
+        this.groups.get(GetGroupRequest.builder()
+            .groupId("test-group-id")
+            .build())
             .as(StepVerifier::create)
             .expectNext(GetGroupResponse.builder()
                 .id("test-group-id")
@@ -261,8 +261,8 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET)
-                .path("/Groups?count=50&filter=id+eq+%22f87c557a-8ddc-43d3-98fb-e420ebc7f0f1%22+or+displayName+eq+%22Cooler%20Group%20Name%20for%20List%22" +
-                    "&sortBy=email&sortOrder=ascending&startIndex=1")
+                .path("/Groups?count=50&filter=id+eq+%22f87c557a-8ddc-43d3-98fb-e420ebc7f0f1%22+or+displayName+eq+%22Cooler%20Group%20Name%20for%20List%22"
+                    + "&sortBy=email&sortOrder=ascending&startIndex=1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -270,14 +270,13 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.groups
-            .list(ListGroupsRequest.builder()
-                .filter("id+eq+\"f87c557a-8ddc-43d3-98fb-e420ebc7f0f1\"+or+displayName+eq+\"Cooler Group Name for List\"")
-                .count(50)
-                .startIndex(1)
-                .sortBy("email")
-                .sortOrder(ASCENDING)
-                .build())
+        this.groups.list(ListGroupsRequest.builder()
+            .filter("id+eq+\"f87c557a-8ddc-43d3-98fb-e420ebc7f0f1\"+or+displayName+eq+\"Cooler Group Name for List\"")
+            .count(50)
+            .startIndex(1)
+            .sortBy("email")
+            .sortOrder(ASCENDING)
+            .build())
             .as(StepVerifier::create)
             .expectNext(ListGroupsResponse.builder()
                 .resource(Group.builder()
@@ -296,8 +295,7 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
                         .build())
                     .schema("urn:scim:schemas:core:1.0")
                     .zoneId("uaa")
-                    .build()
-                )
+                    .build())
                 .startIndex(1)
                 .itemsPerPage(50)
                 .totalResults(1)
@@ -320,12 +318,11 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.groups
-            .listExternalGroupMappings(ListExternalGroupMappingsRequest.builder()
-                .filter("group_id+eq+\"0480db7f-d1bc-4d2b-b723-febc684c0ee9\"")
-                .count(50)
-                .startIndex(1)
-                .build())
+        this.groups.listExternalGroupMappings(ListExternalGroupMappingsRequest.builder()
+            .filter("group_id+eq+\"0480db7f-d1bc-4d2b-b723-febc684c0ee9\"")
+            .count(50)
+            .startIndex(1)
+            .build())
             .as(StepVerifier::create)
             .expectNext(ListExternalGroupMappingsResponse.builder()
                 .resource(ExternalGroupResource.builder()
@@ -333,8 +330,7 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
                     .displayName("Group For Testing Retrieving External Group Mappings")
                     .origin("ldap")
                     .externalGroup("external group")
-                    .build()
-                )
+                    .build())
                 .startIndex(1)
                 .itemsPerPage(1)
                 .totalResults(1)
@@ -357,11 +353,10 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.groups
-            .listMembers(ListMembersRequest.builder()
-                .groupId("f87c557a-8ddc-43d3-98fb-e420ebc7f0f1")
-                .returnEntities(true)
-                .build())
+        this.groups.listMembers(ListMembersRequest.builder()
+            .groupId("f87c557a-8ddc-43d3-98fb-e420ebc7f0f1")
+            .returnEntities(true)
+            .build())
             .as(StepVerifier::create)
             .expectNext(ListMembersResponse.builder()
                 .member(Member.builder()
@@ -391,8 +386,7 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
                         .zoneId("uaa")
                         .passwordLastModified("2016-06-16T00:01:41.000Z")
                         .schema("urn:scim:schemas:core:1.0")
-                        .build()
-                    )
+                        .build())
                     .build())
                 .build())
             .expectComplete()
@@ -412,11 +406,10 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.groups
-            .listMembers(ListMembersRequest.builder()
-                .groupId("f87c557a-8ddc-43d3-98fb-e420ebc7f0f1")
-                .returnEntities(false)
-                .build())
+        this.groups.listMembers(ListMembersRequest.builder()
+            .groupId("f87c557a-8ddc-43d3-98fb-e420ebc7f0f1")
+            .returnEntities(false)
+            .build())
             .as(StepVerifier::create)
             .expectNext(ListMembersResponse.builder()
                 .member(Member.builder()
@@ -433,7 +426,8 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
     public void mapExternalGroup() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/Groups/External")
+                .method(POST)
+                .path("/Groups/External")
                 .payload("fixtures/uaa/groups/POST_external_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -442,11 +436,10 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.groups
-            .mapExternalGroup(MapExternalGroupRequest.builder()
-                .groupId("76937b62-346c-4848-953c-d790b87ec80a")
-                .externalGroup("External group")
-                .build())
+        this.groups.mapExternalGroup(MapExternalGroupRequest.builder()
+            .groupId("76937b62-346c-4848-953c-d790b87ec80a")
+            .externalGroup("External group")
+            .build())
             .as(StepVerifier::create)
             .expectNext(MapExternalGroupResponse.builder()
                 .groupId("76937b62-346c-4848-953c-d790b87ec80a")
@@ -468,7 +461,8 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
     public void removeMember() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/Groups/test-group-id/members/40bc8ef1-0719-4a0c-9f60-e9f843cd4af2")
+                .method(DELETE)
+                .path("/Groups/test-group-id/members/40bc8ef1-0719-4a0c-9f60-e9f843cd4af2")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -476,11 +470,10 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.groups
-            .removeMember(RemoveMemberRequest.builder()
-                .groupId("test-group-id")
-                .memberId("40bc8ef1-0719-4a0c-9f60-e9f843cd4af2")
-                .build())
+        this.groups.removeMember(RemoveMemberRequest.builder()
+            .groupId("test-group-id")
+            .memberId("40bc8ef1-0719-4a0c-9f60-e9f843cd4af2")
+            .build())
             .as(StepVerifier::create)
             .expectNext(RemoveMemberResponse.builder()
                 .memberId("40bc8ef1-0719-4a0c-9f60-e9f843cd4af2")
@@ -495,7 +488,8 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
     public void success() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/Groups/test-group-id")
+                .method(PUT)
+                .path("/Groups/test-group-id")
                 .header("If-Match", "0")
                 .header("X-Identity-Zone-Id", "uaa")
                 .payload("fixtures/uaa/groups/PUT_{id}_request.json")
@@ -506,19 +500,18 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.groups
-            .update(UpdateGroupRequest.builder()
-                .identityZoneId("uaa")
-                .groupId("test-group-id")
-                .version("0")
-                .description("the cool group")
-                .displayName("Cooler Group Name for Update")
-                .member(MemberSummary.builder()
-                    .origin("uaa")
-                    .type(MemberType.USER)
-                    .memberId("f0e6a061-6e3a-4be9-ace5-142ee24e20b7")
-                    .build())
+        this.groups.update(UpdateGroupRequest.builder()
+            .identityZoneId("uaa")
+            .groupId("test-group-id")
+            .version("0")
+            .description("the cool group")
+            .displayName("Cooler Group Name for Update")
+            .member(MemberSummary.builder()
+                .origin("uaa")
+                .type(MemberType.USER)
+                .memberId("f0e6a061-6e3a-4be9-ace5-142ee24e20b7")
                 .build())
+            .build())
             .as(StepVerifier::create)
             .expectNext(UpdateGroupResponse.builder()
                 .id("test-group-id")
@@ -545,7 +538,8 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
     public void unmapExternalGroupByGroupDisplayName() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/Groups/External/displayName/Group%20For%20Testing%20Deleting%20External%20Group%20Mapping%20By%20Name/externalGroup/external%20group/origin/ldap")
+                .method(DELETE)
+                .path("/Groups/External/displayName/Group%20For%20Testing%20Deleting%20External%20Group%20Mapping%20By%20Name/externalGroup/external%20group/origin/ldap")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -553,12 +547,11 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.groups
-            .unmapExternalGroupByGroupDisplayName(UnmapExternalGroupByGroupDisplayNameRequest.builder()
-                .groupDisplayName("Group For Testing Deleting External Group Mapping By Name")
-                .externalGroup("external group")
-                .origin("ldap")
-                .build())
+        this.groups.unmapExternalGroupByGroupDisplayName(UnmapExternalGroupByGroupDisplayNameRequest.builder()
+            .groupDisplayName("Group For Testing Deleting External Group Mapping By Name")
+            .externalGroup("external group")
+            .origin("ldap")
+            .build())
             .as(StepVerifier::create)
             .expectNext(UnmapExternalGroupByGroupDisplayNameResponse.builder()
                 .groupId("f8f0048f-de32-4d20-b41d-5820b690063d")
@@ -580,7 +573,8 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
     public void unmapExternalGroupByGroupId() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/Groups/External/groupId/d68167b4-81b3-490d-9838-94092d5c89f6/externalGroup/external%20group/origin/ldap")
+                .method(DELETE)
+                .path("/Groups/External/groupId/d68167b4-81b3-490d-9838-94092d5c89f6/externalGroup/external%20group/origin/ldap")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -588,12 +582,11 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.groups
-            .unmapExternalGroupByGroupId(UnmapExternalGroupByGroupIdRequest.builder()
-                .groupId("d68167b4-81b3-490d-9838-94092d5c89f6")
-                .externalGroup("external group")
-                .origin("ldap")
-                .build())
+        this.groups.unmapExternalGroupByGroupId(UnmapExternalGroupByGroupIdRequest.builder()
+            .groupId("d68167b4-81b3-490d-9838-94092d5c89f6")
+            .externalGroup("external group")
+            .origin("ldap")
+            .build())
             .as(StepVerifier::create)
             .expectNext(UnmapExternalGroupByGroupIdResponse.builder()
                 .groupId("d68167b4-81b3-490d-9838-94092d5c89f6")

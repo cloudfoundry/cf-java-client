@@ -30,6 +30,7 @@ import org.cloudfoundry.uaa.serverinformation.ServerInformation;
 import reactor.core.publisher.Mono;
 
 import java.util.Base64;
+import java.util.Map;
 
 import static io.netty.handler.codec.http.HttpHeaderNames.AUTHORIZATION;
 
@@ -44,17 +45,17 @@ public final class ReactorServerInformation extends AbstractUaaOperations implem
      * Creates an instance
      *
      * @param connectionContext the {@link ConnectionContext} to use when communicating with the server
-     * @param root              the root URI of the server.  Typically something like {@code https://uaa.run.pivotal.io}.
+     * @param root              the root URI of the server. Typically something like {@code https://uaa.run.pivotal.io}.
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      */
-    public ReactorServerInformation(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
-        super(connectionContext, root, tokenProvider);
+    public ReactorServerInformation(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider,
+                                    Map<String, String> requestTags) {
+        super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<Void> autoLogin(AutoLoginRequest request) {
-        return get(request, Void.class, builder -> builder.pathSegment("autologin"))
-            .checkpoint();
+        return get(request, Void.class, builder -> builder.pathSegment("autologin")).checkpoint();
     }
 
     @Override
@@ -73,7 +74,6 @@ public final class ReactorServerInformation extends AbstractUaaOperations implem
 
     @Override
     public Mono<GetInfoResponse> getInfo(GetInfoRequest request) {
-        return get(request, GetInfoResponse.class, builder -> builder.pathSegment("info"))
-            .checkpoint();
+        return get(request, GetInfoResponse.class, builder -> builder.pathSegment("info")).checkpoint();
     }
 }

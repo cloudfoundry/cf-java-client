@@ -26,48 +26,49 @@ import reactor.core.publisher.Mono;
 import reactor.netty.ByteBufFlux;
 import reactor.netty.http.client.HttpClientResponse;
 
+import java.util.Map;
 import java.util.function.Function;
 
 public abstract class AbstractRoutingV1Operations extends AbstractReactorOperations {
 
-    protected AbstractRoutingV1Operations(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
-        super(connectionContext, root, tokenProvider);
+    protected AbstractRoutingV1Operations(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider,
+                                          Map<String, String> requestTags) {
+        super(connectionContext, root, tokenProvider, requestTags);
     }
 
     protected final <T> Mono<T> get(Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
-        return createOperator()
-            .flatMap(operator -> operator.get()
-                .uri(uriTransformer)
-                .response()
-                .parseBody(responseType));
+        return createOperator().flatMap(operator -> operator.get()
+            .uri(uriTransformer)
+            .response()
+            .parseBody(responseType));
     }
 
-    protected final <T> Flux<T> get(Function<HttpClientResponse, ChannelHandler> handlerBuilder, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
+    protected final <T> Flux<T> get(Function<HttpClientResponse, ChannelHandler> handlerBuilder,
+                                    Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
                                     Function<ByteBufFlux, Flux<T>> bodyTransformer) {
-        return createOperator()
-            .flatMapMany(operator -> operator.get()
-                .uri(uriTransformer)
-                .response()
-                .addChannelHandler(handlerBuilder)
-                .parseBodyToFlux(responseWithBody -> bodyTransformer.apply(responseWithBody.getBody())));
+        return createOperator().flatMapMany(operator -> operator.get()
+            .uri(uriTransformer)
+            .response()
+            .addChannelHandler(handlerBuilder)
+            .parseBodyToFlux(responseWithBody -> bodyTransformer.apply(responseWithBody.getBody())));
     }
 
-    protected final <T> Mono<T> post(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
-        return createOperator()
-            .flatMap(operator -> operator.post()
-                .uri(uriTransformer)
-                .send(request)
-                .response()
-                .parseBody(responseType));
+    protected final <T> Mono<T> post(Object request, Class<T> responseType,
+                                     Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+        return createOperator().flatMap(operator -> operator.post()
+            .uri(uriTransformer)
+            .send(request)
+            .response()
+            .parseBody(responseType));
     }
 
-    protected final <T> Mono<T> put(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
-        return createOperator()
-            .flatMap(operator -> operator.put()
-                .uri(uriTransformer)
-                .send(requestPayload)
-                .response()
-                .parseBody(responseType));
+    protected final <T> Mono<T> put(Object requestPayload, Class<T> responseType,
+                                    Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+        return createOperator().flatMap(operator -> operator.put()
+            .uri(uriTransformer)
+            .send(requestPayload)
+            .response()
+            .parseBody(responseType));
     }
 
 }

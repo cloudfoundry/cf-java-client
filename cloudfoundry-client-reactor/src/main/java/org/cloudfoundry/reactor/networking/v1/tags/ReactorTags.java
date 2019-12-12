@@ -24,6 +24,8 @@ import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.networking.AbstractNetworkingOperations;
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
+
 /**
  * The Reactor-based implementation of {@link Tags}
  */
@@ -33,16 +35,16 @@ public class ReactorTags extends AbstractNetworkingOperations implements Tags {
      * Creates an instance
      *
      * @param connectionContext the {@link ConnectionContext} to use when communicating with the server
-     * @param root              the root URI of the server.  Typically something like {@code https://api.run.pivotal.io}.
+     * @param root              the root URI of the server. Typically something like {@code https://api.run.pivotal.io}.
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      */
-    public ReactorTags(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
-        super(connectionContext, root, tokenProvider);
+    public ReactorTags(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider,
+                       Map<String, String> requestTags) {
+        super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<ListTagsResponse> list(ListTagsRequest request) {
-        return get(ListTagsResponse.class, builder -> builder.pathSegment("tags"))
-            .checkpoint();
+        return get(ListTagsResponse.class, builder -> builder.pathSegment("tags")).checkpoint();
     }
 }

@@ -40,6 +40,7 @@ import org.junit.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
+import java.util.Collections;
 
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.POST;
@@ -48,13 +49,17 @@ import static java.util.Collections.singletonList;
 
 public class ReactorDeploymentsV3Test extends AbstractClientApiTest {
 
-    private final ReactorDeploymentsV3 deployments = new ReactorDeploymentsV3(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    private final ReactorDeploymentsV3 deployments = new ReactorDeploymentsV3(CONNECTION_CONTEXT,
+        this.root,
+        TOKEN_PROVIDER,
+        Collections.emptyMap());
 
     @Test
     public void cancel() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/deployments/test-deployment-id/actions/cancel")
+                .method(POST)
+                .path("/deployments/test-deployment-id/actions/cancel")
                 .payload("fixtures/client/v3/deployments/POST_{id}_cancel_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -62,10 +67,9 @@ public class ReactorDeploymentsV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.deployments
-            .cancel(CancelDeploymentRequest.builder()
-                .deploymentId("test-deployment-id")
-                .build())
+        this.deployments.cancel(CancelDeploymentRequest.builder()
+            .deploymentId("test-deployment-id")
+            .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -76,7 +80,8 @@ public class ReactorDeploymentsV3Test extends AbstractClientApiTest {
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/deployments")
+                .method(POST)
+                .path("/deployments")
                 .payload("fixtures/client/v3/deployments/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -85,17 +90,18 @@ public class ReactorDeploymentsV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.deployments
-            .create(CreateDeploymentRequest.builder()
-                .droplet(Relationship.builder().id("44ccfa61-dbcf-4a0d-82fe-f668e9d2a962").build())
-                .relationships(DeploymentRelationships.builder()
-                    .app(ToOneRelationship.builder()
-                        .data(Relationship.builder()
-                            .id("305cea31-5a44-45ca-b51b-e89c7a8ef8b2")
-                            .build())
+        this.deployments.create(CreateDeploymentRequest.builder()
+            .droplet(Relationship.builder()
+                .id("44ccfa61-dbcf-4a0d-82fe-f668e9d2a962")
+                .build())
+            .relationships(DeploymentRelationships.builder()
+                .app(ToOneRelationship.builder()
+                    .data(Relationship.builder()
+                        .id("305cea31-5a44-45ca-b51b-e89c7a8ef8b2")
                         .build())
                     .build())
                 .build())
+            .build())
             .as(StepVerifier::create)
 
             .expectNext(CreateDeploymentResponse.builder()
@@ -140,7 +146,8 @@ public class ReactorDeploymentsV3Test extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/deployments/test-deployment-id")
+                .method(GET)
+                .path("/deployments/test-deployment-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -148,10 +155,9 @@ public class ReactorDeploymentsV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.deployments
-            .get(GetDeploymentRequest.builder()
-                .deploymentId("test-deployment-id")
-                .build())
+        this.deployments.get(GetDeploymentRequest.builder()
+            .deploymentId("test-deployment-id")
+            .build())
             .as(StepVerifier::create)
 
             .expectNext(GetDeploymentResponse.builder()
@@ -196,7 +202,8 @@ public class ReactorDeploymentsV3Test extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/deployments")
+                .method(GET)
+                .path("/deployments")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -204,9 +211,8 @@ public class ReactorDeploymentsV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.deployments
-            .list(ListDeploymentsRequest.builder()
-                .build())
+        this.deployments.list(ListDeploymentsRequest.builder()
+            .build())
             .as(StepVerifier::create)
             .expectNext(ListDeploymentsResponse.builder()
                 .pagination(Pagination.builder()

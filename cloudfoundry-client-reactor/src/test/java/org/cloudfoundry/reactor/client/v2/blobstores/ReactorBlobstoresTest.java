@@ -28,19 +28,21 @@ import org.junit.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
+import java.util.Collections;
 
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorBlobstoresTest extends AbstractClientApiTest {
 
-    private ReactorBlobstores blobstores = new ReactorBlobstores(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    private ReactorBlobstores blobstores = new ReactorBlobstores(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE).path("/blobstores/buildpack_cache")
+                .method(DELETE)
+                .path("/blobstores/buildpack_cache")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -48,9 +50,8 @@ public final class ReactorBlobstoresTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.blobstores
-            .deleteBuildpackCaches(DeleteBlobstoreBuildpackCachesRequest.builder()
-                .build())
+        this.blobstores.deleteBuildpackCaches(DeleteBlobstoreBuildpackCachesRequest.builder()
+            .build())
             .as(StepVerifier::create)
             .expectNext(DeleteBlobstoreBuildpackCachesResponse.builder()
                 .metadata(Metadata.builder()

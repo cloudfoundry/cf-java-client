@@ -26,7 +26,6 @@ import org.cloudfoundry.uaa.tokens.ListTokenKeysRequest;
 import org.cloudfoundry.uaa.tokens.ListTokenKeysResponse;
 import org.cloudfoundry.uaa.tokens.TokenKey;
 import org.cloudfoundry.uaa.tokens.Tokens;
-import org.junit.Assert;
 import org.junit.Test;
 import reactor.core.publisher.Mono;
 

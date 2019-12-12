@@ -32,6 +32,8 @@ import org.cloudfoundry.uaa.identityproviders.UpdateIdentityProviderRequest;
 import org.cloudfoundry.uaa.identityproviders.UpdateIdentityProviderResponse;
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
+
 /**
  * The Reactor-based implementation of {@link IdentityProviders}
  */
@@ -41,41 +43,45 @@ public final class ReactorIdentityProviders extends AbstractUaaOperations implem
      * Creates an instance
      *
      * @param connectionContext the {@link ConnectionContext} to use when communicating with the server
-     * @param root              the root URI of the server.  Typically something like {@code https://uaa.run.pivotal.io}.
+     * @param root              the root URI of the server. Typically something like {@code https://uaa.run.pivotal.io}.
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      */
-    public ReactorIdentityProviders(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
-        super(connectionContext, root, tokenProvider);
+    public ReactorIdentityProviders(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider,
+                                    Map<String, String> requestTags) {
+        super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<CreateIdentityProviderResponse> create(CreateIdentityProviderRequest request) {
-        return post(request, CreateIdentityProviderResponse.class, builder -> builder.pathSegment("identity-providers").queryParam("rawConfig", true))
-            .checkpoint();
+        return post(request, CreateIdentityProviderResponse.class, builder -> builder.pathSegment("identity-providers")
+            .queryParam("rawConfig", true)).checkpoint();
     }
 
     @Override
     public Mono<DeleteIdentityProviderResponse> delete(DeleteIdentityProviderRequest request) {
-        return delete(request, DeleteIdentityProviderResponse.class, builder -> builder.pathSegment("identity-providers", request.getIdentityProviderId()).queryParam("rawConfig", true))
-            .checkpoint();
+        return delete(request, DeleteIdentityProviderResponse.class,
+            builder -> builder.pathSegment("identity-providers", request.getIdentityProviderId())
+                .queryParam("rawConfig", true)).checkpoint();
     }
 
     @Override
     public Mono<GetIdentityProviderResponse> get(GetIdentityProviderRequest request) {
-        return get(request, GetIdentityProviderResponse.class, builder -> builder.pathSegment("identity-providers", request.getIdentityProviderId()).queryParam("rawConfig", true))
-            .checkpoint();
+        return get(request, GetIdentityProviderResponse.class,
+            builder -> builder.pathSegment("identity-providers", request.getIdentityProviderId())
+                .queryParam("rawConfig", true)).checkpoint();
     }
 
     @Override
     public Mono<ListIdentityProvidersResponse> list(ListIdentityProvidersRequest request) {
-        return get(request, ListIdentityProvidersResponse.class, builder -> builder.pathSegment("identity-providers").queryParam("rawConfig", true))
-            .checkpoint();
+        return get(request, ListIdentityProvidersResponse.class, builder -> builder.pathSegment("identity-providers")
+            .queryParam("rawConfig", true)).checkpoint();
     }
 
     @Override
     public Mono<UpdateIdentityProviderResponse> update(UpdateIdentityProviderRequest request) {
-        return put(request, UpdateIdentityProviderResponse.class, builder -> builder.pathSegment("identity-providers", request.getIdentityProviderId()).queryParam("rawConfig", true))
-            .checkpoint();
+        return put(request, UpdateIdentityProviderResponse.class,
+            builder -> builder.pathSegment("identity-providers", request.getIdentityProviderId())
+                .queryParam("rawConfig", true)).checkpoint();
     }
 
 }

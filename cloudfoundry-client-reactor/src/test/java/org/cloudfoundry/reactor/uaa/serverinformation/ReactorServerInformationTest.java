@@ -33,6 +33,7 @@ import reactor.test.StepVerifier;
 
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,24 +44,27 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorServerInformationTest extends AbstractUaaApiTest {
 
-    private final ReactorServerInformation info = new ReactorServerInformation(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    private final ReactorServerInformation info = new ReactorServerInformation(CONNECTION_CONTEXT,
+        this.root,
+        TOKEN_PROVIDER,
+        Collections.emptyMap());
 
     @Test
     public void autoLogin() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/autologin?client_id=admin&code=NaOjAprtCK")
+                .method(GET)
+                .path("/autologin?client_id=admin&code=NaOjAprtCK")
                 .build())
             .response(TestResponse.builder()
                 .status(FOUND)
                 .build())
             .build());
 
-        this.info
-            .autoLogin(AutoLoginRequest.builder()
-                .clientId("admin")
-                .code("NaOjAprtCK")
-                .build())
+        this.info.autoLogin(AutoLoginRequest.builder()
+            .clientId("admin")
+            .code("NaOjAprtCK")
+            .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -70,7 +74,8 @@ public final class ReactorServerInformationTest extends AbstractUaaApiTest {
     public void getAutoLoginAuthenticationCode() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST).path("/autologin")
+                .method(POST)
+                .path("/autologin")
                 .payload("fixtures/uaa/info/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -79,13 +84,12 @@ public final class ReactorServerInformationTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.info
-            .getAuthenticationCode(GetAutoLoginAuthenticationCodeRequest.builder()
-                .clientId("admin")
-                .clientSecret("adminsecret")
-                .password("koala")
-                .username("marissa")
-                .build())
+        this.info.getAuthenticationCode(GetAutoLoginAuthenticationCodeRequest.builder()
+            .clientId("admin")
+            .clientSecret("adminsecret")
+            .password("koala")
+            .username("marissa")
+            .build())
             .as(StepVerifier::create)
             .expectNext(GetAutoLoginAuthenticationCodeResponse.builder()
                 .code("m0R24i7t2s")
@@ -98,12 +102,15 @@ public final class ReactorServerInformationTest extends AbstractUaaApiTest {
     @Test
     public void getInfo() {
         Map<String, String> ipDefinitions = new HashMap<>();
-        ipDefinitions.put("SAMLMetadataUrl", "http://localhost:8080/uaa/saml/discovery?returnIDParam=idp&entityID=cloudfoundry-saml-login&idp=SAMLMetadataUrl&isPassive=true");
-        ipDefinitions.put("SAML", "http://localhost:8080/uaa/saml/discovery?returnIDParam=idp&entityID=cloudfoundry-saml-login&idp=SAML&isPassive=true");
+        ipDefinitions.put("SAMLMetadataUrl",
+            "http://localhost:8080/uaa/saml/discovery?returnIDParam=idp&entityID=cloudfoundry-saml-login&idp=SAMLMetadataUrl&isPassive=true");
+        ipDefinitions.put("SAML",
+            "http://localhost:8080/uaa/saml/discovery?returnIDParam=idp&entityID=cloudfoundry-saml-login&idp=SAML&isPassive=true");
 
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/info")
+                .method(GET)
+                .path("/info")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -111,9 +118,8 @@ public final class ReactorServerInformationTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.info
-            .getInfo(GetInfoRequest.builder()
-                .build())
+        this.info.getInfo(GetInfoRequest.builder()
+            .build())
             .as(StepVerifier::create)
             .expectNext(GetInfoResponse.builder()
                 .app(ApplicationInfo.builder()
@@ -129,7 +135,8 @@ public final class ReactorServerInformationTest extends AbstractUaaApiTest {
                     .uaa("http://localhost:8080/uaa")
                     .build())
                 .prompts(Prompts.builder()
-                    .passcode(Arrays.asList("password", "One Time Code ( Get one at http://localhost:8080/uaa/passcode )"))
+                    .passcode(Arrays.asList("password",
+                        "One Time Code ( Get one at http://localhost:8080/uaa/passcode )"))
                     .password(Arrays.asList("password", "Password"))
                     .username(Arrays.asList("text", "Email"))
                     .build())
