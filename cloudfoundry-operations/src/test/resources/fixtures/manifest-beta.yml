@@ -1,5 +1,5 @@
 ---
-inherit: manifest-alpha.yml
+inherit: manifest-alpha-unix.yml
 
 applications:
 - name: alpha-application-1

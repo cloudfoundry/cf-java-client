@@ -1,0 +1,4 @@
+---
+applications:
+- name: alpha-application-1
+  path: alpha-path

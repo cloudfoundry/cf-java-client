@@ -4,29 +4,6 @@ applications:
   buildpack: alpha-buildpack
   command: alpha-command
   disk_quota: -1
-  health-check-http-endpoint: alpha-health-check-http-endpoint
-  health-check-type: none
-  instances: -1
-  memory: 1M
-  path: /alpha-path
-  no-route: true
-  random-route: true
-  routes:
-  - route: alpha-route-1
-  - route: alpha-route-2
-  stack: alpha-stack
-  timeout: -1
-  env:
-    ALPHA_KEY_1: alpha-value-1
-    ALPHA_KEY_2: alpha-value-2
-  services:
-  - alpha-instance-1
-  - alpha-instance-2
-
-- name: alpha-application-2
-  buildpack: alpha-buildpack
-  command: alpha-command
-  disk_quota: -1
   domain: alpha-domain
   domains:
   - alpha-domains-1
