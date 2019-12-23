@@ -49,66 +49,6 @@ public final class ApplicationManifestUtilsTest {
     }
 
     @Test
-    public void read() throws IOException {
-        List<ApplicationManifest> expected = Arrays.asList(
-            ApplicationManifest.builder()
-                .name("alpha-application-1")
-                .buildpack("alpha-buildpack")
-                .command("alpha-command")
-                .disk(-1)
-                .healthCheckHttpEndpoint("alpha-health-check-http-endpoint")
-                .healthCheckType(NONE)
-                .instances(-1)
-                .memory(1)
-                .noRoute(true)
-                .path(Paths.get("/alpha-path"))
-                .randomRoute(true)
-                .route(Route.builder()
-                    .route("alpha-route-1")
-                    .build())
-                .route(Route.builder()
-                    .route("alpha-route-2")
-                    .build())
-                .stack("alpha-stack")
-                .timeout(-1)
-                .environmentVariable("ALPHA_KEY_1", "alpha-value-1")
-                .environmentVariable("ALPHA_KEY_2", "alpha-value-2")
-                .service("alpha-instance-1")
-                .service("alpha-instance-2")
-                .build(),
-            ApplicationManifest.builder()
-                .name("alpha-application-2")
-                .buildpack("alpha-buildpack")
-                .command("alpha-command")
-                .disk(-1)
-                .domain("alpha-domain")
-                .domain("alpha-domains-1")
-                .domain("alpha-domains-2")
-                .healthCheckHttpEndpoint("alpha-health-check-http-endpoint")
-                .healthCheckType(PORT)
-                .host("alpha-host")
-                .host("alpha-hosts-1")
-                .host("alpha-hosts-2")
-                .instances(-1)
-                .memory(1024)
-                .noHostname(true)
-                .noRoute(true)
-                .path(Paths.get("c:\\alpha-path"))
-                .randomRoute(true)
-                .stack("alpha-stack")
-                .timeout(-1)
-                .environmentVariable("ALPHA_KEY_1", "1")
-                .environmentVariable("ALPHA_KEY_2", "alpha-value-2")
-                .service("alpha-instance-1")
-                .service("alpha-instance-2")
-                .build());
-
-        List<ApplicationManifest> actual = ApplicationManifestUtils.read(new ClassPathResource("fixtures/manifest-alpha.yml").getFile().toPath());
-
-        assertThat(actual).isEqualTo(expected);
-    }
-
-    @Test
     public void readCommon() throws IOException {
         List<ApplicationManifest> expected = Arrays.asList(
             ApplicationManifest.builder()
@@ -325,32 +265,6 @@ public final class ApplicationManifestUtilsTest {
                 .service("beta-instance-2")
                 .build(),
             ApplicationManifest.builder()
-                .name("alpha-application-2")
-                .buildpack("alpha-buildpack")
-                .command("alpha-command")
-                .disk(-1)
-                .domain("alpha-domain")
-                .domain("alpha-domains-1")
-                .domain("alpha-domains-2")
-                .healthCheckHttpEndpoint("alpha-health-check-http-endpoint")
-                .healthCheckType(PORT)
-                .host("alpha-host")
-                .host("alpha-hosts-1")
-                .host("alpha-hosts-2")
-                .instances(-1)
-                .memory(1024)
-                .noHostname(true)
-                .noRoute(true)
-                .path(Paths.get("c:\\alpha-path"))
-                .randomRoute(true)
-                .stack("alpha-stack")
-                .timeout(-1)
-                .environmentVariable("ALPHA_KEY_1", "1")
-                .environmentVariable("ALPHA_KEY_2", "alpha-value-2")
-                .service("alpha-instance-1")
-                .service("alpha-instance-2")
-                .build(),
-            ApplicationManifest.builder()
                 .name("beta-application-1")
                 .buildpack("beta-buildpack")
                 .command("beta-command")
@@ -460,7 +374,7 @@ public final class ApplicationManifestUtilsTest {
 
     @Test
     public void relativePath() throws IOException {
-        Path root = new ClassPathResource("fixtures/manifest-mike.yml").getFile().toPath();
+        Path root = new ClassPathResource("fixtures/manifest-november.yml").getFile().toPath();
 
         List<ApplicationManifest> expected = Collections.singletonList(
             ApplicationManifest.builder()
@@ -523,9 +437,15 @@ public final class ApplicationManifestUtilsTest {
                 .build()
         );
 
-        List<ApplicationManifest> actual = ApplicationManifestUtils.read(new ClassPathResource("fixtures/manifest-quota.yml").getFile().toPath());
+        List<ApplicationManifest> actual = ApplicationManifestUtils.read(new ClassPathResource("fixtures/manifest-mike.yml").getFile().toPath());
 
         assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    public void unixRead() throws IOException {
+        assumeTrue(SystemUtils.IS_OS_UNIX);
+        read("/alpha-path", "fixtures/manifest-alpha-unix.yml");
     }
 
     @Test
@@ -535,9 +455,48 @@ public final class ApplicationManifestUtilsTest {
     }
 
     @Test
+    public void windowsRead() throws IOException {
+        assumeTrue(SystemUtils.IS_OS_WINDOWS);
+        read("c:\\alpha-path", "fixtures/manifest-alpha-windows.yml");
+    }
+
+    @Test
     public void windowsWrite() throws IOException {
         assumeTrue(SystemUtils.IS_OS_WINDOWS);
         write("c:\\alpha-path", "fixtures/manifest-echo-windows.yml");
+    }
+
+    private void read(String path, String expectedManifest) throws IOException {
+        List<ApplicationManifest> expected = Arrays.asList(
+            ApplicationManifest.builder()
+                .name("alpha-application-1")
+                .buildpack("alpha-buildpack")
+                .command("alpha-command")
+                .disk(-1)
+                .healthCheckHttpEndpoint("alpha-health-check-http-endpoint")
+                .healthCheckType(NONE)
+                .instances(-1)
+                .memory(1)
+                .noRoute(true)
+                .path(Paths.get(path))
+                .randomRoute(true)
+                .route(Route.builder()
+                    .route("alpha-route-1")
+                    .build())
+                .route(Route.builder()
+                    .route("alpha-route-2")
+                    .build())
+                .stack("alpha-stack")
+                .timeout(-1)
+                .environmentVariable("ALPHA_KEY_1", "alpha-value-1")
+                .environmentVariable("ALPHA_KEY_2", "alpha-value-2")
+                .service("alpha-instance-1")
+                .service("alpha-instance-2")
+                .build());
+
+        List<ApplicationManifest> actual = ApplicationManifestUtils.read(new ClassPathResource(expectedManifest).getFile().toPath());
+
+        assertThat(actual).isEqualTo(expected);
     }
 
     private void write(String path, String expectedManifest) throws IOException {
