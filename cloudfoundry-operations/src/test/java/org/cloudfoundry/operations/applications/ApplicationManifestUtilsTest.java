@@ -459,6 +459,21 @@ public final class ApplicationManifestUtilsTest {
     }
 
     @Test
+    public void relativePath() throws IOException {
+        Path root = new ClassPathResource("fixtures/manifest-mike.yml").getFile().toPath();
+
+        List<ApplicationManifest> expected = Collections.singletonList(
+            ApplicationManifest.builder()
+                .name("alpha-application-1")
+                .path(root.getParent().resolve("alpha-path"))
+                .build());
+
+        List<ApplicationManifest> actual = ApplicationManifestUtils.read(root);
+
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
     public void testDiskQuotaAndMemoryParsing() throws Exception {
         List<ApplicationManifest> expected = Arrays.asList(
             ApplicationManifest.builder()
