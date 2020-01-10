@@ -32,15 +32,15 @@ import org.junit.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
+import java.util.Collections;
 
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-
 public final class ReactorTcpRoutesTest extends AbstractRoutingApiTest {
 
-    private final ReactorTcpRoutes tcpRoutes = new ReactorTcpRoutes(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    private final ReactorTcpRoutes tcpRoutes = new ReactorTcpRoutes(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void create() {

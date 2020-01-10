@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.reactor.uaa.identityproviders;
 
-
 import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
@@ -57,7 +56,7 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorIdentityProvidersTest extends AbstractUaaApiTest {
 
-    private final ReactorIdentityProviders identityProviders = new ReactorIdentityProviders(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    private final ReactorIdentityProviders identityProviders = new ReactorIdentityProviders(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void createLdap() {

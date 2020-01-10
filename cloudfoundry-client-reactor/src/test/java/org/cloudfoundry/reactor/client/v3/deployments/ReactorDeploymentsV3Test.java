@@ -40,6 +40,7 @@ import org.junit.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
+import java.util.Collections;
 
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.POST;
@@ -48,7 +49,7 @@ import static java.util.Collections.singletonList;
 
 public class ReactorDeploymentsV3Test extends AbstractClientApiTest {
 
-    private final ReactorDeploymentsV3 deployments = new ReactorDeploymentsV3(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    private final ReactorDeploymentsV3 deployments = new ReactorDeploymentsV3(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void cancel() {

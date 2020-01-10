@@ -60,7 +60,7 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorUserProvidedServiceInstancesTest extends AbstractClientApiTest {
 
-    private final ReactorUserProvidedServiceInstances userProvidedServiceInstances = new ReactorUserProvidedServiceInstances(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    private final ReactorUserProvidedServiceInstances userProvidedServiceInstances = new ReactorUserProvidedServiceInstances(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void associateRoute() {

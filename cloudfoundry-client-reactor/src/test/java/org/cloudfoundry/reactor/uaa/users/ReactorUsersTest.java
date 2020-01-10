@@ -71,7 +71,7 @@ import static org.cloudfoundry.uaa.users.MembershipType.DIRECT;
 
 public final class ReactorUsersTest extends AbstractUaaApiTest {
 
-    private final ReactorUsers users = new ReactorUsers(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    private final ReactorUsers users = new ReactorUsers(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void changePassword() {

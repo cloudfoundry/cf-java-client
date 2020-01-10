@@ -29,15 +29,15 @@ import org.junit.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
+import java.util.Collections;
 
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.PUT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-
 public final class ReactorRouterGroupsTest extends AbstractRoutingApiTest {
 
-    private final ReactorRouterGroups routerGroups = new ReactorRouterGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    private final ReactorRouterGroups routerGroups = new ReactorRouterGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void list() {

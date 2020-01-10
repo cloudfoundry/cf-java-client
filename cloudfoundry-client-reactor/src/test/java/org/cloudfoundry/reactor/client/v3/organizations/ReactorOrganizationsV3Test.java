@@ -48,7 +48,7 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
 
-    private final ReactorOrganizationsV3 organizations = new ReactorOrganizationsV3(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    private final ReactorOrganizationsV3 organizations = new ReactorOrganizationsV3(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void assignDefaultIsolationSegment() {

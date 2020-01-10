@@ -51,7 +51,7 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorDomainsTest extends AbstractClientApiTest {
 
-    private final ReactorDomains domains = new ReactorDomains(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    private final ReactorDomains domains = new ReactorDomains(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void create() {

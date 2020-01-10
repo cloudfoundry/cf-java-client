@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.reactor.client.v3.serviceInstances;
+package org.cloudfoundry.reactor.client.v3.serviceinstances;
 
 import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.Metadata;
@@ -36,11 +36,11 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import org.cloudfoundry.reactor.client.v3.serviceinstances.ReactorServiceInstancesV3;
 import org.junit.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
+import java.util.Collections;
 
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
@@ -50,10 +50,9 @@ import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-
 public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest {
 
-    private final ReactorServiceInstancesV3 serviceInstances = new ReactorServiceInstancesV3(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    private final ReactorServiceInstancesV3 serviceInstances = new ReactorServiceInstancesV3(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void list() {

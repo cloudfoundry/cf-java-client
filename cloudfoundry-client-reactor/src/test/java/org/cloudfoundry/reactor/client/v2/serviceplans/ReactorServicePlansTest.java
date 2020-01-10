@@ -57,10 +57,9 @@ import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-
 public final class ReactorServicePlansTest extends AbstractClientApiTest {
 
-    private final ReactorServicePlans servicePlans = new ReactorServicePlans(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    private final ReactorServicePlans servicePlans = new ReactorServicePlans(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void delete() {

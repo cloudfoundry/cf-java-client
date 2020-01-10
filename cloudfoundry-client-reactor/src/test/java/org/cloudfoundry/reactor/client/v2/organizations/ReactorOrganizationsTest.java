@@ -119,7 +119,7 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorOrganizationsTest extends AbstractClientApiTest {
 
-    private final ReactorOrganizations organizations = new ReactorOrganizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    private final ReactorOrganizations organizations = new ReactorOrganizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void associateOrganizationAuditor() {

@@ -30,14 +30,15 @@ import reactor.netty.ByteBufFlux;
 import reactor.netty.http.client.HttpClientForm;
 import reactor.netty.http.client.HttpClientRequest;
 
+import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 public abstract class AbstractClientV2Operations extends AbstractReactorOperations {
 
-    protected AbstractClientV2Operations(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
-        super(connectionContext, root, tokenProvider);
+    protected AbstractClientV2Operations(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
+        super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override

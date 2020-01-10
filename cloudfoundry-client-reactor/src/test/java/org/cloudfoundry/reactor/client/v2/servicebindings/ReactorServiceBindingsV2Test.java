@@ -51,7 +51,7 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorServiceBindingsV2Test extends AbstractClientApiTest {
 
-    private final ReactorServiceBindingsV2 serviceBindings = new ReactorServiceBindingsV2(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    private final ReactorServiceBindingsV2 serviceBindings = new ReactorServiceBindingsV2(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void create() {

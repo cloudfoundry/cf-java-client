@@ -44,6 +44,7 @@ import org.cloudfoundry.uaa.tokens.Tokens;
 import reactor.core.publisher.Mono;
 
 import java.util.Base64;
+import java.util.Map;
 
 import static io.netty.handler.codec.http.HttpHeaderNames.AUTHORIZATION;
 import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
@@ -63,9 +64,10 @@ public final class ReactorTokens extends AbstractUaaOperations implements Tokens
      * @param connectionContext the {@link ConnectionContext} to use when communicating with the server
      * @param root              the root URI of the server. Typically something like {@code https://uaa.run.pivotal.io}.
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
+     * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorTokens(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
-        super(connectionContext, root, tokenProvider);
+    public ReactorTokens(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
+        super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
