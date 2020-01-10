@@ -28,6 +28,9 @@ import org.immutables.value.Value;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
+import java.util.Map;
+
 /**
  * The Reactor-based implementation of {@link DopplerClient}
  */
@@ -61,7 +64,12 @@ abstract class _ReactorDopplerClient implements DopplerClient {
 
     @Value.Derived
     ReactorDopplerEndpoints getDopplerEndpoints() {
-        return new ReactorDopplerEndpoints(getConnectionContext(), getRoot(), getTokenProvider());
+        return new ReactorDopplerEndpoints(getConnectionContext(), getRoot(), getTokenProvider(), getRequestTags());
+    }
+
+    @Value.Default
+    Map<String, String> getRequestTags() {
+        return Collections.emptyMap();
     }
 
     @Value.Default
@@ -73,6 +81,5 @@ abstract class _ReactorDopplerClient implements DopplerClient {
      * The token provider
      */
     abstract TokenProvider getTokenProvider();
-
 
 }

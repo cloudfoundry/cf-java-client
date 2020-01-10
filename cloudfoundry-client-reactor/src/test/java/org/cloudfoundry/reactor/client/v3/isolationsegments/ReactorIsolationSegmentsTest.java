@@ -60,7 +60,7 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
 
-    private final ReactorIsolationSegments isolationSegments = new ReactorIsolationSegments(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    private final ReactorIsolationSegments isolationSegments = new ReactorIsolationSegments(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void addOrganizationEntitlement() {

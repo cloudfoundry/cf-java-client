@@ -60,6 +60,7 @@ import reactor.test.StepVerifier;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.time.Duration;
+import java.util.Collections;
 
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
@@ -72,7 +73,7 @@ import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 
 public final class ReactorPackagesTest extends AbstractClientApiTest {
 
-    private final ReactorPackages packages = new ReactorPackages(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    private final ReactorPackages packages = new ReactorPackages(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void copy() {

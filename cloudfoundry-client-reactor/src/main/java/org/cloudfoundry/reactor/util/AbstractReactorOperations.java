@@ -22,6 +22,8 @@ import org.cloudfoundry.reactor.TokenProvider;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 
+import java.util.Map;
+
 import static io.netty.handler.codec.http.HttpHeaderNames.AUTHORIZATION;
 
 public abstract class AbstractReactorOperations {
@@ -30,14 +32,17 @@ public abstract class AbstractReactorOperations {
 
     protected final ConnectionContext connectionContext;
 
+    protected final Map<String, String> requestTags;
+
     protected final Mono<String> root;
 
     protected final TokenProvider tokenProvider;
 
-    protected AbstractReactorOperations(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
+    protected AbstractReactorOperations(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
         this.connectionContext = connectionContext;
         this.root = root;
         this.tokenProvider = tokenProvider;
+        this.requestTags = requestTags;
     }
 
     protected Mono<Operator> createOperator() {
@@ -52,6 +57,7 @@ public abstract class AbstractReactorOperations {
     private void addHeaders(HttpHeaders httpHeaders) {
         UserAgent.setUserAgent(httpHeaders);
         JsonCodec.setDecodeHeaders(httpHeaders);
+        this.requestTags.forEach(httpHeaders::set);
     }
 
     private Mono<? extends HttpHeaders> addHeadersWhen(HttpHeaders httpHeaders) {

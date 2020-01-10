@@ -62,6 +62,7 @@ import org.junit.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
+import java.util.Collections;
 
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
@@ -75,7 +76,7 @@ import static org.cloudfoundry.uaa.tokens.GrantType.REFRESH_TOKEN;
 
 public final class ReactorClientsTest extends AbstractUaaApiTest {
 
-    private final ReactorClients clients = new ReactorClients(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    private final ReactorClients clients = new ReactorClients(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void batchChangeSecret() {

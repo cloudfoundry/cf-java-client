@@ -46,6 +46,7 @@ import reactor.test.StepVerifier;
 
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.Collections;
 
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.POST;
@@ -53,7 +54,7 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorTokensTest extends AbstractUaaApiTest {
 
-    private final ReactorTokens tokens = new ReactorTokens(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    private final ReactorTokens tokens = new ReactorTokens(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void check() {

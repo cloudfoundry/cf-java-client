@@ -40,6 +40,8 @@ import org.immutables.value.Value;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.function.Function;
 
 /**
@@ -51,13 +53,13 @@ abstract class _ReactorUaaClient implements UaaClient {
     @Override
     @Value.Derived
     public Authorizations authorizations() {
-        return new ReactorAuthorizations(getConnectionContext(), getRoot(), getTokenProvider());
+        return new ReactorAuthorizations(getConnectionContext(), getRoot(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public Clients clients() {
-        return new ReactorClients(getConnectionContext(), getRoot(), getTokenProvider());
+        return new ReactorClients(getConnectionContext(), getRoot(), getTokenProvider(), getRequestTags());
     }
 
     @Override
@@ -69,37 +71,37 @@ abstract class _ReactorUaaClient implements UaaClient {
     @Override
     @Value.Derived
     public Groups groups() {
-        return new ReactorGroups(getConnectionContext(), getRoot(), getTokenProvider());
+        return new ReactorGroups(getConnectionContext(), getRoot(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public IdentityProviders identityProviders() {
-        return new ReactorIdentityProviders(getConnectionContext(), getRoot(), getTokenProvider());
+        return new ReactorIdentityProviders(getConnectionContext(), getRoot(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public IdentityZones identityZones() {
-        return new ReactorIdentityZones(getConnectionContext(), getRoot(), getTokenProvider());
+        return new ReactorIdentityZones(getConnectionContext(), getRoot(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public ServerInformation serverInformation() {
-        return new ReactorServerInformation(getConnectionContext(), getRoot(), getTokenProvider());
+        return new ReactorServerInformation(getConnectionContext(), getRoot(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public Tokens tokens() {
-        return new ReactorTokens(getConnectionContext(), getRoot(), getTokenProvider());
+        return new ReactorTokens(getConnectionContext(), getRoot(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public Users users() {
-        return new ReactorUsers(getConnectionContext(), getRoot(), getTokenProvider());
+        return new ReactorUsers(getConnectionContext(), getRoot(), getTokenProvider(), getRequestTags());
     }
 
     /**
@@ -112,6 +114,11 @@ abstract class _ReactorUaaClient implements UaaClient {
      */
     @Nullable
     abstract String getIdentityZoneSubdomain();
+
+    @Value.Default
+    Map<String, String> getRequestTags() {
+        return Collections.emptyMap();
+    }
 
     @Value.Default
     Mono<String> getRoot() {

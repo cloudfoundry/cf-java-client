@@ -38,7 +38,7 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorEventsTest extends AbstractClientApiTest {
 
-    private final ReactorEvents events = new ReactorEvents(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    private final ReactorEvents events = new ReactorEvents(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void get() {

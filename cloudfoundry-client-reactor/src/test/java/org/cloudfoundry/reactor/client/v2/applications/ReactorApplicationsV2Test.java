@@ -100,7 +100,7 @@ import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 
 public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
 
-    private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @SuppressWarnings("deprecation")
     @Test

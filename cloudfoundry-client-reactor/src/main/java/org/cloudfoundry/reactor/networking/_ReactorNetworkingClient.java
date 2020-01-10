@@ -26,6 +26,9 @@ import org.cloudfoundry.reactor.networking.v1.tags.ReactorTags;
 import org.immutables.value.Value;
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
+import java.util.Map;
+
 /**
  * The Reactor-based implementation of {@link NetworkingClient}
  */
@@ -35,19 +38,24 @@ abstract class _ReactorNetworkingClient implements NetworkingClient {
     @Override
     @Value.Derived
     public Policies policies() {
-        return new ReactorPolicies(getConnectionContext(), getRoot(), getTokenProvider());
+        return new ReactorPolicies(getConnectionContext(), getRoot(), getTokenProvider(), getRequestTags());
     }
 
     @Override
     @Value.Derived
     public Tags tags() {
-        return new ReactorTags(getConnectionContext(), getRoot(), getTokenProvider());
+        return new ReactorTags(getConnectionContext(), getRoot(), getTokenProvider(), getRequestTags());
     }
 
     /**
      * The connection context
      */
     abstract ConnectionContext getConnectionContext();
+
+    @Value.Default
+    Map<String, String> getRequestTags() {
+        return Collections.emptyMap();
+    }
 
     @Value.Default
     Mono<String> getRoot() {

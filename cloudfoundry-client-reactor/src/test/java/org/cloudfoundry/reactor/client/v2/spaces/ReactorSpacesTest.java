@@ -128,7 +128,7 @@ import static org.cloudfoundry.client.v2.serviceinstances.ServiceInstance.builde
 
 public final class ReactorSpacesTest extends AbstractClientApiTest {
 
-    private final ReactorSpaces spaces = new ReactorSpaces(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    private final ReactorSpaces spaces = new ReactorSpaces(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void associateAuditor() {
