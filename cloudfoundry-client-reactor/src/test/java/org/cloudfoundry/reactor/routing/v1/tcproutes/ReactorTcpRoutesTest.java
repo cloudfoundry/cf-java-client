@@ -46,8 +46,7 @@ public final class ReactorTcpRoutesTest extends AbstractRoutingApiTest {
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST)
-                .path("/v1/tcp_routes/create")
+                .method(POST).path("/v1/tcp_routes/create")
                 .payload("fixtures/routing/v1/tcproutes/POST_create_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -55,15 +54,16 @@ public final class ReactorTcpRoutesTest extends AbstractRoutingApiTest {
                 .build())
             .build());
 
-        this.tcpRoutes.create(CreateTcpRoutesRequest.builder()
-            .tcpRoute(TcpRouteConfiguration.builder()
-                .backendIp("10.1.1.12")
-                .backendPort(60000)
-                .port(5200)
-                .routerGroupId("xyz789")
-                .ttl(30)
+        this.tcpRoutes
+            .create(CreateTcpRoutesRequest.builder()
+                .tcpRoute(TcpRouteConfiguration.builder()
+                    .backendIp("10.1.1.12")
+                    .backendPort(60000)
+                    .port(5200)
+                    .routerGroupId("xyz789")
+                    .ttl(30)
+                    .build())
                 .build())
-            .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -73,8 +73,7 @@ public final class ReactorTcpRoutesTest extends AbstractRoutingApiTest {
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST)
-                .path("/v1/tcp_routes/delete")
+                .method(POST).path("/v1/tcp_routes/delete")
                 .payload("fixtures/routing/v1/tcproutes/POST_delete_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -82,14 +81,15 @@ public final class ReactorTcpRoutesTest extends AbstractRoutingApiTest {
                 .build())
             .build());
 
-        this.tcpRoutes.delete(DeleteTcpRoutesRequest.builder()
-            .tcpRoute(TcpRouteDeletion.builder()
-                .backendIp("10.1.1.12")
-                .backendPort(60000)
-                .port(5200)
-                .routerGroupId("xyz789")
+        this.tcpRoutes
+            .delete(DeleteTcpRoutesRequest.builder()
+                .tcpRoute(TcpRouteDeletion.builder()
+                    .backendIp("10.1.1.12")
+                    .backendPort(60000)
+                    .port(5200)
+                    .routerGroupId("xyz789")
+                    .build())
                 .build())
-            .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -99,8 +99,7 @@ public final class ReactorTcpRoutesTest extends AbstractRoutingApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/v1/tcp_routes")
+                .method(GET).path("/v1/tcp_routes")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -108,8 +107,9 @@ public final class ReactorTcpRoutesTest extends AbstractRoutingApiTest {
                 .build())
             .build());
 
-        this.tcpRoutes.list(ListTcpRoutesRequest.builder()
-            .build())
+        this.tcpRoutes
+            .list(ListTcpRoutesRequest.builder()
+                .build())
             .as(StepVerifier::create)
             .expectNext(ListTcpRoutesResponse.builder()
                 .tcpRoute(TcpRoute.builder()

@@ -46,36 +46,38 @@ public final class ReactorServiceBrokers extends AbstractClientV2Operations impl
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorServiceBrokers(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider,
-                                 Map<String, String> requestTags) {
+    public ReactorServiceBrokers(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<CreateServiceBrokerResponse> create(CreateServiceBrokerRequest request) {
-        return post(request, CreateServiceBrokerResponse.class, builder -> builder.pathSegment("service_brokers")).checkpoint();
+        return post(request, CreateServiceBrokerResponse.class, builder -> builder.pathSegment("service_brokers"))
+            .checkpoint();
     }
 
     @Override
     public Mono<Void> delete(DeleteServiceBrokerRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("service_brokers", request.getServiceBrokerId())).checkpoint();
+        return delete(request, Void.class, builder -> builder.pathSegment("service_brokers", request.getServiceBrokerId()))
+            .checkpoint();
     }
 
     @Override
     public Mono<GetServiceBrokerResponse> get(GetServiceBrokerRequest request) {
-        return get(request, GetServiceBrokerResponse.class,
-            builder -> builder.pathSegment("service_brokers", request.getServiceBrokerId())).checkpoint();
+        return get(request, GetServiceBrokerResponse.class, builder -> builder.pathSegment("service_brokers", request.getServiceBrokerId()))
+            .checkpoint();
     }
 
     @Override
     public Mono<ListServiceBrokersResponse> list(ListServiceBrokersRequest request) {
-        return get(request, ListServiceBrokersResponse.class, builder -> builder.pathSegment("service_brokers")).checkpoint();
+        return get(request, ListServiceBrokersResponse.class, builder -> builder.pathSegment("service_brokers"))
+            .checkpoint();
     }
 
     @Override
     public Mono<UpdateServiceBrokerResponse> update(UpdateServiceBrokerRequest request) {
-        return put(request, UpdateServiceBrokerResponse.class,
-            builder -> builder.pathSegment("service_brokers", request.getServiceBrokerId())).checkpoint();
+        return put(request, UpdateServiceBrokerResponse.class, builder -> builder.pathSegment("service_brokers", request.getServiceBrokerId()))
+            .checkpoint();
     }
 
 }

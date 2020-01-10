@@ -45,31 +45,32 @@ public final class ReactorServices extends AbstractClientV2Operations implements
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorServices(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider,
-                           Map<String, String> requestTags) {
+    public ReactorServices(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<DeleteServiceResponse> delete(DeleteServiceRequest request) {
-        return delete(request, DeleteServiceResponse.class,
-            builder -> builder.pathSegment("services", request.getServiceId())).checkpoint();
+        return delete(request, DeleteServiceResponse.class, builder -> builder.pathSegment("services", request.getServiceId()))
+            .checkpoint();
     }
 
     @Override
     public Mono<GetServiceResponse> get(GetServiceRequest request) {
-        return get(request, GetServiceResponse.class, builder -> builder.pathSegment("services", request.getServiceId())).checkpoint();
+        return get(request, GetServiceResponse.class, builder -> builder.pathSegment("services", request.getServiceId()))
+            .checkpoint();
     }
 
     @Override
     public Mono<ListServicesResponse> list(ListServicesRequest request) {
-        return get(request, ListServicesResponse.class, builder -> builder.pathSegment("services")).checkpoint();
+        return get(request, ListServicesResponse.class, builder -> builder.pathSegment("services"))
+            .checkpoint();
     }
 
     @Override
     public Mono<ListServiceServicePlansResponse> listServicePlans(ListServiceServicePlansRequest request) {
-        return get(request, ListServiceServicePlansResponse.class,
-            builder -> builder.pathSegment("services", request.getServiceId(), "service_plans")).checkpoint();
+        return get(request, ListServiceServicePlansResponse.class, builder -> builder.pathSegment("services", request.getServiceId(), "service_plans"))
+            .checkpoint();
     }
 
 }

@@ -39,14 +39,14 @@ public final class ReactorResourceMatch extends AbstractClientV2Operations imple
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorResourceMatch(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider,
-                                Map<String, String> requestTags) {
+    public ReactorResourceMatch(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<ListMatchingResourcesResponse> list(ListMatchingResourcesRequest request) {
-        return put(request, ListMatchingResourcesResponse.class, builder -> builder.pathSegment("resource_match")).checkpoint();
+        return put(request, ListMatchingResourcesResponse.class, builder -> builder.pathSegment("resource_match"))
+            .checkpoint();
     }
 
 }

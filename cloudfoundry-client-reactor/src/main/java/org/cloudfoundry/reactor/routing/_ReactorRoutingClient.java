@@ -59,8 +59,7 @@ abstract class _ReactorRoutingClient implements RoutingClient {
 
     @Value.Default
     Mono<String> getRoot() {
-        return getConnectionContext().getRootProvider()
-            .getRoot("routing", getConnectionContext());
+        return getConnectionContext().getRootProvider().getRoot("routing", getConnectionContext());
     }
 
     /**

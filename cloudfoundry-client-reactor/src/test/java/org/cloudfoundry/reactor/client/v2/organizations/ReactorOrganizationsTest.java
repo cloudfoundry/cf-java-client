@@ -119,17 +119,13 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorOrganizationsTest extends AbstractClientApiTest {
 
-    private final ReactorOrganizations organizations = new ReactorOrganizations(CONNECTION_CONTEXT,
-        this.root,
-        TOKEN_PROVIDER,
-        Collections.emptyMap());
+    private final ReactorOrganizations organizations = new ReactorOrganizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void associateOrganizationAuditor() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT)
-                .path("/organizations/test-organization-id/auditors/uaa-id-71")
+                .method(PUT).path("/organizations/test-organization-id/auditors/uaa-id-71")
                 .build())
             .response(TestResponse.builder()
                 .status(CREATED)
@@ -137,10 +133,11 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.organizations.associateAuditor(AssociateOrganizationAuditorRequest.builder()
-            .auditorId("uaa-id-71")
-            .organizationId("test-organization-id")
-            .build())
+        this.organizations
+            .associateAuditor(AssociateOrganizationAuditorRequest.builder()
+                .auditorId("uaa-id-71")
+                .organizationId("test-organization-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(AssociateOrganizationAuditorResponse.builder()
                 .metadata(Metadata.builder()
@@ -173,8 +170,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     public void associateOrganizationAuditorByUsername() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT)
-                .path("/organizations/test-organization-id/auditors")
+                .method(PUT).path("/organizations/test-organization-id/auditors")
                 .payload("fixtures/client/v2/organizations/PUT_{id}_auditors_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -183,10 +179,11 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.organizations.associateAuditorByUsername(AssociateOrganizationAuditorByUsernameRequest.builder()
-            .organizationId("test-organization-id")
-            .username("user@example.com")
-            .build())
+        this.organizations
+            .associateAuditorByUsername(AssociateOrganizationAuditorByUsernameRequest.builder()
+                .organizationId("test-organization-id")
+                .username("user@example.com")
+                .build())
             .as(StepVerifier::create)
             .expectNext(AssociateOrganizationAuditorByUsernameResponse.builder()
                 .metadata(Metadata.builder()
@@ -219,8 +216,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     public void associateOrganizationBillingManager() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT)
-                .path("/organizations/test-organization-id/billing_managers/test-billing-manager-id")
+                .method(PUT).path("/organizations/test-organization-id/billing_managers/test-billing-manager-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -228,10 +224,11 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.organizations.associateBillingManager(AssociateOrganizationBillingManagerRequest.builder()
-            .billingManagerId("test-billing-manager-id")
-            .organizationId("test-organization-id")
-            .build())
+        this.organizations
+            .associateBillingManager(AssociateOrganizationBillingManagerRequest.builder()
+                .billingManagerId("test-billing-manager-id")
+                .organizationId("test-organization-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(AssociateOrganizationBillingManagerResponse.builder()
                 .entity(OrganizationEntity.builder()
@@ -264,8 +261,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     public void associateOrganizationBillingManagerByUsername() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT)
-                .path("/organizations/test-organization-id/billing_managers")
+                .method(PUT).path("/organizations/test-organization-id/billing_managers")
                 .payload("fixtures/client/v2/organizations/PUT_{id}_billing_managers_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -274,10 +270,11 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.organizations.associateBillingManagerByUsername(AssociateOrganizationBillingManagerByUsernameRequest.builder()
-            .organizationId("test-organization-id")
-            .username("user@example.com")
-            .build())
+        this.organizations
+            .associateBillingManagerByUsername(AssociateOrganizationBillingManagerByUsernameRequest.builder()
+                .organizationId("test-organization-id")
+                .username("user@example.com")
+                .build())
             .as(StepVerifier::create)
             .expectNext(AssociateOrganizationBillingManagerByUsernameResponse.builder()
                 .metadata(Metadata.builder()
@@ -310,8 +307,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     public void associateOrganizationManager() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT)
-                .path("/organizations/test-organization-id/managers/test-manager-id")
+                .method(PUT).path("/organizations/test-organization-id/managers/test-manager-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -319,10 +315,11 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.organizations.associateManager(AssociateOrganizationManagerRequest.builder()
-            .organizationId("test-organization-id")
-            .managerId("test-manager-id")
-            .build())
+        this.organizations
+            .associateManager(AssociateOrganizationManagerRequest.builder()
+                .organizationId("test-organization-id")
+                .managerId("test-manager-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(AssociateOrganizationManagerResponse.builder()
                 .metadata(Metadata.builder()
@@ -355,8 +352,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     public void associateOrganizationManagerByUsername() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT)
-                .path("/organizations/test-organization-id/managers")
+                .method(PUT).path("/organizations/test-organization-id/managers")
                 .payload("fixtures/client/v2/organizations/PUT_{id}_managers_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -365,10 +361,11 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.organizations.associateManagerByUsername(AssociateOrganizationManagerByUsernameRequest.builder()
-            .organizationId("test-organization-id")
-            .username("user@example.com")
-            .build())
+        this.organizations
+            .associateManagerByUsername(AssociateOrganizationManagerByUsernameRequest.builder()
+                .organizationId("test-organization-id")
+                .username("user@example.com")
+                .build())
             .as(StepVerifier::create)
             .expectNext(AssociateOrganizationManagerByUsernameResponse.builder()
                 .metadata(Metadata.builder()
@@ -401,8 +398,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     public void associateOrganizationUser() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT)
-                .path("/organizations/test-organization-id/users/test-user-id")
+                .method(PUT).path("/organizations/test-organization-id/users/test-user-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -410,10 +406,11 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.organizations.associateUser(AssociateOrganizationUserRequest.builder()
-            .organizationId("test-organization-id")
-            .userId("test-user-id")
-            .build())
+        this.organizations
+            .associateUser(AssociateOrganizationUserRequest.builder()
+                .organizationId("test-organization-id")
+                .userId("test-user-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(AssociateOrganizationUserResponse.builder()
                 .metadata(Metadata.builder()
@@ -446,8 +443,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     public void associateOrganizationUserByUsername() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT)
-                .path("/organizations/test-organization-id/users")
+                .method(PUT).path("/organizations/test-organization-id/users")
                 .payload("fixtures/client/v2/organizations/PUT_{id}_users_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -456,10 +452,11 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.organizations.associateUserByUsername(AssociateOrganizationUserByUsernameRequest.builder()
-            .organizationId("test-organization-id")
-            .username("user@example.com")
-            .build())
+        this.organizations
+            .associateUserByUsername(AssociateOrganizationUserByUsernameRequest.builder()
+                .organizationId("test-organization-id")
+                .username("user@example.com")
+                .build())
             .as(StepVerifier::create)
             .expectNext(AssociateOrganizationUserByUsernameResponse.builder()
                 .metadata(Metadata.builder()
@@ -492,8 +489,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     public void associatePrivateDomain() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT)
-                .path("/organizations/test-organization-id/private_domains/test-private-domain-id")
+                .method(PUT).path("/organizations/test-organization-id/private_domains/test-private-domain-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -501,10 +497,11 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.organizations.associatePrivateDomain(AssociateOrganizationPrivateDomainRequest.builder()
-            .organizationId("test-organization-id")
-            .privateDomainId("test-private-domain-id")
-            .build())
+        this.organizations
+            .associatePrivateDomain(AssociateOrganizationPrivateDomainRequest.builder()
+                .organizationId("test-organization-id")
+                .privateDomainId("test-private-domain-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(AssociateOrganizationPrivateDomainResponse.builder()
                 .entity(OrganizationEntity.builder()
@@ -537,8 +534,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST)
-                .path("/organizations")
+                .method(POST).path("/organizations")
                 .payload("fixtures/client/v2/organizations/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -547,10 +543,11 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.organizations.create(CreateOrganizationRequest.builder()
-            .name("my-org-name")
-            .quotaDefinitionId("ffc919cd-3e21-43a6-9e4e-62802d149cdb")
-            .build())
+        this.organizations
+            .create(CreateOrganizationRequest.builder()
+                .name("my-org-name")
+                .quotaDefinitionId("ffc919cd-3e21-43a6-9e4e-62802d149cdb")
+                .build())
             .as(StepVerifier::create)
             .expectNext(CreateOrganizationResponse.builder()
                 .metadata(Metadata.builder()
@@ -583,17 +580,17 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE)
-                .path("/organizations/test-organization-id")
+                .method(DELETE).path("/organizations/test-organization-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
                 .build())
             .build());
 
-        this.organizations.delete(DeleteOrganizationRequest.builder()
-            .organizationId("test-organization-id")
-            .build())
+        this.organizations
+            .delete(DeleteOrganizationRequest.builder()
+                .organizationId("test-organization-id")
+                .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -603,8 +600,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     public void deleteAsync() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE)
-                .path("/organizations/test-organization-id?async=true")
+                .method(DELETE).path("/organizations/test-organization-id?async=true")
                 .build())
             .response(TestResponse.builder()
                 .status(ACCEPTED)
@@ -612,10 +608,11 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.organizations.delete(DeleteOrganizationRequest.builder()
-            .async(true)
-            .organizationId("test-organization-id")
-            .build())
+        this.organizations
+            .delete(DeleteOrganizationRequest.builder()
+                .async(true)
+                .organizationId("test-organization-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(DeleteOrganizationResponse.builder()
                 .metadata(Metadata.builder()
@@ -636,8 +633,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/organizations/test-organization-id")
+                .method(GET).path("/organizations/test-organization-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -645,9 +641,10 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.organizations.get(GetOrganizationRequest.builder()
-            .organizationId("test-organization-id")
-            .build())
+        this.organizations
+            .get(GetOrganizationRequest.builder()
+                .organizationId("test-organization-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(GetOrganizationResponse.builder()
                 .metadata(Metadata.builder()
@@ -680,8 +677,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     public void getInstanceUsage() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/organizations/test-organization-id/instance_usage")
+                .method(GET).path("/organizations/test-organization-id/instance_usage")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -689,9 +685,10 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.organizations.getInstanceUsage(GetOrganizationInstanceUsageRequest.builder()
-            .organizationId("test-organization-id")
-            .build())
+        this.organizations
+            .getInstanceUsage(GetOrganizationInstanceUsageRequest.builder()
+                .organizationId("test-organization-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(GetOrganizationInstanceUsageResponse.builder()
                 .instanceUsage(3)
@@ -704,8 +701,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     public void getMemoryUsage() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/organizations/test-organization-id/memory_usage")
+                .method(GET).path("/organizations/test-organization-id/memory_usage")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -713,9 +709,10 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.organizations.getMemoryUsage(GetOrganizationMemoryUsageRequest.builder()
-            .organizationId("test-organization-id")
-            .build())
+        this.organizations
+            .getMemoryUsage(GetOrganizationMemoryUsageRequest.builder()
+                .organizationId("test-organization-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(GetOrganizationMemoryUsageResponse.builder()
                 .memoryUsageInMb(0)
@@ -728,8 +725,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     public void getUserRoles() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/organizations/test-organization-id/user_roles?page=-1")
+                .method(GET).path("/organizations/test-organization-id/user_roles?page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -737,10 +733,11 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.organizations.getUserRoles(GetOrganizationUserRolesRequest.builder()
-            .organizationId("test-organization-id")
-            .page(-1)
-            .build())
+        this.organizations
+            .getUserRoles(GetOrganizationUserRolesRequest.builder()
+                .organizationId("test-organization-id")
+                .page(-1)
+                .build())
             .as(StepVerifier::create)
             .expectNext(GetOrganizationUserRolesResponse.builder()
                 .totalResults(2)
@@ -779,8 +776,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/organizations?q=name:test-name&page=-1")
+                .method(GET).path("/organizations?q=name:test-name&page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -788,10 +784,11 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.organizations.list(ListOrganizationsRequest.builder()
-            .name("test-name")
-            .page(-1)
-            .build())
+        this.organizations
+            .list(ListOrganizationsRequest.builder()
+                .name("test-name")
+                .page(-1)
+                .build())
             .as(StepVerifier::create)
             .expectNext(ListOrganizationsResponse.builder()
                 .totalResults(1)
@@ -828,8 +825,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     public void listAuditors() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/organizations/test-organization-id/auditors?page=-1")
+                .method(GET).path("/organizations/test-organization-id/auditors?page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -837,10 +833,11 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.organizations.listAuditors(ListOrganizationAuditorsRequest.builder()
-            .organizationId("test-organization-id")
-            .page(-1)
-            .build())
+        this.organizations
+            .listAuditors(ListOrganizationAuditorsRequest.builder()
+                .organizationId("test-organization-id")
+                .page(-1)
+                .build())
             .as(StepVerifier::create)
             .expectNext(ListOrganizationAuditorsResponse.builder()
                 .totalResults(1)
@@ -874,8 +871,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     public void listBillingManagers() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/organizations/test-organization-id/billing_managers?page=-1")
+                .method(GET).path("/organizations/test-organization-id/billing_managers?page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -883,10 +879,11 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.organizations.listBillingManagers(ListOrganizationBillingManagersRequest.builder()
-            .organizationId("test-organization-id")
-            .page(-1)
-            .build())
+        this.organizations
+            .listBillingManagers(ListOrganizationBillingManagersRequest.builder()
+                .organizationId("test-organization-id")
+                .page(-1)
+                .build())
             .as(StepVerifier::create)
             .expectNext(ListOrganizationBillingManagersResponse.builder()
                 .totalResults(1)
@@ -920,8 +917,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     public void listDomains() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/organizations/test-organization-id/domains?page=-1")
+                .method(GET).path("/organizations/test-organization-id/domains?page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -929,10 +925,11 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.organizations.listDomains(ListOrganizationDomainsRequest.builder()
-            .organizationId("test-organization-id")
-            .page(-1)
-            .build())
+        this.organizations
+            .listDomains(ListOrganizationDomainsRequest.builder()
+                .organizationId("test-organization-id")
+                .page(-1)
+                .build())
             .as(StepVerifier::create)
             .expectNext(ListOrganizationDomainsResponse.builder()
                 .totalResults(2)
@@ -966,8 +963,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     public void listManagers() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/organizations/test-organization-id/managers?page=-1")
+                .method(GET).path("/organizations/test-organization-id/managers?page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -975,10 +971,11 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.organizations.listManagers(ListOrganizationManagersRequest.builder()
-            .organizationId("test-organization-id")
-            .page(-1)
-            .build())
+        this.organizations
+            .listManagers(ListOrganizationManagersRequest.builder()
+                .organizationId("test-organization-id")
+                .page(-1)
+                .build())
             .as(StepVerifier::create)
             .expectNext(ListOrganizationManagersResponse.builder()
                 .totalResults(2)
@@ -1031,8 +1028,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     public void listPrivateDomains() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/organizations/test-organization-id/private_domains?page=-1")
+                .method(GET).path("/organizations/test-organization-id/private_domains?page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -1040,10 +1036,11 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.organizations.listPrivateDomains(ListOrganizationPrivateDomainsRequest.builder()
-            .organizationId("test-organization-id")
-            .page(-1)
-            .build())
+        this.organizations
+            .listPrivateDomains(ListOrganizationPrivateDomainsRequest.builder()
+                .organizationId("test-organization-id")
+                .page(-1)
+                .build())
             .as(StepVerifier::create)
             .expectNext(ListOrganizationPrivateDomainsResponse.builder()
                 .totalResults(1)
@@ -1058,7 +1055,8 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
                         .name("domain-2.example.com")
                         .owningOrganizationId("09beeba3-f2ed-4e45-90f9-fc2119e02e9e")
                         .owningOrganizationUrl("/v2/organizations/09beeba3-f2ed-4e45-90f9-fc2119e02e9e")
-                        .sharedOrganizationsUrl("/v2/private_domains/4625debe-c7ac-4d8e-84d2-448691c30ebc/shared_organizations")
+                        .sharedOrganizationsUrl
+                            ("/v2/private_domains/4625debe-c7ac-4d8e-84d2-448691c30ebc/shared_organizations")
                         .build())
                     .build())
                 .build())
@@ -1070,8 +1068,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     public void listServices() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/organizations/test-organization-id/services?page=-1")
+                .method(GET).path("/organizations/test-organization-id/services?page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -1079,10 +1076,11 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.organizations.listServices(ListOrganizationServicesRequest.builder()
-            .organizationId("test-organization-id")
-            .page(-1)
-            .build())
+        this.organizations
+            .listServices(ListOrganizationServicesRequest.builder()
+                .organizationId("test-organization-id")
+                .page(-1)
+                .build())
             .as(StepVerifier::create)
             .expectNext(ListOrganizationServicesResponse.builder()
                 .totalResults(1)
@@ -1115,8 +1113,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     public void listSpaceQuotaDefinitions() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/organizations/test-organization-id/space_quota_definitions?page=-1")
+                .method(GET).path("/organizations/test-organization-id/space_quota_definitions?page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -1124,10 +1121,11 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.organizations.listSpaceQuotaDefinitions(ListOrganizationSpaceQuotaDefinitionsRequest.builder()
-            .organizationId("test-organization-id")
-            .page(-1)
-            .build())
+        this.organizations
+            .listSpaceQuotaDefinitions(ListOrganizationSpaceQuotaDefinitionsRequest.builder()
+                .organizationId("test-organization-id")
+                .page(-1)
+                .build())
             .as(StepVerifier::create)
             .expectNext(ListOrganizationSpaceQuotaDefinitionsResponse.builder()
                 .totalResults(1)
@@ -1159,8 +1157,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     public void listSpaces() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/organizations/test-organization-id/spaces?page=-1")
+                .method(GET).path("/organizations/test-organization-id/spaces?page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -1168,10 +1165,11 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.organizations.listSpaces(ListOrganizationSpacesRequest.builder()
-            .organizationId("test-organization-id")
-            .page(-1)
-            .build())
+        this.organizations
+            .listSpaces(ListOrganizationSpacesRequest.builder()
+                .organizationId("test-organization-id")
+                .page(-1)
+                .build())
             .as(StepVerifier::create)
             .expectNext(ListOrganizationSpacesResponse.builder()
                 .totalResults(1)
@@ -1209,8 +1207,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     public void listUsers() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/organizations/test-organization-id/users?page=-1")
+                .method(GET).path("/organizations/test-organization-id/users?page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -1218,10 +1215,11 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.organizations.listUsers(ListOrganizationUsersRequest.builder()
-            .organizationId("test-organization-id")
-            .page(-1)
-            .build())
+        this.organizations
+            .listUsers(ListOrganizationUsersRequest.builder()
+                .organizationId("test-organization-id")
+                .page(-1)
+                .build())
             .as(StepVerifier::create)
             .expectNext(ListOrganizationUsersResponse.builder()
                 .totalResults(1)
@@ -1255,18 +1253,18 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     public void removeAuditor() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE)
-                .path("/organizations/test-organization-id/auditors/test-auditor-id")
+                .method(DELETE).path("/organizations/test-organization-id/auditors/test-auditor-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
                 .build())
             .build());
 
-        this.organizations.removeAuditor(RemoveOrganizationAuditorRequest.builder()
-            .auditorId("test-auditor-id")
-            .organizationId("test-organization-id")
-            .build())
+        this.organizations
+            .removeAuditor(RemoveOrganizationAuditorRequest.builder()
+                .auditorId("test-auditor-id")
+                .organizationId("test-organization-id")
+                .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -1276,8 +1274,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     public void removeAuditorByUsername() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE)
-                .path("/organizations/test-organization-id/auditors")
+                .method(DELETE).path("/organizations/test-organization-id/auditors")
                 .payload("fixtures/client/v2/organizations/DELETE_{id}_auditors_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -1285,10 +1282,11 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.organizations.removeAuditorByUsername(RemoveOrganizationAuditorByUsernameRequest.builder()
-            .organizationId("test-organization-id")
-            .username("auditor@example.com")
-            .build())
+        this.organizations
+            .removeAuditorByUsername(RemoveOrganizationAuditorByUsernameRequest.builder()
+                .organizationId("test-organization-id")
+                .username("auditor@example.com")
+                .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -1298,18 +1296,18 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     public void removeBillingManager() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE)
-                .path("/organizations/test-organization-id/billing_managers/test-billing-manager-id")
+                .method(DELETE).path("/organizations/test-organization-id/billing_managers/test-billing-manager-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
                 .build())
             .build());
 
-        this.organizations.removeBillingManager(RemoveOrganizationBillingManagerRequest.builder()
-            .billingManagerId("test-billing-manager-id")
-            .organizationId("test-organization-id")
-            .build())
+        this.organizations
+            .removeBillingManager(RemoveOrganizationBillingManagerRequest.builder()
+                .billingManagerId("test-billing-manager-id")
+                .organizationId("test-organization-id")
+                .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -1319,18 +1317,18 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     public void removeManager() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE)
-                .path("/organizations/test-organization-id/managers/test-manager-id")
+                .method(DELETE).path("/organizations/test-organization-id/managers/test-manager-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
                 .build())
             .build());
 
-        this.organizations.removeManager(RemoveOrganizationManagerRequest.builder()
-            .organizationId("test-organization-id")
-            .managerId("test-manager-id")
-            .build())
+        this.organizations
+            .removeManager(RemoveOrganizationManagerRequest.builder()
+                .organizationId("test-organization-id")
+                .managerId("test-manager-id")
+                .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -1340,8 +1338,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     public void removeOrganizationBillingManagerByUsername() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE)
-                .path("/organizations/test-organization-id/billing_managers")
+                .method(DELETE).path("/organizations/test-organization-id/billing_managers")
                 .payload("fixtures/client/v2/organizations/DELETE_{id}_billing_managers_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -1349,10 +1346,11 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.organizations.removeBillingManagerByUsername(RemoveOrganizationBillingManagerByUsernameRequest.builder()
-            .organizationId("test-organization-id")
-            .username("billing_manager@example.com")
-            .build())
+        this.organizations
+            .removeBillingManagerByUsername(RemoveOrganizationBillingManagerByUsernameRequest.builder()
+                .organizationId("test-organization-id")
+                .username("billing_manager@example.com")
+                .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -1362,8 +1360,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     public void removeOrganizationManagerByUsername() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE)
-                .path("/organizations/test-organization-id/managers")
+                .method(DELETE).path("/organizations/test-organization-id/managers")
                 .payload("fixtures/client/v2/organizations/DELETE_{id}_managers_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -1371,10 +1368,11 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.organizations.removeManagerByUsername(RemoveOrganizationManagerByUsernameRequest.builder()
-            .organizationId("test-organization-id")
-            .username("manage@example.com")
-            .build())
+        this.organizations
+            .removeManagerByUsername(RemoveOrganizationManagerByUsernameRequest.builder()
+                .organizationId("test-organization-id")
+                .username("manage@example.com")
+                .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -1384,18 +1382,18 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     public void removePrivateDomain() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE)
-                .path("/organizations/test-organization-id/private_domains/test-private-domain-id")
+                .method(DELETE).path("/organizations/test-organization-id/private_domains/test-private-domain-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
                 .build())
             .build());
 
-        this.organizations.removePrivateDomain(RemoveOrganizationPrivateDomainRequest.builder()
-            .organizationId("test-organization-id")
-            .privateDomainId("test-private-domain-id")
-            .build())
+        this.organizations
+            .removePrivateDomain(RemoveOrganizationPrivateDomainRequest.builder()
+                .organizationId("test-organization-id")
+                .privateDomainId("test-private-domain-id")
+                .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -1405,18 +1403,18 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     public void removeUser() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE)
-                .path("/organizations/test-organization-id/users/test-user-id")
+                .method(DELETE).path("/organizations/test-organization-id/users/test-user-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
                 .build())
             .build());
 
-        this.organizations.removeUser(RemoveOrganizationUserRequest.builder()
-            .organizationId("test-organization-id")
-            .userId("test-user-id")
-            .build())
+        this.organizations
+            .removeUser(RemoveOrganizationUserRequest.builder()
+                .organizationId("test-organization-id")
+                .userId("test-user-id")
+                .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -1426,8 +1424,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     public void removeUserByUsername() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE)
-                .path("/organizations/test-organization-id/users")
+                .method(DELETE).path("/organizations/test-organization-id/users")
                 .payload("fixtures/client/v2/organizations/DELETE_{id}_users_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -1435,10 +1432,11 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.organizations.removeUserByUsername(RemoveOrganizationUserByUsernameRequest.builder()
-            .organizationId("test-organization-id")
-            .username("user@example.com")
-            .build())
+        this.organizations
+            .removeUserByUsername(RemoveOrganizationUserByUsernameRequest.builder()
+                .organizationId("test-organization-id")
+                .username("user@example.com")
+                .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -1448,8 +1446,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     public void summary() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/organizations/test-organization-id/summary")
+                .method(GET).path("/organizations/test-organization-id/summary")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -1457,9 +1454,10 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.organizations.summary(SummaryOrganizationRequest.builder()
-            .organizationId("test-organization-id")
-            .build())
+        this.organizations
+            .summary(SummaryOrganizationRequest.builder()
+                .organizationId("test-organization-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(SummaryOrganizationResponse.builder()
                 .id("525a6450-9202-4ea1-beca-6fdda210710e")
@@ -1482,8 +1480,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     public void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT)
-                .path("/organizations/test-organization-id")
+                .method(PUT).path("/organizations/test-organization-id")
                 .payload("fixtures/client/v2/organizations/PUT_{id}_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -1492,11 +1489,12 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.organizations.update(UpdateOrganizationRequest.builder()
-            .organizationId("test-organization-id")
-            .name("New Organization Name")
-            .quotaDefinitionId("7df44b58-1834-486f-aed8-d5d97126e603")
-            .build())
+        this.organizations
+            .update(UpdateOrganizationRequest.builder()
+                .organizationId("test-organization-id")
+                .name("New Organization Name")
+                .quotaDefinitionId("7df44b58-1834-486f-aed8-d5d97126e603")
+                .build())
             .as(StepVerifier::create)
             .expectNext(UpdateOrganizationResponse.builder()
                 .metadata(Metadata.builder()

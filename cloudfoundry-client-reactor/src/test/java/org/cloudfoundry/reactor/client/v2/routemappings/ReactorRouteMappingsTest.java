@@ -48,17 +48,13 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorRouteMappingsTest extends AbstractClientApiTest {
 
-    private final ReactorRouteMappings routeMappings = new ReactorRouteMappings(CONNECTION_CONTEXT,
-        this.root,
-        TOKEN_PROVIDER,
-        Collections.emptyMap());
+    private final ReactorRouteMappings routeMappings = new ReactorRouteMappings(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST)
-                .path("/route_mappings")
+                .method(POST).path("/route_mappings")
                 .payload("fixtures/client/v2/route_mappings/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -67,11 +63,12 @@ public final class ReactorRouteMappingsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.routeMappings.create(CreateRouteMappingRequest.builder()
-            .applicationId("d232b485-b035-4d65-9f77-6b867d859de5")
-            .routeId("c041e8a3-64d0-4beb-bac8-1900e3aedd07")
-            .applicationPort(8888)
-            .build())
+        this.routeMappings
+            .create(CreateRouteMappingRequest.builder()
+                .applicationId("d232b485-b035-4d65-9f77-6b867d859de5")
+                .routeId("c041e8a3-64d0-4beb-bac8-1900e3aedd07")
+                .applicationPort(8888)
+                .build())
             .as(StepVerifier::create)
             .expectNext(CreateRouteMappingResponse.builder()
                 .metadata(Metadata.builder()
@@ -95,17 +92,17 @@ public final class ReactorRouteMappingsTest extends AbstractClientApiTest {
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE)
-                .path("/route_mappings/random-route-mapping-id")
+                .method(DELETE).path("/route_mappings/random-route-mapping-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
                 .build())
             .build());
 
-        this.routeMappings.delete(DeleteRouteMappingRequest.builder()
-            .routeMappingId("random-route-mapping-id")
-            .build())
+        this.routeMappings
+            .delete(DeleteRouteMappingRequest.builder()
+                .routeMappingId("random-route-mapping-id")
+                .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -115,8 +112,7 @@ public final class ReactorRouteMappingsTest extends AbstractClientApiTest {
     public void deleteAsync() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE)
-                .path("/route_mappings/random-route-mapping-id?async=true")
+                .method(DELETE).path("/route_mappings/random-route-mapping-id?async=true")
                 .build())
             .response(TestResponse.builder()
                 .status(ACCEPTED)
@@ -124,10 +120,11 @@ public final class ReactorRouteMappingsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.routeMappings.delete(DeleteRouteMappingRequest.builder()
-            .async(true)
-            .routeMappingId("random-route-mapping-id")
-            .build())
+        this.routeMappings
+            .delete(DeleteRouteMappingRequest.builder()
+                .async(true)
+                .routeMappingId("random-route-mapping-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(DeleteRouteMappingResponse.builder()
                 .metadata(Metadata.builder()
@@ -148,8 +145,7 @@ public final class ReactorRouteMappingsTest extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/route_mappings/route-mapping-id")
+                .method(GET).path("/route_mappings/route-mapping-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -157,9 +153,10 @@ public final class ReactorRouteMappingsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.routeMappings.get(GetRouteMappingRequest.builder()
-            .routeMappingId("route-mapping-id")
-            .build())
+        this.routeMappings
+            .get(GetRouteMappingRequest.builder()
+                .routeMappingId("route-mapping-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(GetRouteMappingResponse.builder()
                 .metadata(Metadata.builder()
@@ -183,8 +180,7 @@ public final class ReactorRouteMappingsTest extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/route_mappings?page=-1")
+                .method(GET).path("/route_mappings?page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -192,9 +188,10 @@ public final class ReactorRouteMappingsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.routeMappings.list(ListRouteMappingsRequest.builder()
-            .page(-1)
-            .build())
+        this.routeMappings
+            .list(ListRouteMappingsRequest.builder()
+                .page(-1)
+                .build())
             .as(StepVerifier::create)
             .expectNext(ListRouteMappingsResponse.builder()
                 .totalPages(1)

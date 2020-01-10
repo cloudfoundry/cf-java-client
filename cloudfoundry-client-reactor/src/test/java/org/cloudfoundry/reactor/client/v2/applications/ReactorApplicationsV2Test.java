@@ -100,18 +100,14 @@ import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 
 public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
 
-    private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(CONNECTION_CONTEXT,
-        this.root,
-        TOKEN_PROVIDER,
-        Collections.emptyMap());
+    private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @SuppressWarnings("deprecation")
     @Test
     public void associateRoute() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT)
-                .path("/apps/test-application-id/routes/test-route-id")
+                .method(PUT).path("/apps/test-application-id/routes/test-route-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -119,10 +115,11 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.applications.associateRoute(AssociateApplicationRouteRequest.builder()
-            .applicationId("test-application-id")
-            .routeId("test-route-id")
-            .build())
+        this.applications
+            .associateRoute(AssociateApplicationRouteRequest.builder()
+                .applicationId("test-application-id")
+                .routeId("test-route-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(AssociateApplicationRouteResponse.builder()
                 .metadata(Metadata.builder()
@@ -136,8 +133,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                     .detectedStartCommand("")
                     .diego(false)
                     .diskQuota(1024)
-                    .dockerCredentials(DockerCredentials.builder()
-                        .build())
+                    .dockerCredentials(DockerCredentials.builder().build())
                     .enableSsh(true)
                     .environmentJsons(Collections.emptyMap())
                     .eventsUrl("/v2/apps/638e90b6-502f-47a8-a3bf-b18fdf3fb70a/events")
@@ -168,8 +164,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     public void copy() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST)
-                .path("/apps/test-application-id/copy_bits")
+                .method(POST).path("/apps/test-application-id/copy_bits")
                 .payload("fixtures/client/v2/apps/POST_{id}_copy_bits_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -178,10 +173,11 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.applications.copy(CopyApplicationRequest.builder()
-            .applicationId("test-application-id")
-            .sourceApplicationId("af6ab819-3fb7-42e3-a0f6-947022881b7b")
-            .build())
+        this.applications
+            .copy(CopyApplicationRequest.builder()
+                .applicationId("test-application-id")
+                .sourceApplicationId("af6ab819-3fb7-42e3-a0f6-947022881b7b")
+                .build())
             .as(StepVerifier::create)
             .expectNext(CopyApplicationResponse.builder()
                 .entity(JobEntity.builder()
@@ -203,8 +199,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST)
-                .path("/apps")
+                .method(POST).path("/apps")
                 .payload("fixtures/client/v2/apps/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -213,12 +208,13 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.applications.create(CreateApplicationRequest.builder()
-            .diego(true)
-            .dockerImage("cloudfoundry/hello")
-            .name("docker_app")
-            .spaceId("6ef4e580-c189-49c8-959e-4a3d021b3307")
-            .build())
+        this.applications
+            .create(CreateApplicationRequest.builder()
+                .diego(true)
+                .dockerImage("cloudfoundry/hello")
+                .name("docker_app")
+                .spaceId("6ef4e580-c189-49c8-959e-4a3d021b3307")
+                .build())
             .as(StepVerifier::create)
             .expectNext(CreateApplicationResponse.builder()
                 .metadata(Metadata.builder()
@@ -231,8 +227,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                     .detectedStartCommand("")
                     .diego(true)
                     .diskQuota(1024)
-                    .dockerCredentials(DockerCredentials.builder()
-                        .build())
+                    .dockerCredentials(DockerCredentials.builder().build())
                     .dockerImage("cloudfoundry/hello:latest")
                     .enableSsh(true)
                     .environmentJsons(Collections.emptyMap())
@@ -264,17 +259,17 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE)
-                .path("/apps/test-application-id")
+                .method(DELETE).path("/apps/test-application-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
                 .build())
             .build());
 
-        this.applications.delete(DeleteApplicationRequest.builder()
-            .applicationId("test-application-id")
-            .build())
+        this.applications
+            .delete(DeleteApplicationRequest.builder()
+                .applicationId("test-application-id")
+                .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -284,8 +279,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     public void download() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/apps/test-application-id/download")
+                .method(GET).path("/apps/test-application-id/download")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -293,9 +287,10 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.applications.download(DownloadApplicationRequest.builder()
-            .applicationId("test-application-id")
-            .build())
+        this.applications
+            .download(DownloadApplicationRequest.builder()
+                .applicationId("test-application-id")
+                .build())
             .as(OperationUtils::collectByteArray)
             .as(StepVerifier::create)
             .consumeNextWith(actual -> assertThat(actual).isEqualTo(getBytes("fixtures/client/v2/apps/GET_{id}_download_response.bin")))
@@ -307,8 +302,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     public void downloadDroplet() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/apps/test-application-id/droplet/download")
+                .method(GET).path("/apps/test-application-id/droplet/download")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -316,9 +310,10 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.applications.downloadDroplet(DownloadApplicationDropletRequest.builder()
-            .applicationId("test-application-id")
-            .build())
+        this.applications
+            .downloadDroplet(DownloadApplicationDropletRequest.builder()
+                .applicationId("test-application-id")
+                .build())
             .as(OperationUtils::collectByteArray)
             .as(StepVerifier::create)
             .consumeNextWith(actual -> assertThat(actual).isEqualTo(getBytes("fixtures/client/v2/apps/GET_{id}_download_response.bin")))
@@ -330,8 +325,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     public void environment() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/apps/test-application-id/env")
+                .method(GET).path("/apps/test-application-id/env")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -339,9 +333,10 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.applications.environment(ApplicationEnvironmentRequest.builder()
-            .applicationId("test-application-id")
-            .build())
+        this.applications
+            .environment(ApplicationEnvironmentRequest.builder()
+                .applicationId("test-application-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(ApplicationEnvironmentResponse.builder()
                 .stagingEnvironmentJson("STAGING_ENV", "staging_value")
@@ -349,35 +344,21 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                 .environmentJson("env_var", "env_val")
                 .systemEnvironmentJson("VCAP_SERVICES", Collections.emptyMap())
                 .applicationEnvironmentJson("VCAP_APPLICATION", FluentMap.builder()
-                    .entry("limits",
-                        FluentMap.builder()
-                            .entry("mem",
-                                1024)
-                            .entry("disk",
-                                1024)
-                            .entry("fds",
-                                16384)
-                            .build())
-                    .entry("application_id",
-                        "96e63272-5da0-44b8-90a9-63d12b2692bb")
-                    .entry("application_version",
-                        "86cef6fd-fb03-4f02-97ff-cc6b9d80bbf4")
-                    .entry("application_name",
-                        "name-897")
-                    .entry("application_uris",
-                        Collections.emptyList())
-                    .entry("version",
-                        "86cef6fd-fb03-4f02-97ff-cc6b9d80bbf4")
-                    .entry("name",
-                        "name-897")
-                    .entry("space_name",
-                        "name-898")
-                    .entry("space_id",
-                        "147eef57-aadb-43b0-9518-b355ab4db678")
-                    .entry("uris",
-                        Collections.emptyList())
-                    .entry("users",
-                        null)
+                    .entry("limits", FluentMap.builder()
+                        .entry("mem", 1024)
+                        .entry("disk", 1024)
+                        .entry("fds", 16384)
+                        .build())
+                    .entry("application_id", "96e63272-5da0-44b8-90a9-63d12b2692bb")
+                    .entry("application_version", "86cef6fd-fb03-4f02-97ff-cc6b9d80bbf4")
+                    .entry("application_name", "name-897")
+                    .entry("application_uris", Collections.emptyList())
+                    .entry("version", "86cef6fd-fb03-4f02-97ff-cc6b9d80bbf4")
+                    .entry("name", "name-897")
+                    .entry("space_name", "name-898")
+                    .entry("space_id", "147eef57-aadb-43b0-9518-b355ab4db678")
+                    .entry("uris", Collections.emptyList())
+                    .entry("users", null)
                     .build())
                 .build())
             .expectComplete()
@@ -389,8 +370,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/apps/test-application-id")
+                .method(GET).path("/apps/test-application-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -398,9 +378,10 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.applications.get(GetApplicationRequest.builder()
-            .applicationId("test-application-id")
-            .build())
+        this.applications
+            .get(GetApplicationRequest.builder()
+                .applicationId("test-application-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(GetApplicationResponse.builder()
                 .metadata(Metadata.builder()
@@ -414,8 +395,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                     .detectedStartCommand("")
                     .diego(false)
                     .diskQuota(1024)
-                    .dockerCredentials(DockerCredentials.builder()
-                        .build())
+                    .dockerCredentials(DockerCredentials.builder().build())
                     .enableSsh(true)
                     .eventsUrl("/v2/apps/03f286bb-f17c-42b4-8dcd-b818b0b798af/events")
                     .healthCheckType("port")
@@ -444,8 +424,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     public void getPermissions() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/apps/6fd65993-fbd8-447c-8c04-6e4fe3ac561c/permissions")
+                .method(GET).path("/apps/6fd65993-fbd8-447c-8c04-6e4fe3ac561c/permissions")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -453,9 +432,10 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.applications.getPermissions(GetApplicationPermissionsRequest.builder()
-            .applicationId("6fd65993-fbd8-447c-8c04-6e4fe3ac561c")
-            .build())
+        this.applications
+            .getPermissions(GetApplicationPermissionsRequest.builder()
+                .applicationId("6fd65993-fbd8-447c-8c04-6e4fe3ac561c")
+                .build())
             .as(StepVerifier::create)
             .expectNext(GetApplicationPermissionsResponse.builder()
                 .readBasicData(true)
@@ -469,8 +449,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     public void instances() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/apps/test-application-id/instances")
+                .method(GET).path("/apps/test-application-id/instances")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -478,9 +457,10 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.applications.instances(ApplicationInstancesRequest.builder()
-            .applicationId("test-application-id")
-            .build())
+        this.applications
+            .instances(ApplicationInstancesRequest.builder()
+                .applicationId("test-application-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(ApplicationInstancesResponse.builder()
                 .instance("0", ApplicationInstanceInfo.builder()
@@ -497,8 +477,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/apps?q=name:test-name&page=-1")
+                .method(GET).path("/apps?q=name:test-name&page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -506,10 +485,11 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.applications.list(ListApplicationsRequest.builder()
-            .name("test-name")
-            .page(-1)
-            .build())
+        this.applications
+            .list(ListApplicationsRequest.builder()
+                .name("test-name")
+                .page(-1)
+                .build())
             .as(StepVerifier::create)
             .expectNext(ListApplicationsResponse.builder()
                 .totalResults(3)
@@ -526,8 +506,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                         .detectedStartCommand("")
                         .diego(false)
                         .diskQuota(1024)
-                        .dockerCredentials(DockerCredentials.builder()
-                            .build())
+                        .dockerCredentials(DockerCredentials.builder().build())
                         .enableSsh(true)
                         .eventsUrl("/v2/apps/3d294ed0-105c-4ccd-8f79-5605d6b7198c/events")
                         .healthCheckType("port")
@@ -539,7 +518,8 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                         .production(false)
                         .routesUrl("/v2/apps/3d294ed0-105c-4ccd-8f79-5605d6b7198c/routes")
                         .routeMappingsUrl("/v2/apps/3d294ed0-105c-4ccd-8f79-5605d6b7198c/route_mappings")
-                        .serviceBindingsUrl("/v2/apps/3d294ed0-105c-4ccd-8f79-5605d6b7198c/service_bindings")
+                        .serviceBindingsUrl
+                            ("/v2/apps/3d294ed0-105c-4ccd-8f79-5605d6b7198c/service_bindings")
                         .spaceId("30d5165d-0bef-4103-97cd-72269b9d7a4c")
                         .spaceUrl("/v2/spaces/30d5165d-0bef-4103-97cd-72269b9d7a4c")
                         .stackId("d3476df6-534d-4140-b85b-401fa4923234")
@@ -560,8 +540,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                         .detectedStartCommand("")
                         .diego(false)
                         .diskQuota(1024)
-                        .dockerCredentials(DockerCredentials.builder()
-                            .build())
+                        .dockerCredentials(DockerCredentials.builder().build())
                         .enableSsh(true)
                         .eventsUrl("/v2/apps/522c5382-29e9-48aa-9db0-9f6cfa643ec1/events")
                         .healthCheckType("port")
@@ -573,7 +552,8 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                         .production(false)
                         .routesUrl("/v2/apps/522c5382-29e9-48aa-9db0-9f6cfa643ec1/routes")
                         .routeMappingsUrl("/v2/apps/522c5382-29e9-48aa-9db0-9f6cfa643ec1/route_mappings")
-                        .serviceBindingsUrl("/v2/apps/522c5382-29e9-48aa-9db0-9f6cfa643ec1/service_bindings")
+                        .serviceBindingsUrl
+                            ("/v2/apps/522c5382-29e9-48aa-9db0-9f6cfa643ec1/service_bindings")
                         .spaceId("cf929611-97ab-4c42-93e5-9ec26e26f456")
                         .spaceUrl("/v2/spaces/cf929611-97ab-4c42-93e5-9ec26e26f456")
                         .stackId("14b4a0b7-7c7b-4cf2-99f0-cc3ed1473f09")
@@ -594,8 +574,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                         .detectedStartCommand("")
                         .diego(false)
                         .diskQuota(1024)
-                        .dockerCredentials(DockerCredentials.builder()
-                            .build())
+                        .dockerCredentials(DockerCredentials.builder().build())
                         .enableSsh(true)
                         .eventsUrl("/v2/apps/ec31bfbd-ab5c-490d-8e83-3c1ea5d1bedf/events")
                         .healthCheckType("port")
@@ -607,7 +586,8 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                         .production(false)
                         .routesUrl("/v2/apps/ec31bfbd-ab5c-490d-8e83-3c1ea5d1bedf/routes")
                         .routeMappingsUrl("/v2/apps/ec31bfbd-ab5c-490d-8e83-3c1ea5d1bedf/route_mappings")
-                        .serviceBindingsUrl("/v2/apps/ec31bfbd-ab5c-490d-8e83-3c1ea5d1bedf/service_bindings")
+                        .serviceBindingsUrl
+                            ("/v2/apps/ec31bfbd-ab5c-490d-8e83-3c1ea5d1bedf/service_bindings")
                         .spaceId("e438b2bf-17d6-4265-8813-18e0ab95c029")
                         .spaceUrl("/v2/spaces/e438b2bf-17d6-4265-8813-18e0ab95c029")
                         .stackId("8d42ba27-60df-420e-9208-535e753b706a")
@@ -625,8 +605,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     public void listRoutes() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/apps/test-application-id/routes?page=-1")
+                .method(GET).path("/apps/test-application-id/routes?page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -634,10 +613,11 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.applications.listRoutes(ListApplicationRoutesRequest.builder()
-            .applicationId("test-application-id")
-            .page(-1)
-            .build())
+        this.applications
+            .listRoutes(ListApplicationRoutesRequest.builder()
+                .applicationId("test-application-id")
+                .page(-1)
+                .build())
             .as(StepVerifier::create)
             .expectNext(ListApplicationRoutesResponse.builder()
                 .totalResults(1)
@@ -669,8 +649,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     public void listServiceBindings() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/apps/test-application-id/service_bindings?q=service_instance_guid:test-instance-id&page=-1")
+                .method(GET).path("/apps/test-application-id/service_bindings?q=service_instance_guid:test-instance-id&page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -678,11 +657,12 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.applications.listServiceBindings(ListApplicationServiceBindingsRequest.builder()
-            .applicationId("test-application-id")
-            .serviceInstanceId("test-instance-id")
-            .page(-1)
-            .build())
+        this.applications
+            .listServiceBindings(ListApplicationServiceBindingsRequest.builder()
+                .applicationId("test-application-id")
+                .serviceInstanceId("test-instance-id")
+                .page(-1)
+                .build())
             .as(StepVerifier::create)
             .expectNext(ListApplicationServiceBindingsResponse.builder()
                 .totalResults(1)
@@ -697,8 +677,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                         .applicationId("26ddc1de-3eeb-424b-82f3-f7f30a38b610")
                         .bindingOptions(Collections.emptyMap())
                         .serviceInstanceId("650d0eb7-3b83-414a-82a0-d503d1c8eb5f")
-                        .credential("creds-key-356",
-                            "creds-val-356")
+                        .credential("creds-key-356", "creds-val-356")
                         .gatewayName("")
                         .applicationUrl("/v2/apps/26ddc1de-3eeb-424b-82f3-f7f30a38b610")
                         .serviceInstanceUrl("/v2/service_instances/650d0eb7-3b83-414a-82a0-d503d1c8eb5f")
@@ -713,18 +692,18 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     public void removeRoute() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE)
-                .path("/apps/test-application-id/routes/test-route-id")
+                .method(DELETE).path("/apps/test-application-id/routes/test-route-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
                 .build())
             .build());
 
-        this.applications.removeRoute(RemoveApplicationRouteRequest.builder()
-            .applicationId("test-application-id")
-            .routeId("test-route-id")
-            .build())
+        this.applications
+            .removeRoute(RemoveApplicationRouteRequest.builder()
+                .applicationId("test-application-id")
+                .routeId("test-route-id")
+                .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -734,18 +713,18 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     public void removeServiceBinding() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE)
-                .path("/apps/test-application-id/service_bindings/test-service-binding-id")
+                .method(DELETE).path("/apps/test-application-id/service_bindings/test-service-binding-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
                 .build())
             .build());
 
-        this.applications.removeServiceBinding(RemoveApplicationServiceBindingRequest.builder()
-            .applicationId("test-application-id")
-            .serviceBindingId("test-service-binding-id")
-            .build())
+        this.applications
+            .removeServiceBinding(RemoveApplicationServiceBindingRequest.builder()
+                .applicationId("test-application-id")
+                .serviceBindingId("test-service-binding-id")
+                .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -756,8 +735,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     public void restage() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST)
-                .path("/apps/test-application-id/restage")
+                .method(POST).path("/apps/test-application-id/restage")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -765,9 +743,10 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.applications.restage(RestageApplicationRequest.builder()
-            .applicationId("test-application-id")
-            .build())
+        this.applications
+            .restage(RestageApplicationRequest.builder()
+                .applicationId("test-application-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(RestageApplicationResponse.builder()
                 .metadata(Metadata.builder()
@@ -795,8 +774,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                     .packageUpdatedAt("2015-07-27T22:43:33Z")
                     .detectedStartCommand("")
                     .enableSsh(true)
-                    .dockerCredentials(DockerCredentials.builder()
-                        .build())
+                    .dockerCredentials(DockerCredentials.builder().build())
                     .build())
                 .build())
             .expectComplete()
@@ -807,8 +785,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     public void statistics() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/apps/test-application-id/stats")
+                .method(GET).path("/apps/test-application-id/stats")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -816,9 +793,10 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.applications.statistics(ApplicationStatisticsRequest.builder()
-            .applicationId("test-application-id")
-            .build())
+        this.applications
+            .statistics(ApplicationStatisticsRequest.builder()
+                .applicationId("test-application-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(ApplicationStatisticsResponse.builder()
                 .instance("0", InstanceStatistics.builder()
@@ -851,8 +829,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     public void summary() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/apps/test-application-id/summary")
+                .method(GET).path("/apps/test-application-id/summary")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -860,9 +837,10 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.applications.summary(SummaryApplicationRequest.builder()
-            .applicationId("test-application-id")
-            .build())
+        this.applications
+            .summary(SummaryApplicationRequest.builder()
+                .applicationId("test-application-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(SummaryApplicationResponse.builder()
                 .id("2ee5ef3f-3884-4240-ab99-c747ea21663b")
@@ -881,7 +859,8 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                     .id("01826f41-9d8b-4458-88c6-9b8ddb04d0e8")
                     .name("name-1138")
                     .boundApplicationCount(1)
-                    .servicePlan(builder().id("6dce1c90-929b-466c-98d1-1b856dc6e221")
+                    .servicePlan(builder()
+                        .id("6dce1c90-929b-466c-98d1-1b856dc6e221")
                         .name("name-1139")
                         .service(Service.builder()
                             .id("994dae37-1a53-4959-aaa6-ba85e77d35e6")
@@ -918,8 +897,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                 .ports(Collections.emptyList())
                 .detectedStartCommand("")
                 .enableSsh(true)
-                .dockerCredentials(DockerCredentials.builder()
-                    .build())
+                .dockerCredentials(DockerCredentials.builder().build())
                 .build())
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -929,18 +907,18 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     public void terminateInstance() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE)
-                .path("/apps/test-application-id/instances/0")
+                .method(DELETE).path("/apps/test-application-id/instances/0")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
                 .build())
             .build());
 
-        this.applications.terminateInstance(TerminateApplicationInstanceRequest.builder()
-            .applicationId("test-application-id")
-            .index("0")
-            .build())
+        this.applications
+            .terminateInstance(TerminateApplicationInstanceRequest.builder()
+                .applicationId("test-application-id")
+                .index("0")
+                .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -951,8 +929,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     public void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT)
-                .path("/apps/test-application-id")
+                .method(PUT).path("/apps/test-application-id")
                 .payload("fixtures/client/v2/apps/PUT_{id}_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -961,11 +938,12 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.applications.update(UpdateApplicationRequest.builder()
-            .applicationId("test-application-id")
-            .name("new_name")
-            .environmentJsons(Collections.emptyMap())
-            .build())
+        this.applications
+            .update(UpdateApplicationRequest.builder()
+                .applicationId("test-application-id")
+                .name("new_name")
+                .environmentJsons(Collections.emptyMap())
+                .build())
             .as(StepVerifier::create)
             .expectNext(UpdateApplicationResponse.builder()
                 .entity(ApplicationEntity.builder()
@@ -987,8 +965,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                     .detectedStartCommand("")
                     .ports(Collections.emptyList())
                     .enableSsh(true)
-                    .dockerCredentials(DockerCredentials.builder()
-                        .build())
+                    .dockerCredentials(DockerCredentials.builder().build())
                     .spaceUrl("/v2/spaces/701aebe5-92fd-44cf-a7e6-bc54685c32ea")
                     .stackUrl("/v2/stacks/2cdc06a4-cb6e-4191-9ce8-b6bca4a16aaf")
                     .eventsUrl("/v2/apps/0c71909b-3d44-49c3-b65d-13894d70972c/events")
@@ -1011,23 +988,28 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     public void upload() throws IOException {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT)
-                .path("/apps/test-application-id/bits")
+                .method(PUT).path("/apps/test-application-id/bits")
                 .contents(consumer((headers, body) -> {
                     String boundary = extractBoundary(headers);
 
-                    assertThat(body.readString(Charset.defaultCharset())).isEqualTo("--"
-                        + boundary + "\r\n"
-                        + "content-disposition: form-data; name=\"resources\"\r\n"
-                        + "content-length: 178\r\n" + "content-type: application/json\r\n"
-                        + "content-transfer-encoding: binary\r\n" + "\r\n"
-                        + "[{\"sha1\":\"b907173290db6a155949ab4dc9b2d019dea0c901\",\"fn\":\"path/to/content.txt\",\"size\":123},"
-                        + "{\"sha1\":\"ff84f89760317996b9dd180ab996b079f418396f\",\"fn\":\"path/to/code.jar\",\"size\":123}]"
-                        + "\r\n" + "--" + boundary + "\r\n"
-                        + "content-disposition: form-data; name=\"application\"; filename=\"test-application.zip\"\r\n"
-                        + "content-length: 12\r\n" + "content-type: application/zip\r\n"
-                        + "content-transfer-encoding: binary\r\n" + "\r\n" + "test-content"
-                        + "\r\n" + "--" + boundary + "--\r\n");
+                    assertThat(body.readString(Charset.defaultCharset()))
+                        .isEqualTo("--" + boundary + "\r\n" +
+                            "content-disposition: form-data; name=\"resources\"\r\n" +
+                            "content-length: 178\r\n" +
+                            "content-type: application/json\r\n" +
+                            "content-transfer-encoding: binary\r\n" +
+                            "\r\n" +
+                            "[{\"sha1\":\"b907173290db6a155949ab4dc9b2d019dea0c901\",\"fn\":\"path/to/content.txt\",\"size\":123}," +
+                            "{\"sha1\":\"ff84f89760317996b9dd180ab996b079f418396f\",\"fn\":\"path/to/code.jar\",\"size\":123}]" +
+                            "\r\n" + "--" + boundary + "\r\n" +
+                            "content-disposition: form-data; name=\"application\"; filename=\"test-application.zip\"\r\n" +
+                            "content-length: 12\r\n" +
+                            "content-type: application/zip\r\n" +
+                            "content-transfer-encoding: binary\r\n" +
+                            "\r\n" +
+                            "test-content" +
+                            "\r\n" +
+                            "--" + boundary + "--\r\n");
                 }))
                 .build())
             .response(TestResponse.builder()
@@ -1036,21 +1018,21 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.applications.upload(UploadApplicationRequest.builder()
-            .application(new ClassPathResource("fixtures/client/v2/apps/test-application.zip").getFile()
-                .toPath())
-            .applicationId("test-application-id")
-            .resource(Resource.builder()
-                .hash("b907173290db6a155949ab4dc9b2d019dea0c901")
-                .path("path/to/content.txt")
-                .size(123)
+        this.applications
+            .upload(UploadApplicationRequest.builder()
+                .application(new ClassPathResource("fixtures/client/v2/apps/test-application.zip").getFile().toPath())
+                .applicationId("test-application-id")
+                .resource(Resource.builder()
+                    .hash("b907173290db6a155949ab4dc9b2d019dea0c901")
+                    .path("path/to/content.txt")
+                    .size(123)
+                    .build())
+                .resource(Resource.builder()
+                    .hash("ff84f89760317996b9dd180ab996b079f418396f")
+                    .path("path/to/code.jar")
+                    .size(123)
+                    .build())
                 .build())
-            .resource(Resource.builder()
-                .hash("ff84f89760317996b9dd180ab996b079f418396f")
-                .path("path/to/code.jar")
-                .size(123)
-                .build())
-            .build())
             .as(StepVerifier::create)
             .expectNext(UploadApplicationResponse.builder()
                 .entity(JobEntity.builder()
@@ -1071,17 +1053,20 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     public void uploadDroplet() throws IOException {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT)
-                .path("/apps/test-application-id/droplet/upload")
+                .method(PUT).path("/apps/test-application-id/droplet/upload")
                 .contents(consumer((headers, body) -> {
                     String boundary = extractBoundary(headers);
 
-                    assertThat(body.readString(Charset.defaultCharset())).isEqualTo("--"
-                        + boundary + "\r\n"
-                        + "content-disposition: form-data; name=\"droplet\"; filename=\"test-droplet.tgz\"\r\n"
-                        + "content-length: 12\r\n" + "content-type: application/octet-stream\r\n"
-                        + "content-transfer-encoding: binary\r\n" + "\r\n" + "test-content"
-                        + "\r\n" + "--" + boundary + "--\r\n");
+                    assertThat(body.readString(Charset.defaultCharset()))
+                        .isEqualTo("--" + boundary + "\r\n" +
+                            "content-disposition: form-data; name=\"droplet\"; filename=\"test-droplet.tgz\"\r\n" +
+                            "content-length: 12\r\n" +
+                            "content-type: application/octet-stream\r\n" +
+                            "content-transfer-encoding: binary\r\n" +
+                            "\r\n" +
+                            "test-content" +
+                            "\r\n" +
+                            "--" + boundary + "--\r\n");
                 }))
                 .build())
             .response(TestResponse.builder()
@@ -1090,11 +1075,11 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.applications.uploadDroplet(UploadApplicationDropletRequest.builder()
-            .droplet(new ClassPathResource("fixtures/client/v2/apps/test-droplet.tgz").getFile()
-                .toPath())
-            .applicationId("test-application-id")
-            .build())
+        this.applications
+            .uploadDroplet(UploadApplicationDropletRequest.builder()
+                .droplet(new ClassPathResource("fixtures/client/v2/apps/test-droplet.tgz").getFile().toPath())
+                .applicationId("test-application-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(UploadApplicationDropletResponse.builder()
                 .entity(JobEntity.builder()

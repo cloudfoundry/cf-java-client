@@ -48,17 +48,13 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorServiceBrokersTest extends AbstractClientApiTest {
 
-    private final ReactorServiceBrokers serviceBrokers = new ReactorServiceBrokers(CONNECTION_CONTEXT,
-        this.root,
-        TOKEN_PROVIDER,
-        Collections.emptyMap());
+    private final ReactorServiceBrokers serviceBrokers = new ReactorServiceBrokers(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST)
-                .path("/service_brokers")
+                .method(POST).path("/service_brokers")
                 .payload("fixtures/client/v2/service_brokers/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -67,12 +63,13 @@ public final class ReactorServiceBrokersTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.serviceBrokers.create(CreateServiceBrokerRequest.builder()
-            .name("service-broker-name")
-            .authenticationPassword("secretpassw0rd")
-            .authenticationUsername("admin")
-            .brokerUrl("https://broker.example.com")
-            .build())
+        this.serviceBrokers
+            .create(CreateServiceBrokerRequest.builder()
+                .name("service-broker-name")
+                .authenticationPassword("secretpassw0rd")
+                .authenticationUsername("admin")
+                .brokerUrl("https://broker.example.com")
+                .build())
             .as(StepVerifier::create)
             .expectNext(CreateServiceBrokerResponse.builder()
                 .metadata(Metadata.builder()
@@ -94,17 +91,17 @@ public final class ReactorServiceBrokersTest extends AbstractClientApiTest {
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE)
-                .path("/service_brokers/test-service-broker-id")
+                .method(DELETE).path("/service_brokers/test-service-broker-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
                 .build())
             .build());
 
-        this.serviceBrokers.delete(DeleteServiceBrokerRequest.builder()
-            .serviceBrokerId("test-service-broker-id")
-            .build())
+        this.serviceBrokers
+            .delete(DeleteServiceBrokerRequest.builder()
+                .serviceBrokerId("test-service-broker-id")
+                .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -114,8 +111,7 @@ public final class ReactorServiceBrokersTest extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/service_brokers/test-service-broker-id")
+                .method(GET).path("/service_brokers/test-service-broker-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -123,9 +119,10 @@ public final class ReactorServiceBrokersTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.serviceBrokers.get(GetServiceBrokerRequest.builder()
-            .serviceBrokerId("test-service-broker-id")
-            .build())
+        this.serviceBrokers
+            .get(GetServiceBrokerRequest.builder()
+                .serviceBrokerId("test-service-broker-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(GetServiceBrokerResponse.builder()
                 .metadata(Metadata.builder()
@@ -149,8 +146,7 @@ public final class ReactorServiceBrokersTest extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/service_brokers?q=name:test-name&page=-1")
+                .method(GET).path("/service_brokers?q=name:test-name&page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -158,10 +154,11 @@ public final class ReactorServiceBrokersTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.serviceBrokers.list(ListServiceBrokersRequest.builder()
-            .name("test-name")
-            .page(-1)
-            .build())
+        this.serviceBrokers
+            .list(ListServiceBrokersRequest.builder()
+                .name("test-name")
+                .page(-1)
+                .build())
             .as(StepVerifier::create)
             .expectNext(ListServiceBrokersResponse.builder()
                 .totalResults(3)
@@ -213,8 +210,7 @@ public final class ReactorServiceBrokersTest extends AbstractClientApiTest {
     public void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT)
-                .path("/service_brokers/test-service-broker-id")
+                .method(PUT).path("/service_brokers/test-service-broker-id")
                 .payload("fixtures/client/v2/service_brokers/PUT_{id}_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -223,12 +219,13 @@ public final class ReactorServiceBrokersTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.serviceBrokers.update(UpdateServiceBrokerRequest.builder()
-            .authenticationUsername("admin-user")
-            .authenticationPassword("some-secret")
-            .brokerUrl("https://mybroker.example.com")
-            .serviceBrokerId("test-service-broker-id")
-            .build())
+        this.serviceBrokers
+            .update(UpdateServiceBrokerRequest.builder()
+                .authenticationUsername("admin-user")
+                .authenticationPassword("some-secret")
+                .brokerUrl("https://mybroker.example.com")
+                .serviceBrokerId("test-service-broker-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(UpdateServiceBrokerResponse.builder()
                 .metadata(Metadata.builder()

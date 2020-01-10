@@ -45,35 +45,32 @@ public final class ReactorEnvironmentVariableGroups extends AbstractClientV2Oper
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorEnvironmentVariableGroups(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider,
-                                            Map<String, String> requestTags) {
+    public ReactorEnvironmentVariableGroups(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<GetRunningEnvironmentVariablesResponse> getRunningEnvironmentVariables(GetRunningEnvironmentVariablesRequest request) {
-        return get(request, GetRunningEnvironmentVariablesResponse.class,
-            builder -> builder.pathSegment("config", "environment_variable_groups", "running")).checkpoint();
+        return get(request, GetRunningEnvironmentVariablesResponse.class, builder -> builder.pathSegment("config", "environment_variable_groups", "running"))
+            .checkpoint();
     }
 
     @Override
     public Mono<GetStagingEnvironmentVariablesResponse> getStagingEnvironmentVariables(GetStagingEnvironmentVariablesRequest request) {
-        return get(request, GetStagingEnvironmentVariablesResponse.class,
-            builder -> builder.pathSegment("config", "environment_variable_groups", "staging")).checkpoint();
+        return get(request, GetStagingEnvironmentVariablesResponse.class, builder -> builder.pathSegment("config", "environment_variable_groups", "staging"))
+            .checkpoint();
     }
 
     @Override
-    public Mono<UpdateRunningEnvironmentVariablesResponse>
-    updateRunningEnvironmentVariables(UpdateRunningEnvironmentVariablesRequest request) {
-        return put(request, UpdateRunningEnvironmentVariablesResponse.class,
-            builder -> builder.pathSegment("config", "environment_variable_groups", "running")).checkpoint();
+    public Mono<UpdateRunningEnvironmentVariablesResponse> updateRunningEnvironmentVariables(UpdateRunningEnvironmentVariablesRequest request) {
+        return put(request, UpdateRunningEnvironmentVariablesResponse.class, builder -> builder.pathSegment("config", "environment_variable_groups", "running"))
+            .checkpoint();
     }
 
     @Override
-    public Mono<UpdateStagingEnvironmentVariablesResponse>
-    updateStagingEnvironmentVariables(UpdateStagingEnvironmentVariablesRequest request) {
-        return put(request, UpdateStagingEnvironmentVariablesResponse.class,
-            builder -> builder.pathSegment("config", "environment_variable_groups", "staging")).checkpoint();
+    public Mono<UpdateStagingEnvironmentVariablesResponse> updateStagingEnvironmentVariables(UpdateStagingEnvironmentVariablesRequest request) {
+        return put(request, UpdateStagingEnvironmentVariablesResponse.class, builder -> builder.pathSegment("config", "environment_variable_groups", "staging"))
+            .checkpoint();
     }
 
 }

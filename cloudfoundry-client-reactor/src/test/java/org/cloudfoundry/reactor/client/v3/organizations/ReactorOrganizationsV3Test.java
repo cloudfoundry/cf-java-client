@@ -48,17 +48,13 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
 
-    private final ReactorOrganizationsV3 organizations = new ReactorOrganizationsV3(CONNECTION_CONTEXT,
-        this.root,
-        TOKEN_PROVIDER,
-        Collections.emptyMap());
+    private final ReactorOrganizationsV3 organizations = new ReactorOrganizationsV3(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void assignDefaultIsolationSegment() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PATCH)
-                .path("/organizations/test-organization-id/relationships/default_isolation_segment")
+                .method(PATCH).path("/organizations/test-organization-id/relationships/default_isolation_segment")
                 .payload("fixtures/client/v3/organizations/PATCH_{id}_relationships_default_isolation_segment_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -67,12 +63,13 @@ public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.organizations.assignDefaultIsolationSegment(AssignOrganizationDefaultIsolationSegmentRequest.builder()
-            .data(Relationship.builder()
-                .id("[iso-seg-guid]")
+        this.organizations
+            .assignDefaultIsolationSegment(AssignOrganizationDefaultIsolationSegmentRequest.builder()
+                .data(Relationship.builder()
+                    .id("[iso-seg-guid]")
+                    .build())
+                .organizationId("test-organization-id")
                 .build())
-            .organizationId("test-organization-id")
-            .build())
             .as(StepVerifier::create)
             .expectNext(AssignOrganizationDefaultIsolationSegmentResponse.builder()
                 .data(Relationship.builder()
@@ -93,8 +90,7 @@ public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST)
-                .path("/organizations")
+                .method(POST).path("/organizations")
                 .payload("fixtures/client/v3/organizations/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -103,9 +99,10 @@ public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.organizations.create(CreateOrganizationRequest.builder()
-            .name("my-organization")
-            .build())
+        this.organizations
+            .create(CreateOrganizationRequest.builder()
+                .name("my-organization")
+                .build())
             .as(StepVerifier::create)
             .expectNext(CreateOrganizationResponse.builder()
                 .createdAt("2017-02-01T01:33:58Z")
@@ -128,8 +125,7 @@ public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/organizations/24637893-3b77-489d-bb79-8466f0d88b52")
+                .method(GET).path("/organizations/24637893-3b77-489d-bb79-8466f0d88b52")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -137,9 +133,10 @@ public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.organizations.get(GetOrganizationRequest.builder()
-            .organizationId("24637893-3b77-489d-bb79-8466f0d88b52")
-            .build())
+        this.organizations
+            .get(GetOrganizationRequest.builder()
+                .organizationId("24637893-3b77-489d-bb79-8466f0d88b52")
+                .build())
             .as(StepVerifier::create)
             .expectNext(GetOrganizationResponse.builder()
                 .createdAt("2017-02-01T01:33:58Z")
@@ -162,8 +159,7 @@ public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
     public void getDefaultIsolationSegment() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/organizations/test-organization-id/relationships/default_isolation_segment")
+                .method(GET).path("/organizations/test-organization-id/relationships/default_isolation_segment")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -171,9 +167,10 @@ public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.organizations.getDefaultIsolationSegment(GetOrganizationDefaultIsolationSegmentRequest.builder()
-            .organizationId("test-organization-id")
-            .build())
+        this.organizations
+            .getDefaultIsolationSegment(GetOrganizationDefaultIsolationSegmentRequest.builder()
+                .organizationId("test-organization-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(GetOrganizationDefaultIsolationSegmentResponse.builder()
                 .data(Relationship.builder()
@@ -194,8 +191,7 @@ public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/organizations")
+                .method(GET).path("/organizations")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -203,8 +199,9 @@ public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.organizations.list(ListOrganizationsRequest.builder()
-            .build())
+        this.organizations
+            .list(ListOrganizationsRequest.builder()
+                .build())
             .as(StepVerifier::create)
             .expectNext(ListOrganizationsResponse.builder()
                 .pagination(Pagination.builder()

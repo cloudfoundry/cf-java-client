@@ -55,45 +55,45 @@ public final class ReactorBuildpacks extends AbstractClientV2Operations implemen
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorBuildpacks(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider,
-                             Map<String, String> requestTags) {
+    public ReactorBuildpacks(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<CreateBuildpackResponse> create(CreateBuildpackRequest request) {
-        return post(request, CreateBuildpackResponse.class, builder -> builder.pathSegment("buildpacks")).checkpoint();
+        return post(request, CreateBuildpackResponse.class, builder -> builder.pathSegment("buildpacks"))
+            .checkpoint();
     }
 
     @Override
     public Mono<DeleteBuildpackResponse> delete(DeleteBuildpackRequest request) {
-        return delete(request, DeleteBuildpackResponse.class,
-            builder -> builder.pathSegment("buildpacks", request.getBuildpackId())).checkpoint();
+        return delete(request, DeleteBuildpackResponse.class, builder -> builder.pathSegment("buildpacks", request.getBuildpackId()))
+            .checkpoint();
     }
 
     @Override
     public Mono<GetBuildpackResponse> get(GetBuildpackRequest request) {
-        return get(request, GetBuildpackResponse.class,
-            builder -> builder.pathSegment("buildpacks", request.getBuildpackId())).checkpoint();
+        return get(request, GetBuildpackResponse.class, builder -> builder.pathSegment("buildpacks", request.getBuildpackId()))
+            .checkpoint();
     }
 
     @Override
     public Mono<ListBuildpacksResponse> list(ListBuildpacksRequest request) {
-        return get(request, ListBuildpacksResponse.class, builder -> builder.pathSegment("buildpacks")).checkpoint();
+        return get(request, ListBuildpacksResponse.class, builder -> builder.pathSegment("buildpacks"))
+            .checkpoint();
     }
 
     @Override
     public Mono<UpdateBuildpackResponse> update(UpdateBuildpackRequest request) {
-        return put(request, UpdateBuildpackResponse.class,
-            builder -> builder.pathSegment("buildpacks", request.getBuildpackId())).checkpoint();
+        return put(request, UpdateBuildpackResponse.class, builder -> builder.pathSegment("buildpacks", request.getBuildpackId()))
+            .checkpoint();
     }
 
     @Override
     public Mono<UploadBuildpackResponse> upload(UploadBuildpackRequest request) {
         Path buildpack = request.getBuildpack();
 
-        if (buildpack.toFile()
-            .isDirectory()) {
+        if (buildpack.toFile().isDirectory()) {
             return FileUtils.compress(buildpack)
                 .map(temporaryFile -> UploadBuildpackRequest.builder()
                     .from(request)
@@ -114,7 +114,8 @@ public final class ReactorBuildpacks extends AbstractClientV2Operations implemen
 
     private Mono<UploadBuildpackResponse> upload(UploadBuildpackRequest request, String filename, Runnable onTerminate) {
         return put(request, UploadBuildpackResponse.class, builder -> builder.pathSegment("buildpacks", request.getBuildpackId(), "bits"),
-            multipartRequest -> upload(request.getBuildpack(), multipartRequest, filename), onTerminate).checkpoint();
+            multipartRequest -> upload(request.getBuildpack(), multipartRequest, filename), onTerminate)
+            .checkpoint();
     }
 
     private void upload(Path buildpack, MultipartHttpClientRequest multipartRequest, String filename) {

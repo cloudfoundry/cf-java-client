@@ -28,8 +28,7 @@ public final class CustomRequestTagTest extends AbstractRestTest {
     public void addCustomHttpHeader() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/")
+                .method(GET).path("/")
                 .header(CUSTOM_REQUEST_TAG_NAME, CUSTOM_REQUEST_TAG_VALUE)
                 .build())
             .response(TestResponse.builder()
@@ -37,10 +36,11 @@ public final class CustomRequestTagTest extends AbstractRestTest {
                 .build())
             .build());
 
-        createOperator().flatMap(operator -> operator.get()
-            .uri(uri -> uri.path("/"))
-            .response()
-            .get())
+        createOperator()
+            .flatMap(operator -> operator.get()
+                .uri(uri -> uri.path("/"))
+                .response()
+                .get())
             .as(StepVerifier::create)
             .expectNextMatches(httpClientResponse -> httpClientResponse.status()
                 .equals(OK))
@@ -50,14 +50,12 @@ public final class CustomRequestTagTest extends AbstractRestTest {
     }
 
     private Mono<Operator> createOperator() {
-        return new AbstractReactorOperations(connectionContext,
-            root,
-            TOKEN_PROVIDER,
-            Collections.singletonMap(CUSTOM_REQUEST_TAG_NAME, CUSTOM_REQUEST_TAG_VALUE)) {
+        return new AbstractReactorOperations(this.connectionContext, this.root, TOKEN_PROVIDER, Collections.singletonMap(CUSTOM_REQUEST_TAG_NAME, CUSTOM_REQUEST_TAG_VALUE)) {
 
-            public Mono<Operator> getOperator() {
+            private Mono<Operator> getOperator() {
                 return createOperator();
             }
+
         }.getOperator();
     }
 

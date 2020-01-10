@@ -58,17 +58,13 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorSpaceQuotaDefinitionsTest extends AbstractClientApiTest {
 
-    private final ReactorSpaceQuotaDefinitions spaceQuotaDefinitions = new ReactorSpaceQuotaDefinitions(CONNECTION_CONTEXT,
-        this.root,
-        TOKEN_PROVIDER,
-        Collections.emptyMap());
+    private final ReactorSpaceQuotaDefinitions spaceQuotaDefinitions = new ReactorSpaceQuotaDefinitions(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void associateSpace() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT)
-                .path("/space_quota_definitions/test-space-quota-definition-id/spaces/test-space-id")
+                .method(PUT).path("/space_quota_definitions/test-space-quota-definition-id/spaces/test-space-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -76,10 +72,11 @@ public final class ReactorSpaceQuotaDefinitionsTest extends AbstractClientApiTes
                 .build())
             .build());
 
-        this.spaceQuotaDefinitions.associateSpace(AssociateSpaceQuotaDefinitionRequest.builder()
-            .spaceId("test-space-id")
-            .spaceQuotaDefinitionId("test-space-quota-definition-id")
-            .build())
+        this.spaceQuotaDefinitions
+            .associateSpace(AssociateSpaceQuotaDefinitionRequest.builder()
+                .spaceId("test-space-id")
+                .spaceQuotaDefinitionId("test-space-quota-definition-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(AssociateSpaceQuotaDefinitionResponse.builder()
                 .metadata(Metadata.builder()
@@ -108,8 +105,7 @@ public final class ReactorSpaceQuotaDefinitionsTest extends AbstractClientApiTes
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST)
-                .path("/space_quota_definitions")
+                .method(POST).path("/space_quota_definitions")
                 .payload("fixtures/client/v2/space_quota_definitions/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -118,15 +114,16 @@ public final class ReactorSpaceQuotaDefinitionsTest extends AbstractClientApiTes
                 .build())
             .build());
 
-        this.spaceQuotaDefinitions.create(CreateSpaceQuotaDefinitionRequest.builder()
-            .name("gold_quota")
-            .nonBasicServicesAllowed(true)
-            .totalServices(-1)
-            .totalRoutes(10)
-            .memoryLimit(5120)
-            .organizationId("c9b4ac17-ab4b-4368-b3e2-5cbf09b17a24")
-            .totalReservedRoutePorts(5)
-            .build())
+        this.spaceQuotaDefinitions
+            .create(CreateSpaceQuotaDefinitionRequest.builder()
+                .name("gold_quota")
+                .nonBasicServicesAllowed(true)
+                .totalServices(-1)
+                .totalRoutes(10)
+                .memoryLimit(5120)
+                .organizationId("c9b4ac17-ab4b-4368-b3e2-5cbf09b17a24")
+                .totalReservedRoutePorts(5)
+                .build())
             .as(StepVerifier::create)
             .expectNext(CreateSpaceQuotaDefinitionResponse.builder()
                 .metadata(Metadata.builder()
@@ -158,17 +155,17 @@ public final class ReactorSpaceQuotaDefinitionsTest extends AbstractClientApiTes
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE)
-                .path("/space_quota_definitions/test-space-quota-definition-id")
+                .method(DELETE).path("/space_quota_definitions/test-space-quota-definition-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
                 .build())
             .build());
 
-        this.spaceQuotaDefinitions.delete(DeleteSpaceQuotaDefinitionRequest.builder()
-            .spaceQuotaDefinitionId("test-space-quota-definition-id")
-            .build())
+        this.spaceQuotaDefinitions
+            .delete(DeleteSpaceQuotaDefinitionRequest.builder()
+                .spaceQuotaDefinitionId("test-space-quota-definition-id")
+                .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -178,8 +175,7 @@ public final class ReactorSpaceQuotaDefinitionsTest extends AbstractClientApiTes
     public void deleteAsync() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE)
-                .path("/space_quota_definitions/test-space-quota-definition-id?async=true")
+                .method(DELETE).path("/space_quota_definitions/test-space-quota-definition-id?async=true")
                 .build())
             .response(TestResponse.builder()
                 .status(ACCEPTED)
@@ -187,10 +183,11 @@ public final class ReactorSpaceQuotaDefinitionsTest extends AbstractClientApiTes
                 .build())
             .build());
 
-        this.spaceQuotaDefinitions.delete(DeleteSpaceQuotaDefinitionRequest.builder()
-            .spaceQuotaDefinitionId("test-space-quota-definition-id")
-            .async(true)
-            .build())
+        this.spaceQuotaDefinitions
+            .delete(DeleteSpaceQuotaDefinitionRequest.builder()
+                .spaceQuotaDefinitionId("test-space-quota-definition-id")
+                .async(true)
+                .build())
             .as(StepVerifier::create)
             .expectNext(DeleteSpaceQuotaDefinitionResponse.builder()
                 .metadata(Metadata.builder()
@@ -211,8 +208,7 @@ public final class ReactorSpaceQuotaDefinitionsTest extends AbstractClientApiTes
     public void getSpaceQuotaDefinition() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/space_quota_definitions/test-space-quota-definition-id")
+                .method(GET).path("/space_quota_definitions/test-space-quota-definition-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -220,9 +216,10 @@ public final class ReactorSpaceQuotaDefinitionsTest extends AbstractClientApiTes
                 .build())
             .build());
 
-        this.spaceQuotaDefinitions.get(GetSpaceQuotaDefinitionRequest.builder()
-            .spaceQuotaDefinitionId("test-space-quota-definition-id")
-            .build())
+        this.spaceQuotaDefinitions
+            .get(GetSpaceQuotaDefinitionRequest.builder()
+                .spaceQuotaDefinitionId("test-space-quota-definition-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(GetSpaceQuotaDefinitionResponse.builder()
                 .metadata(Metadata.builder()
@@ -251,8 +248,7 @@ public final class ReactorSpaceQuotaDefinitionsTest extends AbstractClientApiTes
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/space_quota_definitions?page=-1")
+                .method(GET).path("/space_quota_definitions?page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -260,9 +256,10 @@ public final class ReactorSpaceQuotaDefinitionsTest extends AbstractClientApiTes
                 .build())
             .build());
 
-        this.spaceQuotaDefinitions.list(ListSpaceQuotaDefinitionsRequest.builder()
-            .page(-1)
-            .build())
+        this.spaceQuotaDefinitions
+            .list(ListSpaceQuotaDefinitionsRequest.builder()
+                .page(-1)
+                .build())
             .as(StepVerifier::create)
             .expectNext(ListSpaceQuotaDefinitionsResponse.builder()
                 .totalResults(1)
@@ -282,7 +279,8 @@ public final class ReactorSpaceQuotaDefinitionsTest extends AbstractClientApiTes
                         .memoryLimit(20480)
                         .instanceMemoryLimit(-1)
                         .organizationUrl("/v2/organizations/a81d5218-b473-474e-9afb-3223a8b2ae9f")
-                        .spacesUrl("/v2/space_quota_definitions/be2d5c01-3413-43db-bea2-49b0b60ec74d/spaces")
+                        .spacesUrl
+                            ("/v2/space_quota_definitions/be2d5c01-3413-43db-bea2-49b0b60ec74d/spaces")
                         .build())
                     .build())
                 .build())
@@ -294,8 +292,7 @@ public final class ReactorSpaceQuotaDefinitionsTest extends AbstractClientApiTes
     public void listSpaces() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/space_quota_definitions/e37cdd97-af56-4417-a99d-060093057275/spaces")
+                .method(GET).path("/space_quota_definitions/e37cdd97-af56-4417-a99d-060093057275/spaces")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -303,9 +300,10 @@ public final class ReactorSpaceQuotaDefinitionsTest extends AbstractClientApiTes
                 .build())
             .build());
 
-        this.spaceQuotaDefinitions.listSpaces(ListSpaceQuotaDefinitionSpacesRequest.builder()
-            .spaceQuotaDefinitionId("e37cdd97-af56-4417-a99d-060093057275")
-            .build())
+        this.spaceQuotaDefinitions
+            .listSpaces(ListSpaceQuotaDefinitionSpacesRequest.builder()
+                .spaceQuotaDefinitionId("e37cdd97-af56-4417-a99d-060093057275")
+                .build())
             .as(StepVerifier::create)
             .expectNext(ListSpaceQuotaDefinitionSpacesResponse.builder()
                 .totalResults(1)
@@ -346,18 +344,18 @@ public final class ReactorSpaceQuotaDefinitionsTest extends AbstractClientApiTes
     public void removeSpace() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE)
-                .path("/space_quota_definitions/test-space-quota-definition-id/spaces/test-space-id")
+                .method(DELETE).path("/space_quota_definitions/test-space-quota-definition-id/spaces/test-space-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
                 .build())
             .build());
 
-        this.spaceQuotaDefinitions.removeSpace(RemoveSpaceQuotaDefinitionRequest.builder()
-            .spaceId("test-space-id")
-            .spaceQuotaDefinitionId("test-space-quota-definition-id")
-            .build())
+        this.spaceQuotaDefinitions
+            .removeSpace(RemoveSpaceQuotaDefinitionRequest.builder()
+                .spaceId("test-space-id")
+                .spaceQuotaDefinitionId("test-space-quota-definition-id")
+                .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -367,8 +365,7 @@ public final class ReactorSpaceQuotaDefinitionsTest extends AbstractClientApiTes
     public void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT)
-                .path("/space_quota_definitions/bbd837ac-309d-4f53-9d49-67cb75364904")
+                .method(PUT).path("/space_quota_definitions/bbd837ac-309d-4f53-9d49-67cb75364904")
                 .payload("fixtures/client/v2/space_quota_definitions/PUT_{id}_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -377,10 +374,11 @@ public final class ReactorSpaceQuotaDefinitionsTest extends AbstractClientApiTes
                 .build())
             .build());
 
-        this.spaceQuotaDefinitions.update(UpdateSpaceQuotaDefinitionRequest.builder()
-            .name("new_name")
-            .spaceQuotaDefinitionId("bbd837ac-309d-4f53-9d49-67cb75364904")
-            .build())
+        this.spaceQuotaDefinitions
+            .update(UpdateSpaceQuotaDefinitionRequest.builder()
+                .name("new_name")
+                .spaceQuotaDefinitionId("bbd837ac-309d-4f53-9d49-67cb75364904")
+                .build())
             .as(StepVerifier::create)
             .expectNext(UpdateSpaceQuotaDefinitionResponse.builder()
                 .metadata(Metadata.builder()

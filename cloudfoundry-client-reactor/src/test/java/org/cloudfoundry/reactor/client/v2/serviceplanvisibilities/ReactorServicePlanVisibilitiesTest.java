@@ -52,17 +52,13 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorServicePlanVisibilitiesTest extends AbstractClientApiTest {
 
-    private final ServicePlanVisibilities servicePlanVisibilities = new ReactorServicePlanVisibilities(CONNECTION_CONTEXT,
-        this.root,
-        TOKEN_PROVIDER,
-        Collections.emptyMap());
+    private final ServicePlanVisibilities servicePlanVisibilities = new ReactorServicePlanVisibilities(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST)
-                .path("/service_plan_visibilities")
+                .method(POST).path("/service_plan_visibilities")
                 .payload("fixtures/client/v2/service_plan_visibilities/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -71,10 +67,11 @@ public final class ReactorServicePlanVisibilitiesTest extends AbstractClientApiT
                 .build())
             .build());
 
-        this.servicePlanVisibilities.create(CreateServicePlanVisibilityRequest.builder()
-            .organizationId("09be17a1-0cc6-4edb-955c-cf2a2ae85470")
-            .servicePlanId("43f5496b-9117-404a-a637-eb38141b05af")
-            .build())
+        this.servicePlanVisibilities
+            .create(CreateServicePlanVisibilityRequest.builder()
+                .organizationId("09be17a1-0cc6-4edb-955c-cf2a2ae85470")
+                .servicePlanId("43f5496b-9117-404a-a637-eb38141b05af")
+                .build())
             .as(StepVerifier::create)
             .expectNext(CreateServicePlanVisibilityResponse.builder()
                 .metadata(Metadata.builder()
@@ -97,17 +94,17 @@ public final class ReactorServicePlanVisibilitiesTest extends AbstractClientApiT
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE)
-                .path("/service_plan_visibilities/test-service-plan-visibility-id")
+                .method(DELETE).path("/service_plan_visibilities/test-service-plan-visibility-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
                 .build())
             .build());
 
-        this.servicePlanVisibilities.delete(DeleteServicePlanVisibilityRequest.builder()
-            .servicePlanVisibilityId("test-service-plan-visibility-id")
-            .build())
+        this.servicePlanVisibilities
+            .delete(DeleteServicePlanVisibilityRequest.builder()
+                .servicePlanVisibilityId("test-service-plan-visibility-id")
+                .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -117,8 +114,7 @@ public final class ReactorServicePlanVisibilitiesTest extends AbstractClientApiT
     public void deleteAsync() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE)
-                .path("/service_plan_visibilities/test-service-plan-visibility-id?async=true")
+                .method(DELETE).path("/service_plan_visibilities/test-service-plan-visibility-id?async=true")
                 .build())
             .response(TestResponse.builder()
                 .status(ACCEPTED)
@@ -126,10 +122,11 @@ public final class ReactorServicePlanVisibilitiesTest extends AbstractClientApiT
                 .build())
             .build());
 
-        this.servicePlanVisibilities.delete(DeleteServicePlanVisibilityRequest.builder()
-            .async(true)
-            .servicePlanVisibilityId("test-service-plan-visibility-id")
-            .build())
+        this.servicePlanVisibilities
+            .delete(DeleteServicePlanVisibilityRequest.builder()
+                .async(true)
+                .servicePlanVisibilityId("test-service-plan-visibility-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(DeleteServicePlanVisibilityResponse.builder()
                 .metadata(Metadata.builder()
@@ -150,8 +147,7 @@ public final class ReactorServicePlanVisibilitiesTest extends AbstractClientApiT
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/service_plan_visibilities/test-service-plan-visibility-id")
+                .method(GET).path("/service_plan_visibilities/test-service-plan-visibility-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -159,9 +155,10 @@ public final class ReactorServicePlanVisibilitiesTest extends AbstractClientApiT
                 .build())
             .build());
 
-        this.servicePlanVisibilities.get(GetServicePlanVisibilityRequest.builder()
-            .servicePlanVisibilityId("test-service-plan-visibility-id")
-            .build())
+        this.servicePlanVisibilities
+            .get(GetServicePlanVisibilityRequest.builder()
+                .servicePlanVisibilityId("test-service-plan-visibility-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(GetServicePlanVisibilityResponse.builder()
                 .metadata(Metadata.builder()
@@ -184,8 +181,7 @@ public final class ReactorServicePlanVisibilitiesTest extends AbstractClientApiT
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/service_plan_visibilities?q=organization_guid:test-organization-id&page=-1")
+                .method(GET).path("/service_plan_visibilities?q=organization_guid:test-organization-id&page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -193,10 +189,11 @@ public final class ReactorServicePlanVisibilitiesTest extends AbstractClientApiT
                 .build())
             .build());
 
-        this.servicePlanVisibilities.list(ListServicePlanVisibilitiesRequest.builder()
-            .organizationId("test-organization-id")
-            .page(-1)
-            .build())
+        this.servicePlanVisibilities
+            .list(ListServicePlanVisibilitiesRequest.builder()
+                .organizationId("test-organization-id")
+                .page(-1)
+                .build())
             .as(StepVerifier::create)
             .expectNext(ListServicePlanVisibilitiesResponse.builder()
                 .totalPages(1)
@@ -223,8 +220,7 @@ public final class ReactorServicePlanVisibilitiesTest extends AbstractClientApiT
     public void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT)
-                .path("/service_plan_visibilities/test-service-plan-visibility-id")
+                .method(PUT).path("/service_plan_visibilities/test-service-plan-visibility-id")
                 .payload("fixtures/client/v2/service_plan_visibilities/PUT_{id}_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -233,11 +229,12 @@ public final class ReactorServicePlanVisibilitiesTest extends AbstractClientApiT
                 .build())
             .build());
 
-        this.servicePlanVisibilities.update(UpdateServicePlanVisibilityRequest.builder()
-            .organizationId("e4d0b68b-9e73-4253-b03f-2bfda6cd814b")
-            .servicePlanId("7288464d-3866-436a-915c-2bada4725e7e")
-            .servicePlanVisibilityId("test-service-plan-visibility-id")
-            .build())
+        this.servicePlanVisibilities
+            .update(UpdateServicePlanVisibilityRequest.builder()
+                .organizationId("e4d0b68b-9e73-4253-b03f-2bfda6cd814b")
+                .servicePlanId("7288464d-3866-436a-915c-2bada4725e7e")
+                .servicePlanVisibilityId("test-service-plan-visibility-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(UpdateServicePlanVisibilityResponse.builder()
                 .metadata(Metadata.builder()
@@ -256,5 +253,6 @@ public final class ReactorServicePlanVisibilitiesTest extends AbstractClientApiT
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
+
 
 }

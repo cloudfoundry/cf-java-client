@@ -66,10 +66,7 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorIdentityZonesTest extends AbstractUaaApiTest {
 
-    private final ReactorIdentityZones identityZones = new ReactorIdentityZones(CONNECTION_CONTEXT,
-        this.root,
-        TOKEN_PROVIDER,
-        Collections.emptyMap());
+    private final ReactorIdentityZones identityZones = new ReactorIdentityZones(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void create() {
@@ -88,9 +85,7 @@ public final class ReactorIdentityZonesTest extends AbstractUaaApiTest {
                 .jwtRevocable(false)
                 .refreshTokenUnique(false)
                 .refreshTokenFormat(RefreshTokenFormat.JWT)
-                .key("exampleKeyId",
-                    Collections.singletonMap("signingKey",
-                        "s1gNiNg.K3y/t3XT"))
+                .key("exampleKeyId", Collections.singletonMap("signingKey", "s1gNiNg.K3y/t3XT"))
                 .build())
             .samlConfiguration(SamlConfiguration.builder()
                 .assertionSigned(true)
@@ -99,40 +94,37 @@ public final class ReactorIdentityZonesTest extends AbstractUaaApiTest {
                 .wantPartnerAuthenticationRequestSigned(false)
                 .assertionTimeToLive(600)
                 .activeKeyId("legacy-saml-key")
-                .key("legacy-saml-key",
-                    Key.builder()
-                        .key("-----BEGIN RSA PRIVATE KEY-----\nMIIBOwIBAAJBAJv8ZpB5hEK7qxP9K3v43hUS5fGT4waKe7ix4Z4mu5UBv+cw7WSF\nAt0Vaag0sAbsPzU8Hhsrj/qPABvfB8asUwcCAwEAAQJAG0r3ezH35WFG1tGGaUOr"
-                            + "\nQA61cyaII53ZdgCR1IU8bx7AUevmkFtBf+aqMWusWVOWJvGu2r5VpHVAIl8nF6DS\nkQIhAMjEJ3zVYa2/Mo4ey+iU9J9Vd+WoyXDQD4EEtwmyG1PpAiEAxuZlvhDIbbce\n7o5BvOhnCZ2N7kYb1ZC57g3F"
-                            + "+cbJyW8CIQCbsDGHBto2qJyFxbAO7uQ8Y0UVHa0J\nBO/g900SAcJbcQIgRtEljIShOB8pDjrsQPxmI1BLhnjD1EhRSubwhDw5AFUCIQCN\nA24pDtdOHydwtSB5+zFqFLfmVZplQM/g5kb4so70Yw==\n-----END RSA "
-                            + "PRIVATE KEY-----\n")
-                        .passphrase("password")
-                        .certificate("-----BEGIN CERTIFICATE-----\nMIICEjCCAXsCAg36MA0GCSqGSIb3DQEBBQUAMIGbMQswCQYDVQQGEwJKUDEOMAwG\nA1UECBMFVG9reW8xEDAOBgNVBAcTB0NodW8ta3UxETAPBgNVBAoTCEZyYW5rNERE"
-                            + "\nMRgwFgYDVQQLEw9XZWJDZXJ0IFN1cHBvcnQxGDAWBgNVBAMTD0ZyYW5rNEREIFdl\nYiBDQTEjMCEGCSqGSIb3DQEJARYUc3VwcG9ydEBmcmFuazRkZC5jb20wHhcNMTIw"
-                            + "\nODIyMDUyNjU0WhcNMTcwODIxMDUyNjU0WjBKMQswCQYDVQQGEwJKUDEOMAwGA1UE\nCAwFVG9reW8xETAPBgNVBAoMCEZyYW5rNEREMRgwFgYDVQQDDA93d3cuZXhhbXBs"
-                            + "\nZS5jb20wXDANBgkqhkiG9w0BAQEFAANLADBIAkEAm/xmkHmEQrurE/0re/jeFRLl\n8ZPjBop7uLHhnia7lQG/5zDtZIUC3RVpqDSwBuw/NTweGyuP+o8AG98HxqxTBwID"
-                            + "\nAQABMA0GCSqGSIb3DQEBBQUAA4GBABS2TLuBeTPmcaTaUW/LCB2NYOy8GMdzR1mx\n8iBIu2H6/E2tiY3RIevV2OW61qY2/XRQg7YPxx3ffeUugX9F4J/iPnnu1zAxxyBy"
-                            + "\n2VguKv4SWjRFoRkIfIlHX0qVviMhSlNy2ioFLy7JcPZb+v3ftDGywUqcBiVDoea0\nHn+GmxZA\n-----END CERTIFICATE-----\n")
-                        .build())
+                .key("legacy-saml-key", Key.builder()
+                    .key("-----BEGIN RSA PRIVATE KEY-----\nMIIBOwIBAAJBAJv8ZpB5hEK7qxP9K3v43hUS5fGT4waKe7ix4Z4mu5UBv+cw7WSF\nAt0Vaag0sAbsPzU8Hhsrj/qPABvfB8asUwcCAwEAAQJAG0r3ezH35WFG1tGGaUOr" +
+                        "\nQA61cyaII53ZdgCR1IU8bx7AUevmkFtBf+aqMWusWVOWJvGu2r5VpHVAIl8nF6DS\nkQIhAMjEJ3zVYa2/Mo4ey+iU9J9Vd+WoyXDQD4EEtwmyG1PpAiEAxuZlvhDIbbce\n7o5BvOhnCZ2N7kYb1ZC57g3F" +
+                        "+cbJyW8CIQCbsDGHBto2qJyFxbAO7uQ8Y0UVHa0J\nBO/g900SAcJbcQIgRtEljIShOB8pDjrsQPxmI1BLhnjD1EhRSubwhDw5AFUCIQCN\nA24pDtdOHydwtSB5+zFqFLfmVZplQM/g5kb4so70Yw==\n-----END RSA " +
+                        "PRIVATE KEY-----\n")
+                    .passphrase("password")
+                    .certificate("-----BEGIN CERTIFICATE-----\nMIICEjCCAXsCAg36MA0GCSqGSIb3DQEBBQUAMIGbMQswCQYDVQQGEwJKUDEOMAwG\nA1UECBMFVG9reW8xEDAOBgNVBAcTB0NodW8ta3UxETAPBgNVBAoTCEZyYW5rNERE" +
+                        "\nMRgwFgYDVQQLEw9XZWJDZXJ0IFN1cHBvcnQxGDAWBgNVBAMTD0ZyYW5rNEREIFdl\nYiBDQTEjMCEGCSqGSIb3DQEJARYUc3VwcG9ydEBmcmFuazRkZC5jb20wHhcNMTIw" +
+                        "\nODIyMDUyNjU0WhcNMTcwODIxMDUyNjU0WjBKMQswCQYDVQQGEwJKUDEOMAwGA1UE\nCAwFVG9reW8xETAPBgNVBAoMCEZyYW5rNEREMRgwFgYDVQQDDA93d3cuZXhhbXBs" +
+                        "\nZS5jb20wXDANBgkqhkiG9w0BAQEFAANLADBIAkEAm/xmkHmEQrurE/0re/jeFRLl\n8ZPjBop7uLHhnia7lQG/5zDtZIUC3RVpqDSwBuw/NTweGyuP+o8AG98HxqxTBwID" +
+                        "\nAQABMA0GCSqGSIb3DQEBBQUAA4GBABS2TLuBeTPmcaTaUW/LCB2NYOy8GMdzR1mx\n8iBIu2H6/E2tiY3RIevV2OW61qY2/XRQg7YPxx3ffeUugX9F4J/iPnnu1zAxxyBy" +
+                        "\n2VguKv4SWjRFoRkIfIlHX0qVviMhSlNy2ioFLy7JcPZb+v3ftDGywUqcBiVDoea0\nHn+GmxZA\n-----END CERTIFICATE-----\n")
+                    .build())
                 .entityId("cloudfoundry-saml-login")
                 .disableInResponseToCheck(false)
-                .privateKey("-----BEGIN RSA PRIVATE KEY-----\nMIIBOwIBAAJBAJv8ZpB5hEK7qxP9K3v43hUS5fGT4waKe7ix4Z4mu5UBv+cw7WSF\nAt0Vaag0sAbsPzU8Hhsrj/qPABvfB8asUwcCAwEAAQJAG0r3ezH35WFG1tGGaUOr"
-                    + "\nQA61cyaII53ZdgCR1IU8bx7AUevmkFtBf+aqMWusWVOWJvGu2r5VpHVAIl8nF6DS\nkQIhAMjEJ3zVYa2/Mo4ey+iU9J9Vd+WoyXDQD4EEtwmyG1PpAiEAxuZlvhDIbbce\n7o5BvOhnCZ2N7kYb1ZC57g3F"
-                    + "+cbJyW8CIQCbsDGHBto2qJyFxbAO7uQ8Y0UVHa0J\nBO/g900SAcJbcQIgRtEljIShOB8pDjrsQPxmI1BLhnjD1EhRSubwhDw5AFUCIQCN\nA24pDtdOHydwtSB5+zFqFLfmVZplQM/g5kb4so70Yw==\n-----END RSA PRIVATE "
-                    + "KEY-----\n")
+                .privateKey("-----BEGIN RSA PRIVATE KEY-----\nMIIBOwIBAAJBAJv8ZpB5hEK7qxP9K3v43hUS5fGT4waKe7ix4Z4mu5UBv+cw7WSF\nAt0Vaag0sAbsPzU8Hhsrj/qPABvfB8asUwcCAwEAAQJAG0r3ezH35WFG1tGGaUOr" +
+                    "\nQA61cyaII53ZdgCR1IU8bx7AUevmkFtBf+aqMWusWVOWJvGu2r5VpHVAIl8nF6DS\nkQIhAMjEJ3zVYa2/Mo4ey+iU9J9Vd+WoyXDQD4EEtwmyG1PpAiEAxuZlvhDIbbce\n7o5BvOhnCZ2N7kYb1ZC57g3F" +
+                    "+cbJyW8CIQCbsDGHBto2qJyFxbAO7uQ8Y0UVHa0J\nBO/g900SAcJbcQIgRtEljIShOB8pDjrsQPxmI1BLhnjD1EhRSubwhDw5AFUCIQCN\nA24pDtdOHydwtSB5+zFqFLfmVZplQM/g5kb4so70Yw==\n-----END RSA PRIVATE " +
+                    "KEY-----\n")
                 .privateKeyPassword("password")
-                .certificate("-----BEGIN CERTIFICATE-----\nMIICEjCCAXsCAg36MA0GCSqGSIb3DQEBBQUAMIGbMQswCQYDVQQGEwJKUDEOMAwG\nA1UECBMFVG9reW8xEDAOBgNVBAcTB0NodW8ta3UxETAPBgNVBAoTCEZyYW5rNERE"
-                    + "\nMRgwFgYDVQQLEw9XZWJDZXJ0IFN1cHBvcnQxGDAWBgNVBAMTD0ZyYW5rNEREIFdl\nYiBDQTEjMCEGCSqGSIb3DQEJARYUc3VwcG9ydEBmcmFuazRkZC5jb20wHhcNMTIw"
-                    + "\nODIyMDUyNjU0WhcNMTcwODIxMDUyNjU0WjBKMQswCQYDVQQGEwJKUDEOMAwGA1UE\nCAwFVG9reW8xETAPBgNVBAoMCEZyYW5rNEREMRgwFgYDVQQDDA93d3cuZXhhbXBs\nZS5jb20wXDANBgkqhkiG9w0BAQEFAANLADBIAkEAm"
-                    + "/xmkHmEQrurE/0re/jeFRLl\n8ZPjBop7uLHhnia7lQG/5zDtZIUC3RVpqDSwBuw/NTweGyuP+o8AG98HxqxTBwID\nAQABMA0GCSqGSIb3DQEBBQUAA4GBABS2TLuBeTPmcaTaUW/LCB2NYOy8GMdzR1mx\n8iBIu2H6"
-                    + "/E2tiY3RIevV2OW61qY2/XRQg7YPxx3ffeUugX9F4J/iPnnu1zAxxyBy\n2VguKv4SWjRFoRkIfIlHX0qVviMhSlNy2ioFLy7JcPZb+v3ftDGywUqcBiVDoea0\nHn+GmxZA\n-----END CERTIFICATE-----\n")
+                .certificate("-----BEGIN CERTIFICATE-----\nMIICEjCCAXsCAg36MA0GCSqGSIb3DQEBBQUAMIGbMQswCQYDVQQGEwJKUDEOMAwG\nA1UECBMFVG9reW8xEDAOBgNVBAcTB0NodW8ta3UxETAPBgNVBAoTCEZyYW5rNERE" +
+                    "\nMRgwFgYDVQQLEw9XZWJDZXJ0IFN1cHBvcnQxGDAWBgNVBAMTD0ZyYW5rNEREIFdl\nYiBDQTEjMCEGCSqGSIb3DQEJARYUc3VwcG9ydEBmcmFuazRkZC5jb20wHhcNMTIw" +
+                    "\nODIyMDUyNjU0WhcNMTcwODIxMDUyNjU0WjBKMQswCQYDVQQGEwJKUDEOMAwGA1UE\nCAwFVG9reW8xETAPBgNVBAoMCEZyYW5rNEREMRgwFgYDVQQDDA93d3cuZXhhbXBs\nZS5jb20wXDANBgkqhkiG9w0BAQEFAANLADBIAkEAm" +
+                    "/xmkHmEQrurE/0re/jeFRLl\n8ZPjBop7uLHhnia7lQG/5zDtZIUC3RVpqDSwBuw/NTweGyuP+o8AG98HxqxTBwID\nAQABMA0GCSqGSIb3DQEBBQUAA4GBABS2TLuBeTPmcaTaUW/LCB2NYOy8GMdzR1mx\n8iBIu2H6" +
+                    "/E2tiY3RIevV2OW61qY2/XRQg7YPxx3ffeUugX9F4J/iPnnu1zAxxyBy\n2VguKv4SWjRFoRkIfIlHX0qVviMhSlNy2ioFLy7JcPZb+v3ftDGywUqcBiVDoea0\nHn+GmxZA\n-----END CERTIFICATE-----\n")
                 .build())
             .corsPolicy(CorsPolicy.builder()
                 .xhrConfiguration(CorsConfiguration.builder()
                     .allowedOrigin(".*")
                     .allowedUri(".*")
-                    .allowedHeaders("Accept",
-                        "Authorization",
-                        "Content-Type")
+                    .allowedHeaders("Accept", "Authorization", "Content-Type")
                     .allowedMethod("GET")
                     .allowedCredentials(false)
                     .maxAge(1728000L)
@@ -140,9 +132,7 @@ public final class ReactorIdentityZonesTest extends AbstractUaaApiTest {
                 .defaultConfiguration(CorsConfiguration.builder()
                     .allowedOrigin(".*")
                     .allowedUri(".*")
-                    .allowedHeaders("Accept",
-                        "Authorization",
-                        "Content-Type")
+                    .allowedHeaders("Accept", "Authorization", "Content-Type")
                     .allowedMethod("GET")
                     .allowedCredentials(false)
                     .maxAge(1728000L)
@@ -180,8 +170,7 @@ public final class ReactorIdentityZonesTest extends AbstractUaaApiTest {
                 .productLogo("VGVzdFByb2R1Y3RMb2dv")
                 .squareLogo("VGVzdFNxdWFyZUxvZ28=")
                 .footerLegalText("Test footer legal text")
-                .footerLink("Support",
-                    "http://support.example.com")
+                .footerLink("Support", "http://support.example.com")
                 .banner(Banner.builder()
                     .logo("VGVzdFByb2R1Y3RMb2dv")
                     .text("Announcement")
@@ -192,13 +181,7 @@ public final class ReactorIdentityZonesTest extends AbstractUaaApiTest {
                 .build())
             .accountChooserEnabled(false)
             .userConfig(UserConfig.builder()
-                .defaultGroups("openid",
-                    "password.write",
-                    "uaa.user",
-                    "approvals.me",
-                    "profile", "roles",
-                    "user_attributes",
-                    "uaa.offline_token")
+                .defaultGroups("openid", "password.write", "uaa.user", "approvals.me", "profile", "roles", "user_attributes", "uaa.offline_token")
                 .build())
             .mfaConfig(MfaConfig.builder()
                 .enabled(false)
@@ -207,8 +190,7 @@ public final class ReactorIdentityZonesTest extends AbstractUaaApiTest {
 
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST)
-                .path("/identity-zones")
+                .method(POST).path("/identity-zones")
                 .payload("fixtures/uaa/identity-zones/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -217,16 +199,17 @@ public final class ReactorIdentityZonesTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.identityZones.create(CreateIdentityZoneRequest.builder()
-            .identityZoneId("twiglet-create")
-            .subdomain("twiglet-create")
-            .configuration(testConfiguration)
-            .name("The Twiglet Zone")
-            .version(0)
-            .description("Like the Twilight Zone but tastier.")
-            .createdAt(1512452533738L)
-            .lastModified(1512452533738L)
-            .build())
+        this.identityZones
+            .create(CreateIdentityZoneRequest.builder()
+                .identityZoneId("twiglet-create")
+                .subdomain("twiglet-create")
+                .configuration(testConfiguration)
+                .name("The Twiglet Zone")
+                .version(0)
+                .description("Like the Twilight Zone but tastier.")
+                .createdAt(1512452533738L)
+                .lastModified(1512452533738L)
+                .build())
             .as(StepVerifier::create)
             .expectNext(CreateIdentityZoneResponse.builder()
                 .id("twiglet-create")
@@ -246,8 +229,7 @@ public final class ReactorIdentityZonesTest extends AbstractUaaApiTest {
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE)
-                .path("/identity-zones/twiglet-delete")
+                .method(DELETE).path("/identity-zones/twiglet-delete")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -255,9 +237,10 @@ public final class ReactorIdentityZonesTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.identityZones.delete(DeleteIdentityZoneRequest.builder()
-            .identityZoneId("twiglet-delete")
-            .build())
+        this.identityZones
+            .delete(DeleteIdentityZoneRequest.builder()
+                .identityZoneId("twiglet-delete")
+                .build())
             .as(StepVerifier::create)
             .expectNext(DeleteIdentityZoneResponse.builder()
                 .id("twiglet-delete")
@@ -337,8 +320,7 @@ public final class ReactorIdentityZonesTest extends AbstractUaaApiTest {
                         .productLogo("VGVzdFByb2R1Y3RMb2dv")
                         .squareLogo("VGVzdFNxdWFyZUxvZ28=")
                         .footerLegalText("Test footer legal text")
-                        .footerLink("Support",
-                            "http://support.example.com")
+                        .footerLink("Support", "http://support.example.com")
                         .build())
                     .accountChooserEnabled(false)
                     .build())
@@ -355,8 +337,7 @@ public final class ReactorIdentityZonesTest extends AbstractUaaApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/identity-zones/twiglet-get")
+                .method(GET).path("/identity-zones/twiglet-get")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -364,9 +345,10 @@ public final class ReactorIdentityZonesTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.identityZones.get(GetIdentityZoneRequest.builder()
-            .identityZoneId("twiglet-get")
-            .build())
+        this.identityZones
+            .get(GetIdentityZoneRequest.builder()
+                .identityZoneId("twiglet-get")
+                .build())
             .as(StepVerifier::create)
             .expectNext(GetIdentityZoneResponse.builder()
                 .id("twiglet-get")
@@ -392,24 +374,22 @@ public final class ReactorIdentityZonesTest extends AbstractUaaApiTest {
                         .activeKeyId("legacy-saml-key")
                         .assertionSigned(true)
                         .assertionTimeToLive(600)
-                        .certificate("-----BEGIN CERTIFICATE-----\nMIICEjCCAXsCAg36MA0GCSqGSIb3DQEBBQUAMIGbMQswCQYDVQQGEwJKUDEOMAwG\nA1UECBMFVG9reW8xEDAOBgNVBAcTB0NodW8ta3UxETAPBgNVBAoTCEZyYW5rNERE"
-                            + "\nMRgwFgYDVQQLEw9XZWJDZXJ0IFN1cHBvcnQxGDAWBgNVBAMTD0ZyYW5rNEREIFdl\nYiBDQTEjMCEGCSqGSIb3DQEJARYUc3VwcG9ydEBmcmFuazRkZC5jb20wHhcNMTIw"
-                            + "\nODIyMDUyNjU0WhcNMTcwODIxMDUyNjU0WjBKMQswCQYDVQQGEwJKUDEOMAwGA1UE\nCAwFVG9reW8xETAPBgNVBAoMCEZyYW5rNEREMRgwFgYDVQQDDA93d3cuZXhhbXBs"
-                            + "\nZS5jb20wXDANBgkqhkiG9w0BAQEFAANLADBIAkEAm/xmkHmEQrurE/0re/jeFRLl\n8ZPjBop7uLHhnia7lQG/5zDtZIUC3RVpqDSwBuw/NTweGyuP+o8AG98HxqxTBwID"
-                            + "\nAQABMA0GCSqGSIb3DQEBBQUAA4GBABS2TLuBeTPmcaTaUW/LCB2NYOy8GMdzR1mx\n8iBIu2H6/E2tiY3RIevV2OW61qY2/XRQg7YPxx3ffeUugX9F4J/iPnnu1zAxxyBy"
-                            + "\n2VguKv4SWjRFoRkIfIlHX0qVviMhSlNy2ioFLy7JcPZb+v3ftDGywUqcBiVDoea0\nHn+GmxZA\n-----END CERTIFICATE-----\n")
+                        .certificate("-----BEGIN CERTIFICATE-----\nMIICEjCCAXsCAg36MA0GCSqGSIb3DQEBBQUAMIGbMQswCQYDVQQGEwJKUDEOMAwG\nA1UECBMFVG9reW8xEDAOBgNVBAcTB0NodW8ta3UxETAPBgNVBAoTCEZyYW5rNERE" +
+                            "\nMRgwFgYDVQQLEw9XZWJDZXJ0IFN1cHBvcnQxGDAWBgNVBAMTD0ZyYW5rNEREIFdl\nYiBDQTEjMCEGCSqGSIb3DQEJARYUc3VwcG9ydEBmcmFuazRkZC5jb20wHhcNMTIw" +
+                            "\nODIyMDUyNjU0WhcNMTcwODIxMDUyNjU0WjBKMQswCQYDVQQGEwJKUDEOMAwGA1UE\nCAwFVG9reW8xETAPBgNVBAoMCEZyYW5rNEREMRgwFgYDVQQDDA93d3cuZXhhbXBs" +
+                            "\nZS5jb20wXDANBgkqhkiG9w0BAQEFAANLADBIAkEAm/xmkHmEQrurE/0re/jeFRLl\n8ZPjBop7uLHhnia7lQG/5zDtZIUC3RVpqDSwBuw/NTweGyuP+o8AG98HxqxTBwID" +
+                            "\nAQABMA0GCSqGSIb3DQEBBQUAA4GBABS2TLuBeTPmcaTaUW/LCB2NYOy8GMdzR1mx\n8iBIu2H6/E2tiY3RIevV2OW61qY2/XRQg7YPxx3ffeUugX9F4J/iPnnu1zAxxyBy" +
+                            "\n2VguKv4SWjRFoRkIfIlHX0qVviMhSlNy2ioFLy7JcPZb+v3ftDGywUqcBiVDoea0\nHn+GmxZA\n-----END CERTIFICATE-----\n")
                         .disableInResponseToCheck(false)
                         .entityId("cloudfoundry-saml-login")
-                        .key("legacy-saml-key",
-                            Key.builder()
-                                .certificate("-----BEGIN CERTIFICATE-----\nMIICEjCCAXsCAg36MA0GCSqGSIb3DQEBBQUAMIGbMQswCQYDVQQGEwJKUDEOMAwG"
-                                    + "\nA1UECBMFVG9reW8xEDAOBgNVBAcTB0NodW8ta3UxETAPBgNVBAoTCEZyYW5rNERE\nMRgwFgYDVQQLEw9XZWJDZXJ0IFN1cHBvcnQxGDAWBgNVBAMTD0ZyYW5rNEREIFdl"
-                                    + "\nYiBDQTEjMCEGCSqGSIb3DQEJARYUc3VwcG9ydEBmcmFuazRkZC5jb20wHhcNMTIw\nODIyMDUyNjU0WhcNMTcwODIxMDUyNjU0WjBKMQswCQYDVQQGEwJKUDEOMAwGA1UE"
-                                    + "\nCAwFVG9reW8xETAPBgNVBAoMCEZyYW5rNEREMRgwFgYDVQQDDA93d3cuZXhhbXBs\nZS5jb20wXDANBgkqhkiG9w0BAQEFAANLADBIAkEAm/xmkHmEQrurE/0re/jeFRLl\n8ZPjBop7uLHhnia7lQG"
-                                    + "/5zDtZIUC3RVpqDSwBuw/NTweGyuP+o8AG98HxqxTBwID\nAQABMA0GCSqGSIb3DQEBBQUAA4GBABS2TLuBeTPmcaTaUW/LCB2NYOy8GMdzR1mx\n8iBIu2H6/E2tiY3RIevV2OW61qY2" +
-                                    "/XRQg7YPxx3ffeUugX9F4J"
-                                    + "/iPnnu1zAxxyBy\n2VguKv4SWjRFoRkIfIlHX0qVviMhSlNy2ioFLy7JcPZb+v3ftDGywUqcBiVDoea0\nHn+GmxZA\n-----END CERTIFICATE-----\n")
-                                .build())
+                        .key("legacy-saml-key", Key.builder()
+                            .certificate("-----BEGIN CERTIFICATE-----\nMIICEjCCAXsCAg36MA0GCSqGSIb3DQEBBQUAMIGbMQswCQYDVQQGEwJKUDEOMAwG" +
+                                "\nA1UECBMFVG9reW8xEDAOBgNVBAcTB0NodW8ta3UxETAPBgNVBAoTCEZyYW5rNERE\nMRgwFgYDVQQLEw9XZWJDZXJ0IFN1cHBvcnQxGDAWBgNVBAMTD0ZyYW5rNEREIFdl" +
+                                "\nYiBDQTEjMCEGCSqGSIb3DQEJARYUc3VwcG9ydEBmcmFuazRkZC5jb20wHhcNMTIw\nODIyMDUyNjU0WhcNMTcwODIxMDUyNjU0WjBKMQswCQYDVQQGEwJKUDEOMAwGA1UE" +
+                                "\nCAwFVG9reW8xETAPBgNVBAoMCEZyYW5rNEREMRgwFgYDVQQDDA93d3cuZXhhbXBs\nZS5jb20wXDANBgkqhkiG9w0BAQEFAANLADBIAkEAm/xmkHmEQrurE/0re/jeFRLl\n8ZPjBop7uLHhnia7lQG" +
+                                "/5zDtZIUC3RVpqDSwBuw/NTweGyuP+o8AG98HxqxTBwID\nAQABMA0GCSqGSIb3DQEBBQUAA4GBABS2TLuBeTPmcaTaUW/LCB2NYOy8GMdzR1mx\n8iBIu2H6/E2tiY3RIevV2OW61qY2/XRQg7YPxx3ffeUugX9F4J" +
+                                "/iPnnu1zAxxyBy\n2VguKv4SWjRFoRkIfIlHX0qVviMhSlNy2ioFLy7JcPZb+v3ftDGywUqcBiVDoea0\nHn+GmxZA\n-----END CERTIFICATE-----\n")
+                            .build())
                         .requestSigned(true)
                         .wantAssertionSigned(true)
                         .wantPartnerAuthenticationRequestSigned(false)
@@ -477,8 +457,7 @@ public final class ReactorIdentityZonesTest extends AbstractUaaApiTest {
                             .text("Some Policy")
                             .build())
                         .footerLegalText("Test footer legal text")
-                        .footerLink("Support",
-                            "http://support.example.com")
+                        .footerLink("Support", "http://support.example.com")
                         .productLogo("VGVzdFByb2R1Y3RMb2dv")
                         .squareLogo("VGVzdFNxdWFyZUxvZ28=")
                         .build())
@@ -490,14 +469,7 @@ public final class ReactorIdentityZonesTest extends AbstractUaaApiTest {
                         .identityProvider(Type.LDAP)
                         .build())
                     .userConfig(UserConfig.builder()
-                        .defaultGroups(Arrays.asList("openid",
-                            "password.write",
-                            "uaa.user",
-                            "approvals.me",
-                            "profile",
-                            "roles",
-                            "user_attributes",
-                            "uaa.offline_token"))
+                        .defaultGroups(Arrays.asList("openid", "password.write", "uaa.user", "approvals.me", "profile", "roles", "user_attributes", "uaa.offline_token"))
                         .build())
                     .build())
                 .name("The Twiglet Zone")
@@ -513,8 +485,7 @@ public final class ReactorIdentityZonesTest extends AbstractUaaApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/identity-zones")
+                .method(GET).path("/identity-zones")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -522,8 +493,9 @@ public final class ReactorIdentityZonesTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.identityZones.list(ListIdentityZonesRequest.builder()
-            .build())
+        this.identityZones
+            .list(ListIdentityZonesRequest.builder()
+                .build())
             .as(StepVerifier::create)
             .expectNext(ListIdentityZonesResponse.builder()
                 .identityZone(IdentityZone.builder()
@@ -615,8 +587,7 @@ public final class ReactorIdentityZonesTest extends AbstractUaaApiTest {
     public void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT)
-                .path("/identity-zones/twiglet-update")
+                .method(PUT).path("/identity-zones/twiglet-update")
                 .payload("fixtures/uaa/identity-zones/PUT_{id}_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -625,100 +596,9 @@ public final class ReactorIdentityZonesTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.identityZones.update(UpdateIdentityZoneRequest.builder()
-            .identityZoneId("twiglet-update")
-            .subdomain("twiglet-update")
-            .configuration(IdentityZoneConfiguration.builder()
-                .clientLockoutPolicy(ClientLockoutPolicy.builder()
-                    .lockoutPeriodSeconds(-1)
-                    .lockoutAfterFailures(-1)
-                    .countFailuresWithin(-1)
-                    .build())
-                .tokenPolicy(TokenPolicy.builder()
-                    .accessTokenValidity(-1)
-                    .refreshTokenValidity(-1)
-                    .jwtRevocable(false)
-                    .key("updatedKeyId",
-                        Collections.singletonMap("signingKey",
-                            "upD4t3d.s1gNiNg.K3y/t3XT"))
-                    .build())
-                .samlConfiguration(SamlConfiguration.builder()
-                    .assertionSigned(true)
-                    .requestSigned(true)
-                    .wantAssertionSigned(true)
-                    .wantPartnerAuthenticationRequestSigned(false)
-                    .assertionTimeToLive(600)
-                    .build())
-                .corsPolicy(CorsPolicy.builder()
-                    .xhrConfiguration(CorsConfiguration.builder()
-                        .allowedOrigin(".*")
-                        .allowedUri(".*")
-                        .allowedHeader("Accept")
-                        .allowedHeader("Authorization")
-                        .allowedHeader("Content-Type")
-                        .allowedMethod("GET")
-                        .allowedCredentials(false)
-                        .maxAge(1728000L)
-                        .build())
-                    .defaultConfiguration(CorsConfiguration.builder()
-                        .allowedOrigin(".*")
-                        .allowedUri(".*")
-                        .allowedHeader("Accept")
-                        .allowedHeader("Authorization")
-                        .allowedHeader("Content-Type")
-                        .allowedMethod("GET")
-                        .allowedCredentials(false)
-                        .maxAge(1728000L)
-                        .build())
-                    .build())
-                .links(Links.builder()
-                    .logout(LogoutLink.builder()
-                        .redirectUrl("/login")
-                        .redirectParameterName("redirect")
-                        .disableRedirectParameter(true)
-                        .build())
-                    .homeRedirect("http://my.hosted.homepage.com/")
-                    .selfService(SelfServiceLink.builder()
-                        .selfServiceLinksEnabled(true)
-                        .signupLink("/create_account")
-                        .resetPasswordLink("/forgot_password")
-                        .build())
-                    .build())
-                .prompt(Prompt.builder()
-                    .fieldName("username")
-                    .fieldType("text")
-                    .text("Email")
-                    .build())
-                .prompt(Prompt.builder()
-                    .fieldName("password")
-                    .fieldType("password")
-                    .text("Password")
-                    .build())
-                .prompt(Prompt.builder()
-                    .fieldName("passcode")
-                    .fieldType("password")
-                    .text("One Time Code (Get on at /passcode)")
-                    .build())
-                .ldapDiscoveryEnabled(false)
-                .branding(Branding.builder()
-                    .companyName("Test Company")
-                    .productLogo("VGVzdFByb2R1Y3RMb2dv")
-                    .squareLogo("VGVzdFNxdWFyZUxvZ28=")
-                    .footerLegalText("Test footer legal text")
-                    .footerLink("Support",
-                        "http://support.example.com")
-                    .build())
-                .accountChooserEnabled(false)
-                .build())
-            .name("The Updated Twiglet Zone")
-            .version(0)
-            .description("Like the Twilight Zone but not tastier.")
-            .createdAt(1481728057246L)
-            .lastModified(1481728057246L)
-            .build())
-            .as(StepVerifier::create)
-            .expectNext(UpdateIdentityZoneResponse.builder()
-                .id("twiglet-update")
+        this.identityZones
+            .update(UpdateIdentityZoneRequest.builder()
+                .identityZoneId("twiglet-update")
                 .subdomain("twiglet-update")
                 .configuration(IdentityZoneConfiguration.builder()
                     .clientLockoutPolicy(ClientLockoutPolicy.builder()
@@ -730,9 +610,7 @@ public final class ReactorIdentityZonesTest extends AbstractUaaApiTest {
                         .accessTokenValidity(-1)
                         .refreshTokenValidity(-1)
                         .jwtRevocable(false)
-                        .key("updatedKeyId",
-                            Collections.singletonMap("signingKey",
-                                "upD4t3d.s1gNiNg.K3y/t3XT"))
+                        .key("updatedKeyId", Collections.singletonMap("signingKey", "upD4t3d.s1gNiNg.K3y/t3XT"))
                         .build())
                     .samlConfiguration(SamlConfiguration.builder()
                         .assertionSigned(true)
@@ -797,8 +675,96 @@ public final class ReactorIdentityZonesTest extends AbstractUaaApiTest {
                         .productLogo("VGVzdFByb2R1Y3RMb2dv")
                         .squareLogo("VGVzdFNxdWFyZUxvZ28=")
                         .footerLegalText("Test footer legal text")
-                        .footerLink("Support",
-                            "http://support.example.com")
+                        .footerLink("Support", "http://support.example.com")
+                        .build())
+                    .accountChooserEnabled(false)
+                    .build())
+                .name("The Updated Twiglet Zone")
+                .version(0)
+                .description("Like the Twilight Zone but not tastier.")
+                .createdAt(1481728057246L)
+                .lastModified(1481728057246L)
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(UpdateIdentityZoneResponse.builder()
+                .id("twiglet-update")
+                .subdomain("twiglet-update")
+                .configuration(IdentityZoneConfiguration.builder()
+                    .clientLockoutPolicy(ClientLockoutPolicy.builder()
+                        .lockoutPeriodSeconds(-1)
+                        .lockoutAfterFailures(-1)
+                        .countFailuresWithin(-1)
+                        .build())
+                    .tokenPolicy(TokenPolicy.builder()
+                        .accessTokenValidity(-1)
+                        .refreshTokenValidity(-1)
+                        .jwtRevocable(false)
+                        .key("updatedKeyId", Collections.singletonMap("signingKey", "upD4t3d.s1gNiNg.K3y/t3XT"))
+                        .build())
+                    .samlConfiguration(SamlConfiguration.builder()
+                        .assertionSigned(true)
+                        .requestSigned(true)
+                        .wantAssertionSigned(true)
+                        .wantPartnerAuthenticationRequestSigned(false)
+                        .assertionTimeToLive(600)
+                        .build())
+                    .corsPolicy(CorsPolicy.builder()
+                        .xhrConfiguration(CorsConfiguration.builder()
+                            .allowedOrigin(".*")
+                            .allowedUri(".*")
+                            .allowedHeader("Accept")
+                            .allowedHeader("Authorization")
+                            .allowedHeader("Content-Type")
+                            .allowedMethod("GET")
+                            .allowedCredentials(false)
+                            .maxAge(1728000L)
+                            .build())
+                        .defaultConfiguration(CorsConfiguration.builder()
+                            .allowedOrigin(".*")
+                            .allowedUri(".*")
+                            .allowedHeader("Accept")
+                            .allowedHeader("Authorization")
+                            .allowedHeader("Content-Type")
+                            .allowedMethod("GET")
+                            .allowedCredentials(false)
+                            .maxAge(1728000L)
+                            .build())
+                        .build())
+                    .links(Links.builder()
+                        .logout(LogoutLink.builder()
+                            .redirectUrl("/login")
+                            .redirectParameterName("redirect")
+                            .disableRedirectParameter(true)
+                            .build())
+                        .homeRedirect("http://my.hosted.homepage.com/")
+                        .selfService(SelfServiceLink.builder()
+                            .selfServiceLinksEnabled(true)
+                            .signupLink("/create_account")
+                            .resetPasswordLink("/forgot_password")
+                            .build())
+                        .build())
+                    .prompt(Prompt.builder()
+                        .fieldName("username")
+                        .fieldType("text")
+                        .text("Email")
+                        .build())
+                    .prompt(Prompt.builder()
+                        .fieldName("password")
+                        .fieldType("password")
+                        .text("Password")
+                        .build())
+                    .prompt(Prompt.builder()
+                        .fieldName("passcode")
+                        .fieldType("password")
+                        .text("One Time Code (Get on at /passcode)")
+                        .build())
+                    .ldapDiscoveryEnabled(false)
+                    .branding(Branding.builder()
+                        .companyName("Test Company")
+                        .productLogo("VGVzdFByb2R1Y3RMb2dv")
+                        .squareLogo("VGVzdFNxdWFyZUxvZ28=")
+                        .footerLegalText("Test footer legal text")
+                        .footerLink("Support", "http://support.example.com")
                         .build())
                     .accountChooserEnabled(false)
                     .build())

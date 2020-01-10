@@ -41,17 +41,13 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorApplicationUsageEventsTest extends AbstractClientApiTest {
 
-    private final ReactorApplicationUsageEvents applicationUsageEvents = new ReactorApplicationUsageEvents(CONNECTION_CONTEXT,
-        this.root,
-        TOKEN_PROVIDER,
-        Collections.emptyMap());
+    private final ReactorApplicationUsageEvents applicationUsageEvents = new ReactorApplicationUsageEvents(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/app_usage_events/caac0ed4-febf-48a4-951f-c0a7fadf6a68")
+                .method(GET).path("/app_usage_events/caac0ed4-febf-48a4-951f-c0a7fadf6a68")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -59,9 +55,10 @@ public final class ReactorApplicationUsageEventsTest extends AbstractClientApiTe
                 .build())
             .build());
 
-        this.applicationUsageEvents.get(GetApplicationUsageEventRequest.builder()
-            .applicationUsageEventId("caac0ed4-febf-48a4-951f-c0a7fadf6a68")
-            .build())
+        this.applicationUsageEvents
+            .get(GetApplicationUsageEventRequest.builder()
+                .applicationUsageEventId("caac0ed4-febf-48a4-951f-c0a7fadf6a68")
+                .build())
             .as(StepVerifier::create)
             .expectNext(GetApplicationUsageEventResponse.builder()
                 .metadata(Metadata.builder()
@@ -92,8 +89,7 @@ public final class ReactorApplicationUsageEventsTest extends AbstractClientApiTe
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/app_usage_events?after_guid=f1d8ddec-d36a-4670-acb8-6082a1f1a95f&results-per-page=1")
+                .method(GET).path("/app_usage_events?after_guid=f1d8ddec-d36a-4670-acb8-6082a1f1a95f&results-per-page=1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -101,10 +97,11 @@ public final class ReactorApplicationUsageEventsTest extends AbstractClientApiTe
                 .build())
             .build());
 
-        this.applicationUsageEvents.list(ListApplicationUsageEventsRequest.builder()
-            .afterApplicationUsageEventId("f1d8ddec-d36a-4670-acb8-6082a1f1a95f")
-            .resultsPerPage(1)
-            .build())
+        this.applicationUsageEvents
+            .list(ListApplicationUsageEventsRequest.builder()
+                .afterApplicationUsageEventId("f1d8ddec-d36a-4670-acb8-6082a1f1a95f")
+                .resultsPerPage(1)
+                .build())
             .as(StepVerifier::create)
             .expectNext(ListApplicationUsageEventsResponse.builder()
                 .nextUrl("/v2/app_usage_events?after_guid=f1d8ddec-d36a-4670-acb8-6082a1f1a95f&order-direction=asc&page=2&results-per-page=1")
@@ -140,16 +137,16 @@ public final class ReactorApplicationUsageEventsTest extends AbstractClientApiTe
     public void purgeAndReseed() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST)
-                .path("/app_usage_events/destructively_purge_all_and_reseed_started_apps")
+                .method(POST).path("/app_usage_events/destructively_purge_all_and_reseed_started_apps")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
                 .build())
             .build());
 
-        this.applicationUsageEvents.purgeAndReseed(PurgeAndReseedApplicationUsageEventsRequest.builder()
-            .build())
+        this.applicationUsageEvents
+            .purgeAndReseed(PurgeAndReseedApplicationUsageEventsRequest.builder()
+                .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));

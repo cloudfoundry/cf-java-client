@@ -48,43 +48,44 @@ public final class ReactorProcesses extends AbstractClientV3Operations implement
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorProcesses(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider,
-                            Map<String, String> requestTags) {
+    public ReactorProcesses(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<GetProcessResponse> get(GetProcessRequest request) {
-        return get(request, GetProcessResponse.class, builder -> builder.pathSegment("processes", request.getProcessId())).checkpoint();
+        return get(request, GetProcessResponse.class, builder -> builder.pathSegment("processes", request.getProcessId()))
+            .checkpoint();
     }
 
     @Override
     public Mono<GetProcessStatisticsResponse> getStatistics(GetProcessStatisticsRequest request) {
-        return get(request, GetProcessStatisticsResponse.class,
-            builder -> builder.pathSegment("processes", request.getProcessId(), "stats")).checkpoint();
+        return get(request, GetProcessStatisticsResponse.class, builder -> builder.pathSegment("processes", request.getProcessId(), "stats"))
+            .checkpoint();
     }
 
     @Override
     public Mono<ListProcessesResponse> list(ListProcessesRequest request) {
-        return get(request, ListProcessesResponse.class, builder -> builder.pathSegment("processes")).checkpoint();
+        return get(request, ListProcessesResponse.class, builder -> builder.pathSegment("processes"))
+            .checkpoint();
     }
 
     @Override
     public Mono<ScaleProcessResponse> scale(ScaleProcessRequest request) {
-        return post(request, ScaleProcessResponse.class,
-            builder -> builder.pathSegment("processes", request.getProcessId(), "actions", "scale")).checkpoint();
+        return post(request, ScaleProcessResponse.class, builder -> builder.pathSegment("processes", request.getProcessId(), "actions", "scale"))
+            .checkpoint();
     }
 
     @Override
     public Mono<Void> terminateInstance(TerminateProcessInstanceRequest request) {
-        return delete(request, Void.class,
-            builder -> builder.pathSegment("processes", request.getProcessId(), "instances", request.getIndex())).checkpoint();
+        return delete(request, Void.class, builder -> builder.pathSegment("processes", request.getProcessId(), "instances", request.getIndex()))
+            .checkpoint();
     }
 
     @Override
     public Mono<UpdateProcessResponse> update(UpdateProcessRequest request) {
-        return patch(request, UpdateProcessResponse.class,
-            builder -> builder.pathSegment("processes", request.getProcessId())).checkpoint();
+        return patch(request, UpdateProcessResponse.class, builder -> builder.pathSegment("processes", request.getProcessId()))
+            .checkpoint();
     }
 
 }

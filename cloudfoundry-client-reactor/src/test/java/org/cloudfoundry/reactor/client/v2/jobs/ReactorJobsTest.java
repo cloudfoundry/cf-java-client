@@ -42,8 +42,7 @@ public final class ReactorJobsTest extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/jobs/test-job-id")
+                .method(GET).path("/jobs/test-job-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -51,9 +50,10 @@ public final class ReactorJobsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.jobs.get(GetJobRequest.builder()
-            .jobId("test-job-id")
-            .build())
+        this.jobs
+            .get(GetJobRequest.builder()
+                .jobId("test-job-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(GetJobResponse.builder()
                 .metadata(Metadata.builder()

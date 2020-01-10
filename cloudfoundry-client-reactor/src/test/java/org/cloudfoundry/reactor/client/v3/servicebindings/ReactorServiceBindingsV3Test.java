@@ -50,17 +50,13 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorServiceBindingsV3Test extends AbstractClientApiTest {
 
-    private final ReactorServiceBindingsV3 serviceBindings = new ReactorServiceBindingsV3(CONNECTION_CONTEXT,
-        this.root,
-        TOKEN_PROVIDER,
-        Collections.emptyMap());
+    private final ReactorServiceBindingsV3 serviceBindings = new ReactorServiceBindingsV3(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST)
-                .path("/service_bindings")
+                .method(POST).path("/service_bindings")
                 .payload("fixtures/client/v3/servicebindings/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -69,21 +65,21 @@ public final class ReactorServiceBindingsV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.serviceBindings.create(CreateServiceBindingRequest.builder()
-            .data(CreateServiceBindingData.builder()
-                .parameter("some_object_id",
-                    "for_the_service_broker")
-                .build())
-            .relationships(ServiceBindingRelationships.builder()
-                .application(Relationship.builder()
-                    .id("74f7c078-0934-470f-9883-4fddss5b8f13")
+        this.serviceBindings
+            .create(CreateServiceBindingRequest.builder()
+                .data(CreateServiceBindingData.builder()
+                    .parameter("some_object_id", "for_the_service_broker")
                     .build())
-                .serviceInstance(Relationship.builder()
-                    .id("8bfe4c1b-9e18-45b1-83be-124163f31f9e")
+                .relationships(ServiceBindingRelationships.builder()
+                    .application(Relationship.builder()
+                        .id("74f7c078-0934-470f-9883-4fddss5b8f13")
+                        .build())
+                    .serviceInstance(Relationship.builder()
+                        .id("8bfe4c1b-9e18-45b1-83be-124163f31f9e")
+                        .build())
                     .build())
+                .type(ServiceBindingType.APPLICATION)
                 .build())
-            .type(ServiceBindingType.APPLICATION)
-            .build())
             .as(StepVerifier::create)
             .expectNext(CreateServiceBindingResponse.builder()
                 .id("dde5ad2a-d8f4-44dc-a56f-0452d744f1c3")
@@ -111,17 +107,17 @@ public final class ReactorServiceBindingsV3Test extends AbstractClientApiTest {
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE)
-                .path("/service_bindings/test-service-binding-id")
+                .method(DELETE).path("/service_bindings/test-service-binding-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
                 .build())
             .build());
 
-        this.serviceBindings.delete(DeleteServiceBindingRequest.builder()
-            .serviceBindingId("test-service-binding-id")
-            .build())
+        this.serviceBindings
+            .delete(DeleteServiceBindingRequest.builder()
+                .serviceBindingId("test-service-binding-id")
+                .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -131,8 +127,7 @@ public final class ReactorServiceBindingsV3Test extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/service_bindings/test-service-binding-id")
+                .method(GET).path("/service_bindings/test-service-binding-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -140,9 +135,10 @@ public final class ReactorServiceBindingsV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.serviceBindings.get(GetServiceBindingRequest.builder()
-            .serviceBindingId("test-service-binding-id")
-            .build())
+        this.serviceBindings
+            .get(GetServiceBindingRequest.builder()
+                .serviceBindingId("test-service-binding-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(GetServiceBindingResponse.builder()
                 .id("dde5ad2a-d8f4-44dc-a56f-0452d744f1c3")
@@ -170,8 +166,7 @@ public final class ReactorServiceBindingsV3Test extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/service_bindings?app_guids=test-application-id&order_by=+created_at&page=1")
+                .method(GET).path("/service_bindings?app_guids=test-application-id&order_by=+created_at&page=1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -179,11 +174,12 @@ public final class ReactorServiceBindingsV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.serviceBindings.list(ListServiceBindingsRequest.builder()
-            .page(1)
-            .orderBy("+created_at")
-            .applicationId("test-application-id")
-            .build())
+        this.serviceBindings
+            .list(ListServiceBindingsRequest.builder()
+                .page(1)
+                .orderBy("+created_at")
+                .applicationId("test-application-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(ListServiceBindingsResponse.builder()
                 .pagination(Pagination.builder()
@@ -202,8 +198,7 @@ public final class ReactorServiceBindingsV3Test extends AbstractClientApiTest {
                     .id("dde5ad2a-d8f4-44dc-a56f-0452d744f1c3")
                     .type("app")
                     .data(ServiceBindingData.builder()
-                        .credential("super-secret",
-                            "password")
+                        .credential("super-secret", "password")
                         .syslogDrainUrl("syslog://drain.url.com")
                         .build())
                     .createdAt("2015-11-13T17:02:56Z")
@@ -221,8 +216,7 @@ public final class ReactorServiceBindingsV3Test extends AbstractClientApiTest {
                     .id("7aa37bad-6ccb-4ef9-ba48-9ce3a91b2b62")
                     .type("app")
                     .data(ServiceBindingData.builder()
-                        .credential("super-secret",
-                            "password")
+                        .credential("super-secret", "password")
                         .syslogDrainUrl("syslog://drain.url.com")
                         .build())
                     .createdAt("2015-11-13T17:02:56Z")

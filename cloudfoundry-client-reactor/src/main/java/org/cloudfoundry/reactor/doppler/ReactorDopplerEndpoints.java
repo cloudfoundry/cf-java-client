@@ -33,14 +33,12 @@ import java.util.Map;
 
 final class ReactorDopplerEndpoints extends AbstractDopplerOperations {
 
-    ReactorDopplerEndpoints(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider,
-                            Map<String, String> requestTags) {
+    ReactorDopplerEndpoints(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     Flux<Envelope> containerMetrics(ContainerMetricsRequest request) {
-        return get(builder -> builder.pathSegment("apps", request.getApplicationId(), "containermetrics"), MultipartCodec::createDecoder,
-            MultipartCodec::decode).map(ReactorDopplerEndpoints::toEnvelope)
+        return get(builder -> builder.pathSegment("apps", request.getApplicationId(), "containermetrics"), MultipartCodec::createDecoder, MultipartCodec::decode).map(ReactorDopplerEndpoints::toEnvelope)
             .checkpoint();
     }
 
@@ -50,8 +48,7 @@ final class ReactorDopplerEndpoints extends AbstractDopplerOperations {
     }
 
     Flux<Envelope> recentLogs(RecentLogsRequest request) {
-        return get(builder -> builder.pathSegment("apps", request.getApplicationId(), "recentlogs"), MultipartCodec::createDecoder,
-            MultipartCodec::decode).map(ReactorDopplerEndpoints::toEnvelope)
+        return get(builder -> builder.pathSegment("apps", request.getApplicationId(), "recentlogs"), MultipartCodec::createDecoder, MultipartCodec::decode).map(ReactorDopplerEndpoints::toEnvelope)
             .checkpoint();
     }
 

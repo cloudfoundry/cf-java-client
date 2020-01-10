@@ -39,14 +39,14 @@ public final class ReactorInfo extends AbstractClientV2Operations implements Inf
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorInfo(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider,
-                       Map<String, String> requestTags) {
+    public ReactorInfo(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<GetInfoResponse> get(GetInfoRequest request) {
-        return get(request, GetInfoResponse.class, builder -> builder.pathSegment("info")).checkpoint();
+        return get(request, GetInfoResponse.class, builder -> builder.pathSegment("info"))
+            .checkpoint();
     }
 
 }

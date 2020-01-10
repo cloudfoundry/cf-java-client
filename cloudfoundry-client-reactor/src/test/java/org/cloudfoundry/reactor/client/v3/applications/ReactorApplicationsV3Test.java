@@ -118,17 +118,13 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
 
-    private final ReactorApplicationsV3 applications = new ReactorApplicationsV3(CONNECTION_CONTEXT,
-        this.root,
-        TOKEN_PROVIDER,
-        Collections.emptyMap());
+    private final ReactorApplicationsV3 applications = new ReactorApplicationsV3(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST)
-                .path("/apps")
+                .method(POST).path("/apps")
                 .payload("fixtures/client/v3/apps/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -137,20 +133,21 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.applications.create(CreateApplicationRequest.builder()
-            .name("my_app")
-            .relationships(ApplicationRelationships.builder()
-                .space(ToOneRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("2f35885d-0c9d-4423-83ad-fd05066f8576")
+        this.applications
+            .create(CreateApplicationRequest.builder()
+                .name("my_app")
+                .relationships(ApplicationRelationships.builder()
+                    .space(ToOneRelationship.builder()
+                        .data(Relationship.builder()
+                            .id("2f35885d-0c9d-4423-83ad-fd05066f8576")
+                            .build())
                         .build())
                     .build())
+                .metadata(Metadata.builder()
+                    .annotation("version", "1.2.3")
+                    .label("isLive", "true")
+                    .build())
                 .build())
-            .metadata(Metadata.builder()
-                .annotation("version", "1.2.3")
-                .label("isLive", "true")
-                .build())
-            .build())
             .as(StepVerifier::create)
             .expectNext(CreateApplicationResponse.builder()
                 .id("1cb006ee-fb05-47e1-b541-c34179ddc446")
@@ -220,8 +217,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE)
-                .path("/apps/test-application-id")
+                .method(DELETE).path("/apps/test-application-id")
                 .build())
             .response(TestResponse.builder()
                 .status(ACCEPTED)
@@ -229,9 +225,10 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.applications.delete(DeleteApplicationRequest.builder()
-            .applicationId("test-application-id")
-            .build())
+        this.applications
+            .delete(DeleteApplicationRequest.builder()
+                .applicationId("test-application-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext("[guid]")
             .expectComplete()
@@ -242,8 +239,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/apps/test-application-id")
+                .method(GET).path("/apps/test-application-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -251,9 +247,10 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.applications.get(GetApplicationRequest.builder()
-            .applicationId("test-application-id")
-            .build())
+        this.applications
+            .get(GetApplicationRequest.builder()
+                .applicationId("test-application-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(GetApplicationResponse.builder()
                 .id("1cb006ee-fb05-47e1-b541-c34179ddc446")
@@ -324,8 +321,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     public void getCurrentDroplet() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/apps/test-application-id/droplets/current")
+                .method(GET).path("/apps/test-application-id/droplets/current")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -333,9 +329,10 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.applications.getCurrentDroplet(GetApplicationCurrentDropletRequest.builder()
-            .applicationId("test-application-id")
-            .build())
+        this.applications
+            .getCurrentDroplet(GetApplicationCurrentDropletRequest.builder()
+                .applicationId("test-application-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(GetApplicationCurrentDropletResponse.builder()
                 .id("585bc3c1-3743-497d-88b0-403ad6b56d16")
@@ -383,8 +380,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     public void getCurrentDropletRelationship() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/apps/test-application-id/relationships/current_droplet")
+                .method(GET).path("/apps/test-application-id/relationships/current_droplet")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -392,9 +388,10 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.applications.getCurrentDropletRelationship(GetApplicationCurrentDropletRelationshipRequest.builder()
-            .applicationId("test-application-id")
-            .build())
+        this.applications
+            .getCurrentDropletRelationship(GetApplicationCurrentDropletRelationshipRequest.builder()
+                .applicationId("test-application-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(GetApplicationCurrentDropletRelationshipResponse.builder()
                 .data(Relationship.builder()
@@ -415,8 +412,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     public void getEnvironment() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/apps/test-application-id/env")
+                .method(GET).path("/apps/test-application-id/env")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -424,60 +420,41 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.applications.getEnvironment(GetApplicationEnvironmentRequest.builder()
-            .applicationId("test-application-id")
-            .build())
+        this.applications
+            .getEnvironment(GetApplicationEnvironmentRequest.builder()
+                .applicationId("test-application-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(GetApplicationEnvironmentResponse.builder()
-                .stagingEnvironmentVariable("GEM_CACHE",
-                    "http://gem-cache.example.org")
+                .stagingEnvironmentVariable("GEM_CACHE", "http://gem-cache.example.org")
                 .runningEnvironmentVariable("HTTP_PROXY", "http://proxy.example.org")
                 .environmentVariable("RAILS_ENV", "production")
                 .systemEnvironmentVariable("VCAP_SERVICES", FluentMap.builder()
-                    .entry("mysql",
-                        Collections.singletonList(FluentMap.builder()
-                            .entry("name",
-                                "db-for-my-app")
-                            .entry("label",
-                                "mysql")
-                            .entry("tags",
-                                Arrays.asList("relational",
-                                    "sql"))
-                            .entry("plan",
-                                "xlarge")
-                            .entry("credentials",
-                                FluentMap.builder()
-                                    .entry("username",
-                                        "user")
-                                    .entry("password",
-                                        "top-secret")
-                                    .build())
-                            .entry("syslog_drain_url",
-                                "https://syslog.example.org/drain")
-                            .entry("provider",
-                                null)
-                            .build()))
+                    .entry("mysql", Collections.singletonList(FluentMap.builder()
+                        .entry("name", "db-for-my-app")
+                        .entry("label", "mysql")
+                        .entry("tags", Arrays.asList("relational", "sql"))
+                        .entry("plan", "xlarge")
+                        .entry("credentials", FluentMap.builder()
+                            .entry("username", "user")
+                            .entry("password", "top-secret")
+                            .build())
+                        .entry("syslog_drain_url", "https://syslog.example.org/drain")
+                        .entry("provider", null)
+                        .build()))
                     .build())
-                .applicationEnvironmentVariable("VCAP_APPLICATION",
-                    FluentMap.builder()
-                        .entry("limits",
-                            FluentMap.builder()
-                                .entry("fds",
-                                    16384)
-                                .build())
-                        .entry("application_name",
-                            "my_app")
-                        .entry("application_uris",
-                            Collections.singletonList("my_app.example.org"))
-                        .entry("name", "my_app")
-                        .entry("space_name",
-                            "my_space")
-                        .entry("space_id",
-                            "2f35885d-0c9d-4423-83ad-fd05066f8576")
-                        .entry("uris",
-                            Collections.singletonList("my_app.example.org"))
-                        .entry("users", null)
+                .applicationEnvironmentVariable("VCAP_APPLICATION", FluentMap.builder()
+                    .entry("limits", FluentMap.builder()
+                        .entry("fds", 16384)
                         .build())
+                    .entry("application_name", "my_app")
+                    .entry("application_uris", Collections.singletonList("my_app.example.org"))
+                    .entry("name", "my_app")
+                    .entry("space_name", "my_space")
+                    .entry("space_id", "2f35885d-0c9d-4423-83ad-fd05066f8576")
+                    .entry("uris", Collections.singletonList("my_app.example.org"))
+                    .entry("users", null)
+                    .build())
                 .build())
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -487,8 +464,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     public void getEnvironmentVariables() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/apps/test-application-id/environment_variables")
+                .method(GET).path("/apps/test-application-id/environment_variables")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -496,9 +472,10 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.applications.getEnvironmentVariables(GetApplicationEnvironmentVariablesRequest.builder()
-            .applicationId("test-application-id")
-            .build())
+        this.applications
+            .getEnvironmentVariables(GetApplicationEnvironmentVariablesRequest.builder()
+                .applicationId("test-application-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(GetApplicationEnvironmentVariablesResponse.builder()
                 .var("RAILS_ENV", "production")
@@ -517,8 +494,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     public void getProcess() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/apps/test-application-id/processes/test-type")
+                .method(GET).path("/apps/test-application-id/processes/test-type")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -526,10 +502,11 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.applications.getProcess(GetApplicationProcessRequest.builder()
-            .applicationId("test-application-id")
-            .type("test-type")
-            .build())
+        this.applications
+            .getProcess(GetApplicationProcessRequest.builder()
+                .applicationId("test-application-id")
+                .type("test-type")
+                .build())
             .as(StepVerifier::create)
             .expectNext(GetApplicationProcessResponse.builder()
                 .id("6a901b7c-9417-4dc1-8189-d3234aa0ab82")
@@ -578,8 +555,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     public void getProcessStatistics() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/apps/test-id/processes/test-type/stats")
+                .method(GET).path("/apps/test-id/processes/test-type/stats")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -587,10 +563,11 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.applications.getProcessStatistics(GetApplicationProcessStatisticsRequest.builder()
-            .applicationId("test-id")
-            .type("test-type")
-            .build())
+        this.applications
+            .getProcessStatistics(GetApplicationProcessStatisticsRequest.builder()
+                .applicationId("test-id")
+                .type("test-type")
+                .build())
             .as(StepVerifier::create)
             .expectNext(GetApplicationProcessStatisticsResponse.builder()
                 .resource(ProcessStatisticsResource.builder()
@@ -624,8 +601,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/apps")
+                .method(GET).path("/apps")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -633,8 +609,9 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.applications.list(ListApplicationsRequest.builder()
-            .build())
+        this.applications
+            .list(ListApplicationsRequest.builder()
+                .build())
             .as(StepVerifier::create)
             .expectNext(ListApplicationsResponse.builder()
                 .pagination(Pagination.builder()
@@ -775,8 +752,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     public void listBuilds() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/apps/test-application-id/builds")
+                .method(GET).path("/apps/test-application-id/builds")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -784,9 +760,10 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.applications.listBuilds(ListApplicationBuildsRequest.builder()
-            .applicationId("test-application-id")
-            .build())
+        this.applications
+            .listBuilds(ListApplicationBuildsRequest.builder()
+                .applicationId("test-application-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(ListApplicationBuildsResponse.builder()
                 .pagination(Pagination.builder()
@@ -836,8 +813,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     public void listDroplets() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/apps/test-application-id/droplets")
+                .method(GET).path("/apps/test-application-id/droplets")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -845,9 +821,10 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.applications.listDroplets(ListApplicationDropletsRequest.builder()
-            .applicationId("test-application-id")
-            .build())
+        this.applications
+            .listDroplets(ListApplicationDropletsRequest.builder()
+                .applicationId("test-application-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(ListApplicationDropletsResponse.builder()
                 .pagination(Pagination.builder()
@@ -871,8 +848,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
                         .build())
                     .image(null)
                     .executionMetadata("PRIVATE DATA HIDDEN")
-                    .processType("redacted_message",
-                        "[PRIVATE DATA HIDDEN IN LISTS]")
+                    .processType("redacted_message", "[PRIVATE DATA HIDDEN IN LISTS]")
                     .checksum(Checksum.builder()
                         .type(ChecksumType.SHA256)
                         .value("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855")
@@ -908,8 +884,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
                             .build())
                         .build())
                     .executionMetadata("[PRIVATE DATA HIDDEN IN LISTS]")
-                    .processType("redacted_message",
-                        "[PRIVATE DATA HIDDEN IN LISTS]")
+                    .processType("redacted_message", "[PRIVATE DATA HIDDEN IN LISTS]")
                     .image("cloudfoundry/diego-docker-app-custom:latest")
                     .checksum(null)
                     .stack(null)
@@ -938,8 +913,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     public void listPackages() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/apps/test-application-id/packages")
+                .method(GET).path("/apps/test-application-id/packages")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -947,9 +921,10 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.applications.listPackages(ListApplicationPackagesRequest.builder()
-            .applicationId("test-application-id")
-            .build())
+        this.applications
+            .listPackages(ListApplicationPackagesRequest.builder()
+                .applicationId("test-application-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(ListApplicationPackagesResponse.builder()
                 .pagination(Pagination.builder()
@@ -999,8 +974,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     public void listProcesses() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/apps/test-application-id/processes")
+                .method(GET).path("/apps/test-application-id/processes")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -1008,9 +982,10 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.applications.listProcesses(ListApplicationProcessesRequest.builder()
-            .applicationId("test-application-id")
-            .build())
+        this.applications
+            .listProcesses(ListApplicationProcessesRequest.builder()
+                .applicationId("test-application-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(ListApplicationProcessesResponse.builder()
                 .pagination(Pagination.builder()
@@ -1113,8 +1088,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     public void listTasks() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/apps/test-application-id/tasks")
+                .method(GET).path("/apps/test-application-id/tasks")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -1122,9 +1096,10 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.applications.listTasks(ListApplicationTasksRequest.builder()
-            .applicationId("test-application-id")
-            .build())
+        this.applications
+            .listTasks(ListApplicationTasksRequest.builder()
+                .applicationId("test-application-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(ListApplicationTasksResponse.builder()
                 .pagination(Pagination.builder()
@@ -1202,8 +1177,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     public void scale() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT)
-                .path("/apps/test-application-id/processes/test-type/actions/scale")
+                .method(PUT).path("/apps/test-application-id/processes/test-type/actions/scale")
                 .payload("fixtures/client/v3/apps/PUT_{id}_processes_{type}_actions_scale_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -1212,13 +1186,14 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.applications.scale(ScaleApplicationRequest.builder()
-            .applicationId("test-application-id")
-            .type("test-type")
-            .instances(5)
-            .memoryInMb(256)
-            .diskInMb(1_024)
-            .build())
+        this.applications
+            .scale(ScaleApplicationRequest.builder()
+                .applicationId("test-application-id")
+                .type("test-type")
+                .instances(5)
+                .memoryInMb(256)
+                .diskInMb(1_024)
+                .build())
             .as(StepVerifier::create)
             .expectNext(ScaleApplicationResponse.builder()
                 .id("6a901b7c-9417-4dc1-8189-d3234aa0ab82")
@@ -1267,8 +1242,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     public void setCurrentDroplet() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PATCH)
-                .path("/apps/test-application-id/relationships/current_droplet")
+                .method(PATCH).path("/apps/test-application-id/relationships/current_droplet")
                 .payload("fixtures/client/v3/apps/PATCH_{id}_relationships_current_droplet_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -1277,12 +1251,13 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.applications.setCurrentDroplet(SetApplicationCurrentDropletRequest.builder()
-            .data(Relationship.builder()
-                .id("[droplet_guid]")
+        this.applications
+            .setCurrentDroplet(SetApplicationCurrentDropletRequest.builder()
+                .data(Relationship.builder()
+                    .id("[droplet_guid]")
+                    .build())
+                .applicationId("test-application-id")
                 .build())
-            .applicationId("test-application-id")
-            .build())
             .as(StepVerifier::create)
             .expectNext(SetApplicationCurrentDropletResponse.builder()
                 .data(Relationship.builder()
@@ -1303,8 +1278,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     public void start() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST)
-                .path("/apps/test-application-id/actions/start")
+                .method(POST).path("/apps/test-application-id/actions/start")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -1312,9 +1286,10 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.applications.start(StartApplicationRequest.builder()
-            .applicationId("test-application-id")
-            .build())
+        this.applications
+            .start(StartApplicationRequest.builder()
+                .applicationId("test-application-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(StartApplicationResponse.builder()
                 .id("1cb006ee-fb05-47e1-b541-c34179ddc446")
@@ -1380,8 +1355,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     public void stop() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST)
-                .path("/apps/test-application-id/actions/stop")
+                .method(POST).path("/apps/test-application-id/actions/stop")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -1389,9 +1363,10 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.applications.stop(StopApplicationRequest.builder()
-            .applicationId("test-application-id")
-            .build())
+        this.applications
+            .stop(StopApplicationRequest.builder()
+                .applicationId("test-application-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(StopApplicationResponse.builder()
                 .id("1cb006ee-fb05-47e1-b541-c34179ddc446")
@@ -1457,19 +1432,19 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     public void terminateInstance() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE)
-                .path("/apps/test-application-id/processes/test-type/instances/test-index")
+                .method(DELETE).path("/apps/test-application-id/processes/test-type/instances/test-index")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
                 .build())
             .build());
 
-        this.applications.terminateInstance(TerminateApplicationInstanceRequest.builder()
-            .applicationId("test-application-id")
-            .index("test-index")
-            .type("test-type")
-            .build())
+        this.applications
+            .terminateInstance(TerminateApplicationInstanceRequest.builder()
+                .applicationId("test-application-id")
+                .index("test-index")
+                .type("test-type")
+                .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -1479,8 +1454,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     public void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PATCH)
-                .path("/apps/test-application-id")
+                .method(PATCH).path("/apps/test-application-id")
                 .payload("fixtures/client/v3/apps/PATCH_{id}_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -1489,21 +1463,22 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.applications.update(UpdateApplicationRequest.builder()
-            .applicationId("test-application-id")
-            .name("my_app")
-            .lifecycle(Lifecycle.builder()
-                .type(LifecycleType.BUILDPACK)
-                .data(BuildpackData.builder()
-                    .buildpack("java_buildpack")
+        this.applications
+            .update(UpdateApplicationRequest.builder()
+                .applicationId("test-application-id")
+                .name("my_app")
+                .lifecycle(Lifecycle.builder()
+                    .type(LifecycleType.BUILDPACK)
+                    .data(BuildpackData.builder()
+                        .buildpack("java_buildpack")
+                        .build())
+                    .build())
+                .metadata(Metadata.builder()
+                    .annotation("version", "1.2.4")
+                    .label("isLive", "false")
+                    .label("maintenance", "true")
                     .build())
                 .build())
-            .metadata(Metadata.builder()
-                .annotation("version", "1.2.4")
-                .label("isLive", "false")
-                .label("maintenance", "true")
-                .build())
-            .build())
             .as(StepVerifier::create)
             .expectNext(UpdateApplicationResponse.builder()
                 .id("1cb006ee-fb05-47e1-b541-c34179ddc446")
@@ -1574,8 +1549,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     public void updateEnvironmentVariables() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PATCH)
-                .path("/apps/test-application-id/environment_variables")
+                .method(PATCH).path("/apps/test-application-id/environment_variables")
                 .payload("fixtures/client/v3/apps/PATCH_{id}_environment_variables_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -1584,10 +1558,11 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.applications.updateEnvironmentVariables(UpdateApplicationEnvironmentVariablesRequest.builder()
-            .applicationId("test-application-id")
-            .var("DEBUG", "false")
-            .build())
+        this.applications
+            .updateEnvironmentVariables(UpdateApplicationEnvironmentVariablesRequest.builder()
+                .applicationId("test-application-id")
+                .var("DEBUG", "false")
+                .build())
             .as(StepVerifier::create)
             .expectNext(UpdateApplicationEnvironmentVariablesResponse.builder()
                 .var("RAILS_ENV", "production")

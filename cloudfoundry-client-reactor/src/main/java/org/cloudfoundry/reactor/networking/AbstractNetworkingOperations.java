@@ -28,42 +28,42 @@ import java.util.function.Function;
 
 public abstract class AbstractNetworkingOperations extends AbstractReactorOperations {
 
-    protected AbstractNetworkingOperations(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider,
-                                           Map<String, String> requestTags) {
+    protected AbstractNetworkingOperations(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     protected final <T> Mono<T> get(Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
-        return createOperator().flatMap(operator -> operator.get()
-            .uri(uriTransformer)
-            .response()
-            .parseBody(responseType));
+        return createOperator()
+            .flatMap(operator -> operator.get()
+                .uri(uriTransformer)
+                .response()
+                .parseBody(responseType));
     }
 
-    protected final <T> Mono<T> get(Object requestPayload, Class<T> responseType,
-                                    Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
-        return createOperator().flatMap(operator -> operator.get()
-            .uri(queryTransformer(requestPayload).andThen(uriTransformer))
-            .response()
-            .parseBody(responseType));
+    protected final <T> Mono<T> get(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+        return createOperator()
+            .flatMap(operator -> operator.get()
+                .uri(queryTransformer(requestPayload).andThen(uriTransformer))
+                .response()
+                .parseBody(responseType));
     }
 
-    protected final <T> Mono<T> post(Object request, Class<T> responseType,
-                                     Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
-        return createOperator().flatMap(operator -> operator.post()
-            .uri(uriTransformer)
-            .send(request)
-            .response()
-            .parseBody(responseType));
+    protected final <T> Mono<T> post(Object request, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+        return createOperator()
+            .flatMap(operator -> operator.post()
+                .uri(uriTransformer)
+                .send(request)
+                .response()
+                .parseBody(responseType));
     }
 
-    protected final <T> Mono<T> put(Object requestPayload, Class<T> responseType,
-                                    Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
-        return createOperator().flatMap(operator -> operator.put()
-            .uri(uriTransformer)
-            .send(requestPayload)
-            .response()
-            .parseBody(responseType));
+    protected final <T> Mono<T> put(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+        return createOperator()
+            .flatMap(operator -> operator.put()
+                .uri(uriTransformer)
+                .send(requestPayload)
+                .response()
+                .parseBody(responseType));
     }
 
     private static Function<UriComponentsBuilder, UriComponentsBuilder> queryTransformer(Object requestPayload) {

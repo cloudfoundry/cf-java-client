@@ -52,8 +52,7 @@ public final class ReactorStacksTest extends AbstractClientApiTest {
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST)
-                .path("/stacks")
+                .method(POST).path("/stacks")
                 .payload("fixtures/client/v2/stacks/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -62,10 +61,11 @@ public final class ReactorStacksTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.stacks.create(CreateStackRequest.builder()
-            .description("Description for the example stack")
-            .name("example_stack")
-            .build())
+        this.stacks
+            .create(CreateStackRequest.builder()
+                .description("Description for the example stack")
+                .name("example_stack")
+                .build())
             .as(StepVerifier::create)
             .expectNext(CreateStackResponse.builder()
                 .metadata(Metadata.builder()
@@ -87,17 +87,17 @@ public final class ReactorStacksTest extends AbstractClientApiTest {
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE)
-                .path("/stacks/test-stack-id")
+                .method(DELETE).path("/stacks/test-stack-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
                 .build())
             .build());
 
-        this.stacks.delete(DeleteStackRequest.builder()
-            .stackId("test-stack-id")
-            .build())
+        this.stacks
+            .delete(DeleteStackRequest.builder()
+                .stackId("test-stack-id")
+                .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -107,8 +107,7 @@ public final class ReactorStacksTest extends AbstractClientApiTest {
     public void deleteAsync() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE)
-                .path("/stacks/test-stack-id?async=true")
+                .method(DELETE).path("/stacks/test-stack-id?async=true")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -116,10 +115,11 @@ public final class ReactorStacksTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.stacks.delete(DeleteStackRequest.builder()
-            .async(true)
-            .stackId("test-stack-id")
-            .build())
+        this.stacks
+            .delete(DeleteStackRequest.builder()
+                .async(true)
+                .stackId("test-stack-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(DeleteStackResponse.builder()
                 .metadata(Metadata.builder()
@@ -140,8 +140,7 @@ public final class ReactorStacksTest extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/stacks/test-stack-id")
+                .method(GET).path("/stacks/test-stack-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -149,9 +148,10 @@ public final class ReactorStacksTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.stacks.get(GetStackRequest.builder()
-            .stackId("test-stack-id")
-            .build())
+        this.stacks
+            .get(GetStackRequest.builder()
+                .stackId("test-stack-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(GetStackResponse.builder()
                 .metadata(Metadata.builder()
@@ -172,8 +172,7 @@ public final class ReactorStacksTest extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/stacks?q=name:test-name&page=-1")
+                .method(GET).path("/stacks?q=name:test-name&page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -181,10 +180,11 @@ public final class ReactorStacksTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.stacks.list(ListStacksRequest.builder()
-            .name("test-name")
-            .page(-1)
-            .build())
+        this.stacks
+            .list(ListStacksRequest.builder()
+                .name("test-name")
+                .page(-1)
+                .build())
             .as(StepVerifier::create)
             .expectNext(ListStacksResponse.builder()
                 .totalResults(3)

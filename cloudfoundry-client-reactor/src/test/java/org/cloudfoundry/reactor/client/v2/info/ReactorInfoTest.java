@@ -39,8 +39,7 @@ public final class ReactorInfoTest extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/info")
+                .method(GET).path("/info")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -48,8 +47,9 @@ public final class ReactorInfoTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.info.get(GetInfoRequest.builder()
-            .build())
+        this.info
+            .get(GetInfoRequest.builder()
+                .build())
             .as(StepVerifier::create)
             .expectNext(GetInfoResponse.builder()
                 .name("vcap")

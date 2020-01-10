@@ -45,29 +45,32 @@ public final class ReactorStacks extends AbstractClientV2Operations implements S
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorStacks(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider,
-                         Map<String, String> requestTags) {
+    public ReactorStacks(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<CreateStackResponse> create(CreateStackRequest request) {
-        return post(request, CreateStackResponse.class, builder -> builder.pathSegment("stacks")).checkpoint();
+        return post(request, CreateStackResponse.class, builder -> builder.pathSegment("stacks"))
+            .checkpoint();
     }
 
     @Override
     public Mono<DeleteStackResponse> delete(DeleteStackRequest request) {
-        return delete(request, DeleteStackResponse.class, builder -> builder.pathSegment("stacks", request.getStackId())).checkpoint();
+        return delete(request, DeleteStackResponse.class, builder -> builder.pathSegment("stacks", request.getStackId()))
+            .checkpoint();
     }
 
     @Override
     public Mono<GetStackResponse> get(GetStackRequest request) {
-        return get(request, GetStackResponse.class, builder -> builder.pathSegment("stacks", request.getStackId())).checkpoint();
+        return get(request, GetStackResponse.class, builder -> builder.pathSegment("stacks", request.getStackId()))
+            .checkpoint();
     }
 
     @Override
     public Mono<ListStacksResponse> list(ListStacksRequest request) {
-        return get(request, ListStacksResponse.class, builder -> builder.pathSegment("stacks")).checkpoint();
+        return get(request, ListStacksResponse.class, builder -> builder.pathSegment("stacks"))
+            .checkpoint();
     }
 
 }

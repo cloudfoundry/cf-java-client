@@ -41,8 +41,7 @@ public final class ReactorBlobstoresTest extends AbstractClientApiTest {
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE)
-                .path("/blobstores/buildpack_cache")
+                .method(DELETE).path("/blobstores/buildpack_cache")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -50,8 +49,9 @@ public final class ReactorBlobstoresTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.blobstores.deleteBuildpackCaches(DeleteBlobstoreBuildpackCachesRequest.builder()
-            .build())
+        this.blobstores
+            .deleteBuildpackCaches(DeleteBlobstoreBuildpackCachesRequest.builder()
+                .build())
             .as(StepVerifier::create)
             .expectNext(DeleteBlobstoreBuildpackCachesResponse.builder()
                 .metadata(Metadata.builder()

@@ -47,17 +47,13 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorSharedDomainsTest extends AbstractClientApiTest {
 
-    private final ReactorSharedDomains sharedDomains = new ReactorSharedDomains(CONNECTION_CONTEXT,
-        this.root,
-        TOKEN_PROVIDER,
-        Collections.emptyMap());
+    private final ReactorSharedDomains sharedDomains = new ReactorSharedDomains(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST)
-                .path("/shared_domains")
+                .method(POST).path("/shared_domains")
                 .payload("fixtures/client/v2/shared_domains/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -66,10 +62,11 @@ public final class ReactorSharedDomainsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.sharedDomains.create(CreateSharedDomainRequest.builder()
-            .name("shared-domain.com")
-            .routerGroupId("random-guid")
-            .build())
+        this.sharedDomains
+            .create(CreateSharedDomainRequest.builder()
+                .name("shared-domain.com")
+                .routerGroupId("random-guid")
+                .build())
             .as(StepVerifier::create)
             .expectNext(CreateSharedDomainResponse.builder()
                 .metadata(Metadata.builder()
@@ -91,17 +88,17 @@ public final class ReactorSharedDomainsTest extends AbstractClientApiTest {
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE)
-                .path("/shared_domains/fa1385de-55ba-41d3-beb2-f83919c634d6")
+                .method(DELETE).path("/shared_domains/fa1385de-55ba-41d3-beb2-f83919c634d6")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
                 .build())
             .build());
 
-        this.sharedDomains.delete(DeleteSharedDomainRequest.builder()
-            .sharedDomainId("fa1385de-55ba-41d3-beb2-f83919c634d6")
-            .build())
+        this.sharedDomains
+            .delete(DeleteSharedDomainRequest.builder()
+                .sharedDomainId("fa1385de-55ba-41d3-beb2-f83919c634d6")
+                .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -111,8 +108,7 @@ public final class ReactorSharedDomainsTest extends AbstractClientApiTest {
     public void deleteAsync() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE)
-                .path("/shared_domains/fa1385de-55ba-41d3-beb2-f83919c634d6?async=true")
+                .method(DELETE).path("/shared_domains/fa1385de-55ba-41d3-beb2-f83919c634d6?async=true")
                 .build())
             .response(TestResponse.builder()
                 .status(ACCEPTED)
@@ -120,10 +116,11 @@ public final class ReactorSharedDomainsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.sharedDomains.delete(DeleteSharedDomainRequest.builder()
-            .async(true)
-            .sharedDomainId("fa1385de-55ba-41d3-beb2-f83919c634d6")
-            .build())
+        this.sharedDomains
+            .delete(DeleteSharedDomainRequest.builder()
+                .async(true)
+                .sharedDomainId("fa1385de-55ba-41d3-beb2-f83919c634d6")
+                .build())
             .as(StepVerifier::create)
             .expectNext(DeleteSharedDomainResponse.builder()
                 .metadata(Metadata.builder()
@@ -144,8 +141,7 @@ public final class ReactorSharedDomainsTest extends AbstractClientApiTest {
     public void listSharedDomains() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/shared_domains?page=-1")
+                .method(GET).path("/shared_domains?page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -153,9 +149,10 @@ public final class ReactorSharedDomainsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.sharedDomains.list(ListSharedDomainsRequest.builder()
-            .page(-1)
-            .build())
+        this.sharedDomains
+            .list(ListSharedDomainsRequest.builder()
+                .page(-1)
+                .build())
             .as(StepVerifier::create)
             .expectNext(ListSharedDomainsResponse.builder()
                 .totalResults(5)
@@ -217,18 +214,16 @@ public final class ReactorSharedDomainsTest extends AbstractClientApiTest {
 
     public static final class Get extends AbstractClientApiTest {
 
-        private final ReactorSharedDomains sharedDomains = new ReactorSharedDomains(CONNECTION_CONTEXT,
-            this.root,
-            TOKEN_PROVIDER,
-            Collections.emptyMap());
+        private final ReactorSharedDomains sharedDomains = new ReactorSharedDomains(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
         @Test
         public void get() {
             mockRequest(interactionContext());
 
-            this.sharedDomains.get(GetSharedDomainRequest.builder()
-                .sharedDomainId("fa1385de-55ba-41d3-beb2-f83919c634d6")
-                .build())
+            this.sharedDomains
+                .get(GetSharedDomainRequest.builder()
+                    .sharedDomainId("fa1385de-55ba-41d3-beb2-f83919c634d6")
+                    .build())
                 .as(StepVerifier::create)
                 .expectNext(GetSharedDomainResponse.builder()
                     .metadata(Metadata.builder()
@@ -247,8 +242,7 @@ public final class ReactorSharedDomainsTest extends AbstractClientApiTest {
         public InteractionContext interactionContext() {
             return InteractionContext.builder()
                 .request(TestRequest.builder()
-                    .method(GET)
-                    .path("/shared_domains/fa1385de-55ba-41d3-beb2-f83919c634d6")
+                    .method(GET).path("/shared_domains/fa1385de-55ba-41d3-beb2-f83919c634d6")
                     .build())
                 .response(TestResponse.builder()
                     .status(OK)

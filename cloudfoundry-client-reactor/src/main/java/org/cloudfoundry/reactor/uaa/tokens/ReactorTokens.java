@@ -64,9 +64,9 @@ public final class ReactorTokens extends AbstractUaaOperations implements Tokens
      * @param connectionContext the {@link ConnectionContext} to use when communicating with the server
      * @param root              the root URI of the server. Typically something like {@code https://uaa.run.pivotal.io}.
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
+     * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorTokens(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider,
-                         Map<String, String> requestTags) {
+    public ReactorTokens(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
@@ -134,12 +134,14 @@ public final class ReactorTokens extends AbstractUaaOperations implements Tokens
 
     @Override
     public Mono<GetTokenKeyResponse> getKey(GetTokenKeyRequest request) {
-        return get(request, GetTokenKeyResponse.class, builder -> builder.pathSegment("token_key")).checkpoint();
+        return get(request, GetTokenKeyResponse.class, builder -> builder.pathSegment("token_key"))
+            .checkpoint();
     }
 
     @Override
     public Mono<ListTokenKeysResponse> listKeys(ListTokenKeysRequest request) {
-        return get(request, ListTokenKeysResponse.class, builder -> builder.pathSegment("token_keys")).checkpoint();
+        return get(request, ListTokenKeysResponse.class, builder -> builder.pathSegment("token_keys"))
+            .checkpoint();
     }
 
     @Override

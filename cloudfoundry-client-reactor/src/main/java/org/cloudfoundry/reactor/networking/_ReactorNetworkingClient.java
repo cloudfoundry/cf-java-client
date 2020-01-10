@@ -59,8 +59,7 @@ abstract class _ReactorNetworkingClient implements NetworkingClient {
 
     @Value.Default
     Mono<String> getRoot() {
-        return getConnectionContext().getRootProvider()
-            .getRoot("network_policy_v1", getConnectionContext());
+        return getConnectionContext().getRootProvider().getRoot("network_policy_v1", getConnectionContext());
     }
 
     /**

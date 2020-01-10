@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.reactor.client.v3.serviceInstances;
+package org.cloudfoundry.reactor.client.v3.serviceinstances;
 
 import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.Metadata;
@@ -36,7 +36,6 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import org.cloudfoundry.reactor.client.v3.serviceinstances.ReactorServiceInstancesV3;
 import org.junit.Test;
 import reactor.test.StepVerifier;
 
@@ -53,17 +52,13 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest {
 
-    private final ReactorServiceInstancesV3 serviceInstances = new ReactorServiceInstancesV3(CONNECTION_CONTEXT,
-        this.root,
-        TOKEN_PROVIDER,
-        Collections.emptyMap());
+    private final ReactorServiceInstancesV3 serviceInstances = new ReactorServiceInstancesV3(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/service_instances?names=test-service-instance-name&space_guids=test-space-id&page=1")
+                .method(GET).path("/service_instances?names=test-service-instance-name&space_guids=test-space-id&page=1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -71,11 +66,12 @@ public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.serviceInstances.list(ListServiceInstancesRequest.builder()
-            .page(1)
-            .serviceInstanceName("test-service-instance-name")
-            .spaceId("test-space-id")
-            .build())
+        this.serviceInstances
+            .list(ListServiceInstancesRequest.builder()
+                .page(1)
+                .serviceInstanceName("test-service-instance-name")
+                .spaceId("test-space-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(ListServiceInstancesResponse.builder()
                 .pagination(Pagination.builder()
@@ -144,8 +140,7 @@ public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest {
     public void listSharedSpaces() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/service_instances/test-service-instance-id/relationships/shared_spaces")
+                .method(GET).path("/service_instances/test-service-instance-id/relationships/shared_spaces")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -153,9 +148,10 @@ public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.serviceInstances.listSharedSpacesRelationship(ListSharedSpacesRelationshipRequest.builder()
-            .serviceInstanceId("test-service-instance-id")
-            .build())
+        this.serviceInstances
+            .listSharedSpacesRelationship(ListSharedSpacesRelationshipRequest.builder()
+                .serviceInstanceId("test-service-instance-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(ListSharedSpacesRelationshipResponse.builder()
                 .data(Relationship.builder()
@@ -176,8 +172,7 @@ public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest {
     public void share() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST)
-                .path("/service_instances/test-service-instance-id/relationships/shared_spaces")
+                .method(POST).path("/service_instances/test-service-instance-id/relationships/shared_spaces")
                 .payload("fixtures/client/v3/serviceinstances/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -186,15 +181,16 @@ public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.serviceInstances.share(ShareServiceInstanceRequest.builder()
-            .serviceInstanceId("test-service-instance-id")
-            .data(Relationship.builder()
-                .id("space-guid-1")
+        this.serviceInstances
+            .share(ShareServiceInstanceRequest.builder()
+                .serviceInstanceId("test-service-instance-id")
+                .data(Relationship.builder()
+                    .id("space-guid-1")
+                    .build())
+                .data(Relationship.builder()
+                    .id("space-guid-2")
+                    .build())
                 .build())
-            .data(Relationship.builder()
-                .id("space-guid-2")
-                .build())
-            .build())
             .as(StepVerifier::create)
             .expectNext(ShareServiceInstanceResponse.builder()
                 .data(Relationship.builder()
@@ -215,18 +211,18 @@ public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest {
     public void unshare() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE)
-                .path("/service_instances/test-service-instance-id/relationships/shared_spaces/test-space-id")
+                .method(DELETE).path("/service_instances/test-service-instance-id/relationships/shared_spaces/test-space-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
                 .build())
             .build());
 
-        this.serviceInstances.unshare(UnshareServiceInstanceRequest.builder()
-            .serviceInstanceId("test-service-instance-id")
-            .spaceId("test-space-id")
-            .build())
+        this.serviceInstances
+            .unshare(UnshareServiceInstanceRequest.builder()
+                .serviceInstanceId("test-service-instance-id")
+                .spaceId("test-space-id")
+                .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -236,8 +232,7 @@ public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest {
     public void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PATCH)
-                .path("/service_instances/68d54d31-9b3a-463b-ba94-e8e4c32edbac")
+                .method(PATCH).path("/service_instances/68d54d31-9b3a-463b-ba94-e8e4c32edbac")
                 .payload("fixtures/client/v3/serviceinstances/PATCH_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -246,13 +241,14 @@ public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.serviceInstances.update(UpdateServiceInstanceRequest.builder()
-            .serviceInstanceId("68d54d31-9b3a-463b-ba94-e8e4c32edbac")
-            .metadata(Metadata.builder()
-                .annotation("note", "detailed information")
-                .label("key", "value")
+        this.serviceInstances
+            .update(UpdateServiceInstanceRequest.builder()
+                .serviceInstanceId("68d54d31-9b3a-463b-ba94-e8e4c32edbac")
+                .metadata(Metadata.builder()
+                    .annotation("note", "detailed information")
+                    .label("key", "value")
+                    .build())
                 .build())
-            .build())
             .as(StepVerifier::create)
             .expectNext(UpdateServiceInstanceResponse.builder()
                 .createdAt("2017-11-17T13:54:21Z")

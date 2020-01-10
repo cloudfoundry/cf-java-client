@@ -72,17 +72,13 @@ import static org.cloudfoundry.client.v2.securitygroups.Protocol.UDP;
 
 public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
 
-    private final ReactorSecurityGroups securityGroups = new ReactorSecurityGroups(CONNECTION_CONTEXT,
-        this.root,
-        TOKEN_PROVIDER,
-        Collections.emptyMap());
+    private final ReactorSecurityGroups securityGroups = new ReactorSecurityGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void associateSpace() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT)
-                .path("/security_groups/1452e164-0c3e-4a6c-b3c3-c40ad9fd0159/spaces/1305ec2b-a31c-4d2e-adc8-d9b764237e96")
+                .method(PUT).path("/security_groups/1452e164-0c3e-4a6c-b3c3-c40ad9fd0159/spaces/1305ec2b-a31c-4d2e-adc8-d9b764237e96")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -90,10 +86,11 @@ public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.securityGroups.associateSpace(AssociateSecurityGroupSpaceRequest.builder()
-            .securityGroupId("1452e164-0c3e-4a6c-b3c3-c40ad9fd0159")
-            .spaceId("1305ec2b-a31c-4d2e-adc8-d9b764237e96")
-            .build())
+        this.securityGroups
+            .associateSpace(AssociateSecurityGroupSpaceRequest.builder()
+                .securityGroupId("1452e164-0c3e-4a6c-b3c3-c40ad9fd0159")
+                .spaceId("1305ec2b-a31c-4d2e-adc8-d9b764237e96")
+                .build())
             .as(StepVerifier::create)
             .expectNext(AssociateSecurityGroupSpaceResponse.builder()
                 .metadata(Metadata.builder()
@@ -118,8 +115,7 @@ public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST)
-                .path("/security_groups")
+                .method(POST).path("/security_groups")
                 .payload("fixtures/client/v2/security_groups/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -128,30 +124,31 @@ public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.securityGroups.create(CreateSecurityGroupRequest.builder()
-            .name("my_super_sec_group")
-            .rule(RuleEntity.builder()
-                .protocol(ICMP)
-                .destination("0.0.0.0/0")
-                .type(0)
-                .code(1)
+        this.securityGroups
+            .create(CreateSecurityGroupRequest.builder()
+                .name("my_super_sec_group")
+                .rule(RuleEntity.builder()
+                    .protocol(ICMP)
+                    .destination("0.0.0.0/0")
+                    .type(0)
+                    .code(1)
+                    .build())
+                .rule(RuleEntity.builder()
+                    .protocol(TCP)
+                    .destination("0.0.0.0/0")
+                    .ports("2048-3000")
+                    .log(true)
+                    .build())
+                .rule(RuleEntity.builder()
+                    .protocol(UDP)
+                    .destination("0.0.0.0/0")
+                    .ports("53, 5353")
+                    .build())
+                .rule(RuleEntity.builder()
+                    .protocol(ALL)
+                    .destination("0.0.0.0/0")
+                    .build())
                 .build())
-            .rule(RuleEntity.builder()
-                .protocol(TCP)
-                .destination("0.0.0.0/0")
-                .ports("2048-3000")
-                .log(true)
-                .build())
-            .rule(RuleEntity.builder()
-                .protocol(UDP)
-                .destination("0.0.0.0/0")
-                .ports("53, 5353")
-                .build())
-            .rule(RuleEntity.builder()
-                .protocol(ALL)
-                .destination("0.0.0.0/0")
-                .build())
-            .build())
             .as(StepVerifier::create)
             .expectNext(CreateSecurityGroupResponse.builder()
                 .metadata(Metadata.builder()
@@ -195,17 +192,17 @@ public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE)
-                .path("/security_groups/test-id")
+                .method(DELETE).path("/security_groups/test-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
                 .build())
             .build());
 
-        this.securityGroups.delete(DeleteSecurityGroupRequest.builder()
-            .securityGroupId("test-id")
-            .build())
+        this.securityGroups
+            .delete(DeleteSecurityGroupRequest.builder()
+                .securityGroupId("test-id")
+                .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -215,8 +212,7 @@ public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
     public void deleteAsync() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE)
-                .path("/security_groups/test-id?async=true")
+                .method(DELETE).path("/security_groups/test-id?async=true")
                 .build())
             .response(TestResponse.builder()
                 .status(ACCEPTED)
@@ -224,10 +220,11 @@ public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.securityGroups.delete(DeleteSecurityGroupRequest.builder()
-            .async(true)
-            .securityGroupId("test-id")
-            .build())
+        this.securityGroups
+            .delete(DeleteSecurityGroupRequest.builder()
+                .async(true)
+                .securityGroupId("test-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(DeleteSecurityGroupResponse.builder()
                 .metadata(Metadata.builder()
@@ -248,17 +245,17 @@ public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
     public void deleteRunning() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE)
-                .path("/config/running_security_groups/test-id")
+                .method(DELETE).path("/config/running_security_groups/test-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
                 .build())
             .build());
 
-        this.securityGroups.removeRunningDefault(RemoveSecurityGroupRunningDefaultRequest.builder()
-            .securityGroupId("test-id")
-            .build())
+        this.securityGroups
+            .removeRunningDefault(RemoveSecurityGroupRunningDefaultRequest.builder()
+                .securityGroupId("test-id")
+                .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -268,17 +265,17 @@ public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
     public void deleteStaging() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE)
-                .path("/config/staging_security_groups/test-id")
+                .method(DELETE).path("/config/staging_security_groups/test-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
                 .build())
             .build());
 
-        this.securityGroups.removeStagingDefault(RemoveSecurityGroupStagingDefaultRequest.builder()
-            .securityGroupId("test-id")
-            .build())
+        this.securityGroups
+            .removeStagingDefault(RemoveSecurityGroupStagingDefaultRequest.builder()
+                .securityGroupId("test-id")
+                .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -288,8 +285,7 @@ public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/security_groups/1452e164-0c3e-4a6c-b3c3-c40ad9fd0159")
+                .method(GET).path("/security_groups/1452e164-0c3e-4a6c-b3c3-c40ad9fd0159")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -297,9 +293,10 @@ public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.securityGroups.get(GetSecurityGroupRequest.builder()
-            .securityGroupId("1452e164-0c3e-4a6c-b3c3-c40ad9fd0159")
-            .build())
+        this.securityGroups
+            .get(GetSecurityGroupRequest.builder()
+                .securityGroupId("1452e164-0c3e-4a6c-b3c3-c40ad9fd0159")
+                .build())
             .as(StepVerifier::create)
             .expectNext(GetSecurityGroupResponse.builder()
                 .metadata(Metadata.builder()
@@ -325,8 +322,7 @@ public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/security_groups")
+                .method(GET).path("/security_groups")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -334,8 +330,9 @@ public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.securityGroups.list(ListSecurityGroupsRequest.builder()
-            .build())
+        this.securityGroups
+            .list(ListSecurityGroupsRequest.builder()
+                .build())
             .as(StepVerifier::create)
             .expectNext(ListSecurityGroupsResponse.builder()
                 .totalResults(5)
@@ -431,8 +428,7 @@ public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
     public void listRunning() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/config/running_security_groups")
+                .method(GET).path("/config/running_security_groups")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -440,8 +436,9 @@ public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.securityGroups.listRunningDefaults(ListSecurityGroupRunningDefaultsRequest.builder()
-            .build())
+        this.securityGroups
+            .listRunningDefaults(ListSecurityGroupRunningDefaultsRequest.builder()
+                .build())
             .as(StepVerifier::create)
             .expectNext(ListSecurityGroupRunningDefaultsResponse.builder()
                 .totalPages(1)
@@ -472,8 +469,7 @@ public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
     public void listSpaces() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/security_groups/1452e164-0c3e-4a6c-b3c3-c40ad9fd0159/spaces?space_guid=09a060b2-f97a-4a57-b7d2-35e06ad71050")
+                .method(GET).path("/security_groups/1452e164-0c3e-4a6c-b3c3-c40ad9fd0159/spaces?space_guid=09a060b2-f97a-4a57-b7d2-35e06ad71050")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -481,10 +477,11 @@ public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.securityGroups.listSpaces(ListSecurityGroupSpacesRequest.builder()
-            .securityGroupId("1452e164-0c3e-4a6c-b3c3-c40ad9fd0159")
-            .spaceId("09a060b2-f97a-4a57-b7d2-35e06ad71050")
-            .build())
+        this.securityGroups
+            .listSpaces(ListSecurityGroupSpacesRequest.builder()
+                .securityGroupId("1452e164-0c3e-4a6c-b3c3-c40ad9fd0159")
+                .spaceId("09a060b2-f97a-4a57-b7d2-35e06ad71050")
+                .build())
             .as(StepVerifier::create)
             .expectNext(ListSecurityGroupSpacesResponse.builder()
                 .totalPages(1)
@@ -523,8 +520,7 @@ public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
     public void listStaging() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/config/staging_security_groups")
+                .method(GET).path("/config/staging_security_groups")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -532,8 +528,9 @@ public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.securityGroups.listStagingDefaults(ListSecurityGroupStagingDefaultsRequest.builder()
-            .build())
+        this.securityGroups
+            .listStagingDefaults(ListSecurityGroupStagingDefaultsRequest.builder()
+                .build())
             .as(StepVerifier::create)
             .expectNext(ListSecurityGroupStagingDefaultsResponse.builder()
                 .totalPages(1)
@@ -564,18 +561,18 @@ public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
     public void removeSpace() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE)
-                .path("/security_groups/1452e164-0c3e-4a6c-b3c3-c40ad9fd0159/spaces/ca8f04d1-bc2b-40ef-975e-fda2cc785c2a")
+                .method(DELETE).path("/security_groups/1452e164-0c3e-4a6c-b3c3-c40ad9fd0159/spaces/ca8f04d1-bc2b-40ef-975e-fda2cc785c2a")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
                 .build())
             .build());
 
-        this.securityGroups.removeSpace(RemoveSecurityGroupSpaceRequest.builder()
-            .securityGroupId("1452e164-0c3e-4a6c-b3c3-c40ad9fd0159")
-            .spaceId("ca8f04d1-bc2b-40ef-975e-fda2cc785c2a")
-            .build())
+        this.securityGroups
+            .removeSpace(RemoveSecurityGroupSpaceRequest.builder()
+                .securityGroupId("1452e164-0c3e-4a6c-b3c3-c40ad9fd0159")
+                .spaceId("ca8f04d1-bc2b-40ef-975e-fda2cc785c2a")
+                .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -585,8 +582,7 @@ public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
     public void setRunning() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT)
-                .path("/config/running_security_groups/test-security-group-default-id")
+                .method(PUT).path("/config/running_security_groups/test-security-group-default-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -594,9 +590,10 @@ public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.securityGroups.setRunningDefault(SetSecurityGroupRunningDefaultRequest.builder()
-            .securityGroupId("test-security-group-default-id")
-            .build())
+        this.securityGroups
+            .setRunningDefault(SetSecurityGroupRunningDefaultRequest.builder()
+                .securityGroupId("test-security-group-default-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(SetSecurityGroupRunningDefaultResponse.builder()
                 .metadata(Metadata.builder()
@@ -624,8 +621,7 @@ public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
     public void setStaging() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT)
-                .path("/config/staging_security_groups/test-security-group-default-id")
+                .method(PUT).path("/config/staging_security_groups/test-security-group-default-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -633,9 +629,10 @@ public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.securityGroups.setStagingDefault(SetSecurityGroupStagingDefaultRequest.builder()
-            .securityGroupId("test-security-group-default-id")
-            .build())
+        this.securityGroups
+            .setStagingDefault(SetSecurityGroupStagingDefaultRequest.builder()
+                .securityGroupId("test-security-group-default-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(SetSecurityGroupStagingDefaultResponse.builder()
                 .metadata(Metadata.builder()
@@ -663,8 +660,7 @@ public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
     public void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT)
-                .path("/security_groups/1452e164-0c3e-4a6c-b3c3-c40ad9fd0159")
+                .method(PUT).path("/security_groups/1452e164-0c3e-4a6c-b3c3-c40ad9fd0159")
                 .payload("fixtures/client/v2/security_groups/PUT_{id}_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -673,11 +669,12 @@ public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.securityGroups.update(UpdateSecurityGroupRequest.builder()
-            .name("new_name")
-            .rules()
-            .securityGroupId("1452e164-0c3e-4a6c-b3c3-c40ad9fd0159")
-            .build())
+        this.securityGroups
+            .update(UpdateSecurityGroupRequest.builder()
+                .name("new_name")
+                .rules()
+                .securityGroupId("1452e164-0c3e-4a6c-b3c3-c40ad9fd0159")
+                .build())
             .as(StepVerifier::create)
             .expectNext(UpdateSecurityGroupResponse.builder()
                 .metadata(Metadata.builder()

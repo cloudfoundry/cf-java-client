@@ -39,15 +39,14 @@ public final class ReactorBlobstores extends AbstractClientV2Operations implemen
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorBlobstores(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider,
-                             Map<String, String> requestTags) {
+    public ReactorBlobstores(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<DeleteBlobstoreBuildpackCachesResponse> deleteBuildpackCaches(DeleteBlobstoreBuildpackCachesRequest request) {
-        return delete(request, DeleteBlobstoreBuildpackCachesResponse.class,
-            builder -> builder.pathSegment("blobstores", "buildpack_cache")).checkpoint();
+        return delete(request, DeleteBlobstoreBuildpackCachesResponse.class, builder -> builder.pathSegment("blobstores", "buildpack_cache"))
+            .checkpoint();
     }
 
 }

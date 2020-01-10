@@ -47,36 +47,38 @@ public final class ReactorSpacesV3 extends AbstractClientV3Operations implements
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorSpacesV3(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider,
-                           Map<String, String> requestTags) {
+    public ReactorSpacesV3(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<AssignSpaceIsolationSegmentResponse> assignIsolationSegment(AssignSpaceIsolationSegmentRequest request) {
-        return patch(request, AssignSpaceIsolationSegmentResponse.class,
-            builder -> builder.pathSegment("spaces", request.getSpaceId(), "relationships", "isolation_segment")).checkpoint();
+        return patch(request, AssignSpaceIsolationSegmentResponse.class, builder -> builder.pathSegment("spaces", request.getSpaceId(), "relationships", "isolation_segment"))
+            .checkpoint();
     }
 
     @Override
     public Mono<CreateSpaceResponse> create(CreateSpaceRequest request) {
-        return post(request, CreateSpaceResponse.class, builder -> builder.pathSegment("spaces")).checkpoint();
+        return post(request, CreateSpaceResponse.class, builder -> builder.pathSegment("spaces"))
+            .checkpoint();
     }
 
     @Override
     public Mono<GetSpaceResponse> get(GetSpaceRequest request) {
-        return get(request, GetSpaceResponse.class, builder -> builder.pathSegment("spaces", request.getSpaceId())).checkpoint();
+        return get(request, GetSpaceResponse.class, builder -> builder.pathSegment("spaces", request.getSpaceId()))
+            .checkpoint();
     }
 
     @Override
     public Mono<GetSpaceIsolationSegmentResponse> getIsolationSegment(GetSpaceIsolationSegmentRequest request) {
-        return get(request, GetSpaceIsolationSegmentResponse.class,
-            builder -> builder.pathSegment("spaces", request.getSpaceId(), "relationships", "isolation_segment")).checkpoint();
+        return get(request, GetSpaceIsolationSegmentResponse.class, builder -> builder.pathSegment("spaces", request.getSpaceId(), "relationships", "isolation_segment"))
+            .checkpoint();
     }
 
     @Override
     public Mono<ListSpacesResponse> list(ListSpacesRequest request) {
-        return get(request, ListSpacesResponse.class, builder -> builder.pathSegment("spaces")).checkpoint();
+        return get(request, ListSpacesResponse.class, builder -> builder.pathSegment("spaces"))
+            .checkpoint();
     }
 
 }

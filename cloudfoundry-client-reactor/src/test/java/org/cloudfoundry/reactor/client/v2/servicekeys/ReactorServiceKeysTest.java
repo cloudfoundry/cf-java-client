@@ -45,17 +45,13 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorServiceKeysTest extends AbstractClientApiTest {
 
-    private final ReactorServiceKeys serviceKeys = new ReactorServiceKeys(CONNECTION_CONTEXT,
-        this.root,
-        TOKEN_PROVIDER,
-        Collections.emptyMap());
+    private final ReactorServiceKeys serviceKeys = new ReactorServiceKeys(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST)
-                .path("/service_keys")
+                .method(POST).path("/service_keys")
                 .payload("fixtures/client/v2/service_keys/POST_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -64,10 +60,11 @@ public final class ReactorServiceKeysTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.serviceKeys.create(CreateServiceKeyRequest.builder()
-            .name("name-960")
-            .serviceInstanceId("132944c8-c31d-4bb8-9155-ae4e2ebe1a0c")
-            .build())
+        this.serviceKeys
+            .create(CreateServiceKeyRequest.builder()
+                .name("name-960")
+                .serviceInstanceId("132944c8-c31d-4bb8-9155-ae4e2ebe1a0c")
+                .build())
             .as(StepVerifier::create)
             .expectNext(CreateServiceKeyResponse.builder()
                 .metadata(Metadata.builder()
@@ -90,17 +87,17 @@ public final class ReactorServiceKeysTest extends AbstractClientApiTest {
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE)
-                .path("/service_keys/test-service-key-id")
+                .method(DELETE).path("/service_keys/test-service-key-id")
                 .build())
             .response(TestResponse.builder()
                 .status(NO_CONTENT)
                 .build())
             .build());
 
-        this.serviceKeys.delete(DeleteServiceKeyRequest.builder()
-            .serviceKeyId("test-service-key-id")
-            .build())
+        this.serviceKeys
+            .delete(DeleteServiceKeyRequest.builder()
+                .serviceKeyId("test-service-key-id")
+                .build())
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -110,8 +107,7 @@ public final class ReactorServiceKeysTest extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/service_keys/test-service-key-id")
+                .method(GET).path("/service_keys/test-service-key-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -119,9 +115,10 @@ public final class ReactorServiceKeysTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.serviceKeys.get(GetServiceKeyRequest.builder()
-            .serviceKeyId("test-service-key-id")
-            .build())
+        this.serviceKeys
+            .get(GetServiceKeyRequest.builder()
+                .serviceKeyId("test-service-key-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(GetServiceKeyResponse.builder()
                 .metadata(Metadata.builder()
@@ -146,8 +143,7 @@ public final class ReactorServiceKeysTest extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/service_keys?q=name:test-name&page=-1")
+                .method(GET).path("/service_keys?q=name:test-name&page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -155,10 +151,11 @@ public final class ReactorServiceKeysTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.serviceKeys.list(ListServiceKeysRequest.builder()
-            .name("test-name")
-            .page(-1)
-            .build())
+        this.serviceKeys
+            .list(ListServiceKeysRequest.builder()
+                .name("test-name")
+                .page(-1)
+                .build())
             .as(StepVerifier::create)
             .expectNext(ListServiceKeysResponse.builder()
                 .totalResults(1)
@@ -170,8 +167,7 @@ public final class ReactorServiceKeysTest extends AbstractClientApiTest {
                         .url("/v2/service_keys/3936801c-9d3f-4b9f-8465-aa3bd263612e")
                         .build())
                     .entity(ServiceKeyEntity.builder()
-                        .credential("creds-key-383",
-                            "creds-val-383")
+                        .credential("creds-key-383", "creds-val-383")
                         .name("name-934")
                         .serviceInstanceId("84d384d9-42c2-4e4b-a8c6-865e9446e024")
                         .serviceInstanceUrl("/v2/service_instances/84d384d9-42c2-4e4b-a8c6-865e9446e024")

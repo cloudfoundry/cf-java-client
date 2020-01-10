@@ -62,8 +62,7 @@ public final class ReactorDropletsTest extends AbstractClientApiTest {
     public void copy() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST)
-                .path("/droplets?source_guid=test-source-droplet-id")
+                .method(POST).path("/droplets?source_guid=test-source-droplet-id")
                 .payload("fixtures/client/v3/droplets/POST_source_guid={id}_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -72,16 +71,17 @@ public final class ReactorDropletsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.droplets.copy(CopyDropletRequest.builder()
-            .sourceDropletId("test-source-droplet-id")
-            .relationships(DropletRelationships.builder()
-                .application(ToOneRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("[app-guid]")
+        this.droplets
+            .copy(CopyDropletRequest.builder()
+                .sourceDropletId("test-source-droplet-id")
+                .relationships(DropletRelationships.builder()
+                    .application(ToOneRelationship.builder()
+                        .data(Relationship.builder()
+                            .id("[app-guid]")
+                            .build())
                         .build())
                     .build())
                 .build())
-            .build())
             .as(StepVerifier::create)
             .expectNext(CopyDropletResponse.builder()
                 .id("585bc3c1-3743-497d-88b0-403ad6b56d16")
@@ -121,8 +121,7 @@ public final class ReactorDropletsTest extends AbstractClientApiTest {
     public void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(DELETE)
-                .path("/droplets/test-droplet-id")
+                .method(DELETE).path("/droplets/test-droplet-id")
                 .build())
             .response(TestResponse.builder()
                 .status(ACCEPTED)
@@ -130,9 +129,10 @@ public final class ReactorDropletsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.droplets.delete(DeleteDropletRequest.builder()
-            .dropletId("test-droplet-id")
-            .build())
+        this.droplets
+            .delete(DeleteDropletRequest.builder()
+                .dropletId("test-droplet-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext("[guid]")
             .expectComplete()
@@ -143,8 +143,7 @@ public final class ReactorDropletsTest extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/droplets/test-droplet-id")
+                .method(GET).path("/droplets/test-droplet-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -152,9 +151,10 @@ public final class ReactorDropletsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.droplets.get(GetDropletRequest.builder()
-            .dropletId("test-droplet-id")
-            .build())
+        this.droplets
+            .get(GetDropletRequest.builder()
+                .dropletId("test-droplet-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(GetDropletResponse.builder()
                 .id("585bc3c1-3743-497d-88b0-403ad6b56d16")
@@ -204,8 +204,7 @@ public final class ReactorDropletsTest extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/droplets")
+                .method(GET).path("/droplets")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -213,8 +212,9 @@ public final class ReactorDropletsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.droplets.list(ListDropletsRequest.builder()
-            .build())
+        this.droplets
+            .list(ListDropletsRequest.builder()
+                .build())
             .as(StepVerifier::create)
             .expectNext(ListDropletsResponse.builder()
                 .pagination(Pagination.builder()
@@ -237,8 +237,7 @@ public final class ReactorDropletsTest extends AbstractClientApiTest {
                             .build())
                         .build())
                     .executionMetadata("PRIVATE DATA HIDDEN")
-                    .processType("redacted_message",
-                        "[PRIVATE DATA HIDDEN IN LISTS]")
+                    .processType("redacted_message", "[PRIVATE DATA HIDDEN IN LISTS]")
                     .checksum(Checksum.builder()
                         .type(ChecksumType.SHA256)
                         .value("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855")
@@ -275,8 +274,7 @@ public final class ReactorDropletsTest extends AbstractClientApiTest {
                             .build())
                         .build())
                     .executionMetadata("[PRIVATE DATA HIDDEN IN LISTS]")
-                    .processType("redacted_message",
-                        "[PRIVATE DATA HIDDEN IN LISTS]")
+                    .processType("redacted_message", "[PRIVATE DATA HIDDEN IN LISTS]")
                     .image("cloudfoundry/diego-docker-app-custom:latest")
                     .checksum(null)
                     .stack(null)

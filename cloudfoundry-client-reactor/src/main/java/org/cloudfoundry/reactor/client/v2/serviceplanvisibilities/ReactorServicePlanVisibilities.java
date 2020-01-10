@@ -47,39 +47,38 @@ public final class ReactorServicePlanVisibilities extends AbstractClientV2Operat
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorServicePlanVisibilities(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider,
-                                          Map<String, String> requestTags) {
+    public ReactorServicePlanVisibilities(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<CreateServicePlanVisibilityResponse> create(CreateServicePlanVisibilityRequest request) {
-        return post(request, CreateServicePlanVisibilityResponse.class,
-            builder -> builder.pathSegment("service_plan_visibilities")).checkpoint();
+        return post(request, CreateServicePlanVisibilityResponse.class, builder -> builder.pathSegment("service_plan_visibilities"))
+            .checkpoint();
     }
 
     @Override
     public Mono<DeleteServicePlanVisibilityResponse> delete(DeleteServicePlanVisibilityRequest request) {
-        return delete(request, DeleteServicePlanVisibilityResponse.class,
-            builder -> builder.pathSegment("service_plan_visibilities", request.getServicePlanVisibilityId())).checkpoint();
+        return delete(request, DeleteServicePlanVisibilityResponse.class, builder -> builder.pathSegment("service_plan_visibilities", request.getServicePlanVisibilityId()))
+            .checkpoint();
     }
 
     @Override
     public Mono<GetServicePlanVisibilityResponse> get(GetServicePlanVisibilityRequest request) {
-        return get(request, GetServicePlanVisibilityResponse.class,
-            builder -> builder.pathSegment("service_plan_visibilities", request.getServicePlanVisibilityId())).checkpoint();
+        return get(request, GetServicePlanVisibilityResponse.class, builder -> builder.pathSegment("service_plan_visibilities", request.getServicePlanVisibilityId()))
+            .checkpoint();
     }
 
     @Override
     public Mono<ListServicePlanVisibilitiesResponse> list(ListServicePlanVisibilitiesRequest request) {
-        return get(request, ListServicePlanVisibilitiesResponse.class,
-            builder -> builder.pathSegment("service_plan_visibilities")).checkpoint();
+        return get(request, ListServicePlanVisibilitiesResponse.class, builder -> builder.pathSegment("service_plan_visibilities"))
+            .checkpoint();
     }
 
     @Override
     public Mono<UpdateServicePlanVisibilityResponse> update(UpdateServicePlanVisibilityRequest request) {
-        return put(request, UpdateServicePlanVisibilityResponse.class,
-            builder -> builder.pathSegment("service_plan_visibilities", request.getServicePlanVisibilityId())).checkpoint();
+        return put(request, UpdateServicePlanVisibilityResponse.class, builder -> builder.pathSegment("service_plan_visibilities", request.getServicePlanVisibilityId()))
+            .checkpoint();
     }
 
 }

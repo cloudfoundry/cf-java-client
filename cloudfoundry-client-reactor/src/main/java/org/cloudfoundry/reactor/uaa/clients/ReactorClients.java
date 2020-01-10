@@ -63,87 +63,93 @@ public final class ReactorClients extends AbstractUaaOperations implements Clien
      * @param connectionContext the {@link ConnectionContext} to use when communicating with the server
      * @param root              the root URI of the server. Typically something like {@code https://uaa.run.pivotal.io}.
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
+     * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorClients(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider,
-                          Map<String, String> requestTags) {
+    public ReactorClients(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<BatchChangeSecretResponse> batchChangeSecret(BatchChangeSecretRequest request) {
-        return post(request, BatchChangeSecretResponse.class,
-            builder -> builder.pathSegment("oauth", "clients", "tx", "secret")).checkpoint();
+        return post(request, BatchChangeSecretResponse.class, builder -> builder.pathSegment("oauth", "clients", "tx", "secret"))
+            .checkpoint();
     }
 
     @Override
     public Mono<BatchCreateClientsResponse> batchCreate(BatchCreateClientsRequest request) {
-        return post(request, BatchCreateClientsResponse.class, builder -> builder.pathSegment("oauth", "clients", "tx")).checkpoint();
+        return post(request, BatchCreateClientsResponse.class, builder -> builder.pathSegment("oauth", "clients", "tx"))
+            .checkpoint();
     }
 
     @Override
     public Mono<BatchDeleteClientsResponse> batchDelete(BatchDeleteClientsRequest request) {
-        return post(request, BatchDeleteClientsResponse.class,
-            builder -> builder.pathSegment("oauth", "clients", "tx", "delete")).checkpoint();
+        return post(request, BatchDeleteClientsResponse.class, builder -> builder.pathSegment("oauth", "clients", "tx", "delete"))
+            .checkpoint();
     }
 
     @Override
     public Mono<BatchUpdateClientsResponse> batchUpdate(BatchUpdateClientsRequest request) {
-        return put(request, BatchUpdateClientsResponse.class, builder -> builder.pathSegment("oauth", "clients", "tx")).checkpoint();
+        return put(request, BatchUpdateClientsResponse.class, builder -> builder.pathSegment("oauth", "clients", "tx"))
+            .checkpoint();
     }
 
     @Override
     public Mono<ChangeSecretResponse> changeSecret(ChangeSecretRequest request) {
-        return put(request, ChangeSecretResponse.class,
-            builder -> builder.pathSegment("oauth", "clients", request.getClientId(), "secret")).checkpoint();
+        return put(request, ChangeSecretResponse.class, builder -> builder.pathSegment("oauth", "clients", request.getClientId(), "secret"))
+            .checkpoint();
     }
 
     @Override
     public Mono<CreateClientResponse> create(CreateClientRequest request) {
-        return post(request, CreateClientResponse.class, builder -> builder.pathSegment("oauth", "clients")).checkpoint();
+        return post(request, CreateClientResponse.class, builder -> builder.pathSegment("oauth", "clients"))
+            .checkpoint();
     }
 
     @Override
     public Mono<DeleteClientResponse> delete(DeleteClientRequest request) {
-        return delete(request, DeleteClientResponse.class,
-            builder -> builder.pathSegment("oauth", "clients", request.getClientId())).checkpoint();
+        return delete(request, DeleteClientResponse.class, builder -> builder.pathSegment("oauth", "clients", request.getClientId()))
+            .checkpoint();
     }
 
     @Override
     public Mono<GetClientResponse> get(GetClientRequest request) {
-        return get(request, GetClientResponse.class,
-            builder -> builder.pathSegment("oauth", "clients", request.getClientId())).checkpoint();
+        return get(request, GetClientResponse.class, builder -> builder.pathSegment("oauth", "clients", request.getClientId()))
+            .checkpoint();
     }
 
     @Override
     public Mono<GetMetadataResponse> getMetadata(GetMetadataRequest request) {
-        return get(request, GetMetadataResponse.class,
-            builder -> builder.pathSegment("oauth", "clients", request.getClientId(), "meta")).checkpoint();
+        return get(request, GetMetadataResponse.class, builder -> builder.pathSegment("oauth", "clients", request.getClientId(), "meta"))
+            .checkpoint();
     }
 
     @Override
     public Mono<ListClientsResponse> list(ListClientsRequest request) {
-        return get(request, ListClientsResponse.class, builder -> builder.pathSegment("oauth", "clients")).checkpoint();
+        return get(request, ListClientsResponse.class, builder -> builder.pathSegment("oauth", "clients"))
+            .checkpoint();
     }
 
     @Override
     public Mono<ListMetadatasResponse> listMetadatas(ListMetadatasRequest request) {
-        return get(request, ListMetadatasResponse.class, builder -> builder.pathSegment("oauth", "clients", "meta")).checkpoint();
+        return get(request, ListMetadatasResponse.class, builder -> builder.pathSegment("oauth", "clients", "meta"))
+            .checkpoint();
     }
 
     @Override
     public Mono<MixedActionsResponse> mixedActions(MixedActionsRequest request) {
-        return post(request, MixedActionsResponse.class, builder -> builder.pathSegment("oauth", "clients", "tx", "modify")).checkpoint();
+        return post(request, MixedActionsResponse.class, builder -> builder.pathSegment("oauth", "clients", "tx", "modify"))
+            .checkpoint();
     }
 
     @Override
     public Mono<UpdateClientResponse> update(UpdateClientRequest request) {
-        return put(request, UpdateClientResponse.class,
-            builder -> builder.pathSegment("oauth", "clients", request.getClientId())).checkpoint();
+        return put(request, UpdateClientResponse.class, builder -> builder.pathSegment("oauth", "clients", request.getClientId()))
+            .checkpoint();
     }
 
     @Override
     public Mono<UpdateMetadataResponse> updateMetadata(UpdateMetadataRequest request) {
-        return put(request, UpdateMetadataResponse.class,
-            builder -> builder.pathSegment("oauth", "clients", request.getClientId(), "meta")).checkpoint();
+        return put(request, UpdateMetadataResponse.class, builder -> builder.pathSegment("oauth", "clients", request.getClientId(), "meta"))
+            .checkpoint();
     }
 }

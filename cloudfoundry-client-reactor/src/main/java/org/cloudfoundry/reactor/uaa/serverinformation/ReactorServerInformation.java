@@ -47,15 +47,16 @@ public final class ReactorServerInformation extends AbstractUaaOperations implem
      * @param connectionContext the {@link ConnectionContext} to use when communicating with the server
      * @param root              the root URI of the server. Typically something like {@code https://uaa.run.pivotal.io}.
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
+     * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorServerInformation(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider,
-                                    Map<String, String> requestTags) {
+    public ReactorServerInformation(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<Void> autoLogin(AutoLoginRequest request) {
-        return get(request, Void.class, builder -> builder.pathSegment("autologin")).checkpoint();
+        return get(request, Void.class, builder -> builder.pathSegment("autologin"))
+            .checkpoint();
     }
 
     @Override
@@ -74,6 +75,7 @@ public final class ReactorServerInformation extends AbstractUaaOperations implem
 
     @Override
     public Mono<GetInfoResponse> getInfo(GetInfoRequest request) {
-        return get(request, GetInfoResponse.class, builder -> builder.pathSegment("info")).checkpoint();
+        return get(request, GetInfoResponse.class, builder -> builder.pathSegment("info"))
+            .checkpoint();
     }
 }

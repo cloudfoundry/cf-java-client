@@ -53,8 +53,7 @@ public final class ReactorTasksTest extends AbstractClientApiTest {
     public void cancel() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT)
-                .path("/tasks/test-id/cancel")
+                .method(PUT).path("/tasks/test-id/cancel")
                 .build())
             .response(TestResponse.builder()
                 .status(ACCEPTED)
@@ -62,9 +61,10 @@ public final class ReactorTasksTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.tasks.cancel(CancelTaskRequest.builder()
-            .taskId("test-id")
-            .build())
+        this.tasks
+            .cancel(CancelTaskRequest.builder()
+                .taskId("test-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(CancelTaskResponse.builder()
                 .id("d5cc22ec-99a3-4e6a-af91-a44b4ab7b6fa")
@@ -101,8 +101,7 @@ public final class ReactorTasksTest extends AbstractClientApiTest {
     public void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST)
-                .path("/apps/test-application-id/tasks")
+                .method(POST).path("/apps/test-application-id/tasks")
                 .payload("fixtures/client/v3/tasks/POST_apps_{id}_tasks_request.json")
                 .build())
             .response(TestResponse.builder()
@@ -111,10 +110,11 @@ public final class ReactorTasksTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.tasks.create(CreateTaskRequest.builder()
-            .applicationId("test-application-id")
-            .command("rake db:migrate")
-            .build())
+        this.tasks
+            .create(CreateTaskRequest.builder()
+                .applicationId("test-application-id")
+                .command("rake db:migrate")
+                .build())
             .as(StepVerifier::create)
             .expectNext(CreateTaskResponse.builder()
                 .id("d5cc22ec-99a3-4e6a-af91-a44b4ab7b6fa")
@@ -151,8 +151,7 @@ public final class ReactorTasksTest extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/tasks/test-id")
+                .method(GET).path("/tasks/test-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -160,9 +159,10 @@ public final class ReactorTasksTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.tasks.get(GetTaskRequest.builder()
-            .taskId("test-id")
-            .build())
+        this.tasks
+            .get(GetTaskRequest.builder()
+                .taskId("test-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(GetTaskResponse.builder()
                 .id("d5cc22ec-99a3-4e6a-af91-a44b4ab7b6fa")
@@ -199,8 +199,7 @@ public final class ReactorTasksTest extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/tasks")
+                .method(GET).path("/tasks")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -208,8 +207,9 @@ public final class ReactorTasksTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.tasks.list(ListTasksRequest.builder()
-            .build())
+        this.tasks
+            .list(ListTasksRequest.builder()
+                .build())
             .as(StepVerifier::create)
             .expectNext(ListTasksResponse.builder()
                 .pagination(Pagination.builder()

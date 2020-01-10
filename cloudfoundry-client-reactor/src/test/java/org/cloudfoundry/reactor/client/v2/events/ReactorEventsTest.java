@@ -44,8 +44,7 @@ public final class ReactorEventsTest extends AbstractClientApiTest {
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/events/test-event-id")
+                .method(GET).path("/events/test-event-id")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -53,9 +52,10 @@ public final class ReactorEventsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.events.get(GetEventRequest.builder()
-            .eventId("test-event-id")
-            .build())
+        this.events
+            .get(GetEventRequest.builder()
+                .eventId("test-event-id")
+                .build())
             .as(StepVerifier::create)
             .expectNext(GetEventResponse.builder()
                 .metadata(Metadata.builder()
@@ -85,8 +85,7 @@ public final class ReactorEventsTest extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/events?q=actee:test-actee&page=-1")
+                .method(GET).path("/events?q=actee:test-actee&page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -94,10 +93,11 @@ public final class ReactorEventsTest extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.events.list(ListEventsRequest.builder()
-            .actee("test-actee")
-            .page(-1)
-            .build())
+        this.events
+            .list(ListEventsRequest.builder()
+                .actee("test-actee")
+                .page(-1)
+                .build())
             .as(StepVerifier::create)
             .expectNext(ListEventsResponse.builder()
                 .totalResults(3)

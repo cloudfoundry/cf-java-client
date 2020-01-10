@@ -122,8 +122,7 @@ abstract class _ReactorUaaClient implements UaaClient {
 
     @Value.Default
     Mono<String> getRoot() {
-        Mono<String> cached = getConnectionContext().getRootProvider()
-            .getRoot("uaa", getConnectionContext())
+        Mono<String> cached = getConnectionContext().getRootProvider().getRoot("uaa", getConnectionContext())
             .map(getIdentityZoneEndpoint(getIdentityZoneSubdomain()));
 
         return getConnectionContext().getCacheDuration()
@@ -148,11 +147,8 @@ abstract class _ReactorUaaClient implements UaaClient {
             }
 
             UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(raw);
-            builder.host(String.format("%s.%s", identityZoneId, builder.build()
-                .getHost()));
-            return builder.build()
-                .encode()
-                .toUriString();
+            builder.host(String.format("%s.%s", identityZoneId, builder.build().getHost()));
+            return builder.build().encode().toUriString();
         };
     }
 

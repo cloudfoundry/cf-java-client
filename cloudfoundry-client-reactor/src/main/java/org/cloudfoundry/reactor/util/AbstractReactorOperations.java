@@ -38,8 +38,7 @@ public abstract class AbstractReactorOperations {
 
     protected final TokenProvider tokenProvider;
 
-    protected AbstractReactorOperations(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider,
-                                        Map<String, String> requestTags) {
+    protected AbstractReactorOperations(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
         this.connectionContext = connectionContext;
         this.root = root;
         this.tokenProvider = tokenProvider;
@@ -58,7 +57,7 @@ public abstract class AbstractReactorOperations {
     private void addHeaders(HttpHeaders httpHeaders) {
         UserAgent.setUserAgent(httpHeaders);
         JsonCodec.setDecodeHeaders(httpHeaders);
-        setCustomHttpHeaders(httpHeaders);
+        this.requestTags.forEach(httpHeaders::set);
     }
 
     private Mono<? extends HttpHeaders> addHeadersWhen(HttpHeaders httpHeaders) {
@@ -72,12 +71,6 @@ public abstract class AbstractReactorOperations {
             .root(root)
             .tokenProvider(this.tokenProvider)
             .build();
-    }
-
-    private HttpHeaders setCustomHttpHeaders(HttpHeaders httpHeaders) {
-        requestTags.entrySet()
-            .forEach(entry -> httpHeaders.set(entry.getKey(), entry.getValue()));
-        return httpHeaders;
     }
 
 }

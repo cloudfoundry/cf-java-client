@@ -60,8 +60,7 @@ public final class ReactorTokensTest extends AbstractUaaApiTest {
     public void check() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST)
-                .path("/check_token?scopes=password.write,scim.userids&token=f9f2f98d88e04ff7bb1f69041d3c0346")
+                .method(POST).path("/check_token?scopes=password.write,scim.userids&token=f9f2f98d88e04ff7bb1f69041d3c0346")
                 .header("Authorization", "Basic YXBwOmFwcGNsaWVudHNlY3JldA==")
                 .build())
             .response(TestResponse.builder()
@@ -70,13 +69,14 @@ public final class ReactorTokensTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.tokens.check(CheckTokenRequest.builder()
-            .token("f9f2f98d88e04ff7bb1f69041d3c0346")
-            .scope("password.write")
-            .scope("scim.userids")
-            .clientId("app")
-            .clientSecret("appclientsecret")
-            .build())
+        this.tokens
+            .check(CheckTokenRequest.builder()
+                .token("f9f2f98d88e04ff7bb1f69041d3c0346")
+                .scope("password.write")
+                .scope("scim.userids")
+                .clientId("app")
+                .clientSecret("appclientsecret")
+                .build())
             .as(StepVerifier::create)
             .expectNext(CheckTokenResponse.builder()
                 .userId("ae77988e-1b25-4e02-87f2-81f98293a356")
@@ -84,8 +84,7 @@ public final class ReactorTokensTest extends AbstractUaaApiTest {
                 .email("marissa@test.org")
                 .clientId("app")
                 .expirationTime(1462015244L)
-                .scopes(Arrays.asList("scim.userids", "openid", "cloud_controller.read", "password.write",
-                    "cloud_controller.write"))
+                .scopes(Arrays.asList("scim.userids", "openid", "cloud_controller.read", "password.write", "cloud_controller.write"))
                 .jwtId("f9f2f98d88e04ff7bb1f69041d3c0346")
                 .audiences(Arrays.asList("app", "scim", "openid", "cloud_controller", "password"))
                 .subject("ae77988e-1b25-4e02-87f2-81f98293a356")
@@ -108,8 +107,7 @@ public final class ReactorTokensTest extends AbstractUaaApiTest {
     public void getKey() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/token_key")
+                .method(GET).path("/token_key")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -117,25 +115,27 @@ public final class ReactorTokensTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.tokens.getKey(GetTokenKeyRequest.builder()
-            .build())
+        this.tokens
+            .getKey(GetTokenKeyRequest.builder()
+                .build())
             .as(StepVerifier::create)
             .expectNext(GetTokenKeyResponse.builder()
                 .id("testKey")
                 .algorithm("SHA256withRSA")
-                .value("-----BEGIN PUBLIC KEY-----\n"
-                    + "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0m59l2u9iDnMbrXHfqkO\n"
-                    + "rn2dVQ3vfBJqcDuFUK03d+1PZGbVlNCqnkpIJ8syFppW8ljnWweP7+LiWpRoz0I7\n"
-                    + "fYb3d8TjhV86Y997Fl4DBrxgM6KTJOuE/uxnoDhZQ14LgOU2ckXjOzOdTsnGMKQB\n"
-                    + "LCl0vpcXBtFLMaSbpv1ozi8h7DJyVZ6EnFQZUWGdgTMhDrmqevfx95U/16c5WBDO\n"
-                    + "kqwIn7Glry9n9Suxygbf8g5AzpWcusZgDLIIZ7JTUldBb8qU2a0Dl4mvLZOn4wPo\n"
-                    + "jfj9Cw2QICsc5+Pwf21fP+hzf+1WSRHbnYv8uanRO0gZ8ekGaghM/2H6gqJbo2nI\n" + "JwIDAQAB\n"
-                    + "-----END PUBLIC KEY-----")
+                .value("-----BEGIN PUBLIC KEY-----\n" +
+                    "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0m59l2u9iDnMbrXHfqkO\n" +
+                    "rn2dVQ3vfBJqcDuFUK03d+1PZGbVlNCqnkpIJ8syFppW8ljnWweP7+LiWpRoz0I7\n" +
+                    "fYb3d8TjhV86Y997Fl4DBrxgM6KTJOuE/uxnoDhZQ14LgOU2ckXjOzOdTsnGMKQB\n" +
+                    "LCl0vpcXBtFLMaSbpv1ozi8h7DJyVZ6EnFQZUWGdgTMhDrmqevfx95U/16c5WBDO\n" +
+                    "kqwIn7Glry9n9Suxygbf8g5AzpWcusZgDLIIZ7JTUldBb8qU2a0Dl4mvLZOn4wPo\n" +
+                    "jfj9Cw2QICsc5+Pwf21fP+hzf+1WSRHbnYv8uanRO0gZ8ekGaghM/2H6gqJbo2nI\n" +
+                    "JwIDAQAB\n" +
+                    "-----END PUBLIC KEY-----")
                 .keyType(KeyType.RSA)
                 .use("sig")
-                .n("ANJufZdrvYg5zG61x36pDq59nVUN73wSanA7hVCtN3ftT2Rm1ZTQqp5KSCfLMhaaVvJY51sHj"
-                    + "+/i4lqUaM9CO32G93fE44VfOmPfexZeAwa8YDOikyTrhP7sZ6A4WUNeC4DlNnJF4zsznU7JxjCkASwpdL6XFwbRSzGkm6b9aM4vIewyclWehJxUGVFhnYEzIQ65qnr38feVP9enOVgQzpKsCJ+xpa8vZ/UrscoG3"
-                    + "/IOQM6VnLrGYAyyCGeyU1JXQW/KlNmtA5eJry2Tp+MD6I34/QsNkCArHOfj8H9tXz/oc3/tVkkR252L/Lmp0TtIGfHpBmoITP9h+oKiW6NpyCc=")
+                .n("ANJufZdrvYg5zG61x36pDq59nVUN73wSanA7hVCtN3ftT2Rm1ZTQqp5KSCfLMhaaVvJY51sHj" +
+                    "+/i4lqUaM9CO32G93fE44VfOmPfexZeAwa8YDOikyTrhP7sZ6A4WUNeC4DlNnJF4zsznU7JxjCkASwpdL6XFwbRSzGkm6b9aM4vIewyclWehJxUGVFhnYEzIQ65qnr38feVP9enOVgQzpKsCJ+xpa8vZ/UrscoG3" +
+                    "/IOQM6VnLrGYAyyCGeyU1JXQW/KlNmtA5eJry2Tp+MD6I34/QsNkCArHOfj8H9tXz/oc3/tVkkR252L/Lmp0TtIGfHpBmoITP9h+oKiW6NpyCc=")
                 .e("AQAB")
                 .build())
             .expectComplete()
@@ -146,9 +146,8 @@ public final class ReactorTokensTest extends AbstractUaaApiTest {
     public void getTokenByAuthorizationCode() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST)
-                .path("/oauth/token?code=zI6Z1X&client_id=login&client_secret=loginsecret&redirect_uri=https://uaa.cloudfoundry.com/redirect/cf"
-                    + "&token_format=opaque&grant_type=authorization_code&response_type=token")
+                .method(POST).path("/oauth/token?code=zI6Z1X&client_id=login&client_secret=loginsecret&redirect_uri=https://uaa.cloudfoundry.com/redirect/cf" +
+                    "&token_format=opaque&grant_type=authorization_code&response_type=token")
                 .header("Authorization", null)
                 .header("Content-Type", "application/x-www-form-urlencoded")
                 .build())
@@ -158,13 +157,14 @@ public final class ReactorTokensTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.tokens.getByAuthorizationCode(GetTokenByAuthorizationCodeRequest.builder()
-            .clientId("login")
-            .clientSecret("loginsecret")
-            .authorizationCode("zI6Z1X")
-            .redirectUri("https://uaa.cloudfoundry.com/redirect/cf")
-            .tokenFormat(TokenFormat.OPAQUE)
-            .build())
+        this.tokens
+            .getByAuthorizationCode(GetTokenByAuthorizationCodeRequest.builder()
+                .clientId("login")
+                .clientSecret("loginsecret")
+                .authorizationCode("zI6Z1X")
+                .redirectUri("https://uaa.cloudfoundry.com/redirect/cf")
+                .tokenFormat(TokenFormat.OPAQUE)
+                .build())
             .as(StepVerifier::create)
             .expectNext(GetTokenByAuthorizationCodeResponse.builder()
                 .accessToken("555e2047bbc849628ff8cbfa7b342274")
@@ -182,8 +182,7 @@ public final class ReactorTokensTest extends AbstractUaaApiTest {
     public void getTokenByClientCredentials() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST)
-                .path("/oauth/token?client_id=login&client_secret=loginsecret&token_format=opaque&grant_type=client_credentials&response_type=token")
+                .method(POST).path("/oauth/token?client_id=login&client_secret=loginsecret&token_format=opaque&grant_type=client_credentials&response_type=token")
                 .header("Authorization", null)
                 .header("Content-Type", "application/x-www-form-urlencoded")
                 .build())
@@ -193,11 +192,12 @@ public final class ReactorTokensTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.tokens.getByClientCredentials(GetTokenByClientCredentialsRequest.builder()
-            .clientId("login")
-            .clientSecret("loginsecret")
-            .tokenFormat(TokenFormat.OPAQUE)
-            .build())
+        this.tokens
+            .getByClientCredentials(GetTokenByClientCredentialsRequest.builder()
+                .clientId("login")
+                .clientSecret("loginsecret")
+                .tokenFormat(TokenFormat.OPAQUE)
+                .build())
             .as(StepVerifier::create)
             .expectNext(GetTokenByClientCredentialsResponse.builder()
                 .accessToken("f87f93a2666d4e6eaa54e34df86d160c")
@@ -214,8 +214,7 @@ public final class ReactorTokensTest extends AbstractUaaApiTest {
     public void getTokenByOneTimePasscode() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST)
-                .path("/oauth/token?client_id=app&client_secret=appclientsecret&passcode=qcZNkd&token_format=opaque&grant_type=password&response_type=token")
+                .method(POST).path("/oauth/token?client_id=app&client_secret=appclientsecret&passcode=qcZNkd&token_format=opaque&grant_type=password&response_type=token")
                 .header("Authorization", null)
                 .header("Content-Type", "application/x-www-form-urlencoded")
                 .build())
@@ -225,12 +224,13 @@ public final class ReactorTokensTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.tokens.getByOneTimePasscode(GetTokenByOneTimePasscodeRequest.builder()
-            .clientId("app")
-            .clientSecret("appclientsecret")
-            .passcode("qcZNkd")
-            .tokenFormat(TokenFormat.OPAQUE)
-            .build())
+        this.tokens
+            .getByOneTimePasscode(GetTokenByOneTimePasscodeRequest.builder()
+                .clientId("app")
+                .clientSecret("appclientsecret")
+                .passcode("qcZNkd")
+                .tokenFormat(TokenFormat.OPAQUE)
+                .build())
             .as(StepVerifier::create)
             .expectNext(GetTokenByOneTimePasscodeResponse.builder()
                 .accessToken("0ddcada64ef742a28badaf4750ef435f")
@@ -248,9 +248,8 @@ public final class ReactorTokensTest extends AbstractUaaApiTest {
     public void getTokenByOpenId() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST)
-                .path("/oauth/token?code=NAlA1d&client_id=app&client_secret=appclientsecret&redirect_uri=https://uaa.cloudfoundry.com/redirect/cf&token_format=opaque"
-                    + "&grant_type=authorization_code&response_type=id_token")
+                .method(POST).path("/oauth/token?code=NAlA1d&client_id=app&client_secret=appclientsecret&redirect_uri=https://uaa.cloudfoundry.com/redirect/cf&token_format=opaque" +
+                    "&grant_type=authorization_code&response_type=id_token")
                 .header("Authorization", null)
                 .header("Content-Type", "application/x-www-form-urlencoded")
                 .build())
@@ -260,13 +259,14 @@ public final class ReactorTokensTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.tokens.getByOpenId(GetTokenByOpenIdRequest.builder()
-            .clientId("app")
-            .clientSecret("appclientsecret")
-            .authorizationCode("NAlA1d")
-            .redirectUri("https://uaa.cloudfoundry.com/redirect/cf")
-            .tokenFormat(TokenFormat.OPAQUE)
-            .build())
+        this.tokens
+            .getByOpenId(GetTokenByOpenIdRequest.builder()
+                .clientId("app")
+                .clientSecret("appclientsecret")
+                .authorizationCode("NAlA1d")
+                .redirectUri("https://uaa.cloudfoundry.com/redirect/cf")
+                .tokenFormat(TokenFormat.OPAQUE)
+                .build())
             .as(StepVerifier::create)
             .expectNext(GetTokenByOpenIdResponse.builder()
                 .accessToken("53a58e6581ee49d08f9e572f673bc8db")
@@ -285,9 +285,8 @@ public final class ReactorTokensTest extends AbstractUaaApiTest {
     public void getTokenByPassword() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST)
-                .path("/oauth/token?client_id=app&client_secret=appclientsecret&password=secr3T&token_format=opaque&"
-                    + "username=jENeJj@test.org&grant_type=password&response_type=token")
+                .method(POST).path("/oauth/token?client_id=app&client_secret=appclientsecret&password=secr3T&token_format=opaque&" +
+                    "username=jENeJj@test.org&grant_type=password&response_type=token")
                 .header("Authorization", null)
                 .header("Content-Type", "application/x-www-form-urlencoded")
                 .build())
@@ -297,13 +296,14 @@ public final class ReactorTokensTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.tokens.getByPassword(GetTokenByPasswordRequest.builder()
-            .clientId("app")
-            .clientSecret("appclientsecret")
-            .password("secr3T")
-            .tokenFormat(TokenFormat.OPAQUE)
-            .username("jENeJj@test.org")
-            .build())
+        this.tokens
+            .getByPassword(GetTokenByPasswordRequest.builder()
+                .clientId("app")
+                .clientSecret("appclientsecret")
+                .password("secr3T")
+                .tokenFormat(TokenFormat.OPAQUE)
+                .username("jENeJj@test.org")
+                .build())
             .as(StepVerifier::create)
             .expectNext(GetTokenByPasswordResponse.builder()
                 .accessToken("cd37a35114084fafb83d21c6f2af0e84")
@@ -321,8 +321,7 @@ public final class ReactorTokensTest extends AbstractUaaApiTest {
     public void listKeys() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/token_keys")
+                .method(GET).path("/token_keys")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -330,26 +329,28 @@ public final class ReactorTokensTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.tokens.listKeys(ListTokenKeysRequest.builder()
-            .build())
+        this.tokens
+            .listKeys(ListTokenKeysRequest.builder()
+                .build())
             .as(StepVerifier::create)
             .expectNext(ListTokenKeysResponse.builder()
                 .key(TokenKey.builder()
                     .id("testKey")
                     .algorithm("SHA256withRSA")
-                    .value("-----BEGIN PUBLIC KEY-----\n"
-                        + "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0m59l2u9iDnMbrXHfqkO\n"
-                        + "rn2dVQ3vfBJqcDuFUK03d+1PZGbVlNCqnkpIJ8syFppW8ljnWweP7+LiWpRoz0I7\n"
-                        + "fYb3d8TjhV86Y997Fl4DBrxgM6KTJOuE/uxnoDhZQ14LgOU2ckXjOzOdTsnGMKQB\n"
-                        + "LCl0vpcXBtFLMaSbpv1ozi8h7DJyVZ6EnFQZUWGdgTMhDrmqevfx95U/16c5WBDO\n"
-                        + "kqwIn7Glry9n9Suxygbf8g5AzpWcusZgDLIIZ7JTUldBb8qU2a0Dl4mvLZOn4wPo\n"
-                        + "jfj9Cw2QICsc5+Pwf21fP+hzf+1WSRHbnYv8uanRO0gZ8ekGaghM/2H6gqJbo2nI\n"
-                        + "JwIDAQAB\n" + "-----END PUBLIC KEY-----")
+                    .value("-----BEGIN PUBLIC KEY-----\n" +
+                        "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0m59l2u9iDnMbrXHfqkO\n" +
+                        "rn2dVQ3vfBJqcDuFUK03d+1PZGbVlNCqnkpIJ8syFppW8ljnWweP7+LiWpRoz0I7\n" +
+                        "fYb3d8TjhV86Y997Fl4DBrxgM6KTJOuE/uxnoDhZQ14LgOU2ckXjOzOdTsnGMKQB\n" +
+                        "LCl0vpcXBtFLMaSbpv1ozi8h7DJyVZ6EnFQZUWGdgTMhDrmqevfx95U/16c5WBDO\n" +
+                        "kqwIn7Glry9n9Suxygbf8g5AzpWcusZgDLIIZ7JTUldBb8qU2a0Dl4mvLZOn4wPo\n" +
+                        "jfj9Cw2QICsc5+Pwf21fP+hzf+1WSRHbnYv8uanRO0gZ8ekGaghM/2H6gqJbo2nI\n" +
+                        "JwIDAQAB\n" +
+                        "-----END PUBLIC KEY-----")
                     .keyType(KeyType.RSA)
                     .use("sig")
-                    .n("ANJufZdrvYg5zG61x36pDq59nVUN73wSanA7hVCtN3ftT2Rm1ZTQqp5KSCfLMhaaVvJY51sHj"
-                        + "+/i4lqUaM9CO32G93fE44VfOmPfexZeAwa8YDOikyTrhP7sZ6A4WUNeC4DlNnJF4zsznU7JxjCkASwpdL6XFwbRSzGkm6b9aM4vIewyclWehJxUGVFhnYEzIQ65qnr38feVP9enOVgQzpKsCJ+xpa8vZ/UrscoG3"
-                        + "/IOQM6VnLrGYAyyCGeyU1JXQW/KlNmtA5eJry2Tp+MD6I34/QsNkCArHOfj8H9tXz/oc3/tVkkR252L/Lmp0TtIGfHpBmoITP9h+oKiW6NpyCc=")
+                    .n("ANJufZdrvYg5zG61x36pDq59nVUN73wSanA7hVCtN3ftT2Rm1ZTQqp5KSCfLMhaaVvJY51sHj" +
+                        "+/i4lqUaM9CO32G93fE44VfOmPfexZeAwa8YDOikyTrhP7sZ6A4WUNeC4DlNnJF4zsznU7JxjCkASwpdL6XFwbRSzGkm6b9aM4vIewyclWehJxUGVFhnYEzIQ65qnr38feVP9enOVgQzpKsCJ+xpa8vZ/UrscoG3" +
+                        "/IOQM6VnLrGYAyyCGeyU1JXQW/KlNmtA5eJry2Tp+MD6I34/QsNkCArHOfj8H9tXz/oc3/tVkkR252L/Lmp0TtIGfHpBmoITP9h+oKiW6NpyCc=")
                     .e("AQAB")
                     .build())
                 .build())
@@ -361,8 +362,7 @@ public final class ReactorTokensTest extends AbstractUaaApiTest {
     public void refreshToken() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(POST)
-                .path("/oauth/token?client_id=app&client_secret=appclientsecret&refresh_token=6af5fc07a8b74c2eafb0079ff477bb11-r&token_format=opaque&grant_type=refresh_token")
+                .method(POST).path("/oauth/token?client_id=app&client_secret=appclientsecret&refresh_token=6af5fc07a8b74c2eafb0079ff477bb11-r&token_format=opaque&grant_type=refresh_token")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -370,12 +370,13 @@ public final class ReactorTokensTest extends AbstractUaaApiTest {
                 .build())
             .build());
 
-        this.tokens.refresh(RefreshTokenRequest.builder()
-            .clientId("app")
-            .clientSecret("appclientsecret")
-            .refreshToken("6af5fc07a8b74c2eafb0079ff477bb11-r")
-            .tokenFormat(TokenFormat.OPAQUE)
-            .build())
+        this.tokens
+            .refresh(RefreshTokenRequest.builder()
+                .clientId("app")
+                .clientSecret("appclientsecret")
+                .refreshToken("6af5fc07a8b74c2eafb0079ff477bb11-r")
+                .tokenFormat(TokenFormat.OPAQUE)
+                .build())
             .as(StepVerifier::create)
             .expectNext(RefreshTokenResponse.builder()
                 .accessToken("eyJhbGciOiJIUzI1NiIsImtpZCI6Imx")

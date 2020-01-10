@@ -40,8 +40,7 @@ public final class ReactorTagsClientTest extends AbstractNetworkingApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET)
-                .path("/tags")
+                .method(GET).path("/tags")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -49,8 +48,9 @@ public final class ReactorTagsClientTest extends AbstractNetworkingApiTest {
                 .build())
             .build());
 
-        this.tags.list(ListTagsRequest.builder()
-            .build())
+        this.tags
+            .list(ListTagsRequest.builder()
+                .build())
             .as(StepVerifier::create)
             .expectNext(ListTagsResponse.builder()
                 .tag(Tag.builder()

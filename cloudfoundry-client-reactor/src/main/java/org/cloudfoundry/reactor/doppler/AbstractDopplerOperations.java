@@ -32,13 +32,11 @@ import java.util.function.Function;
 
 abstract class AbstractDopplerOperations extends AbstractReactorOperations {
 
-    AbstractDopplerOperations(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider,
-                              Map<String, String> requestTags) {
+    AbstractDopplerOperations(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
-    final <T> Flux<T> get(Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
-                          Function<HttpClientResponse, ChannelHandler> channelHandlerBuilder,
+    final <T> Flux<T> get(Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer, Function<HttpClientResponse, ChannelHandler> channelHandlerBuilder,
                           Function<ByteBufFlux, Flux<T>> bodyTransformer) {
         return createOperator().flatMapMany(operator -> operator.get()
             .uri(uriTransformer)

@@ -45,31 +45,32 @@ public final class ReactorRouteMappings extends AbstractClientV2Operations imple
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorRouteMappings(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider,
-                                Map<String, String> requestTags) {
+    public ReactorRouteMappings(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<CreateRouteMappingResponse> create(CreateRouteMappingRequest request) {
-        return post(request, CreateRouteMappingResponse.class, builder -> builder.pathSegment("route_mappings")).checkpoint();
+        return post(request, CreateRouteMappingResponse.class, builder -> builder.pathSegment("route_mappings"))
+            .checkpoint();
     }
 
     @Override
     public Mono<DeleteRouteMappingResponse> delete(DeleteRouteMappingRequest request) {
-        return delete(request, DeleteRouteMappingResponse.class,
-            builder -> builder.pathSegment("route_mappings", request.getRouteMappingId())).checkpoint();
+        return delete(request, DeleteRouteMappingResponse.class, builder -> builder.pathSegment("route_mappings", request.getRouteMappingId()))
+            .checkpoint();
     }
 
     @Override
     public Mono<GetRouteMappingResponse> get(GetRouteMappingRequest request) {
-        return get(request, GetRouteMappingResponse.class,
-            builder -> builder.pathSegment("route_mappings", request.getRouteMappingId())).checkpoint();
+        return get(request, GetRouteMappingResponse.class, builder -> builder.pathSegment("route_mappings", request.getRouteMappingId()))
+            .checkpoint();
     }
 
     @Override
     public Mono<ListRouteMappingsResponse> list(ListRouteMappingsRequest request) {
-        return get(request, ListRouteMappingsResponse.class, builder -> builder.pathSegment("route_mappings")).checkpoint();
+        return get(request, ListRouteMappingsResponse.class, builder -> builder.pathSegment("route_mappings"))
+            .checkpoint();
     }
 
 }
