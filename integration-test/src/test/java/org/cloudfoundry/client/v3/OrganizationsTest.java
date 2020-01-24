@@ -20,6 +20,9 @@ import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.CloudFoundryVersion;
 import org.cloudfoundry.IfCloudFoundryVersion;
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v3.domains.CreateDomainRequest;
+import org.cloudfoundry.client.v3.domains.CreateDomainResponse;
+import org.cloudfoundry.client.v3.domains.DomainRelationships;
 import org.cloudfoundry.client.v3.isolationsegments.AddIsolationSegmentOrganizationEntitlementRequest;
 import org.cloudfoundry.client.v3.isolationsegments.AddIsolationSegmentOrganizationEntitlementResponse;
 import org.cloudfoundry.client.v3.isolationsegments.CreateIsolationSegmentRequest;
@@ -33,6 +36,7 @@ import org.cloudfoundry.client.v3.organizations.GetOrganizationDefaultDomainResp
 import org.cloudfoundry.client.v3.organizations.GetOrganizationDefaultIsolationSegmentRequest;
 import org.cloudfoundry.client.v3.organizations.GetOrganizationRequest;
 import org.cloudfoundry.client.v3.organizations.GetOrganizationResponse;
+import org.cloudfoundry.client.v3.organizations.ListOrganizationDomainsRequest;
 import org.cloudfoundry.client.v3.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v3.organizations.OrganizationResource;
 import org.cloudfoundry.client.v3.organizations.UpdateOrganizationRequest;
@@ -127,6 +131,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             .consumeNextWith(name -> assertThat(name).contains("apps.", ".springapps.io"))
             .expectComplete()
             .verify(Duration.ofMinutes(5));
+
     }
 
     @Test
@@ -165,6 +170,94 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             .filter(resource -> organizationName.equals(resource.getName()))
             .as(StepVerifier::create)
             .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void listDomains() {
+        String domainName = this.nameFactory.getDomainName();
+        String organizationName = this.nameFactory.getOrganizationName();
+
+        createOrganizationId(this.cloudFoundryClient, organizationName)
+            .delayUntil(organizationId -> requestCreateDomain(this.cloudFoundryClient, organizationId, domainName))
+            .flatMapMany(organizationId -> PaginationUtils.requestClientV3Resources(page -> this.cloudFoundryClient.organizationsV3()
+                .listDomains(ListOrganizationDomainsRequest.builder()
+                    .organizationId(organizationId)
+                    .page(page)
+                    .build())))
+            .filter(resource -> domainName.equals(resource.getName()))
+            .as(StepVerifier::create)
+            .consumeNextWith(resource -> assertThat(resource.getName()).isEqualTo(domainName))
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void listDomainsFilterByOwningOrganizationIds() {
+        String domainName = this.nameFactory.getDomainName();
+        String globalDomainName = this.nameFactory.getDomainName();
+        String organizationName = this.nameFactory.getOrganizationName();
+
+        createOrganizationId(this.cloudFoundryClient, organizationName)
+            .delayUntil(organizationId -> Mono.when(
+                requestCreateDomain(this.cloudFoundryClient, organizationId, domainName),
+                requestCreateDomain(this.cloudFoundryClient, globalDomainName)))
+            .flatMapMany(organizationId -> PaginationUtils.requestClientV3Resources(page -> this.cloudFoundryClient.organizationsV3()
+                .listDomains(ListOrganizationDomainsRequest.builder()
+                    .organizationId(organizationId)
+                    .owningOrganizationId(organizationId)
+                    .page(page)
+                    .build())))
+            .filter(resource -> domainName.equals(resource.getName()) || globalDomainName.equals(resource.getName()))
+            .as(StepVerifier::create)
+            .consumeNextWith(resource -> assertThat(resource.getName()).isEqualTo(domainName))
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void listDomainsReturningGlobalDomains() {
+        String globalDomainName = this.nameFactory.getDomainName();
+        String organizationName = this.nameFactory.getOrganizationName();
+
+        createOrganizationId(this.cloudFoundryClient, organizationName)
+            .delayUntil(organizationId -> requestCreateDomain(this.cloudFoundryClient, globalDomainName))
+            .flatMapMany(organizationId -> PaginationUtils.requestClientV3Resources(page -> this.cloudFoundryClient.organizationsV3()
+                .listDomains(ListOrganizationDomainsRequest.builder()
+                    .organizationId(organizationId)
+                    .page(page)
+                    .build())))
+            .filter(resource -> globalDomainName.equals(resource.getName()))
+            .as(StepVerifier::create)
+            .consumeNextWith(resource -> assertThat(resource.getName()).isEqualTo(globalDomainName))
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void listDomainsReturningSharedDomains() {
+        String domainName = this.nameFactory.getDomainName();
+        String domainNameAnother = this.nameFactory.getDomainName();
+        String organizationName = this.nameFactory.getOrganizationName();
+        String organizationNameAnother = this.nameFactory.getOrganizationName();
+
+        Mono.zip(
+            createOrganizationId(this.cloudFoundryClient, organizationName),
+            createOrganizationId(this.cloudFoundryClient, organizationNameAnother))
+            .flatMap(function((organizationId, anotherOrganizationId) -> Mono
+                .when(
+                    requestCreateDomain(this.cloudFoundryClient, organizationId, domainName),
+                    requestCreateDomain(this.cloudFoundryClient, anotherOrganizationId, domainNameAnother))
+                .thenReturn(organizationId)))
+            .flatMapMany(organizationId -> PaginationUtils.requestClientV3Resources(page -> this.cloudFoundryClient.organizationsV3()
+                .listDomains(ListOrganizationDomainsRequest.builder()
+                    .organizationId(organizationId)
+                    .page(page)
+                    .build())))
+            .filter(resource -> domainName.equals(resource.getName()) || domainNameAnother.equals(resource.getName()))
+            .as(StepVerifier::create)
+            .consumeNextWith(resource -> assertThat(resource.getName()).isEqualTo(domainName))
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -266,6 +359,29 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                 .name(organizationName)
                 .page(page)
                 .build()));
+    }
+
+    private static Mono<CreateDomainResponse> requestCreateDomain(CloudFoundryClient cloudFoundryClient, String organizationId, String domainName) {
+        return cloudFoundryClient.domainsV3()
+            .create(CreateDomainRequest.builder()
+                .name(domainName)
+                .relationships(DomainRelationships.builder()
+                    .organization(ToOneRelationship.builder()
+                        .data(Relationship.builder()
+                            .id(organizationId)
+                            .build())
+                        .build())
+                    .build())
+                .internal(false)
+                .build());
+    }
+
+    private static Mono<CreateDomainResponse> requestCreateDomain(CloudFoundryClient cloudFoundryClient, String domainName) {
+        return cloudFoundryClient.domainsV3()
+            .create(CreateDomainRequest.builder()
+                .name(domainName)
+                .internal(false)
+                .build());
     }
 
 }

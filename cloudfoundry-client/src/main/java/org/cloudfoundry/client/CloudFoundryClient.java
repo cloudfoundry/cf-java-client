@@ -50,6 +50,7 @@ import org.cloudfoundry.client.v2.users.Users;
 import org.cloudfoundry.client.v3.applications.ApplicationsV3;
 import org.cloudfoundry.client.v3.builds.Builds;
 import org.cloudfoundry.client.v3.deployments.DeploymentsV3;
+import org.cloudfoundry.client.v3.domains.DomainsV3;
 import org.cloudfoundry.client.v3.droplets.Droplets;
 import org.cloudfoundry.client.v3.isolationsegments.IsolationSegments;
 import org.cloudfoundry.client.v3.jobs.JobsV3;
@@ -110,6 +111,11 @@ public interface CloudFoundryClient {
      * Main entry point to the Cloud Foundry Domains Client API
      */
     Domains domains();
+
+    /**
+     * Main entry point to the Cloud Foundry Domains V3 Client API
+     */
+    DomainsV3 domainsV3();
 
     /**
      * Main entry point to the Cloud Foundry Droplets Client API

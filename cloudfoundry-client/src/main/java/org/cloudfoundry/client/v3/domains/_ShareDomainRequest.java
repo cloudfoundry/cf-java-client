@@ -16,30 +16,31 @@
 
 package org.cloudfoundry.client.v3.domains;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v3.ToManyRelationship;
-import org.cloudfoundry.client.v3.ToOneRelationship;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.cloudfoundry.client.v3.Relationship;
 import org.immutables.value.Value;
 
-@JsonDeserialize
+import java.util.List;
+
+/**
+ * The request payload for the Share Domain operation.
+ */
+@JsonSerialize
 @Value.Immutable
-abstract class _DomainRelationships {
+abstract class _ShareDomainRequest {
 
     /**
-     * The organization the domain is scoped to. If set, the domain will only be available in that organization.
-     * Otherwise, the domain will be globally available.
+     * The organizations the domain is shared to
      */
-    @JsonProperty("organization")
-    abstract ToOneRelationship getOrganization();
+    @JsonProperty("data")
+    abstract List<Relationship> getData();
 
     /**
-     * Organizations the domain is shared with. If set, the domain will be available in these organizations in addition
-     * to the organization the domain is scoped to.
+     * The domain id
      */
-    @JsonProperty("shared_organizations")
-    @Nullable
-    abstract ToManyRelationship getSharedOrganizations();
+    @JsonIgnore
+    abstract String getDomainId();
 
 }
