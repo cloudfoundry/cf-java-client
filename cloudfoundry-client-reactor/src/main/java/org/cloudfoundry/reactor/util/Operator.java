@@ -206,7 +206,8 @@ public class Operator extends OperatorContextAware {
         private Flux<HttpClientResponseWithBody> processResponse(Flux<HttpClientResponseWithBody> inbound) {
             return inbound
                 .transform(this::invalidateToken)
-                .retry(t -> t instanceof InvalidTokenException)
+                .retry(this.context.getConnectionContext().getInvalidTokenRetries(),
+                    t -> t instanceof InvalidTokenException)
                 .transform(this.context.getErrorPayloadMapper()
                     .orElse(ErrorPayloadMappers.fallback()));
         }

@@ -146,6 +146,12 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
             .orElse(Mono.empty());
     }
 
+    @Override
+    @Value.Default
+    public Long getInvalidTokenRetries() {
+        return 5L;
+    }
+
     /**
      * The hostname of the API root. Typically something like {@code api.run.pivotal.io}.
      */

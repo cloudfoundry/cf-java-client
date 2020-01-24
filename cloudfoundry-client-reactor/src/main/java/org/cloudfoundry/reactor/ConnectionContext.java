@@ -56,4 +56,9 @@ public interface ConnectionContext {
      */
     Mono<Void> trust(String host, int port);
 
+    /**
+     * The number of retries after an unsuccessful request
+     */
+    Long getInvalidTokenRetries();
+
 }
