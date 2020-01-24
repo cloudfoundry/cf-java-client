@@ -16,28 +16,14 @@
 
 package org.cloudfoundry.client.v3.domains;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.client.v3.ToManyRelationship;
-import org.cloudfoundry.client.v3.ToOneRelationship;
 import org.immutables.value.Value;
 
+/**
+ * The response payload for the Update a Domain operation
+ */
 @JsonDeserialize
 @Value.Immutable
-abstract class _DomainRelationships {
-
-    /**
-     * The organization the domain is scoped to. If set, the domain will only be available in that organization.
-     * Otherwise, the domain will be globally available.
-     */
-    @JsonProperty("organization")
-    abstract ToOneRelationship getOrganization();
-
-    /**
-     * Organizations the domain is shared with. If set, the domain will be available in these organizations in addition
-     * to the organization the domain is scoped to.
-     */
-    @JsonProperty("shared_organizations")
-    abstract ToManyRelationship getSharedOrganizations();
+abstract class _UpdateDomainResponse extends Domain {
 
 }
