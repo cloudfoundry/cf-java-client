@@ -33,6 +33,7 @@ import org.cloudfoundry.client.v3.organizations.GetOrganizationRequest;
 import org.cloudfoundry.client.v3.organizations.GetOrganizationResponse;
 import org.cloudfoundry.client.v3.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v3.organizations.OrganizationResource;
+import org.cloudfoundry.client.v3.organizations.UpdateOrganizationRequest;
 import org.cloudfoundry.util.PaginationUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -130,6 +131,31 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(r -> r.getData().getId()))))
             .as(StepVerifier::create)
             .consumeNextWith(tupleEquality())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void update() {
+        String organizationName = this.nameFactory.getOrganizationName();
+
+        requestCreateOrganization(this.cloudFoundryClient, organizationName)
+            .flatMap(resp -> this.cloudFoundryClient.organizationsV3().update(UpdateOrganizationRequest.builder()
+                .organizationId(resp.getId())
+                .metadata(Metadata.builder()
+                    .annotation("annotationKey", "annotationValue")
+                    .label("labelKey", "labelValue")
+                    .build())
+                .build()))
+            .thenMany(PaginationUtils.requestClientV3Resources(page -> this.cloudFoundryClient.organizationsV3()
+                .list(ListOrganizationsRequest.builder()
+                    .page(page)
+                    .build())))
+            .filter(resource -> organizationName.equals(resource.getName()) &&
+                "annotationValue".equals(resource.getMetadata().getAnnotations().get("annotationKey")) &&
+                "labelValue".equals(resource.getMetadata().getAnnotations().get("labelKey")))
+            .as(StepVerifier::create)
+            .expectNextCount(1)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }

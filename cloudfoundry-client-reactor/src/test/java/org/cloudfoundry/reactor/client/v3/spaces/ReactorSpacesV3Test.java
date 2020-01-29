@@ -17,9 +17,12 @@
 package org.cloudfoundry.reactor.client.v3.spaces;
 
 import org.cloudfoundry.client.v3.Link;
+import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.Pagination;
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.ToOneRelationship;
+import org.cloudfoundry.client.v3.organizations.UpdateOrganizationRequest;
+import org.cloudfoundry.client.v3.organizations.UpdateOrganizationResponse;
 import org.cloudfoundry.client.v3.spaces.AssignSpaceIsolationSegmentRequest;
 import org.cloudfoundry.client.v3.spaces.AssignSpaceIsolationSegmentResponse;
 import org.cloudfoundry.client.v3.spaces.CreateSpaceRequest;
@@ -32,6 +35,8 @@ import org.cloudfoundry.client.v3.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v3.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v3.spaces.SpaceRelationships;
 import org.cloudfoundry.client.v3.spaces.SpaceResource;
+import org.cloudfoundry.client.v3.spaces.UpdateSpaceRequest;
+import org.cloudfoundry.client.v3.spaces.UpdateSpaceResponse;
 import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
@@ -157,6 +162,10 @@ public class ReactorSpacesV3Test extends AbstractClientApiTest {
                 .createdAt("2017-02-01T01:33:58Z")
                 .updatedAt("2017-02-01T01:33:58Z")
                 .name("space1")
+                .metadata(Metadata.builder()
+                    .annotations(Collections.emptyMap())
+                    .labels(Collections.emptyMap())
+                    .build())
                 .link("self", Link.builder()
                     .href("https://api.example.org/v3/spaces/885735b5-aea4-4cf5-8e44-961af0e41920")
                     .build())
@@ -241,6 +250,45 @@ public class ReactorSpacesV3Test extends AbstractClientApiTest {
                     .link("self", Link.builder()
                         .href("https://api.example.org/v3/spaces/d4c91047-7b29-4fda-b7f9-04033e5c9c9f")
                         .build())
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void update() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(PATCH).path("/spaces/test-space-id")
+                .payload("fixtures/client/v3/spaces/PATCH_{id}_request.json")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v3/spaces/PATCH_{id}_response.json")
+                .build())
+            .build());
+
+        this.spaces
+            .update(UpdateSpaceRequest.builder()
+                .spaceId("test-space-id")
+                .metadata(Metadata.builder()
+                    .annotation("version", "1.2.4")
+                    .label("dept", "1234")
+                    .build())
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(UpdateSpaceResponse.builder()
+                .id("885735b5-aea4-4cf5-8e44-961af0e41920")
+                .createdAt("2017-02-01T01:33:58Z")
+                .updatedAt("2017-02-01T01:33:58Z")
+                .name("space1")
+                .metadata(Metadata.builder()
+                    .annotation("version", "1.2.4")
+                    .label("dept", "1234")
+                    .build())
+                .link("self", Link.builder()
+                    .href("https://api.example.org/v3/spaces/885735b5-aea4-4cf5-8e44-961af0e41920")
                     .build())
                 .build())
             .expectComplete()

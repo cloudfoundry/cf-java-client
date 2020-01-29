@@ -16,6 +16,8 @@
 
 package org.cloudfoundry.client.v3.organizations;
 
+import org.cloudfoundry.client.v3.spaces.UpdateSpaceRequest;
+import org.cloudfoundry.client.v3.spaces.UpdateSpaceResponse;
 import reactor.core.publisher.Mono;
 
 /**
@@ -62,5 +64,11 @@ public interface OrganizationsV3 {
      * @return the response from the List Organizations request
      */
     Mono<ListOrganizationsResponse> list(ListOrganizationsRequest request);
+
+    /**
+     * @param request the Update Organization request
+     * @return the response from the Update Organization request
+     */
+    Mono<UpdateOrganizationResponse> update(UpdateOrganizationRequest request);
 
 }
