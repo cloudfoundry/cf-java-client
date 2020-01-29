@@ -16,6 +16,8 @@
 
 package org.cloudfoundry.client.v3.spaces;
 
+import org.cloudfoundry.client.v3.applications.UpdateApplicationRequest;
+import org.cloudfoundry.client.v3.applications.UpdateApplicationResponse;
 import reactor.core.publisher.Mono;
 
 /**
@@ -62,5 +64,12 @@ public interface SpacesV3 {
      * @return the response from the List Spaces request
      */
     Mono<ListSpacesResponse> list(ListSpacesRequest request);
+
+    /**
+     * @param request the Update Space request
+     * @return the response from the Update Space request
+     */
+    Mono<UpdateSpaceResponse> update(UpdateSpaceRequest request);
+
 
 }

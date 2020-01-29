@@ -16,10 +16,18 @@
 
 package org.cloudfoundry.reactor.client.v3.organizations;
 
+import org.cloudfoundry.client.v3.BuildpackData;
+import org.cloudfoundry.client.v3.Lifecycle;
+import org.cloudfoundry.client.v3.LifecycleType;
 import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.Pagination;
 import org.cloudfoundry.client.v3.Relationship;
+import org.cloudfoundry.client.v3.ToOneRelationship;
+import org.cloudfoundry.client.v3.applications.ApplicationRelationships;
+import org.cloudfoundry.client.v3.applications.ApplicationState;
+import org.cloudfoundry.client.v3.applications.UpdateApplicationRequest;
+import org.cloudfoundry.client.v3.applications.UpdateApplicationResponse;
 import org.cloudfoundry.client.v3.organizations.AssignOrganizationDefaultIsolationSegmentRequest;
 import org.cloudfoundry.client.v3.organizations.AssignOrganizationDefaultIsolationSegmentResponse;
 import org.cloudfoundry.client.v3.organizations.CreateOrganizationRequest;
@@ -31,6 +39,8 @@ import org.cloudfoundry.client.v3.organizations.GetOrganizationResponse;
 import org.cloudfoundry.client.v3.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v3.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v3.organizations.OrganizationResource;
+import org.cloudfoundry.client.v3.organizations.UpdateOrganizationRequest;
+import org.cloudfoundry.client.v3.organizations.UpdateOrganizationResponse;
 import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
@@ -237,6 +247,46 @@ public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
                 .build())
             .expectComplete()
             .verify(Duration.ofSeconds(5));
+    }
+
+
+    @Test
+    public void update() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(PATCH).path("/organizations/test-organization-id")
+                .payload("fixtures/client/v3/organizations/PATCH_{id}_request.json")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v3/organizations/PATCH_{id}_response.json")
+                .build())
+            .build());
+
+        this.organizations
+            .update(UpdateOrganizationRequest.builder()
+                .organizationId("test-organization-id")
+                .metadata(Metadata.builder()
+                    .annotation("version", "1.2.4")
+                    .label("dept", "1234")
+                    .build())
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(UpdateOrganizationResponse.builder()
+                    .createdAt("2017-02-01T01:33:58Z")
+                    .id("24637893-3b77-489d-bb79-8466f0d88b52")
+                    .link("self", Link.builder()
+                        .href("https://api.example.org/v3/organizations/24637893-3b77-489d-bb79-8466f0d88b52")
+                        .build())
+                    .metadata(Metadata.builder()
+                        .annotation("version", "1.2.4")
+                        .label("dept", "1234")
+                        .build())
+                    .name("my-organization")
+                    .updatedAt("2017-02-01T01:33:58Z")
+                    .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
 }
