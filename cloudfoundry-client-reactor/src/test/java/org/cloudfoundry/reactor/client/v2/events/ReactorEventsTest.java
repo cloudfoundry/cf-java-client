@@ -85,7 +85,7 @@ public final class ReactorEventsTest extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/events?q=actee:test-actee&page=-1")
+                .method(GET).path("/events?q=actee%3Atest-actee&page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)

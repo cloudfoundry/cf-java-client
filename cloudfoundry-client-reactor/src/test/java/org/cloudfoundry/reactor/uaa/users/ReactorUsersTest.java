@@ -389,7 +389,7 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
     public void getVerificationLink() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/Users/1faa46a0-0c6f-4e13-8334-d1f6e5f2e1dd/verify-link?redirect_uri=http://redirect.to/app")
+                .method(GET).path("/Users/1faa46a0-0c6f-4e13-8334-d1f6e5f2e1dd/verify-link?redirect_uri=http%3A%2F%2Fredirect.to%2Fapp")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -455,7 +455,7 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path(
-                    "/Users?count=50&filter=id+eq+%22a94534d5-de08-41eb-8712-a51314e6a484%22+or+email+eq+%22Da63pG@test.org%22&sortBy=email&sortOrder=ascending&startIndex=1")
+                    "/Users?count=50&filter=id%2Beq%2B%22a94534d5-de08-41eb-8712-a51314e6a484%22%2Bor%2Bemail%2Beq%2B%22Da63pG%40test.org%22&sortBy=email&sortOrder=ascending&startIndex=1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -584,7 +584,7 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path(
-                    "/ids/Users?count=10&filter=userName+eq+%22bobOu38vE@test.org%22+or+id+eq+%22c1476587-5ec9-4b7e-9ed2-381e3133f07a%22" +
+                    "/ids/Users?count=10&filter=userName%2Beq%2B%22bobOu38vE%40test.org%22%2Bor%2Bid%2Beq%2B%22c1476587-5ec9-4b7e-9ed2-381e3133f07a%22" +
                         "&includeInactive=true&sortOrder=descending&startIndex=1")
                 .build())
             .response(TestResponse.builder()

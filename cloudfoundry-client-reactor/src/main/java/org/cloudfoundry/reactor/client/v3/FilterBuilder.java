@@ -17,80 +17,51 @@
 package org.cloudfoundry.reactor.client.v3;
 
 import org.cloudfoundry.client.v3.FilterParameter;
-import org.cloudfoundry.reactor.client.MethodNameComparator;
 import org.cloudfoundry.reactor.util.AnnotationUtils;
-import org.springframework.web.util.UriComponentsBuilder;
-import reactor.core.Exceptions;
+import org.cloudfoundry.reactor.util.AnnotationUtils.AnnotatedValue;
+import org.cloudfoundry.reactor.util.UriQueryParameter;
+import org.cloudfoundry.reactor.util.UriQueryParameterBuilder;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Optional;
-import java.util.function.Consumer;
+import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-final class FilterBuilder {
+final class FilterBuilder implements UriQueryParameterBuilder {
 
-    private FilterBuilder() {
+    public Stream<UriQueryParameter> build(Object instance) {
+        return AnnotationUtils.streamAnnotatedValues(instance, FilterParameter.class)
+            .map(FilterBuilder::processValue)
+            .filter(Objects::nonNull);
     }
 
-    /**
-     * Augments a {@link UriComponentsBuilder} with queries based on the methods annotated with {@link FilterParameter}
-     *
-     * @param builder  the builder to augment
-     * @param instance the instance to inspect and invoke
-     */
-    public static void augment(UriComponentsBuilder builder, Object instance) {
-        Arrays.stream(instance.getClass().getMethods())
-            .sorted(MethodNameComparator.INSTANCE)
-            .forEach(processMethod(builder, instance));
+    private static UriQueryParameter processCollection(String name, Object value) {
+        return processValue(name, ((Collection<?>) value).stream()
+            .map(Object::toString)
+            .map(String::trim)
+            .collect(Collectors.toList()));
     }
 
-    private static Optional<Object> getValue(Method method, Object instance) {
-        try {
-            return Optional.ofNullable(method.invoke(instance));
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            throw Exceptions.propagate(e);
+    private static UriQueryParameter processValue(AnnotatedValue<FilterParameter> annotatedValue) {
+        FilterParameter filterParameter = annotatedValue.getAnnotation();
+        Object value = annotatedValue.getValue();
+        if (value instanceof Collection) {
+            return processCollection(filterParameter.value(), value);
+        } else {
+            return processValue(filterParameter.value(), value.toString());
         }
     }
 
-    private static Consumer<FilterParameter> processAnnotation(UriComponentsBuilder builder, Method method, Object instance) {
-        return filterParameter -> getValue(method, instance)
-            .ifPresent(processValue(builder, filterParameter));
-    }
-
-    private static void processCollection(UriComponentsBuilder builder, String name, Object value) {
-        processValue(builder, name,
-            ((Collection<?>) value).stream()
-                .map(o -> o.toString().trim())
-                .collect(Collectors.toList()));
-    }
-
-    private static Consumer<Method> processMethod(UriComponentsBuilder builder, Object instance) {
-        return method -> AnnotationUtils.findAnnotation(method, FilterParameter.class)
-            .ifPresent(processAnnotation(builder, method, instance));
-    }
-
-    private static void processValue(UriComponentsBuilder builder, String name, Collection<String> collection) {
+    private static UriQueryParameter processValue(String name, Collection<String> collection) {
         String value = String.join(",", collection);
         if (!value.isEmpty()) {
-            processValue(builder, name, value);
+            return processValue(name, value);
         }
+        return null;
     }
 
-    private static void processValue(UriComponentsBuilder builder, String name, String value) {
-        builder.queryParam(name, value);
-    }
-
-    private static Consumer<Object> processValue(UriComponentsBuilder builder, FilterParameter filterParameter) {
-        return value -> {
-            if (value instanceof Collection) {
-                processCollection(builder, filterParameter.value(), value);
-            } else {
-                processValue(builder, filterParameter.value(), value.toString());
-            }
-        };
+    private static UriQueryParameter processValue(String name, String value) {
+        return UriQueryParameter.of(name, value);
     }
 
 }
