@@ -20,11 +20,14 @@ import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.QueryBuilder;
 import org.cloudfoundry.reactor.util.AbstractReactorOperations;
+import org.cloudfoundry.reactor.util.UriQueryParameter;
+import org.cloudfoundry.reactor.util.UriQueryParameters;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 public abstract class AbstractNetworkingOperations extends AbstractReactorOperations {
 
@@ -66,9 +69,10 @@ public abstract class AbstractNetworkingOperations extends AbstractReactorOperat
                 .parseBody(responseType));
     }
 
-    private static Function<UriComponentsBuilder, UriComponentsBuilder> queryTransformer(Object requestPayload) {
+    private Function<UriComponentsBuilder, UriComponentsBuilder> queryTransformer(Object requestPayload) {
         return builder -> {
-            QueryBuilder.augment(builder, requestPayload);
+            Stream<UriQueryParameter> parameters = new QueryBuilder().build(requestPayload);
+            UriQueryParameters.set(builder, parameters);
             return builder;
         };
     }

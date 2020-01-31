@@ -17,6 +17,8 @@
 package org.cloudfoundry.reactor.client.v2;
 
 import org.cloudfoundry.client.v2.FilterParameter;
+import org.cloudfoundry.reactor.util.UriQueryParameter;
+import org.cloudfoundry.reactor.util.UriQueryParameters;
 import org.junit.Test;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -24,6 +26,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.client.v2.FilterParameter.Operation.GREATER_THAN;
@@ -37,7 +40,8 @@ public final class FilterBuilderTest {
     public void test() {
         UriComponentsBuilder builder = UriComponentsBuilder.newInstance();
 
-        FilterBuilder.augment(builder, new StubFilterParamsSubClass());
+        Stream<UriQueryParameter> parameters = new FilterBuilder().build(new StubFilterParamsSubClass());
+        UriQueryParameters.set(builder, parameters);
 
         MultiValueMap<String, String> queryParams = builder.build().encode().getQueryParams();
         List<String> q = queryParams.get("q");
