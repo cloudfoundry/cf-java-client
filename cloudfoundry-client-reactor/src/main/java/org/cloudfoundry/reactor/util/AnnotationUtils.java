@@ -16,34 +16,42 @@
 
 package org.cloudfoundry.reactor.util;
 
+import org.cloudfoundry.reactor.client.MethodNameComparator;
+import reactor.core.Exceptions;
+
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 public final class AnnotationUtils {
 
     private AnnotationUtils() {
     }
 
-    public static <T extends Annotation> Optional<T> findAnnotation(Method method, Class<T> annotationType) {
-        Class<?> clazz = method.getDeclaringClass();
-        T annotation = method.getAnnotation(annotationType);
+    public static class AnnotatedValue<T extends Annotation> {
 
-        while (annotation == null) {
-            clazz = clazz.getSuperclass();
+        private final T annotation;
 
-            if (clazz == null || Object.class == clazz) {
-                break;
-            }
+        private final Object value;
 
-            try {
-                annotation = clazz.getDeclaredMethod(method.getName(), method.getParameterTypes()).getAnnotation(annotationType);
-            } catch (NoSuchMethodException e) {
-                // No equivalent method found
-            }
+        public AnnotatedValue(T annotation, Object value) {
+            this.annotation = annotation;
+            this.value = value;
         }
 
-        return Optional.ofNullable(annotation);
+        public T getAnnotation() {
+            return annotation;
+        }
+
+        public Object getValue() {
+            return value;
+        }
+
     }
 
     public static <T extends Annotation> Optional<T> findAnnotation(Class<?> type, Class<T> annotationType) {
@@ -61,6 +69,53 @@ public final class AnnotationUtils {
         }
 
         return Optional.ofNullable(annotation);
+    }
+
+    public static <T extends Annotation> Stream<AnnotatedValue<T>> streamAnnotatedValues(Object instance, Class<T> annotationClass) {
+        Class<?> instanceClass = instance.getClass();
+        return Arrays.stream(instanceClass.getMethods())
+            .sorted(MethodNameComparator.INSTANCE)
+            .map(processMethod(instance, annotationClass))
+            .filter(Objects::nonNull);
+    }
+
+    private static <T extends Annotation> Optional<T> findAnnotation(Method method, Class<T> annotationType) {
+        Class<?> clazz = method.getDeclaringClass();
+        T annotation = method.getAnnotation(annotationType);
+
+        while (annotation == null) {
+            clazz = clazz.getSuperclass();
+
+            if (clazz == null || Object.class == clazz) {
+                break;
+            }
+
+            try {
+                annotation = clazz.getDeclaredMethod(method.getName(), method.getParameterTypes())
+                    .getAnnotation(annotationType);
+            } catch (NoSuchMethodException e) {
+                // No equivalent method found
+            }
+        }
+
+        return Optional.ofNullable(annotation);
+    }
+
+    private static Optional<Object> getValue(Method method, Object instance) {
+        try {
+            return Optional.ofNullable(method.invoke(instance));
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw Exceptions.propagate(e);
+        }
+    }
+
+    private static <T extends Annotation> Function<T, Optional<AnnotatedValue<T>>> processAnnotation(Method method, Object instance) {
+        return annotation -> getValue(method, instance).map(value -> new AnnotatedValue<T>(annotation, value));
+    }
+
+    private static <T extends Annotation> Function<Method, AnnotatedValue<T>> processMethod(Object instance, Class<T> annotationClass) {
+        return method -> findAnnotation(method, annotationClass).flatMap(processAnnotation(method, instance))
+            .orElse(null);
     }
 
 }

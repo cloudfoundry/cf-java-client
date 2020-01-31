@@ -18,14 +18,10 @@ package org.cloudfoundry.reactor.client;
 
 import org.cloudfoundry.QueryParameter;
 import org.cloudfoundry.reactor.util.AnnotationUtils;
+import org.cloudfoundry.reactor.util.AnnotationUtils.AnnotatedValue;
 import org.springframework.web.util.UriComponentsBuilder;
-import reactor.core.Exceptions;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -44,34 +40,27 @@ public final class QueryBuilder {
      * @param instance the instance to inspect and invoke
      */
     public static void augment(UriComponentsBuilder builder, Object instance) {
-        Arrays.stream(instance.getClass().getMethods())
-            .sorted(MethodNameComparator.INSTANCE)
-            .forEach(processMethod(builder, instance));
+        AnnotationUtils.streamAnnotatedValues(instance, QueryParameter.class)
+            .forEach(processValue(builder));
     }
 
-    private static Optional<Object> getValue(Method method, Object instance) {
-        try {
-            return Optional.ofNullable(method.invoke(instance));
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            throw Exceptions.propagate(e);
-        }
-    }
-
-    private static Consumer<QueryParameter> processAnnotation(UriComponentsBuilder builder, Method method, Object instance) {
-        return queryParameter -> getValue(method, instance)
-            .ifPresent(processValue(builder, queryParameter));
+    private static Consumer<AnnotatedValue<QueryParameter>> processValue(UriComponentsBuilder builder) {
+        return annotatedValue -> {
+            QueryParameter queryParameter = annotatedValue.getAnnotation();
+            Object value = annotatedValue.getValue();
+            if (value instanceof Collection) {
+                processCollection(builder, queryParameter, value);
+            } else {
+                processValue(builder, queryParameter.value(), value.toString());
+            }
+        };
     }
 
     private static void processCollection(UriComponentsBuilder builder, QueryParameter queryParameter, Object value) {
-        processValue(builder, queryParameter.value(),
-            ((Collection<?>) value).stream()
-                .map(o -> o.toString().trim())
-                .collect(Collectors.joining(queryParameter.delimiter())));
-    }
-
-    private static Consumer<Method> processMethod(UriComponentsBuilder builder, Object instance) {
-        return method -> AnnotationUtils.findAnnotation(method, QueryParameter.class)
-            .ifPresent(processAnnotation(builder, method, instance));
+        processValue(builder, queryParameter.value(), ((Collection<?>) value).stream()
+            .map(Object::toString)
+            .map(String::trim)
+            .collect(Collectors.joining(queryParameter.delimiter())));
     }
 
     private static void processValue(UriComponentsBuilder builder, String name, String value) {

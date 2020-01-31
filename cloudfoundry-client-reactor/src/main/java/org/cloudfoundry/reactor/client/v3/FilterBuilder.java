@@ -17,16 +17,11 @@
 package org.cloudfoundry.reactor.client.v3;
 
 import org.cloudfoundry.client.v3.FilterParameter;
-import org.cloudfoundry.reactor.client.MethodNameComparator;
 import org.cloudfoundry.reactor.util.AnnotationUtils;
+import org.cloudfoundry.reactor.util.AnnotationUtils.AnnotatedValue;
 import org.springframework.web.util.UriComponentsBuilder;
-import reactor.core.Exceptions;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -42,34 +37,27 @@ final class FilterBuilder {
      * @param instance the instance to inspect and invoke
      */
     public static void augment(UriComponentsBuilder builder, Object instance) {
-        Arrays.stream(instance.getClass().getMethods())
-            .sorted(MethodNameComparator.INSTANCE)
-            .forEach(processMethod(builder, instance));
-    }
-
-    private static Optional<Object> getValue(Method method, Object instance) {
-        try {
-            return Optional.ofNullable(method.invoke(instance));
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            throw Exceptions.propagate(e);
-        }
-    }
-
-    private static Consumer<FilterParameter> processAnnotation(UriComponentsBuilder builder, Method method, Object instance) {
-        return filterParameter -> getValue(method, instance)
-            .ifPresent(processValue(builder, filterParameter));
+        AnnotationUtils.streamAnnotatedValues(instance, FilterParameter.class)
+            .forEach(processValue(builder));
     }
 
     private static void processCollection(UriComponentsBuilder builder, String name, Object value) {
-        processValue(builder, name,
-            ((Collection<?>) value).stream()
-                .map(o -> o.toString().trim())
-                .collect(Collectors.toList()));
+        processValue(builder, name, ((Collection<?>) value).stream()
+            .map(Object::toString)
+            .map(String::trim)
+            .collect(Collectors.toList()));
     }
 
-    private static Consumer<Method> processMethod(UriComponentsBuilder builder, Object instance) {
-        return method -> AnnotationUtils.findAnnotation(method, FilterParameter.class)
-            .ifPresent(processAnnotation(builder, method, instance));
+    private static Consumer<AnnotatedValue<FilterParameter>> processValue(UriComponentsBuilder builder) {
+        return annotatedValue -> {
+            FilterParameter filterParameter = annotatedValue.getAnnotation();
+            Object value = annotatedValue.getValue();
+            if (value instanceof Collection) {
+                processCollection(builder, filterParameter.value(), value);
+            } else {
+                processValue(builder, filterParameter.value(), value.toString());
+            }
+        };
     }
 
     private static void processValue(UriComponentsBuilder builder, String name, Collection<String> collection) {
@@ -81,16 +69,6 @@ final class FilterBuilder {
 
     private static void processValue(UriComponentsBuilder builder, String name, String value) {
         builder.queryParam(name, value);
-    }
-
-    private static Consumer<Object> processValue(UriComponentsBuilder builder, FilterParameter filterParameter) {
-        return value -> {
-            if (value instanceof Collection) {
-                processCollection(builder, filterParameter.value(), value);
-            } else {
-                processValue(builder, filterParameter.value(), value.toString());
-            }
-        };
     }
 
 }
