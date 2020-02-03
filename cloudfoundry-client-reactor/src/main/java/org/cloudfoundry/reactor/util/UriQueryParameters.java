@@ -23,8 +23,14 @@ import java.util.stream.Stream;
 
 public class UriQueryParameters {
 
-    public static void set(UriComponentsBuilder builder, Stream<UriQueryParameter> parameters) {
-        parameters.forEach(parameter -> builder.queryParam(parameter.getKey(), parameter.getValue()));
+    public static void set(UriComponentsBuilder builder, Stream<UriQueryParameter> uriQueryParameters) {
+        // Replace all literal values with URI variables to apply more strict encoding:
+        UriVariablesRegistry uriVariablesRegistry = new UriVariablesRegistry();
+        uriQueryParameters.forEach(uriQueryParameter -> {
+            UriVariable uriVariable = uriVariablesRegistry.register(uriQueryParameter.getValue());
+            builder.queryParam(uriQueryParameter.getKey(), uriVariable.getPlaceholder());
+        });
+        builder.uriVariables(uriVariablesRegistry.getUriVariablesMap());
     }
 
 }

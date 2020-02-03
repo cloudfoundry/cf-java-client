@@ -39,14 +39,15 @@ public final class QueryBuilderTest {
         Stream<UriQueryParameter> parameters = new QueryBuilder().build(new StubQueryParamsSubClass());
         UriQueryParameters.set(builder, parameters);
 
-        MultiValueMap<String, String> queryParams = builder.build().encode().getQueryParams();
+        MultiValueMap<String, String> queryParams = builder.encode().build().getQueryParams();
 
-        assertThat(queryParams).hasSize(7);
+        assertThat(queryParams).hasSize(8);
         assertThat(queryParams.getFirst("test-single")).isEqualTo("test-value-1");
-        assertThat(queryParams.getFirst("test-collection")).isEqualTo("test-value-2,test-value-3");
+        assertThat(queryParams.getFirst("test-collection")).isEqualTo("test-value-2%2Ctest-value-3");
         assertThat(queryParams.getFirst("test-collection-custom-delimiter")).isEqualTo("test-value-4%20test-value-5");
         assertThat(queryParams.getFirst("test-subclass")).isEqualTo("test-value-6");
         assertThat(queryParams.getFirst("test-override")).isEqualTo("test-value-7");
+        assertThat(queryParams.getFirst("test-reserved-characters")).isEqualTo("%3A%2F%3F%23%5B%5D%40%21%24%26%27%28%29%2A%2B%2C%3B%3D");
     }
 
     public static abstract class StubQueryParams {
@@ -79,6 +80,11 @@ public final class QueryBuilderTest {
         @QueryParameter("test-single")
         public final String getSingle() {
             return "test-value-1";
+        }
+
+        @QueryParameter("test-reserved-characters")
+        public final String getReservedCharacters() {
+            return ":/?#[]@!$&'()*+,;=";
         }
 
         @QueryParameter("test-override")

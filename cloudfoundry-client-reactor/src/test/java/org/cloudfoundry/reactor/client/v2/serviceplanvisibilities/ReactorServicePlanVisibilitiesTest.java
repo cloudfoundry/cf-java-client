@@ -181,7 +181,7 @@ public final class ReactorServicePlanVisibilitiesTest extends AbstractClientApiT
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/service_plan_visibilities?q=organization_guid:test-organization-id&page=-1")
+                .method(GET).path("/service_plan_visibilities?q=organization_guid%3Atest-organization-id&page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)

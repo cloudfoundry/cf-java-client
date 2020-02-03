@@ -232,7 +232,7 @@ public final class ReactorServiceBindingsV2Test extends AbstractClientApiTest {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET)
-                .path("/service_bindings?q=app_guid:dd44fd4f-5e20-4c52-b66d-7af6e201f01e&page=-1")
+                .path("/service_bindings?q=app_guid%3Add44fd4f-5e20-4c52-b66d-7af6e201f01e&page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)

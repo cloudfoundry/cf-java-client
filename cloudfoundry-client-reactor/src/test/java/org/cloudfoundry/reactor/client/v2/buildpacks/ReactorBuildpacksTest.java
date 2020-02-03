@@ -168,7 +168,7 @@ public final class ReactorBuildpacksTest extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/buildpacks?q=name:test-name&page=-1")
+                .method(GET).path("/buildpacks?q=name%3Atest-name&page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)

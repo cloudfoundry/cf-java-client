@@ -39,13 +39,14 @@ public final class FilterBuilderTest {
         Stream<UriQueryParameter> parameters = new FilterBuilder().build(new StubFilterParamsSubClass());
         UriQueryParameters.set(builder, parameters);
 
-        MultiValueMap<String, String> queryParams = builder.build().encode().getQueryParams();
+        MultiValueMap<String, String> queryParams = builder.encode().build().getQueryParams();
 
-        assertThat(queryParams).hasSize(5);
+        assertThat(queryParams).hasSize(6);
         assertThat(queryParams.getFirst("test-single")).isEqualTo("test-value-1");
-        assertThat(queryParams.getFirst("test-collection")).isEqualTo("test-value-2,test-value-3");
+        assertThat(queryParams.getFirst("test-collection")).isEqualTo("test-value-2%2Ctest-value-3");
         assertThat(queryParams.getFirst("test-subclass")).isEqualTo("test-value-4");
         assertThat(queryParams.getFirst("test-override")).isEqualTo("test-value-7");
+        assertThat(queryParams.getFirst("test-reserved-characters")).isEqualTo("%3A%2F%3F%23%5B%5D%40%21%24%26%27%28%29%2A%2B%2C%3B%3D");
     }
 
     public static abstract class StubFilterParams {
@@ -73,6 +74,11 @@ public final class FilterBuilderTest {
         @FilterParameter("test-single")
         public final String getSingle() {
             return "test-value-1";
+        }
+
+        @FilterParameter("test-reserved-characters")
+        public final String getReservedCharacters() {
+            return ":/?#[]@!$&'()*+,;=";
         }
 
         @FilterParameter("test-override")

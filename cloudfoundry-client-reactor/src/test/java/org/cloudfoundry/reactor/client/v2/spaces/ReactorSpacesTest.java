@@ -697,7 +697,7 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/spaces?q=name:test-name&page=-1")
+                .method(GET).path("/spaces?q=name%3Atest-name&page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
@@ -747,7 +747,7 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     public void listApplications() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/spaces/test-space-id/apps?q=name:test-name&page=-1")
+                .method(GET).path("/spaces/test-space-id/apps?q=name%3Atest-name&page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)

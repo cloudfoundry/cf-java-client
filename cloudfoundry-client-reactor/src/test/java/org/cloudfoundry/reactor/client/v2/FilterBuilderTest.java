@@ -43,20 +43,21 @@ public final class FilterBuilderTest {
         Stream<UriQueryParameter> parameters = new FilterBuilder().build(new StubFilterParamsSubClass());
         UriQueryParameters.set(builder, parameters);
 
-        MultiValueMap<String, String> queryParams = builder.build().encode().getQueryParams();
+        MultiValueMap<String, String> queryParams = builder.encode().build().getQueryParams();
         List<String> q = queryParams.get("q");
 
         assertThat(q)
-            .hasSize(9)
-            .containsOnly("test-empty-value:",
+            .hasSize(10)
+            .containsOnly("test-empty-value%3A",
                 "test-greater-than%3Etest-value-1",
                 "test-greater-than-or-equal-to%3E%3Dtest-value-2",
-                "test-in%20IN%20test-value-3,test-value-4",
-                "test-is:test-value-5",
+                "test-in%20IN%20test-value-3%2Ctest-value-4",
+                "test-is%3Atest-value-5",
                 "test-less-than%3Ctest-value-6",
                 "test-less-than-or-equal-to%3C%3Dtest-value-7",
-                "test-default%20IN%20test-value-8,test-value-9",
-                "test-override:test-value-10");
+                "test-default%20IN%20test-value-8%2Ctest-value-9",
+                "test-override%3Atest-value-10",
+                "test-reserved-characters%3A%3A%2F%3F%23%5B%5D%40%21%24%26%27%28%29%2A%2B%2C%3B%3D");
     }
 
     public static abstract class StubFilterParams {
@@ -99,6 +100,11 @@ public final class FilterBuilderTest {
         @FilterParameter(value = "test-less-than-or-equal-to", operation = LESS_THAN_OR_EQUAL_TO)
         public final String getLessThanOrEqualTo() {
             return "test-value-7";
+        }
+
+        @FilterParameter("test-reserved-characters")
+        public final String getReservedCharacters() {
+            return ":/?#[]@!$&'()*+,;=";
         }
 
         @FilterParameter("test-null")
