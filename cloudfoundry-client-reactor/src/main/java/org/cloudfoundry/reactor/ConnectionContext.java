@@ -39,6 +39,11 @@ public interface ConnectionContext {
     HttpClient getHttpClient();
 
     /**
+     * The number of retries after an unsuccessful request
+     */
+    Long getInvalidTokenRetries();
+
+    /**
      * The {@link ObjectMapper} to use
      */
     ObjectMapper getObjectMapper();
