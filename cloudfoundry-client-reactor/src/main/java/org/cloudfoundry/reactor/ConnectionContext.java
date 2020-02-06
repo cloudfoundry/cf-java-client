@@ -39,6 +39,11 @@ public interface ConnectionContext {
     HttpClient getHttpClient();
 
     /**
+     * The number of retries after an unsuccessful request
+     */
+    Long getInvalidTokenRetries();
+
+    /**
      * The {@link ObjectMapper} to use
      */
     ObjectMapper getObjectMapper();
@@ -55,10 +60,5 @@ public interface ConnectionContext {
      * @param port the port of the endpoint to trust
      */
     Mono<Void> trust(String host, int port);
-
-    /**
-     * The number of retries after an unsuccessful request
-     */
-    Long getInvalidTokenRetries();
 
 }
