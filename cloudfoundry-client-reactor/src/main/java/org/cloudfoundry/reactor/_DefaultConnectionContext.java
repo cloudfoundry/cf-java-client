@@ -109,6 +109,12 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
 
     @Override
     @Value.Default
+    public Long getInvalidTokenRetries() {
+        return 5L;
+    }
+
+    @Override
+    @Value.Default
     public ObjectMapper getObjectMapper() {
         ObjectMapper objectMapper = new ObjectMapper().disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             .enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
