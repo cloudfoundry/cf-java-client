@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.client.v3;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.AllowNulls;
@@ -35,6 +36,7 @@ abstract class _Metadata {
      * The metadata annotations
      */
     @JsonProperty("annotations")
+    @JsonInclude
     @AllowNulls
     @Nullable
     abstract Map<String, String> getAnnotations();
@@ -43,6 +45,7 @@ abstract class _Metadata {
      * The metadata labels
      */
     @JsonProperty("labels")
+    @JsonInclude
     @AllowNulls
     @Nullable
     abstract Map<String, String> getLabels();
