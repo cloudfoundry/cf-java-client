@@ -35,18 +35,18 @@ abstract class _Metadata {
     /**
      * The metadata annotations
      */
-    @JsonProperty("annotations")
-    @JsonInclude
     @AllowNulls
+    @JsonInclude
+    @JsonProperty("annotations")
     @Nullable
     abstract Map<String, String> getAnnotations();
 
     /**
      * The metadata labels
      */
-    @JsonProperty("labels")
-    @JsonInclude
     @AllowNulls
+    @JsonInclude
+    @JsonProperty("labels")
     @Nullable
     abstract Map<String, String> getLabels();
 
