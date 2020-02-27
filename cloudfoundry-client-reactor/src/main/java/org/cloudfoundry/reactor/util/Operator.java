@@ -99,7 +99,8 @@ public class Operator extends OperatorContextAware {
     private static HttpClient attachRequestLogger(HttpClient httpClient) {
         RequestLogger requestLogger = new RequestLogger();
         return httpClient.doAfterRequest((request, connection) -> requestLogger.request(request))
-            .doAfterResponse((response, connection) -> requestLogger.response(response));
+            .doAfterResponseSuccess((response, connection) -> requestLogger.response(response))
+            .doOnResponseError((response, connection) -> requestLogger.response(response));
     }
 
     public static class PayloadConfiguration extends OperatorContextAware {

@@ -164,8 +164,12 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
 
     @Value.Derived
     Optional<ConnectionProvider> getConnectionProvider() {
+        ConnectionProvider.Builder builder = ConnectionProvider.builder("cloudfoundry-client");
+
         return Optional.ofNullable(getConnectionPoolSize())
-            .map(connectionPoolSize -> ConnectionProvider.fixed("cloudfoundry-client", connectionPoolSize));
+            .map(connectionPoolSize -> builder.maxConnections(connectionPoolSize)
+                .pendingAcquireMaxCount(-1)
+                .build());
     }
 
     /**
