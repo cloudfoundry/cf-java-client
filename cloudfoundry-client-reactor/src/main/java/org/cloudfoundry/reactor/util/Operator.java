@@ -17,6 +17,8 @@
 package org.cloudfoundry.reactor.util;
 
 import io.netty.channel.ChannelHandler;
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -159,7 +161,13 @@ public class Operator extends OperatorContextAware {
         }
 
         public <T> Mono<T> parseBody(Class<T> bodyType) {
-            addChannelHandler(ignore -> JsonCodec.createDecoder());
+            addChannelHandler(response -> {
+                if (HttpHeaderValues.APPLICATION_JSON.contentEquals(response.responseHeaders().get(HttpHeaderNames.CONTENT_TYPE))) {
+                    return JsonCodec.createDecoder();
+                }
+
+                return null;
+            });
             return parseBodyToMono(responseWithBody -> deserialized(responseWithBody.getBody(), bodyType));
         }
 
@@ -185,7 +193,10 @@ public class Operator extends OperatorContextAware {
 
         private void attachChannelHandlers(HttpClientResponse response, Connection connection) {
             for (Function<HttpClientResponse, ChannelHandler> handlerBuilder : this.channelHandlerBuilders) {
-                connection.addHandler(handlerBuilder.apply(response));
+                ChannelHandler handler = handlerBuilder.apply(response);
+                if (handler != null) {
+                    connection.addHandler(handler);
+                }
             }
         }
 
