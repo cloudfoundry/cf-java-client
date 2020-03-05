@@ -20,12 +20,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cloudfoundry.UnknownCloudFoundryException;
 import org.cloudfoundry.client.v2.ClientV2Exception;
 import org.cloudfoundry.client.v3.ClientV3Exception;
-import org.cloudfoundry.reactor.HttpClientResponseWithBody;
+import org.cloudfoundry.reactor.HttpClientResponseWithConnection;
 import org.cloudfoundry.uaa.UaaException;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 import reactor.core.publisher.Flux;
 import reactor.netty.ByteBufFlux;
+import reactor.netty.Connection;
+import reactor.netty.NettyInbound;
 import reactor.netty.http.client.HttpClientResponse;
 import reactor.test.StepVerifier;
 
@@ -42,16 +44,22 @@ import static org.mockito.Mockito.when;
 
 public final class ErrorPayloadMappersTest {
 
+    private final Connection connection = mock(Connection.class, RETURNS_SMART_NULLS);
+
+    private final NettyInbound inbound = mock(NettyInbound.class, RETURNS_SMART_NULLS);
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private final HttpClientResponse response = mock(HttpClientResponse.class, RETURNS_SMART_NULLS);
 
     @Test
     public void clientV2BadPayload() throws IOException {
+        when(this.connection.inbound()).thenReturn(this.inbound);
+        when(this.inbound.receive()).thenReturn(ByteBufFlux.fromPath(new ClassPathResource("fixtures/invalid_error_response.json").getFile().toPath()));
         when(this.response.status()).thenReturn(BAD_REQUEST);
-        HttpClientResponseWithBody responseWithBody = buildResponseWithBody(ByteBufFlux.fromPath(new ClassPathResource("fixtures/invalid_error_response.json").getFile().toPath()));
+        HttpClientResponseWithConnection responseWithConnection = buildResponseWithConnection(this.connection);
 
-        Flux.just(responseWithBody)
+        Flux.just(responseWithConnection)
             .transform(ErrorPayloadMappers.clientV2(this.objectMapper))
             .as(StepVerifier::create)
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(UnknownCloudFoundryException.class)
@@ -63,10 +71,12 @@ public final class ErrorPayloadMappersTest {
 
     @Test
     public void clientV2ClientError() throws IOException {
+        when(this.connection.inbound()).thenReturn(this.inbound);
+        when(this.inbound.receive()).thenReturn(ByteBufFlux.fromPath(new ClassPathResource("fixtures/client/v2/error_response.json").getFile().toPath()));
         when(this.response.status()).thenReturn(BAD_REQUEST);
-        HttpClientResponseWithBody responseWithBody = buildResponseWithBody(ByteBufFlux.fromPath(new ClassPathResource("fixtures/client/v2/error_response.json").getFile().toPath()));
+        HttpClientResponseWithConnection responseWithConnection = buildResponseWithConnection(this.connection);
 
-        Flux.just(responseWithBody)
+        Flux.just(responseWithConnection)
             .transform(ErrorPayloadMappers.clientV2(this.objectMapper))
             .as(StepVerifier::create)
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class)
@@ -81,22 +91,24 @@ public final class ErrorPayloadMappersTest {
     @Test
     public void clientV2NoError() {
         when(this.response.status()).thenReturn(OK);
-        HttpClientResponseWithBody responseWithBody = buildResponseWithBody();
+        HttpClientResponseWithConnection responseWithConnection = buildResponseWithConnection(this.connection);
 
-        Flux.just(responseWithBody)
+        Flux.just(responseWithConnection)
             .transform(ErrorPayloadMappers.clientV2(this.objectMapper))
             .as(StepVerifier::create)
-            .expectNext(responseWithBody)
+            .expectNext(responseWithConnection)
             .expectComplete()
             .verify(Duration.ofSeconds(1));
     }
 
     @Test
     public void clientV2ServerError() throws IOException {
+        when(this.connection.inbound()).thenReturn(this.inbound);
+        when(this.inbound.receive()).thenReturn(ByteBufFlux.fromPath(new ClassPathResource("fixtures/client/v2/error_response.json").getFile().toPath()));
         when(this.response.status()).thenReturn(INTERNAL_SERVER_ERROR);
-        HttpClientResponseWithBody responseWithBody = buildResponseWithBody(ByteBufFlux.fromPath(new ClassPathResource("fixtures/client/v2/error_response.json").getFile().toPath()));
+        HttpClientResponseWithConnection responseWithConnection = buildResponseWithConnection(this.connection);
 
-        Flux.just(responseWithBody)
+        Flux.just(responseWithConnection)
             .transform(ErrorPayloadMappers.clientV2(this.objectMapper))
             .as(StepVerifier::create)
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class)
@@ -110,10 +122,12 @@ public final class ErrorPayloadMappersTest {
 
     @Test
     public void clientV3BadPayload() throws IOException {
+        when(this.connection.inbound()).thenReturn(this.inbound);
+        when(this.inbound.receive()).thenReturn(ByteBufFlux.fromPath(new ClassPathResource("fixtures/invalid_error_response.json").getFile().toPath()));
         when(this.response.status()).thenReturn(BAD_REQUEST);
-        HttpClientResponseWithBody responseWithBody = buildResponseWithBody(ByteBufFlux.fromPath(new ClassPathResource("fixtures/invalid_error_response.json").getFile().toPath()));
+        HttpClientResponseWithConnection responseWithConnection = buildResponseWithConnection(this.connection);
 
-        Flux.just(responseWithBody)
+        Flux.just(responseWithConnection)
             .transform(ErrorPayloadMappers.clientV3(this.objectMapper))
             .as(StepVerifier::create)
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(UnknownCloudFoundryException.class)
@@ -125,10 +139,12 @@ public final class ErrorPayloadMappersTest {
 
     @Test
     public void clientV3ClientError() throws IOException {
+        when(this.connection.inbound()).thenReturn(this.inbound);
+        when(this.inbound.receive()).thenReturn(ByteBufFlux.fromPath(new ClassPathResource("fixtures/client/v3/error_response.json").getFile().toPath()));
         when(this.response.status()).thenReturn(BAD_REQUEST);
-        HttpClientResponseWithBody responseWithBody = buildResponseWithBody(ByteBufFlux.fromPath(new ClassPathResource("fixtures/client/v3/error_response.json").getFile().toPath()));
+        HttpClientResponseWithConnection responseWithConnection = buildResponseWithConnection(this.connection);
 
-        Flux.just(responseWithBody)
+        Flux.just(responseWithConnection)
             .transform(ErrorPayloadMappers.clientV3(this.objectMapper))
             .as(StepVerifier::create)
             .consumeErrorWith(t -> {
@@ -148,22 +164,24 @@ public final class ErrorPayloadMappersTest {
     @Test
     public void clientV3NoError() {
         when(this.response.status()).thenReturn(OK);
-        HttpClientResponseWithBody responseWithBody = buildResponseWithBody();
+        HttpClientResponseWithConnection responseWithConnection = buildResponseWithConnection(this.connection);
 
-        Flux.just(responseWithBody)
+        Flux.just(responseWithConnection)
             .transform(ErrorPayloadMappers.clientV3(this.objectMapper))
             .as(StepVerifier::create)
-            .expectNext(responseWithBody)
+            .expectNext(responseWithConnection)
             .expectComplete()
             .verify(Duration.ofSeconds(1));
     }
 
     @Test
     public void clientV3ServerError() throws IOException {
+        when(this.connection.inbound()).thenReturn(this.inbound);
+        when(this.inbound.receive()).thenReturn(ByteBufFlux.fromPath(new ClassPathResource("fixtures/client/v3/error_response.json").getFile().toPath()));
         when(this.response.status()).thenReturn(INTERNAL_SERVER_ERROR);
-        HttpClientResponseWithBody responseWithBody = buildResponseWithBody(ByteBufFlux.fromPath(new ClassPathResource("fixtures/client/v3/error_response.json").getFile().toPath()));
+        HttpClientResponseWithConnection responseWithConnection = buildResponseWithConnection(this.connection);
 
-        Flux.just(responseWithBody)
+        Flux.just(responseWithConnection)
             .transform(ErrorPayloadMappers.clientV3(this.objectMapper))
             .as(StepVerifier::create)
             .consumeErrorWith(t -> {
@@ -182,10 +200,12 @@ public final class ErrorPayloadMappersTest {
 
     @Test
     public void uaaBadPayload() throws IOException {
+        when(this.connection.inbound()).thenReturn(this.inbound);
+        when(this.inbound.receive()).thenReturn(ByteBufFlux.fromPath(new ClassPathResource("fixtures/invalid_error_response.json").getFile().toPath()));
         when(this.response.status()).thenReturn(BAD_REQUEST);
-        HttpClientResponseWithBody responseWithBody = buildResponseWithBody(ByteBufFlux.fromPath(new ClassPathResource("fixtures/invalid_error_response.json").getFile().toPath()));
+        HttpClientResponseWithConnection responseWithConnection = buildResponseWithConnection(this.connection);
 
-        Flux.just(responseWithBody)
+        Flux.just(responseWithConnection)
             .transform(ErrorPayloadMappers.uaa(this.objectMapper))
             .as(StepVerifier::create)
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(UnknownCloudFoundryException.class)
@@ -197,10 +217,12 @@ public final class ErrorPayloadMappersTest {
 
     @Test
     public void uaaClientError() throws IOException {
+        when(this.connection.inbound()).thenReturn(this.inbound);
+        when(this.inbound.receive()).thenReturn(ByteBufFlux.fromPath(new ClassPathResource("fixtures/uaa/error_response.json").getFile().toPath()));
         when(this.response.status()).thenReturn(BAD_REQUEST);
-        HttpClientResponseWithBody responseWithBody = buildResponseWithBody(ByteBufFlux.fromPath(new ClassPathResource("fixtures/uaa/error_response.json").getFile().toPath()));
+        HttpClientResponseWithConnection responseWithConnection = buildResponseWithConnection(this.connection);
 
-        Flux.just(responseWithBody)
+        Flux.just(responseWithConnection)
             .transform(ErrorPayloadMappers.uaa(this.objectMapper))
             .as(StepVerifier::create)
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(UaaException.class)
@@ -213,22 +235,24 @@ public final class ErrorPayloadMappersTest {
     @Test
     public void uaaNoError() {
         when(this.response.status()).thenReturn(OK);
-        HttpClientResponseWithBody responseWithBody = buildResponseWithBody();
+        HttpClientResponseWithConnection responseWithConnection = buildResponseWithConnection(this.connection);
 
-        Flux.just(responseWithBody)
+        Flux.just(responseWithConnection)
             .transform(ErrorPayloadMappers.uaa(this.objectMapper))
             .as(StepVerifier::create)
-            .expectNext(responseWithBody)
+            .expectNext(responseWithConnection)
             .expectComplete()
             .verify(Duration.ofSeconds(1));
     }
 
     @Test
     public void uaaServerError() throws IOException {
+        when(this.connection.inbound()).thenReturn(this.inbound);
+        when(this.inbound.receive()).thenReturn(ByteBufFlux.fromPath(new ClassPathResource("fixtures/uaa/error_response.json").getFile().toPath()));
         when(this.response.status()).thenReturn(INTERNAL_SERVER_ERROR);
-        HttpClientResponseWithBody responseWithBody = buildResponseWithBody(ByteBufFlux.fromPath(new ClassPathResource("fixtures/uaa/error_response.json").getFile().toPath()));
+        HttpClientResponseWithConnection responseWithConnection = buildResponseWithConnection(this.connection);
 
-        Flux.just(responseWithBody)
+        Flux.just(responseWithConnection)
             .transform(ErrorPayloadMappers.uaa(this.objectMapper))
             .as(StepVerifier::create)
             .consumeErrorWith(t -> assertThat(t).isInstanceOf(UaaException.class)
@@ -238,12 +262,8 @@ public final class ErrorPayloadMappersTest {
             .verify(Duration.ofSeconds(1));
     }
 
-    private HttpClientResponseWithBody buildResponseWithBody() {
-        return buildResponseWithBody(ByteBufFlux.fromInbound(Flux.empty()));
-    }
-
-    private HttpClientResponseWithBody buildResponseWithBody(ByteBufFlux body) {
-        return HttpClientResponseWithBody.of(body, this.response);
+    private HttpClientResponseWithConnection buildResponseWithConnection(Connection connection) {
+        return HttpClientResponseWithConnection.of(connection, this.response);
     }
 
 }

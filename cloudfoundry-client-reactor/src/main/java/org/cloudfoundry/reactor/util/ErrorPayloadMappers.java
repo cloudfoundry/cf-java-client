@@ -22,9 +22,11 @@ import org.cloudfoundry.UnknownCloudFoundryException;
 import org.cloudfoundry.client.v2.ClientV2Exception;
 import org.cloudfoundry.client.v3.ClientV3Exception;
 import org.cloudfoundry.client.v3.Errors;
-import org.cloudfoundry.reactor.HttpClientResponseWithBody;
+import org.cloudfoundry.reactor.HttpClientResponseWithConnection;
 import org.cloudfoundry.uaa.UaaException;
 import reactor.core.publisher.Mono;
+import reactor.netty.ByteBufFlux;
+import reactor.netty.Connection;
 import reactor.netty.http.client.HttpClientResponse;
 
 import java.util.Map;
@@ -58,15 +60,21 @@ public final class ErrorPayloadMappers {
 
     public static ErrorPayloadMapper fallback() {
         return inbound -> inbound
-            .flatMap(responseWithBody -> {
-                HttpClientResponse response = responseWithBody.getResponse();
+            .flatMap(responseWithConnection -> {
+                HttpClientResponse response = responseWithConnection.getResponse();
 
                 if (isError(response)) {
-                    return responseWithBody.getBody().aggregate().asString()
-                        .flatMap(payload -> Mono.error(new UnknownCloudFoundryException(response.status().code(), payload)));
+                    Connection connection = responseWithConnection.getConnection();
+                    ByteBufFlux body = ByteBufFlux.fromInbound(connection.inbound().receive());
+
+                    return body.aggregate().asString()
+                        .doFinally(signalType -> connection.channel().close())
+                        .flatMap(payload -> {
+                            return Mono.error(new UnknownCloudFoundryException(response.status().code(), payload));
+                        });
                 }
 
-                return Mono.just(responseWithBody);
+                return Mono.just(responseWithConnection);
             });
     }
 
@@ -87,13 +95,17 @@ public final class ErrorPayloadMappers {
         return statusClass == CLIENT_ERROR || statusClass == SERVER_ERROR;
     }
 
-    private static Function<HttpClientResponseWithBody, Mono<HttpClientResponseWithBody>> mapToError(ExceptionGenerator exceptionGenerator) {
+    private static Function<HttpClientResponseWithConnection, Mono<HttpClientResponseWithConnection>> mapToError(ExceptionGenerator exceptionGenerator) {
         return response -> {
             if (!isError(response.getResponse())) {
                 return Mono.just(response);
             }
 
-            return response.getBody().aggregate().asString()
+            Connection connection = response.getConnection();
+            ByteBufFlux body = ByteBufFlux.fromInbound(connection.inbound().receive()
+                .doFinally(signalType -> connection.dispose()));
+
+            return body.aggregate().asString()
                 .switchIfEmpty(Mono.error(new UnknownCloudFoundryException(response.getResponse().status().code())))
                 .flatMap(payload -> {
                     try {

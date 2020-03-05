@@ -17,10 +17,13 @@
 package org.cloudfoundry.reactor.util;
 
 import io.netty.channel.ChannelHandler;
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import org.cloudfoundry.reactor.HttpClientResponseWithBody;
+import org.cloudfoundry.reactor.HttpClientResponseWithConnection;
 import org.reactivestreams.Publisher;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
@@ -152,26 +155,37 @@ public class Operator extends OperatorContextAware {
         }
 
         public Mono<HttpClientResponse> get() {
-            return this.responseReceiver.response((resp, body) -> Mono.just(HttpClientResponseWithBody.of(body, resp)))
+            return this.responseReceiver.responseConnection((response, connection) -> Mono.just(HttpClientResponseWithConnection.of(connection, response)))
                 .transform(this::processResponse)
-                .map(HttpClientResponseWithBody::getResponse)
+                .map(HttpClientResponseWithConnection::getResponse)
                 .singleOrEmpty();
         }
 
         public <T> Mono<T> parseBody(Class<T> bodyType) {
-            addChannelHandler(ignore -> JsonCodec.createDecoder());
+            addChannelHandler(response -> {
+                if (HttpHeaderValues.APPLICATION_JSON.contentEquals(response.responseHeaders().get(HttpHeaderNames.CONTENT_TYPE))) {
+                    return JsonCodec.createDecoder();
+                }
+
+                return null;
+            });
+
             return parseBodyToMono(responseWithBody -> deserialized(responseWithBody.getBody(), bodyType));
         }
 
         public <T> Flux<T> parseBodyToFlux(Function<HttpClientResponseWithBody, Publisher<T>> responseTransformer) {
-            return this.responseReceiver.responseConnection((response, connection) -> {
-                attachChannelHandlers(response, connection);
-                ByteBufFlux body = ByteBufFlux.fromInbound(connection.inbound().receive()
-                    .doFinally(signalType -> connection.dispose()));
-
-                return Mono.just(HttpClientResponseWithBody.of(body, response));
-            })
+            return this.responseReceiver.responseConnection((response, connection) -> Mono.just(HttpClientResponseWithConnection.of(connection, response)))
                 .transform(this::processResponse)
+                .flatMap(httpClientResponseWithConnection -> {
+                    Connection connection = httpClientResponseWithConnection.getConnection();
+                    HttpClientResponse response = httpClientResponseWithConnection.getResponse();
+
+                    attachChannelHandlers(response, connection);
+                    ByteBufFlux body = ByteBufFlux.fromInbound(connection.inbound().receive()
+                        .doFinally(signalType -> connection.dispose()));
+
+                    return Mono.just(HttpClientResponseWithBody.of(body, response));
+                })
                 .flatMap(responseTransformer);
         }
 
@@ -179,13 +193,16 @@ public class Operator extends OperatorContextAware {
             return parseBodyToFlux(responseTransformer).singleOrEmpty();
         }
 
-        private static boolean isUnauthorized(HttpClientResponseWithBody response) {
+        private static boolean isUnauthorized(HttpClientResponseWithConnection response) {
             return response.getResponse().status() == HttpResponseStatus.UNAUTHORIZED;
         }
 
         private void attachChannelHandlers(HttpClientResponse response, Connection connection) {
             for (Function<HttpClientResponse, ChannelHandler> handlerBuilder : this.channelHandlerBuilders) {
-                connection.addHandler(handlerBuilder.apply(response));
+                ChannelHandler handler = handlerBuilder.apply(response);
+                if (handler != null) {
+                    connection.addHandler(handler);
+                }
             }
         }
 
@@ -193,7 +210,7 @@ public class Operator extends OperatorContextAware {
             return JsonCodec.decode(this.context.getConnectionContext().getObjectMapper(), body, bodyType);
         }
 
-        private Flux<HttpClientResponseWithBody> invalidateToken(Flux<HttpClientResponseWithBody> inbound) {
+        private Flux<HttpClientResponseWithConnection> invalidateToken(Flux<HttpClientResponseWithConnection> inbound) {
             return inbound
                 .doOnNext(response -> {
                     if (isUnauthorized(response)) {
@@ -203,7 +220,7 @@ public class Operator extends OperatorContextAware {
                 });
         }
 
-        private Flux<HttpClientResponseWithBody> processResponse(Flux<HttpClientResponseWithBody> inbound) {
+        private Flux<HttpClientResponseWithConnection> processResponse(Flux<HttpClientResponseWithConnection> inbound) {
             return inbound
                 .transform(this::invalidateToken)
                 .retry(this.context.getConnectionContext().getInvalidTokenRetries(),
