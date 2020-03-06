@@ -32,6 +32,7 @@ import org.cloudfoundry.client.v3.spaces.GetSpaceIsolationSegmentRequest;
 import org.cloudfoundry.client.v3.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v3.spaces.SpaceRelationships;
 import org.cloudfoundry.client.v3.spaces.SpaceResource;
+import org.cloudfoundry.client.v3.spaces.UpdateSpaceRequest;
 import org.cloudfoundry.util.PaginationUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -124,6 +125,32 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .map(response -> response.getData().getId()))))
             .as(StepVerifier::create)
             .consumeNextWith(tupleEquality())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void update() {
+        String spaceName = this.nameFactory.getSpaceName();
+
+        this.organizationId
+            .flatMap(organizationId -> requestCreateSpace(this.cloudFoundryClient, organizationId, spaceName))
+            .flatMap(resp -> this.cloudFoundryClient.spacesV3().update(UpdateSpaceRequest.builder()
+                .spaceId(resp.getId())
+                .metadata(Metadata.builder()
+                    .annotation("annotationKey", "annotationValue")
+                    .label("labelKey", "labelValue")
+                    .build())
+                .build()))
+            .thenMany(PaginationUtils.requestClientV3Resources(page -> this.cloudFoundryClient.spacesV3()
+                .list(ListSpacesRequest.builder()
+                    .page(page)
+                    .build())))
+            .filter(resource -> spaceName.equals(resource.getName()) &&
+                "annotationValue".equals(resource.getMetadata().getAnnotations().get("annotationKey")) &&
+                "labelValue".equals(resource.getMetadata().getAnnotations().get("labelKey")))
+            .as(StepVerifier::create)
+            .expectNextCount(1)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
