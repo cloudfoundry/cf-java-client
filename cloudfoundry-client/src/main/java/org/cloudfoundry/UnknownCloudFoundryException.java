@@ -17,7 +17,7 @@
 package org.cloudfoundry;
 
 /**
- * A exception representing a Cloud Foundry error that cannot be mapped to any other error.
+ * An exception representing a Cloud Foundry error that cannot be mapped to any other error.
  */
 public final class UnknownCloudFoundryException extends AbstractCloudFoundryException {
 
