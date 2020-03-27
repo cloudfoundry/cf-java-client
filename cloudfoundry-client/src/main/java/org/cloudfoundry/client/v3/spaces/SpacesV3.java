@@ -16,8 +16,6 @@
 
 package org.cloudfoundry.client.v3.spaces;
 
-import org.cloudfoundry.client.v3.applications.UpdateApplicationRequest;
-import org.cloudfoundry.client.v3.applications.UpdateApplicationResponse;
 import reactor.core.publisher.Mono;
 
 /**
@@ -66,6 +64,8 @@ public interface SpacesV3 {
     Mono<ListSpacesResponse> list(ListSpacesRequest request);
 
     /**
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.82.0/#update-a-space">Update a Space</a> request
+     *
      * @param request the Update Space request
      * @return the response from the Update Space request
      */

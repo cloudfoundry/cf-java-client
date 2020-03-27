@@ -17,7 +17,6 @@
 package org.cloudfoundry.client.v3.spaces;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.client.v3.applications.Application;
 import org.immutables.value.Value;
 
 /**

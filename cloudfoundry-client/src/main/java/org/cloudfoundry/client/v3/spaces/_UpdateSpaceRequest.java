@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v3.Lifecycle;
 import org.cloudfoundry.client.v3.Metadata;
 import org.immutables.value.Value;
 
@@ -32,16 +31,16 @@ import org.immutables.value.Value;
 abstract class _UpdateSpaceRequest {
 
     /**
-     * The space id
-     */
-    @JsonIgnore
-    abstract String getSpaceId();
-
-    /**
      * The metadata
      */
     @JsonProperty("metadata")
     @Nullable
     abstract Metadata getMetadata();
+
+    /**
+     * The space id
+     */
+    @JsonIgnore
+    abstract String getSpaceId();
 
 }

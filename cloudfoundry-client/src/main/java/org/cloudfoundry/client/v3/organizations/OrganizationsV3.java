@@ -16,8 +16,6 @@
 
 package org.cloudfoundry.client.v3.organizations;
 
-import org.cloudfoundry.client.v3.spaces.UpdateSpaceRequest;
-import org.cloudfoundry.client.v3.spaces.UpdateSpaceResponse;
 import reactor.core.publisher.Mono;
 
 /**
@@ -66,6 +64,8 @@ public interface OrganizationsV3 {
     Mono<ListOrganizationsResponse> list(ListOrganizationsRequest request);
 
     /**
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.82.0/#update-an-organization">Update an Organization</a> request
+     *
      * @param request the Update Organization request
      * @return the response from the Update Organization request
      */

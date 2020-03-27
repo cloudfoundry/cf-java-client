@@ -17,11 +17,10 @@
 package org.cloudfoundry.client.v3.organizations;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.client.v3.spaces.Space;
 import org.immutables.value.Value;
 
 /**
- * The response payload for the Update Space operation
+ * The response payload for the Update Organization operation
  */
 @JsonDeserialize
 @Value.Immutable

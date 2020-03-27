@@ -24,17 +24,11 @@ import org.cloudfoundry.client.v3.Metadata;
 import org.immutables.value.Value;
 
 /**
- * The request payload for the Update Space operation
+ * The request payload for the Update Organization operation
  */
 @JsonSerialize
 @Value.Immutable
 abstract class _UpdateOrganizationRequest {
-
-    /**
-     * The space id
-     */
-    @JsonIgnore
-    abstract String getOrganizationId();
 
     /**
      * The metadata
@@ -42,5 +36,11 @@ abstract class _UpdateOrganizationRequest {
     @JsonProperty("metadata")
     @Nullable
     abstract Metadata getMetadata();
+
+    /**
+     * The organization id
+     */
+    @JsonIgnore
+    abstract String getOrganizationId();
 
 }

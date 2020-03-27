@@ -41,8 +41,8 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
-import java.util.concurrent.TimeoutException;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_12)
@@ -130,32 +130,6 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void update() {
-        String spaceName = this.nameFactory.getSpaceName();
-
-        this.organizationId
-            .flatMap(organizationId -> requestCreateSpace(this.cloudFoundryClient, organizationId, spaceName))
-            .flatMap(resp -> this.cloudFoundryClient.spacesV3().update(UpdateSpaceRequest.builder()
-                .spaceId(resp.getId())
-                .metadata(Metadata.builder()
-                    .annotation("annotationKey", "annotationValue")
-                    .label("labelKey", "labelValue")
-                    .build())
-                .build()))
-            .thenMany(PaginationUtils.requestClientV3Resources(page -> this.cloudFoundryClient.spacesV3()
-                .list(ListSpacesRequest.builder()
-                    .page(page)
-                    .build())))
-            .filter(resource -> spaceName.equals(resource.getName()) &&
-                "annotationValue".equals(resource.getMetadata().getAnnotations().get("annotationKey")) &&
-                "labelValue".equals(resource.getMetadata().getAnnotations().get("labelKey")))
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
-    }
-
-    @Test
     public void list() {
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -205,6 +179,31 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .filter(resource -> spaceName.equals(resource.getName()))
             .as(StepVerifier::create)
             .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_8)
+    @Test
+    public void update() {
+        String spaceName = this.nameFactory.getSpaceName();
+
+        this.organizationId
+            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .flatMap(spaceId -> this.cloudFoundryClient.spacesV3().update(UpdateSpaceRequest.builder()
+                .metadata(Metadata.builder()
+                    .annotation("annotationKey", "annotationValue")
+                    .label("labelKey", "labelValue")
+                    .build())
+                .spaceId(spaceId)
+                .build()))
+            .thenMany(requestListSpaces(this.cloudFoundryClient, spaceName))
+            .map(SpaceResource::getMetadata)
+            .as(StepVerifier::create)
+            .consumeNextWith(metadata -> {
+                assertThat(metadata.getAnnotations().get("annotationKey")).isEqualTo("annotationValue");
+                assertThat(metadata.getAnnotations().get("labelKey")).isEqualTo("labelValue");
+            })
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }

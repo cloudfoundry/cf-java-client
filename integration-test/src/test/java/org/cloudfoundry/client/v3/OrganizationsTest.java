@@ -40,11 +40,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import reactor.util.function.Tuples;
 
 import java.time.Duration;
-import java.util.concurrent.TimeoutException;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_12)
@@ -136,31 +135,6 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void update() {
-        String organizationName = this.nameFactory.getOrganizationName();
-
-        requestCreateOrganization(this.cloudFoundryClient, organizationName)
-            .flatMap(resp -> this.cloudFoundryClient.organizationsV3().update(UpdateOrganizationRequest.builder()
-                .organizationId(resp.getId())
-                .metadata(Metadata.builder()
-                    .annotation("annotationKey", "annotationValue")
-                    .label("labelKey", "labelValue")
-                    .build())
-                .build()))
-            .thenMany(PaginationUtils.requestClientV3Resources(page -> this.cloudFoundryClient.organizationsV3()
-                .list(ListOrganizationsRequest.builder()
-                    .page(page)
-                    .build())))
-            .filter(resource -> organizationName.equals(resource.getName()) &&
-                "annotationValue".equals(resource.getMetadata().getAnnotations().get("annotationKey")) &&
-                "labelValue".equals(resource.getMetadata().getAnnotations().get("labelKey")))
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
-    }
-
-    @Test
     public void list() {
         String organizationName = this.nameFactory.getOrganizationName();
 
@@ -188,6 +162,29 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .build())))
             .as(StepVerifier::create)
             .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void update() {
+        String organizationName = this.nameFactory.getOrganizationName();
+
+        createOrganizationId(this.cloudFoundryClient, organizationName)
+            .flatMap(organizationId -> this.cloudFoundryClient.organizationsV3().update(UpdateOrganizationRequest.builder()
+                .metadata(Metadata.builder()
+                    .annotation("annotationKey", "annotationValue")
+                    .label("labelKey", "labelValue")
+                    .build())
+                .organizationId(organizationId)
+                .build()))
+            .thenMany(requestListOrganizations(this.cloudFoundryClient, organizationName))
+            .map(OrganizationResource::getMetadata)
+            .as(StepVerifier::create)
+            .consumeNextWith(metadata -> {
+                assertThat(metadata.getAnnotations().get("annotationKey")).isEqualTo("annotationValue");
+                assertThat(metadata.getAnnotations().get("labelKey")).isEqualTo("labelValue");
+            })
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
