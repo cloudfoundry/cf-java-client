@@ -202,7 +202,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .as(StepVerifier::create)
             .consumeNextWith(metadata -> {
                 assertThat(metadata.getAnnotations().get("annotationKey")).isEqualTo("annotationValue");
-                assertThat(metadata.getAnnotations().get("labelKey")).isEqualTo("labelValue");
+                assertThat(metadata.getLabels().get("labelKey")).isEqualTo("labelValue");
             })
             .expectComplete()
             .verify(Duration.ofMinutes(5));

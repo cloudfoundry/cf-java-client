@@ -166,6 +166,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_8)
     @Test
     public void update() {
         String organizationName = this.nameFactory.getOrganizationName();
@@ -183,7 +184,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             .as(StepVerifier::create)
             .consumeNextWith(metadata -> {
                 assertThat(metadata.getAnnotations().get("annotationKey")).isEqualTo("annotationValue");
-                assertThat(metadata.getAnnotations().get("labelKey")).isEqualTo("labelValue");
+                assertThat(metadata.getLabels().get("labelKey")).isEqualTo("labelValue");
             })
             .expectComplete()
             .verify(Duration.ofMinutes(5));
