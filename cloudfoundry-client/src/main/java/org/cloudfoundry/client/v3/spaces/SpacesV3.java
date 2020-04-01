@@ -63,4 +63,13 @@ public interface SpacesV3 {
      */
     Mono<ListSpacesResponse> list(ListSpacesRequest request);
 
+    /**
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.82.0/#update-a-space">Update a Space</a> request
+     *
+     * @param request the Update Space request
+     * @return the response from the Update Space request
+     */
+    Mono<UpdateSpaceResponse> update(UpdateSpaceRequest request);
+
+
 }

@@ -33,17 +33,17 @@ import org.cloudfoundry.client.v3.organizations.GetOrganizationRequest;
 import org.cloudfoundry.client.v3.organizations.GetOrganizationResponse;
 import org.cloudfoundry.client.v3.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v3.organizations.OrganizationResource;
+import org.cloudfoundry.client.v3.organizations.UpdateOrganizationRequest;
 import org.cloudfoundry.util.PaginationUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import reactor.util.function.Tuples;
 
 import java.time.Duration;
-import java.util.concurrent.TimeoutException;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_12)
@@ -162,6 +162,29 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .build())))
             .as(StepVerifier::create)
             .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void update() {
+        String organizationName = this.nameFactory.getOrganizationName();
+
+        createOrganizationId(this.cloudFoundryClient, organizationName)
+            .flatMap(organizationId -> this.cloudFoundryClient.organizationsV3().update(UpdateOrganizationRequest.builder()
+                .metadata(Metadata.builder()
+                    .annotation("annotationKey", "annotationValue")
+                    .label("labelKey", "labelValue")
+                    .build())
+                .organizationId(organizationId)
+                .build()))
+            .thenMany(requestListOrganizations(this.cloudFoundryClient, organizationName))
+            .map(OrganizationResource::getMetadata)
+            .as(StepVerifier::create)
+            .consumeNextWith(metadata -> {
+                assertThat(metadata.getAnnotations().get("annotationKey")).isEqualTo("annotationValue");
+                assertThat(metadata.getAnnotations().get("labelKey")).isEqualTo("labelValue");
+            })
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }

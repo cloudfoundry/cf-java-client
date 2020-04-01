@@ -27,6 +27,8 @@ import org.cloudfoundry.client.v3.organizations.GetOrganizationResponse;
 import org.cloudfoundry.client.v3.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v3.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v3.organizations.OrganizationsV3;
+import org.cloudfoundry.client.v3.organizations.UpdateOrganizationRequest;
+import org.cloudfoundry.client.v3.organizations.UpdateOrganizationResponse;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
@@ -82,6 +84,12 @@ public final class ReactorOrganizationsV3 extends AbstractClientV3Operations imp
     @Override
     public Mono<ListOrganizationsResponse> list(ListOrganizationsRequest request) {
         return get(request, ListOrganizationsResponse.class, builder -> builder.pathSegment("organizations"))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<UpdateOrganizationResponse> update(UpdateOrganizationRequest request) {
+        return patch(request, UpdateOrganizationResponse.class, builder -> builder.pathSegment("organizations", request.getOrganizationId()))
             .checkpoint();
     }
 

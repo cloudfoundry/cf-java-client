@@ -32,6 +32,7 @@ import org.cloudfoundry.client.v3.spaces.GetSpaceIsolationSegmentRequest;
 import org.cloudfoundry.client.v3.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v3.spaces.SpaceRelationships;
 import org.cloudfoundry.client.v3.spaces.SpaceResource;
+import org.cloudfoundry.client.v3.spaces.UpdateSpaceRequest;
 import org.cloudfoundry.util.PaginationUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,8 +41,8 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
-import java.util.concurrent.TimeoutException;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_12)
@@ -178,6 +179,31 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .filter(resource -> spaceName.equals(resource.getName()))
             .as(StepVerifier::create)
             .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_8)
+    @Test
+    public void update() {
+        String spaceName = this.nameFactory.getSpaceName();
+
+        this.organizationId
+            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .flatMap(spaceId -> this.cloudFoundryClient.spacesV3().update(UpdateSpaceRequest.builder()
+                .metadata(Metadata.builder()
+                    .annotation("annotationKey", "annotationValue")
+                    .label("labelKey", "labelValue")
+                    .build())
+                .spaceId(spaceId)
+                .build()))
+            .thenMany(requestListSpaces(this.cloudFoundryClient, spaceName))
+            .map(SpaceResource::getMetadata)
+            .as(StepVerifier::create)
+            .consumeNextWith(metadata -> {
+                assertThat(metadata.getAnnotations().get("annotationKey")).isEqualTo("annotationValue");
+                assertThat(metadata.getAnnotations().get("labelKey")).isEqualTo("labelValue");
+            })
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
