@@ -70,6 +70,8 @@ import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.serviceInstances.ListSharedSpacesRelationshipRequest;
 import org.cloudfoundry.client.v3.serviceInstances.ListSharedSpacesRelationshipResponse;
 import org.cloudfoundry.client.v3.serviceInstances.UnshareServiceInstanceRequest;
+import org.cloudfoundry.client.v3.spaces.GetSpaceRequest;
+import org.cloudfoundry.client.v3.spaces.GetSpaceResponse;
 import org.cloudfoundry.networking.NetworkingClient;
 import org.cloudfoundry.networking.v1.policies.DeletePoliciesRequest;
 import org.cloudfoundry.networking.v1.policies.Destination;
@@ -501,6 +503,7 @@ final class CloudFoundryCleaner {
                     .page(page)
                     .build()))
             .filter(space -> nameFactory.isSpaceName(ResourceUtils.getEntity(space).getName()))
+            .delayUntil(space -> removeSpaceMetadata(cloudFoundryClient, ResourceUtils.getId(space))) //TODO: Remove once the delete spaces endpoint handles spaces with metadata
             .flatMap(space -> cloudFoundryClient.spaces()
                 .delete(DeleteSpaceRequest.builder()
                     .async(true)
@@ -680,6 +683,23 @@ final class CloudFoundryCleaner {
             .map(Relationship::getId)
             .flatMap(spaceId -> requestUnshareServiceInstance(cloudFoundryClient, serviceInstance, spaceId)
                 .doOnError(t -> LOGGER.error("Unable to remove service share from {}", ResourceUtils.getEntity(serviceInstance).getName(), t))));
+    }
+
+    private static Flux<Void> removeSpaceMetadata(CloudFoundryClient cloudFoundryClient, String spaceId) {
+        return cloudFoundryClient.spacesV3()
+            .get(GetSpaceRequest.builder()
+                .spaceId(spaceId)
+                .build())
+            .map(GetSpaceResponse::getMetadata)
+            .flatMapMany(metadata -> {
+                metadata.getAnnotations().entrySet()
+                    .forEach(key -> key.setValue(null));
+
+                metadata.getLabels().entrySet()
+                    .forEach(key -> key.setValue(null));
+
+                return Flux.empty();
+            });
     }
 
     private static Flux<Void> removeUserProvidedServiceInstanceServiceBindings(CloudFoundryClient cloudFoundryClient, UserProvidedServiceInstanceResource serviceInstance) {

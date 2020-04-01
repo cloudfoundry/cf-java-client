@@ -1,0 +1,10 @@
+{
+  "metadata": {
+    "labels": {
+      "dept": "1234"
+    },
+    "annotations": {
+      "version": "1.2.4"
+    }
+  }
+}
