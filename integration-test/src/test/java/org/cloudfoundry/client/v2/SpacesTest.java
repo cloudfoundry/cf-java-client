@@ -113,7 +113,7 @@ import java.util.Date;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
-import static java.time.temporal.ChronoUnit.HOURS;
+import static java.time.temporal.ChronoUnit.MINUTES;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
@@ -1530,7 +1530,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     private static String getPastTimestamp() {
-        Date past = Date.from(Instant.now().minus(1, HOURS));
+        Date past = Date.from(Instant.now().minus(61, MINUTES));
         return DateUtils.formatToIso8601(past);
     }
 

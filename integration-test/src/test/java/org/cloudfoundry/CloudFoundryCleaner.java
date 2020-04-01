@@ -57,6 +57,7 @@ import org.cloudfoundry.client.v2.spacequotadefinitions.DeleteSpaceQuotaDefiniti
 import org.cloudfoundry.client.v2.spacequotadefinitions.ListSpaceQuotaDefinitionsRequest;
 import org.cloudfoundry.client.v2.spaces.DeleteSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
+import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.client.v2.stacks.DeleteStackRequest;
 import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.DeleteUserProvidedServiceInstanceRequest;
@@ -66,12 +67,15 @@ import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedS
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.RemoveUserProvidedServiceInstanceRouteRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstanceResource;
 import org.cloudfoundry.client.v2.users.UserResource;
+import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.serviceInstances.ListSharedSpacesRelationshipRequest;
 import org.cloudfoundry.client.v3.serviceInstances.ListSharedSpacesRelationshipResponse;
 import org.cloudfoundry.client.v3.serviceInstances.UnshareServiceInstanceRequest;
 import org.cloudfoundry.client.v3.spaces.GetSpaceRequest;
 import org.cloudfoundry.client.v3.spaces.GetSpaceResponse;
+import org.cloudfoundry.client.v3.spaces.UpdateSpaceRequest;
+import org.cloudfoundry.client.v3.spaces.UpdateSpaceResponse;
 import org.cloudfoundry.networking.NetworkingClient;
 import org.cloudfoundry.networking.v1.policies.DeletePoliciesRequest;
 import org.cloudfoundry.networking.v1.policies.Destination;
@@ -108,6 +112,7 @@ import reactor.util.function.Tuples;
 
 import javax.net.ssl.SSLException;
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -503,7 +508,7 @@ final class CloudFoundryCleaner {
                     .page(page)
                     .build()))
             .filter(space -> nameFactory.isSpaceName(ResourceUtils.getEntity(space).getName()))
-            .delayUntil(space -> removeSpaceMetadata(cloudFoundryClient, ResourceUtils.getId(space))) //TODO: Remove once the delete spaces endpoint handles spaces with metadata
+            .delayUntil(space -> removeSpaceMetadata(cloudFoundryClient, space)) //TODO: Remove once the delete spaces endpoint handles spaces with metadata
             .flatMap(space -> cloudFoundryClient.spaces()
                 .delete(DeleteSpaceRequest.builder()
                     .async(true)
@@ -685,20 +690,25 @@ final class CloudFoundryCleaner {
                 .doOnError(t -> LOGGER.error("Unable to remove service share from {}", ResourceUtils.getEntity(serviceInstance).getName(), t))));
     }
 
-    private static Flux<Void> removeSpaceMetadata(CloudFoundryClient cloudFoundryClient, String spaceId) {
+    private static Mono<UpdateSpaceResponse> removeSpaceMetadata(CloudFoundryClient cloudFoundryClient, SpaceResource space) {
         return cloudFoundryClient.spacesV3()
             .get(GetSpaceRequest.builder()
-                .spaceId(spaceId)
+                .spaceId(ResourceUtils.getId(space))
                 .build())
             .map(GetSpaceResponse::getMetadata)
-            .flatMapMany(metadata -> {
-                metadata.getAnnotations().entrySet()
-                    .forEach(key -> key.setValue(null));
+            .flatMap(metadata -> {
+                if (metadata.getAnnotations().isEmpty() && metadata.getLabels().isEmpty()) {
+                    return Mono.empty();
+                }
 
-                metadata.getLabels().entrySet()
-                    .forEach(key -> key.setValue(null));
+                Map<String, String> annotations = new HashMap<>(metadata.getAnnotations());
+                Map<String, String> labels = new HashMap<>(metadata.getLabels());
 
-                return Flux.empty();
+                annotations.replaceAll((k, v) -> null);
+                labels.replaceAll((k, v) -> null);
+
+                return requestUpdateSpace(cloudFoundryClient, annotations, labels, ResourceUtils.getId(space))
+                    .doOnError(t -> LOGGER.error("Unable to remove metadata from {}", ResourceUtils.getEntity(space).getName()));
             });
     }
 
@@ -725,6 +735,17 @@ final class CloudFoundryCleaner {
         return cloudFoundryClient.serviceInstancesV3()
             .unshare(UnshareServiceInstanceRequest.builder()
                 .serviceInstanceId(ResourceUtils.getId(serviceInstance))
+                .spaceId(spaceId)
+                .build());
+    }
+
+    private static Mono<UpdateSpaceResponse> requestUpdateSpace(CloudFoundryClient cloudFoundryClient, Map<String, String> annotations, Map<String, String> labels, String spaceId) {
+        return cloudFoundryClient.spacesV3()
+            .update(UpdateSpaceRequest.builder()
+                .metadata(Metadata.builder()
+                    .annotations(annotations)
+                    .labels(labels)
+                    .build())
                 .spaceId(spaceId)
                 .build());
     }
