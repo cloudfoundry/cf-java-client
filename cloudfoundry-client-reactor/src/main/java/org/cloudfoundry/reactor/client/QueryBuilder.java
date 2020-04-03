@@ -18,74 +18,45 @@ package org.cloudfoundry.reactor.client;
 
 import org.cloudfoundry.QueryParameter;
 import org.cloudfoundry.reactor.util.AnnotationUtils;
-import org.springframework.web.util.UriComponentsBuilder;
-import reactor.core.Exceptions;
+import org.cloudfoundry.reactor.util.AnnotationUtils.AnnotatedValue;
+import org.cloudfoundry.reactor.util.UriQueryParameter;
+import org.cloudfoundry.reactor.util.UriQueryParameterBuilder;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Optional;
-import java.util.function.Consumer;
+import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * A builder for Cloud Foundry queries
  */
-public final class QueryBuilder {
+public final class QueryBuilder implements UriQueryParameterBuilder {
 
-    private QueryBuilder() {
+    public Stream<UriQueryParameter> build(Object instance) {
+        return AnnotationUtils.streamAnnotatedValues(instance, QueryParameter.class)
+            .map(QueryBuilder::processValue)
+            .filter(Objects::nonNull);
     }
 
-    /**
-     * Augments a {@link UriComponentsBuilder} with queries based on the methods annotated with {@link QueryParameter}
-     *
-     * @param builder  the builder to augment
-     * @param instance the instance to inspect and invoke
-     */
-    public static void augment(UriComponentsBuilder builder, Object instance) {
-        Arrays.stream(instance.getClass().getMethods())
-            .sorted(MethodNameComparator.INSTANCE)
-            .forEach(processMethod(builder, instance));
+    private static UriQueryParameter processCollection(QueryParameter queryParameter, Object value) {
+        return processValue(queryParameter.value(), ((Collection<?>) value).stream()
+            .map(Object::toString)
+            .map(String::trim)
+            .collect(Collectors.joining(queryParameter.delimiter())));
     }
 
-    private static Optional<Object> getValue(Method method, Object instance) {
-        try {
-            return Optional.ofNullable(method.invoke(instance));
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            throw Exceptions.propagate(e);
+    private static UriQueryParameter processValue(AnnotatedValue<QueryParameter> annotatedValue) {
+        QueryParameter queryParameter = annotatedValue.getAnnotation();
+        Object value = annotatedValue.getValue();
+        if (value instanceof Collection) {
+            return processCollection(queryParameter, value);
+        } else {
+            return processValue(queryParameter.value(), value.toString());
         }
     }
 
-    private static Consumer<QueryParameter> processAnnotation(UriComponentsBuilder builder, Method method, Object instance) {
-        return queryParameter -> getValue(method, instance)
-            .ifPresent(processValue(builder, queryParameter));
-    }
-
-    private static void processCollection(UriComponentsBuilder builder, QueryParameter queryParameter, Object value) {
-        processValue(builder, queryParameter.value(),
-            ((Collection<?>) value).stream()
-                .map(o -> o.toString().trim())
-                .collect(Collectors.joining(queryParameter.delimiter())));
-    }
-
-    private static Consumer<Method> processMethod(UriComponentsBuilder builder, Object instance) {
-        return method -> AnnotationUtils.findAnnotation(method, QueryParameter.class)
-            .ifPresent(processAnnotation(builder, method, instance));
-    }
-
-    private static void processValue(UriComponentsBuilder builder, String name, String value) {
-        builder.queryParam(name, value);
-    }
-
-    private static Consumer<Object> processValue(UriComponentsBuilder builder, QueryParameter queryParameter) {
-        return value -> {
-            if (value instanceof Collection) {
-                processCollection(builder, queryParameter, value);
-            } else {
-                processValue(builder, queryParameter.value(), value.toString());
-            }
-        };
+    private static UriQueryParameter processValue(String name, String value) {
+        return UriQueryParameter.of(name, value);
     }
 
 }

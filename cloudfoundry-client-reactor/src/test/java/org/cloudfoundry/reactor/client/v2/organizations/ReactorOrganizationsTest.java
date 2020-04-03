@@ -776,7 +776,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/organizations?q=name:test-name&page=-1")
+                .method(GET).path("/organizations?q=name%3Atest-name&page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
