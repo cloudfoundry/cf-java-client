@@ -102,14 +102,14 @@ public final class FilterBuilderTest {
             return "test-value-7";
         }
 
-        @FilterParameter("test-reserved-characters")
-        public final String getReservedCharacters() {
-            return ":/?#[]@!$&'()*+,;=";
-        }
-
         @FilterParameter("test-null")
         public final String getNull() {
             return null;
+        }
+
+        @FilterParameter("test-reserved-characters")
+        public final String getReservedCharacters() {
+            return ":/?#[]@!$&'()*+,;=";
         }
 
         @FilterParameter("test-override")

@@ -24,11 +24,11 @@ import java.util.stream.Stream;
 @Value.Immutable
 public abstract class _DelegatingUriQueryParameterBuilder implements UriQueryParameterBuilder {
 
-    public abstract List<UriQueryParameterBuilder> getBuilders();
-
     @Override
     public Stream<UriQueryParameter> build(Object request) {
         return getBuilders().stream().flatMap(extractor -> extractor.build(request));
     }
+
+    public abstract List<UriQueryParameterBuilder> getBuilders();
 
 }

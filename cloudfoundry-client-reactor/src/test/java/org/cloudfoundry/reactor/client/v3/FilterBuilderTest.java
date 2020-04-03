@@ -71,14 +71,14 @@ public final class FilterBuilderTest {
             return null;
         }
 
-        @FilterParameter("test-single")
-        public final String getSingle() {
-            return "test-value-1";
-        }
-
         @FilterParameter("test-reserved-characters")
         public final String getReservedCharacters() {
             return ":/?#[]@!$&'()*+,;=";
+        }
+
+        @FilterParameter("test-single")
+        public final String getSingle() {
+            return "test-value-1";
         }
 
         @FilterParameter("test-override")

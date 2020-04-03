@@ -21,23 +21,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class UriVariablesRegistry {
+class UriVariablesRegistry {
 
     private final List<UriVariable> uriVariables = new ArrayList<>();
 
-    public Map<String, Object> getUriVariablesMap() {
-        return uriVariables.stream().collect(Collectors.toMap(UriVariable::getKey, UriVariable::getValue));
+    Map<String, Object> getUriVariablesMap() {
+        return this.uriVariables.stream().collect(Collectors.toMap(UriVariable::getKey, UriVariable::getValue));
     }
 
-    public UriVariable register(Object value) {
+    UriVariable register(Object value) {
         UriVariable uriVariable = UriVariable.of(getNextUriVariableKey(), value);
-        uriVariables.add(uriVariable);
+        this.uriVariables.add(uriVariable);
 
         return uriVariable;
     }
 
     private String getNextUriVariableKey() {
-        return Integer.toString(uriVariables.size());
+        return Integer.toString(this.uriVariables.size());
     }
 
 }

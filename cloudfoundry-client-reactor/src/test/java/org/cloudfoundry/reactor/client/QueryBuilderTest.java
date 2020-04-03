@@ -77,14 +77,14 @@ public final class QueryBuilderTest {
             return null;
         }
 
-        @QueryParameter("test-single")
-        public final String getSingle() {
-            return "test-value-1";
-        }
-
         @QueryParameter("test-reserved-characters")
         public final String getReservedCharacters() {
             return ":/?#[]@!$&'()*+,;=";
+        }
+
+        @QueryParameter("test-single")
+        public final String getSingle() {
+            return "test-value-1";
         }
 
         @QueryParameter("test-override")

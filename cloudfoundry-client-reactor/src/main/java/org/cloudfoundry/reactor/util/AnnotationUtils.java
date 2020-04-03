@@ -45,11 +45,11 @@ public final class AnnotationUtils {
         }
 
         public T getAnnotation() {
-            return annotation;
+            return this.annotation;
         }
 
         public Object getValue() {
-            return value;
+            return this.value;
         }
 
     }

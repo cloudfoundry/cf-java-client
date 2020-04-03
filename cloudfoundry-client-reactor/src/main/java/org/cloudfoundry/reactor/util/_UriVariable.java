@@ -26,12 +26,12 @@ public interface _UriVariable {
     @Value.Parameter
     String getKey();
 
-    @Value.Parameter
-    Object getValue();
-
     @Value.Derived
     default String getPlaceholder() {
         return String.format(PLACEHOLDER_PATTERN, getKey());
     }
+
+    @Value.Parameter
+    Object getValue();
 
 }

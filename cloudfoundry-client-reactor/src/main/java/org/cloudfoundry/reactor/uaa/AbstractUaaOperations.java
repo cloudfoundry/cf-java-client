@@ -162,16 +162,16 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
         VersionBuilder.augment(httpHeaders, requestPayload);
     }
 
+    private Operator attachErrorPayloadMapper(Operator operator) {
+        return operator.withErrorPayloadMapper(ErrorPayloadMappers.uaa(this.connectionContext.getObjectMapper()));
+    }
+
     private Function<UriComponentsBuilder, UriComponentsBuilder> queryTransformer(Object requestPayload) {
         return builder -> {
             Stream<UriQueryParameter> parameters = new QueryBuilder().build(requestPayload);
             UriQueryParameters.set(builder, parameters);
             return builder;
         };
-    }
-
-    private Operator attachErrorPayloadMapper(Operator operator) {
-        return operator.withErrorPayloadMapper(ErrorPayloadMappers.uaa(this.connectionContext.getObjectMapper()));
     }
 
 }
