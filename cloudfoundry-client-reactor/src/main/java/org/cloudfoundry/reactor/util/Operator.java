@@ -314,8 +314,8 @@ class OperatorContextAware {
     protected String transformRoot(Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromUriString(this.context.getRoot());
         return uriTransformer.apply(uriComponentsBuilder)
-            .build()
             .encode()
+            .build()
             .toUriString();
     }
 

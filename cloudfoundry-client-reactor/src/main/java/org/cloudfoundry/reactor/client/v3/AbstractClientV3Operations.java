@@ -21,9 +21,13 @@ import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.QueryBuilder;
 import org.cloudfoundry.reactor.util.AbstractReactorOperations;
+import org.cloudfoundry.reactor.util.DelegatingUriQueryParameterBuilder;
 import org.cloudfoundry.reactor.util.ErrorPayloadMappers;
 import org.cloudfoundry.reactor.util.MultipartHttpClientRequest;
 import org.cloudfoundry.reactor.util.Operator;
+import org.cloudfoundry.reactor.util.UriQueryParameter;
+import org.cloudfoundry.reactor.util.UriQueryParameterBuilder;
+import org.cloudfoundry.reactor.util.UriQueryParameters;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -37,6 +41,7 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 public abstract class AbstractClientV3Operations extends AbstractReactorOperations {
 
@@ -129,13 +134,16 @@ public abstract class AbstractClientV3Operations extends AbstractReactorOperatio
         return pathSegments.get(pathSegments.size() - 1);
     }
 
-    private static Function<UriComponentsBuilder, UriComponentsBuilder> queryTransformer(Object requestPayload) {
+    private Function<UriComponentsBuilder, UriComponentsBuilder> queryTransformer(Object requestPayload) {
         return builder -> {
-            FilterBuilder.augment(builder, requestPayload);
-            QueryBuilder.augment(builder, requestPayload);
-
+            Stream<UriQueryParameter> parameters = getUriQueryParameterBuilder().build(requestPayload);
+            UriQueryParameters.set(builder, parameters);
             return builder;
         };
+    }
+
+    private UriQueryParameterBuilder getUriQueryParameterBuilder() {
+        return DelegatingUriQueryParameterBuilder.builder().builders(new FilterBuilder(), new QueryBuilder()).build();
     }
 
     private Operator attachErrorPayloadMapper(Operator operator) {

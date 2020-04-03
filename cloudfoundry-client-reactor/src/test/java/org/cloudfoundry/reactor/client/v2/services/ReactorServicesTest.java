@@ -149,7 +149,7 @@ public final class ReactorServicesTest extends AbstractClientApiTest {
     public void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(GET).path("/services?q=label:test-label&page=-1")
+                .method(GET).path("/services?q=label%3Atest-label&page=-1")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)

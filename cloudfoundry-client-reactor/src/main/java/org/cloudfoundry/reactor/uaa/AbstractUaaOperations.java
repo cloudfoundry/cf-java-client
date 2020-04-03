@@ -23,6 +23,8 @@ import org.cloudfoundry.reactor.client.QueryBuilder;
 import org.cloudfoundry.reactor.util.AbstractReactorOperations;
 import org.cloudfoundry.reactor.util.ErrorPayloadMappers;
 import org.cloudfoundry.reactor.util.Operator;
+import org.cloudfoundry.reactor.util.UriQueryParameter;
+import org.cloudfoundry.reactor.util.UriQueryParameters;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClientResponse;
@@ -30,7 +32,7 @@ import reactor.netty.http.client.HttpClientResponse;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.UnaryOperator;
+import java.util.stream.Stream;
 
 public abstract class AbstractUaaOperations extends AbstractReactorOperations {
 
@@ -160,15 +162,16 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
         VersionBuilder.augment(httpHeaders, requestPayload);
     }
 
-    private static UnaryOperator<UriComponentsBuilder> queryTransformer(Object requestPayload) {
-        return builder -> {
-            QueryBuilder.augment(builder, requestPayload);
-            return builder;
-        };
-    }
-
     private Operator attachErrorPayloadMapper(Operator operator) {
         return operator.withErrorPayloadMapper(ErrorPayloadMappers.uaa(this.connectionContext.getObjectMapper()));
+    }
+
+    private Function<UriComponentsBuilder, UriComponentsBuilder> queryTransformer(Object requestPayload) {
+        return builder -> {
+            Stream<UriQueryParameter> parameters = new QueryBuilder().build(requestPayload);
+            UriQueryParameters.set(builder, parameters);
+            return builder;
+        };
     }
 
 }

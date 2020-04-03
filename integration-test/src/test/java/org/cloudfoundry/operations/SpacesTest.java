@@ -18,12 +18,13 @@ package org.cloudfoundry.operations;
 
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.operations.spaces.CreateSpaceRequest;
+import org.cloudfoundry.operations.spaces.GetSpaceRequest;
+import org.cloudfoundry.operations.spaces.SpaceDetail;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
-import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -49,6 +50,26 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .filter(spaceSummary -> spaceName.equals(spaceSummary.getName()))
             .as(StepVerifier::create)
             .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void getWithURLReservedCharacterInName() {
+        String spaceName = this.nameFactory.getSpaceName() + "+test";
+
+        this.cloudFoundryOperations.spaces()
+            .create(CreateSpaceRequest.builder()
+                .name(spaceName)
+                .organization(this.organizationName)
+                .build())
+            .then(this.cloudFoundryOperations.spaces()
+                .get(GetSpaceRequest.builder()
+                    .name(spaceName)
+                    .build()))
+            .map(SpaceDetail::getName)
+            .as(StepVerifier::create)
+            .expectNext(spaceName)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }

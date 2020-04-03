@@ -20,9 +20,13 @@ import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.QueryBuilder;
 import org.cloudfoundry.reactor.util.AbstractReactorOperations;
+import org.cloudfoundry.reactor.util.DelegatingUriQueryParameterBuilder;
 import org.cloudfoundry.reactor.util.ErrorPayloadMappers;
 import org.cloudfoundry.reactor.util.MultipartHttpClientRequest;
 import org.cloudfoundry.reactor.util.Operator;
+import org.cloudfoundry.reactor.util.UriQueryParameter;
+import org.cloudfoundry.reactor.util.UriQueryParameterBuilder;
+import org.cloudfoundry.reactor.util.UriQueryParameters;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -34,6 +38,7 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 public abstract class AbstractClientV2Operations extends AbstractReactorOperations {
 
@@ -101,14 +106,6 @@ public abstract class AbstractClientV2Operations extends AbstractReactorOperatio
                 .parseBody(responseType));
     }
 
-    private static Function<UriComponentsBuilder, UriComponentsBuilder> queryTransformer(Object requestPayload) {
-        return builder -> {
-            FilterBuilder.augment(builder, requestPayload);
-            QueryBuilder.augment(builder, requestPayload);
-            return builder;
-        };
-    }
-
     private Operator attachErrorPayloadMapper(Operator operator) {
         return operator.withErrorPayloadMapper(ErrorPayloadMappers.clientV2(this.connectionContext.getObjectMapper()));
     }
@@ -117,10 +114,22 @@ public abstract class AbstractClientV2Operations extends AbstractReactorOperatio
         return new MultipartHttpClientRequest(this.connectionContext.getObjectMapper(), request, form);
     }
 
+    private UriQueryParameterBuilder getUriQueryParameterBuilder() {
+        return DelegatingUriQueryParameterBuilder.builder().builders(new FilterBuilder(), new QueryBuilder()).build();
+    }
+
     private BiConsumer<HttpClientRequest, HttpClientForm> multipartRequest(Consumer<MultipartHttpClientRequest> requestTransformer) {
         return (request, form) -> {
             MultipartHttpClientRequest multipartRequest = createMultipartRequest(request, form);
             requestTransformer.accept(multipartRequest);
+        };
+    }
+
+    private Function<UriComponentsBuilder, UriComponentsBuilder> queryTransformer(Object requestPayload) {
+        return builder -> {
+            Stream<UriQueryParameter> parameters = getUriQueryParameterBuilder().build(requestPayload);
+            UriQueryParameters.set(builder, parameters);
+            return builder;
         };
     }
 
