@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2020 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,25 +14,18 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3;
+package org.cloudfoundry.client.v3.organizations;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.Nullable;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.immutables.value.Value;
 
-/**
- * Represents a to-one relationship to another entity
- */
-@JsonDeserialize
 @Value.Immutable
-abstract class _ToOneRelationship {
+abstract class _GetOrganizationDefaultDomainRequest {
 
     /**
-     * The relationship data
+     * The organization id
      */
-    @Nullable
-    @JsonProperty("data")
-    abstract Relationship getData();
+    @JsonIgnore
+    abstract String getOrganizationId();
 
 }
