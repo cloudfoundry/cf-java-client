@@ -21,17 +21,9 @@ import org.junit.Test;
 public final class ToOneRelationshipTest {
 
     @Test
-    public void noData() {
+    public void valid() {
         ToOneRelationship.builder()
             .build();
     }
 
-    @Test
-    public void valid() {
-        ToOneRelationship.builder()
-            .data(Relationship.builder()
-                .id("test-id")
-                .build())
-            .build();
-    }
 }

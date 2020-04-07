@@ -16,10 +16,9 @@
 
 package org.cloudfoundry.client.v3.organizations;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.client.v3.domains.Domain;
 import org.immutables.value.Value;
-
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 @JsonDeserialize
 @Value.Immutable

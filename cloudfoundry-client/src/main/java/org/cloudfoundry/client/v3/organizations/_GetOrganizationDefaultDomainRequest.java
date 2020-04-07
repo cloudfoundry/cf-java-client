@@ -16,9 +16,8 @@
 
 package org.cloudfoundry.client.v3.organizations;
 
-import org.immutables.value.Value;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.immutables.value.Value;
 
 @Value.Immutable
 abstract class _GetOrganizationDefaultDomainRequest {
