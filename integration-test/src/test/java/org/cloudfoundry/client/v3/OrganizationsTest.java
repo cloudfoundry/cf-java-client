@@ -28,6 +28,8 @@ import org.cloudfoundry.client.v3.organizations.AssignOrganizationDefaultIsolati
 import org.cloudfoundry.client.v3.organizations.AssignOrganizationDefaultIsolationSegmentResponse;
 import org.cloudfoundry.client.v3.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v3.organizations.CreateOrganizationResponse;
+import org.cloudfoundry.client.v3.organizations.GetOrganizationDefaultDomainRequest;
+import org.cloudfoundry.client.v3.organizations.GetOrganizationDefaultDomainResponse;
 import org.cloudfoundry.client.v3.organizations.GetOrganizationDefaultIsolationSegmentRequest;
 import org.cloudfoundry.client.v3.organizations.GetOrganizationRequest;
 import org.cloudfoundry.client.v3.organizations.GetOrganizationResponse;
@@ -106,6 +108,23 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             .map(GetOrganizationResponse::getName)
             .as(StepVerifier::create)
             .expectNext(organizationName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_7)
+    @Test
+    public void getDefaultDomain() {
+        String organizationName = this.nameFactory.getOrganizationName();
+
+        createOrganizationId(this.cloudFoundryClient, organizationName)
+            .flatMap(organizationId -> this.cloudFoundryClient.organizationsV3()
+                .getDefaultDomain(GetOrganizationDefaultDomainRequest.builder()
+                    .organizationId(organizationId)
+                    .build()))
+            .map(GetOrganizationDefaultDomainResponse::getName)
+            .as(StepVerifier::create)
+            .consumeNextWith(name -> assertThat(name).contains("apps.", ".springapps.io"))
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
