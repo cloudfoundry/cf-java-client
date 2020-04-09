@@ -104,8 +104,9 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
     @Value.Default
     public HttpClient getHttpClient() {
         HttpClient client = createHttpClient().compress(true)
-            .tcpConfiguration(this::configureTcpClient)
-            .secure(this::configureSsl);
+            .secure(this::configureSsl)
+            .tcpConfiguration(this::configureTcpClient);
+
         return getAdditionalHttpClientConfiguration().map(configuration -> configuration.apply(client))
             .orElse(client);
     }
@@ -154,6 +155,11 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
             .map(t -> t.trust(host, port, Duration.ofSeconds(30)))
             .orElse(Mono.empty());
     }
+
+    /**
+     * Additional configuration for the underlying HttpClient
+     */
+    abstract Optional<UnaryOperator<HttpClient>> getAdditionalHttpClientConfiguration();
 
     /**
      * The hostname of the API root. Typically something like {@code api.run.pivotal.io}.
@@ -224,11 +230,6 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
      * The timeout for the SSL handshake negotiation
      */
     abstract Optional<Duration> getSslHandshakeTimeout();
-    
-    /**
-     * Additional configuration to the underlying HttpClient 
-     */
-    abstract Optional<UnaryOperator<HttpClient>> getAdditionalHttpClientConfiguration();
 
     @Value.Derived
     LoopResources getThreadPool() {
