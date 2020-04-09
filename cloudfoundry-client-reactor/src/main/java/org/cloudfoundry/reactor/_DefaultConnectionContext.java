@@ -49,6 +49,7 @@ import java.lang.management.ManagementFactory;
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.UnaryOperator;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static io.netty.channel.ChannelOption.CONNECT_TIMEOUT_MILLIS;
@@ -102,9 +103,12 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
     @Override
     @Value.Default
     public HttpClient getHttpClient() {
-        return createHttpClient().compress(true)
-            .tcpConfiguration(this::configureTcpClient)
-            .secure(this::configureSsl);
+        HttpClient client = createHttpClient().compress(true)
+            .secure(this::configureSsl)
+            .tcpConfiguration(this::configureTcpClient);
+
+        return getAdditionalHttpClientConfiguration().map(configuration -> configuration.apply(client))
+            .orElse(client);
     }
 
     @Override
@@ -151,6 +155,11 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
             .map(t -> t.trust(host, port, Duration.ofSeconds(30)))
             .orElse(Mono.empty());
     }
+
+    /**
+     * Additional configuration for the underlying HttpClient
+     */
+    abstract Optional<UnaryOperator<HttpClient>> getAdditionalHttpClientConfiguration();
 
     /**
      * The hostname of the API root. Typically something like {@code api.run.pivotal.io}.
