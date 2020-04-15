@@ -208,6 +208,7 @@ public final class DeploymentsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_7)
     @Test
     public void listFilterByStatusValues() throws Exception {
         String name = this.nameFactory.getApplicationName();
