@@ -41,4 +41,16 @@ abstract class _ListDeploymentsRequest extends PaginatedRequest {
     @FilterParameter("states")
     abstract List<DeploymentState> getStates();
 
+    /**
+     * List of status reasons to filter by
+     */
+    @FilterParameter("status_reasons")
+    abstract List<DeploymentStatusReason> getStatusReasons();
+
+    /**
+     * List of status values to filter by
+     */
+    @FilterParameter("status_values")
+    abstract List<DeploymentStatusValue> getStatusValues();
+
 }
