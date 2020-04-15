@@ -93,5 +93,4 @@ public abstract class Deployment extends Resource {
     @Nullable
     public abstract Status getStatus();
 
-
 }

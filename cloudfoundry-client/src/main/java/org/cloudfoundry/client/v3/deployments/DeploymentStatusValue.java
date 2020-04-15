@@ -20,19 +20,24 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * The state of a {@link Deployment}
+ * The status value of a {@link Deployment}
  */
 public enum DeploymentStatusValue {
 
     /**
-     * The deploying status value
+     * The active status value
      */
-    DEPLOYING("DEPLOYING"),
+    ACTIVE("ACTIVE"),
 
     /**
      * The canceling status value
      */
     CANCELING("CANCELING"),
+
+    /**
+     * The deploying status value
+     */
+    DEPLOYING("DEPLOYING"),
 
     /**
      * The finalized status value
@@ -48,6 +53,8 @@ public enum DeploymentStatusValue {
     @JsonCreator
     public static DeploymentStatusValue from(String s) {
         switch (s.toLowerCase()) {
+            case "active":
+                return ACTIVE;
             case "deploying":
                 return DEPLOYING;
             case "canceling":
