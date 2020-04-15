@@ -28,6 +28,7 @@ import org.cloudfoundry.client.v3.deployments.CreateDeploymentResponse;
 import org.cloudfoundry.client.v3.deployments.DeploymentRelationships;
 import org.cloudfoundry.client.v3.deployments.DeploymentResource;
 import org.cloudfoundry.client.v3.deployments.DeploymentState;
+import org.cloudfoundry.client.v3.deployments.DeploymentStatusValue;
 import org.cloudfoundry.client.v3.deployments.GetDeploymentRequest;
 import org.cloudfoundry.client.v3.deployments.ListDeploymentsRequest;
 import org.cloudfoundry.operations.CloudFoundryOperations;
@@ -198,6 +199,29 @@ public final class DeploymentsTest extends AbstractIntegrationTest {
             .flatMapMany(deploymentId -> PaginationUtils.requestClientV3Resources(page -> this.cloudFoundryClient.deploymentsV3()
                 .list(ListDeploymentsRequest.builder()
                     .states(DeploymentState.DEPLOYED, DeploymentState.DEPLOYING)
+                    .page(page)
+                    .build()))
+                .filter(resource -> deploymentId.equals(resource.getId())))
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void listFilterByStatusValues() throws Exception {
+        String name = this.nameFactory.getApplicationName();
+        Path path = new ClassPathResource("test-application.zip").getFile().toPath();
+
+        createApplicationId(this.cloudFoundryOperations, name, path)
+            .flatMap(applicationId -> Mono.zip(
+                Mono.just(applicationId),
+                getDropletId(this.cloudFoundryClient, applicationId)
+            ))
+            .flatMap(function((applicationId, dropletId) -> createDeploymentId(this.cloudFoundryClient, applicationId, dropletId)))
+            .flatMapMany(deploymentId -> PaginationUtils.requestClientV3Resources(page -> this.cloudFoundryClient.deploymentsV3()
+                .list(ListDeploymentsRequest.builder()
+                    .statusValue(DeploymentStatusValue.DEPLOYING)
                     .page(page)
                     .build()))
                 .filter(resource -> deploymentId.equals(resource.getId())))

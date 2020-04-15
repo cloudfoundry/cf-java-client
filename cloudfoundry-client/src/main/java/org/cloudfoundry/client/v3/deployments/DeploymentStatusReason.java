@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * The state of a {@link Deployment}
+ * The status reason of a {@link Deployment}
  */
 public enum DeploymentStatusReason {
 
@@ -28,6 +28,11 @@ public enum DeploymentStatusReason {
      * The canceled status reason
      */
     CANCELED("CANCELED"),
+
+    /**
+     * The canceling status reason
+     */
+    CANCELING("CANCELING"),
 
     /**
      * The degenerate status reason
@@ -38,6 +43,11 @@ public enum DeploymentStatusReason {
      * The deployed status reason
      */
     DEPLOYED("DEPLOYED"),
+
+    /**
+     * The deploying status reason
+     */
+    DEPLOYING("DEPLOYING"),
 
     /**
      * The superseded status reason
@@ -55,10 +65,14 @@ public enum DeploymentStatusReason {
         switch (s.toLowerCase()) {
             case "canceled":
                 return CANCELED;
+            case "canceling":
+                return CANCELING;
             case "degenerate":
                 return DEGENERATE;
             case "deployed":
                 return DEPLOYED;
+            case "deploying":
+                return DEPLOYING;
             case "superseded":
                 return SUPERSEDED;
             default:
