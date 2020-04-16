@@ -109,6 +109,7 @@ import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuples;
+import reactor.util.retry.Retry;
 
 import javax.net.ssl.SSLException;
 import java.time.Duration;
@@ -188,7 +189,7 @@ final class CloudFoundryCleaner {
             ))
             .thenMany(cleanOrganizations(this.cloudFoundryClient, this.nameFactory)) // After Spaces
             .thenMany(cleanOrganizationQuotaDefinitions(this.cloudFoundryClient, this.nameFactory)) // After Organizations
-            .retry(5, t -> t instanceof SSLException)
+            .retryWhen(Retry.max(5).filter(SSLException.class::isInstance))
             .doOnSubscribe(s -> LOGGER.debug(">> CLEANUP <<"))
             .doOnComplete(() -> LOGGER.debug("<< CLEANUP >>"))
             .then()

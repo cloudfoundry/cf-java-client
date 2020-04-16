@@ -34,6 +34,7 @@ import reactor.netty.http.client.HttpClientRequest;
 import reactor.netty.http.client.HttpClientResponse;
 import reactor.netty.http.websocket.WebsocketInbound;
 import reactor.netty.http.websocket.WebsocketOutbound;
+import reactor.util.retry.Retry;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -207,8 +208,7 @@ public class Operator extends OperatorContextAware {
         private Flux<HttpClientResponseWithBody> processResponse(Flux<HttpClientResponseWithBody> inbound) {
             return inbound
                 .transform(this::invalidateToken)
-                .retry(this.context.getConnectionContext().getInvalidTokenRetries(),
-                    t -> t instanceof InvalidTokenException)
+                .retryWhen(Retry.max(this.context.getConnectionContext().getInvalidTokenRetries()).filter(InvalidTokenException.class::isInstance))
                 .transform(this.context.getErrorPayloadMapper()
                     .orElse(ErrorPayloadMappers.fallback()));
         }

@@ -26,6 +26,7 @@ import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.uaa.tokens.Tokens;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+import reactor.util.retry.Retry;
 
 import java.util.Optional;
 
@@ -51,14 +52,8 @@ final class UsernameProvider {
         return getToken(this.connectionContext, this.tokenProvider)
             .map(this::getUsername)
             .subscribeOn(Schedulers.elastic())
-            .retry(1, t -> {
-                if (t instanceof ExpiredJwtException) {
-                    this.tokenProvider.invalidate(this.connectionContext);
-                    return true;
-                }
-
-                return false;
-            });
+            .retryWhen(Retry.max(1).filter(ExpiredJwtException.class::isInstance)
+                .doAfterRetry(r -> this.tokenProvider.invalidate(this.connectionContext)));
     }
 
     private static Mono<String> getToken(ConnectionContext connectionContext, TokenProvider tokenProvider) {
