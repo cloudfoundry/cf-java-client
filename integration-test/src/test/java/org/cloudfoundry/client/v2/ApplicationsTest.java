@@ -81,7 +81,9 @@ import reactor.util.function.Tuple2;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
@@ -833,8 +835,9 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .flatMap(applicationId -> this.cloudFoundryClient.applicationsV2()
                 .update(UpdateApplicationRequest.builder()
                     .applicationId(applicationId)
-                    .name(applicationName2)
                     .environmentJson("test-var", "test-value")
+                    .name(applicationName2)
+                    .ports(60606, 60607)
                     .build())
                 .map(ResourceUtils::getId))
             .flatMap(applicationId -> Mono.zip(
@@ -855,6 +858,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .as(StepVerifier::create)
             .consumeNextWith(consumer((entity1, entity2) -> {
                 assertThat(entity1.getName()).isEqualTo(applicationName2);
+                assertThat(entity1.getPorts().containsAll(Arrays.asList(60606, 60607)));
                 assertThat(entity1.getEnvironmentJsons()).containsEntry("test-var", "test-value");
                 assertThat(entity2.getEnvironmentJsons()).isEmpty();
             }))
@@ -897,24 +901,19 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void uploadDirectory() {
+    public void uploadDirectory() throws IOException {
+        Path application = new ClassPathResource("test-application").getFile().toPath();
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
             .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .flatMap(applicationId -> {
-                try {
-                    return this.cloudFoundryClient.applicationsV2()
-                        .upload(UploadApplicationRequest.builder()
-                            .application(new ClassPathResource("test-application").getFile().toPath())
-                            .async(true)
-                            .applicationId(applicationId)
-                            .build())
-                        .flatMap(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job));
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            })
+            .flatMap(applicationId -> this.cloudFoundryClient.applicationsV2()
+                .upload(UploadApplicationRequest.builder()
+                    .application(application)
+                    .async(true)
+                    .applicationId(applicationId)
+                    .build())
+                .flatMap(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job)))
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
@@ -922,23 +921,18 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_9)
     @Test
-    public void uploadDroplet() {
+    public void uploadDroplet() throws IOException {
+        Path droplet = new ClassPathResource("test-droplet.tgz").getFile().toPath();
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
             .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .flatMap(applicationId -> {
-                try {
-                    return this.cloudFoundryClient.applicationsV2()
-                        .uploadDroplet(UploadApplicationDropletRequest.builder()
-                            .applicationId(applicationId)
-                            .droplet(new ClassPathResource("test-droplet.tgz").getFile().toPath())
-                            .build())
-                        .flatMap(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job));
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            })
+            .flatMap(applicationId -> this.cloudFoundryClient.applicationsV2()
+                .uploadDroplet(UploadApplicationDropletRequest.builder()
+                    .applicationId(applicationId)
+                    .droplet(droplet)
+                    .build())
+                .flatMap(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job)))
             .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofMinutes(5));

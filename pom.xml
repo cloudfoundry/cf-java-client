@@ -64,7 +64,6 @@
         <immutables.version>2.8.3</immutables.version>
         <java-semver.version>0.9.0</java-semver.version>
         <jjwt.version>0.9.1</jjwt.version>
-        <okhttp3.version>3.14.7</okhttp3.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <wire.version>2.2.0</wire.version>
     </properties>
@@ -83,11 +82,6 @@
                 <groupId>com.github.zafarkhaja</groupId>
                 <artifactId>java-semver</artifactId>
                 <version>${java-semver.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.squareup.okhttp3</groupId>
-                <artifactId>mockwebserver</artifactId>
-                <version>${okhttp3.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.squareup.wire</groupId>
