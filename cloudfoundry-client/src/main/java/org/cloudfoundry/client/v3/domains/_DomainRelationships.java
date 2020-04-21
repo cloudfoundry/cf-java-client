@@ -18,6 +18,7 @@ package org.cloudfoundry.client.v3.domains;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.ToManyRelationship;
 import org.cloudfoundry.client.v3.ToOneRelationship;
 import org.immutables.value.Value;
@@ -38,6 +39,7 @@ abstract class _DomainRelationships {
      * to the organization the domain is scoped to.
      */
     @JsonProperty("shared_organizations")
+    @Nullable
     abstract ToManyRelationship getSharedOrganizations();
 
 }
