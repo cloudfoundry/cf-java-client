@@ -43,9 +43,9 @@
 
     <developers>
         <developer>
-            <name>Pivotal</name>
-            <email>info@pivotal.io</email>
-            <organization>Pivotal Software, Inc.</organization>
+            <name>VMware</name>
+            <email>info@vmware.com</email>
+            <organization>VMware, Inc.</organization>
             <organizationUrl>https://www.cloudfoundry.org</organizationUrl>
         </developer>
     </developers>

@@ -21,7 +21,7 @@
 The `cf-java-client` project is a Java language binding for interacting with a Cloud Foundry instance.  The project is broken up into a number of components that expose different levels of abstraction depending on need.
 
 * `cloudfoundry-client` – Interfaces, request, and response objects mapping to the [Cloud Foundry REST APIs][a].  This project has no implementation and therefore cannot connect to a Cloud Foundry instance on its own.
-* `cloudfoundry-client-reactor` – The default implementation of the `cloudfoundry-client` project.  This implementation is based on the Reactor Netty [`HttpClient`][h].
+* `cloudfoundry-client-reactor` – The default implementation of the `cloudfoundry-client` project.  This implementation is based on Reactor Netty [`HttpClient`][h].
 * `cloudfoundry-operations` – An API and implementation that corresponds to the [Cloud Foundry CLI][c] operations.  This project builds on the `cloudfoundry-client` and therefore has a single implementation.
 
 ## Versions
@@ -35,13 +35,12 @@ Most projects will need two dependencies; the Operations API and an implementati
     <dependency>
         <groupId>org.cloudfoundry</groupId>
         <artifactId>cloudfoundry-client-reactor</artifactId>
-        <version>4.3.0.RELEASE</version>
+        <version>4.6.0.RELEASE</version>
     </dependency>
     <dependency>
         <groupId>org.cloudfoundry</groupId>
         <artifactId>cloudfoundry-operations</artifactId>
-        <version>4.3.0.RELEASE</version>
-    </dependency>
+        <version>4.6.0.RELEASE</version>
     </dependency>
     ...
 </dependencies>
@@ -67,8 +66,8 @@ For Gradle, the dependencies would be defined like this:
 
 ```groovy
 dependencies {
-    compile 'org.cloudfoundry:cloudfoundry-client-reactor:4.3.0.RELEASE'
-    compile 'org.cloudfoundry:cloudfoundry-operations:4.3.0.RELEASE'
+    compile 'org.cloudfoundry:cloudfoundry-client-reactor:4.6.0.RELEASE'
+    compile 'org.cloudfoundry:cloudfoundry-operations:4.6.0.RELEASE'
     ...
 }
 ```
@@ -208,7 +207,7 @@ Once you've got a reference to the `CloudFoundryOperations`, it's time to start 
 
 1. Requests a list of all organizations
 1. Extracts the name of each organization
-1. Prints the name of the each organization to `System.out`
+1. Prints the name of each organization to `System.out`
 
 ```java
 cloudFoundryOperations.organizations()
