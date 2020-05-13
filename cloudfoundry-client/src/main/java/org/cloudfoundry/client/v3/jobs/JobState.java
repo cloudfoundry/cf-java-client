@@ -35,6 +35,11 @@ public enum JobState {
     FAILED("FAILED"),
 
     /**
+     * The polling state
+     */
+    POLLING("POLLING"),
+
+    /**
      * The processing state
      */
     PROCESSING("PROCESSING");
@@ -52,6 +57,8 @@ public enum JobState {
                 return COMPLETE;
             case "failed":
                 return FAILED;
+            case "polling":
+                return POLLING;
             case "processing":
                 return PROCESSING;
             default:

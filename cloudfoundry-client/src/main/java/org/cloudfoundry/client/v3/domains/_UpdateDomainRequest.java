@@ -16,37 +16,31 @@
 
 package org.cloudfoundry.client.v3.domains;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.Metadata;
-import org.cloudfoundry.client.v3.Resource;
+import org.immutables.value.Value;
 
-public abstract class Domain extends Resource {
+/**
+ * The request payload for the Update a Domain operation
+ */
+@JsonSerialize
+@Value.Immutable
+abstract class _UpdateDomainRequest {
 
     /**
-     * Metadata applied to the domain.
+     * The id
+     */
+    @JsonIgnore
+    abstract String getDomainId();
+
+    /**
+     * The metadata
      */
     @JsonProperty("metadata")
     @Nullable
-    public abstract Metadata getMetadata();
-
-    /**
-     * The name of the domain.
-     * Must be between 3 ~ 253 characters and follow <a href="https://tools.ietf.org/html/rfc1035">RFC 1035</a>.
-     */
-    @JsonProperty("name")
-    public abstract String getName();
-
-    /**
-     * Relationships of the domain.
-     */
-    @JsonProperty("relationships")
-    public abstract DomainRelationships getRelationships();
-
-    /**
-     * Whether the domain is used for internal (container-to-container) traffic.
-     */
-    @JsonProperty("internal")
-    public abstract boolean isInternal();
+    abstract Metadata getMetadata();
 
 }

@@ -20,6 +20,10 @@ import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.Pagination;
 import org.cloudfoundry.client.v3.Relationship;
+import org.cloudfoundry.client.v3.ToManyRelationship;
+import org.cloudfoundry.client.v3.ToOneRelationship;
+import org.cloudfoundry.client.v3.domains.DomainRelationships;
+import org.cloudfoundry.client.v3.domains.DomainResource;
 import org.cloudfoundry.client.v3.organizations.AssignOrganizationDefaultIsolationSegmentRequest;
 import org.cloudfoundry.client.v3.organizations.AssignOrganizationDefaultIsolationSegmentResponse;
 import org.cloudfoundry.client.v3.organizations.CreateOrganizationRequest;
@@ -28,6 +32,8 @@ import org.cloudfoundry.client.v3.organizations.GetOrganizationDefaultIsolationS
 import org.cloudfoundry.client.v3.organizations.GetOrganizationDefaultIsolationSegmentResponse;
 import org.cloudfoundry.client.v3.organizations.GetOrganizationRequest;
 import org.cloudfoundry.client.v3.organizations.GetOrganizationResponse;
+import org.cloudfoundry.client.v3.organizations.ListOrganizationDomainsRequest;
+import org.cloudfoundry.client.v3.organizations.ListOrganizationDomainsResponse;
 import org.cloudfoundry.client.v3.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v3.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v3.organizations.OrganizationResource;
@@ -241,6 +247,69 @@ public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
             .verify(Duration.ofSeconds(5));
     }
 
+    @Test
+    public void listDomains() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/organizations/test-organization-id/domains")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v3/organizations/GET_{id}_domains_response.json")
+                .build())
+            .build());
+
+        this.organizations
+            .listDomains(ListOrganizationDomainsRequest.builder()
+                .organizationId("test-organization-id")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ListOrganizationDomainsResponse.builder()
+                .pagination(Pagination.builder()
+                    .totalResults(3)
+                    .totalPages(2)
+                    .first(Link.builder()
+                        .href("https://api.example.org/v3/domains?page=1&per_page=2")
+                        .build())
+                    .last(Link.builder()
+                        .href("https://api.example.org/v3/domains?page=2&per_page=2")
+                        .build())
+                    .next(Link.builder()
+                        .href("https://api.example.org/v3/domains?page=2&per_page=2")
+                        .build())
+                    .build())
+                .resource(DomainResource.builder()
+                    .id("3a5d3d89-3f89-4f05-8188-8a2b298c79d5")
+                    .metadata(Metadata.builder()
+                        .annotations(Collections.emptyMap())
+                        .labels(Collections.emptyMap())
+                        .build())
+                    .createdAt("2019-03-08T01:06:19Z")
+                    .updatedAt("2019-03-08T01:06:19Z")
+                    .name("test-domain.com")
+                    .isInternal(false)
+                    .relationships(DomainRelationships.builder()
+                        .organization(ToOneRelationship.builder()
+                            .data(Relationship.builder()
+                                .id("test-organization-id")
+                                .build())
+                            .build())
+                        .sharedOrganizations(ToManyRelationship.builder().build())
+                        .build())
+                    .link("self", Link.builder()
+                        .href("https://api.example.org/v3/domains/3a5d3d89-3f89-4f05-8188-8a2b298c79d5")
+                        .build())
+                    .link("organization", Link.builder()
+                        .href("https://api.example.org/v3/organizations/test-organization-id")
+                        .build())
+                    .link("route_reservations", Link.builder()
+                        .href("https://api.example.org/v3/domains/3a5d3d89-3f89-4f05-8188-8a2b298c79d5/route_reservations")
+                        .build())
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
 
     @Test
     public void update() {

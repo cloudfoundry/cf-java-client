@@ -72,6 +72,14 @@ public interface OrganizationsV3 {
     Mono<ListOrganizationsResponse> list(ListOrganizationsRequest request);
 
     /**
+     * Makes <a href="http://v3-apidocs.cloudfoundry.org/version/3.77.0/index.html#list-domains-for-an-organization">List Organization Domains</a> request
+     *
+     * @param request the List Organization Domains request
+     * @return the response from the List Organization Domains request
+     */
+    Mono<ListOrganizationDomainsResponse> listDomains(ListOrganizationDomainsRequest request);
+
+    /**
      * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.82.0/#update-an-organization">Update an Organization</a> request
      *
      * @param request the Update Organization request
