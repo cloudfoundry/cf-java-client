@@ -56,6 +56,14 @@ public interface DomainsV3 {
     Mono<ListDomainsResponse> list(ListDomainsRequest request);
 
     /**
+     * Makes <a href="http://v3-apidocs.cloudfoundry.org/version/3.77.0/index.html#share-a-domain">Share a Domain</a> request
+     *
+     * @param request The Share a Domain request
+     * @return the response from the Share a Domain request
+     */
+    Mono<ShareDomainResponse> share(ShareDomainRequest request);
+
+    /**
      * Makes <a href="http://v3-apidocs.cloudfoundry.org/version/3.77.0/index.html#unshare-a-domain">Unshare a Domain</a> request
      *
      * @param request The Unshare a Domain request
@@ -70,13 +78,5 @@ public interface DomainsV3 {
      * @return the response from the Update a Domain request
      */
     Mono<UpdateDomainResponse> update(UpdateDomainRequest request);
-
-    /**
-     * Makes <a href="http://v3-apidocs.cloudfoundry.org/version/3.77.0/index.html#share-a-domain">Share a Domain</a> request
-     *
-     * @param request The Share a Domain request
-     * @return the response from the Share a Domain request
-     */
-    Mono<ShareDomainResponse> share(ShareDomainRequest request);
 
 }

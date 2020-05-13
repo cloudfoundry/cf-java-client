@@ -36,6 +36,7 @@ import org.cloudfoundry.client.v3.domains.UpdateDomainRequest;
 import org.cloudfoundry.client.v3.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v3.organizations.CreateOrganizationResponse;
 import org.cloudfoundry.client.v3.organizations.ListOrganizationDomainsRequest;
+import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -63,24 +64,40 @@ public final class DomainsTest extends AbstractIntegrationTest {
     @Autowired
     private Mono<String> organizationId;
 
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_6)
     @Test
     public void create() {
         String domainName = this.nameFactory.getDomainName();
 
-        requestCreateDomain(this.cloudFoundryClient, domainName)
+        this.cloudFoundryClient.domainsV3()
+            .create(CreateDomainRequest.builder()
+                .internal(false)
+                .name(domainName)
+                .build())
             .as(StepVerifier::create)
             .consumeNextWith(globalDomainNameEquality(domainName))
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
 
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_6)
     @Test
     public void createForAnOrganization() {
         String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
             .flatMap(organizationId -> Mono.zip(
-                requestCreateDomain(this.cloudFoundryClient, organizationId, domainName),
+                this.cloudFoundryClient.domainsV3()
+                    .create(CreateDomainRequest.builder()
+                        .name(domainName)
+                        .relationships(DomainRelationships.builder()
+                            .organization(ToOneRelationship.builder()
+                                .data(Relationship.builder()
+                                    .id(organizationId)
+                                    .build())
+                                .build())
+                            .build())
+                        .build()),
                 Mono.just(organizationId)
             ))
             .as(StepVerifier::create)
@@ -93,36 +110,49 @@ public final class DomainsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_7)
     @Test
     public void delete() {
         String domainName = this.nameFactory.getDomainName();
 
         createDomainId(this.cloudFoundryClient, domainName)
-            .delayUntil(domainId -> requestDeleteDomain(this.cloudFoundryClient, domainId))
+            .delayUntil(domainId -> this.cloudFoundryClient.domainsV3()
+                .delete(DeleteDomainRequest.builder()
+                    .domainId(domainId)
+                    .build())
+                .flatMap(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job)))
             .flatMap(domainId -> requestGetDomain(this.cloudFoundryClient, domainId))
             .as(StepVerifier::create)
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV3Exception.class).hasMessageMatching("CF-DomainNotFound\\([0-9]+\\): The domain could not be found: .*"))
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV3Exception.class).hasMessageMatching("CF-ResourceNotFound\\([0-9]+\\): Domain not found.*"))
             .verify(Duration.ofMinutes(5));
     }
 
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_6)
     @Test
     public void get() {
         String domainName = this.nameFactory.getDomainName();
 
         createDomainId(this.cloudFoundryClient, domainName)
-            .flatMap(domainId -> requestGetDomain(this.cloudFoundryClient, domainId))
+            .flatMap(domainId -> this.cloudFoundryClient.domainsV3()
+                .get(GetDomainRequest.builder()
+                    .domainId(domainId)
+                    .build()))
             .as(StepVerifier::create)
             .consumeNextWith(globalDomainNameEquality(domainName))
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
 
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_6)
     @Test
     public void list() {
         String domainName = this.nameFactory.getDomainName();
 
         createDomainId(this.cloudFoundryClient, domainName)
-            .flatMap(domainId -> requestListDomains(this.cloudFoundryClient)
+            .flatMap(domainId -> PaginationUtils.requestClientV3Resources(page -> this.cloudFoundryClient.domainsV3()
+                .list(ListDomainsRequest.builder()
+                    .page(page)
+                    .build()))
                 .filter(resource -> domainId.equals(resource.getId()))
                 .single()
             )
@@ -132,12 +162,36 @@ public final class DomainsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_7)
+    @Test
+    public void listFilterById() {
+        String domainName = this.nameFactory.getDomainName();
+
+        createDomainId(this.cloudFoundryClient, domainName)
+            .flatMapMany(domainId -> PaginationUtils
+                .requestClientV3Resources(page -> this.cloudFoundryClient.domainsV3()
+                    .list(ListDomainsRequest.builder()
+                        .domainId(domainId)
+                        .page(page)
+                        .build())))
+            .as(StepVerifier::create)
+            .consumeNextWith(globalDomainNameEquality(domainName))
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_7)
     @Test
     public void listFilterByName() {
         String domainName = this.nameFactory.getDomainName();
 
         createDomainId(this.cloudFoundryClient, domainName)
-            .flatMap(domainId -> requestListDomains(this.cloudFoundryClient, domainName)
+            .flatMap(domainId -> PaginationUtils
+                .requestClientV3Resources(page -> this.cloudFoundryClient.domainsV3()
+                    .list(ListDomainsRequest.builder()
+                        .name(domainName)
+                        .page(page)
+                        .build()))
                 .filter(resource -> domainId.equals(resource.getId()))
                 .single()
             )
@@ -147,6 +201,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_7)
     @Test
     public void listFilterByOwningOrganizationId() {
         String domainName = this.nameFactory.getDomainName();
@@ -157,7 +212,11 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 createDomainId(this.cloudFoundryClient, domainName, organizationId)
             ))
             .flatMap(function((organizationId, domainId) -> Mono.zip(
-                requestListDomainsByOwningOrganization(this.cloudFoundryClient, organizationId)
+                PaginationUtils.requestClientV3Resources(page -> this.cloudFoundryClient.domainsV3()
+                    .list(ListDomainsRequest.builder()
+                        .owningOrganizationId(organizationId)
+                        .page(page)
+                        .build()))
                     .filter(resource -> domainId.equals(resource.getId()))
                     .single(),
                 Mono.just(organizationId)
@@ -172,6 +231,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_7)
     @Test
     public void share() {
         String domainName = this.nameFactory.getDomainName();
@@ -183,12 +243,15 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 createDomainId(this.cloudFoundryClient, domainName, organizationId),
                 createOrganizationId(this.cloudFoundryClient, organizationName)
             ))
-            .delayUntil(function((organizationId, domainId, newOrganizationId) ->
-                requestShareDomain(this.cloudFoundryClient, domainId, newOrganizationId)))
+            .delayUntil(function((organizationId, domainId, newOrganizationId) -> this.cloudFoundryClient.domainsV3()
+                .share(ShareDomainRequest.builder()
+                    .domainId(domainId)
+                    .data(Relationship.builder()
+                        .id(newOrganizationId)
+                        .build())
+                    .build())))
             .flatMap(function((organizationId, domainId, newOrganizationId) -> Mono.zip(
-                requestListDomainsForOrganization(this.cloudFoundryClient, organizationId)
-                    .filter(resource -> domainId.equals(resource.getId()))
-                    .single(),
+                requestGetDomain(this.cloudFoundryClient, domainId),
                 Mono.just(organizationId),
                 Mono.just(newOrganizationId)
             )))
@@ -202,6 +265,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_7)
     @Test
     public void unshare() {
         String domainName = this.nameFactory.getDomainName();
@@ -216,8 +280,11 @@ public final class DomainsTest extends AbstractIntegrationTest {
             .doOnSuccess(T -> LOGGER.info("OrganizationId: {}, domainId: {}, newOrganizationId: {}", T.getT1(), T.getT2(), T.getT3()))
             .delayUntil(function((organizationId, domainId, newOrganizationId) ->
                 requestShareDomain(this.cloudFoundryClient, domainId, newOrganizationId)))
-            .delayUntil(function((organizationId, domainId, newOrganizationId) ->
-                requestUnshareDomain(this.cloudFoundryClient, domainId, newOrganizationId)))
+            .delayUntil(function((organizationId, domainId, newOrganizationId) -> this.cloudFoundryClient.domainsV3()
+                .unshare(UnshareDomainRequest.builder()
+                    .domainId(domainId)
+                    .organizationId(newOrganizationId)
+                    .build())))
             .flatMapMany(function((organizationId, domainId, newOrganizationId) ->
                 requestListDomainsForOrganization(this.cloudFoundryClient, newOrganizationId)
                     .filter(resource -> domainId.equals(resource.getId()))
@@ -228,6 +295,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_7)
     @Test
     public void update() {
         String domainName = this.nameFactory.getDomainName();
@@ -235,12 +303,12 @@ public final class DomainsTest extends AbstractIntegrationTest {
         createDomainId(this.cloudFoundryClient, domainName)
             .flatMap(domainId -> this.cloudFoundryClient.domainsV3()
                 .update(UpdateDomainRequest.builder()
-                .domainId(domainId)
-                .metadata(Metadata.builder()
-                    .annotation("annotationKey", "annotationValue")
-                    .label("labelKey", "labelValue")
-                    .build())
-                .build()))
+                    .domainId(domainId)
+                    .metadata(Metadata.builder()
+                        .annotation("annotationKey", "annotationValue")
+                        .label("labelKey", "labelValue")
+                        .build())
+                    .build()))
             .thenMany(requestListDomains(this.cloudFoundryClient, domainName))
             .map(DomainResource::getMetadata)
             .as(StepVerifier::create)
@@ -258,7 +326,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     }
 
     private static Mono<String> createDomainId(CloudFoundryClient cloudFoundryClient, String domainName, String organizationId) {
-        return requestCreateDomain(cloudFoundryClient, organizationId, domainName)
+        return requestCreateDomain(cloudFoundryClient, domainName, organizationId)
             .map(CreateDomainResponse::getId);
     }
 
@@ -281,12 +349,12 @@ public final class DomainsTest extends AbstractIntegrationTest {
     private static Mono<CreateDomainResponse> requestCreateDomain(CloudFoundryClient cloudFoundryClient, String domainName) {
         return cloudFoundryClient.domainsV3()
             .create(CreateDomainRequest.builder()
-                .name(domainName)
                 .internal(false)
+                .name(domainName)
                 .build());
     }
 
-    private static Mono<CreateDomainResponse> requestCreateDomain(CloudFoundryClient cloudFoundryClient, String organizationId, String domainName) {
+    private static Mono<CreateDomainResponse> requestCreateDomain(CloudFoundryClient cloudFoundryClient, String domainName, String organizationId) {
         return cloudFoundryClient.domainsV3()
             .create(CreateDomainRequest.builder()
                 .name(domainName)
@@ -297,13 +365,6 @@ public final class DomainsTest extends AbstractIntegrationTest {
                             .build())
                         .build())
                     .build())
-                .build());
-    }
-
-    private static Mono<String> requestDeleteDomain(CloudFoundryClient cloudFoundryClient, String domainId) {
-        return cloudFoundryClient.domainsV3()
-            .delete(DeleteDomainRequest.builder()
-                .domainId(domainId)
                 .build());
     }
 
@@ -319,23 +380,6 @@ public final class DomainsTest extends AbstractIntegrationTest {
             .requestClientV3Resources(page -> cloudFoundryClient.domainsV3()
                 .list(ListDomainsRequest.builder()
                     .name(domainName)
-                    .page(page)
-                    .build()));
-    }
-
-    private static Flux<DomainResource> requestListDomains(CloudFoundryClient cloudFoundryClient) {
-        return PaginationUtils
-            .requestClientV3Resources(page -> cloudFoundryClient.domainsV3()
-                .list(ListDomainsRequest.builder()
-                    .page(page)
-                    .build()));
-    }
-
-    private static Flux<DomainResource> requestListDomainsByOwningOrganization(CloudFoundryClient cloudFoundryClient, String organizationId) {
-        return PaginationUtils
-            .requestClientV3Resources(page -> cloudFoundryClient.domainsV3()
-                .list(ListDomainsRequest.builder()
-                    .owningOrganizationId(organizationId)
                     .page(page)
                     .build()));
     }
@@ -356,14 +400,6 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 .data(Relationship.builder()
                     .id(organizationId)
                     .build())
-                .build());
-    }
-
-    private static Mono<Void> requestUnshareDomain(CloudFoundryClient cloudFoundryClient, String domainId, String organizationId) {
-        return cloudFoundryClient.domainsV3()
-            .unshare(UnshareDomainRequest.builder()
-                .domainId(domainId)
-                .organizationId(organizationId)
                 .build());
     }
 

@@ -241,6 +241,64 @@ public final class ReactorDomainsV3Test extends AbstractClientApiTest {
     }
 
     @Test
+    public void share() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(POST).path("/domains/test-domain-id/relationships/shared_organizations")
+                .payload("fixtures/client/v3/domains/POST_{id}_relationships_shared_organizations_request.json")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v3/domains/POST_{id}_relationships_shared_organizations_response.json")
+                .build())
+            .build());
+
+        this.domains
+            .share(ShareDomainRequest.builder()
+                .domainId("test-domain-id")
+                .data(Relationship.builder()
+                    .id("404f3d89-3f89-6z72-8188-751b298d88d5")
+                    .build())
+                .data(Relationship.builder()
+                    .id("416d3d89-3f89-8h67-2189-123b298d3592")
+                    .build())
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ShareDomainResponse.builder()
+                .data(Relationship.builder()
+                    .id("404f3d89-3f89-6z72-8188-751b298d88d5")
+                    .build())
+                .data(Relationship.builder()
+                    .id("416d3d89-3f89-8h67-2189-123b298d3592")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void unshare() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(DELETE).path("/domains/test-domain-id/relationships/shared_organizations/test-org-id")
+                .build())
+            .response(TestResponse.builder()
+                .status(NO_CONTENT)
+                .build())
+            .build());
+
+        this.domains
+            .unshare(UnshareDomainRequest.builder()
+                .domainId("test-domain-id")
+                .organizationId("test-org-id")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext()
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
     public void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
@@ -300,64 +358,6 @@ public final class ReactorDomainsV3Test extends AbstractClientApiTest {
                     .href("https://api.example.org/v3/domains/3a5d3d89-3f89-4f05-8188-8a2b298c79d5/relationships/shared_organizations")
                     .build())
                 .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
-    }
-
-    @Test
-    public void share() {
-        mockRequest(InteractionContext.builder()
-            .request(TestRequest.builder()
-                .method(POST).path("/domains/test-domain-id/relationships/shared_organizations")
-                .payload("fixtures/client/v3/domains/POST_{id}_relationships_shared_organizations_request.json")
-                .build())
-            .response(TestResponse.builder()
-                .status(OK)
-                .payload("fixtures/client/v3/domains/POST_{id}_relationships_shared_organizations_response.json")
-                .build())
-            .build());
-
-        this.domains
-            .share(ShareDomainRequest.builder()
-                .domainId("test-domain-id")
-                .data(Relationship.builder()
-                    .id("404f3d89-3f89-6z72-8188-751b298d88d5")
-                    .build())
-                .data(Relationship.builder()
-                    .id("416d3d89-3f89-8h67-2189-123b298d3592")
-                    .build())
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(ShareDomainResponse.builder()
-                .data(Relationship.builder()
-                    .id("404f3d89-3f89-6z72-8188-751b298d88d5")
-                    .build())
-                .data(Relationship.builder()
-                    .id("416d3d89-3f89-8h67-2189-123b298d3592")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
-    }
-
-    @Test
-    public void unshare() {
-        mockRequest(InteractionContext.builder()
-            .request(TestRequest.builder()
-                .method(DELETE).path("/domains/test-domain-id/relationships/shared_organizations/test-org-id")
-                .build())
-            .response(TestResponse.builder()
-                .status(NO_CONTENT)
-                .build())
-            .build());
-
-        this.domains
-            .unshare(UnshareDomainRequest.builder()
-                .domainId("test-domain-id")
-                .organizationId("test-org-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext()
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }

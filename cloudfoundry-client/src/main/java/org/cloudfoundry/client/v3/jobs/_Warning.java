@@ -17,37 +17,20 @@
 package org.cloudfoundry.client.v3.jobs;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.cloudfoundry.client.v3.Resource;
-
-import java.util.List;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.immutables.value.Value;
 
 /**
- * Base class for responses that are jobs
+ * The warning object
  */
-public abstract class Job extends Resource {
+@JsonDeserialize
+@Value.Immutable
+abstract class _Warning {
 
     /**
-     * Collection of errors that occurred while processing the job.
+     * Detailed description of the warning
      */
-    @JsonProperty("errors")
-    public abstract List<org.cloudfoundry.client.v3.Error> getErrors();
-
-    /**
-     * Current desired operation of the job
-     */
-    @JsonProperty("operation")
-    public abstract String getOperation();
-
-    /**
-     * State of the job
-     */
-    @JsonProperty("state")
-    public abstract JobState getState();
-
-    /**
-     * Collection of warnings that occurred while processing the job.
-     */
-    @JsonProperty("warnings")
-    public abstract List<Warning> getWarnings();
+    @JsonProperty("detail")
+    abstract String getDetail();
 
 }

@@ -60,12 +60,6 @@ public final class ReactorDomainsV3 extends AbstractClientV3Operations implement
     }
 
     @Override
-    public Mono<UpdateDomainResponse> update(UpdateDomainRequest request) {
-        return patch(request, UpdateDomainResponse.class, builder -> builder.pathSegment("domains", request.getDomainId()))
-            .checkpoint();
-    }
-
-    @Override
     public Mono<String> delete(DeleteDomainRequest request) {
         return delete(request, builder -> builder.pathSegment("domains", request.getDomainId()))
             .checkpoint();
@@ -92,6 +86,12 @@ public final class ReactorDomainsV3 extends AbstractClientV3Operations implement
     @Override
     public Mono<Void> unshare(UnshareDomainRequest request) {
         return delete(request, Void.class, builder -> builder.pathSegment("domains", request.getDomainId(), "relationships", "shared_organizations", request.getOrganizationId()))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<UpdateDomainResponse> update(UpdateDomainRequest request) {
+        return patch(request, UpdateDomainResponse.class, builder -> builder.pathSegment("domains", request.getDomainId()))
             .checkpoint();
     }
 }
