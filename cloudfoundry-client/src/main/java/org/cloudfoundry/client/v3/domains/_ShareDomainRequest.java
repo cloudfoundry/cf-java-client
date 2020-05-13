@@ -14,40 +14,33 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.jobs;
+package org.cloudfoundry.client.v3.domains;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.cloudfoundry.client.v3.Resource;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.cloudfoundry.client.v3.Relationship;
+import org.immutables.value.Value;
 
 import java.util.List;
 
 /**
- * Base class for responses that are jobs
+ * The request payload for the Share Domain operation.
  */
-public abstract class Job extends Resource {
+@JsonSerialize
+@Value.Immutable
+abstract class _ShareDomainRequest {
 
     /**
-     * Collection of errors that occurred while processing the job.
+     * The organizations the domain is shared to
      */
-    @JsonProperty("errors")
-    public abstract List<org.cloudfoundry.client.v3.Error> getErrors();
+    @JsonProperty("data")
+    abstract List<Relationship> getData();
 
     /**
-     * Current desired operation of the job
+     * The domain id
      */
-    @JsonProperty("operation")
-    public abstract String getOperation();
-
-    /**
-     * State of the job
-     */
-    @JsonProperty("state")
-    public abstract JobState getState();
-
-    /**
-     * Collection of warnings that occurred while processing the job.
-     */
-    @JsonProperty("warnings")
-    public abstract List<Warning> getWarnings();
+    @JsonIgnore
+    abstract String getDomainId();
 
 }
