@@ -14,13 +14,19 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.reactor.util;
+package org.cloudfoundry.reactor;
 
-import org.cloudfoundry.reactor.HttpClientResponseWithConnection;
-import reactor.core.publisher.Flux;
+import org.immutables.value.Value;
+import reactor.netty.Connection;
+import reactor.netty.http.client.HttpClientResponse;
 
-import java.util.function.Function;
+@Value.Immutable
+public interface _HttpClientResponseWithConnection {
 
-public interface ErrorPayloadMapper extends Function<Flux<HttpClientResponseWithConnection>, Flux<HttpClientResponseWithConnection>> {
+    @Value.Parameter
+    Connection getConnection();
+
+    @Value.Parameter
+    HttpClientResponse getResponse();
 
 }
