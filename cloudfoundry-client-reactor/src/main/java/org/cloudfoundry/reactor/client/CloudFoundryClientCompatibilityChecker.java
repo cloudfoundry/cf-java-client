@@ -42,8 +42,7 @@ final class CloudFoundryClientCompatibilityChecker {
                 .build())
             .map(response -> Version.valueOf(response.getApiVersion()))
             .zipWith(Mono.just(Version.valueOf(CloudFoundryClient.SUPPORTED_API_VERSION)))
-            .doOnNext(consumer((server, supported) -> logCompatibility(server, supported, this.logger)))
-            .subscribe();
+            .subscribe(consumer((server, supported) -> logCompatibility(server, supported, this.logger)), t -> this.logger.error("An error occurred while checking version compatibility:", t));
     }
 
     private static void logCompatibility(Version server, Version supported, Logger logger) {
