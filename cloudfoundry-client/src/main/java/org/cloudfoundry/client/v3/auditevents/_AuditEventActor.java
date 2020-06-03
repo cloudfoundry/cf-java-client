@@ -27,9 +27,9 @@ public abstract class _AuditEventActor {
     @JsonProperty("guid")
     public abstract String getId();
 
-    @JsonProperty("type")
-    public abstract String getType();
-
     @JsonProperty("name")
     public abstract String getName();
+
+    @JsonProperty("type")
+    public abstract String getType();
 }

@@ -26,19 +26,13 @@ import java.util.List;
  * The request payload for the List Audit Events operation
  */
 @Value.Immutable
-public abstract class _ListAuditEventsRequest extends PaginatedRequest {
+abstract class _ListAuditEventsRequest extends PaginatedRequest {
 
     /**
-     * The types
+     * The organization guids
      */
-    @FilterParameter("types")
-    abstract List<String> getTypes();
-
-    /**
-     * The request target guids
-     */
-    @FilterParameter("target_guids")
-    abstract List<String> getTargetGuids();
+    @FilterParameter("organization_guids")
+    abstract List<String> getOrganizationGuids();
 
     /**
      * The space guids
@@ -47,8 +41,14 @@ public abstract class _ListAuditEventsRequest extends PaginatedRequest {
     abstract List<String> getSpaceGuids();
 
     /**
-     * The organization guids
+     * The request target guids
      */
-    @FilterParameter("organization_guids")
-    abstract List<String> getOrganizationGuids();
+    @FilterParameter("target_guids")
+    abstract List<String> getTargetGuids();
+
+    /**
+     * The types
+     */
+    @FilterParameter("types")
+    abstract List<String> getTypes();
 }

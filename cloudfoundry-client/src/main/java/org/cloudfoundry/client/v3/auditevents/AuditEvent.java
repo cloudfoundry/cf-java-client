@@ -24,9 +24,6 @@ import java.util.Map;
 
 public abstract class AuditEvent extends Resource {
 
-    @JsonProperty("type")
-    abstract String getType();
-
     @JsonProperty("actor")
     abstract AuditEventReference getAuditEventActor();
 
@@ -37,10 +34,13 @@ public abstract class AuditEvent extends Resource {
     abstract Map<String, Object> getData();
 
     @Nullable
+    @JsonProperty("organization")
+    abstract AuditEventRelationship getOrganizationRelationship();
+
+    @Nullable
     @JsonProperty("space")
     abstract AuditEventRelationship getSpaceRelationship();
 
-    @Nullable
-    @JsonProperty("organization")
-    abstract AuditEventRelationship getOrganizationRelationship();
+    @JsonProperty("type")
+    abstract String getType();
 }

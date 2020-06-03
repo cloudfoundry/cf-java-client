@@ -20,12 +20,6 @@ import org.junit.Test;
 
 public class ListAuditEventsRequestTest {
 
-    @Test
-    public void validWithEmptyCollections() {
-        ListAuditEventsRequest.builder()
-            .build();
-    }
-
     @Test(expected = Exception.class)
     public void invalidWithNullableCollection() {
         ListAuditEventsRequest.builder()
@@ -40,6 +34,12 @@ public class ListAuditEventsRequestTest {
             .type("test-type")
             .orderBy("nothing")
             .targetGuid("test-target-id")
+            .build();
+    }
+
+    @Test
+    public void validWithEmptyCollections() {
+        ListAuditEventsRequest.builder()
             .build();
     }
 }

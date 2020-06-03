@@ -203,7 +203,7 @@ abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
     @Override
     @Value.Derived
     public ReactorAuditEventsV3 eventsV3() {
-        return new ReactorAuditEventsV3(getConnectionContext(), getRootV2(), getTokenProvider());
+        return new ReactorAuditEventsV3(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
     }
 
     @Override

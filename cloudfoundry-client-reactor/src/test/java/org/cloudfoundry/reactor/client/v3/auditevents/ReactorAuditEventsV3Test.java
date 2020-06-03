@@ -33,13 +33,14 @@ import org.junit.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
+import java.util.Collections;
 
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public class ReactorAuditEventsV3Test extends AbstractClientApiTest {
 
-    private ReactorAuditEventsV3 events = new ReactorAuditEventsV3(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER);
+    private ReactorAuditEventsV3 events = new ReactorAuditEventsV3(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void get() {

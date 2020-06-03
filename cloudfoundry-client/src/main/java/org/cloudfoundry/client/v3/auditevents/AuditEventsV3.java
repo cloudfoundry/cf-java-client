@@ -19,6 +19,7 @@ package org.cloudfoundry.client.v3.auditevents;
 import reactor.core.publisher.Mono;
 
 public interface AuditEventsV3 {
+
     /**
      * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/3.77.0/index.html#get-an-audit-event">Get Audit Event</a> request
      *
@@ -27,7 +28,7 @@ public interface AuditEventsV3 {
      */
     Mono<GetAuditEventResponse> get(GetAuditEventRequest request);
 
-        /**
+    /**
      * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#list-audit-events">List Audit Events</a> request
      *
      * @param request the List Audit Events request
