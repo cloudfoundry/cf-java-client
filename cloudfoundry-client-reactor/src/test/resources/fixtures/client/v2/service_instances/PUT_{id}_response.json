@@ -1,17 +1,17 @@
 {
   "metadata": {
-    "guid": "2a80a0f7-cb9c-414a-8a6b-7cc3f811ad41",
-    "url": "/v2/service_instances/2a80a0f7-cb9c-414a-8a6b-7cc3f811ad41",
-    "created_at": "2015-07-27T22:43:08Z",
-    "updated_at": null
+    "guid": "a34f1423-4b84-4727-ab49-3f1522c4cb16",
+    "url": "/v2/service_instances/a34f1423-4b84-4727-ab49-3f1522c4cb16",
+    "created_at": "2016-06-08T16:41:30Z",
+    "updated_at": "2016-06-08T16:41:26Z"
   },
   "entity": {
-    "name": "name-139",
+    "name": "name-1529",
     "credentials": {
-      "creds-key-75": "creds-val-75"
+      "creds-key-41": "creds-val-41"
     },
-    "service_plan_guid": "b07ff29a-78b8-486f-87a8-3f695368b83d",
-    "space_guid": "04219ffa-a817-459f-bbd7-c161bdca541b",
+    "service_plan_guid": "4ec73bf4-9f3a-44c7-bbac-61ee9cb5a511",
+    "space_guid": "da37b4b7-2439-4b30-9eb3-bded0dbf690f",
     "gateway_data": null,
     "dashboard_url": null,
     "type": "managed_service_instance",
@@ -19,14 +19,22 @@
       "type": "update",
       "state": "in progress",
       "description": "",
-      "updated_at": "2015-07-27T22:43:08Z",
-      "created_at": "2015-07-27T22:43:08Z"
+      "updated_at": "2016-06-08T16:41:30Z",
+      "created_at": "2016-06-08T16:41:30Z"
     },
     "tags": [
+
     ],
-    "space_url": "/v2/spaces/04219ffa-a817-459f-bbd7-c161bdca541b",
-    "service_plan_url": "/v2/service_plans/b07ff29a-78b8-486f-87a8-3f695368b83d",
-    "service_bindings_url": "/v2/service_instances/2a80a0f7-cb9c-414a-8a6b-7cc3f811ad41/service_bindings",
-    "service_keys_url": "/v2/service_instances/2a80a0f7-cb9c-414a-8a6b-7cc3f811ad41/service_keys"
+    "maintenance_info": {
+      "version": "2.1.0",
+      "description": "OS image update.\nExpect downtime."
+    },
+    "space_url": "/v2/spaces/da37b4b7-2439-4b30-9eb3-bded0dbf690f",
+    "service_plan_url": "/v2/service_plans/4ec73bf4-9f3a-44c7-bbac-61ee9cb5a511",
+    "service_bindings_url": "/v2/service_instances/a34f1423-4b84-4727-ab49-3f1522c4cb16/service_bindings",
+    "service_keys_url": "/v2/service_instances/a34f1423-4b84-4727-ab49-3f1522c4cb16/service_keys",
+    "routes_url": "/v2/service_instances/a34f1423-4b84-4727-ab49-3f1522c4cb16/routes",
+    "shared_from_url": "/v2/service_instances/0d632575-bb06-4ea5-bb19-a451a9644d92/shared_from",
+    "shared_to_url": "/v2/service_instances/0d632575-bb06-4ea5-bb19-a451a9644d92/shared_to"
   }
 }

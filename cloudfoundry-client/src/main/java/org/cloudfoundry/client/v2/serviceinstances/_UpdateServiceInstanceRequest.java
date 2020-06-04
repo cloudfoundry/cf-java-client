@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.QueryParameter;
+import org.cloudfoundry.client.v2.MaintenanceInfo;
 import org.immutables.value.Value;
 
 import java.util.List;
@@ -41,6 +42,13 @@ abstract class _UpdateServiceInstanceRequest {
     @Nullable
     @QueryParameter("accepts_incomplete")
     abstract Boolean getAcceptsIncomplete();
+
+    /**
+     * The maintenance info
+     */
+    @JsonProperty("maintenance_info")
+    @Nullable
+    abstract MaintenanceInfo getMaintenanceInfo();
 
     /**
      * The name
