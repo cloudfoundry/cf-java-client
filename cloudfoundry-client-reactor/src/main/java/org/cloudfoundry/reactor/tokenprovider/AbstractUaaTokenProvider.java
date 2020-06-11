@@ -234,7 +234,7 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
                 .uri(tokenUriTransformer(getIdentityZoneSubdomain()))
                 .sendForm(tokenRequestTransformer)
                 .response()
-                .parseBodyToMono(responseWithBody -> tokenExtractor.apply(responseWithBody.getBody())));
+                .parseBodyToToken(responseWithBody -> tokenExtractor.apply(responseWithBody.getBody())));
     }
 
     private void setAuthorization(HttpHeaders headers) {
