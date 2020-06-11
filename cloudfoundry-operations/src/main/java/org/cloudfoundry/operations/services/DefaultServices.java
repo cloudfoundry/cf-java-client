@@ -927,6 +927,7 @@ public final class DefaultServices implements Services {
             .update(org.cloudfoundry.client.v2.serviceinstances
                 .UpdateServiceInstanceRequest.builder()
                 .acceptsIncomplete(true)
+                .maintenanceInfo(request.getMaintenanceInfo())
                 .parameters(request.getParameters())
                 .serviceInstanceId(serviceInstanceId)
                 .servicePlanId(servicePlanId)
@@ -958,6 +959,7 @@ public final class DefaultServices implements Services {
             .documentationUrl(documentationUrl.orElse(null))
             .id(ResourceUtils.getId(resource))
             .lastOperation(lastOperation.getType())
+            .maintenanceInfo(serviceInstanceEntity.getMaintenanceInfo())
             .message(lastOperation.getDescription())
             .name(serviceInstanceEntity.getName())
             .plan(plan.orElse(null))
@@ -989,6 +991,7 @@ public final class DefaultServices implements Services {
                 .applications(Optional.ofNullable(applicationBindings.get(service.getName())).orElse(Collections.emptyList()))
                 .id(service.getId())
                 .lastOperation(service.getLastOperation() == null ? null : service.getLastOperation().getDescription())
+                .maintenanceInfo(service.getMaintenanceInfo())
                 .name(service.getName())
                 .plan(service.getServicePlan() == null ? null : service.getServicePlan().getName())
                 .service(service.getServicePlan() == null ? null : service.getServicePlan().getService().getLabel())

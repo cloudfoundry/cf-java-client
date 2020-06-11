@@ -18,6 +18,7 @@ package org.cloudfoundry.operations.services;
 
 import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
+import org.cloudfoundry.client.v2.MaintenanceInfo;
 import org.immutables.value.Value;
 
 import java.time.Duration;
@@ -37,6 +38,12 @@ abstract class _UpdateServiceInstanceRequest {
     Duration getCompletionTimeout() {
         return Duration.ofMinutes(5);
     }
+
+    /**
+     * The maintenance info to upgrade to
+     */
+    @Nullable
+    abstract MaintenanceInfo getMaintenanceInfo();
 
     /**
      * The parameters of the service instance

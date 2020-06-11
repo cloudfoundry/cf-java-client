@@ -18,6 +18,7 @@ package org.cloudfoundry.operations.services;
 
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.ClientV2Exception;
+import org.cloudfoundry.client.v2.MaintenanceInfo;
 import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
@@ -480,6 +481,10 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
                 .documentationUrl("test-documentation-url")
                 .id("test-service-instance-id")
                 .lastOperation("test-type")
+                .maintenanceInfo(MaintenanceInfo.builder()
+                    .description("test-description")
+                    .version("test-version")
+                    .build())
                 .name("test-service-instance-name")
                 .plan("test-service-plan")
                 .tag("test-tag")
