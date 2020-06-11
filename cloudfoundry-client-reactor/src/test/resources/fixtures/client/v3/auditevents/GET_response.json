@@ -1,0 +1,48 @@
+{
+  "pagination": {
+    "total_results": 1,
+    "total_pages": 1,
+    "first": {
+      "href": "https://api.example.org/v3/audit_events?page=1&per_page=2"
+    },
+    "last": {
+      "href": "https://api.example.org/v3/audit_events?page=1&per_page=2"
+    },
+    "next": null,
+    "previous": null
+  },
+  "resources": [
+    {
+      "guid": "a595fe2f-01ff-4965-a50c-290258ab8582",
+      "created_at": "2016-06-08T16:41:23Z",
+      "updated_at": "2016-06-08T16:41:26Z",
+      "type": "audit.app.update",
+      "actor": {
+        "guid": "d144abe3-3d7b-40d4-b63f-2584798d3ee5",
+        "type": "user",
+        "name": "admin"
+      },
+      "target": {
+        "guid": "2e3151ba-9a63-4345-9c5b-6d8c238f4e55",
+        "type": "app",
+        "name": "my-app"
+      },
+      "data": {
+        "request": {
+          "recursive": true
+        }
+      },
+      "space": {
+        "guid": "cb97dd25-d4f7-4185-9e6f-ad6e585c207c"
+      },
+      "organization": {
+        "guid": "d9be96f5-ea8f-4549-923f-bec882e32e3c"
+      },
+      "links": {
+        "self": {
+          "href": "https://api.example.org//v3/audit_events/a595fe2f-01ff-4965-a50c-290258ab8582"
+        }
+      }
+    }
+  ]
+}

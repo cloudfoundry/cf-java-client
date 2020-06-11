@@ -48,6 +48,7 @@ import org.cloudfoundry.client.v2.stacks.Stacks;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstances;
 import org.cloudfoundry.client.v2.users.Users;
 import org.cloudfoundry.client.v3.applications.ApplicationsV3;
+import org.cloudfoundry.client.v3.auditevents.AuditEventsV3;
 import org.cloudfoundry.client.v3.builds.Builds;
 import org.cloudfoundry.client.v3.deployments.DeploymentsV3;
 import org.cloudfoundry.client.v3.domains.DomainsV3;
@@ -86,6 +87,11 @@ public interface CloudFoundryClient {
      * Main entry point to the Cloud Foundry Applications V3 Client API
      */
     ApplicationsV3 applicationsV3();
+
+    /**
+     * Main entry point to the Cloud Foundry Audit Events V3 Client API
+     */
+    AuditEventsV3 auditEventsV3();
 
     /**
      * Main entry point to the Cloud Foundry Blobstores Client API
