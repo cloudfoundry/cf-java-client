@@ -24,6 +24,6 @@ import org.immutables.value.Value;
  */
 @JsonDeserialize
 @Value.Immutable
-public abstract class _GetAuditEventResponse extends AuditEvent {
+abstract class _GetAuditEventResponse extends AuditEvent {
 
 }

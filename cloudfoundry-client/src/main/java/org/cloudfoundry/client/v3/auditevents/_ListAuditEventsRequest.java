@@ -29,22 +29,22 @@ import java.util.List;
 abstract class _ListAuditEventsRequest extends PaginatedRequest {
 
     /**
-     * The organization guids
+     * The organization ids
      */
     @FilterParameter("organization_guids")
-    abstract List<String> getOrganizationGuids();
+    abstract List<String> getOrganizationIds();
 
     /**
-     * The space guids
+     * The space ids
      */
     @FilterParameter("space_guids")
-    abstract List<String> getSpaceGuids();
+    abstract List<String> getSpaceIds();
 
     /**
-     * The request target guids
+     * The request target ids
      */
     @FilterParameter("target_guids")
-    abstract List<String> getTargetGuids();
+    abstract List<String> getTargetIds();
 
     /**
      * The types

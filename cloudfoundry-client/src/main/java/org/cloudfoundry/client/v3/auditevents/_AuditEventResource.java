@@ -20,10 +20,10 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.immutables.value.Value;
 
 /**
- * The Resource response payload for the List audit events operation
+ * The Resource response payload for the List Audit Events operation
  */
 @JsonDeserialize
 @Value.Immutable
-public abstract class _AuditEventResource extends AuditEvent {
+abstract class _AuditEventResource extends AuditEvent {
 
 }

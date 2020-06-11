@@ -36,12 +36,14 @@ public class ReactorAuditEventsV3 extends AbstractClientV3Operations implements 
 
     @Override
     public Mono<GetAuditEventResponse> get(GetAuditEventRequest request) {
-        return get(request, GetAuditEventResponse.class, uriComponentsBuilder -> uriComponentsBuilder.pathSegment("audit_events", request.getEventId()));
+        return get(request, GetAuditEventResponse.class, builder -> builder.pathSegment("audit_events", request.getEventId()))
+            .checkpoint();
     }
 
     @Override
     public Mono<ListAuditEventsResponse> list(ListAuditEventsRequest request) {
-        return get(request, ListAuditEventsResponse.class, uriComponentsBuilder -> uriComponentsBuilder.pathSegment("audit_events"))
+        return get(request, ListAuditEventsResponse.class, builder -> builder.pathSegment("audit_events"))
             .checkpoint();
     }
+
 }

@@ -23,17 +23,17 @@ public class ListAuditEventsRequestTest {
     @Test(expected = Exception.class)
     public void invalidWithNullableCollection() {
         ListAuditEventsRequest.builder()
-            .organizationGuids((String[]) null)
+            .organizationIds((String[]) null)
             .build();
     }
 
     @Test
     public void valid() {
         ListAuditEventsRequest.builder()
-            .organizationGuids("organization-id-1", "organization-id-2")
+            .organizationIds("organization-id-1", "organization-id-2")
             .type("test-type")
             .orderBy("nothing")
-            .targetGuid("test-target-id")
+            .targetId("test-target-id")
             .build();
     }
 

@@ -89,6 +89,11 @@ public interface CloudFoundryClient {
     ApplicationsV3 applicationsV3();
 
     /**
+     * Main entry point to the Cloud Foundry Audit Events V3 Client API
+     */
+    AuditEventsV3 auditEventsV3();
+
+    /**
      * Main entry point to the Cloud Foundry Blobstores Client API
      */
     Blobstores blobstores();
@@ -132,11 +137,6 @@ public interface CloudFoundryClient {
      * Main entry point to the Cloud Foundry Events Client API
      */
     Events events();
-
-    /**
-     * Main entry point to the Cloud Foundry Audit Events V3 Client API
-     */
-    AuditEventsV3 eventsV3();
 
     /**
      * Main entry point to the Cloud Foundry Feature Flags Client API

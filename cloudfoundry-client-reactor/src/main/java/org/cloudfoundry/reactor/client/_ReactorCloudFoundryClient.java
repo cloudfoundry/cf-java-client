@@ -49,6 +49,7 @@ import org.cloudfoundry.client.v2.stacks.Stacks;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstances;
 import org.cloudfoundry.client.v2.users.Users;
 import org.cloudfoundry.client.v3.applications.ApplicationsV3;
+import org.cloudfoundry.client.v3.auditevents.AuditEventsV3;
 import org.cloudfoundry.client.v3.builds.Builds;
 import org.cloudfoundry.client.v3.deployments.DeploymentsV3;
 import org.cloudfoundry.client.v3.domains.DomainsV3;
@@ -143,6 +144,12 @@ abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
 
     @Override
     @Value.Derived
+    public AuditEventsV3 auditEventsV3() {
+        return new ReactorAuditEventsV3(getConnectionContext(), getRootV3(), getTokenProvider(), getRequestTags());
+    }
+
+    @Override
+    @Value.Derived
     public Blobstores blobstores() {
         return new ReactorBlobstores(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
     }
@@ -198,12 +205,6 @@ abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
     @Value.Derived
     public Events events() {
         return new ReactorEvents(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
-    }
-
-    @Override
-    @Value.Derived
-    public ReactorAuditEventsV3 eventsV3() {
-        return new ReactorAuditEventsV3(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
     }
 
     @Override

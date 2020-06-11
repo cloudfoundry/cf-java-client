@@ -25,6 +25,6 @@ import org.immutables.value.Value;
  */
 @JsonDeserialize
 @Value.Immutable
-public abstract class _ListAuditEventsResponse extends PaginatedResponse<AuditEventResource> {
+abstract class _ListAuditEventsResponse extends PaginatedResponse<AuditEventResource> {
 
 }

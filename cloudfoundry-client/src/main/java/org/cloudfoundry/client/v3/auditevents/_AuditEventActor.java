@@ -22,14 +22,24 @@ import org.immutables.value.Value;
 
 @Value.Immutable
 @JsonDeserialize
-public abstract class _AuditEventActor {
+abstract class _AuditEventActor {
 
+    /**
+     * The actor id
+     */
     @JsonProperty("guid")
-    public abstract String getId();
+    abstract String getId();
 
+    /**
+     * The actor name
+     */
     @JsonProperty("name")
-    public abstract String getName();
+    abstract String getName();
 
+    /**
+     * The actor type
+     */
     @JsonProperty("type")
-    public abstract String getType();
+    abstract String getType();
+
 }

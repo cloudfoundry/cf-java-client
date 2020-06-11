@@ -17,30 +17,58 @@
 package org.cloudfoundry.client.v3.auditevents;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.Resource;
 
 import java.util.Map;
 
+/**
+ * Base class for responses that are audit events
+ */
 public abstract class AuditEvent extends Resource {
 
+    /**
+     * The event actor
+     */
     @JsonProperty("actor")
-    abstract AuditEventReference getAuditEventActor();
+    @Nullable
+    public abstract AuditEventActor getAuditEventActor();
 
+    /**
+     * The event target
+     */
     @JsonProperty("target")
-    abstract AuditEventReference getAuditEventTarget();
+    @Nullable
+    public abstract AuditEventTarget getAuditEventTarget();
 
+    /**
+     * Additional information about event
+     */
+    @AllowNulls
     @JsonProperty("data")
-    abstract Map<String, Object> getData();
-
     @Nullable
+    public abstract Map<String, Object> getData();
+
+    /**
+     * The organization where the event occurred
+     */
     @JsonProperty("organization")
-    abstract AuditEventRelationship getOrganizationRelationship();
-
     @Nullable
-    @JsonProperty("space")
-    abstract AuditEventRelationship getSpaceRelationship();
+    public abstract AuditEventRelationship getOrganizationRelationship();
 
+    /**
+     * The space where the event occurred.
+     */
+    @JsonProperty("space")
+    @Nullable
+    public abstract AuditEventRelationship getSpaceRelationship();
+
+    /**
+     * The event type
+     */
     @JsonProperty("type")
-    abstract String getType();
+    @Nullable
+    public abstract String getType();
+
 }

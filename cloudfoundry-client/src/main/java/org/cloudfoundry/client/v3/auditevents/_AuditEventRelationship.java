@@ -20,10 +20,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.immutables.value.Value;
 
-@Value.Immutable
+/**
+ * The Audit Event relationship
+ */
 @JsonDeserialize
-public abstract class _AuditEventRelationship {
+@Value.Immutable
+abstract class _AuditEventRelationship {
 
+    /**
+     * The relationship id
+     */
     @JsonProperty("guid")
     abstract String getId();
 
