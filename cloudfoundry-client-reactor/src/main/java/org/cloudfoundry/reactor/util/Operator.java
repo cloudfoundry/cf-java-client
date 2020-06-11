@@ -193,6 +193,22 @@ public class Operator extends OperatorContextAware {
             return parseBodyToFlux(responseTransformer).singleOrEmpty();
         }
 
+        public <T> Mono<T> parseBodyToToken(Function<HttpClientResponseWithBody, Publisher<T>> responseTransformer) {
+            return this.responseReceiver.responseConnection((response, connection) -> Mono.just(HttpClientResponseWithConnection.of(connection, response)))
+                .transform(this.context.getErrorPayloadMapper()
+                    .orElse(ErrorPayloadMappers.fallback()))
+                .flatMap(httpClientResponseWithConnection -> {
+                    Connection connection = httpClientResponseWithConnection.getConnection();
+                    HttpClientResponse response = httpClientResponseWithConnection.getResponse();
+
+                    ByteBufFlux body = ByteBufFlux.fromInbound(connection.inbound().receive()
+                        .doFinally(signalType -> connection.dispose()));
+
+                    return Mono.just(HttpClientResponseWithBody.of(body, response));
+                })
+                .flatMap(responseTransformer).singleOrEmpty();
+        }
+
         private static boolean isUnauthorized(HttpClientResponseWithConnection response) {
             return response.getResponse().status() == HttpResponseStatus.UNAUTHORIZED;
         }
