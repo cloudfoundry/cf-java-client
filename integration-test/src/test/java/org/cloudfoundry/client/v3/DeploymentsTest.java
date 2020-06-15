@@ -222,7 +222,7 @@ public final class DeploymentsTest extends AbstractIntegrationTest {
             .flatMap(function((applicationId, dropletId) -> createDeploymentId(this.cloudFoundryClient, applicationId, dropletId)))
             .flatMapMany(deploymentId -> PaginationUtils.requestClientV3Resources(page -> this.cloudFoundryClient.deploymentsV3()
                 .list(ListDeploymentsRequest.builder()
-                    .statusValue(DeploymentStatusValue.DEPLOYING)
+                    .statusValues(DeploymentStatusValue.DEPLOYING, DeploymentStatusValue.ACTIVE)
                     .page(page)
                     .build()))
                 .filter(resource -> deploymentId.equals(resource.getId())))
