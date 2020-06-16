@@ -18,6 +18,7 @@ package org.cloudfoundry.client.v3.spaces;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.ToOneRelationship;
 import org.immutables.value.Value;
 
@@ -33,5 +34,12 @@ abstract class _SpaceRelationships {
      */
     @JsonProperty("organization")
     abstract ToOneRelationship getOrganization();
+
+    /**
+     * The quota relationship
+     */
+    @JsonProperty("quota")
+    @Nullable
+    abstract ToOneRelationship getQuota();
 
 }
