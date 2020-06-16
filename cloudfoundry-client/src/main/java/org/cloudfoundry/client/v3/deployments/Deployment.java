@@ -93,4 +93,11 @@ public abstract class Deployment extends Resource {
     @Nullable
     public abstract Status getStatus();
 
+    /**
+     * The strategy of the deployment
+     */
+    @JsonProperty("strategy")
+    @Nullable
+    public abstract DeploymentStrategy getStrategy();
+
 }
