@@ -47,9 +47,19 @@ public class RequestLogger {
         List<String> warnings = response.responseHeaders().getAll(CF_WARNINGS);
 
         if (warnings.isEmpty()) {
-            RESPONSE_LOGGER.debug("{}    {} ({})", response.status().code(), response.uri(), elapsed);
+            if (RESPONSE_LOGGER.isTraceEnabled()) {
+                RESPONSE_LOGGER.debug("{}    {} ({}, {})", response.status().code(), response.uri(), elapsed, response.responseHeaders().get("X-Vcap-Request-Id"));
+            } else {
+                RESPONSE_LOGGER.debug("{}    {} ({})", response.status().code(), response.uri(), elapsed);
+            }
         } else {
-            RESPONSE_LOGGER.warn("{}    {} ({}) [{}]", response.status().code(), response.uri(), elapsed, String.join(", ", warnings));
+            if (RESPONSE_LOGGER.isTraceEnabled()) {
+                RESPONSE_LOGGER.warn("{}    {} ({}, {}) [{}]", response.status().code(), response.uri(), elapsed, response.responseHeaders().get("X-Vcap-Request-Id"),
+                    String.join(", ", warnings));
+            } else {
+                RESPONSE_LOGGER.warn("{}    {} ({}) [{}]", response.status().code(), response.uri(), elapsed, String.join(", ", warnings));
+
+            }
         }
     }
 
