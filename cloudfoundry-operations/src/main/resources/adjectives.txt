@@ -2856,10 +2856,6 @@ biweekly
 biyearly
 bizarre
 bizonal
-black
-blackberrylike
-blackguardly
-blackish
 bladdery
 bladeless
 blae
@@ -14619,17 +14615,11 @@ manipular
 manipulatable
 manistic
 manky
-manless
-manlier
-manliest
-manlike
-manly
 manned
 mannered
 manneristic
 mannerless
 mannerly
-mannish
 manometric
 manometrical
 manorial
@@ -16412,7 +16402,6 @@ nonbiological
 nonbiting
 nonbitter
 nonbituminous
-nonblack
 nonblamable
 nonblameful
 nonblasphemous
@@ -20239,7 +20228,6 @@ overlush
 overluxuriant
 overluxurious
 overmagnetic
-overmany
 overmasterful
 overmature
 overmean
@@ -30931,8 +30919,6 @@ unbirdlike
 unbiting
 unbitten
 unbitter
-unblacked
-unblackened
 unblamable
 unblamed
 unblaming
@@ -35189,7 +35175,6 @@ unmandated
 unmandatory
 unmaned
 unmaneuvered
-unmanful
 unmangled
 unmaniacal
 unmanicured
@@ -35201,8 +35186,6 @@ unmanipulatable
 unmanipulated
 unmanipulative
 unmanipulatory
-unmanly
-unmanned
 unmannered
 unmannerly
 unmannish
@@ -39476,10 +39459,6 @@ unwhisperable
 unwhispered
 unwhispering
 unwhistled
-unwhite
-unwhited
-unwhitened
-unwhitewashed
 unwholesome
 unwicked
 unwidened
@@ -39530,9 +39509,6 @@ unwitnessed
 unwitting
 unwitty
 unwoeful
-unwomanish
-unwomanlike
-unwomanly
 unwon
 unwonderful
 unwondering
@@ -40303,11 +40279,6 @@ whiplike
 whisperous
 whistleable
 whistly
-white
-whitebelt
-whited
-whiteslave
-whitish
 whittling
 whole
 wholehearted
@@ -40425,9 +40396,6 @@ woesome
 wolfish
 wolflike
 wolframic
-womanish
-womanless
-womanly
 wombed
 wonderful
 wondering

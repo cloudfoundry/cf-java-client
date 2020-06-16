@@ -118,13 +118,6 @@ abominableness
 abomination
 abominator
 abondance
-aboriginality
-aborigine
-aborticide
-abortion
-abortionist
-abortiveness
-abortus
 aboudikro
 aboulia
 abp
@@ -550,7 +543,6 @@ activity
 actomyosin
 acton
 actor
-actress
 actualisation
 actualism
 actualist
@@ -723,9 +715,6 @@ adulator
 adulterant
 adulteration
 adulterator
-adulterer
-adulteress
-adultery
 adulthood
 adultness
 adumbration
@@ -742,7 +731,6 @@ adventitiousness
 adventure
 adventurer
 adventuresomeness
-adventuress
 adventurism
 adventurousness
 adverb
@@ -1617,7 +1605,6 @@ ambarella
 ambary
 ambassador
 ambassadorship
-ambassadress
 ambatch
 amber
 amberfish
@@ -1985,11 +1972,9 @@ anba
 anbury
 anc
 ancestor
-ancestress
 ancestry
 anchor
 anchorage
-anchoress
 anchoret
 anchoretism
 anchorite
@@ -3031,7 +3016,6 @@ arbitrationist
 arbitrator
 arbitrement
 arbitrer
-arbitress
 arbor
 arborescence
 arboretum
@@ -3769,7 +3753,6 @@ audition
 auditor
 auditorium
 auditorship
-auditress
 aug
 augend
 auger
@@ -5661,57 +5644,6 @@ bks
 bl
 blabber
 blabbermouth
-blackacre
-blackamoor
-blackball
-blackballer
-blackbeetle
-blackberry
-blackbird
-blackbirder
-blackbirding
-blackboard
-blackboy
-blackbuck
-blackbutt
-blackcap
-blackcoat
-blackcock
-blackcurrant
-blackdamp
-blackener
-blackface
-blackfellow
-blackfin
-blackfire
-blackfish
-blackfly
-blackguard
-blackguardism
-blackhead
-blackheart
-blackheartedness
-blacking
-blackishness
-blackjack
-blackleg
-blacklist
-blackmail
-blackmailer
-blackness
-blackout
-blackpatch
-blackplate
-blackpoll
-blackrag
-blacksmith
-blacksnake
-blacktail
-blackthorn
-blacktongue
-blacktop
-blackweed
-blackwood
 bladder
 bladdernose
 bladdernut
@@ -6024,7 +5956,6 @@ bobsledding
 bobsleigh
 bobstay
 bobtail
-bobwhite
 bocaccio
 bocage
 boccaccio
@@ -6138,7 +6069,6 @@ bondstone
 bondswoman
 bondwoman
 bone
-boneblack
 bonefish
 bonehead
 boneheadedness
@@ -6219,7 +6149,6 @@ boorishness
 boost
 booster
 boot
-bootblack
 boote
 bootee
 bootery
@@ -9032,7 +8961,6 @@ chantership
 chanteuse
 chantey
 chanticleer
-chantress
 chantry
 chanty
 chaona
@@ -10238,7 +10166,6 @@ cloison
 cloisonn
 cloisonna
 cloister
-cloistress
 cloke
 cloky
 clomp
@@ -10340,10 +10267,8 @@ coaction
 coactivity
 coactor
 coadjutor
-coadjutress
 coadjutrix
 coadunation
-coadventuress
 coagulability
 coagulant
 coagulase
@@ -11257,7 +11182,6 @@ conduction
 conductivity
 conductor
 conductorship
-conductress
 conduit
 conduplication
 condylarth
@@ -11503,7 +11427,6 @@ conspicuity
 conspicuousness
 conspiracy
 conspirator
-conspiratress
 constable
 constableship
 constabulary
@@ -15273,7 +15196,6 @@ director
 directorate
 directorship
 directory
-directress
 directrix
 direfulness
 direness
@@ -16968,7 +16890,6 @@ editorialist
 editorialization
 editorializer
 editorship
-editress
 eds
 educ
 educability
@@ -17122,7 +17043,6 @@ electioneerer
 electiveness
 elector
 electorate
-electress
 electret
 electricalness
 electrician
@@ -17373,7 +17293,6 @@ embrectomy
 embrittlement
 embrocation
 embroiderer
-embroideress
 embroidery
 embroiler
 embroilment
@@ -17529,7 +17448,6 @@ enchainment
 enchanter
 enchantingness
 enchantment
-enchantress
 enchaonement
 enchaser
 enchilada
@@ -19049,7 +18967,6 @@ eyeball
 eyebar
 eyebath
 eyebeam
-eyeblack
 eyebolt
 eyebright
 eyebrow
@@ -20811,7 +20728,6 @@ fossula
 fosterage
 fosterer
 fosterling
-fostress
 fouett
 fouetta
 foulard
@@ -24229,7 +24145,6 @@ heinie
 heinousness
 heir
 heirdom
-heiress
 heirloom
 heirship
 heist
@@ -25464,7 +25379,6 @@ hunks
 huntaway
 hunter
 hunting
-huntress
 huntsman
 huntsmanship
 huppah
@@ -27414,7 +27328,6 @@ initialler
 initiation
 initiative
 initiator
-initiatress
 initiatrix
 injection
 injector
@@ -27865,7 +27778,6 @@ interlocker
 interloculus
 interlocution
 interlocutor
-interlocutress
 interlocutrix
 interloop
 interloper
@@ -28589,7 +28501,6 @@ jangler
 janissary
 janitor
 janitorship
-janitress
 japan
 japanner
 jape
@@ -28792,7 +28703,6 @@ joinery
 joint
 jointedness
 jointer
-jointress
 jointure
 jointweed
 jointworm
@@ -28937,8 +28847,6 @@ jurisprudence
 jurist
 juror
 jury
-juryman
-jurywoman
 jus
 justaucorps
 juster
@@ -29946,7 +29854,6 @@ lamp
 lampad
 lampadaire
 lampas
-lampblack
 lampern
 lampers
 lampion
@@ -30182,7 +30089,6 @@ launchplex
 launderability
 launderer
 launderette
-laundress
 laundry
 laundryman
 laundrywoman
@@ -30859,7 +30765,6 @@ linstock
 lint
 lintel
 linter
-lintwhite
 linyphiid
 lion
 lioncel
@@ -31951,7 +31856,6 @@ mana
 manacle
 management
 manager
-manageress
 managership
 manak
 manakin
@@ -32467,7 +32371,6 @@ mayhem
 mayonnaise
 mayor
 mayoralty
-mayoress
 mayorship
 maypole
 maypop
@@ -33896,7 +33799,6 @@ monist
 monition
 monitor
 monitorship
-monitress
 monk
 monkery
 monkey
@@ -37504,7 +37406,6 @@ nonvoter
 nonvulgarity
 nonwar
 nonweakness
-nonwhite
 nonworker
 nonzealousness
 noodle
@@ -40551,7 +40452,6 @@ peepshow
 peepul
 peer
 peerage
-peeress
 peerie
 peerlessness
 peetweet
@@ -42750,7 +42650,6 @@ portent
 portentousness
 porter
 porterage
-porteress
 porterhouse
 portfire
 portfolio
@@ -42768,7 +42667,6 @@ portraitist
 portraiture
 portrayal
 portrayer
-portress
 portulaca
 pos
 posada
@@ -44204,7 +44102,6 @@ printmaker
 printmaking
 prion
 priorate
-prioress
 priority
 priorship
 priory
@@ -44514,7 +44411,6 @@ propraetor
 propranolol
 proprietor
 proprietorship
-proprietress
 propriety
 proprioceptor
 proptosis
@@ -48818,10 +48714,7 @@ schoolie
 schooling
 schoolman
 schoolmarm
-schoolmaster
-schoolmastership
 schoolmate
-schoolmistress
 schoolroom
 schoolteacher
 schoolwork
@@ -49051,7 +48944,6 @@ scullion
 sculp
 sculpin
 sculptor
-sculptress
 sculpture
 scum
 scumboard
@@ -49104,7 +48996,6 @@ seamer
 seaminess
 seamlessness
 seamount
-seamstress
 seance
 seaplane
 seaport
@@ -49195,7 +49086,6 @@ seditiousness
 seducer
 seduction
 seductiveness
-seductress
 sedulity
 sedulousness
 sedum
@@ -49218,7 +49108,6 @@ seemer
 seemliness
 seepage
 seer
-seeress
 seersucker
 seesaw
 segar
@@ -49486,7 +49375,6 @@ semivowel
 semiwarfare
 semiwildness
 semolina
-sempstress
 sen
 sena
 senarmontite
@@ -50043,7 +49931,6 @@ shockstall
 shoddiness
 shoe
 shoebill
-shoeblack
 shoehorn
 shoelace
 shoemaker
@@ -51205,8 +51092,6 @@ songbird
 songfest
 songfulness
 songkok
-songster
-songstress
 songwriter
 sonics
 sonnet
@@ -51478,7 +51363,6 @@ spectacle
 spectacularism
 spectacularity
 spectator
-spectatress
 specter
 spectra
 spectrality
@@ -53309,7 +53193,6 @@ subprefecture
 subprehensility
 subprincipal
 subprior
-subprioress
 subpriorship
 subproblem
 subproctor
@@ -55380,7 +55263,6 @@ temporizer
 temporomaxillary
 temptation
 temptingness
-temptress
 tempura
 ten
 tenability
@@ -58249,7 +58131,6 @@ underlaborer
 underlabourer
 underland
 underlash
-underlaundress
 underlawyer
 underlayer
 underleather
@@ -60032,7 +59913,6 @@ victoriate
 victorine
 victoriousness
 victory
-victress
 victrix
 victualage
 victualer
@@ -60348,7 +60228,6 @@ vorticity
 votary
 vote
 voter
-votress
 voucher
 vouchsafement
 vouge
@@ -60940,29 +60819,6 @@ whist
 whistler
 whistling
 whit
-whiteacre
-whitebait
-whitebeam
-whitebeard
-whitecap
-whitecup
-whitedamp
-whiteface
-whitefish
-whitefly
-whitener
-whiteness
-whitening
-whitesmith
-whitethorn
-whitethroat
-whitewall
-whitewash
-whitewing
-whitewood
-whitey
-whiting
-whitishness
 whitleather
 whitlow
 whitlowwort
