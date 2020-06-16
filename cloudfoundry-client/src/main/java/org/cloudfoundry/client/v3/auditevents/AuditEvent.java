@@ -19,6 +19,7 @@ package org.cloudfoundry.client.v3.auditevents;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
+import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.Resource;
 
 import java.util.Map;
@@ -55,14 +56,14 @@ public abstract class AuditEvent extends Resource {
      */
     @JsonProperty("organization")
     @Nullable
-    public abstract AuditEventRelationship getOrganizationRelationship();
+    public abstract Relationship getOrganizationRelationship();
 
     /**
      * The space where the event occurred.
      */
     @JsonProperty("space")
     @Nullable
-    public abstract AuditEventRelationship getSpaceRelationship();
+    public abstract Relationship getSpaceRelationship();
 
     /**
      * The event type

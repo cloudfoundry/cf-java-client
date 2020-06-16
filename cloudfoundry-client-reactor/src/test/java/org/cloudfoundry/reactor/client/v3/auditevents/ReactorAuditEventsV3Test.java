@@ -18,8 +18,8 @@ package org.cloudfoundry.reactor.client.v3.auditevents;
 
 import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.Pagination;
+import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.auditevents.AuditEventActor;
-import org.cloudfoundry.client.v3.auditevents.AuditEventRelationship;
 import org.cloudfoundry.client.v3.auditevents.AuditEventResource;
 import org.cloudfoundry.client.v3.auditevents.AuditEventTarget;
 import org.cloudfoundry.client.v3.auditevents.GetAuditEventRequest;
@@ -76,10 +76,10 @@ public class ReactorAuditEventsV3Test extends AbstractClientApiTest {
                     .type("app")
                     .build())
                 .data((Collections.singletonMap("request", null)))
-                .spaceRelationship(AuditEventRelationship.builder()
+                .spaceRelationship(Relationship.builder()
                     .id("cb97dd25-d4f7-4185-9e6f-ad6e585c207c")
                     .build())
-                .organizationRelationship(AuditEventRelationship.builder()
+                .organizationRelationship(Relationship.builder()
                     .id("d9be96f5-ea8f-4549-923f-bec882e32e3c")
                     .build())
                 .link("self", Link.builder()
@@ -133,10 +133,10 @@ public class ReactorAuditEventsV3Test extends AbstractClientApiTest {
                         .type("app")
                         .build())
                     .data(Collections.singletonMap("request", Collections.singletonMap("recursive", true)))
-                    .spaceRelationship(AuditEventRelationship.builder()
+                    .spaceRelationship(Relationship.builder()
                         .id("cb97dd25-d4f7-4185-9e6f-ad6e585c207c")
                         .build())
-                    .organizationRelationship(AuditEventRelationship.builder()
+                    .organizationRelationship(Relationship.builder()
                         .id("d9be96f5-ea8f-4549-923f-bec882e32e3c")
                         .build())
                     .link("self", Link.builder()
