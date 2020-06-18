@@ -17,6 +17,8 @@
 package org.cloudfoundry.client.v2;
 
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.CloudFoundryVersion;
+import org.cloudfoundry.IfCloudFoundryVersion;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
@@ -775,6 +777,29 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
             .as(StepVerifier::create)
             .expectNextCount(1)
             .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_7)
+    @Test
+    public void upgrade() {
+        String serviceInstanceName = this.nameFactory.getServiceInstanceName();
+
+        this.spaceId
+            .flatMap(spaceId -> createServiceInstanceId(this.cloudFoundryClient, this.serviceBrokerId, serviceInstanceName, this.serviceName, spaceId))
+            .flatMap(serviceInstanceId -> this.cloudFoundryClient.serviceInstances()
+                .update(UpdateServiceInstanceRequest.builder()
+                    .maintenanceInfo(MaintenanceInfo.builder()
+                        .description("test-update")
+                        .version("9.9")
+                        .build())
+                    .serviceInstanceId(serviceInstanceId)
+                    .build()))
+            .thenMany(requestListServiceInstances(this.cloudFoundryClient, serviceInstanceName))
+            .map(resource -> ResourceUtils.getEntity(resource).getMaintenanceInfo().getVersion())
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class).hasMessageMatching("CF-MaintenanceInfoNotSupported\\([0-9]+\\): The service broker does not support upgrades " +
+                "for service instances created from this plan."))
             .verify(Duration.ofMinutes(5));
     }
 
