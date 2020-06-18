@@ -1,0 +1,2 @@
+Application for testing [Log Cache](https://github.com/cloudfoundry/log-cache-release) client. This application uses
+[Metric Registrar](https://docs.pivotal.io/platform/application-service/2-9/metric-registrar/using.html) to produce different types of metrics.
