@@ -17,6 +17,7 @@
 package org.cloudfoundry.client.v2;
 
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.ApplicationUtils;
 import org.cloudfoundry.ServiceBrokerUtils;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.servicebrokers.CreateServiceBrokerRequest;
@@ -76,12 +77,9 @@ public final class ServiceBrokersTest extends AbstractIntegrationTest {
             throw Exceptions.propagate(e);
         }
 
-        ServiceBrokerUtils.ApplicationMetadata applicationMetadata = this.organizationId
-            .flatMap(organizationId -> Mono.zip(
-                createSpaceId(this.cloudFoundryClient, organizationId, spaceName),
-                getSharedDomain(this.cloudFoundryClient)
-            ))
-            .flatMap(function((spaceId, domain) -> ServiceBrokerUtils.pushServiceBrokerApplication(this.cloudFoundryClient, application, domain, this.nameFactory, planName, serviceName, spaceId)))
+        ApplicationUtils.ApplicationMetadata applicationMetadata = this.organizationId
+            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .flatMap(spaceId -> ServiceBrokerUtils.pushServiceBrokerApplication(this.cloudFoundryClient, application, this.nameFactory, planName, serviceName, spaceId))
             .block(Duration.ofMinutes(5));
 
         this.cloudFoundryClient.serviceBrokers()
@@ -202,26 +200,12 @@ public final class ServiceBrokersTest extends AbstractIntegrationTest {
             .map(ResourceUtils::getId);
     }
 
-    private static Mono<SharedDomainResource> getSharedDomain(CloudFoundryClient cloudFoundryClient) {
-        return requestListSharedDomains(cloudFoundryClient)
-            .filter(resource -> !Optional.ofNullable(ResourceUtils.getEntity(resource).getInternal()).orElse(false))
-            .next();
-    }
-
     private static Mono<CreateSpaceResponse> requestCreateSpace(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceName) {
         return cloudFoundryClient.spaces()
             .create(CreateSpaceRequest.builder()
                 .name(spaceName)
                 .organizationId(organizationId)
                 .build());
-    }
-
-    private static Flux<SharedDomainResource> requestListSharedDomains(CloudFoundryClient cloudFoundryClient) {
-        return PaginationUtils
-            .requestClientV2Resources(page -> cloudFoundryClient.sharedDomains()
-                .list(ListSharedDomainsRequest.builder()
-                    .page(page)
-                    .build()));
     }
 
 }
