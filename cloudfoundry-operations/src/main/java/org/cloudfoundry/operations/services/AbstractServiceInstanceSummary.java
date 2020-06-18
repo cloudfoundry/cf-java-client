@@ -17,6 +17,7 @@
 package org.cloudfoundry.operations.services;
 
 import org.cloudfoundry.Nullable;
+import org.cloudfoundry.client.v2.MaintenanceInfo;
 
 import java.util.List;
 
@@ -40,6 +41,12 @@ public abstract class AbstractServiceInstanceSummary {
      */
     @Nullable
     abstract String getLastOperation();
+
+    /**
+     * The maintenance info
+     */
+    @Nullable
+    abstract MaintenanceInfo getMaintenanceInfo();
 
     /**
      * The service instance name
