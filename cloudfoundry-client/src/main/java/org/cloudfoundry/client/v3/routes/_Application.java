@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,29 @@
 
 package org.cloudfoundry.client.v3.routes;
 
-import org.junit.Test;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
+import org.immutables.value.Value;
 
-public class GetRouteRequestTest {
+/**
+ * Represents an application to route traffic to.
+ */
+@JsonDeserialize
+@Value.Immutable
+abstract class _Application {
 
-    @Test(expected = IllegalStateException.class)
-    public void noRouteId() {
-        GetRouteRequest.builder()
-            .build();
-    }
+    /**
+     * The application id
+     */
+    @JsonProperty("guid")
+    abstract String getApplicationId();
 
-    @Test
-    public void valid() {
-        GetRouteRequest.builder()
-            .routeId("test-route-id")
-            .build();
-    }
+    /**
+     * The Process
+     */
+    @JsonProperty("process")
+    @Nullable
+    abstract Process getProcess();
 
 }

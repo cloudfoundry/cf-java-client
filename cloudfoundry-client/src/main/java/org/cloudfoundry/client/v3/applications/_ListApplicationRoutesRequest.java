@@ -5,12 +5,14 @@ import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.FilterParameter;
 import org.cloudfoundry.client.v3.PaginatedRequest;
 import org.immutables.value.Value;
-import org.immutables.value.internal.$processor$.meta.$BuilderMirrors;
 
 import java.util.List;
 
+/**
+ * The request payload for the List Application Routes operation
+ */
 @Value.Immutable
-public abstract class _ListApplicationRoutesRequest extends PaginatedRequest {
+abstract class _ListApplicationRoutesRequest extends PaginatedRequest {
 
     /**
      * The application id
@@ -19,10 +21,29 @@ public abstract class _ListApplicationRoutesRequest extends PaginatedRequest {
     abstract String getApplicationId();
 
     /**
+     * The domain guids
+     */
+    @FilterParameter("domain_guids")
+    abstract List<String> getDomainIds();
+
+    /**
      * The hosts
      */
     @FilterParameter("hosts")
     abstract List<String> getHosts();
+
+    /**
+     * The label selector
+     */
+    @FilterParameter("label_selector")
+    @Nullable
+    abstract String getLabelSelector();
+
+    /**
+     * The organization ids
+     */
+    @FilterParameter("organization_guids")
+    abstract List<String> getOrganizationIds();
 
     /**
      * The paths
@@ -31,27 +52,14 @@ public abstract class _ListApplicationRoutesRequest extends PaginatedRequest {
     abstract List<String> getPaths();
 
     /**
-     * The domain guids
+     * The ports
      */
-    @FilterParameter("domain_guids")
-    abstract List<String> getDomainGuids();
+    @FilterParameter("ports")
+    abstract List<Integer> getPorts();
 
     /**
-     * The space guids
+     * The space ids
      */
     @FilterParameter("space_guids")
-    abstract List<String> getSpaceGuids();
-
-    /**
-     * The organization guids
-     */
-    @FilterParameter("organization_guids")
-    abstract List<String> getOrganizationGuids();
-
-    /**
-     * The metadata query
-     */
-    @FilterParameter("label_selector")
-    @Nullable
-    abstract String getLabelSelector();
+    abstract List<String> getSpaceIds();
 }

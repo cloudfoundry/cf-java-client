@@ -67,9 +67,8 @@ public final class ReactorSpacesV3 extends AbstractClientV3Operations implements
     }
 
     @Override
-
     public Mono<String> deleteUnmappedRoutes(DeleteUnmappedRoutesRequest request) {
-        return delete(request, builder -> builder.pathSegment("spaces", request.getSpaceId(), "routes"))
+        return delete(request, builder -> builder.pathSegment("spaces", request.getSpaceId(), "routes").query("unmapped=true"))
             .checkpoint();
     }
 

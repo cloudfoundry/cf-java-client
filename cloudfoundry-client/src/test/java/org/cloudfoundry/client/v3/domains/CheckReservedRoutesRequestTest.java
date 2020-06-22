@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2020 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.routes;
+package org.cloudfoundry.client.v3.domains;
 
 import org.junit.Test;
 
-public class GetRouteRequestTest {
+public final class CheckReservedRoutesRequestTest {
 
     @Test(expected = IllegalStateException.class)
-    public void noRouteId() {
-        GetRouteRequest.builder()
+    public void noDomainId() {
+        CheckReservedRoutesRequest.builder()
             .build();
     }
 
     @Test
     public void valid() {
-        GetRouteRequest.builder()
-            .routeId("test-route-id")
+        CheckReservedRoutesRequest.builder()
+            .domainId("test-domain-id")
             .build();
     }
 

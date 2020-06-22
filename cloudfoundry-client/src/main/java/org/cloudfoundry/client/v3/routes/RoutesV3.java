@@ -29,6 +29,14 @@ public interface RoutesV3 {
     Mono<GetRouteResponse> get(GetRouteRequest request);
 
     /**
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.86.0/index.html#insert-destinations-for-a-route">Insert Route Destinations</a> request
+     *
+     * @param request the Insert Route Destinations request
+     * @return the response from the Insert Route Destinations request
+     */
+    Mono<InsertRouteDestinationsResponse> insertDestinations(InsertRouteDestinationsRequest request);
+
+    /**
      * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.77.0/index.html#list-routes">List Routes</a> request
      *
      * @param request the List Route request
@@ -37,10 +45,35 @@ public interface RoutesV3 {
     Mono<ListRoutesResponse> list(ListRoutesRequest request);
 
     /**
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.86.0/index.html#list-destinations-for-a-route">List Route Destinations</a> request
+     *
+     * @param request the List Route Destinations request
+     * @return the response from the List Route Destinations request
+     */
+    Mono<ListRouteDestinationsResponse> listDestinations(ListRouteDestinationsRequest request);
+
+    /**
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.86.0/index.html#remove-destination-for-a-route">Remove Route Destinations</a> request
+     *
+     * @param request the Remove Route Destinations request
+     * @return the response from the Remove Route Destinations request
+     */
+    Mono<Void> removeDestinations(RemoveRouteDestinationsRequest request);
+
+    /**
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.86.0/index.html#replace-all-destinations-for-a-route">Replace Route Destinations</a> request
+     *
+     * @param request the Replace Route Destinations request
+     * @return the response from the Replace Route Destinations request
+     */
+    Mono<ReplaceRouteDestinationsResponse> replaceDestinations(ReplaceRouteDestinationsRequest request);
+
+    /**
      * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.77.0/index.html#list-routes">List Routes</a> request
      *
      * @param request the List Route request
      * @return the response from the List Route request
      */
     Mono<UpdateRouteResponse> update(UpdateRouteRequest request);
+
 }

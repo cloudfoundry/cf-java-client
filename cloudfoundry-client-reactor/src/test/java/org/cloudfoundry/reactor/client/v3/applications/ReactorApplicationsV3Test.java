@@ -93,7 +93,10 @@ import org.cloudfoundry.client.v3.processes.ProcessResource;
 import org.cloudfoundry.client.v3.processes.ProcessState;
 import org.cloudfoundry.client.v3.processes.ProcessStatisticsResource;
 import org.cloudfoundry.client.v3.processes.ProcessUsage;
-import org.cloudfoundry.client.v3.routes.ListRoutesRequest;
+import org.cloudfoundry.client.v3.routes.Application;
+import org.cloudfoundry.client.v3.routes.Destination;
+import org.cloudfoundry.client.v3.routes.Process;
+import org.cloudfoundry.client.v3.routes.Protocol;
 import org.cloudfoundry.client.v3.routes.RouteRelationships;
 import org.cloudfoundry.client.v3.routes.RouteResource;
 import org.cloudfoundry.client.v3.tasks.Result;
@@ -120,6 +123,7 @@ import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
 import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+import static org.cloudfoundry.client.v3.routes.Protocol.HTTP;
 
 public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
 
@@ -1090,6 +1094,98 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
+    public void listRoutes() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/apps/test-application-id/routes")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v3/apps/GET_{id}_routes_response.json")
+                .build())
+            .build());
+        this.applications
+            .listRoutes(ListApplicationRoutesRequest.builder()
+                .applicationId("test-application-id")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ListApplicationRoutesResponse.builder()
+                .pagination(Pagination.builder()
+                    .totalResults(3)
+                    .totalPages(2)
+                    .first(Link.builder()
+                        .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/routes?page=1&per_page=2")
+                        .build())
+                    .last(Link.builder()
+                        .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/routes?page=2&per_page=2")
+                        .build())
+                    .next(Link.builder()
+                        .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/routes?page=2&per_page=2")
+                        .build())
+                    .build())
+                .resource(RouteResource.builder().host("test-hostname")
+                    .id("cbad697f-cac1-48f4-9017-ac08f39dfb31")
+                    .protocol(HTTP)
+                    .path("/some_path")
+                    .createdAt("2019-05-10T17:17:48Z")
+                    .updatedAt("2019-05-10T17:17:48Z")
+                    .host("a-hostname")
+                    .url("a-hostname.a-domain.com/some_path")
+                    .destinations(Destination.builder()
+                        .destinationId("385bf117-17f5-4689-8c5c-08c6cc821fed")
+                        .application(Application.builder()
+                            .applicationId("0a6636b5-7fc4-44d8-8752-0db3e40b35a5")
+                            .process(Process.builder()
+                                .type("web")
+                                .build())
+                            .build())
+                        .port(8080)
+                        .build())
+                    .destinations(Destination.builder()
+                        .destinationId("27e96a3b-5bcf-49ed-8048-351e0be23e6f")
+                        .application(Application.builder()
+                            .applicationId("f61e59fa-2121-4217-8c7b-15bfd75baf25")
+                            .process(Process.builder()
+                                .type("web")
+                                .build())
+                            .build())
+                        .port(8080)
+                        .build())
+                    .metadata(Metadata.builder()
+                        .annotations(Collections.emptyMap())
+                        .labels(Collections.emptyMap())
+                        .build())
+                    .relationships(RouteRelationships.builder()
+                        .space(ToOneRelationship.builder()
+                            .data(Relationship.builder()
+                                .id("885a8cb3-c07b-4856-b448-eeb10bf36236")
+                                .build())
+                            .build())
+                        .domain(ToOneRelationship.builder()
+                            .data(Relationship.builder()
+                                .id("0b5f3633-194c-42d2-9408-972366617e0e")
+                                .build())
+                            .build())
+                        .build())
+                    .link("self", Link.builder()
+                        .href("https://api.example.org/v3/routes/cbad697f-cac1-48f4-9017-ac08f39dfb31")
+                        .build())
+                    .link("space", Link.builder()
+                        .href("https://api.example.org/v3/spaces/885a8cb3-c07b-4856-b448-eeb10bf36236")
+                        .build())
+                    .link("domain", Link.builder()
+                        .href("https://api.example.org/v3/domains/0b5f3633-194c-42d2-9408-972366617e0e")
+                        .build())
+                    .link("destinations", Link.builder()
+                        .href("https://api.example.org/v3/routes/cbad697f-cac1-48f4-9017-ac08f39dfb31/destinations")
+                        .build())
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
     public void listTasks() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
@@ -1171,76 +1267,6 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
                         .build())
                     .link("droplet", Link.builder()
                         .href("https://api.example.org/v3/droplets/740ebd2b-162b-469a-bd72-3edb96fabd9a")
-                        .build())
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
-    }
-
-    @Test
-    public void listRoutes(){
-        mockRequest(InteractionContext.builder()
-            .request(TestRequest.builder()
-                .method(GET).path("/apps/test-application-id/routes")
-                .build())
-            .response(TestResponse.builder()
-                .status(OK)
-                .payload("fixtures/client/v3/apps/GET_{id}_routes_response.json")
-                .build())
-            .build());
-        this.applications
-            .listRoutes(ListApplicationRoutesRequest.builder()
-                .applicationId("test-application-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(ListApplicationRoutesResponse.builder()
-                .pagination(Pagination.builder()
-                    .totalResults(3)
-                    .totalPages(2)
-                    .first(Link.builder()
-                        .href("https://api.example.org/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5/routes?page=1&per_page=2")
-                        .build())
-                    .last(Link.builder()
-                        .href("https://api.example.org/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5/routes?page=2&per_page=2")
-                        .build())
-                    .next(Link.builder()
-                        .href("https://api.example.org/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5/routes?page=2&per_page=2")
-                        .build())
-                    .build())
-                .resource(RouteResource.builder().host("test-hostname")
-                    .id("cbad697f-cac1-48f4-9017-ac08f39dfb31")
-                    .path("/some_path")
-                    .url("test-hostname.a-domain.com/some_path")
-                    .createdAt("2019-11-01T17:17:48Z")
-                    .updatedAt("2019-11-01T17:17:48Z")
-                    .metadata(Metadata.builder()
-                        .label("test-label", "test-label-value")
-                        .annotation("note", "detailed information")
-                        .build())
-                    .relationships(RouteRelationships.builder()
-                        .space(ToOneRelationship.builder()
-                            .data(Relationship.builder()
-                                .id("space-guid")
-                                .build())
-                            .build())
-                        .domain(ToOneRelationship.builder()
-                            .data(Relationship.builder()
-                                .id("domain-guid")
-                                .build())
-                            .build())
-                        .build())
-                    .link("self", Link.builder()
-                        .href("https://api.example.org/v3/routes/cbad697f-cac1-48f4-9017-ac08f39dfb31")
-                        .build())
-                    .link("space", Link.builder()
-                        .href("https://api.example.org/v3/spaces/space-guid")
-                        .build())
-                    .link("domain", Link.builder()
-                        .href("https://api.example.org/v3/domains/domain-guid")
-                        .build())
-                    .link("destinations", Link.builder()
-                        .href("https://api.example.org/v3/routes/cbad697f-cac1-48f4-9017-ac08f39dfb31/destinations")
                         .build())
                     .build())
                 .build())

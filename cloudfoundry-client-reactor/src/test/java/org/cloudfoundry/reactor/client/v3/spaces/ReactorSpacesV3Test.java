@@ -58,7 +58,7 @@ public class ReactorSpacesV3Test extends AbstractClientApiTest {
     private final ReactorSpacesV3 spaces = new ReactorSpacesV3(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void assignDefaultIsolationSegment() {
+    public void assignIsolationSegment() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PATCH).path("/spaces/test-space-id/relationships/isolation_segment")
@@ -142,7 +142,7 @@ public class ReactorSpacesV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void delete() {
+    public void deleteUnmappedRoutes() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/spaces/test-space-id/routes?unmapped=true")
@@ -198,7 +198,7 @@ public class ReactorSpacesV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void getDefaultIsolationSegment() {
+    public void getIsolationSegment() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/spaces/test-space-id/relationships/isolation_segment")
@@ -317,4 +317,5 @@ public class ReactorSpacesV3Test extends AbstractClientApiTest {
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
+
 }

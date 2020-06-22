@@ -3,23 +3,22 @@ package org.cloudfoundry.client.v3.routes;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v3.Metadata;
 import org.immutables.value.Value;
 
+import java.util.List;
+
 /**
- * The request payload for the Update Route operation
+ * The request payload for the Insert Route Destinations operation
  */
 @JsonSerialize
 @Value.Immutable
-abstract class _UpdateRouteRequest {
+abstract class _InsertRouteDestinationsRequest {
 
     /**
-     * The metadata
+     * The destinations to add to the route
      */
-    @JsonProperty("metadata")
-    @Nullable
-    abstract Metadata getMetadata();
+    @JsonProperty("destinations")
+    abstract List<Destination> getDestinations();
 
     /**
      * The route id

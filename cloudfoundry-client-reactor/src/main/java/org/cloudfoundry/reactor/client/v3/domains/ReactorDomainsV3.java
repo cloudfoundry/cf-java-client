@@ -16,6 +16,8 @@
 
 package org.cloudfoundry.reactor.client.v3.domains;
 
+import org.cloudfoundry.client.v3.domains.CheckReservedRoutesRequest;
+import org.cloudfoundry.client.v3.domains.CheckReservedRoutesResponse;
 import org.cloudfoundry.client.v3.domains.CreateDomainRequest;
 import org.cloudfoundry.client.v3.domains.CreateDomainResponse;
 import org.cloudfoundry.client.v3.domains.DeleteDomainRequest;
@@ -51,6 +53,12 @@ public final class ReactorDomainsV3 extends AbstractClientV3Operations implement
      */
     public ReactorDomainsV3(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
+    }
+
+    @Override
+    public Mono<CheckReservedRoutesResponse> checkReservedRoutes(CheckReservedRoutesRequest request) {
+        return get(request, CheckReservedRoutesResponse.class, builder -> builder.pathSegment("domains", request.getDomainId(), "route_reservations"))
+            .checkpoint();
     }
 
     @Override

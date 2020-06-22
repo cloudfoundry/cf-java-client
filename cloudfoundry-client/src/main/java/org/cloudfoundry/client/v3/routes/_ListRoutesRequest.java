@@ -11,45 +11,55 @@ import java.util.List;
  * The request payload for the List Routes operation
  */
 @Value.Immutable
-public abstract class _ListRoutesRequest extends PaginatedRequest {
+abstract class _ListRoutesRequest extends PaginatedRequest {
 
     /**
-     * The hosts
+     * The application ids filter
+     */
+    @FilterParameter("app_guids")
+    abstract List<String> getApplicationIds();
+
+    /**
+     * The domain ids filter
+     */
+    @FilterParameter("domain_guids")
+    abstract List<String> getDomainIds();
+
+    /**
+     * The hosts filter
      */
     @FilterParameter("hosts")
     abstract List<String> getHosts();
 
     /**
-     * The paths
+     * A query string containing a list of label selector requirements
      */
-    @FilterParameter("paths")
-    abstract List<String> getPaths();
-
+    @FilterParameter("label_selector")
+    @Nullable
+    abstract String getLabelSelector();
 
     /**
-     * The domain guids
-     */
-    @FilterParameter("domain_guids")
-    abstract List<String> getDomainIds();
-
-
-    /**
-     * The space guids
-     */
-    @FilterParameter("space_guids")
-    abstract List<String> getSpaceIds();
-
-    /**
-     * The organization guids
+     * The organization ids filter
      */
     @FilterParameter("organization_guids")
     abstract List<String> getOrganizationIds();
 
     /**
-     * The metadata query
+     * The paths filter
      */
-    @FilterParameter("label_selector")
-    @Nullable
-    abstract String getLabelSelector();
+    @FilterParameter("paths")
+    abstract List<String> getPaths();
+
+    /**
+     * The ports filter
+     */
+    @FilterParameter("ports")
+    abstract List<Integer> getPorts();
+
+    /**
+     * The space ids filter
+     */
+    @FilterParameter("space_guids")
+    abstract List<String> getSpaceIds();
 
 }

@@ -6,9 +6,12 @@ import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.Metadata;
 import org.immutables.value.Value;
 
+/**
+ * The request payload for the Create Route operation
+ */
 @JsonSerialize
 @Value.Immutable
-public abstract class _CreateRouteRequest {
+abstract class _CreateRouteRequest {
 
     /**
      * The host
@@ -18,6 +21,13 @@ public abstract class _CreateRouteRequest {
     abstract String getHost();
 
     /**
+     * The metadata
+     */
+    @Nullable
+    @JsonProperty("metadata")
+    abstract Metadata getMetadata();
+
+    /**
      * The path
      */
     @Nullable
@@ -25,17 +35,16 @@ public abstract class _CreateRouteRequest {
     abstract String getPath();
 
     /**
+     * The port
+     */
+    @JsonProperty("port")
+    @Nullable
+    abstract Integer getPort();
+
+    /**
      * The relationships
      */
     @JsonProperty("relationships")
     abstract RouteRelationships getRelationships();
-
-    /**
-     * The metadata
-     */
-    @Nullable
-    @JsonProperty("metadata")
-    abstract Metadata getMetadata();
-
 
 }

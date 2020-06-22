@@ -5,10 +5,19 @@ import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.Resource;
 
+import java.util.List;
+
 /**
  * Base class for responses that are routes
  */
 public abstract class Route extends Resource {
+
+    /**
+     * The destinations
+     */
+    @JsonProperty("destinations")
+    @Nullable
+    public abstract List<Destination> getDestinations();
 
     /**
      * The host
@@ -17,16 +26,31 @@ public abstract class Route extends Resource {
     public abstract String getHost();
 
     /**
+     * The metadata
+     */
+    @JsonProperty("metadata")
+    @Nullable
+    public abstract Metadata getMetadata();
+
+    /**
      * The path
      */
     @JsonProperty("path")
     public abstract String getPath();
 
     /**
-     * The url
+     * The port
      */
-    @JsonProperty("url")
-    public abstract String getUrl();
+    @JsonProperty("port")
+    @Nullable
+    public abstract Integer getPort();
+
+    /**
+     * The protocol
+     */
+    @JsonProperty("protocol")
+    @Nullable
+    public abstract Protocol getProtocol();
 
     /**
      * The relationships
@@ -35,9 +59,9 @@ public abstract class Route extends Resource {
     public abstract RouteRelationships getRelationships();
 
     /**
-     * The metadata
+     * The url
      */
-    @JsonProperty("metadata")
-    @Nullable
-    public abstract Metadata getMetadata();
+    @JsonProperty("url")
+    public abstract String getUrl();
+
 }

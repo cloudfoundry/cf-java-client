@@ -18,18 +18,18 @@ package org.cloudfoundry.client.v3.routes;
 
 import org.junit.Test;
 
-public class GetRouteRequestTest {
+public class ListRouteDestinationsRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noRouteId() {
-        GetRouteRequest.builder()
+        ListRouteDestinationsRequest.builder()
             .build();
     }
 
     @Test
     public void valid() {
-        GetRouteRequest.builder()
-            .routeId("test-route-id")
+        ListRouteDestinationsRequest.builder()
+            .routeId("test-route-destination-id")
             .build();
     }
 

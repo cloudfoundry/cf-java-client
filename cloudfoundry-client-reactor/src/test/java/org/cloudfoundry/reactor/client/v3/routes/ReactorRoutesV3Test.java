@@ -21,13 +21,23 @@ import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.Pagination;
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.ToOneRelationship;
+import org.cloudfoundry.client.v3.routes.Application;
 import org.cloudfoundry.client.v3.routes.CreateRouteRequest;
 import org.cloudfoundry.client.v3.routes.CreateRouteResponse;
 import org.cloudfoundry.client.v3.routes.DeleteRouteRequest;
+import org.cloudfoundry.client.v3.routes.Destination;
 import org.cloudfoundry.client.v3.routes.GetRouteRequest;
 import org.cloudfoundry.client.v3.routes.GetRouteResponse;
+import org.cloudfoundry.client.v3.routes.InsertRouteDestinationsRequest;
+import org.cloudfoundry.client.v3.routes.InsertRouteDestinationsResponse;
+import org.cloudfoundry.client.v3.routes.ListRouteDestinationsRequest;
+import org.cloudfoundry.client.v3.routes.ListRouteDestinationsResponse;
 import org.cloudfoundry.client.v3.routes.ListRoutesRequest;
 import org.cloudfoundry.client.v3.routes.ListRoutesResponse;
+import org.cloudfoundry.client.v3.routes.Process;
+import org.cloudfoundry.client.v3.routes.RemoveRouteDestinationsRequest;
+import org.cloudfoundry.client.v3.routes.ReplaceRouteDestinationsRequest;
+import org.cloudfoundry.client.v3.routes.ReplaceRouteDestinationsResponse;
 import org.cloudfoundry.client.v3.routes.RouteRelationships;
 import org.cloudfoundry.client.v3.routes.RouteResource;
 import org.cloudfoundry.client.v3.routes.UpdateRouteRequest;
@@ -47,6 +57,8 @@ import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.PATCH;
 import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
+import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
+import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public class ReactorRoutesV3Test extends AbstractClientApiTest {
@@ -61,7 +73,7 @@ public class ReactorRoutesV3Test extends AbstractClientApiTest {
                 .payload("fixtures/client/v3/routes/POST_request.json")
                 .build())
             .response(TestResponse.builder()
-                .status(OK)
+                .status(CREATED)
                 .payload("fixtures/client/v3/routes/POST_response.json")
                 .build())
             .build());
@@ -128,6 +140,28 @@ public class ReactorRoutesV3Test extends AbstractClientApiTest {
     }
 
     @Test
+    public void delete() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(DELETE).path("/routes/test-route-id")
+                .build())
+            .response(TestResponse.builder()
+                .status(ACCEPTED)
+                .header("Location", "https://api.example.org/v3/jobs/test-route-id")
+                .build())
+            .build());
+
+        this.routes
+            .delete(DeleteRouteRequest.builder()
+                .routeId("test-route-id")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext("test-route-id")
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
@@ -183,6 +217,69 @@ public class ReactorRoutesV3Test extends AbstractClientApiTest {
             .expectComplete()
             .verify(Duration.ofSeconds(5));
 
+    }
+
+    @Test
+    public void insertDestinations() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(POST).path("/routes/test-route-id/destinations")
+                .payload("fixtures/client/v3/routes/POST_{id}_destinations_request.json")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v3/routes/POST_{id}_destinations_response.json")
+                .build())
+            .build());
+
+        this.routes.insertDestinations(InsertRouteDestinationsRequest.builder()
+            .destinations(Destination.builder()
+                    .application(Application.builder()
+                        .applicationId("1cb006ee-fb05-47e1-b541-c34179ddc446")
+                        .build())
+                    .build(),
+                Destination.builder()
+                    .application(Application.builder()
+                        .applicationId("01856e12-8ee8-11e9-98a5-bb397dbc818f")
+                        .process(Process.builder()
+                            .type("api")
+                            .build())
+                        .build())
+                    .port(9000)
+                    .build())
+            .routeId("test-route-id")
+            .build())
+            .as(StepVerifier::create)
+            .expectNext(InsertRouteDestinationsResponse.builder()
+                .destinations(Destination.builder()
+                        .destinationId("89323d4e-2e84-43e7-83e9-adbf50a20c0e")
+                        .application(Application.builder()
+                            .applicationId("1cb006ee-fb05-47e1-b541-c34179ddc446")
+                            .process(Process.builder()
+                                .type("web")
+                                .build())
+                            .build())
+                        .port(8080)
+                        .build(),
+                    Destination.builder()
+                        .destinationId("fbef10a2-8ee7-11e9-aa2d-abeeaf7b83c5")
+                        .application(Application.builder()
+                            .applicationId("01856e12-8ee8-11e9-98a5-bb397dbc818f")
+                            .process(Process.builder()
+                                .type("api")
+                                .build())
+                            .build())
+                        .port(9000)
+                        .build())
+                .link("self", Link.builder()
+                    .href("https://api.example.org/v3/routes/cbad697f-cac1-48f4-9017-ac08f39dfb31/destinations")
+                    .build())
+                .link("route", Link.builder()
+                    .href("https://api.example.org/v3/routes/cbad697f-cac1-48f4-9017-ac08f39dfb31")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -254,6 +351,141 @@ public class ReactorRoutesV3Test extends AbstractClientApiTest {
     }
 
     @Test
+    public void listDestinations() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/routes/test-route-id/destinations")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v3/routes/GET_{id}_destinations_response.json")
+                .build())
+            .build());
+
+        this.routes.listDestinations(ListRouteDestinationsRequest.builder()
+            .routeId("test-route-id")
+            .build())
+            .as(StepVerifier::create)
+            .expectNext(ListRouteDestinationsResponse.builder()
+                .destinations(Destination.builder()
+                        .destinationId("89323d4e-2e84-43e7-83e9-adbf50a20c0e")
+                        .application(Application.builder()
+                            .applicationId("1cb006ee-fb05-47e1-b541-c34179ddc446")
+                            .process(Process.builder()
+                                .type("web")
+                                .build())
+                            .build())
+                        .port(8080)
+                        .build(),
+                    Destination.builder()
+                        .destinationId("fbef10a2-8ee7-11e9-aa2d-abeeaf7b83c5")
+                        .application(Application.builder()
+                            .applicationId("01856e12-8ee8-11e9-98a5-bb397dbc818f")
+                            .process(Process.builder()
+                                .type("api")
+                                .build())
+                            .build())
+                        .port(9000)
+                        .build())
+                .link("self", Link.builder()
+                    .href("https://api.example.org/v3/routes/cbad697f-cac1-48f4-9017-ac08f39dfb31/destinations")
+                    .build())
+                .link("route", Link.builder()
+                    .href("https://api.example.org/v3/routes/cbad697f-cac1-48f4-9017-ac08f39dfb31")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void removeDestinations() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(DELETE).path("/routes/test-route-id/destinations/test-destination-id")
+                .build())
+            .response(TestResponse.builder()
+                .status(NO_CONTENT)
+                .build())
+            .build());
+
+        this.routes.removeDestinations(RemoveRouteDestinationsRequest.builder()
+            .destinationId("test-destination-id")
+            .routeId("test-route-id")
+            .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void replaceDestinations() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(PATCH).path("/routes/test-route-id/destinations")
+                .payload("fixtures/client/v3/routes/PATCH_{id}_destinations_request.json")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v3/routes/PATCH_{id}_destinations_response.json")
+                .build())
+            .build());
+
+        this.routes.replaceDestinations(ReplaceRouteDestinationsRequest.builder()
+            .destinations(Destination.builder()
+                    .application(Application.builder()
+                        .applicationId("1cb006ee-fb05-47e1-b541-c34179ddc446")
+                        .build())
+                    .weight(61)
+                    .build(),
+                Destination.builder()
+                    .application(Application.builder()
+                        .applicationId("01856e12-8ee8-11e9-98a5-bb397dbc818f")
+                        .process(Process.builder()
+                            .type("api")
+                            .build())
+                        .build())
+                    .port(9000)
+                    .weight(39)
+                    .build())
+            .routeId("test-route-id")
+            .build())
+            .as(StepVerifier::create)
+            .expectNext(ReplaceRouteDestinationsResponse.builder()
+                .destinations(Destination.builder()
+                        .destinationId("89323d4e-2e84-43e7-83e9-adbf50a20c0e")
+                        .application(Application.builder()
+                            .applicationId("1cb006ee-fb05-47e1-b541-c34179ddc446")
+                            .process(Process.builder()
+                                .type("web")
+                                .build())
+                            .build())
+                        .port(8080)
+                        .weight(61)
+                        .build(),
+                    Destination.builder()
+                        .destinationId("fbef10a2-8ee7-11e9-aa2d-abeeaf7b83c5")
+                        .application(Application.builder()
+                            .applicationId("01856e12-8ee8-11e9-98a5-bb397dbc818f")
+                            .process(Process.builder()
+                                .type("api")
+                                .build())
+                            .build())
+                        .port(9000)
+                        .weight(39)
+                        .build())
+                .link("self", Link.builder()
+                    .href("https://api.example.org/v3/routes/cbad697f-cac1-48f4-9017-ac08f39dfb31/destinations")
+                    .build())
+                .link("route", Link.builder()
+                    .href("https://api.example.org/v3/routes/cbad697f-cac1-48f4-9017-ac08f39dfb31")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
     public void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
@@ -309,28 +541,6 @@ public class ReactorRoutesV3Test extends AbstractClientApiTest {
                     .href("https://api.example.org/v3/routes/cbad697f-cac1-48f4-9017-ac08f39dfb31/destinations")
                     .build())
                 .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
-    }
-
-    @Test
-    public void delete() {
-        mockRequest(InteractionContext.builder()
-            .request(TestRequest.builder()
-                .method(DELETE).path("/routes/test-route-id")
-                .build())
-            .response(TestResponse.builder()
-                .status(ACCEPTED)
-                .header("Location", "https://api.example.org/v3/jobs/test-route-id")
-                .build())
-            .build());
-
-        this.routes
-            .delete(DeleteRouteRequest.builder()
-                .routeId("test-route-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext("test-route-id")
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }

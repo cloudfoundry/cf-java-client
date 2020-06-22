@@ -4,10 +4,16 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.immutables.value.Value;
 
 /**
- * The request payload for the Get Route operation
+ * The request payload for the Remove Route Destination operation
  */
 @Value.Immutable
-abstract class _GetRouteRequest {
+abstract class _RemoveRouteDestinationsRequest {
+
+    /**
+     * The destination id
+     */
+    @JsonIgnore
+    abstract String getDestinationId();
 
     /**
      * The route id

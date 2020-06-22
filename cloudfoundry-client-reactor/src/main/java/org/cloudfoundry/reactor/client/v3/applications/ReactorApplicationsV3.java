@@ -170,14 +170,14 @@ public final class ReactorApplicationsV3 extends AbstractClientV3Operations impl
     }
 
     @Override
-    public Mono<ListApplicationTasksResponse> listTasks(ListApplicationTasksRequest request) {
-        return get(request, ListApplicationTasksResponse.class, builder -> builder.pathSegment("apps", request.getApplicationId(), "tasks"))
+    public Mono<ListApplicationRoutesResponse> listRoutes(ListApplicationRoutesRequest request) {
+        return get(request, ListApplicationRoutesResponse.class, builder -> builder.pathSegment("apps", request.getApplicationId(), "routes"))
             .checkpoint();
     }
 
     @Override
-    public Mono<ListApplicationRoutesResponse> listRoutes(ListApplicationRoutesRequest request) {
-        return get(request, ListApplicationRoutesResponse.class, builder -> builder.pathSegment("apps", request.getApplicationId(), "routes"))
+    public Mono<ListApplicationTasksResponse> listTasks(ListApplicationTasksRequest request) {
+        return get(request, ListApplicationTasksResponse.class, builder -> builder.pathSegment("apps", request.getApplicationId(), "tasks"))
             .checkpoint();
     }
 

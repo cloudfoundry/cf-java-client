@@ -1,0 +1,20 @@
+{
+  "destinations": [
+    {
+      "app": {
+        "guid": "1cb006ee-fb05-47e1-b541-c34179ddc446"
+      },
+      "weight": 61
+    },
+    {
+      "app": {
+        "guid": "01856e12-8ee8-11e9-98a5-bb397dbc818f",
+        "process": {
+          "type": "api"
+        }
+      },
+      "weight": 39,
+      "port": 9000
+    }
+  ]
+}

@@ -28,12 +28,13 @@ public class UpdateRouteRequestTest {
     }
 
     @Test
-    public void valid(){
+    public void valid() {
         UpdateRouteRequest.builder()
             .metadata(Metadata.builder()
-                .label("test", "Test")
+                .label("test-key", "test-value")
                 .build())
             .routeId("test-route-id")
             .build();
     }
+
 }
