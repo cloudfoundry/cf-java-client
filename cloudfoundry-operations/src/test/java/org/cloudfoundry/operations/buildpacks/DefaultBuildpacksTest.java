@@ -96,6 +96,7 @@ public final class DefaultBuildpacksTest extends AbstractOperationsTest {
                 .locked(true)
                 .name("test-buildpack-name")
                 .position(1)
+                .stack("test-buildpack-stack")
                 .build())
             .expectComplete()
             .verify(Duration.ofSeconds(5));
