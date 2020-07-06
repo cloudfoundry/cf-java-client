@@ -195,6 +195,7 @@ public final class DefaultBuildpacks implements Buildpacks {
             .locked(entity.getLocked())
             .name(entity.getName())
             .position(entity.getPosition())
+            .stack(entity.getStack())
             .build();
     }
 

@@ -56,4 +56,10 @@ abstract class _Buildpack {
      */
     abstract Integer getPosition();
 
+    /**
+     * The stack
+     */
+    @Nullable
+    abstract String getStack();
+
 }
