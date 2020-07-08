@@ -14,31 +14,23 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.builds;
+package org.cloudfoundry.client.v3.domains;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.Nullable;
-import org.immutables.value.Value;
+import org.junit.Test;
 
-/**
- * Represents a droplet
- */
-@JsonDeserialize
-@Value.Immutable
-abstract class _Droplet {
+public final class CheckReservedRoutesRequestTest {
 
-    /**
-     * The href
-     */
-    @JsonProperty("href")
-    @Nullable
-    abstract String getHref();
+    @Test(expected = IllegalStateException.class)
+    public void noDomainId() {
+        CheckReservedRoutesRequest.builder()
+            .build();
+    }
 
-    /**
-     * The id
-     */
-    @JsonProperty("guid")
-    abstract String getId();
+    @Test
+    public void valid() {
+        CheckReservedRoutesRequest.builder()
+            .domainId("test-domain-id")
+            .build();
+    }
 
 }

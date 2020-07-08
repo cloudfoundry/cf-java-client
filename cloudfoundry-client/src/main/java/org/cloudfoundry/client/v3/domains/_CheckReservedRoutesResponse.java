@@ -14,31 +14,23 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.builds;
+package org.cloudfoundry.client.v3.domains;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
- * Represents a droplet
+ * The response payload for the Check Reserved Routes operation
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _Droplet {
+abstract class _CheckReservedRoutesResponse {
 
     /**
-     * The href
+     * The matching route
      */
-    @JsonProperty("href")
-    @Nullable
-    abstract String getHref();
-
-    /**
-     * The id
-     */
-    @JsonProperty("guid")
-    abstract String getId();
+    @JsonProperty("matching_route")
+    abstract Boolean getMatchingRoute();
 
 }

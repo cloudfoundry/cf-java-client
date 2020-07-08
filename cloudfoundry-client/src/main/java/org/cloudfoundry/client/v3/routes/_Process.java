@@ -14,31 +14,23 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.builds;
+package org.cloudfoundry.client.v3.routes;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
- * Represents a droplet
+ * Represents a route Process type.
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _Droplet {
+abstract class _Process {
 
     /**
-     * The href
+     * The type
      */
-    @JsonProperty("href")
-    @Nullable
-    abstract String getHref();
-
-    /**
-     * The id
-     */
-    @JsonProperty("guid")
-    abstract String getId();
+    @JsonProperty("type")
+    abstract String getType();
 
 }

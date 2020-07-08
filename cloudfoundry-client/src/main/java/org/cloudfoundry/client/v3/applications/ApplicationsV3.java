@@ -136,6 +136,14 @@ public interface ApplicationsV3 {
     Mono<ListApplicationProcessesResponse> listProcesses(ListApplicationProcessesRequest request);
 
     /**
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.77.0/index.html#list-routes-for-an-app">List Application Routes</a> request
+     *
+     * @param request the List Application Routes request
+     * @return the response from the List Application Routes request
+     */
+    Mono<ListApplicationRoutesResponse> listRoutes(ListApplicationRoutesRequest request);
+
+    /**
      * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#list-tasks-for-an-app">List Application Tasks</a> request
      *
      * @param request the List Application Tasks request

@@ -25,6 +25,7 @@ import org.cloudfoundry.client.v3.spaces.AssignSpaceIsolationSegmentRequest;
 import org.cloudfoundry.client.v3.spaces.AssignSpaceIsolationSegmentResponse;
 import org.cloudfoundry.client.v3.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v3.spaces.CreateSpaceResponse;
+import org.cloudfoundry.client.v3.spaces.DeleteUnmappedRoutesRequest;
 import org.cloudfoundry.client.v3.spaces.GetSpaceIsolationSegmentRequest;
 import org.cloudfoundry.client.v3.spaces.GetSpaceIsolationSegmentResponse;
 import org.cloudfoundry.client.v3.spaces.GetSpaceRequest;
@@ -45,9 +46,11 @@ import reactor.test.StepVerifier;
 import java.time.Duration;
 import java.util.Collections;
 
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.PATCH;
 import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public class ReactorSpacesV3Test extends AbstractClientApiTest {
@@ -55,7 +58,7 @@ public class ReactorSpacesV3Test extends AbstractClientApiTest {
     private final ReactorSpacesV3 spaces = new ReactorSpacesV3(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void assignDefaultIsolationSegment() {
+    public void assignIsolationSegment() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PATCH).path("/spaces/test-space-id/relationships/isolation_segment")
@@ -139,6 +142,28 @@ public class ReactorSpacesV3Test extends AbstractClientApiTest {
     }
 
     @Test
+    public void deleteUnmappedRoutes() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(DELETE).path("/spaces/test-space-id/routes?unmapped=true")
+                .build())
+            .response(TestResponse.builder()
+                .status(ACCEPTED)
+                .header("Location", "https://api.example.org/v3/jobs/test-space-id")
+                .build())
+            .build());
+
+        this.spaces
+            .deleteUnmappedRoutes(DeleteUnmappedRoutesRequest.builder()
+                .spaceId("test-space-id")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext("test-space-id")
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
@@ -173,7 +198,7 @@ public class ReactorSpacesV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void getDefaultIsolationSegment() {
+    public void getIsolationSegment() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/spaces/test-space-id/relationships/isolation_segment")

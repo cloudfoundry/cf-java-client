@@ -24,6 +24,14 @@ import reactor.core.publisher.Mono;
 public interface DomainsV3 {
 
     /**
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.86.0/index.html#check-reserved-routes-for-a-domain">Check Reserved Routes</a> request
+     *
+     * @param request the Check Reserved Routes request
+     * @return the response from the Check Reserved Routes request
+     */
+    Mono<CheckReservedRoutesResponse> checkReservedRoutes(CheckReservedRoutesRequest request);
+
+    /**
      * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.77.0/index.html#create-a-domain">Create a domain</a> request
      *
      * @param request the Create a Domain request

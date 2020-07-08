@@ -415,7 +415,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 )
             ))
             .delayUntil(function((applicationId, routeId, stackId) -> associateApplicationWithRoute(this.cloudFoundryClient, applicationId, routeId)))
-            .flatMapMany(function((aplicationId, routeId, stackId) -> PaginationUtils
+            .flatMapMany(function((applicationId, routeId, stackId) -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.routes()
                     .listApplications(ListRouteApplicationsRequest.builder()
                         .page(page)

@@ -1,0 +1,81 @@
+{
+  "pagination": {
+    "total_results": 3,
+    "total_pages": 2,
+    "first": {
+      "href": "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/routes?page=1&per_page=2"
+    },
+    "last": {
+      "href": "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/routes?page=2&per_page=2"
+    },
+    "next": {
+      "href": "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/routes?page=2&per_page=2"
+    },
+    "previous": null
+  },
+  "resources": [
+    {
+      "guid": "cbad697f-cac1-48f4-9017-ac08f39dfb31",
+      "protocol": "http",
+      "created_at": "2019-05-10T17:17:48Z",
+      "updated_at": "2019-05-10T17:17:48Z",
+      "host": "a-hostname",
+      "path": "/some_path",
+      "url": "a-hostname.a-domain.com/some_path",
+      "destinations": [
+        {
+          "guid": "385bf117-17f5-4689-8c5c-08c6cc821fed",
+          "app": {
+            "guid": "0a6636b5-7fc4-44d8-8752-0db3e40b35a5",
+            "process": {
+              "type": "web"
+            }
+          },
+          "weight": null,
+          "port": 8080
+        },
+        {
+          "guid": "27e96a3b-5bcf-49ed-8048-351e0be23e6f",
+          "app": {
+            "guid": "f61e59fa-2121-4217-8c7b-15bfd75baf25",
+            "process": {
+              "type": "web"
+            }
+          },
+          "weight": null,
+          "port": 8080
+        }
+      ],
+      "metadata": {
+        "labels": {},
+        "annotations": {}
+      },
+      "relationships": {
+        "space": {
+          "data": {
+            "guid": "885a8cb3-c07b-4856-b448-eeb10bf36236"
+          }
+        },
+        "domain": {
+          "data": {
+            "guid": "0b5f3633-194c-42d2-9408-972366617e0e"
+          }
+        }
+      },
+      "links": {
+        "self": {
+          "href": "https://api.example.org/v3/routes/cbad697f-cac1-48f4-9017-ac08f39dfb31"
+        },
+        "space": {
+          "href": "https://api.example.org/v3/spaces/885a8cb3-c07b-4856-b448-eeb10bf36236"
+        },
+        "domain": {
+          "href": "https://api.example.org/v3/domains/0b5f3633-194c-42d2-9408-972366617e0e"
+        },
+        "destinations": {
+          "href": "https://api.example.org/v3/routes/cbad697f-cac1-48f4-9017-ac08f39dfb31/destinations"
+        }
+      }
+    }
+  ]
+}
