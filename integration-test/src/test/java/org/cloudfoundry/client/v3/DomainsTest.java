@@ -20,6 +20,8 @@ import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.CloudFoundryVersion;
 import org.cloudfoundry.IfCloudFoundryVersion;
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v3.domains.CheckReservedRoutesRequest;
+import org.cloudfoundry.client.v3.domains.CheckReservedRoutesResponse;
 import org.cloudfoundry.client.v3.domains.CreateDomainRequest;
 import org.cloudfoundry.client.v3.domains.CreateDomainResponse;
 import org.cloudfoundry.client.v3.domains.DeleteDomainRequest;
@@ -36,6 +38,9 @@ import org.cloudfoundry.client.v3.domains.UpdateDomainRequest;
 import org.cloudfoundry.client.v3.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v3.organizations.CreateOrganizationResponse;
 import org.cloudfoundry.client.v3.organizations.ListOrganizationDomainsRequest;
+import org.cloudfoundry.client.v3.routes.CreateRouteRequest;
+import org.cloudfoundry.client.v3.routes.CreateRouteResponse;
+import org.cloudfoundry.client.v3.routes.RouteRelationships;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.junit.Test;
@@ -63,6 +68,128 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     @Autowired
     private Mono<String> organizationId;
+
+    @Autowired
+    private Mono<String> spaceId;
+
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_7)
+    @Test
+    public void checkReservedRoutes() {
+        String domainName = this.nameFactory.getDomainName();
+
+        this.organizationId
+            .flatMap(organizationId -> createDomainId(this.cloudFoundryClient, domainName, organizationId))
+            .flatMap(domainId ->
+                this.cloudFoundryClient.domainsV3()
+                    .checkReservedRoutes(CheckReservedRoutesRequest.builder()
+                        .domainId(domainId)
+                        .build()))
+            .as(StepVerifier::create)
+            .expectNext(CheckReservedRoutesResponse.builder()
+                .matchingRoute(false)
+                .build())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_7)
+    @Test
+    public void checkReservedRoutesByHost() {
+        String domainName = this.nameFactory.getDomainName();
+        String hostName = this.nameFactory.getHostName();
+
+        this.organizationId
+            .flatMap(organizationId -> Mono.zip(
+                createDomainId(this.cloudFoundryClient, domainName, organizationId),
+                this.spaceId
+            ))
+            .flatMap(function((domainId, spaceId) -> requestCreateRoute(this.cloudFoundryClient, domainId, hostName, null, null, spaceId)
+                .thenReturn(domainId)))
+            .flatMap(domainId -> this.cloudFoundryClient.domainsV3()
+                    .checkReservedRoutes(CheckReservedRoutesRequest.builder()
+                        .domainId(domainId)
+                        .host(hostName)
+                        .build()))
+            .as(StepVerifier::create)
+            .expectNext(CheckReservedRoutesResponse.builder()
+                .matchingRoute(true)
+                .build())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_7)
+    @Test
+    public void checkReservedRoutesByPath() {
+        String domainName = this.nameFactory.getDomainName();
+        String path = this.nameFactory.getPath();
+
+        this.organizationId
+            .flatMap(organizationId -> Mono.zip(
+                createDomainId(this.cloudFoundryClient, domainName, organizationId),
+                this.spaceId
+            ))
+            .flatMap(function((domainId, spaceId) -> requestCreateRoute(this.cloudFoundryClient, domainId, null, path,null, spaceId)
+                .thenReturn(domainId)))
+            .flatMap(domainId -> this.cloudFoundryClient.domainsV3()
+                .checkReservedRoutes(CheckReservedRoutesRequest.builder()
+                    .domainId(domainId)
+                    .path(path)
+                    .build()))
+            .as(StepVerifier::create)
+            .expectNext(CheckReservedRoutesResponse.builder()
+                .matchingRoute(true)
+                .build())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    //TODO: Establish router group availability. This test has not been verified.
+    public void checkReservedRoutesByPort() {
+        String domainName = this.nameFactory.getDomainName();
+        Integer port = this.nameFactory.getPort();
+
+        this.organizationId
+            .flatMap(organizationId -> Mono.zip(
+                createDomainId(this.cloudFoundryClient, domainName, organizationId),
+                this.spaceId
+            ))
+            .flatMap(function((domainId, spaceId) -> requestCreateRoute(this.cloudFoundryClient, domainId, null, null,port, spaceId)
+                .thenReturn(domainId)))
+            .flatMap(domainId -> this.cloudFoundryClient.domainsV3()
+                .checkReservedRoutes(CheckReservedRoutesRequest.builder()
+                    .domainId(domainId)
+                    .port(port)
+                    .build()))
+            .as(StepVerifier::create)
+            .expectNext(CheckReservedRoutesResponse.builder()
+                .matchingRoute(true)
+                .build())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    private static Mono<CreateRouteResponse> requestCreateRoute(CloudFoundryClient cloudFoundryClient, String domainId, String host, String path, Integer port, String spaceId) {
+
+        return cloudFoundryClient.routesV3()
+            .create(CreateRouteRequest.builder()
+                .host(host)
+                .path(path)
+                .port(port)
+                .relationships(RouteRelationships.builder()
+                    .domain(ToOneRelationship.builder()
+                        .data(Relationship.builder()
+                            .id(domainId)
+                            .build())
+                        .build())
+                    .space(ToOneRelationship.builder()
+                        .data(Relationship.builder()
+                            .id(spaceId)
+                            .build())
+                        .build())
+                    .build())
+                .build());
+    }
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_6)
     @Test

@@ -40,6 +40,14 @@ public interface SpacesV3 {
     Mono<CreateSpaceResponse> create(CreateSpaceRequest request);
 
     /**
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.77.0/index.html#delete-unmapped-routes-for-a-space">Delete Unmapped Routes</a> request
+     *
+     * @param request the Delete Unmapped Routes in Space request
+     * @return the response from the Delete Unmapped Routes in Space request
+     */
+    Mono<String> deleteUnmappedRoutes(DeleteUnmappedRoutesRequest request);
+
+    /**
      * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#get-a-space">Get Space</a> request
      *
      * @param request the Get Space request
@@ -70,6 +78,5 @@ public interface SpacesV3 {
      * @return the response from the Update Space request
      */
     Mono<UpdateSpaceResponse> update(UpdateSpaceRequest request);
-
 
 }

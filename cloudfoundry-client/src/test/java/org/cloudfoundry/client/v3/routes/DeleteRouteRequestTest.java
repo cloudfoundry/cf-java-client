@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2020 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,31 +14,23 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.builds;
+package org.cloudfoundry.client.v3.routes;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.Nullable;
-import org.immutables.value.Value;
+import org.junit.Test;
 
-/**
- * Represents a droplet
- */
-@JsonDeserialize
-@Value.Immutable
-abstract class _Droplet {
+public class DeleteRouteRequestTest {
 
-    /**
-     * The href
-     */
-    @JsonProperty("href")
-    @Nullable
-    abstract String getHref();
+    @Test(expected = IllegalStateException.class)
+    public void noRouteId() {
+        DeleteRouteRequest.builder()
+            .build();
+    }
 
-    /**
-     * The id
-     */
-    @JsonProperty("guid")
-    abstract String getId();
+    @Test
+    public void valid() {
+        DeleteRouteRequest.builder()
+            .routeId("test-route-id")
+            .build();
+    }
 
 }
