@@ -107,7 +107,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .flatMap(function((domainId, spaceId) -> Mono.zip(
                 createApplicationId(this.cloudFoundryClient, applicationName, spaceId),
                 Mono.just(domainId),
-                createRouteId(this.cloudFoundryClient, domainId, "listByDomain", spaceId)
+                createRouteId(this.cloudFoundryClient, domainId, "listApplicationRoutesByDomain", spaceId)
             )))
             .delayUntil(function((applicationId, domainId, routeId) -> requestReplaceDestinations(this.cloudFoundryClient, applicationId, routeId)))
             .flatMapMany(function((applicationId, domainId, ignore) -> PaginationUtils.requestClientV3Resources(page ->
@@ -120,7 +120,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .map(RouteResource::getMetadata)
             .map(Metadata::getLabels)
             .as(StepVerifier::create)
-            .expectNext(Collections.singletonMap("test-listByDomain-key", "test-listByDomain-value"))
+            .expectNext(Collections.singletonMap("test-listApplicationRoutesByDomain-key", "test-listApplicationRoutesByDomain-value"))
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -139,7 +139,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             ))
             .flatMap(function((domainId, spaceId) -> Mono.zip(
                 createApplicationId(this.cloudFoundryClient, applicationName, spaceId),
-                createRouteId(this.cloudFoundryClient, domainId, hostName, "listByHost", null, null, spaceId)
+                createRouteId(this.cloudFoundryClient, domainId, hostName, "listApplicationRoutesByHost", null, null, spaceId)
             )))
             .flatMap(function((applicationId, routeId) -> requestReplaceDestinations(this.cloudFoundryClient, applicationId, routeId)
                 .thenReturn(applicationId)))
@@ -150,11 +150,11 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                         .host(hostName)
                         .page(page)
                         .build())))
-            .filter(route -> route.getMetadata().getLabels().containsKey("test-listByHost-key"))
+            .filter(route -> route.getMetadata().getLabels().containsKey("test-listApplicationRoutesByHost-key"))
             .map(RouteResource::getMetadata)
             .map(Metadata::getLabels)
             .as(StepVerifier::create)
-            .expectNext(Collections.singletonMap("test-listByHost-key", "test-listByHost-value"))
+            .expectNext(Collections.singletonMap("test-listApplicationRoutesByHost-key", "test-listApplicationRoutesByHost-value"))
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -164,15 +164,16 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     public void listApplicationRoutesByLabelSelector() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
             .flatMap(organizationId -> Mono.zip(
                 createDomainId(this.cloudFoundryClient, domainName, organizationId),
-                this.spaceId
+                createSpaceId(this.cloudFoundryClient, organizationId, spaceName)
             ))
             .flatMap(function((domainId, spaceId) -> Mono.zip(
                 createApplicationId(this.cloudFoundryClient, applicationName, spaceId),
-                createRouteId(this.cloudFoundryClient, domainId, "listByLabelSelector", spaceId)
+                createRouteId(this.cloudFoundryClient, domainId, "listApplicationRoutesByLabelSelector", spaceId)
             )))
             .flatMapMany(function((applicationId, routeId) -> requestReplaceDestinations(this.cloudFoundryClient, applicationId, routeId)
                 .thenReturn(applicationId)))
@@ -180,13 +181,13 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 this.cloudFoundryClient.applicationsV3()
                     .listRoutes(ListApplicationRoutesRequest.builder()
                         .applicationId(applicationId)
-                        .labelSelector("test-listByLabelSelector-key=test-listByLabelSelector-value")
+                        .labelSelector("test-listApplicationRoutesByLabelSelector-key=test-listApplicationRoutesByLabelSelector-value")
                         .page(page)
                         .build())))
             .map(RouteResource::getMetadata)
             .map(Metadata::getLabels)
             .as(StepVerifier::create)
-            .expectNext(Collections.singletonMap("test-listByLabelSelector-key", "test-listByLabelSelector-value"))
+            .expectNext(Collections.singletonMap("test-listApplicationRoutesByLabelSelector-key", "test-listApplicationRoutesByLabelSelector-value"))
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -209,7 +210,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .flatMap(function((domainId, organizationId, spaceId) -> Mono.zip(
                 createApplicationId(this.cloudFoundryClient, applicationName, spaceId),
                 Mono.just(organizationId),
-                createRouteId(this.cloudFoundryClient, domainId, "listByOrganizationId", spaceId)
+                createRouteId(this.cloudFoundryClient, domainId, "listApplicationRoutesByOrganizationId", spaceId)
             )))
             .delayUntil(function((applicationId, organizationId, routeId) -> requestReplaceDestinations(this.cloudFoundryClient, applicationId, routeId)))
             .flatMapMany(function((applicationId, organizationId, ignore) -> PaginationUtils.requestClientV3Resources(page ->
@@ -222,7 +223,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .map(RouteResource::getMetadata)
             .map(Metadata::getLabels)
             .as(StepVerifier::create)
-            .expectNext(Collections.singletonMap("test-listByOrganizationId-key", "test-listByOrganizationId-value"))
+            .expectNext(Collections.singletonMap("test-listApplicationRoutesByOrganizationId-key", "test-listApplicationRoutesByOrganizationId-value"))
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -242,7 +243,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
             .flatMap(function((domainId, spaceId) -> Mono.zip(
                 createApplicationId(this.cloudFoundryClient, applicationName, spaceId),
-                createRouteId(this.cloudFoundryClient, domainId, null, "listByPath", path, null, spaceId)
+                createRouteId(this.cloudFoundryClient, domainId, null, "listApplicationRoutesByPath", path, null, spaceId)
             )))
             .flatMapMany(function((applicationId, routeId) -> requestReplaceDestinations(this.cloudFoundryClient, applicationId, routeId)
                 .thenReturn(applicationId)))
@@ -253,11 +254,11 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                         .path(path)
                         .page(page)
                         .build())))
-            .filter(route -> route.getMetadata().getLabels().containsKey("test-listByPath-key"))
+            .filter(route -> route.getMetadata().getLabels().containsKey("test-listApplicationRoutesByPath-key"))
             .map(RouteResource::getMetadata)
             .map(Metadata::getLabels)
             .as(StepVerifier::create)
-            .expectNext(Collections.singletonMap("test-listByPath-key", "test-listByPath-value"))
+            .expectNext(Collections.singletonMap("test-listApplicationRoutesByPath-key", "test-listApplicationRoutesByPath-value"))
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -278,7 +279,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
             .flatMap(function((domainId, spaceId) -> Mono.zip(
                 createApplicationId(this.cloudFoundryClient, applicationName, spaceId),
-                createRouteId(this.cloudFoundryClient, domainId, null, "listByPort", null, port, spaceId)
+                createRouteId(this.cloudFoundryClient, domainId, null, "listApplicationRoutesByPort", null, port, spaceId)
             )))
             .flatMapMany(function((applicationId, routeId) -> requestReplaceDestinations(this.cloudFoundryClient, applicationId, routeId)
                 .thenReturn(applicationId)))
@@ -289,11 +290,11 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                         .port(port)
                         .page(page)
                         .build())))
-            .filter(route -> route.getMetadata().getLabels().containsKey("test-listByPort-key"))
+            .filter(route -> route.getMetadata().getLabels().containsKey("test-listApplicationRoutesByPort-key"))
             .map(RouteResource::getMetadata)
             .map(Metadata::getLabels)
             .as(StepVerifier::create)
-            .expectNext(Collections.singletonMap("test-listByPort-key", "test-listByPort-value"))
+            .expectNext(Collections.singletonMap("test-listApplicationRoutesByPort-key", "test-listApplicationRoutesByPort-value"))
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -303,16 +304,17 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     public void listApplicationRoutesBySpaceId() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
+        String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
             .flatMap(organizationId -> Mono.zip(
                 createDomainId(this.cloudFoundryClient, domainName, organizationId),
-                this.spaceId
+                createSpaceId(this.cloudFoundryClient, organizationId, spaceName)
             ))
 
             .flatMap(function((domainId, spaceId) -> Mono.zip(
                 createApplicationId(this.cloudFoundryClient, applicationName, spaceId),
-                createRouteId(this.cloudFoundryClient, domainId, "listBySpaceId", spaceId),
+                createRouteId(this.cloudFoundryClient, domainId, "listApplicationRoutesBySpaceId", spaceId),
                 Mono.just(spaceId)
             )))
             .delayUntil(function((applicationId, routeId, spaceId) -> requestReplaceDestinations(this.cloudFoundryClient, applicationId, routeId)
@@ -324,11 +326,11 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                         .page(page)
                         .spaceId(spaceId)
                         .build()))))
-            .filter(route -> route.getMetadata().getLabels().containsKey("test-listBySpaceId-key"))
+            .filter(route -> route.getMetadata().getLabels().containsKey("test-listApplicationRoutesBySpaceId-key"))
             .map(RouteResource::getMetadata)
             .map(Metadata::getLabels)
             .as(StepVerifier::create)
-            .expectNext(Collections.singletonMap("test-listBySpaceId-key", "test-listBySpaceId-value"))
+            .expectNext(Collections.singletonMap("test-listApplicationRoutesBySpaceId-key", "test-listApplicationRoutesBySpaceId-value"))
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
