@@ -62,6 +62,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     @Autowired
     private Mono<String> spaceId;
 
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
     @Test
     public void listApplicationRoutes() {
         String applicationName = this.nameFactory.getApplicationName();
@@ -92,6 +93,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
     @Test
     public void listApplicationRoutesByDomain() {
         String applicationName = this.nameFactory.getApplicationName();
@@ -123,6 +125,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
     @Test
     public void listApplicationRoutesByHost() {
         String applicationName = this.nameFactory.getApplicationName();
@@ -156,6 +159,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
     @Test
     public void listApplicationRoutesByLabelSelector() {
         String applicationName = this.nameFactory.getApplicationName();
@@ -187,6 +191,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
     @Test
     public void listApplicationRoutesByOrganizationId() {
         String applicationName = this.nameFactory.getApplicationName();
@@ -222,6 +227,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
     @Test
     public void listApplicationRoutesByPath() {
         String applicationName = this.nameFactory.getApplicationName();
@@ -256,6 +262,43 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    //TODO: Test has not been validated
+    @IfCloudFoundryVersion(greaterThan = CloudFoundryVersion.PCF_2_9)
+    @Test
+    public void listApplicationRoutesByPort() {
+        String applicationName = this.nameFactory.getApplicationName();
+        String domainName = this.nameFactory.getDomainName();
+        Integer port = this.nameFactory.getPort();
+
+        this.organizationId
+            .flatMap(organizationId -> Mono.zip(
+                createDomainId(this.cloudFoundryClient, domainName, organizationId),
+                this.spaceId
+            ))
+
+            .flatMap(function((domainId, spaceId) -> Mono.zip(
+                createApplicationId(this.cloudFoundryClient, applicationName, spaceId),
+                createRouteId(this.cloudFoundryClient, domainId, null, "listByPort", null, port, spaceId)
+            )))
+            .flatMapMany(function((applicationId, routeId) -> requestReplaceDestinations(this.cloudFoundryClient, applicationId, routeId)
+                .thenReturn(applicationId)))
+            .flatMap(applicationId -> PaginationUtils.requestClientV3Resources(page ->
+                this.cloudFoundryClient.applicationsV3()
+                    .listRoutes(ListApplicationRoutesRequest.builder()
+                        .applicationId(applicationId)
+                        .port(port)
+                        .page(page)
+                        .build())))
+            .filter(route -> route.getMetadata().getLabels().containsKey("test-listByPort-key"))
+            .map(RouteResource::getMetadata)
+            .map(Metadata::getLabels)
+            .as(StepVerifier::create)
+            .expectNext(Collections.singletonMap("test-listByPort-key", "test-listByPort-value"))
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
     @Test
     public void listApplicationRoutesBySpaceId() {
         String applicationName = this.nameFactory.getApplicationName();
@@ -286,42 +329,6 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .map(Metadata::getLabels)
             .as(StepVerifier::create)
             .expectNext(Collections.singletonMap("test-listBySpaceId-key", "test-listBySpaceId-value"))
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
-    }
-
-    //TODO: Test has not been validated
-    @IfCloudFoundryVersion(greaterThan = CloudFoundryVersion.PCF_2_9)
-    @Test
-    public void listByPort() {
-        String applicationName = this.nameFactory.getApplicationName();
-        String domainName = this.nameFactory.getDomainName();
-        Integer port = this.nameFactory.getPort();
-
-        this.organizationId
-            .flatMap(organizationId -> Mono.zip(
-                createDomainId(this.cloudFoundryClient, domainName, organizationId),
-                this.spaceId
-            ))
-
-            .flatMap(function((domainId, spaceId) -> Mono.zip(
-                createApplicationId(this.cloudFoundryClient, applicationName, spaceId),
-                createRouteId(this.cloudFoundryClient, domainId, null, "listByPort", null, port, spaceId)
-            )))
-            .flatMapMany(function((applicationId, routeId) -> requestReplaceDestinations(this.cloudFoundryClient, applicationId, routeId)
-                .thenReturn(applicationId)))
-            .flatMap(applicationId -> PaginationUtils.requestClientV3Resources(page ->
-                this.cloudFoundryClient.applicationsV3()
-                    .listRoutes(ListApplicationRoutesRequest.builder()
-                        .applicationId(applicationId)
-                        .port(port)
-                        .page(page)
-                        .build())))
-            .filter(route -> route.getMetadata().getLabels().containsKey("test-listByPort-key"))
-            .map(RouteResource::getMetadata)
-            .map(Metadata::getLabels)
-            .as(StepVerifier::create)
-            .expectNext(Collections.singletonMap("test-listByPort-key", "test-listByPort-value"))
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
