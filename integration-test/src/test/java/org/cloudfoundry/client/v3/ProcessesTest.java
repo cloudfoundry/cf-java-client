@@ -48,6 +48,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -64,8 +65,9 @@ public final class ProcessesTest extends AbstractIntegrationTest {
     @Test
     public void get() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
+        Path path =  new ClassPathResource("test-application.zip").getFile().toPath();
 
-        createApplication(this.cloudFoundryOperations, applicationName)
+        createApplication(this.cloudFoundryOperations, applicationName, path)
             .then(getApplicationId(this.cloudFoundryOperations, applicationName))
             .flatMap(applicationId -> getProcessId(this.cloudFoundryClient, applicationId))
             .flatMap(processId -> this.cloudFoundryClient.processes()
@@ -82,8 +84,9 @@ public final class ProcessesTest extends AbstractIntegrationTest {
     @Test
     public void getStatistics() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
+        Path path =  new ClassPathResource("test-application.zip").getFile().toPath();
 
-        createApplication(this.cloudFoundryOperations, applicationName)
+        createApplication(this.cloudFoundryOperations, applicationName, path)
             .then(getApplicationId(this.cloudFoundryOperations, applicationName))
             .flatMap(applicationId -> getProcessId(this.cloudFoundryClient, applicationId))
             .flatMap(processId -> this.cloudFoundryClient.processes()
@@ -101,8 +104,9 @@ public final class ProcessesTest extends AbstractIntegrationTest {
     @Test
     public void list() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
+        Path path =  new ClassPathResource("test-application.zip").getFile().toPath();
 
-        createApplication(this.cloudFoundryOperations, applicationName)
+        createApplication(this.cloudFoundryOperations, applicationName, path)
             .then(getApplicationId(this.cloudFoundryOperations, applicationName))
             .flatMap(applicationId -> getProcessId(this.cloudFoundryClient, applicationId))
             .flatMapMany(processId -> PaginationUtils.requestClientV3Resources(page -> this.cloudFoundryClient.processes()
@@ -120,8 +124,9 @@ public final class ProcessesTest extends AbstractIntegrationTest {
     @Test
     public void scale() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
+        Path path =  new ClassPathResource("test-application.zip").getFile().toPath();
 
-        createApplication(this.cloudFoundryOperations, applicationName)
+        createApplication(this.cloudFoundryOperations, applicationName, path)
             .then(getApplicationId(this.cloudFoundryOperations, applicationName))
             .flatMap(applicationId -> getProcessId(this.cloudFoundryClient, applicationId))
             .flatMap(processId -> this.cloudFoundryClient.processes()
@@ -141,8 +146,9 @@ public final class ProcessesTest extends AbstractIntegrationTest {
     @Test
     public void terminateInstance() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
+        Path path =  new ClassPathResource("test-application.zip").getFile().toPath();
 
-        createApplication(this.cloudFoundryOperations, applicationName)
+        createApplication(this.cloudFoundryOperations, applicationName, path)
             .then(getApplicationId(this.cloudFoundryOperations, applicationName))
             .flatMap(applicationId -> getProcessId(this.cloudFoundryClient, applicationId))
             .flatMap(processId -> this.cloudFoundryClient.processes()
@@ -160,8 +166,9 @@ public final class ProcessesTest extends AbstractIntegrationTest {
     @Test
     public void update() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
+        Path path =  new ClassPathResource("test-application.zip").getFile().toPath();
 
-        createApplication(this.cloudFoundryOperations, applicationName)
+        createApplication(this.cloudFoundryOperations, applicationName, path)
             .then(getApplicationId(this.cloudFoundryOperations, applicationName))
             .flatMap(applicationId -> getProcessId(this.cloudFoundryClient, applicationId))
             .flatMap(processId -> this.cloudFoundryClient.processes()
@@ -181,7 +188,7 @@ public final class ProcessesTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    private static Mono<Void> createApplication(CloudFoundryOperations cloudFoundryOperations, String name) throws IOException {
+    private static Mono<Void> createApplication(CloudFoundryOperations cloudFoundryOperations, String name, Path path) throws IOException {
         return cloudFoundryOperations.applications()
             .push(PushApplicationRequest.builder()
                 .buildpack("staticfile_buildpack")
@@ -189,7 +196,7 @@ public final class ProcessesTest extends AbstractIntegrationTest {
                 .healthCheckType(ApplicationHealthCheck.PORT)
                 .memory(64)
                 .name(name)
-                .path(new ClassPathResource("test-application.zip").getFile().toPath())
+                .path(path)
                 .noStart(false)
                 .build());
     }

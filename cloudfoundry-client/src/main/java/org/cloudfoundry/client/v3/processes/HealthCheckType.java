@@ -56,6 +56,8 @@ public enum HealthCheckType {
         switch (s.toLowerCase()) {
             case "http":
                 return HTTP;
+            case "none":
+                return NONE;
             case "port":
                 return PORT;
             case "process":
