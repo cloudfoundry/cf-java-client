@@ -32,7 +32,7 @@ public enum ProcessState {
     /**
      * The down state
      */
-    DOWN("down"),
+    DOWN("DOWN"),
 
     /**
      * The running state
@@ -42,7 +42,7 @@ public enum ProcessState {
     /**
      * The starting state
      */
-    STARTING("starting");
+    STARTING("STARTING");
 
     private final String value;
 
