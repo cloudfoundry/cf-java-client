@@ -49,7 +49,7 @@ abstract class _ApplicationManifest {
         }
 
         if (getDocker() != null) {
-            if (getDocker().getImage() != null && getBuildpack() != null) {
+            if (getDocker().getImage() != null && getBuildpacks() != null && !getBuildpacks().isEmpty()) {
                 throw new IllegalStateException("docker image and buildpack cannot both be set");
             }
 
@@ -72,10 +72,10 @@ abstract class _ApplicationManifest {
     }
 
     /**
-     * The buildpack used by the application
+     * The buildpacks used by the application
      */
     @Nullable
-    abstract String getBuildpack();
+    abstract List<String> getBuildpacks();
 
     /**
      * The command used to execute the application

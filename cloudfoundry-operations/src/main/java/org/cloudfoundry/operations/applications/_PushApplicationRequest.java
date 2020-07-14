@@ -21,6 +21,7 @@ import org.immutables.value.Value;
 
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.List;
 
 /**
  * The request options for the push application operation
@@ -64,10 +65,10 @@ abstract class _PushApplicationRequest {
     abstract Path getApplication();
 
     /**
-     * The buildpack for the application
+     * The buildpacks for the application
      */
     @Nullable
-    abstract String getBuildpack();
+    abstract List<String> getBuildpacks();
 
     /**
      * The custom start command for the application

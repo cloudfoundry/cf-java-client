@@ -104,8 +104,8 @@ import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
 import org.cloudfoundry.client.v2.stacks.ListStacksResponse;
 import org.cloudfoundry.client.v2.stacks.StackEntity;
 import org.cloudfoundry.client.v3.BuildpackData;
+import org.cloudfoundry.client.v3.DockerData;
 import org.cloudfoundry.client.v3.Lifecycle;
-import org.cloudfoundry.client.v3.LifecycleType;
 import org.cloudfoundry.client.v3.applications.ApplicationState;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsResponse;
@@ -145,6 +145,8 @@ import java.util.Queue;
 import java.util.function.Supplier;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.cloudfoundry.client.v3.LifecycleType.BUILDPACK;
+import static org.cloudfoundry.client.v3.LifecycleType.DOCKER;
 import static org.cloudfoundry.operations.TestObjects.fill;
 import static org.mockito.Mockito.RETURNS_SMART_NULLS;
 import static org.mockito.Mockito.mock;
@@ -411,11 +413,12 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     public void get() {
-        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
-        requestApplicationStatistics(this.cloudFoundryClient, "test-metadata-id");
+        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
+        requestApplicationStatistics(this.cloudFoundryClient, "test-application-id");
         requestStack(this.cloudFoundryClient, "test-application-stackId");
-        requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
-        requestApplicationInstances(this.cloudFoundryClient, "test-metadata-id");
+        requestApplicationSummary(this.cloudFoundryClient, "test-application-id");
+        requestApplicationInstances(this.cloudFoundryClient, "test-application-id");
+        requestGetApplicationV3Buildpack(this.cloudFoundryClient, "test-application-id");
 
         this.applications
             .get(GetApplicationRequest.builder()
@@ -423,7 +426,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .build())
             .as(StepVerifier::create)
             .expectNext(fill(ApplicationDetail.builder())
-                .buildpack("test-application-summary-buildpack")
+                .buildpack("test-buildpack")
                 .id("test-application-summary-id")
                 .instanceDetail(fill(InstanceDetail.builder())
                     .index("instance-0")
@@ -442,9 +445,10 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     public void getApplicationManifest() {
-        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
-        requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
+        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
+        requestApplicationSummary(this.cloudFoundryClient, "test-application-id");
         requestStack(this.cloudFoundryClient, "test-application-summary-stackId");
+        requestGetApplicationV3BuildpackMultiple(this.cloudFoundryClient, "test-application-id");
 
         this.applications
             .getApplicationManifest(GetApplicationManifestRequest.builder()
@@ -452,7 +456,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .build())
             .as(StepVerifier::create)
             .expectNext(ApplicationManifest.builder()
-                .buildpack("test-application-summary-buildpack")
+                .buildpacks("test-buildpack-1", "test-buildpack-2")
                 .command("test-application-summary-command")
                 .disk(1)
                 .environmentVariables(Collections.emptyMap())
@@ -474,9 +478,10 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     public void getApplicationManifestDocker() {
-        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
-        requestApplicationSummaryDocker(this.cloudFoundryClient, "test-metadata-id");
+        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
+        requestApplicationSummaryDocker(this.cloudFoundryClient, "test-application-id");
         requestStack(this.cloudFoundryClient, "test-application-summary-stackId");
+        requestGetApplicationV3Docker(this.cloudFoundryClient, "test-application-id");
 
         this.applications
             .getApplicationManifest(GetApplicationManifestRequest.builder()
@@ -510,9 +515,10 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     public void getApplicationManifestNoRoutes() {
-        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
-        requestApplicationSummaryNoRoutes(this.cloudFoundryClient, "test-metadata-id");
+        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
+        requestApplicationSummaryNoRoutes(this.cloudFoundryClient, "test-application-id");
         requestStack(this.cloudFoundryClient, "test-application-summary-stackId");
+        requestGetApplicationV3Buildpack(this.cloudFoundryClient, "test-application-id");
 
         this.applications
             .getApplicationManifest(GetApplicationManifestRequest.builder()
@@ -520,7 +526,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .build())
             .as(StepVerifier::create)
             .expectNext(ApplicationManifest.builder()
-                .buildpack("test-application-summary-buildpack")
+                .buildpack("test-buildpack")
                 .command("test-application-summary-command")
                 .disk(1)
                 .environmentVariables(Collections.emptyMap())
@@ -539,9 +545,10 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     public void getApplicationManifestTcp() {
-        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
-        requestApplicationSummaryTcp(this.cloudFoundryClient, "test-metadata-id");
+        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
+        requestApplicationSummaryTcp(this.cloudFoundryClient, "test-application-id");
         requestStack(this.cloudFoundryClient, "test-application-summary-stackId");
+        requestGetApplicationV3Buildpack(this.cloudFoundryClient, "test-application-id");
 
         this.applications
             .getApplicationManifest(GetApplicationManifestRequest.builder()
@@ -549,7 +556,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .build())
             .as(StepVerifier::create)
             .expectNext(ApplicationManifest.builder()
-                .buildpack("test-application-summary-buildpack")
+                .buildpack("test-buildpack")
                 .command("test-application-summary-command")
                 .disk(1)
                 .environmentVariables(Collections.emptyMap())
@@ -571,11 +578,12 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     public void getBuildpackError() {
-        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
-        requestApplicationStatistics(this.cloudFoundryClient, "test-metadata-id");
+        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
+        requestApplicationStatistics(this.cloudFoundryClient, "test-application-id");
         requestStack(this.cloudFoundryClient, "test-application-stackId");
-        requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
-        requestApplicationInstancesError(this.cloudFoundryClient, "test-metadata-id", 170004);
+        requestApplicationSummary(this.cloudFoundryClient, "test-application-id");
+        requestApplicationInstancesError(this.cloudFoundryClient, "test-application-id", 170004);
+        requestGetApplicationV3Buildpack(this.cloudFoundryClient, "test-application-id");
 
         this.applications
             .get(GetApplicationRequest.builder()
@@ -583,7 +591,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .build())
             .as(StepVerifier::create)
             .expectNext(fill(ApplicationDetail.builder())
-                .buildpack("test-application-summary-buildpack")
+                .buildpack("test-buildpack")
                 .id("test-application-summary-id")
                 .lastUploaded(new Date(0))
                 .name("test-application-summary-name")
@@ -597,11 +605,12 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     public void getDetectedBuildpack() {
-        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
-        requestApplicationStatistics(this.cloudFoundryClient, "test-metadata-id");
+        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
+        requestApplicationStatistics(this.cloudFoundryClient, "test-application-id");
         requestStack(this.cloudFoundryClient, "test-application-stackId");
-        requestApplicationSummaryDetectedBuildpack(this.cloudFoundryClient, "test-metadata-id");
-        requestApplicationInstances(this.cloudFoundryClient, "test-metadata-id");
+        requestApplicationSummaryDetectedBuildpack(this.cloudFoundryClient, "test-application-id");
+        requestApplicationInstances(this.cloudFoundryClient, "test-application-id");
+        requestGetApplicationV3Docker(this.cloudFoundryClient, "test-application-id");
 
         this.applications
             .get(GetApplicationRequest.builder()
@@ -848,11 +857,12 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     public void getInstancesError() {
-        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
-        requestApplicationStatistics(this.cloudFoundryClient, "test-metadata-id");
+        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
+        requestApplicationStatistics(this.cloudFoundryClient, "test-application-id");
         requestStack(this.cloudFoundryClient, "test-application-stackId");
-        requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
-        requestApplicationInstancesError(this.cloudFoundryClient, "test-metadata-id", 220001);
+        requestApplicationSummary(this.cloudFoundryClient, "test-application-id");
+        requestApplicationInstancesError(this.cloudFoundryClient, "test-application-id", 220001);
+        requestGetApplicationV3Buildpack(this.cloudFoundryClient, "test-application-id");
 
         this.applications
             .get(GetApplicationRequest.builder()
@@ -860,7 +870,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .build())
             .as(StepVerifier::create)
             .expectNext(fill(ApplicationDetail.builder())
-                .buildpack("test-application-summary-buildpack")
+                .buildpack("test-buildpack")
                 .id("test-application-summary-id")
                 .lastUploaded(new Date(0))
                 .name("test-application-summary-name")
@@ -874,11 +884,12 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     public void getNoBuildpack() {
-        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
-        requestApplicationStatistics(this.cloudFoundryClient, "test-metadata-id");
+        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
+        requestApplicationStatistics(this.cloudFoundryClient, "test-application-id");
         requestStack(this.cloudFoundryClient, "test-application-stackId");
-        requestApplicationSummaryNoBuildpack(this.cloudFoundryClient, "test-metadata-id");
-        requestApplicationInstances(this.cloudFoundryClient, "test-metadata-id");
+        requestApplicationSummaryNoBuildpack(this.cloudFoundryClient, "test-application-id");
+        requestApplicationInstances(this.cloudFoundryClient, "test-application-id");
+        requestGetApplicationV3Docker(this.cloudFoundryClient, "test-application-id");
 
         this.applications
             .get(GetApplicationRequest.builder()
@@ -905,11 +916,12 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     public void getStagingError() {
-        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
-        requestApplicationStatistics(this.cloudFoundryClient, "test-metadata-id");
+        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
+        requestApplicationStatistics(this.cloudFoundryClient, "test-application-id");
         requestStack(this.cloudFoundryClient, "test-application-stackId");
-        requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
-        requestApplicationInstancesError(this.cloudFoundryClient, "test-metadata-id", 170002);
+        requestApplicationSummary(this.cloudFoundryClient, "test-application-id");
+        requestApplicationInstancesError(this.cloudFoundryClient, "test-application-id", 170002);
+        requestGetApplicationV3Buildpack(this.cloudFoundryClient, "test-application-id");
 
         this.applications
             .get(GetApplicationRequest.builder()
@@ -917,7 +929,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .build())
             .as(StepVerifier::create)
             .expectNext(fill(ApplicationDetail.builder())
-                .buildpack("test-application-summary-buildpack")
+                .buildpack("test-buildpack")
                 .id("test-application-summary-id")
                 .lastUploaded(new Date(0))
                 .name("test-application-summary-name")
@@ -931,11 +943,12 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     public void getStoppedError() {
-        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
-        requestApplicationStatisticsError(this.cloudFoundryClient, "test-metadata-id", 200003);
+        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
+        requestApplicationStatisticsError(this.cloudFoundryClient, "test-application-id", 200003);
         requestStack(this.cloudFoundryClient, "test-application-stackId");
-        requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
-        requestApplicationInstances(this.cloudFoundryClient, "test-metadata-id");
+        requestApplicationSummary(this.cloudFoundryClient, "test-application-id");
+        requestApplicationInstances(this.cloudFoundryClient, "test-application-id");
+        requestGetApplicationV3Buildpack(this.cloudFoundryClient, "test-application-id");
 
         this.applications
             .get(GetApplicationRequest.builder()
@@ -943,7 +956,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .build())
             .as(StepVerifier::create)
             .expectNext(fill(ApplicationDetail.builder())
-                .buildpack("test-application-summary-buildpack")
+                .buildpack("test-buildpack")
                 .id("test-application-summary-id")
                 .instanceDetail(InstanceDetail.builder()
                     .index("instance-0")
@@ -962,11 +975,12 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     public void getWithEmptyInstance() {
-        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
-        requestApplicationStatistics(this.cloudFoundryClient, "test-metadata-id");
+        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
+        requestApplicationStatistics(this.cloudFoundryClient, "test-application-id");
         requestStack(this.cloudFoundryClient, "test-application-stackId");
-        requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
-        requestApplicationEmptyInstance(this.cloudFoundryClient, "test-metadata-id");
+        requestApplicationSummary(this.cloudFoundryClient, "test-application-id");
+        requestApplicationEmptyInstance(this.cloudFoundryClient, "test-application-id");
+        requestGetApplicationV3Buildpack(this.cloudFoundryClient, "test-application-id");
 
         this.applications
             .get(GetApplicationRequest.builder()
@@ -974,7 +988,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .build())
             .as(StepVerifier::create)
             .expectNext(fill(ApplicationDetail.builder())
-                .buildpack("test-application-summary-buildpack")
+                .buildpack("test-buildpack")
                 .id("test-application-summary-id")
                 .instanceDetail(fill(InstanceDetail.builder())
                     .index("instance-0")
@@ -993,11 +1007,12 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     public void getWithEmptyInstanceStats() {
-        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
-        requestApplicationEmptyStats(this.cloudFoundryClient, "test-metadata-id");
+        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
+        requestApplicationEmptyStats(this.cloudFoundryClient, "test-application-id");
         requestStack(this.cloudFoundryClient, "test-application-stackId");
-        requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
-        requestApplicationInstances(this.cloudFoundryClient, "test-metadata-id");
+        requestApplicationSummary(this.cloudFoundryClient, "test-application-id");
+        requestApplicationInstances(this.cloudFoundryClient, "test-application-id");
+        requestGetApplicationV3Buildpack(this.cloudFoundryClient, "test-application-id");
 
         this.applications
             .get(GetApplicationRequest.builder()
@@ -1005,7 +1020,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .build())
             .as(StepVerifier::create)
             .expectNext(fill(ApplicationDetail.builder())
-                .buildpack("test-application-summary-buildpack")
+                .buildpack("test-buildpack")
                 .id("test-application-summary-id")
                 .instanceDetail(InstanceDetail.builder()
                     .index("instance-0")
@@ -1024,11 +1039,12 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     public void getWithNoInstances() {
-        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
-        requestApplicationStatistics(this.cloudFoundryClient, "test-metadata-id");
+        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
+        requestApplicationStatistics(this.cloudFoundryClient, "test-application-id");
         requestStack(this.cloudFoundryClient, "test-application-stackId");
-        requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
-        requestApplicationNoInstances(this.cloudFoundryClient, "test-metadata-id");
+        requestApplicationSummary(this.cloudFoundryClient, "test-application-id");
+        requestApplicationNoInstances(this.cloudFoundryClient, "test-application-id");
+        requestGetApplicationV3Buildpack(this.cloudFoundryClient, "test-application-id");
 
         this.applications
             .get(GetApplicationRequest.builder()
@@ -1036,7 +1052,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .build())
             .as(StepVerifier::create)
             .expectNext(fill(ApplicationDetail.builder())
-                .buildpack("test-application-summary-buildpack")
+                .buildpack("test-buildpack")
                 .id("test-application-summary-id")
                 .lastUploaded(new Date(0))
                 .name("test-application-summary-name")
@@ -1050,11 +1066,12 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     public void getWithNullStats() {
-        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
-        requestApplicationNullStats(this.cloudFoundryClient, "test-metadata-id");
+        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
+        requestApplicationNullStats(this.cloudFoundryClient, "test-application-id");
         requestStack(this.cloudFoundryClient, "test-application-stackId");
-        requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
-        requestApplicationInstances(this.cloudFoundryClient, "test-metadata-id");
+        requestApplicationSummary(this.cloudFoundryClient, "test-application-id");
+        requestApplicationInstances(this.cloudFoundryClient, "test-application-id");
+        requestGetApplicationV3Buildpack(this.cloudFoundryClient, "test-application-id");
 
         this.applications
             .get(GetApplicationRequest.builder()
@@ -1062,7 +1079,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .build())
             .as(StepVerifier::create)
             .expectNext(fill(ApplicationDetail.builder())
-                .buildpack("test-application-summary-buildpack")
+                .buildpack("test-buildpack")
                 .id("test-application-summary-id")
                 .instanceDetail(InstanceDetail.builder()
                     .index("instance-0")
@@ -1081,11 +1098,12 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     public void getWithNullUsage() {
-        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
-        requestApplicationNullUsage(this.cloudFoundryClient, "test-metadata-id");
+        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
+        requestApplicationNullUsage(this.cloudFoundryClient, "test-application-id");
         requestStack(this.cloudFoundryClient, "test-application-stackId");
-        requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
-        requestApplicationInstances(this.cloudFoundryClient, "test-metadata-id");
+        requestApplicationSummary(this.cloudFoundryClient, "test-application-id");
+        requestApplicationInstances(this.cloudFoundryClient, "test-application-id");
+        requestGetApplicationV3Buildpack(this.cloudFoundryClient, "test-application-id");
 
         this.applications
             .get(GetApplicationRequest.builder()
@@ -1093,7 +1111,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .build())
             .as(StepVerifier::create)
             .expectNext(fill(ApplicationDetail.builder())
-                .buildpack("test-application-summary-buildpack")
+                .buildpack("test-buildpack")
                 .id("test-application-summary-id")
                 .instanceDetail(InstanceDetail.builder()
                     .index("instance-0")
@@ -3115,6 +3133,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .build()))
             .thenReturn(Mono
                 .just(fill(SummaryApplicationResponse.builder(), "application-summary-")
+                    .buildpack("test-buildpack")
                     .healthCheckType("port")
                     .packageUpdatedAt(DateUtils.formatToIso8601(new Date(0)))
                     .route(fill(org.cloudfoundry.client.v2.routes.Route.builder(), "route-")
@@ -3196,6 +3215,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .build()))
             .thenReturn(Mono
                 .just(fill(SummaryApplicationResponse.builder(), "application-summary-")
+                    .buildpack("test-buildpack")
                     .healthCheckType("port")
                     .dockerImage(null)
                     .dockerCredentials(null)
@@ -3210,6 +3230,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .build()))
             .thenReturn(Mono
                 .just(fill(SummaryApplicationResponse.builder(), "application-summary-")
+                    .buildpack("test-buildpack")
                     .healthCheckType("port")
                     .packageUpdatedAt(DateUtils.formatToIso8601(new Date(0)))
                     .route(fill(org.cloudfoundry.client.v2.routes.Route.builder(), "route-")
@@ -3295,7 +3316,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                             .data(BuildpackData.builder()
                                 .buildpack("test-buildpack")
                                 .build())
-                            .type(LifecycleType.BUILDPACK)
+                            .type(BUILDPACK)
                             .build())
                         .name("test-name")
                         .state(ApplicationState.STOPPED)
@@ -3357,21 +3378,25 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     private static void requestCreateApplication(CloudFoundryClient cloudFoundryClient, ApplicationManifest manifest, String spaceId, String stackId, String applicationId) {
+        CreateApplicationRequest.Builder builder = CreateApplicationRequest.builder()
+            .command(manifest.getCommand())
+            .diskQuota(manifest.getDisk())
+            .environmentJsons(manifest.getEnvironmentVariables())
+            .healthCheckTimeout(manifest.getTimeout())
+            .healthCheckHttpEndpoint(manifest.getHealthCheckHttpEndpoint())
+            .healthCheckType(Optional.ofNullable(manifest.getHealthCheckType()).map(ApplicationHealthCheck::getValue).orElse(null))
+            .instances(manifest.getInstances())
+            .memory(manifest.getMemory())
+            .name(manifest.getName())
+            .spaceId(spaceId)
+            .stackId(stackId);
+
+        if (manifest.getBuildpacks() != null) {
+            builder.buildpack(manifest.getBuildpacks().get(0));
+        }
+
         when(cloudFoundryClient.applicationsV2()
-            .create(CreateApplicationRequest.builder()
-                .buildpack(manifest.getBuildpack())
-                .command(manifest.getCommand())
-                .diskQuota(manifest.getDisk())
-                .environmentJsons(manifest.getEnvironmentVariables())
-                .healthCheckTimeout(manifest.getTimeout())
-                .healthCheckHttpEndpoint(manifest.getHealthCheckHttpEndpoint())
-                .healthCheckType(Optional.ofNullable(manifest.getHealthCheckType()).map(ApplicationHealthCheck::getValue).orElse(null))
-                .instances(manifest.getInstances())
-                .memory(manifest.getMemory())
-                .name(manifest.getName())
-                .spaceId(spaceId)
-                .stackId(stackId)
-                .build()))
+            .create(builder.build()))
             .thenReturn(Mono
                 .just(fill(CreateApplicationResponse.builder(), "create-")
                     .metadata(fill(Metadata.builder())
@@ -3386,7 +3411,6 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
 
         when(cloudFoundryClient.applicationsV2()
             .create(requestBuilder
-                .buildpack(request.getBuildpack())
                 .command(request.getCommand())
                 .diego(true)
                 .diskQuota(request.getDiskQuota())
@@ -3543,6 +3567,69 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                         .packageState("STAGING")
                         .build())
                     .build()));
+    }
+
+    private static void requestGetApplicationV3Buildpack(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        when(cloudFoundryClient.applicationsV3()
+            .get(org.cloudfoundry.client.v3.applications.GetApplicationRequest.builder()
+                .applicationId(applicationId)
+                .build()))
+            .thenReturn(Mono
+                .just(org.cloudfoundry.client.v3.applications.GetApplicationResponse.builder()
+                    .createdAt("test-created-at")
+                    .id(applicationId)
+                    .lifecycle(Lifecycle.builder()
+                        .data(BuildpackData.builder()
+                            .buildpack("test-buildpack")
+                            .build())
+                        .type(BUILDPACK)
+                        .build())
+                    .name("test-name")
+                    .state(ApplicationState.STOPPED)
+                    .updatedAt("test-updated-at")
+                    .build()));
+    }
+
+    private static void requestGetApplicationV3BuildpackMultiple(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        when(cloudFoundryClient.applicationsV3()
+            .get(org.cloudfoundry.client.v3.applications.GetApplicationRequest.builder()
+                .applicationId(applicationId)
+                .build()))
+            .thenReturn(Mono
+                .just(org.cloudfoundry.client.v3.applications.GetApplicationResponse.builder()
+                    .createdAt("test-created-at")
+                    .id(applicationId)
+                    .lifecycle(Lifecycle.builder()
+                        .data(BuildpackData.builder()
+                            .buildpacks("test-buildpack-1", "test-buildpack-2")
+                            .build())
+                        .type(BUILDPACK)
+                        .build())
+                    .name("test-name")
+                    .state(ApplicationState.STOPPED)
+                    .updatedAt("test-updated-at")
+                    .build()));
+    }
+
+    private static void requestGetApplicationV3Docker(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        when(cloudFoundryClient.applicationsV3()
+            .get(org.cloudfoundry.client.v3.applications.GetApplicationRequest.builder()
+                .applicationId(applicationId)
+                .build()))
+            .thenReturn(Mono
+                .just(org.cloudfoundry.client.v3.applications.GetApplicationResponse.builder()
+                    .createdAt("test-created-at")
+                    .id(applicationId)
+                    .lifecycle(Lifecycle.builder()
+                        .data(DockerData.builder()
+                            .build())
+                        .type(DOCKER)
+                        .build())
+                    .name("test-name")
+                    .state(ApplicationState.STOPPED)
+                    .updatedAt("test-updated-at")
+                    .build()));
+
     }
 
     private static void requestGetSharedDomain(CloudFoundryClient cloudFoundryClient, String domainId) {
@@ -4010,18 +4097,21 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     private static void requestUpdateApplication(CloudFoundryClient cloudFoundryClient, String applicationId, ApplicationManifest manifest, String stackId) {
-        UpdateApplicationRequest.Builder requestBuilder = UpdateApplicationRequest.builder();
+        UpdateApplicationRequest.Builder builder = UpdateApplicationRequest.builder();
         if (manifest.getDocker() != null) {
-            Optional.ofNullable(manifest.getDocker().getImage()).ifPresent(requestBuilder::dockerImage);
+            Optional.ofNullable(manifest.getDocker().getImage()).ifPresent(builder::dockerImage);
             String dockerUsername = manifest.getDocker().getUsername();
             String dockerPassword = manifest.getDocker().getPassword();
-            requestBuilder.dockerCredentials(DockerCredentials.builder().username(dockerUsername).password(dockerPassword).build());
+            builder.dockerCredentials(DockerCredentials.builder().username(dockerUsername).password(dockerPassword).build());
+        }
+
+        if (manifest.getBuildpacks() != null) {
+            builder.buildpack(manifest.getBuildpacks().get(0));
         }
 
         when(cloudFoundryClient.applicationsV2()
-            .update(UpdateApplicationRequest.builder()
+            .update(builder
                 .applicationId(applicationId)
-                .buildpack(manifest.getBuildpack())
                 .command(manifest.getCommand())
                 .diskQuota(manifest.getDisk())
                 .environmentJsons(manifest.getEnvironmentVariables())

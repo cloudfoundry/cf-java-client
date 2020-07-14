@@ -1,5 +1,6 @@
 ---
-buildpack: charlie-buildpack
+buildpacks:
+- charlie-buildpack
 command: charlie-command
 disk_quota: -1
 health-check-http-endpoint: charlie-health-check-http-endpoint
@@ -25,7 +26,8 @@ applications:
 - name: charlie-application-1
 
 - name: charlie-application-2
-  buildpack: alternate-buildpack
+  buildpacks:
+  - alternate-buildpack
   command: alternate-command
   disk_quota: -2
   health-check-http-endpoint: alternate-health-check-http-endpoint

@@ -1,3 +1,4 @@
 ---
 applications:
-- buildpack: foxtrot-buildpack
+- buildpacks:
+  - foxtrot-buildpack

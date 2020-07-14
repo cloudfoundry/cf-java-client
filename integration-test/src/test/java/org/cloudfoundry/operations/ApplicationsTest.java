@@ -75,7 +75,9 @@ import reactor.test.StepVerifier;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -282,6 +284,38 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
+    public void getMultipleBuildpacks() throws IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        createApplicationPhp(this.cloudFoundryOperations, new ClassPathResource("test-php.zip").getFile().toPath(), applicationName, true)
+            .then(this.cloudFoundryOperations.applications()
+                .get(GetApplicationRequest.builder()
+                    .name(applicationName)
+                    .build()))
+            .map(ApplicationDetail::getBuildpacks)
+            .as(StepVerifier::create)
+            .expectNext(Arrays.asList("staticfile_buildpack", "php_buildpack"))
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void getMultipleBuildpacksManifest() throws IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        createApplicationPhp(this.cloudFoundryOperations, new ClassPathResource("test-php.zip").getFile().toPath(), applicationName, true)
+            .then(this.cloudFoundryOperations.applications()
+                .getApplicationManifest(GetApplicationManifestRequest.builder()
+                    .name(applicationName)
+                    .build()))
+            .map(ApplicationManifest::getBuildpacks)
+            .as(StepVerifier::create)
+            .expectNext(Arrays.asList("staticfile_buildpack", "php_buildpack"))
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
     public void getStopped() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
@@ -469,6 +503,54 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .name(applicationName)
                     .build()))
             .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void pushManifestMultipleBuildpacks() throws IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+        List<String> buildpacks = Arrays.asList("staticfile_buildpack", "php_buildpack");
+
+        this.cloudFoundryOperations.applications()
+            .pushManifest(PushApplicationManifestRequest.builder()
+                .manifest(ApplicationManifest.builder()
+                    .buildpacks(buildpacks)
+                    .disk(512)
+                    .healthCheckType(ApplicationHealthCheck.PORT)
+                    .memory(64)
+                    .name(applicationName)
+                    .path(new ClassPathResource("test-php.zip").getFile().toPath())
+                    .build())
+                .noStart(true)
+                .build())
+            .then(requestGetManifest(this.cloudFoundryOperations, applicationName))
+            .map(ApplicationManifest::getBuildpacks)
+            .as(StepVerifier::create)
+            .expectNext(buildpacks)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void pushMultipleBuildpacks() throws IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+        List<String> buildpacks = Arrays.asList("staticfile_buildpack", "php_buildpack");
+
+        this.cloudFoundryOperations.applications()
+            .push(PushApplicationRequest.builder()
+                .buildpacks("staticfile_buildpack", "php_buildpack")
+                .diskQuota(512)
+                .healthCheckType(ApplicationHealthCheck.NONE)
+                .memory(64)
+                .name(applicationName)
+                .noStart(true)
+                .path(new ClassPathResource("test-php.zip").getFile().toPath())
+                .build())
+            .then(requestGetManifest(this.cloudFoundryOperations, applicationName))
+            .map(ApplicationManifest::getBuildpacks)
+            .as(StepVerifier::create)
+            .expectNext(buildpacks)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -691,10 +773,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                         .build())
                     .noStart(true)
                     .build()))
-            .then(this.cloudFoundryOperations.applications()
-                .getApplicationManifest(GetApplicationManifestRequest.builder()
-                    .name(applicationName)
-                    .build()))
+            .then(requestGetManifest(this.cloudFoundryOperations, applicationName))
             .map(manifest -> manifest.getRoutes().get(0).getRoute())
             .as(StepVerifier::create)
             .consumeNextWith(route -> assertThat(route).matches(domainName + "+?:\\d+$"))
@@ -1183,6 +1262,19 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .build());
     }
 
+    private static Mono<Void> createApplicationPhp(CloudFoundryOperations cloudFoundryOperations, Path application, String name, Boolean noStart) {
+        return cloudFoundryOperations.applications()
+            .push(PushApplicationRequest.builder()
+                .buildpacks("staticfile_buildpack", "php_buildpack")
+                .diskQuota(512)
+                .healthCheckType(ApplicationHealthCheck.NONE)
+                .memory(64)
+                .name(name)
+                .noStart(noStart)
+                .path(application)
+                .build());
+    }
+
     private static Mono<Void> createApplicationTcp(CloudFoundryOperations cloudFoundryOperations, String applicationName, String domainName) throws IOException {
         return cloudFoundryOperations.applications()
             .pushManifest(PushApplicationManifestRequest.builder()
@@ -1281,16 +1373,23 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .build());
     }
 
-    private static Mono<ApplicationDetail> requestGetApplication(CloudFoundryOperations cloudFoundryOperations, String applicationtName) {
+    private static Mono<ApplicationDetail> requestGetApplication(CloudFoundryOperations cloudFoundryOperations, String applicationName) {
         return cloudFoundryOperations.applications()
             .get(GetApplicationRequest.builder()
-                .name(applicationtName)
+                .name(applicationName)
                 .build());
     }
 
     private static Mono<ApplicationHealthCheck> requestGetHealthCheck(CloudFoundryOperations cloudFoundryOperations, String applicationName) {
         return cloudFoundryOperations.applications()
             .getHealthCheck(GetApplicationHealthCheckRequest.builder()
+                .name(applicationName)
+                .build());
+    }
+
+    private static Mono<ApplicationManifest> requestGetManifest(CloudFoundryOperations cloudFoundryOperations, String applicationName) {
+        return cloudFoundryOperations.applications()
+            .getApplicationManifest(GetApplicationManifestRequest.builder()
                 .name(applicationName)
                 .build());
     }

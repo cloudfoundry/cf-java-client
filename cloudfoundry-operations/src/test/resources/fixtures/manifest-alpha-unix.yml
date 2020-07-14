@@ -1,7 +1,8 @@
 ---
 applications:
 - name: alpha-application-1
-  buildpack: alpha-buildpack
+  buildpacks:
+  - alpha-buildpack
   command: alpha-command
   disk_quota: -1
   health-check-http-endpoint: alpha-health-check-http-endpoint
