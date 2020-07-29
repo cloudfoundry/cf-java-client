@@ -3,7 +3,8 @@ inherit: manifest-alpha-unix.yml
 
 applications:
 - name: alpha-application-1
-  buildpack: beta-buildpack
+  buildpacks:
+  - beta-buildpack
   command: beta-command
   disk_quota: -2
   health-check-http-endpoint: beta-health-check-http-endpoint
@@ -26,7 +27,8 @@ applications:
   - beta-instance-2
 
 - name: beta-application-1
-  buildpack: beta-buildpack
+  buildpacks:
+  - beta-buildpack
   command: beta-command
   disk_quota: -1
   health-check-http-endpoint: beta-health-check-http-endpoint
@@ -49,7 +51,8 @@ applications:
   - beta-instance-2
 
 - name: beta-application-2
-  buildpack: beta-buildpack
+  buildpacks:
+  - beta-buildpack
   command: beta-command
   disk_quota: -1
   domain: beta-domain

@@ -1,7 +1,8 @@
 ---
 inherit: manifest-charlie.yml
 
-buildpack: delta-buildpack
+buildpacks:
+- delta-buildpack
 command: delta-command
 disk_quota: -3
 health-check-http-endpoint: delta-health-check-http-endpoint

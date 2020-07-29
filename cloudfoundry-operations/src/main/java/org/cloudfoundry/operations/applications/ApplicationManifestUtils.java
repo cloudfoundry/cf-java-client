@@ -323,7 +323,8 @@ public final class ApplicationManifestUtils {
 
     @SuppressWarnings("unchecked")
     private static ApplicationManifest.Builder toApplicationManifest(Map<String, Object> application, ApplicationManifest.Builder builder, Path root) {
-        asString(application, "buildpack", builder::buildpack);
+        asListOfString(application, "buildpacks", builder::buildpacks);
+        asString(application, "buildpack", builder::buildpacks);
         asString(application, "command", builder::command);
         asMemoryInteger(application, "disk_quota", builder::disk);
         asDocker(application, "docker", builder::docker);
@@ -358,7 +359,7 @@ public final class ApplicationManifestUtils {
     private static Map<String, Object> toYaml(ApplicationManifest applicationManifest) {
         Map<String, Object> yaml = new TreeMap<>();
 
-        putIfPresent(yaml, "buildpack", applicationManifest.getBuildpack());
+        putIfPresent(yaml, "buildpacks", applicationManifest.getBuildpacks());
         putIfPresent(yaml, "command", applicationManifest.getCommand());
         Integer disk = applicationManifest.getDisk();
         if (null != disk) {
