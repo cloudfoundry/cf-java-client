@@ -1,6 +1,7 @@
 ---
 applications:
-- buildpack: alpha-buildpack
+- buildpacks:
+  - alpha-buildpack
   command: alpha-command
   disk_quota: 512M
   env:
@@ -21,7 +22,8 @@ applications:
   - alpha-instance-2
   stack: alpha-stack
   timeout: -1
-- buildpack: alpha-buildpack
+- buildpacks:
+  - alpha-buildpack
   command: alpha-command
   domains:
   - alpha-domain

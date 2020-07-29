@@ -78,7 +78,7 @@ public final class ApplicationManifestUtilsTest {
                 .build(),
             ApplicationManifest.builder()
                 .name("charlie-application-2")
-                .buildpack("alternate-buildpack")
+                .buildpacks("charlie-buildpack", "alternate-buildpack")
                 .command("alternate-command")
                 .disk(-2)
                 .healthCheckHttpEndpoint("alternate-health-check-http-endpoint")
@@ -122,7 +122,7 @@ public final class ApplicationManifestUtilsTest {
         List<ApplicationManifest> expected = Arrays.asList(
             ApplicationManifest.builder()
                 .name("charlie-application-1")
-                .buildpack("delta-buildpack")
+                .buildpacks("charlie-buildpack", "delta-buildpack")
                 .command("delta-command")
                 .disk(-3)
                 .healthCheckHttpEndpoint("delta-health-check-http-endpoint")
@@ -157,7 +157,7 @@ public final class ApplicationManifestUtilsTest {
                 .build(),
             ApplicationManifest.builder()
                 .name("charlie-application-2")
-                .buildpack("alternate-buildpack")
+                .buildpacks("charlie-buildpack", "delta-buildpack", "alternate-buildpack")
                 .command("alternate-command")
                 .disk(-2)
                 .healthCheckHttpEndpoint("alternate-health-check-http-endpoint")
@@ -231,7 +231,7 @@ public final class ApplicationManifestUtilsTest {
         List<ApplicationManifest> expected = Arrays.asList(
             ApplicationManifest.builder()
                 .name("alpha-application-1")
-                .buildpack("beta-buildpack")
+                .buildpacks("alpha-buildpack", "beta-buildpack")
                 .command("beta-command")
                 .disk(-2)
                 .healthCheckHttpEndpoint("beta-health-check-http-endpoint")
@@ -443,6 +443,19 @@ public final class ApplicationManifestUtilsTest {
     }
 
     @Test
+    public void readSingleBuildpack() throws IOException {
+        List<ApplicationManifest> expected = Collections.singletonList(
+            ApplicationManifest.builder()
+                .name("oscar-application")
+                .buildpack("oscar-buildpack")
+                .build());
+
+        List<ApplicationManifest> actual = ApplicationManifestUtils.read(new ClassPathResource("fixtures/manifest-oscar.yml").getFile().toPath());
+
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
     public void unixRead() throws IOException {
         assumeTrue(SystemUtils.IS_OS_UNIX);
         read("/alpha-path", "fixtures/manifest-alpha-unix.yml");
@@ -467,7 +480,7 @@ public final class ApplicationManifestUtilsTest {
     }
 
     private void read(String path, String expectedManifest) throws IOException {
-        List<ApplicationManifest> expected = Arrays.asList(
+        List<ApplicationManifest> expected = Collections.singletonList(
             ApplicationManifest.builder()
                 .name("alpha-application-1")
                 .buildpack("alpha-buildpack")

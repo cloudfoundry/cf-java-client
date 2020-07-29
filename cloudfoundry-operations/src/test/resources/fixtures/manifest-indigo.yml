@@ -1,5 +1,6 @@
 ---
-buildpack: indigo-buildpack
+buildpacks:
+- indigo-buildpack
 command: indigo-command
 disk_quota: -1
 health-check-http-endpoint: indigo-health-check-http-endpoint

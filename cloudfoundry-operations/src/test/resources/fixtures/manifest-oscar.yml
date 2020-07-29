@@ -1,0 +1,4 @@
+---
+applications:
+- name: oscar-application
+  buildpack: oscar-buildpack
