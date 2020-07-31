@@ -98,7 +98,7 @@ public final class DelayUtils {
     private static Flux<?> getDelay(Duration minimum, Duration maximum, Instant finish, Flux<Long> iterations) {
         return iterations
             .map(iteration -> calculateDuration(minimum, maximum, iteration))
-            .flatMap(delay -> {
+            .concatMap(delay -> {
                 if (Instant.now().isAfter(finish)) {
                     return Mono.error(new DelayTimeoutException());
                 }
