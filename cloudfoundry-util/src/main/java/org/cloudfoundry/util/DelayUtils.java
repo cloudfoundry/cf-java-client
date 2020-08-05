@@ -106,7 +106,7 @@ public final class DelayUtils {
                 return Mono
                     .delay(delay)
                     .doOnSubscribe(logDelay(delay));
-            }, 1);
+            });
     }
 
     private static Consumer<Subscription> logDelay(Duration delay) {
