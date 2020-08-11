@@ -212,7 +212,7 @@ public class Operator extends OperatorContextAware {
         }
 
         private static boolean isUnauthorized(HttpClientResponseWithConnection response) {
-            return response.getResponse().status() == HttpResponseStatus.UNAUTHORIZED;
+            return response.getResponse().status().equals(HttpResponseStatus.UNAUTHORIZED);
         }
 
         private void attachChannelHandlers(HttpClientResponse response, Connection connection) {
