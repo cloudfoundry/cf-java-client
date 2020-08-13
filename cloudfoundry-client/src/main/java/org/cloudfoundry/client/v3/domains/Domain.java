@@ -17,9 +17,13 @@
 package org.cloudfoundry.client.v3.domains;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.Resource;
+import org.cloudfoundry.client.v3.routes.Protocol;
+
+import java.util.List;
 
 public abstract class Domain extends Resource {
 
@@ -42,6 +46,21 @@ public abstract class Domain extends Resource {
      */
     @JsonProperty("relationships")
     public abstract DomainRelationships getRelationships();
+
+    /**
+     * Router group information
+     */
+    @AllowNulls
+    @JsonProperty("router_group")
+    @Nullable
+    public abstract RouterGroup getRouterGroup();
+
+    /**
+     * Available protocols for routes using the domain
+     */
+    @JsonProperty("supported_protocols")
+    @Nullable
+    public abstract List<Protocol> getSupportedProtocols();
 
     /**
      * Whether the domain is used for internal (container-to-container) traffic.
