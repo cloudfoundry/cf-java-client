@@ -25,6 +25,7 @@ import org.cloudfoundry.client.v3.spaces.AssignSpaceIsolationSegmentRequest;
 import org.cloudfoundry.client.v3.spaces.AssignSpaceIsolationSegmentResponse;
 import org.cloudfoundry.client.v3.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v3.spaces.CreateSpaceResponse;
+import org.cloudfoundry.client.v3.spaces.DeleteSpaceRequest;
 import org.cloudfoundry.client.v3.spaces.DeleteUnmappedRoutesRequest;
 import org.cloudfoundry.client.v3.spaces.GetSpaceIsolationSegmentRequest;
 import org.cloudfoundry.client.v3.spaces.GetSpaceIsolationSegmentResponse;
@@ -142,6 +143,28 @@ public class ReactorSpacesV3Test extends AbstractClientApiTest {
     }
 
     @Test
+    public void delete() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(DELETE).path("/spaces/test-space-id")
+                .build())
+            .response(TestResponse.builder()
+                .status(ACCEPTED)
+                .header("Location", "https://api.example.org/v3/jobs/test-job-id")
+                .build())
+            .build());
+
+        this.spaces
+            .delete(DeleteSpaceRequest.builder()
+                .spaceId("test-space-id")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext("test-job-id")
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
     public void deleteUnmappedRoutes() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
@@ -149,7 +172,7 @@ public class ReactorSpacesV3Test extends AbstractClientApiTest {
                 .build())
             .response(TestResponse.builder()
                 .status(ACCEPTED)
-                .header("Location", "https://api.example.org/v3/jobs/test-space-id")
+                .header("Location", "https://api.example.org/v3/jobs/test-job-id")
                 .build())
             .build());
 
@@ -158,7 +181,7 @@ public class ReactorSpacesV3Test extends AbstractClientApiTest {
                 .spaceId("test-space-id")
                 .build())
             .as(StepVerifier::create)
-            .expectNext("test-space-id")
+            .expectNext("test-job-id")
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
