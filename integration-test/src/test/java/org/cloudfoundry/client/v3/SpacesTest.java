@@ -36,6 +36,7 @@ import org.cloudfoundry.client.v3.spaces.AssignSpaceIsolationSegmentRequest;
 import org.cloudfoundry.client.v3.spaces.AssignSpaceIsolationSegmentResponse;
 import org.cloudfoundry.client.v3.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v3.spaces.CreateSpaceResponse;
+import org.cloudfoundry.client.v3.spaces.DeleteSpaceRequest;
 import org.cloudfoundry.client.v3.spaces.DeleteUnmappedRoutesRequest;
 import org.cloudfoundry.client.v3.spaces.GetSpaceIsolationSegmentRequest;
 import org.cloudfoundry.client.v3.spaces.ListSpacesRequest;
@@ -111,6 +112,24 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 .single())
             .as(StepVerifier::create)
             .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_8)
+    @Test
+    public void delete() {
+        String spaceName = this.nameFactory.getSpaceName();
+
+        this.organizationId
+            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .flatMap(spaceId -> this.cloudFoundryClient.spacesV3()
+                .delete(DeleteSpaceRequest.builder()
+                    .spaceId(spaceId)
+                    .build())
+                .flatMap(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job)))
+            .thenMany(requestListSpaces(this.cloudFoundryClient, spaceName))
+            .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }

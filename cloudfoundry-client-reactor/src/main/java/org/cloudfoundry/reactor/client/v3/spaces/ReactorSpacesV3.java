@@ -20,6 +20,7 @@ import org.cloudfoundry.client.v3.spaces.AssignSpaceIsolationSegmentRequest;
 import org.cloudfoundry.client.v3.spaces.AssignSpaceIsolationSegmentResponse;
 import org.cloudfoundry.client.v3.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v3.spaces.CreateSpaceResponse;
+import org.cloudfoundry.client.v3.spaces.DeleteSpaceRequest;
 import org.cloudfoundry.client.v3.spaces.DeleteUnmappedRoutesRequest;
 import org.cloudfoundry.client.v3.spaces.GetSpaceIsolationSegmentRequest;
 import org.cloudfoundry.client.v3.spaces.GetSpaceIsolationSegmentResponse;
@@ -63,6 +64,12 @@ public final class ReactorSpacesV3 extends AbstractClientV3Operations implements
     @Override
     public Mono<CreateSpaceResponse> create(CreateSpaceRequest request) {
         return post(request, CreateSpaceResponse.class, builder -> builder.pathSegment("spaces"))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<String> delete(DeleteSpaceRequest request) {
+        return delete(request, builder -> builder.pathSegment("spaces", request.getSpaceId()))
             .checkpoint();
     }
 
