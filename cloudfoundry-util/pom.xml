@@ -25,7 +25,7 @@
     <parent>
         <groupId>org.cloudfoundry</groupId>
         <artifactId>cloudfoundry-java-client</artifactId>
-        <version>4.9.0.BUILD-SNAPSHOT</version>
+        <version>4.10.0.BUILD-SNAPSHOT</version>
     </parent>
 
     <artifactId>cloudfoundry-util</artifactId>
