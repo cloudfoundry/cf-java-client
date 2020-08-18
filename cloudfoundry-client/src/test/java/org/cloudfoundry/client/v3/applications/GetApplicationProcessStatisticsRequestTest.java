@@ -16,6 +16,9 @@
 
 package org.cloudfoundry.client.v3.applications;
 
+import org.cloudfoundry.client.v3.processes.ProcessState;
+import org.cloudfoundry.client.v3.processes.ProcessStatisticsResource;
+import org.cloudfoundry.client.v3.processes.ProcessUsage;
 import org.junit.Test;
 
 public final class GetApplicationProcessStatisticsRequestTest {
@@ -42,4 +45,40 @@ public final class GetApplicationProcessStatisticsRequestTest {
             .build();
     }
 
+    @Test
+    public void validDownResponse() {
+    	ProcessStatisticsResource processStatisticsResource = ProcessStatisticsResource.builder()
+    			.type("web")
+    			.index(0)
+    			.state(ProcessState.DOWN)
+    			.uptime(new Integer(0))
+    			.build();
+        GetApplicationProcessStatisticsResponse.builder()
+        	.resource(processStatisticsResource)
+            .build();
+    }
+
+    @Test
+    public void validRunningResponse() {
+    	ProcessUsage processUsage = ProcessUsage.builder()
+    			.time("")
+    			.cpu(new Double("0.00038711029163348665"))
+    			.memory(new Integer(19177472))
+    			.disk(new Integer(69705728))
+    			.build();
+    	ProcessStatisticsResource processStatisticsResource = ProcessStatisticsResource.builder()
+    			.type("web")
+    			.index(0)
+    			.state(ProcessState.RUNNING)
+    			.host("10.244.16.10")
+    			.usage(processUsage)
+    			.uptime(new Integer(9042))
+    			.memoryQuota(new Integer(268435456))
+    			.diskQuota(new Integer(1073741824))
+    			.fileDescriptorQuota(new Integer(16384))
+    			.build();
+        GetApplicationProcessStatisticsResponse.builder()
+        	.resource(processStatisticsResource)
+            .build();
+    }
 }
