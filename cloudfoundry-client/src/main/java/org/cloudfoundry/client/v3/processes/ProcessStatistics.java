@@ -38,14 +38,14 @@ public abstract class ProcessStatistics {
      */
     @JsonProperty("disk_quota")
     @Nullable
-    public abstract Integer getDiskQuota();
+    public abstract Long getDiskQuota();
 
     /**
      * The file descriptor quota
      */
     @JsonProperty("fds_quota")
     @Nullable
-    public abstract Integer getFileDescriptorQuota();
+    public abstract Long getFileDescriptorQuota();
 
     /**
      * The host
@@ -79,7 +79,7 @@ public abstract class ProcessStatistics {
      */
     @JsonProperty("mem_quota")
     @Nullable
-    public abstract Integer getMemoryQuota();
+    public abstract Long getMemoryQuota();
 
     /**
      * The state
@@ -98,7 +98,7 @@ public abstract class ProcessStatistics {
      * The uptime
      */
     @JsonProperty("uptime")
-    public abstract Integer getUptime();
+    public abstract Long getUptime();
 
     /**
      * The usage

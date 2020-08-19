@@ -51,7 +51,7 @@ public final class GetApplicationProcessStatisticsRequestTest {
     			.type("web")
     			.index(0)
     			.state(ProcessState.DOWN)
-    			.uptime(new Integer(0))
+    			.uptime(new Long(0))
     			.build();
         GetApplicationProcessStatisticsResponse.builder()
         	.resource(processStatisticsResource)
@@ -72,10 +72,10 @@ public final class GetApplicationProcessStatisticsRequestTest {
     			.state(ProcessState.RUNNING)
     			.host("10.244.16.10")
     			.usage(processUsage)
-    			.uptime(new Integer(9042))
-    			.memoryQuota(new Integer(268435456))
-    			.diskQuota(new Integer(1073741824))
-    			.fileDescriptorQuota(new Integer(16384))
+    			.uptime(new Long(9042))
+    			.memoryQuota(new Long(268435456))
+    			.diskQuota(new Long(1073741824))
+    			.fileDescriptorQuota(new Long(16384))
     			.build();
         GetApplicationProcessStatisticsResponse.builder()
         	.resource(processStatisticsResource)
