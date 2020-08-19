@@ -148,10 +148,6 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
     }
 
     private static Optional<Claims> parseToken(String token) {
-        if (!token.contains(".")) {
-            return Optional.empty();
-        }
-
         try {
             String jws = token.substring(0, token.lastIndexOf('.') + 1);
 
