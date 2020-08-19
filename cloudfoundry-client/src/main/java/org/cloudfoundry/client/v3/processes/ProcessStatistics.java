@@ -37,18 +37,21 @@ public abstract class ProcessStatistics {
      * The disk quota
      */
     @JsonProperty("disk_quota")
+    @Nullable
     public abstract Integer getDiskQuota();
 
     /**
      * The file descriptor quota
      */
     @JsonProperty("fds_quota")
+    @Nullable
     public abstract Integer getFileDescriptorQuota();
 
     /**
      * The host
      */
     @JsonProperty("host")
+    @Nullable
     public abstract String getHost();
 
     /**
@@ -61,6 +64,7 @@ public abstract class ProcessStatistics {
      * The instance port mappings
      */
     @JsonProperty("instance_ports")
+    @Nullable
     public abstract List<PortMapping> getInstancePorts();
 
     /**
@@ -74,6 +78,7 @@ public abstract class ProcessStatistics {
      * The memory quota
      */
     @JsonProperty("mem_quota")
+    @Nullable
     public abstract Integer getMemoryQuota();
 
     /**
@@ -99,6 +104,7 @@ public abstract class ProcessStatistics {
      * The usage
      */
     @JsonProperty("usage")
+    @Nullable
     public abstract ProcessUsage getUsage();
 
 }
