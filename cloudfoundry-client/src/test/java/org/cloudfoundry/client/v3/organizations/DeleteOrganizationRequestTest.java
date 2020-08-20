@@ -18,7 +18,7 @@ package org.cloudfoundry.client.v3.organizations;
 
 import org.junit.Test;
 
-public final class GetOrganizationRequestTest {
+public final class DeleteOrganizationRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noOrganizationId() {

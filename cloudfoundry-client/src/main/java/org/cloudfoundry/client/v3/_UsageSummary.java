@@ -14,23 +14,29 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.organizations;
+package org.cloudfoundry.client.v3;
 
-import org.junit.Test;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.immutables.value.Value;
 
-public final class GetOrganizationRequestTest {
+/**
+ * Represents a summary of resource usage
+ */
+@JsonDeserialize
+@Value.Immutable
+abstract class _UsageSummary {
 
-    @Test(expected = IllegalStateException.class)
-    public void noOrganizationId() {
-        GetOrganizationRequest.builder()
-            .build();
-    }
+    /**
+     * The total memory usage
+     */
+    @JsonProperty("memory_in_mb")
+    abstract Integer getMemoryInMb();
 
-    @Test
-    public void valid() {
-        GetOrganizationRequest.builder()
-            .organizationId("test-id")
-            .build();
-    }
+    /**
+     * The number of started instances
+     */
+    @JsonProperty("started_instances")
+    abstract Integer getStartedInstances();
 
 }

@@ -16,21 +16,19 @@
 
 package org.cloudfoundry.client.v3.organizations;
 
-import org.junit.Test;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.immutables.value.Value;
 
-public final class GetOrganizationRequestTest {
+/**
+ * The request payload for the Get Organization Usage Summary operation
+ */
+@Value.Immutable
+abstract class _GetOrganizationUsageSummaryRequest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noOrganizationId() {
-        GetOrganizationRequest.builder()
-            .build();
-    }
-
-    @Test
-    public void valid() {
-        GetOrganizationRequest.builder()
-            .organizationId("test-id")
-            .build();
-    }
+    /**
+     * The organization id
+     */
+    @JsonIgnore
+    abstract String getOrganizationId();
 
 }
