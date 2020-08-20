@@ -31,15 +31,19 @@ import org.cloudfoundry.client.v3.organizations.AssignOrganizationDefaultIsolati
 import org.cloudfoundry.client.v3.organizations.AssignOrganizationDefaultIsolationSegmentResponse;
 import org.cloudfoundry.client.v3.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v3.organizations.CreateOrganizationResponse;
+import org.cloudfoundry.client.v3.organizations.DeleteOrganizationRequest;
 import org.cloudfoundry.client.v3.organizations.GetOrganizationDefaultDomainRequest;
 import org.cloudfoundry.client.v3.organizations.GetOrganizationDefaultDomainResponse;
 import org.cloudfoundry.client.v3.organizations.GetOrganizationDefaultIsolationSegmentRequest;
 import org.cloudfoundry.client.v3.organizations.GetOrganizationRequest;
 import org.cloudfoundry.client.v3.organizations.GetOrganizationResponse;
+import org.cloudfoundry.client.v3.organizations.GetOrganizationUsageSummaryRequest;
+import org.cloudfoundry.client.v3.organizations.GetOrganizationUsageSummaryResponse;
 import org.cloudfoundry.client.v3.organizations.ListOrganizationDomainsRequest;
 import org.cloudfoundry.client.v3.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v3.organizations.OrganizationResource;
 import org.cloudfoundry.client.v3.organizations.UpdateOrganizationRequest;
+import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +61,9 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
+
+    @Autowired
+    private Mono<String> organizationId;
 
     @Test
     public void assignDefaultIsolationSegment() {
@@ -96,6 +103,23 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
             .single()
             .as(StepVerifier::create)
             .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_8)
+    @Test
+    public void delete() {
+        String organizationName = this.nameFactory.getOrganizationName();
+
+        createOrganizationId(this.cloudFoundryClient, organizationName)
+            .flatMap(organizationId -> this.cloudFoundryClient.organizationsV3()
+                .delete(DeleteOrganizationRequest.builder()
+                    .organizationId(organizationId)
+                    .build())
+                .flatMap(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job)))
+            .thenMany(requestListOrganizations(this.cloudFoundryClient, organizationName))
+            .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -153,6 +177,24 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .map(r -> r.getData().getId()))))
             .as(StepVerifier::create)
             .consumeNextWith(tupleEquality())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_8)
+    @Test
+    public void getUsageSummary() {
+        this.organizationId
+            .flatMap(organizationId -> this.cloudFoundryClient.organizationsV3()
+                .getUsageSummary(GetOrganizationUsageSummaryRequest.builder()
+                    .organizationId(organizationId)
+                    .build()))
+            .map(GetOrganizationUsageSummaryResponse::getUsageSummary)
+            .as(StepVerifier::create)
+            .consumeNextWith(usage -> {
+                assertThat(usage.getMemoryInMb()).isGreaterThan(63);
+                assertThat(usage.getStartedInstances()).isGreaterThan(0);
+            })
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }

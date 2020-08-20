@@ -1,0 +1,14 @@
+{
+  "usage_summary": {
+    "started_instances": 3,
+    "memory_in_mb": 50
+  },
+  "links": {
+    "self": {
+      "href": "https://api.example.org/v3/organizations/d4c91047-7b29-4fda-b7f9-04033e5c9c9f/usage_summary"
+    },
+    "organization": {
+      "href": "https://api.example.org/v3/organizations/d4c91047-7b29-4fda-b7f9-04033e5c9c9f"
+    }
+  }
+}

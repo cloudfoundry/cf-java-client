@@ -22,16 +22,22 @@ import org.cloudfoundry.client.v3.Pagination;
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.ToManyRelationship;
 import org.cloudfoundry.client.v3.ToOneRelationship;
+import org.cloudfoundry.client.v3.UsageSummary;
 import org.cloudfoundry.client.v3.domains.DomainRelationships;
 import org.cloudfoundry.client.v3.domains.DomainResource;
 import org.cloudfoundry.client.v3.organizations.AssignOrganizationDefaultIsolationSegmentRequest;
 import org.cloudfoundry.client.v3.organizations.AssignOrganizationDefaultIsolationSegmentResponse;
 import org.cloudfoundry.client.v3.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v3.organizations.CreateOrganizationResponse;
+import org.cloudfoundry.client.v3.organizations.DeleteOrganizationRequest;
+import org.cloudfoundry.client.v3.organizations.GetOrganizationDefaultDomainRequest;
+import org.cloudfoundry.client.v3.organizations.GetOrganizationDefaultDomainResponse;
 import org.cloudfoundry.client.v3.organizations.GetOrganizationDefaultIsolationSegmentRequest;
 import org.cloudfoundry.client.v3.organizations.GetOrganizationDefaultIsolationSegmentResponse;
 import org.cloudfoundry.client.v3.organizations.GetOrganizationRequest;
 import org.cloudfoundry.client.v3.organizations.GetOrganizationResponse;
+import org.cloudfoundry.client.v3.organizations.GetOrganizationUsageSummaryRequest;
+import org.cloudfoundry.client.v3.organizations.GetOrganizationUsageSummaryResponse;
 import org.cloudfoundry.client.v3.organizations.ListOrganizationDomainsRequest;
 import org.cloudfoundry.client.v3.organizations.ListOrganizationDomainsResponse;
 import org.cloudfoundry.client.v3.organizations.ListOrganizationsRequest;
@@ -49,10 +55,13 @@ import reactor.test.StepVerifier;
 import java.time.Duration;
 import java.util.Collections;
 
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.PATCH;
 import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+import static org.cloudfoundry.client.v3.routes.Protocol.HTTP;
 
 public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
 
@@ -130,6 +139,28 @@ public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
+    public void delete() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(DELETE).path("/organizations/test-organization-id")
+                .build())
+            .response(TestResponse.builder()
+                .status(ACCEPTED)
+                .header("Location", "https://api.example.org/v3/jobs/test-job-id")
+                .build())
+            .build());
+
+        this.organizations
+            .delete(DeleteOrganizationRequest.builder()
+                .organizationId("test-organization-id")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext("test-job-id")
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
     public void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
@@ -164,6 +195,66 @@ public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
+    public void getDefaultDomain() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/organizations/test-organization-id/domains/default")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v3/organizations/GET_{id}_domains_default_response.json")
+                .build())
+            .build());
+
+        this.organizations
+            .getDefaultDomain(GetOrganizationDefaultDomainRequest.builder()
+                .organizationId("test-organization-id")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(GetOrganizationDefaultDomainResponse.builder()
+                .id("3a5d3d89-3f89-4f05-8188-8a2b298c79d5")
+                .createdAt("2019-03-08T01:06:19Z")
+                .updatedAt("2019-03-08T01:06:19Z")
+                .name("test-domain.com")
+                .isInternal(false)
+                .supportedProtocol(HTTP)
+                .metadata(Metadata.builder()
+                    .annotations(Collections.emptyMap())
+                    .labels(Collections.emptyMap())
+                    .build())
+                .relationships(DomainRelationships.builder()
+                    .organization(ToOneRelationship.builder()
+                        .data(Relationship.builder()
+                            .id("3a3f3d89-3f89-4f05-8188-751b298c79d5")
+                            .build())
+                        .build())
+                    .sharedOrganizations(ToManyRelationship.builder()
+                        .data(Relationship.builder()
+                            .id("404f3d89-3f89-6z72-8188-751b298d88d5")
+                            .build())
+                        .data(Relationship.builder()
+                            .id("416d3d89-3f89-8h67-2189-123b298d3592")
+                            .build())
+                        .build())
+                    .build())
+                .link("self", Link.builder()
+                    .href("https://api.example.org/v3/domains/3a5d3d89-3f89-4f05-8188-8a2b298c79d5")
+                    .build())
+                .link("organization", Link.builder()
+                    .href("https://api.example.org/v3/organizations/3a3f3d89-3f89-4f05-8188-751b298c79d5")
+                    .build())
+                .link("route_reservations", Link.builder()
+                    .href("https://api.example.org/v3/domains/3a5d3d89-3f89-4f05-8188-8a2b298c79d5/route_reservations")
+                    .build())
+                .link("shared_organizations", Link.builder()
+                    .href("https://api.example.org/v3/domains/3a5d3d89-3f89-4f05-8188-8a2b298c79d5/relationships/shared_organizations")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
     public void getDefaultIsolationSegment() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
@@ -189,6 +280,39 @@ public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
                     .build())
                 .link("related", Link.builder()
                     .href("https://api.example.org/v3/isolation_segments/9d8e007c-ce52-4ea7-8a57-f2825d2c6b39")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void getUsageSummary() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/organizations/test-organization-id/usage_summary")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v3/organizations/GET_{id}_usage_summary_response.json")
+                .build())
+            .build());
+
+        this.organizations
+            .getUsageSummary(GetOrganizationUsageSummaryRequest.builder()
+                .organizationId("test-organization-id")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(GetOrganizationUsageSummaryResponse.builder()
+                .usageSummary(UsageSummary.builder()
+                    .startedInstances(3)
+                    .memoryInMb(50)
+                    .build())
+                .link("self", Link.builder()
+                    .href("https://api.example.org/v3/organizations/d4c91047-7b29-4fda-b7f9-04033e5c9c9f/usage_summary")
+                    .build())
+                .link("organization", Link.builder()
+                    .href("https://api.example.org/v3/organizations/d4c91047-7b29-4fda-b7f9-04033e5c9c9f")
                     .build())
                 .build())
             .expectComplete()

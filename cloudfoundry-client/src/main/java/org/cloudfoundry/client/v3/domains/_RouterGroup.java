@@ -14,23 +14,22 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.organizations;
+package org.cloudfoundry.client.v3.domains;
 
-import org.junit.Test;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.immutables.value.Value;
 
-public final class GetOrganizationRequestTest {
+import java.util.List;
 
-    @Test(expected = IllegalStateException.class)
-    public void noOrganizationId() {
-        GetOrganizationRequest.builder()
-            .build();
-    }
+@JsonDeserialize
+@Value.Immutable
+public abstract class _RouterGroup {
 
-    @Test
-    public void valid() {
-        GetOrganizationRequest.builder()
-            .organizationId("test-id")
-            .build();
-    }
+    /**
+     * The id of the desired router group to route tcp traffic through
+     */
+    @JsonProperty("guid")
+    public abstract List<String> getId();
 
 }

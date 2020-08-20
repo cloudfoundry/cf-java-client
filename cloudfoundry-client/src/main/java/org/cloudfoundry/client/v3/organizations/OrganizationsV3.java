@@ -40,6 +40,14 @@ public interface OrganizationsV3 {
     Mono<CreateOrganizationResponse> create(CreateOrganizationRequest request);
 
     /**
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.87.0/index.html#delete-an-organization">Delete Organization</a> request
+     *
+     * @param request the Delete Organization request
+     * @return the response from the Delete Organization request
+     */
+    Mono<String> delete(DeleteOrganizationRequest request);
+
+    /**
      * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.34.0/index.html#create-an-organization">Get Organization</a> request
      *
      * @param request the Get Organization request
@@ -48,10 +56,10 @@ public interface OrganizationsV3 {
     Mono<GetOrganizationResponse> get(GetOrganizationRequest request);
 
     /**
-     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.76.0/index.html#get-default-domain">List Organizations</a> request
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.87.0/index.html#get-default-domain">Get Default Domain for an Organization</a> request
      *
-     * @param request the List Organizations request
-     * @return the response from the List Organizations request
+     * @param request the Get Default Domain for an Organization request
+     * @return the response from the Get Default Domain for an Organization request
      */
     Mono<GetOrganizationDefaultDomainResponse> getDefaultDomain(GetOrganizationDefaultDomainRequest request);
 
@@ -62,6 +70,14 @@ public interface OrganizationsV3 {
      * @return the response from the Get Default Isolation Segment request
      */
     Mono<GetOrganizationDefaultIsolationSegmentResponse> getDefaultIsolationSegment(GetOrganizationDefaultIsolationSegmentRequest request);
+
+    /**
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.87.0/index.html#get-usage-summary">Get Usage Summary</a> request
+     *
+     * @param request the Get Usage Summary request
+     * @return the response from the Get Usage Summary request
+     */
+    Mono<GetOrganizationUsageSummaryResponse> getUsageSummary(GetOrganizationUsageSummaryRequest request);
 
     /**
      * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#list-organizations">List Organizations</a> request
