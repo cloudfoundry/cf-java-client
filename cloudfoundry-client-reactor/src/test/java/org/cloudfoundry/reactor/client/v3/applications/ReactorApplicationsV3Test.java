@@ -1278,7 +1278,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     public void scale() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
-                .method(PUT).path("/apps/test-application-id/processes/test-type/actions/scale")
+                .method(POST).path("/apps/test-application-id/processes/test-type/actions/scale")
                 .payload("fixtures/client/v3/apps/PUT_{id}_processes_{type}_actions_scale_request.json")
                 .build())
             .response(TestResponse.builder()
