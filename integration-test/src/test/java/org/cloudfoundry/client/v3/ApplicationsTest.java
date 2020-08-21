@@ -23,7 +23,10 @@ import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v3.applications.ApplicationRelationships;
 import org.cloudfoundry.client.v3.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.CreateApplicationResponse;
+import org.cloudfoundry.client.v3.applications.GetApplicationProcessRequest;
+import org.cloudfoundry.client.v3.applications.GetApplicationProcessResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationRoutesRequest;
+import org.cloudfoundry.client.v3.applications.ScaleApplicationRequest;
 import org.cloudfoundry.client.v3.domains.CreateDomainRequest;
 import org.cloudfoundry.client.v3.domains.CreateDomainResponse;
 import org.cloudfoundry.client.v3.domains.DomainRelationships;
@@ -335,6 +338,28 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
+    @Test
+    public void scale() {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        this.spaceId
+            .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, applicationName, spaceId))
+            .flatMap(applicationId -> this.cloudFoundryClient.applicationsV3()
+                .scale(ScaleApplicationRequest.builder()
+                    .applicationId(applicationId)
+                    .diskInMb(404)
+                    .type("web")
+                    .build())
+                .thenReturn(applicationId))
+            .flatMap(applicationId -> requestApplicationProcess(this.cloudFoundryClient, applicationId))
+            .map(GetApplicationProcessResponse::getDiskInMb)
+            .as(StepVerifier::create)
+            .expectNext(404)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
     private static Mono<String> createApplicationId(CloudFoundryClient cloudFoundryClient, String applicationName, String spaceId) {
         return requestCreateApplication(cloudFoundryClient, applicationName, spaceId)
             .map(CreateApplicationResponse::getId);
@@ -363,6 +388,14 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     private static Mono<String> createSpaceId(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceName) {
         return requestCreateSpace(cloudFoundryClient, organizationId, spaceName)
             .map(CreateSpaceResponse::getId);
+    }
+
+    private static Mono<GetApplicationProcessResponse> requestApplicationProcess(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        return cloudFoundryClient.applicationsV3()
+            .getProcess(GetApplicationProcessRequest.builder()
+                .applicationId(applicationId)
+                .type("web")
+                .build());
     }
 
     private static Mono<CreateApplicationResponse> requestCreateApplication(CloudFoundryClient cloudFoundryClient, String applicationName, String spaceId) {
