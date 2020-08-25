@@ -586,7 +586,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
                     .usage(ProcessUsage.builder()
                         .time("2016-03-23T23:17:30.476314154Z")
                         .cpu(0.00038711029163348665)
-                        .memory(19177472)
+                        .memory((long)19177472)
                         .disk(69705728)
                         .build())
                     .host("10.244.16.10")

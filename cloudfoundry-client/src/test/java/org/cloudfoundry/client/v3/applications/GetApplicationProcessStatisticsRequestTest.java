@@ -63,7 +63,7 @@ public final class GetApplicationProcessStatisticsRequestTest {
     	ProcessUsage processUsage = ProcessUsage.builder()
     			.time("")
     			.cpu(new Double("0.00038711029163348665"))
-    			.memory(new Integer(19177472))
+    			.memory(new Long(19177472))
     			.disk(new Integer(69705728))
     			.build();
     	ProcessStatisticsResource processStatisticsResource = ProcessStatisticsResource.builder()

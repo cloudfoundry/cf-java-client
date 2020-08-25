@@ -43,7 +43,7 @@ abstract class _ProcessUsage {
      * The memory
      */
     @JsonProperty("mem")
-    abstract Integer getMemory();
+    abstract Long getMemory();
 
     /**
      * The time
