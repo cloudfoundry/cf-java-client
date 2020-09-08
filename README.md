@@ -10,12 +10,12 @@
 
 | Job | Status
 | --- | ------
-| `unit-test`             | [![unit-test-master](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/java-client/jobs/unit-test-master/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/java-client/jobs/unit-test-master)
-| `integration-test-2.5`  | [![integration-test-2.5-master](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/java-client/jobs/integration-test-2.5-master/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/java-client/jobs/integration-test-2.5-master)
-| `integration-test-2.6`  | [![integration-test-2.6-master](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/java-client/jobs/integration-test-2.6-master/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/java-client/jobs/integration-test-2.6-master)
-| `integration-test-2.7`  | [![integration-test-2.7-master](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/java-client/jobs/integration-test-2.7-master/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/java-client/jobs/integration-test-2.7-master)
-| `integration-test-2.8`  | [![integration-test-2.8-master](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/java-client/jobs/integration-test-2.8-master/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/java-client/jobs/integration-test-2.8-master)
-| `deploy`                | [![deploy-master](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/java-client/jobs/deploy-master/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/java-client/jobs/deploy-master)
+| `unit-test`             | [![unit-test-main](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/java-client/jobs/unit-test-main/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/java-client/jobs/unit-test-main)
+| `integration-test-2.6`  | [![integration-test-2.6-main](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/java-client/jobs/integration-test-2.6-main/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/java-client/jobs/integration-test-2.6-main)
+| `integration-test-2.7`  | [![integration-test-2.7-main](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/java-client/jobs/integration-test-2.7-main/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/java-client/jobs/integration-test-2.7-main)
+| `integration-test-2.8`  | [![integration-test-2.8-main](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/java-client/jobs/integration-test-2.8-main/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/java-client/jobs/integration-test-2.8-main)
+| `integration-test-2.9`  | [![integration-test-2.9-main](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/java-client/jobs/integration-test-2.9-main/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/java-client/jobs/integration-test-2.9-main)
+| `deploy`                | [![deploy-main](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/java-client/jobs/deploy-main/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/java-client/jobs/deploy-main)
 
 
 The `cf-java-client` project is a Java language binding for interacting with a Cloud Foundry instance.  The project is broken up into a number of components that expose different levels of abstraction depending on need.
@@ -35,12 +35,12 @@ Most projects will need two dependencies; the Operations API and an implementati
     <dependency>
         <groupId>org.cloudfoundry</groupId>
         <artifactId>cloudfoundry-client-reactor</artifactId>
-        <version>4.6.0.RELEASE</version>
+        <version>4.9.0.RELEASE</version>
     </dependency>
     <dependency>
         <groupId>org.cloudfoundry</groupId>
         <artifactId>cloudfoundry-operations</artifactId>
-        <version>4.6.0.RELEASE</version>
+        <version>4.9.0.RELEASE</version>
     </dependency>
     ...
 </dependencies>
@@ -66,8 +66,8 @@ For Gradle, the dependencies would be defined like this:
 
 ```groovy
 dependencies {
-    compile 'org.cloudfoundry:cloudfoundry-client-reactor:4.6.0.RELEASE'
-    compile 'org.cloudfoundry:cloudfoundry-operations:4.6.0.RELEASE'
+    compile 'org.cloudfoundry:cloudfoundry-client-reactor:4.9.0.RELEASE'
+    compile 'org.cloudfoundry:cloudfoundry-operations:4.9.0.RELEASE'
     ...
 }
 ```
