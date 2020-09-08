@@ -3,18 +3,18 @@
 
 | Artifact | Javadocs
 | -------- | --------
-| `cloudfoundry-client`         | [![javadoc](https://javadoc.io/badge2/org.cloudfoundry/cloudfoundry-client/3.23.0.RELEASE/javadoc.svg)](https://javadoc.io/doc/org.cloudfoundry/cloudfoundry-client/3.23.0.RELEASE)
-| `cloudfoundry-client-reactor` | [![javadoc](https://javadoc.io/badge2/org.cloudfoundry/cloudfoundry-client-reactor/3.23.0.RELEASE/javadoc.svg)](https://javadoc.io/doc/org.cloudfoundry/cloudfoundry-client-reactor/3.23.0.RELEASE)
-| `cloudfoundry-operations`     | [![javadoc](https://javadoc.io/badge2/org.cloudfoundry/cloudfoundry-operations/3.23.0.RELEASE/javadoc.svg)](https://javadoc.io/doc/org.cloudfoundry/cloudfoundry-operations/3.23.0.RELEASE)
-| `cloudfoundry-util`           | [![javadoc](https://javadoc.io/badge2/org.cloudfoundry/cloudfoundry-util/3.23.0.RELEASE/javadoc.svg)](https://javadoc.io/doc/org.cloudfoundry/cloudfoundry-util/3.23.0.RELEASE)
+| `cloudfoundry-client`         | [![javadoc](https://javadoc.io/badge2/org.cloudfoundry/cloudfoundry-client/3.26.0.RELEASE/javadoc.svg)](https://javadoc.io/doc/org.cloudfoundry/cloudfoundry-client/3.26.0.RELEASE)
+| `cloudfoundry-client-reactor` | [![javadoc](https://javadoc.io/badge2/org.cloudfoundry/cloudfoundry-client-reactor/3.26.0.RELEASE/javadoc.svg)](https://javadoc.io/doc/org.cloudfoundry/cloudfoundry-client-reactor/3.26.0.RELEASE)
+| `cloudfoundry-operations`     | [![javadoc](https://javadoc.io/badge2/org.cloudfoundry/cloudfoundry-operations/3.26.0.RELEASE/javadoc.svg)](https://javadoc.io/doc/org.cloudfoundry/cloudfoundry-operations/3.26.0.RELEASE)
+| `cloudfoundry-util`           | [![javadoc](https://javadoc.io/badge2/org.cloudfoundry/cloudfoundry-util/3.26.0.RELEASE/javadoc.svg)](https://javadoc.io/doc/org.cloudfoundry/cloudfoundry-util/3.26.0.RELEASE)
 
 | Job | Status
 | --- | ------
 | `unit-test`             | [![unit-test-3.x](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/java-client/jobs/unit-test-3.x/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/java-client/jobs/unit-test-3.x)
-| `integration-test-2.5`  | [![integration-test-2.5-3.x](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/java-client/jobs/integration-test-2.5-3.x/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/java-client/jobs/integration-test-2.5-3.x)
 | `integration-test-2.6`  | [![integration-test-2.6-3.x](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/java-client/jobs/integration-test-2.6-3.x/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/java-client/jobs/integration-test-2.6-3.x)
 | `integration-test-2.7`  | [![integration-test-2.7-3.x](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/java-client/jobs/integration-test-2.7-3.x/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/java-client/jobs/integration-test-2.7-3.x)
 | `integration-test-2.8`  | [![integration-test-2.8-3.x](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/java-client/jobs/integration-test-2.8-3.x/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/java-client/jobs/integration-test-2.8-3.x)
+| `integration-test-2.9`  | [![integration-test-2.9-3.x](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/java-client/jobs/integration-test-2.9-3.x/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/java-client/jobs/integration-test-2.9-3.x)
 | `deploy`                | [![deploy-3.x](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/java-client/jobs/deploy-3.x/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/java-client/jobs/deploy-3.x)
 
 
@@ -35,12 +35,12 @@ Most projects will need two dependencies; the Operations API and an implementati
     <dependency>
         <groupId>org.cloudfoundry</groupId>
         <artifactId>cloudfoundry-client-reactor</artifactId>
-        <version>3.23.0.RELEASE</version>
+        <version>3.26.0.RELEASE</version>
     </dependency>
     <dependency>
         <groupId>org.cloudfoundry</groupId>
         <artifactId>cloudfoundry-operations</artifactId>
-        <version>3.23.0.RELEASE</version>
+        <version>3.26.0.RELEASE</version>
     </dependency>
     ...
 </dependencies>
@@ -66,8 +66,8 @@ For Gradle, the dependencies would be defined like this:
 
 ```groovy
 dependencies {
-    compile 'org.cloudfoundry:cloudfoundry-client-reactor:3.23.0.RELEASE'
-    compile 'org.cloudfoundry:cloudfoundry-operations:3.23.0.RELEASE'
+    compile 'org.cloudfoundry:cloudfoundry-client-reactor:3.26.0.RELEASE'
+    compile 'org.cloudfoundry:cloudfoundry-operations:3.26.0.RELEASE'
     ...
 }
 ```
