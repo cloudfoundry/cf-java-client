@@ -49,8 +49,8 @@ final class UsernameProvider {
 
     Mono<String> get() {
         return getToken(this.connectionContext, this.tokenProvider)
+            .publishOn(Schedulers.elastic())
             .map(this::getUsername)
-            .subscribeOn(Schedulers.elastic())
             .retry(1, t -> {
                 if (t instanceof ExpiredJwtException) {
                     this.tokenProvider.invalidate(this.connectionContext);
