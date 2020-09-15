@@ -16,14 +16,25 @@
 
 package org.cloudfoundry.client.v3.applications;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.immutables.value.Value;
 
 /**
- * The Resource response payload for the List Applications operation
+ * The request payload for the Get Application Feature operation.
  */
-@JsonDeserialize
 @Value.Immutable
-abstract class _ApplicationResource extends Application {
+abstract class _GetApplicationFeatureRequest {
+
+    /**
+     * The id of the application
+     */
+    @JsonIgnore
+    abstract String getApplicationId();
+
+    /**
+     * The required feature name
+     */
+    @JsonIgnore
+    abstract String getFeatureName();
 
 }

@@ -20,10 +20,10 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.immutables.value.Value;
 
 /**
- * The Resource response payload for the List Applications operation
+ * The Resource response payload for the List Application Features operation
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _ApplicationResource extends Application {
+abstract class _ApplicationFeatureResource extends ApplicationFeature {
 
 }
