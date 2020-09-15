@@ -16,14 +16,21 @@
 
 package org.cloudfoundry.client.v3.applications;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.immutables.value.Value;
+import org.junit.Test;
 
-/**
- * The Resource response payload for the List Applications operation
- */
-@JsonDeserialize
-@Value.Immutable
-abstract class _ApplicationResource extends Application {
+public final class ListApplicationFeaturesRequestTest {
+
+    @Test(expected = IllegalStateException.class)
+    public void noApplicationId() {
+        ListApplicationFeaturesRequest.builder()
+            .build();
+    }
+
+    @Test
+    public void valid() {
+        ListApplicationFeaturesRequest.builder()
+            .applicationId("test-application-id")
+            .build();
+    }
 
 }

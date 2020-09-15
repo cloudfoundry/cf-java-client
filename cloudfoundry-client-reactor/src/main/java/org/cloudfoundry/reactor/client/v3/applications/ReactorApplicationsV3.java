@@ -28,6 +28,8 @@ import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentVariablesRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentVariablesResponse;
+import org.cloudfoundry.client.v3.applications.GetApplicationFeatureRequest;
+import org.cloudfoundry.client.v3.applications.GetApplicationFeatureResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationProcessRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationProcessResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationProcessStatisticsRequest;
@@ -38,6 +40,8 @@ import org.cloudfoundry.client.v3.applications.ListApplicationBuildsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationBuildsResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationDropletsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationDropletsResponse;
+import org.cloudfoundry.client.v3.applications.ListApplicationFeaturesRequest;
+import org.cloudfoundry.client.v3.applications.ListApplicationFeaturesResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationPackagesRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationPackagesResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationProcessesRequest;
@@ -59,6 +63,8 @@ import org.cloudfoundry.client.v3.applications.StopApplicationResponse;
 import org.cloudfoundry.client.v3.applications.TerminateApplicationInstanceRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationEnvironmentVariablesRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationEnvironmentVariablesResponse;
+import org.cloudfoundry.client.v3.applications.UpdateApplicationFeatureRequest;
+import org.cloudfoundry.client.v3.applications.UpdateApplicationFeatureResponse;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationResponse;
 import org.cloudfoundry.reactor.ConnectionContext;
@@ -128,6 +134,12 @@ public final class ReactorApplicationsV3 extends AbstractClientV3Operations impl
     }
 
     @Override
+    public Mono<GetApplicationFeatureResponse> getFeature(GetApplicationFeatureRequest request) {
+        return get(request, GetApplicationFeatureResponse.class, builder -> builder.pathSegment("apps", request.getApplicationId(), "features", request.getFeatureName()))
+            .checkpoint();
+    }
+
+    @Override
     public Mono<GetApplicationProcessResponse> getProcess(GetApplicationProcessRequest request) {
         return get(request, GetApplicationProcessResponse.class, builder -> builder.pathSegment("apps", request.getApplicationId(), "processes", request.getType()))
             .checkpoint();
@@ -154,6 +166,12 @@ public final class ReactorApplicationsV3 extends AbstractClientV3Operations impl
     @Override
     public Mono<ListApplicationDropletsResponse> listDroplets(ListApplicationDropletsRequest request) {
         return get(request, ListApplicationDropletsResponse.class, builder -> builder.pathSegment("apps", request.getApplicationId(), "droplets"))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<ListApplicationFeaturesResponse> listFeatures(ListApplicationFeaturesRequest request) {
+        return get(request, ListApplicationFeaturesResponse.class, builder -> builder.pathSegment("apps", request.getApplicationId(), "features"))
             .checkpoint();
     }
 
@@ -220,6 +238,12 @@ public final class ReactorApplicationsV3 extends AbstractClientV3Operations impl
     @Override
     public Mono<UpdateApplicationEnvironmentVariablesResponse> updateEnvironmentVariables(UpdateApplicationEnvironmentVariablesRequest request) {
         return patch(request, UpdateApplicationEnvironmentVariablesResponse.class, builder -> builder.pathSegment("apps", request.getApplicationId(), "environment_variables"))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<UpdateApplicationFeatureResponse> updateFeature(UpdateApplicationFeatureRequest request) {
+        return patch(request, UpdateApplicationFeatureResponse.class, builder -> builder.pathSegment("apps", request.getApplicationId(), "features", request.getFeatureName()))
             .checkpoint();
     }
 
