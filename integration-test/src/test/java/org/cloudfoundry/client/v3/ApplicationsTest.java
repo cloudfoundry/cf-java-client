@@ -20,13 +20,18 @@ import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.CloudFoundryVersion;
 import org.cloudfoundry.IfCloudFoundryVersion;
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v3.applications.ApplicationFeatureResource;
 import org.cloudfoundry.client.v3.applications.ApplicationRelationships;
 import org.cloudfoundry.client.v3.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.CreateApplicationResponse;
+import org.cloudfoundry.client.v3.applications.GetApplicationFeatureRequest;
+import org.cloudfoundry.client.v3.applications.GetApplicationFeatureResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationProcessRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationProcessResponse;
+import org.cloudfoundry.client.v3.applications.ListApplicationFeaturesRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationRoutesRequest;
 import org.cloudfoundry.client.v3.applications.ScaleApplicationRequest;
+import org.cloudfoundry.client.v3.applications.UpdateApplicationFeatureRequest;
 import org.cloudfoundry.client.v3.domains.CreateDomainRequest;
 import org.cloudfoundry.client.v3.domains.CreateDomainResponse;
 import org.cloudfoundry.client.v3.domains.DomainRelationships;
@@ -52,6 +57,7 @@ import reactor.test.StepVerifier;
 import java.time.Duration;
 import java.util.Collections;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public final class ApplicationsTest extends AbstractIntegrationTest {
@@ -64,6 +70,27 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Autowired
     private Mono<String> spaceId;
+
+    @Test
+    public void getFeature() {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        this.spaceId
+            .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, applicationName, spaceId))
+            .flatMap(applicationId -> this.cloudFoundryClient.applicationsV3()
+                .getFeature(GetApplicationFeatureRequest.builder()
+                    .applicationId(applicationId)
+                    .featureName("ssh")
+                    .build()))
+            .as(StepVerifier::create)
+            .expectNext(GetApplicationFeatureResponse.builder()
+                .description("Enable SSHing into the app.")
+                .enabled(true)
+                .name("ssh")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
     @Test
@@ -338,6 +365,26 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    @Test
+    public void listFeatures() {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        this.spaceId
+            .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, applicationName, spaceId))
+            .flatMapMany(applicationId -> PaginationUtils.requestClientV3Resources(page ->
+                this.cloudFoundryClient.applicationsV3()
+                    .listFeatures(ListApplicationFeaturesRequest.builder()
+                        .applicationId(applicationId)
+                        .page(page)
+                        .build())))
+            .filter(resource -> "revisions".equals(resource.getName()))
+            .map(ApplicationFeatureResource::getDescription)
+            .as(StepVerifier::create)
+            .consumeNextWith(description -> assertThat(description).startsWith("Enable versioning of an application"))
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
     @Test
     public void scale() {
@@ -356,6 +403,32 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .map(GetApplicationProcessResponse::getDiskInMb)
             .as(StepVerifier::create)
             .expectNext(404)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void updateFeature() {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        this.spaceId
+            .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, applicationName, spaceId))
+            .flatMap(applicationId -> Mono.zip(
+                Mono.just(applicationId),
+                getFeatureEnabled(this.cloudFoundryClient, applicationId, "ssh")
+            ))
+            .delayUntil(function((applicationId, enabled) -> this.cloudFoundryClient.applicationsV3()
+                .updateFeature(UpdateApplicationFeatureRequest.builder()
+                    .applicationId(applicationId)
+                    .enabled(!enabled)
+                    .featureName("ssh")
+                    .build())))
+            .flatMap(function((applicationId, enabled) -> Mono.zip(
+                Mono.just(!enabled),
+                getFeatureEnabled(this.cloudFoundryClient, applicationId, "ssh"))
+            ))
+            .as(StepVerifier::create)
+            .consumeNextWith(tupleEquality())
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -388,6 +461,11 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     private static Mono<String> createSpaceId(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceName) {
         return requestCreateSpace(cloudFoundryClient, organizationId, spaceName)
             .map(CreateSpaceResponse::getId);
+    }
+
+    private static Mono<Boolean> getFeatureEnabled(CloudFoundryClient cloudFoundryClient, String applicationId, String featureName) {
+        return requestGetFeature(cloudFoundryClient, applicationId, featureName)
+            .map(GetApplicationFeatureResponse::getEnabled);
     }
 
     private static Mono<GetApplicationProcessResponse> requestApplicationProcess(CloudFoundryClient cloudFoundryClient, String applicationId) {
@@ -496,6 +574,14 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                             .build())
                         .build())
                     .build())
+                .build());
+    }
+
+    private static Mono<GetApplicationFeatureResponse> requestGetFeature(CloudFoundryClient cloudFoundryClient, String applicationId, String featureName) {
+        return cloudFoundryClient.applicationsV3()
+            .getFeature(GetApplicationFeatureRequest.builder()
+                .applicationId(applicationId)
+                .featureName(featureName)
                 .build());
     }
 

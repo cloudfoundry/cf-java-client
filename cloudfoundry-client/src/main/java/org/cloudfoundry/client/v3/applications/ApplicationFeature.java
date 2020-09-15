@@ -16,14 +16,33 @@
 
 package org.cloudfoundry.client.v3.applications;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.immutables.value.Value;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.cloudfoundry.Nullable;
 
 /**
- * The Resource response payload for the List Applications operation
+ * Base class for responses that are Application Features
  */
-@JsonDeserialize
-@Value.Immutable
-abstract class _ApplicationResource extends Application {
+public abstract class ApplicationFeature {
+
+    /**
+     * The description of the application feature
+     */
+    @JsonProperty("description")
+    @Nullable
+    public abstract String getDescription();
+
+    /**
+     * Denotes whether or not the application feature is enabled
+     */
+    @JsonProperty("enabled")
+    @Nullable
+    public abstract Boolean getEnabled();
+
+    /**
+     * The name of the application feature
+     */
+    @JsonProperty("name")
+    @Nullable
+    public abstract String getName();
 
 }

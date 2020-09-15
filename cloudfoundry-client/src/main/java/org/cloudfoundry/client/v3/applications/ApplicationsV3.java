@@ -80,6 +80,14 @@ public interface ApplicationsV3 {
     Mono<GetApplicationEnvironmentVariablesResponse> getEnvironmentVariables(GetApplicationEnvironmentVariablesRequest request);
 
     /**
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.88.0/index.html#get-an-app-feature">Get Application Feature</a> request
+     *
+     * @param request the Get Application Feature request
+     * @return the response from the Get Application Feature request
+     */
+    Mono<GetApplicationFeatureResponse> getFeature(GetApplicationFeatureRequest request);
+
+    /**
      * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/#get-a-process">Get Application Process</a> request
      *
      * @param request the Get Application Process request
@@ -118,6 +126,14 @@ public interface ApplicationsV3 {
      * @return the response from the List Application Droplets request
      */
     Mono<ListApplicationDropletsResponse> listDroplets(ListApplicationDropletsRequest request);
+
+    /**
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.88.0/index.html#list-app-features">List Application Features</a> request
+     *
+     * @param request the List Application Features request
+     * @return the response from the List Application Features request
+     */
+    Mono<ListApplicationFeaturesResponse> listFeatures(ListApplicationFeaturesRequest request);
 
     /**
      * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/#list-packages-for-an-app">List Application Packages</a> request
@@ -206,5 +222,13 @@ public interface ApplicationsV3 {
      * @return the response from the Update Application Environment Variables request
      */
     Mono<UpdateApplicationEnvironmentVariablesResponse> updateEnvironmentVariables(UpdateApplicationEnvironmentVariablesRequest request);
+
+    /**
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.88.0/index.html#update-an-app-feature">Update Application Feature</a> request
+     *
+     * @param request the Update Application Feature request
+     * @return the response from the Update Application Feature request
+     */
+    Mono<UpdateApplicationFeatureResponse> updateFeature(UpdateApplicationFeatureRequest request);
 
 }

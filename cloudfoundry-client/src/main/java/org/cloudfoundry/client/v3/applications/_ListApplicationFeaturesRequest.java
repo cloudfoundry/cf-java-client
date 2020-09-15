@@ -16,14 +16,20 @@
 
 package org.cloudfoundry.client.v3.applications;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.cloudfoundry.client.v3.PaginatedRequest;
 import org.immutables.value.Value;
 
 /**
- * The Resource response payload for the List Applications operation
+ * The request payload for the List Application Features operation.
  */
-@JsonDeserialize
 @Value.Immutable
-abstract class _ApplicationResource extends Application {
+abstract class _ListApplicationFeaturesRequest extends PaginatedRequest {
+
+    /**
+     * The id of the application
+     */
+    @JsonIgnore
+    abstract String getApplicationId();
 
 }

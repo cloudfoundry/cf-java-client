@@ -1,0 +1,5 @@
+{
+  "name": "ssh",
+  "description": "Enable SSHing into the app.",
+  "enabled": true
+}

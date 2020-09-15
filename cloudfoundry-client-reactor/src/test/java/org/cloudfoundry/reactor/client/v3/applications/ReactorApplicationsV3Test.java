@@ -27,6 +27,7 @@ import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.Pagination;
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.ToOneRelationship;
+import org.cloudfoundry.client.v3.applications.ApplicationFeatureResource;
 import org.cloudfoundry.client.v3.applications.ApplicationRelationships;
 import org.cloudfoundry.client.v3.applications.ApplicationResource;
 import org.cloudfoundry.client.v3.applications.ApplicationState;
@@ -41,6 +42,8 @@ import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentVariablesRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentVariablesResponse;
+import org.cloudfoundry.client.v3.applications.GetApplicationFeatureRequest;
+import org.cloudfoundry.client.v3.applications.GetApplicationFeatureResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationProcessRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationProcessResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationProcessStatisticsRequest;
@@ -51,6 +54,8 @@ import org.cloudfoundry.client.v3.applications.ListApplicationBuildsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationBuildsResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationDropletsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationDropletsResponse;
+import org.cloudfoundry.client.v3.applications.ListApplicationFeaturesRequest;
+import org.cloudfoundry.client.v3.applications.ListApplicationFeaturesResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationPackagesRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationPackagesResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationProcessesRequest;
@@ -72,6 +77,8 @@ import org.cloudfoundry.client.v3.applications.StopApplicationResponse;
 import org.cloudfoundry.client.v3.applications.TerminateApplicationInstanceRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationEnvironmentVariablesRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationEnvironmentVariablesResponse;
+import org.cloudfoundry.client.v3.applications.UpdateApplicationFeatureRequest;
+import org.cloudfoundry.client.v3.applications.UpdateApplicationFeatureResponse;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationResponse;
 import org.cloudfoundry.client.v3.builds.BuildResource;
@@ -96,7 +103,6 @@ import org.cloudfoundry.client.v3.processes.ProcessUsage;
 import org.cloudfoundry.client.v3.routes.Application;
 import org.cloudfoundry.client.v3.routes.Destination;
 import org.cloudfoundry.client.v3.routes.Process;
-import org.cloudfoundry.client.v3.routes.Protocol;
 import org.cloudfoundry.client.v3.routes.RouteRelationships;
 import org.cloudfoundry.client.v3.routes.RouteResource;
 import org.cloudfoundry.client.v3.tasks.Result;
@@ -118,7 +124,6 @@ import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.PATCH;
 import static io.netty.handler.codec.http.HttpMethod.POST;
-import static io.netty.handler.codec.http.HttpMethod.PUT;
 import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
 import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
@@ -494,6 +499,33 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
                 .link("app", Link.builder()
                     .href("https://api.example.org/v3/apps/[guid]")
                     .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void getFeature() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/apps/test-application-id/features/test-feature-name")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v3/apps/GET_{id}_features_{name}_response.json")
+                .build())
+            .build());
+
+        this.applications
+            .getFeature(GetApplicationFeatureRequest.builder()
+                .applicationId("test-application-id")
+                .featureName("test-feature-name")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(GetApplicationFeatureResponse.builder()
+                .description("Enable SSHing into the app.")
+                .enabled(true)
+                .name("ssh")
                 .build())
             .expectComplete()
             .verify(Duration.ofSeconds(5));
@@ -912,6 +944,49 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
                         .href("https://api.example.org/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058396/relationships/current_droplet")
                         .method("PATCH")
                         .build())
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void listFeatures() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/apps/test-application-id/features")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v3/apps/GET_{id}_features_response.json")
+                .build())
+            .build());
+
+        this.applications
+            .listFeatures(ListApplicationFeaturesRequest.builder()
+                .applicationId("test-application-id")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(ListApplicationFeaturesResponse.builder()
+                .pagination(Pagination.builder()
+                    .totalResults(1)
+                    .totalPages(1)
+                    .first(Link.builder()
+                        .href("/v3/apps/05d39de4-2c9e-4c76-8fd6-10417da07e42/features")
+                        .build())
+                    .last(Link.builder()
+                        .href("/v3/apps/05d39de4-2c9e-4c76-8fd6-10417da07e42/features")
+                        .build())
+                    .build())
+                .resource(ApplicationFeatureResource.builder()
+                    .name("ssh")
+                    .description("Enable SSHing into the app.")
+                    .enabled(true)
+                    .build())
+                .resource(ApplicationFeatureResource.builder()
+                    .name("revisions")
+                    .description("Enable versioning of an application")
+                    .enabled(false)
                     .build())
                 .build())
             .expectComplete()
@@ -1674,6 +1749,35 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
                 .link("app", Link.builder()
                     .href("https://api.example.org/v3/apps/[guid]")
                     .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void updateFeature() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(PATCH).path("/apps/test-application-id/features/ssh")
+                .payload("fixtures/client/v3/apps/PATCH_{id}_features_{name}_request.json")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v3/apps/PATCH_{id}_features_{name}_response.json")
+                .build())
+            .build());
+
+        this.applications
+            .updateFeature(UpdateApplicationFeatureRequest.builder()
+                .applicationId("test-application-id")
+                .enabled(false)
+                .featureName("ssh")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(UpdateApplicationFeatureResponse.builder()
+                .description("Enable SSHing into the app.")
+                .enabled(true)
+                .name("ssh")
                 .build())
             .expectComplete()
             .verify(Duration.ofSeconds(5));
