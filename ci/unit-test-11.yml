@@ -4,8 +4,8 @@ platform: linux
 image_resource:
   type: registry-image
   source:
-    repository: openjdk
-    tag: 8-jdk
+    repository: bellsoft/liberica-openjdk-debian
+    tag: "11"
 
 inputs:
 - name: cf-java-client
