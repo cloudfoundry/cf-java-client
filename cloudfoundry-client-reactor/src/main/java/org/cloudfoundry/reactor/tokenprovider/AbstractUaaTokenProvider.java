@@ -17,6 +17,7 @@
 package org.cloudfoundry.reactor.tokenprovider;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -154,8 +155,9 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
 
         try {
             String jws = token.substring(0, token.lastIndexOf('.') + 1);
+            JwtParser parser = Jwts.parserBuilder().build();
 
-            return Optional.of(Jwts.parser().parseClaimsJwt(jws).getBody());
+            return Optional.of(parser.parseClaimsJwt(jws).getBody());
         } catch (Exception e) {
             return Optional.empty();
         }
