@@ -18,7 +18,6 @@ package org.cloudfoundry.reactor.uaa;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwsHeader;
-import io.jsonwebtoken.impl.Base64Codec;
 import io.jsonwebtoken.impl.DefaultClaims;
 import io.jsonwebtoken.impl.DefaultJwsHeader;
 import org.cloudfoundry.uaa.tokens.KeyType;
@@ -33,14 +32,13 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
+import java.util.Base64;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public final class UaaSigningKeyResolverTest {
-
-    private static final Base64Codec BASE64 = new Base64Codec();
 
     private final Tokens tokens = mock(Tokens.class);
 
@@ -118,7 +116,7 @@ public final class UaaSigningKeyResolverTest {
     }
 
     private static String getEncoded(PublicKey publicKey) {
-        return String.format("-----BEGIN PUBLIC KEY-----\n%s\n-----END PUBLIC KEY-----", BASE64.encode(publicKey.getEncoded()));
+        return String.format("-----BEGIN PUBLIC KEY-----\n%s\n-----END PUBLIC KEY-----", Base64.getEncoder().encodeToString(publicKey.getEncoded()));
     }
 
     private KeyPair getKeyPair() throws NoSuchAlgorithmException {

@@ -92,7 +92,7 @@ public final class UsernameProviderTest {
     private static String getToken(PrivateKey privateKey, Instant expiration) {
         return Jwts.builder()
             .setHeader((Map<String, Object>) new DefaultJwsHeader().setKeyId("test-key"))
-            .signWith(SignatureAlgorithm.RS256, privateKey)
+            .signWith(privateKey, SignatureAlgorithm.RS256)
             .claim("user_name", "test-username")
             .setExpiration(Date.from(expiration))
             .compact();
@@ -100,7 +100,7 @@ public final class UsernameProviderTest {
 
     private KeyPair getKeyPair() throws NoSuchAlgorithmException {
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-        keyPairGenerator.initialize(1024);
+        keyPairGenerator.initialize(2048);
         return keyPairGenerator.generateKeyPair();
     }
 

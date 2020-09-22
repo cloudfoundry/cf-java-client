@@ -19,6 +19,7 @@ package org.cloudfoundry.reactor.uaa;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SigningKeyResolver;
 import org.cloudfoundry.reactor.ConnectionContext;
@@ -68,9 +69,11 @@ final class UsernameProvider {
     }
 
     private String getUsername(String token) {
-        Jws<Claims> jws = Jwts.parser()
+        JwtParser parser = Jwts.parserBuilder()
             .setSigningKeyResolver(this.signingKeyResolver)
-            .parseClaimsJws(token);
+            .build();
+
+        Jws<Claims> jws = parser.parseClaimsJws(token);
 
         return Optional
             .ofNullable(jws.getBody().get("user_name", String.class))

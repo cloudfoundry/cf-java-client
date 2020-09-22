@@ -19,7 +19,6 @@ package org.cloudfoundry.reactor.uaa;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwsHeader;
 import io.jsonwebtoken.SigningKeyResolver;
-import io.jsonwebtoken.impl.Base64Codec;
 import org.cloudfoundry.uaa.tokens.ListTokenKeysRequest;
 import org.cloudfoundry.uaa.tokens.ListTokenKeysResponse;
 import org.cloudfoundry.uaa.tokens.TokenKey;
@@ -32,12 +31,11 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.time.Duration;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
 final class UaaSigningKeyResolver implements SigningKeyResolver {
-
-    private static final Base64Codec BASE64 = new Base64Codec();
 
     private static final String BEGIN = "-----BEGIN PUBLIC KEY-----";
 
@@ -66,7 +64,7 @@ final class UaaSigningKeyResolver implements SigningKeyResolver {
     }
 
     private static byte[] decode(TokenKey tokenKey) {
-        return BASE64.decode(tokenKey.getValue().replace(BEGIN, "").replace(END, "").trim());
+        return Base64.getMimeDecoder().decode(tokenKey.getValue().replace(BEGIN, "").replace(END, "").trim());
     }
 
     private static Key generateKey(TokenKey tokenKey) {
