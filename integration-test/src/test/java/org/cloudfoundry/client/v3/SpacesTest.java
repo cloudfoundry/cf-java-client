@@ -45,6 +45,7 @@ import org.cloudfoundry.client.v3.spaces.SpaceResource;
 import org.cloudfoundry.client.v3.spaces.UpdateSpaceRequest;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
@@ -134,8 +135,9 @@ public final class SpacesTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: Test has not been validated
+    //TODO: Await resolution of https://github.com/cloudfoundry/cloud_controller_ng/issues/1876
     @IfCloudFoundryVersion(greaterThan = CloudFoundryVersion.PCF_2_9)
+    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/1876")
     @Test
     public void deleteUnmappedRoutes() {
         String domainName = this.nameFactory.getDomainName();

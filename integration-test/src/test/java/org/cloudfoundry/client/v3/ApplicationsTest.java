@@ -293,9 +293,8 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: Test has not been validated
+    //TODO: Establish router group availability. This test has not been verified.
     @IfCloudFoundryVersion(greaterThan = CloudFoundryVersion.PCF_2_9)
-    @Test
     public void listApplicationRoutesByPort() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();

@@ -18,13 +18,38 @@ package org.cloudfoundry.client.v3.serviceInstances;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.cloudfoundry.Nullable;
+import org.cloudfoundry.client.v3.LastOperation;
+import org.cloudfoundry.client.v3.MaintenanceInfo;
 import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.Resource;
+
+import java.util.List;
 
 /**
  * Base class for responses that are service instances
  */
 public abstract class ServiceInstance extends Resource {
+
+    /**
+     * The dashboard url
+     */
+    @JsonProperty("dashboard_url")
+    @Nullable
+    public abstract String getDashboardUrl();
+
+    /**
+     * The last operation
+     */
+    @JsonProperty("last_operation")
+    @Nullable
+    abstract LastOperation getLastOperation();
+
+    /**
+     * The maintenance info
+     */
+    @JsonProperty("maintenance_info")
+    @Nullable
+    abstract MaintenanceInfo getMaintenanceInfo();
 
     /**
      * The metadata
@@ -45,5 +70,40 @@ public abstract class ServiceInstance extends Resource {
     @JsonProperty("relationships")
     @Nullable
     public abstract ServiceInstanceRelationships getRelationships();
+
+    /**
+     * The route service url
+     */
+    @JsonProperty("route_service_url")
+    @Nullable
+    public abstract String getRouteServiceUrl();
+
+    /**
+     * The syslog drain url
+     */
+    @JsonProperty("syslog_drain_url")
+    @Nullable
+    public abstract String getSyslogDrainUrl();
+
+    /**
+     * A list of tags for the service instance
+     */
+    @JsonProperty("tags")
+    @Nullable
+    public abstract List<String> getTags();
+
+    /**
+     * The type of the service instance
+     */
+    @JsonProperty("type")
+    @Nullable
+    public abstract ServiceInstanceType getType();
+
+    /**
+     * Whether or not an upgrade of this service instance is available on the current Service Plan
+     */
+    @JsonProperty("upgrade_available")
+    @Nullable
+    public abstract Boolean getUpdateAvailable();
 
 }
