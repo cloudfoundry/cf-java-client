@@ -72,7 +72,7 @@ public interface CloudFoundryClient {
     /**
      * The currently supported Cloud Controller API version
      */
-    String SUPPORTED_API_VERSION = "2.145.0";
+    String SUPPORTED_API_VERSION = "2.150.0";
 
     /**
      * Main entry point to the Cloud Foundry Application Usage Events Client API

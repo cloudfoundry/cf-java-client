@@ -14,31 +14,53 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.serviceInstances;
+package org.cloudfoundry.client.v3;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v3.ToOneRelationship;
 import org.immutables.value.Value;
 
 /**
- * The service instance relationship
+ * The last operation object
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _ServiceInstanceRelationships {
+abstract class _LastOperation {
 
     /**
-     * The space relationship
+     * When the entity was created
      */
-    @JsonProperty("service_plan")
+    @JsonProperty("created_at")
     @Nullable
-    abstract ToOneRelationship getServicePlan();
+    abstract String getCreatedAt();
 
     /**
-     * The space relationship
+     * The description
      */
-    @JsonProperty("space")
-    abstract ToOneRelationship getSpace();
+    @JsonProperty("description")
+    @Nullable
+    abstract String getDescription();
+
+    /**
+     * The state
+     */
+    @JsonProperty("state")
+    @Nullable
+    abstract String getState();
+
+    /**
+     * The type
+     */
+    @JsonProperty("type")
+    @Nullable
+    abstract String getType();
+
+    /**
+     * When the entity was last updated
+     */
+    @JsonProperty("updated_at")
+    @Nullable
+    abstract String getUpdatedAt();
+
 }
