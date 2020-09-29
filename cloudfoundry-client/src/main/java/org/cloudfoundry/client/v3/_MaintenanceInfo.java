@@ -14,31 +14,32 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.serviceInstances;
+package org.cloudfoundry.client.v3;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v3.ToOneRelationship;
 import org.immutables.value.Value;
 
 /**
- * The service instance relationship
+ * The entity representing service plan maintenance info
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _ServiceInstanceRelationships {
+abstract class _MaintenanceInfo {
 
     /**
-     * The space relationship
+     * The description
      */
-    @JsonProperty("service_plan")
+    @JsonProperty("description")
     @Nullable
-    abstract ToOneRelationship getServicePlan();
+    abstract String getDescription();
 
     /**
-     * The space relationship
+     * The version
      */
-    @JsonProperty("space")
-    abstract ToOneRelationship getSpace();
+    @JsonProperty("version")
+    @Nullable
+    abstract String getVersion();
+
 }
