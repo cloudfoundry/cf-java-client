@@ -295,6 +295,27 @@ public final class DefaultServiceAdminTest extends AbstractOperationsTest {
     }
 
     @Test
+    public void enableServiceAccessSpecifyServicePlanWithoutPublicVisibility() {
+        ServicePlanResource servicePlan1 = buildServicePlan("test-service-plan-id-1", "test-service-plan-name-1");
+        ServicePlanResource servicePlan2 = buildServicePlan("test-service-plan-id-2", "test-service-plan-name-2");
+
+        requestListServicesWithName(this.cloudFoundryClient, "test-service-name");
+        requestListServicePlans(this.cloudFoundryClient, "test-service-id", servicePlan1, servicePlan2);
+        requestListServicePlanVisibilities(this.cloudFoundryClient, "test-service-plan-id-1");
+        requestDeleteServicePlanVisibility(this.cloudFoundryClient, "test-service-plan-visibility-id");
+        requestUpdateServicePlan(this.cloudFoundryClient, "test-service-plan-id-1");
+
+        this.serviceAdmin
+            .enableServiceAccess(EnableServiceAccessRequest.builder()
+                .serviceName("test-service-name")
+                .servicePlanName("test-service-plan-name-1")
+                .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
     public void listServiceAccessSettings() {
         requestListServiceBrokers(this.cloudFoundryClient);
         requestListServicePlanVisibilitiesEmpty(this.cloudFoundryClient);
@@ -508,6 +529,19 @@ public final class DefaultServiceAdminTest extends AbstractOperationsTest {
             .verify(Duration.ofSeconds(5));
     }
 
+    private static ServicePlanResource buildServicePlan(String id, String name) {
+        return fill(ServicePlanResource.builder(), "service-plan-")
+            .metadata(fill(Metadata.builder(), "service-plan-")
+                .id(id)
+                .build())
+            .entity(fill(ServicePlanEntity.builder(), "service-plan-")
+                .name(name)
+                .serviceId("test-service-id")
+                .publiclyVisible(false)
+                .build())
+            .build();
+    }
+
     private static void requestCreateServiceBroker(CloudFoundryClient cloudFoundryClient, String name, String url, String username, String password, String spaceId) {
         when(cloudFoundryClient.serviceBrokers()
             .create(org.cloudfoundry.client.v2.servicebrokers.CreateServiceBrokerRequest.builder()
@@ -699,6 +733,15 @@ public final class DefaultServiceAdminTest extends AbstractOperationsTest {
     }
 
     private static void requestListServicePlans(CloudFoundryClient cloudFoundryClient, String serviceId) {
+        ServicePlanResource resource = fill(ServicePlanResource.builder(), "service-plan-")
+            .entity(fill(ServicePlanEntity.builder(), "service-plan-")
+                .serviceId("test-service-id")
+                .build())
+            .build();
+        requestListServicePlans(cloudFoundryClient, serviceId, resource);
+    }
+
+    private static void requestListServicePlans(CloudFoundryClient cloudFoundryClient, String serviceId, ServicePlanResource... resources) {
         when(cloudFoundryClient.servicePlans()
             .list(ListServicePlansRequest.builder()
                 .page(1)
@@ -706,11 +749,7 @@ public final class DefaultServiceAdminTest extends AbstractOperationsTest {
                 .build()))
             .thenReturn(Mono
                 .just(fill(ListServicePlansResponse.builder())
-                    .resource(fill(ServicePlanResource.builder(), "service-plan-")
-                        .entity(fill(ServicePlanEntity.builder(), "service-plan-")
-                            .serviceId("test-service-id")
-                            .build())
-                        .build())
+                    .resources(resources)
                     .build()));
     }
 
@@ -771,6 +810,15 @@ public final class DefaultServiceAdminTest extends AbstractOperationsTest {
             .thenReturn(Mono
                 .just(fill(UpdateServiceBrokerResponse.builder())
                     .build()));
+    }
+
+    private static void requestUpdateServicePlan(CloudFoundryClient cloudFoundryClient, String servicePlanId) {
+        when(cloudFoundryClient.servicePlans()
+            .update(UpdateServicePlanRequest.builder()
+                .publiclyVisible(true)
+                .servicePlanId(servicePlanId)
+                .build()))
+            .thenReturn(Mono.empty());
     }
 
     private static void requestUpdateServicePlan(CloudFoundryClient cloudFoundryClient, boolean publiclyVisible, String servicePlanId) {

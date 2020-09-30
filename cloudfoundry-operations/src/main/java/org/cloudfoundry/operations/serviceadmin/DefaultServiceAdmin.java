@@ -515,6 +515,7 @@ public final class DefaultServiceAdmin implements ServiceAdmin {
         }
 
         return Flux.fromIterable(servicePlans)
+            .filter(servicePlan -> isUpdateableServicePlan(request.getServicePlanName(), servicePlan))
             .filter(servicePlan -> !ResourceUtils.getEntity(servicePlan).getPubliclyVisible())
             .flatMap(servicePlan -> requestUpdateServicePlanPublicStatus(cloudFoundryClient, true, ResourceUtils.getId(servicePlan)))
             .then();
