@@ -26,7 +26,7 @@
     <artifactId>cloudfoundry-java-client</artifactId>
     <name>Cloud Foundry Java Client Parent</name>
     <description>A Java language binding for interacting with a Cloud Foundry instance</description>
-    <version>4.11.0.BUILD-SNAPSHOT</version>
+    <version>4.12.0.BUILD-SNAPSHOT</version>
     <packaging>pom</packaging>
     <url>https://github.com/cloudfoundry/cf-java-client</url>
 
