@@ -22,21 +22,59 @@ import org.cloudfoundry.IfCloudFoundryVersion;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v3.applications.ApplicationFeatureResource;
 import org.cloudfoundry.client.v3.applications.ApplicationRelationships;
+import org.cloudfoundry.client.v3.applications.ApplicationResource;
 import org.cloudfoundry.client.v3.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.CreateApplicationResponse;
+import org.cloudfoundry.client.v3.applications.DeleteApplicationRequest;
+import org.cloudfoundry.client.v3.applications.GetApplicationCurrentDropletRelationshipRequest;
+import org.cloudfoundry.client.v3.applications.GetApplicationCurrentDropletRequest;
+import org.cloudfoundry.client.v3.applications.GetApplicationCurrentDropletResponse;
+import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentRequest;
+import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentVariablesRequest;
+import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentVariablesResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationFeatureRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationFeatureResponse;
+import org.cloudfoundry.client.v3.applications.GetApplicationPermissionsRequest;
+import org.cloudfoundry.client.v3.applications.GetApplicationPermissionsResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationProcessRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationProcessResponse;
+import org.cloudfoundry.client.v3.applications.GetApplicationRequest;
+import org.cloudfoundry.client.v3.applications.GetApplicationResponse;
+import org.cloudfoundry.client.v3.applications.GetApplicationSshEnabledRequest;
+import org.cloudfoundry.client.v3.applications.GetApplicationSshEnabledResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationFeaturesRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationRoutesRequest;
+import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.applications.ScaleApplicationRequest;
+import org.cloudfoundry.client.v3.applications.SetApplicationCurrentDropletRequest;
+import org.cloudfoundry.client.v3.applications.SetApplicationCurrentDropletResponse;
+import org.cloudfoundry.client.v3.applications.StartApplicationRequest;
+import org.cloudfoundry.client.v3.applications.StartApplicationResponse;
+import org.cloudfoundry.client.v3.applications.StopApplicationRequest;
+import org.cloudfoundry.client.v3.applications.UpdateApplicationEnvironmentVariablesRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationFeatureRequest;
+import org.cloudfoundry.client.v3.applications.UpdateApplicationRequest;
+import org.cloudfoundry.client.v3.builds.BuildState;
+import org.cloudfoundry.client.v3.builds.CreateBuildRequest;
+import org.cloudfoundry.client.v3.builds.CreateBuildResponse;
+import org.cloudfoundry.client.v3.builds.GetBuildRequest;
+import org.cloudfoundry.client.v3.builds.GetBuildResponse;
 import org.cloudfoundry.client.v3.domains.CreateDomainRequest;
 import org.cloudfoundry.client.v3.domains.CreateDomainResponse;
 import org.cloudfoundry.client.v3.domains.DomainRelationships;
+import org.cloudfoundry.client.v3.droplets.DropletResource;
+import org.cloudfoundry.client.v3.droplets.ListDropletsRequest;
 import org.cloudfoundry.client.v3.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v3.organizations.CreateOrganizationResponse;
+import org.cloudfoundry.client.v3.packages.CreatePackageRequest;
+import org.cloudfoundry.client.v3.packages.CreatePackageResponse;
+import org.cloudfoundry.client.v3.packages.GetPackageRequest;
+import org.cloudfoundry.client.v3.packages.GetPackageResponse;
+import org.cloudfoundry.client.v3.packages.PackageRelationships;
+import org.cloudfoundry.client.v3.packages.PackageState;
+import org.cloudfoundry.client.v3.packages.PackageType;
+import org.cloudfoundry.client.v3.packages.UploadPackageRequest;
+import org.cloudfoundry.client.v3.packages.UploadPackageResponse;
 import org.cloudfoundry.client.v3.routes.Application;
 import org.cloudfoundry.client.v3.routes.CreateRouteRequest;
 import org.cloudfoundry.client.v3.routes.CreateRouteResponse;
@@ -48,16 +86,24 @@ import org.cloudfoundry.client.v3.routes.RouteResource;
 import org.cloudfoundry.client.v3.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v3.spaces.CreateSpaceResponse;
 import org.cloudfoundry.client.v3.spaces.SpaceRelationships;
+import org.cloudfoundry.util.DelayUtils;
+import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.util.Collections;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.cloudfoundry.client.v3.applications.ApplicationState.STARTED;
+import static org.cloudfoundry.client.v3.applications.ApplicationState.STOPPED;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public final class ApplicationsTest extends AbstractIntegrationTest {
@@ -70,6 +116,112 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Autowired
     private Mono<String> spaceId;
+
+    @Test
+    public void create() {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        this.spaceId
+            .flatMap(spaceId -> this.cloudFoundryClient.applicationsV3()
+                .create(CreateApplicationRequest.builder()
+                    .environmentVariable("test-create-env-key", "test-create-env-value")
+                    .metadata(Metadata.builder()
+                        .label("test-create-label-key", "test-create-label-value")
+                        .build())
+                    .name(applicationName)
+                    .relationships(ApplicationRelationships.builder()
+                        .space(ToOneRelationship.builder()
+                            .data(Relationship.builder()
+                                .id(spaceId)
+                                .build())
+                            .build())
+                        .build())
+                    .build())
+                .map(CreateApplicationResponse::getId))
+            .flatMap(applicationId -> requestGetApplication(this.cloudFoundryClient, applicationId))
+            .map(response -> response.getMetadata().getLabels().get(("test-create-label-key")))
+            .as(StepVerifier::create)
+            .expectNext("test-create-label-value")
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void delete() {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        this.spaceId
+            .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, applicationName, spaceId))
+            .delayUntil(applicationId -> this.cloudFoundryClient.applicationsV3()
+                .delete(DeleteApplicationRequest.builder()
+                    .applicationId(applicationId)
+                    .build())
+                .flatMap(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job)))
+            .flatMap(applicationId -> requestGetApplications(this.cloudFoundryClient, applicationId))
+            .as(StepVerifier::create)
+            .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV3Exception.class).hasMessageMatching("CF-ResourceNotFound\\([0-9]+\\): App not found.*"))
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void get() {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        this.spaceId
+            .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, applicationName, spaceId))
+            .flatMap(applicationId -> this.cloudFoundryClient.applicationsV3()
+                .get(GetApplicationRequest.builder()
+                    .applicationId(applicationId)
+                    .build()))
+            .map(GetApplicationResponse::getName)
+            .as(StepVerifier::create)
+            .expectNext(applicationName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void getDropletAssociation() {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        this.spaceId
+            .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, applicationName, spaceId))
+            .flatMap(applicationId -> Mono.zip(
+                Mono.just(applicationId),
+                uploadPackageAndCreateDropletId(this.cloudFoundryClient, applicationId)
+            ))
+            .delayUntil(function((applicationId, dropletId) -> requestSetDroplet(this.cloudFoundryClient, applicationId, dropletId)))
+            .flatMap(function((applicationId, dropletId) -> Mono.zip(
+                Mono.just(dropletId),
+                this.cloudFoundryClient.applicationsV3()
+                    .getCurrentDropletRelationship(GetApplicationCurrentDropletRelationshipRequest.builder()
+                        .applicationId(applicationId)
+                        .build())
+                    .map(response -> response.getData().getId()))
+            ))
+            .as(StepVerifier::create)
+            .consumeNextWith(tupleEquality())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void getEnvironment() {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        this.spaceId
+            .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, applicationName, spaceId))
+            .flatMap(applicationId -> this.cloudFoundryClient.applicationsV3()
+                .getEnvironment(GetApplicationEnvironmentRequest.builder()
+                    .applicationId(applicationId)
+                    .build()))
+            .map(env -> ((Map<String, Object>) env.getApplicationEnvironmentVariables().get("VCAP_APPLICATION")).get("name"))
+            .as(StepVerifier::create)
+            .expectNext(applicationName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
 
     @Test
     public void getFeature() {
@@ -88,6 +240,64 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .enabled(true)
                 .name("ssh")
                 .build())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_10)
+    @Test
+    public void getPermissions() {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        this.spaceId
+            .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, applicationName, spaceId))
+            .flatMap(applicationId -> this.cloudFoundryClient.applicationsV3()
+                .getPermissions(GetApplicationPermissionsRequest.builder()
+                    .applicationId(applicationId)
+                    .build()))
+            .as(StepVerifier::create)
+            .expectNext(GetApplicationPermissionsResponse.builder()
+                .readBasicData(true)
+                .readSensitiveData(true)
+                .build())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void getSshEnabled() {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        this.spaceId
+            .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, applicationName, spaceId))
+            .flatMap(applicationId -> this.cloudFoundryClient.applicationsV3()
+                .getSshEnabled(GetApplicationSshEnabledRequest.builder()
+                    .applicationId(applicationId)
+                    .build()))
+            .as(StepVerifier::create)
+            .expectNext(GetApplicationSshEnabledResponse.builder()
+                .enabled(true)
+                .reason("")
+                .build())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void list() {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        this.spaceId
+            .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, applicationName, spaceId))
+            .flatMapMany(applicationId -> PaginationUtils.requestClientV3Resources(page ->
+                this.cloudFoundryClient.applicationsV3()
+                    .list(ListApplicationsRequest.builder()
+                        .page(page)
+                        .build()))
+                .filter(resource -> applicationId.equals(resource.getId())))
+            .map(ApplicationResource::getName)
+            .as(StepVerifier::create)
+            .expectNext(applicationName)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -294,7 +504,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     //TODO: Establish router group availability. This test has not been verified.
-    @IfCloudFoundryVersion(greaterThan = CloudFoundryVersion.PCF_2_9)
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_10)
     public void listApplicationRoutesByPort() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
@@ -384,6 +594,31 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    @Test
+    public void listFilterBySpaceId() {
+        String applicationName = this.nameFactory.getApplicationName();
+        String spaceName = this.nameFactory.getSpaceName();
+
+        this.organizationId
+            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .flatMap(spaceId -> Mono.zip(
+                Mono.just(spaceId),
+                createApplicationId(this.cloudFoundryClient, applicationName, spaceId)
+            ))
+            .flatMapMany(function((spaceId, applicationId) -> PaginationUtils
+                .requestClientV3Resources(page ->
+                    this.cloudFoundryClient.applicationsV3()
+                        .list(ListApplicationsRequest.builder()
+                            .spaceId(spaceId)
+                            .page(page)
+                            .build()))))
+            .map(ApplicationResource::getName)
+            .as(StepVerifier::create)
+            .expectNext(applicationName)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
     @Test
     public void scale() {
@@ -402,6 +637,118 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .map(GetApplicationProcessResponse::getDiskInMb)
             .as(StepVerifier::create)
             .expectNext(404)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void setAndGetDroplet() {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        this.spaceId
+            .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, applicationName, spaceId))
+            .flatMap(applicationId -> Mono.zip(
+                Mono.just(applicationId),
+                uploadPackageAndCreateDropletId(this.cloudFoundryClient, applicationId)
+            ))
+            .delayUntil(function((applicationId, dropletId) -> this.cloudFoundryClient.applicationsV3()
+                .setCurrentDroplet(SetApplicationCurrentDropletRequest.builder()
+                    .applicationId(applicationId)
+                    .data(Relationship.builder()
+                        .id(dropletId)
+                        .build())
+                    .build())))
+            .flatMap(function((applicationId, dropletId) -> Mono.zip(
+                Mono.just(dropletId),
+                this.cloudFoundryClient.applicationsV3()
+                    .getCurrentDroplet(GetApplicationCurrentDropletRequest.builder()
+                        .applicationId(applicationId)
+                        .build())
+                    .map(GetApplicationCurrentDropletResponse::getId))))
+            .as(StepVerifier::create)
+            .consumeNextWith(tupleEquality())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void start() {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        this.spaceId
+            .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, applicationName, spaceId))
+            .delayUntil(applicationId -> prepareApplicationToStart(this.cloudFoundryClient, applicationId))
+            .delayUntil((applicationId -> this.cloudFoundryClient.applicationsV3()
+                .start(StartApplicationRequest.builder()
+                    .applicationId(applicationId)
+                    .build())))
+            .flatMap(applicationId -> requestGetApplication(this.cloudFoundryClient, applicationId))
+            .map(GetApplicationResponse::getState)
+            .as(StepVerifier::create)
+            .expectNext(STARTED)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void stop() {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        this.spaceId
+            .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, applicationName, spaceId))
+            .delayUntil(applicationId -> prepareApplicationToStart(this.cloudFoundryClient, applicationId))
+            .delayUntil((applicationId -> requestStartApplication(this.cloudFoundryClient, applicationId)))
+            .delayUntil(applicationId -> this.cloudFoundryClient.applicationsV3()
+                .stop(StopApplicationRequest.builder()
+                    .applicationId(applicationId)
+                    .build()))
+            .flatMap(applicationId -> requestGetApplication(this.cloudFoundryClient, applicationId))
+            .map(GetApplicationResponse::getState)
+            .as(StepVerifier::create)
+            .expectNext(STOPPED)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void update() {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        this.spaceId
+            .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, applicationName, spaceId))
+            .delayUntil(applicationId -> this.cloudFoundryClient.applicationsV3()
+                .update(UpdateApplicationRequest.builder()
+                    .applicationId(applicationId)
+                    .metadata(Metadata.builder()
+                        .label("test-update-key", "test-update-value")
+                        .build())
+                    .build()))
+            .flatMap(applicationId -> requestGetApplication(this.cloudFoundryClient, applicationId))
+            .map(response -> response.getMetadata().getLabels())
+            .as(StepVerifier::create)
+            .expectNext(Collections.singletonMap("test-update-key", "test-update-value"))
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void updateAndGetEnvironmentVariables() {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        this.spaceId
+            .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, applicationName, spaceId))
+            .delayUntil(applicationId -> this.cloudFoundryClient.applicationsV3()
+                .updateEnvironmentVariables(UpdateApplicationEnvironmentVariablesRequest.builder()
+                    .applicationId(applicationId)
+                    .var("test-updateEnv-key", "test-updateEnv-key")
+                    .build()))
+            .flatMap(applicationId -> this.cloudFoundryClient.applicationsV3()
+                .getEnvironmentVariables(GetApplicationEnvironmentVariablesRequest.builder()
+                    .applicationId(applicationId)
+                    .build()))
+            .map(GetApplicationEnvironmentVariablesResponse::getVars)
+            .as(StepVerifier::create)
+            .expectNext(Collections.singletonMap("test-updateEnv-key", "test-updateEnv-key"))
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -437,6 +784,11 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .map(CreateApplicationResponse::getId);
     }
 
+    private static Mono<String> createBuildId(CloudFoundryClient cloudFoundryClient, String packageId) {
+        return requestCreateBuild(cloudFoundryClient, packageId)
+            .map(CreateBuildResponse::getId);
+    }
+
     private static Mono<String> createDomainId(CloudFoundryClient cloudFoundryClient, String domainName, String organizationId) {
         return requestCreateDomain(cloudFoundryClient, domainName, organizationId)
             .map(CreateDomainResponse::getId);
@@ -445,6 +797,10 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     private static Mono<String> createOrganizationId(CloudFoundryClient cloudFoundryClient, String organizationName) {
         return requestCreateOrganization(cloudFoundryClient, organizationName)
             .map(CreateOrganizationResponse::getId);
+    }
+
+    private static Mono<String> createPackageId(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        return requestCreatePackage(cloudFoundryClient, applicationId).map(CreatePackageResponse::getId);
     }
 
     private static Mono<String> createRouteId(CloudFoundryClient cloudFoundryClient, String domainId, String label, String spaceId) {
@@ -489,6 +845,15 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .build());
     }
 
+    private static Mono<CreateBuildResponse> requestCreateBuild(CloudFoundryClient cloudFoundryClient, String packageId) {
+        return cloudFoundryClient.builds()
+            .create(CreateBuildRequest.builder()
+                .getPackage(Relationship.builder()
+                    .id(packageId)
+                    .build())
+                .build());
+    }
+
     private static Mono<CreateDomainResponse> requestCreateDomain(CloudFoundryClient cloudFoundryClient, String domainName, String organizationId) {
         return cloudFoundryClient.domainsV3()
             .create(CreateDomainRequest.builder()
@@ -508,6 +873,20 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         return cloudFoundryClient.organizationsV3()
             .create(CreateOrganizationRequest.builder()
                 .name(organizationName)
+                .build());
+    }
+
+    private static Mono<CreatePackageResponse> requestCreatePackage(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        return cloudFoundryClient.packages()
+            .create(CreatePackageRequest.builder()
+                .relationships(PackageRelationships.builder()
+                    .application(ToOneRelationship.builder()
+                        .data(Relationship.builder()
+                            .id(applicationId)
+                            .build())
+                        .build())
+                    .build())
+                .type(PackageType.BITS)
                 .build());
     }
 
@@ -576,12 +955,57 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .build());
     }
 
+    private static Mono<GetApplicationResponse> requestGetApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        return cloudFoundryClient.applicationsV3()
+            .get(GetApplicationRequest.builder()
+                .applicationId(applicationId)
+                .build());
+    }
+
+    private static Mono<GetApplicationResponse> requestGetApplications(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        return cloudFoundryClient.applicationsV3()
+            .get(GetApplicationRequest.builder()
+                .applicationId(applicationId)
+                .build());
+    }
+
+    private static Mono<GetBuildResponse> requestGetBuild(CloudFoundryClient cloudFoundryClient, String buildId) {
+        return cloudFoundryClient.builds()
+            .get(GetBuildRequest.builder()
+                .buildId(buildId)
+                .build());
+    }
+
     private static Mono<GetApplicationFeatureResponse> requestGetFeature(CloudFoundryClient cloudFoundryClient, String applicationId, String featureName) {
         return cloudFoundryClient.applicationsV3()
             .getFeature(GetApplicationFeatureRequest.builder()
                 .applicationId(applicationId)
                 .featureName(featureName)
                 .build());
+    }
+
+    private static Mono<GetPackageResponse> requestGetPackage(CloudFoundryClient cloudFoundryClient, String packageId) {
+        return cloudFoundryClient.packages()
+            .get(GetPackageRequest.builder()
+                .packageId(packageId)
+                .build());
+    }
+
+    private static Flux<ApplicationResource> requestListApplications(CloudFoundryClient cloudFoundryClient, String applicationName) {
+        return PaginationUtils.requestClientV3Resources(page ->
+            cloudFoundryClient.applicationsV3()
+                .list(ListApplicationsRequest.builder()
+                    .name(applicationName)
+                    .page(page)
+                    .build()));
+    }
+
+    private static Flux<DropletResource> requestListDroplets(CloudFoundryClient cloudFoundryClient) {
+        return PaginationUtils.requestClientV3Resources(page ->
+            cloudFoundryClient.droplets()
+                .list(ListDropletsRequest.builder()
+                    .page(page)
+                    .build()));
     }
 
     private static Mono<ReplaceRouteDestinationsResponse> requestReplaceDestinations(CloudFoundryClient cloudFoundryClient, String applicationId, String routeId) {
@@ -594,6 +1018,62 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                     .build())
                 .routeId(routeId)
                 .build());
+    }
+
+    private static Mono<SetApplicationCurrentDropletResponse> requestSetDroplet(CloudFoundryClient cloudFoundryClient, String applicationId, String dropletId) {
+        return cloudFoundryClient.applicationsV3()
+            .setCurrentDroplet(SetApplicationCurrentDropletRequest.builder()
+                .applicationId(applicationId)
+                .data(Relationship.builder()
+                    .id(dropletId)
+                    .build())
+                .build());
+    }
+
+    private static Mono<StartApplicationResponse> requestStartApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        return cloudFoundryClient.applicationsV3()
+            .start(StartApplicationRequest.builder()
+                .applicationId(applicationId)
+                .build());
+    }
+
+    private static Mono<UploadPackageResponse> requestUploadPackage(CloudFoundryClient cloudFoundryClient, String packageId) {
+        try {
+            return cloudFoundryClient.packages()
+                .upload(UploadPackageRequest.builder()
+                    .bits(new ClassPathResource("test-application.zip").getFile().toPath())
+                    .packageId(packageId)
+                    .build());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static Mono<String> uploadPackageAndCreateDropletId(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        return createPackageId(cloudFoundryClient, applicationId)
+            .delayUntil(packageId -> requestUploadPackage(cloudFoundryClient, packageId))
+            .delayUntil(packageId -> waitForPackageUpload(cloudFoundryClient, packageId))
+            .flatMap(packageId -> createBuildId(cloudFoundryClient, packageId))
+            .delayUntil(buildId -> waitForBuild(cloudFoundryClient, buildId))
+            .flatMap(buildId -> requestGetBuild(cloudFoundryClient, buildId))
+            .map(build -> build.getDroplet().getId());
+    }
+
+    private static Mono<GetBuildResponse> waitForBuild(CloudFoundryClient cloudFoundryClient, String buildId) {
+        return requestGetBuild(cloudFoundryClient, buildId)
+            .filter(response -> BuildState.STAGED.equals(response.getState()))
+            .repeatWhenEmpty(DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)));
+    }
+
+    private static Mono<GetPackageResponse> waitForPackageUpload(CloudFoundryClient cloudFoundryClient, String packageId) {
+        return requestGetPackage(cloudFoundryClient, packageId)
+            .filter(response -> PackageState.READY.equals(response.getState()))
+            .repeatWhenEmpty(DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)));
+    }
+
+    private Mono<SetApplicationCurrentDropletResponse> prepareApplicationToStart(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        return uploadPackageAndCreateDropletId(cloudFoundryClient, applicationId)
+            .flatMap(dropletId -> requestSetDroplet(cloudFoundryClient, applicationId, dropletId));
     }
 
 }

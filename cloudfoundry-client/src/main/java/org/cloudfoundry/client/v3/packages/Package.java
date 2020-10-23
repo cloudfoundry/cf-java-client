@@ -19,6 +19,8 @@ package org.cloudfoundry.client.v3.packages;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import org.cloudfoundry.Nullable;
+import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.Resource;
 
 /**
@@ -38,6 +40,13 @@ public abstract class Package extends Resource {
     public abstract PackageData getData();
 
     /**
+     * The metadata
+     */
+    @JsonProperty("metadata")
+    @Nullable
+    public abstract Metadata getMetadata();
+
+    /**
      * The state
      */
     @JsonProperty("state")
@@ -48,5 +57,12 @@ public abstract class Package extends Resource {
      */
     @JsonProperty("type")
     public abstract PackageType getType();
+
+    /**
+     * The relationships
+     */
+    @JsonProperty("relationships")
+    @Nullable
+    abstract PackageRelationships getRelationships();
 
 }

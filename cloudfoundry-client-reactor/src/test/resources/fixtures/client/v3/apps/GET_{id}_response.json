@@ -22,11 +22,11 @@
   },
   "metadata": {
     "labels": {
-        "isLive": "false",
-        "maintenance": "true"
+      "isLive": "false",
+      "maintenance": "true"
     },
     "annotations": {
-        "version": "1.2.4"
+      "version": "1.2.4"
     }
   },
   "links": {

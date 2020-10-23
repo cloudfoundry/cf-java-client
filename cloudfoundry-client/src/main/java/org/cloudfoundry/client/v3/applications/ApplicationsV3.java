@@ -88,6 +88,14 @@ public interface ApplicationsV3 {
     Mono<GetApplicationFeatureResponse> getFeature(GetApplicationFeatureRequest request);
 
     /**
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.90.0/#get-permissions">Get permissions for an Application</a> request
+     *
+     * @param request the Get Permissions for an Application request
+     * @return the response from the Get Permissions for an Application request
+     */
+    Mono<GetApplicationPermissionsResponse> getPermissions(GetApplicationPermissionsRequest request);
+
+    /**
      * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/#get-a-process">Get Application Process</a> request
      *
      * @param request the Get Application Process request
@@ -102,6 +110,14 @@ public interface ApplicationsV3 {
      * @return the response from the Get Statistics for a Process for an Application request
      */
     Mono<GetApplicationProcessStatisticsResponse> getProcessStatistics(GetApplicationProcessStatisticsRequest request);
+
+    /**
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.90.0/#get-ssh-enabled-for-an-app">Get SSH enabled for an Application</a> request
+     *
+     * @param request the Get SSH enabled for an Application request
+     * @return the response from the Get SSH enabled for an Application request
+     */
+    Mono<GetApplicationSshEnabledResponse> getSshEnabled(GetApplicationSshEnabledRequest request);
 
     /**
      * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#list-apps">List Applications</a> request

@@ -14,24 +14,23 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.packages;
+package org.cloudfoundry.client.v3.applications;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.client.v3.ToOneRelationship;
-import org.immutables.value.Value;
+import org.junit.Test;
 
-/**
- * The relationships for the Create Package request
- */
-@JsonDeserialize
-@Value.Immutable
-abstract class _PackageRelationships {
+public final class GetApplicationPermissionRequestTest {
 
-    /**
-     * The application relationship
-     */
-    @JsonProperty("app")
-    abstract ToOneRelationship getApplication();
+    @Test(expected = IllegalStateException.class)
+    public void noApplicationId() {
+        GetApplicationPermissionsRequest.builder()
+            .build();
+    }
+
+    @Test
+    public void valid() {
+        GetApplicationPermissionsRequest.builder()
+            .applicationId("test-application-id")
+            .build();
+    }
 
 }
