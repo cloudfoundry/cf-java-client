@@ -19,6 +19,7 @@ package org.cloudfoundry.client.v3.builds;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.Lifecycle;
+import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.Resource;
 
@@ -58,6 +59,20 @@ public abstract class Build extends Resource {
      */
     @JsonProperty("lifecycle")
     public abstract Lifecycle getLifecycle();
+
+    /**
+     * The metadata
+     */
+    @JsonProperty("metadata")
+    @Nullable
+    public abstract Metadata getMetadata();
+
+    /**
+     * The relationships
+     */
+    @JsonProperty("relationships")
+    @Nullable
+    public abstract BuildRelationships getRelationships();
 
     /**
      * State of the build

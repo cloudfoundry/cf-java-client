@@ -14,24 +14,21 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.packages;
+package org.cloudfoundry.client.v3.applications;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.client.v3.ToOneRelationship;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.immutables.value.Value;
 
 /**
- * The relationships for the Create Package request
+ * The request payload for the Get Permissions for an Application operation
  */
-@JsonDeserialize
 @Value.Immutable
-abstract class _PackageRelationships {
+abstract class _GetApplicationPermissionsRequest {
 
     /**
-     * The application relationship
+     * The application id
      */
-    @JsonProperty("app")
-    abstract ToOneRelationship getApplication();
+    @JsonIgnore
+    abstract String getApplicationId();
 
 }

@@ -30,12 +30,16 @@ import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentVariable
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentVariablesResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationFeatureRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationFeatureResponse;
+import org.cloudfoundry.client.v3.applications.GetApplicationPermissionsRequest;
+import org.cloudfoundry.client.v3.applications.GetApplicationPermissionsResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationProcessRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationProcessResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationProcessStatisticsRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationProcessStatisticsResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationResponse;
+import org.cloudfoundry.client.v3.applications.GetApplicationSshEnabledRequest;
+import org.cloudfoundry.client.v3.applications.GetApplicationSshEnabledResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationBuildsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationBuildsResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationDropletsRequest;
@@ -140,6 +144,12 @@ public final class ReactorApplicationsV3 extends AbstractClientV3Operations impl
     }
 
     @Override
+    public Mono<GetApplicationPermissionsResponse> getPermissions(GetApplicationPermissionsRequest request) {
+        return get(request, GetApplicationPermissionsResponse.class, builder -> builder.pathSegment("apps", request.getApplicationId(), "permissions"))
+            .checkpoint();
+    }
+
+    @Override
     public Mono<GetApplicationProcessResponse> getProcess(GetApplicationProcessRequest request) {
         return get(request, GetApplicationProcessResponse.class, builder -> builder.pathSegment("apps", request.getApplicationId(), "processes", request.getType()))
             .checkpoint();
@@ -148,6 +158,12 @@ public final class ReactorApplicationsV3 extends AbstractClientV3Operations impl
     @Override
     public Mono<GetApplicationProcessStatisticsResponse> getProcessStatistics(GetApplicationProcessStatisticsRequest request) {
         return get(request, GetApplicationProcessStatisticsResponse.class, builder -> builder.pathSegment("apps", request.getApplicationId(), "processes", request.getType(), "stats"))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<GetApplicationSshEnabledResponse> getSshEnabled(GetApplicationSshEnabledRequest request) {
+        return get(request, GetApplicationSshEnabledResponse.class, builder -> builder.pathSegment("apps", request.getApplicationId(), "ssh_enabled"))
             .checkpoint();
     }
 

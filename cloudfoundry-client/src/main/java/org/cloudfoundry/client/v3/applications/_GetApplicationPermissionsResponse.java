@@ -14,24 +14,29 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.packages;
+package org.cloudfoundry.client.v3.applications;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.client.v3.ToOneRelationship;
 import org.immutables.value.Value;
 
 /**
- * The relationships for the Create Package request
+ * The response payload for the Get Permissions for an Application operation
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _PackageRelationships {
+abstract class _GetApplicationPermissionsResponse {
 
     /**
-     * The application relationship
+     * Whether the current user can read basic data
      */
-    @JsonProperty("app")
-    abstract ToOneRelationship getApplication();
+    @JsonProperty("read_basic_data")
+    abstract Boolean getReadBasicData();
+
+    /**
+     * Whether the current user can read sensitive data
+     */
+    @JsonProperty("read_sensitive_data")
+    abstract Boolean getReadSensitiveData();
 
 }
