@@ -14,24 +14,29 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.packages;
+package org.cloudfoundry.client.v3.applications;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.client.v3.ToOneRelationship;
 import org.immutables.value.Value;
 
 /**
- * The relationships for the Create Package request
+ * The response payload for the Get SSH enabled for an Application operation
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _PackageRelationships {
+abstract class _GetApplicationSshEnabledResponse {
 
     /**
-     * The application relationship
+     * Whether SSH is enabled
      */
-    @JsonProperty("app")
-    abstract ToOneRelationship getApplication();
+    @JsonProperty("enabled")
+    abstract Boolean getEnabled();
+
+    /**
+     * The reason for the enabled status
+     */
+    @JsonProperty("reason")
+    abstract String getReason();
 
 }

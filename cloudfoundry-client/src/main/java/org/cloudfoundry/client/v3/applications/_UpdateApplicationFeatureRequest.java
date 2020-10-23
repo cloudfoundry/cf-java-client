@@ -19,8 +19,6 @@ package org.cloudfoundry.client.v3.applications;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v3.Lifecycle;
 import org.immutables.value.Value;
 
 /**
@@ -37,15 +35,15 @@ abstract class _UpdateApplicationFeatureRequest {
     abstract String getApplicationId();
 
     /**
-     * The feature name
-     */
-    @JsonIgnore
-    abstract String getFeatureName();
-
-    /**
      * Denotes whether or not the app feature should be enabled
      */
     @JsonProperty("enabled")
     abstract Boolean getEnabled();
+
+    /**
+     * The feature name
+     */
+    @JsonIgnore
+    abstract String getFeatureName();
 
 }

@@ -44,12 +44,16 @@ import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentVariable
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentVariablesResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationFeatureRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationFeatureResponse;
+import org.cloudfoundry.client.v3.applications.GetApplicationPermissionsRequest;
+import org.cloudfoundry.client.v3.applications.GetApplicationPermissionsResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationProcessRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationProcessResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationProcessStatisticsRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationProcessStatisticsResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationResponse;
+import org.cloudfoundry.client.v3.applications.GetApplicationSshEnabledRequest;
+import org.cloudfoundry.client.v3.applications.GetApplicationSshEnabledResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationBuildsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationBuildsResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationDropletsRequest;
@@ -532,6 +536,31 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
+    public void getPermissions() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/apps/test-application-id/permissions")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v3/apps/GET_{id}_permissions_response.json")
+                .build())
+            .build());
+
+        this.applications
+            .getPermissions(GetApplicationPermissionsRequest.builder()
+                .applicationId("test-application-id")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(GetApplicationPermissionsResponse.builder()
+                .readBasicData(true)
+                .readSensitiveData(false)
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
     public void getProcess() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
@@ -633,6 +662,31 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
                     .diskQuota(1073741824)
                     .fileDescriptorQuota(16384)
                     .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void getSshEnabled() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/apps/test-application-id/ssh_enabled")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v3/apps/GET_{id}_ssh_enabled_response.json")
+                .build())
+            .build());
+
+        this.applications
+            .getSshEnabled(GetApplicationSshEnabledRequest.builder()
+                .applicationId("test-application-id")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(GetApplicationSshEnabledResponse.builder()
+                .enabled(false)
+                .reason("Disabled globally")
                 .build())
             .expectComplete()
             .verify(Duration.ofSeconds(5));

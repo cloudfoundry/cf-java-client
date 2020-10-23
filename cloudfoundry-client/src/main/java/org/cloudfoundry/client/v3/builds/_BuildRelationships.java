@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.packages;
+package org.cloudfoundry.client.v3.builds;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -22,11 +22,11 @@ import org.cloudfoundry.client.v3.ToOneRelationship;
 import org.immutables.value.Value;
 
 /**
- * The relationships for the Create Package request
+ * The Build relationships
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _PackageRelationships {
+abstract class _BuildRelationships {
 
     /**
      * The application relationship
