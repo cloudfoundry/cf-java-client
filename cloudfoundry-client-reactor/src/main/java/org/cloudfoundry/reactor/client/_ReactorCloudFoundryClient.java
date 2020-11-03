@@ -48,6 +48,7 @@ import org.cloudfoundry.client.v2.spaces.Spaces;
 import org.cloudfoundry.client.v2.stacks.Stacks;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstances;
 import org.cloudfoundry.client.v2.users.Users;
+import org.cloudfoundry.client.v3.admin.AdminV3;
 import org.cloudfoundry.client.v3.applications.ApplicationsV3;
 import org.cloudfoundry.client.v3.auditevents.AuditEventsV3;
 import org.cloudfoundry.client.v3.builds.Builds;
@@ -98,6 +99,7 @@ import org.cloudfoundry.reactor.client.v2.spaces.ReactorSpaces;
 import org.cloudfoundry.reactor.client.v2.stacks.ReactorStacks;
 import org.cloudfoundry.reactor.client.v2.userprovidedserviceinstances.ReactorUserProvidedServiceInstances;
 import org.cloudfoundry.reactor.client.v2.users.ReactorUsers;
+import org.cloudfoundry.reactor.client.v3.admin.ReactorAdminV3;
 import org.cloudfoundry.reactor.client.v3.applications.ReactorApplicationsV3;
 import org.cloudfoundry.reactor.client.v3.auditevents.ReactorAuditEventsV3;
 import org.cloudfoundry.reactor.client.v3.builds.ReactorBuilds;
@@ -127,6 +129,12 @@ import java.util.Map;
  */
 @Value.Immutable
 abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
+
+    @Override
+    @Value.Derived
+    public AdminV3 adminV3() {
+        return new ReactorAdminV3(getConnectionContext(), getRootV3(), getTokenProvider(), getRequestTags());
+    }
 
     @Override
     @Value.Derived

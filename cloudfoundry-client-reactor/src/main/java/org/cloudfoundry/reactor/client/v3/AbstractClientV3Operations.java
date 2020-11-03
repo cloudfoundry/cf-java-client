@@ -119,6 +119,16 @@ public abstract class AbstractClientV3Operations extends AbstractReactorOperatio
                 .parseBody(responseType));
     }
 
+    protected final Mono<String> post(Object requestPayload, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+        return createOperator()
+            .flatMap(operator -> operator.post()
+                .uri(queryTransformer(requestPayload).andThen(uriTransformer))
+                .send(requestPayload)
+                .response()
+                .get())
+            .map(AbstractClientV3Operations::extractJobId);
+    }
+
     protected final <T> Mono<T> put(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return createOperator()
             .flatMap(operator -> operator.put()
@@ -134,18 +144,6 @@ public abstract class AbstractClientV3Operations extends AbstractReactorOperatio
         return pathSegments.get(pathSegments.size() - 1);
     }
 
-    private Function<UriComponentsBuilder, UriComponentsBuilder> queryTransformer(Object requestPayload) {
-        return builder -> {
-            Stream<UriQueryParameter> parameters = getUriQueryParameterBuilder().build(requestPayload);
-            UriQueryParameters.set(builder, parameters);
-            return builder;
-        };
-    }
-
-    private UriQueryParameterBuilder getUriQueryParameterBuilder() {
-        return DelegatingUriQueryParameterBuilder.builder().builders(new FilterBuilder(), new QueryBuilder()).build();
-    }
-
     private Operator attachErrorPayloadMapper(Operator operator) {
         return operator.withErrorPayloadMapper(ErrorPayloadMappers.clientV3(this.connectionContext.getObjectMapper()));
     }
@@ -154,11 +152,23 @@ public abstract class AbstractClientV3Operations extends AbstractReactorOperatio
         return new MultipartHttpClientRequest(this.connectionContext.getObjectMapper(), request, form);
     }
 
+    private UriQueryParameterBuilder getUriQueryParameterBuilder() {
+        return DelegatingUriQueryParameterBuilder.builder().builders(new FilterBuilder(), new QueryBuilder()).build();
+    }
+
     private BiConsumer<HttpClientRequest, HttpClientForm>
     multipartRequest(Consumer<MultipartHttpClientRequest> requestTransformer) {
         return (request, outbound) -> {
             MultipartHttpClientRequest multipartRequest = createMultipartRequest(request, outbound);
             requestTransformer.accept(multipartRequest);
+        };
+    }
+
+    private Function<UriComponentsBuilder, UriComponentsBuilder> queryTransformer(Object requestPayload) {
+        return builder -> {
+            Stream<UriQueryParameter> parameters = getUriQueryParameterBuilder().build(requestPayload);
+            UriQueryParameters.set(builder, parameters);
+            return builder;
         };
     }
 

@@ -47,6 +47,7 @@ import org.cloudfoundry.client.v2.spaces.Spaces;
 import org.cloudfoundry.client.v2.stacks.Stacks;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstances;
 import org.cloudfoundry.client.v2.users.Users;
+import org.cloudfoundry.client.v3.admin.AdminV3;
 import org.cloudfoundry.client.v3.applications.ApplicationsV3;
 import org.cloudfoundry.client.v3.auditevents.AuditEventsV3;
 import org.cloudfoundry.client.v3.builds.Builds;
@@ -74,6 +75,11 @@ public interface CloudFoundryClient {
      * The currently supported Cloud Controller API version
      */
     String SUPPORTED_API_VERSION = "2.150.0";
+
+    /**
+     * Main entry point to the Cloud Foundry Application Usage Events Client API
+     */
+    AdminV3 adminV3();
 
     /**
      * Main entry point to the Cloud Foundry Application Usage Events Client API
