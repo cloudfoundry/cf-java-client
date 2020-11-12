@@ -65,11 +65,11 @@ public final class ReactorBuildpacksTest extends AbstractClientApiTest {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(POST).path("/buildpacks")
-                .payload("fixtures/client/V3/buildpacks/POST_request.json")
+                .payload("fixtures/client/v3/buildpacks/POST_request.json")
                 .build())
             .response(TestResponse.builder()
                 .status(CREATED)
-                .payload("fixtures/client/V3/buildpacks/POST_response.json")
+                .payload("fixtures/client/v3/buildpacks/POST_response.json")
                 .build())
             .build());
 
@@ -138,7 +138,7 @@ public final class ReactorBuildpacksTest extends AbstractClientApiTest {
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
-                .payload("fixtures/client/V3/buildpacks/GET_{id}_response.json")
+                .payload("fixtures/client/v3/buildpacks/GET_{id}_response.json")
                 .build())
             .build());
 
@@ -181,7 +181,7 @@ public final class ReactorBuildpacksTest extends AbstractClientApiTest {
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
-                .payload("fixtures/client/V3/buildpacks/GET_response.json")
+                .payload("fixtures/client/v3/buildpacks/GET_response.json")
                 .build())
             .build());
 
@@ -235,11 +235,11 @@ public final class ReactorBuildpacksTest extends AbstractClientApiTest {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PATCH).path("/buildpacks/test-buildpack-id")
-                .payload("fixtures/client/V3/buildpacks/PATCH_{id}_request.json")
+                .payload("fixtures/client/v3/buildpacks/PATCH_{id}_request.json")
                 .build())
             .response(TestResponse.builder()
                 .status(OK)
-                .payload("fixtures/client/V3/buildpacks/PATCH_{id}_response.json")
+                .payload("fixtures/client/v3/buildpacks/PATCH_{id}_response.json")
                 .build())
             .build());
 
@@ -301,13 +301,13 @@ public final class ReactorBuildpacksTest extends AbstractClientApiTest {
                 .build())
             .response(TestResponse.builder()
                 .status(CREATED)
-                .payload("fixtures/client/V3/buildpacks/POST_{id}_upload_response.json")
+                .payload("fixtures/client/v3/buildpacks/POST_{id}_upload_response.json")
                 .build())
             .build());
 
         this.buildpacks
             .upload(UploadBuildpackRequest.builder()
-                .bits(new ClassPathResource("fixtures/client/V3/buildpacks/test-buildpack.zip").getFile().toPath())
+                .bits(new ClassPathResource("fixtures/client/v3/buildpacks/test-buildpack.zip").getFile().toPath())
                 .buildpackId("test-buildpack-id")
                 .build())
             .as(StepVerifier::create)
