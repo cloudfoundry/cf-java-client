@@ -1,0 +1,7 @@
+{
+  "name": "ruby_buildpack",
+  "position": 42,
+  "enabled": true,
+  "locked": false,
+  "stack": "windows64"
+}

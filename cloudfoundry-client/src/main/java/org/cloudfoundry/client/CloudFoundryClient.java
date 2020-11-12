@@ -50,6 +50,7 @@ import org.cloudfoundry.client.v2.users.Users;
 import org.cloudfoundry.client.v3.admin.AdminV3;
 import org.cloudfoundry.client.v3.applications.ApplicationsV3;
 import org.cloudfoundry.client.v3.auditevents.AuditEventsV3;
+import org.cloudfoundry.client.v3.buildpacks.BuildpacksV3;
 import org.cloudfoundry.client.v3.builds.Builds;
 import org.cloudfoundry.client.v3.deployments.DeploymentsV3;
 import org.cloudfoundry.client.v3.domains.DomainsV3;
@@ -110,6 +111,11 @@ public interface CloudFoundryClient {
      * Main entry point to the Cloud Foundry Buildpacks Client API
      */
     Buildpacks buildpacks();
+
+    /**
+     * Main entry point to the Cloud Foundry Buildpacks V3 Client API
+     */
+    BuildpacksV3 buildpacksV3();
 
     /**
      * Main entry point to the Cloud Foundry Builds Client API

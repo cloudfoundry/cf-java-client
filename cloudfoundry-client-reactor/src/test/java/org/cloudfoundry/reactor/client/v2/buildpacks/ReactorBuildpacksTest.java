@@ -56,7 +56,7 @@ import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 
 public final class ReactorBuildpacksTest extends AbstractClientApiTest {
 
-    private ReactorBuildpacks buildpacks = new ReactorBuildpacks(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
+    private final ReactorBuildpacks buildpacks = new ReactorBuildpacks(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void create() {
