@@ -51,6 +51,7 @@ import org.cloudfoundry.client.v2.users.Users;
 import org.cloudfoundry.client.v3.admin.AdminV3;
 import org.cloudfoundry.client.v3.applications.ApplicationsV3;
 import org.cloudfoundry.client.v3.auditevents.AuditEventsV3;
+import org.cloudfoundry.client.v3.buildpacks.BuildpacksV3;
 import org.cloudfoundry.client.v3.builds.Builds;
 import org.cloudfoundry.client.v3.deployments.DeploymentsV3;
 import org.cloudfoundry.client.v3.domains.DomainsV3;
@@ -103,6 +104,7 @@ import org.cloudfoundry.reactor.client.v3.admin.ReactorAdminV3;
 import org.cloudfoundry.reactor.client.v3.applications.ReactorApplicationsV3;
 import org.cloudfoundry.reactor.client.v3.auditevents.ReactorAuditEventsV3;
 import org.cloudfoundry.reactor.client.v3.builds.ReactorBuilds;
+import org.cloudfoundry.reactor.client.v3.builpacks.ReactorBuildpacksV3;
 import org.cloudfoundry.reactor.client.v3.deployments.ReactorDeploymentsV3;
 import org.cloudfoundry.reactor.client.v3.domains.ReactorDomainsV3;
 import org.cloudfoundry.reactor.client.v3.droplets.ReactorDroplets;
@@ -170,6 +172,12 @@ abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
     @Value.Derived
     public Buildpacks buildpacks() {
         return new ReactorBuildpacks(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
+    }
+
+    @Override
+    @Value.Derived
+    public BuildpacksV3 buildpacksV3() {
+        return new ReactorBuildpacksV3(getConnectionContext(), getRootV3(), getTokenProvider(), getRequestTags());
     }
 
     @Override
