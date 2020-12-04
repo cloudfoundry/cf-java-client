@@ -1,0 +1,15 @@
+{
+  "type": "organization_auditor",
+  "relationships": {
+    "user": {
+      "data": {
+        "guid": "test-user-id"
+      }
+    },
+    "organization": {
+      "data": {
+        "guid": "test-organization-id"
+      }
+    }
+  }
+}

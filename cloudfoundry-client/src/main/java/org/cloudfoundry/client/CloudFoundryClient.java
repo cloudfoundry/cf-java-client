@@ -60,6 +60,7 @@ import org.cloudfoundry.client.v3.jobs.JobsV3;
 import org.cloudfoundry.client.v3.organizations.OrganizationsV3;
 import org.cloudfoundry.client.v3.packages.Packages;
 import org.cloudfoundry.client.v3.processes.Processes;
+import org.cloudfoundry.client.v3.roles.RolesV3;
 import org.cloudfoundry.client.v3.routes.RoutesV3;
 import org.cloudfoundry.client.v3.serviceInstances.ServiceInstancesV3;
 import org.cloudfoundry.client.v3.servicebindings.ServiceBindingsV3;
@@ -211,6 +212,11 @@ public interface CloudFoundryClient {
      * Main entry point to the Cloud Foundry Resource Match Client API
      */
     ResourceMatch resourceMatch();
+
+    /**
+     * Main entry point to the Cloud Foundry Roles V3 Client API
+     */
+    RolesV3 rolesV3();
 
     /**
      * Main entry point to the Cloud Foundry Route Mappings Client API
