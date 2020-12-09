@@ -17,6 +17,8 @@
 package org.cloudfoundry.client.v3;
 
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.CloudFoundryVersion;
+import org.cloudfoundry.IfCloudFoundryVersion;
 import org.cloudfoundry.ServiceBrokerUtils;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v3.serviceofferings.DeleteServiceOfferingRequest;
@@ -25,9 +27,6 @@ import org.cloudfoundry.client.v3.serviceofferings.GetServiceOfferingResponse;
 import org.cloudfoundry.client.v3.serviceofferings.ListServiceOfferingsRequest;
 import org.cloudfoundry.client.v3.serviceofferings.ServiceOfferingResource;
 import org.cloudfoundry.client.v3.serviceofferings.UpdateServiceOfferingRequest;
-import org.cloudfoundry.client.v3.serviceplans.DeleteServicePlanRequest;
-import org.cloudfoundry.client.v3.serviceplans.ListServicePlansRequest;
-import org.cloudfoundry.client.v3.serviceplans.ServicePlanResource;
 import org.cloudfoundry.client.v3.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v3.spaces.CreateSpaceResponse;
 import org.cloudfoundry.client.v3.spaces.SpaceRelationships;
@@ -44,6 +43,7 @@ import java.util.Collections;
 import static org.cloudfoundry.ServiceBrokerUtils.createServiceBroker;
 import static org.cloudfoundry.ServiceBrokerUtils.deleteServiceBroker;
 
+@IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_10)
 public final class ServiceOfferingsTest extends AbstractIntegrationTest {
 
     @Autowired
