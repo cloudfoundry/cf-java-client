@@ -63,6 +63,7 @@ import org.cloudfoundry.client.v3.processes.Processes;
 import org.cloudfoundry.client.v3.routes.RoutesV3;
 import org.cloudfoundry.client.v3.serviceInstances.ServiceInstancesV3;
 import org.cloudfoundry.client.v3.servicebindings.ServiceBindingsV3;
+import org.cloudfoundry.client.v3.serviceofferings.ServiceOfferingsV3;
 import org.cloudfoundry.client.v3.serviceplans.ServicePlansV3;
 import org.cloudfoundry.client.v3.spaces.SpacesV3;
 import org.cloudfoundry.client.v3.tasks.Tasks;
@@ -261,6 +262,11 @@ public interface CloudFoundryClient {
      * Main entry point to the Cloud Foundry Service Keys Client API
      */
     ServiceKeys serviceKeys();
+
+    /**
+     * Main entry point to the Cloud Foundry Service Offerings V3 Client API
+     */
+    ServiceOfferingsV3 serviceOfferingsV3();
 
     /**
      * Main entry point to the Cloud Foundry Service Plan Visibilities Client API

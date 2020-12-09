@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.serviceplans;
+package org.cloudfoundry.client.v3.serviceofferings;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -25,30 +25,23 @@ import org.immutables.value.Value;
 import java.util.Map;
 
 /**
- * Broker Catalog information for a Service Plan
+ * Broker Catalog information for a Service Offering
  */
 @JsonDeserialize
 @Value.Immutable
 abstract class _BrokerCatalog {
 
     /**
-     * The identifier that the service broker provided for this service plan
+     * The identifier that the service broker provided for this service offering
      */
     @JsonProperty("id")
     abstract String getBrokerCatalogId();
 
     /**
-     * Broker-related features of the Service Plan
+     * Broker-related features of the service offering
      */
     @JsonProperty("features")
     abstract Features getFeatures();
-
-    /**
-     * The maximum number of seconds that Cloud Foundry will wait for an asynchronous service broker operation
-     */
-    @JsonProperty("maximum_polling_duration")
-    @Nullable
-    abstract Integer getMaximumPollingDuration();
 
     /**
      * The metadata
