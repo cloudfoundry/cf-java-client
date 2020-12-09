@@ -18,6 +18,7 @@ package org.cloudfoundry.client.v3.serviceofferings;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
@@ -31,6 +32,7 @@ abstract class _Features {
      * Whether service instance updates relating only to context are propagated to the service broker
      */
     @JsonProperty("allow_context_updates")
+    @Nullable
     abstract Boolean getAllowContextUpdates();
 
     /**
