@@ -1,0 +1,10 @@
+{
+  "metadata": {
+    "labels": {
+      "key": "value"
+    },
+    "annotations": {
+      "note": "detailed information"
+    }
+  }
+}
