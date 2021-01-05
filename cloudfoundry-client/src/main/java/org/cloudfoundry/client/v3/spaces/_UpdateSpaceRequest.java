@@ -30,6 +30,10 @@ import org.immutables.value.Value;
 @Value.Immutable
 abstract class _UpdateSpaceRequest {
 
+    @JsonProperty("name")
+    @Nullable
+    abstract String getName();
+
     /**
      * The metadata
      */

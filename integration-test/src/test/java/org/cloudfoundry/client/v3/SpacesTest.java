@@ -243,6 +243,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     @Test
     public void update() {
         String spaceName = this.nameFactory.getSpaceName();
+        String newSpaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
             .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
@@ -251,9 +252,10 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .annotation("annotationKey", "annotationValue")
                     .label("labelKey", "labelValue")
                     .build())
+                .name(newSpaceName)
                 .spaceId(spaceId)
                 .build()))
-            .thenMany(requestListSpaces(this.cloudFoundryClient, spaceName))
+            .thenMany(requestListSpaces(this.cloudFoundryClient, newSpaceName))
             .map(SpaceResource::getMetadata)
             .as(StepVerifier::create)
             .consumeNextWith(metadata -> {
