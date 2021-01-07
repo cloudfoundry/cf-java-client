@@ -95,7 +95,7 @@ public final class FileUtils {
                     throw Exceptions.propagate(e);
                 }
             })
-            .subscribeOn(Schedulers.elastic());
+            .subscribeOn(Schedulers.boundedElastic());
     }
 
     /**

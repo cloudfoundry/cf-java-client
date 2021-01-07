@@ -36,9 +36,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.ReplayProcessor;
+import reactor.core.publisher.Sinks;
 import reactor.netty.ByteBufFlux;
 import reactor.netty.http.client.HttpClientForm;
 import reactor.netty.http.client.HttpClientRequest;
@@ -58,6 +57,7 @@ import java.util.function.Function;
 import static io.netty.handler.codec.http.HttpHeaderNames.AUTHORIZATION;
 import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
 import static io.netty.handler.codec.http.HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED;
+import static reactor.core.publisher.Sinks.EmitFailureHandler.FAIL_FAST;
 
 /**
  * An abstract base class for all token providers that interact with the UAA. It encapsulates the logic to refresh the token before
@@ -106,7 +106,7 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
      * @return a {@link Flux} that emits the last token on subscribe and new refresh tokens as they are negotiated
      */
     public Flux<String> getRefreshTokens(ConnectionContext connectionContext) {
-        return getRefreshTokenStream(connectionContext).processor;
+        return getRefreshTokenStream(connectionContext).sink.asFlux();
     }
 
     @Override
@@ -206,7 +206,7 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
                 }
 
                 this.refreshTokens.put(connectionContext, Mono.just(refreshToken));
-                getRefreshTokenStream(connectionContext).sink.next(refreshToken);
+                getRefreshTokenStream(connectionContext).sink.emitNext(refreshToken, FAIL_FAST);
             });
     }
 
@@ -271,9 +271,7 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
 
     private static final class RefreshToken {
 
-        private ReplayProcessor<String> processor = ReplayProcessor.cacheLast();
-
-        private FluxSink<String> sink = this.processor.sink();
+        private Sinks.Many<String> sink = Sinks.many().replay().latest();
 
     }
 

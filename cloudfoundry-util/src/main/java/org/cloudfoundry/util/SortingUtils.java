@@ -17,8 +17,8 @@
 package org.cloudfoundry.util;
 
 import reactor.core.Disposable;
-import reactor.core.publisher.DirectProcessor;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Sinks;
 import reactor.util.function.Tuple2;
 
 import java.time.Duration;
@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.function.Function;
+
+import static reactor.core.publisher.Sinks.EmitFailureHandler.FAIL_FAST;
 
 /**
  * Utilities for sorting
@@ -53,7 +55,7 @@ public final class SortingUtils {
 
             Object monitor = new Object();
 
-            DirectProcessor<Void> d = DirectProcessor.create();
+            Sinks.Many<Object> d = Sinks.many().multicast().directBestEffort();
 
             Disposable disposable = source
                 .timestamp()
@@ -61,11 +63,11 @@ public final class SortingUtils {
                     synchronized (monitor) {
                         accumulator.add(item);
                     }
-                }, d::onError, d::onComplete);
+                }, throwable -> d.emitError(throwable, FAIL_FAST), () -> d.emitComplete(FAIL_FAST));
 
             return Flux
                 .interval(timespan)
-                .takeUntilOther(d)
+                .takeUntilOther(d.asFlux())
                 .flatMap(n -> getItems(accumulator, monitor, timespan), null, () -> getItems(accumulator, monitor, Duration.ZERO))
                 .doOnCancel(disposable::dispose);
         };

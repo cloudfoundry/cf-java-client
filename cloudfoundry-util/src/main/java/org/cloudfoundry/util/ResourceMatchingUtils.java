@@ -58,7 +58,7 @@ public final class ResourceMatchingUtils {
             .doOnNext(matched -> LOGGER.debug("{} resources matched totaling {}", matched.size(), SizeUtils.asIbi(matched.stream()
                 .mapToInt(ArtifactMetadata::getSize)
                 .sum())))
-            .subscribeOn(Schedulers.elastic());
+            .subscribeOn(Schedulers.boundedElastic());
     }
 
     private static Flux<ArtifactMetadata> getArtifactMetadataFromDirectory(Path application) {

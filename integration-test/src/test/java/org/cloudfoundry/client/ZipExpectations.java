@@ -45,7 +45,7 @@ public final class ZipExpectations {
             Iterator<Entry> expectedIterator = expectedEntries.iterator();
 
             for (Entry actualEntry : actualEntries) {
-                assertThat(actualEntry).isEqualToComparingOnlyGivenFields(expectedIterator.next(), "compressedSize", "contents", "crc", "directory", "name", "size");
+                assertThat(actualEntry).usingRecursiveComparison().isEqualTo(expectedIterator.next());
             }
         });
     }

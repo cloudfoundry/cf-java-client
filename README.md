@@ -10,12 +10,12 @@
 
 | Job | Status
 | --- | ------
-| `unit-test java 8`             | [![unit-test-8-main](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/java-client/jobs/unit-test-8-main/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/java-client/jobs/unit-test-8-main)
-| `unit-test java 11`             | [![unit-test-11-main](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/java-client/jobs/unit-test-11-main/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/java-client/jobs/unit-test-11-main)
+| `unit-test java 8`      | [![unit-test-8-main](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/java-client/jobs/unit-test-8-main/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/java-client/jobs/unit-test-8-main)
+| `unit-test java 11`     | [![unit-test-11-main](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/java-client/jobs/unit-test-11-main/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/java-client/jobs/unit-test-11-main)
 | `integration-test-2.7`  | [![integration-test-2.7-main](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/java-client/jobs/integration-test-2.7-main/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/java-client/jobs/integration-test-2.7-main)
 | `integration-test-2.8`  | [![integration-test-2.8-main](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/java-client/jobs/integration-test-2.8-main/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/java-client/jobs/integration-test-2.8-main)
 | `integration-test-2.9`  | [![integration-test-2.9-main](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/java-client/jobs/integration-test-2.9-main/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/java-client/jobs/integration-test-2.9-main)
-| `integration-test-2.10`  | [![integration-test-2.10-main](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/java-client/jobs/integration-test-2.10-main/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/java-client/jobs/integration-test-2.10-main)
+| `integration-test-2.10` | [![integration-test-2.10-main](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/java-client/jobs/integration-test-2.10-main/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/java-client/jobs/integration-test-2.10-main)
 | `deploy`                | [![deploy-main](https://java-experience.ci.springapps.io/api/v1/teams/java-experience/pipelines/java-client/jobs/deploy-main/badge)](https://java-experience.ci.springapps.io/teams/java-experience/pipelines/java-client/jobs/deploy-main)
 
 The `cf-java-client` project is a Java language binding for interacting with a Cloud Foundry instance.  The project is broken up into a number of components that expose different levels of abstraction depending on need.
@@ -25,7 +25,7 @@ The `cf-java-client` project is a Java language binding for interacting with a C
 * `cloudfoundry-operations` – An API and implementation that corresponds to the [Cloud Foundry CLI][c] operations.  This project builds on the `cloudfoundry-client` and therefore has a single implementation.
 
 ## Versions
-The Cloud Foundry Java Client has two active versions. The `4.x` line uses Spring Boot `2.3.x` just to manage its dependencies, while the `3.x` line uses Spring Boot `2.1.x`. Unless you have a specific dependency-related reason for using the older version we recommend you adopt the `4.x` line.
+The Cloud Foundry Java Client has two active versions. The `5.x` line uses Spring Boot `2.4.x` just to manage its dependencies, while the `4.x` line uses Spring Boot `2.3.x`.
 
 ## Dependencies
 Most projects will need two dependencies; the Operations API and an implementation of the Client API.  For Maven, the dependencies would be defined like this:
@@ -35,12 +35,12 @@ Most projects will need two dependencies; the Operations API and an implementati
     <dependency>
         <groupId>org.cloudfoundry</groupId>
         <artifactId>cloudfoundry-client-reactor</artifactId>
-        <version>4.10.0.RELEASE</version>
+        <version>5.0.0.RELEASE</version>
     </dependency>
     <dependency>
         <groupId>org.cloudfoundry</groupId>
         <artifactId>cloudfoundry-operations</artifactId>
-        <version>4.10.0.RELEASE</version>
+        <version>5.0.0.RELEASE</version>
     </dependency>
     ...
 </dependencies>
@@ -66,8 +66,8 @@ For Gradle, the dependencies would be defined like this:
 
 ```groovy
 dependencies {
-    compile 'org.cloudfoundry:cloudfoundry-client-reactor:4.10.0.RELEASE'
-    compile 'org.cloudfoundry:cloudfoundry-operations:4.10.0.RELEASE'
+    compile 'org.cloudfoundry:cloudfoundry-client-reactor:5.0.0.RELEASE'
+    compile 'org.cloudfoundry:cloudfoundry-operations:5.0.0.RELEASE'
     ...
 }
 ```

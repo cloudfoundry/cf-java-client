@@ -37,7 +37,6 @@ import reactor.netty.resources.ConnectionProvider;
 import reactor.netty.resources.LoopResources;
 import reactor.netty.tcp.SslProvider;
 import reactor.netty.tcp.SslProvider.DefaultConfigurationType;
-import reactor.netty.tcp.TcpClient;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -104,10 +103,9 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
     @Value.Default
     public HttpClient getHttpClient() {
         HttpClient client = createHttpClient().compress(true)
-            .secure(this::configureSsl)
-            .tcpConfiguration(this::configureTcpClient);
+            .secure(this::configureSsl);
 
-        return getAdditionalHttpClientConfiguration().map(configuration -> configuration.apply(client))
+        return getAdditionalHttpClientConfiguration().map(configuration -> configuration.apply(configureHttpClient(client)))
             .orElse(client);
     }
 
@@ -256,22 +254,33 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
         }
     }
 
-    private TcpClient configureConnectTimeout(TcpClient tcpClient) {
+    private HttpClient configureConnectTimeout(HttpClient client) {
         return getConnectTimeout()
-            .map(connectTimeout -> tcpClient.option(CONNECT_TIMEOUT_MILLIS, (int) connectTimeout.toMillis()))
-            .orElse(tcpClient);
+            .map(connectTimeout -> client.option(CONNECT_TIMEOUT_MILLIS, (int) connectTimeout.toMillis()))
+            .orElse(client);
     }
 
-    private TcpClient configureKeepAlive(TcpClient tcpClient) {
+    private HttpClient configureHttpClient(HttpClient client) {
+        client = configureProxy(client);
+        client = client.runOn(getThreadPool())
+            .option(SO_SNDBUF, SEND_RECEIVE_BUFFER_SIZE)
+            .option(SO_RCVBUF, SEND_RECEIVE_BUFFER_SIZE);
+        client = configureKeepAlive(client);
+        client = client.wiretap("cloudfoundry-client.wire", LogLevel.TRACE);
+
+        return configureConnectTimeout(client);
+    }
+
+    private HttpClient configureKeepAlive(HttpClient client) {
         return getKeepAlive()
-            .map(keepAlive -> tcpClient.option(SO_KEEPALIVE, keepAlive))
-            .orElse(tcpClient);
+            .map(keepAlive -> client.option(SO_KEEPALIVE, keepAlive))
+            .orElse(client);
     }
 
-    private TcpClient configureProxy(TcpClient tcpClient) {
+    private HttpClient configureProxy(HttpClient client) {
         return getProxyConfiguration()
-            .map(proxyConfiguration -> proxyConfiguration.configure(tcpClient))
-            .orElse(tcpClient);
+            .map(proxyConfiguration -> proxyConfiguration.configure(client))
+            .orElse(client);
     }
 
     private void configureSsl(SslProvider.SslContextSpec ssl) {
@@ -280,17 +289,6 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
         getSslCloseNotifyReadTimeout().ifPresent(builder::closeNotifyReadTimeout);
         getSslHandshakeTimeout().ifPresent(builder::handshakeTimeout);
         getSslCloseNotifyFlushTimeout().ifPresent(builder::closeNotifyFlushTimeout);
-    }
-
-    private TcpClient configureTcpClient(TcpClient tcpClient) {
-        tcpClient = configureProxy(tcpClient);
-        tcpClient = tcpClient.runOn(getThreadPool())
-            .option(SO_SNDBUF, SEND_RECEIVE_BUFFER_SIZE)
-            .option(SO_RCVBUF, SEND_RECEIVE_BUFFER_SIZE);
-        tcpClient = configureKeepAlive(tcpClient);
-        tcpClient = tcpClient.wiretap("cloudfoundry-client.wire", LogLevel.TRACE);
-
-        return configureConnectTimeout(tcpClient);
     }
 
     private HttpClient createHttpClient() {
