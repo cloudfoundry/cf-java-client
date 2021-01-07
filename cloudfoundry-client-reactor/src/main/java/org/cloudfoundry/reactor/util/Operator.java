@@ -159,6 +159,13 @@ public class Operator extends OperatorContextAware {
         public Mono<HttpClientResponse> get() {
             return this.responseReceiver.responseConnection((response, connection) -> Mono.just(HttpClientResponseWithConnection.of(connection, response)))
                 .transform(this::processResponse)
+                .flatMap(httpClientResponseWithConnection -> {
+                    Connection connection = httpClientResponseWithConnection.getConnection();
+                    return ByteBufFlux.fromInbound(connection.inbound().receive()
+                        .doFinally(signalType -> connection.dispose()))
+                        .then()
+                        .thenReturn(httpClientResponseWithConnection);
+                })
                 .map(HttpClientResponseWithConnection::getResponse)
                 .singleOrEmpty();
         }
