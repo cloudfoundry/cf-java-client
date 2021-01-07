@@ -53,20 +53,7 @@ public final class DelayUtils {
     }
 
     /**
-     * Implements an exponential backoff delay for use with {@link Mono#retryWhen(Function)}
-     *
-     * @param minimum the minimum duration
-     * @param maximum the maximum duration
-     * @param timeout the maximum amount of time to delay for
-     * @return a delayed {@link Publisher}
-     */
-    public static Function<Flux<Throwable>, Publisher<?>> exponentialBackOffError(Duration minimum, Duration maximum, Duration timeout) {
-        Instant finish = Instant.now().plus(timeout);
-        return errors -> getDelay(minimum, maximum, finish, errors.zipWith(Flux.range(0, Integer.MAX_VALUE), (error, iteration) -> iteration.longValue()));
-    }
-
-    /**
-     * Implements an fixed delay for use with {@link Mono#repeatWhenEmpty(Function)}
+     * Implements a fixed delay for use with {@link Mono#repeatWhenEmpty(Function)}
      *
      * @param duration the duration of the delay
      * @return a delayed {@link Publisher}

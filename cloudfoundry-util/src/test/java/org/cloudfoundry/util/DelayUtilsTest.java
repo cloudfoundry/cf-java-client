@@ -44,45 +44,6 @@ public final class DelayUtilsTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void exponentialBackOffError() {
-        StepVerifier.withVirtualTime(() -> (Publisher<Long>) DelayUtils.exponentialBackOffError(Duration.ofSeconds(1), Duration.ofSeconds(5), Duration.ofSeconds(5))
-            .apply(Flux.just(new RuntimeException(), new RuntimeException(), new RuntimeException())))
-            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(2)))
-            .expectNext(0L)
-            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(4)))
-            .expectNext(0L)
-            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(8)))
-            .expectNext(0L)
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
-    }
-
-    @SuppressWarnings("unchecked")
-    @Test
-    public void exponentialBackOffErrorMaximum() {
-        StepVerifier.withVirtualTime(() -> (Publisher<Long>) DelayUtils.exponentialBackOffError(Duration.ofSeconds(1), Duration.ofSeconds(1), Duration.ofSeconds(5))
-            .apply(Flux.just(new RuntimeException(), new RuntimeException(), new RuntimeException())))
-            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(1)))
-            .expectNext(0L)
-            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(1)))
-            .expectNext(0L)
-            .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(1)))
-            .expectNext(0L)
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
-    }
-
-    @Test
-    public void exponentialBackOffErrorTimeout() {
-        StepVerifier.create(DelayUtils.exponentialBackOffError(Duration.ofMillis(500), Duration.ofMillis(500), Duration.ofMillis(100))
-            .apply(Mono.delay(Duration.ofMillis(200))
-                .thenMany(Flux.just(new RuntimeException()))))
-            .expectError(DelayTimeoutException.class)
-            .verify(Duration.ofSeconds(5));
-    }
-
-    @SuppressWarnings("unchecked")
-    @Test
     public void exponentialBackOffMaximum() {
         StepVerifier.withVirtualTime(() -> (Publisher<Long>) DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(1), Duration.ofSeconds(5))
             .apply(Flux.just(1L, 2L, 3L)))
