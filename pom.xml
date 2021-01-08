@@ -270,6 +270,13 @@
             </build>
         </profile>
         <profile>
+            <id>test-logcache</id>
+
+            <modules>
+                <module>test-log-cache</module>
+            </modules>
+        </profile>
+        <profile>
             <id>test-service-broker</id>
 
             <modules>
