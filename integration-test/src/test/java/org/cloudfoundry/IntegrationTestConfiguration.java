@@ -28,7 +28,9 @@ import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerRequ
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.doppler.DopplerClient;
+import org.cloudfoundry.logcache.v1.TestLogCacheEndpoints;
 import org.cloudfoundry.networking.NetworkingClient;
 import org.cloudfoundry.operations.DefaultCloudFoundryOperations;
 import org.cloudfoundry.reactor.ConnectionContext;
@@ -37,6 +39,7 @@ import org.cloudfoundry.reactor.ProxyConfiguration;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.ReactorCloudFoundryClient;
 import org.cloudfoundry.reactor.doppler.ReactorDopplerClient;
+import org.cloudfoundry.reactor.logcache.v1.ReactorLogCacheClient;
 import org.cloudfoundry.reactor.networking.ReactorNetworkingClient;
 import org.cloudfoundry.reactor.routing.ReactorRoutingClient;
 import org.cloudfoundry.reactor.tokenprovider.ClientCredentialsGrantTokenProvider;
@@ -66,15 +69,20 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.security.SecureRandom;
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -274,8 +282,30 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean
+    ReactorLogCacheClient logCacheClient(ConnectionContext connectionContext, TokenProvider tokenProvider) {
+        return ReactorLogCacheClient.builder()
+            .connectionContext(connectionContext)
+            .tokenProvider(tokenProvider)
+            .build();
+    }
+
+    @Bean
     RandomNameFactory nameFactory(Random random) {
         return new RandomNameFactory(random);
+    }
+
+    @Bean(initMethod = "block")
+    @DependsOn("cloudFoundryCleaner")
+    Mono<String> metricRegistrarServiceInstance(CloudFoundryClient cloudFoundryClient, Mono<String> spaceId, NameFactory nameFactory) {
+        return spaceId
+            .flatMap(spaceIdValue ->cloudFoundryClient.userProvidedServiceInstances()
+                .create(CreateUserProvidedServiceInstanceRequest.builder()
+                    .name(nameFactory.getServiceInstanceName())
+                    .spaceId(spaceIdValue)
+                    .syslogDrainUrl("structured-format://json")
+                    .build()))
+            .map(ResourceUtils::getId)
+            .cache();
     }
 
     @Bean
@@ -432,6 +462,39 @@ public class IntegrationTestConfiguration {
     @Bean
     String stackName() {
         return "cflinuxfs3";
+    }
+
+    @Bean(initMethod = "block")
+    @DependsOn("cloudFoundryCleaner")
+    Mono<ApplicationUtils.ApplicationMetadata> testLogCacheApp(CloudFoundryClient cloudFoundryClient, Mono<String> spaceId, Mono<String> metricRegistrarServiceInstance, String testLogCacheAppName,
+                                                               String testLogCacheHostName, Path testLogCacheAppbits) {
+        return metricRegistrarServiceInstance
+            .zipWith(spaceId)
+            .flatMap(function((metricsRegistrarServiceInstanceId, spaceIdValue) -> ApplicationUtils
+                .pushApplication(cloudFoundryClient, testLogCacheAppbits, testLogCacheAppName, Collections.singleton(metricsRegistrarServiceInstanceId), new HashMap<>(), testLogCacheHostName,
+                                 spaceIdValue)))
+            .cache();
+    }
+
+    @Bean
+    Path testLogCacheAppBits() throws IOException {
+        return new ClassPathResource("test-log-cache.jar").getFile().toPath();
+    }
+
+    @Bean
+    String testLogCacheAppName(NameFactory nameFactory) {
+        return nameFactory.getApplicationName();
+    }
+
+    @Bean
+    TestLogCacheEndpoints testLogCacheEndpoints(ConnectionContext connectionContext, TokenProvider tokenProvider, Mono<ApplicationUtils.ApplicationMetadata> testLogCacheApp) {
+
+        return new TestLogCacheEndpoints(connectionContext, testLogCacheApp.map(app -> app.uri), tokenProvider);
+    }
+
+    @Bean
+    String testLogCacheHostName(NameFactory nameFactory) {
+        return nameFactory.getHostName();
     }
 
     @Bean

@@ -1,0 +1,16 @@
+{
+  "meta": {
+    "traffic_controller": {
+      "count": "5490",
+      "expired": "1069110",
+      "newestTimestamp": "1588631926299067790",
+      "oldestTimestamp": "1588595386296937544"
+    },
+    "uaa": {
+      "count": "100000",
+      "expired": "79066604",
+      "newestTimestamp": "1588631951858159538",
+      "oldestTimestamp": "1588623478864261934"
+    }
+  }
+}

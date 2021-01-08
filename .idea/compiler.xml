@@ -9,6 +9,7 @@
         <module name="cloudfoundry-client" />
         <module name="cloudfoundry-util" />
         <module name="cloudfoundry-client-reactor" />
+        <module name="test-log-cache" />
         <module name="test-service-broker" />
         <module name="integration-test" />
         <module name="cloudfoundry-operations" />
@@ -22,6 +23,7 @@
       <module name="cloudfoundry-operations" options="-Werror -Xlint:all -Xlint:-options -Xlint:-processing -Xlint:-serial" />
       <module name="cloudfoundry-util" options="-Werror -Xlint:all -Xlint:-options -Xlint:-processing -Xlint:-serial" />
       <module name="integration-test" options="-Werror -Xlint:all -Xlint:-options -Xlint:-processing -Xlint:-serial" />
+      <module name="test-log-cache" options="-Werror -Xlint:all -Xlint:-options -Xlint:-processing -Xlint:-serial" />
       <module name="test-service-broker" options="-Werror -Xlint:all -Xlint:-options -Xlint:-processing -Xlint:-serial" />
     </option>
   </component>

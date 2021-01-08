@@ -1,0 +1,87 @@
+{
+  "envelopes" : {
+    "batch" : [
+      {
+        "deprecated_tags" : {},
+        "gauge" : {
+          "metrics" : {
+            "cpu" : {
+              "unit" : "percentage",
+              "value" : 0.394234612100979
+            },
+            "disk" : {
+              "unit" : "bytes",
+              "value" : 433881088
+            },
+            "disk_quota" : {
+              "unit" : "bytes",
+              "value" : 2122546345
+            },
+            "memory" : {
+              "unit" : "bytes",
+              "value" : 822926477
+            },
+            "memory_quota" : {
+              "unit" : "bytes",
+              "value" : 2147483648
+            }
+          }
+        },
+        "instance_id" : "0",
+        "source_id" : "1a69c137-90f5-4b0a-8526-2ebca84c83a8",
+        "tags" : {
+          "app_id" : "1a69c137-90f5-4b0a-8526-2ebca84c83a8",
+          "app_name" : "test",
+          "deployment" : "cf-6a000373a858bcb78f1c",
+          "index" : "f237deb0-471f-459a-a18b-de084a8113e7",
+          "instance_id" : "0",
+          "ip" : "10.194.34.36",
+          "job" : "diego_cell",
+          "organization_id" : "825ec316-5590-416a-9247-1dd0a5750801",
+          "organization_name" : "system",
+          "origin" : "rep",
+          "process_id" : "1a69c137-90f5-4b0a-8526-2ebca84c83a8",
+          "process_instance_id" : "9173f9d0-02b7-4f39-4738-f53b",
+          "process_type" : "web",
+          "product" : "Pivotal Application Service",
+          "source_id" : "1a69c137-90f5-4b0a-8526-2ebca84c83a8",
+          "space_id" : "547d902c-0554-4e7c-b886-3926a2e73bdf",
+          "space_name" : "test",
+          "system_domain" : "cf.red.springapps.io"
+        },
+        "timestamp" : "1588592413697846700"
+      },
+      {
+        "deprecated_tags" : {},
+        "instance_id" : "0",
+        "log" : {
+          "payload" : "MjAyMC0wNS0wNCAxODozNjo0NC42ODYgIElORk8gMTMgLS0tIFstaW5zdGFuY2Uua2V5LTBdIG8uYy5zLkZpbGVXYXRjaGluZ1g1MDlFeHRlbmRlZEtleU1hbmFnZXIgOiBVcGRhdGVkIEtleU1hbmFnZXIgZm9yIC9ldGMvY2YtaW5zdGFuY2UtY3JlZGVudGlhbHMvaW5zdGFuY2Uua2V5IGFuZCAvZXRjL2NmLWluc3RhbmNlLWNyZWRlbnRpYWxzL2luc3RhbmNlLmNydA==",
+          "type" : "OUT"
+        },
+        "source_id" : "1a69c137-90f5-4b0a-8526-2ebca84c83a8",
+        "tags" : {
+          "app_id" : "1a69c137-90f5-4b0a-8526-2ebca84c83a8",
+          "app_name" : "test",
+          "deployment" : "cf-6a000373a858bcb78f1c",
+          "index" : "f237deb0-471f-459a-a18b-de084a8113e7",
+          "instance_id" : "0",
+          "ip" : "10.194.34.36",
+          "job" : "diego_cell",
+          "organization_id" : "825ec316-5590-416a-9247-1dd0a5750801",
+          "organization_name" : "system",
+          "origin" : "rep",
+          "process_id" : "1a69c137-90f5-4b0a-8526-2ebca84c83a8",
+          "process_instance_id" : "9173f9d0-02b7-4f39-4738-f53b",
+          "process_type" : "web",
+          "product" : "Pivotal Application Service",
+          "source_id" : "1a69c137-90f5-4b0a-8526-2ebca84c83a8",
+          "source_type" : "APP/PROC/WEB",
+          "space_id" : "547d902c-0554-4e7c-b886-3926a2e73bdf",
+          "space_name" : "test",
+          "system_domain" : "cf.red.springapps.io"
+        },
+        "timestamp" : "1588617404686865694"
+      }
+    ]
+  }
+}
