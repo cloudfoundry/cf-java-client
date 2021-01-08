@@ -19,6 +19,7 @@ package org.cloudfoundry.logcache.v1;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.Nullable;
+import org.cloudfoundry.doppler.HttpStartStop;
 import org.immutables.value.Value;
 
 import java.nio.ByteBuffer;
@@ -29,18 +30,23 @@ import java.util.Base64;
 @Value.Immutable
 abstract class _Log {
 
-    @Nullable
-    @JsonProperty("payload")
-    abstract String getPayload();
-
-    @Nullable
-    @JsonProperty("type")
-    abstract LogType getType();
-
     public String getPayloadAsText() {
         final byte[] decodedPayload = Base64.getDecoder().decode(getPayload());
         return StandardCharsets.UTF_8.decode(ByteBuffer.wrap(decodedPayload)).toString();
     }
 
-}
+    /**
+     * The log payload
+     */
+    @JsonProperty("payload")
+    @Nullable
+    abstract String getPayload();
 
+    /**
+     * The log type
+     */
+    @JsonProperty("type")
+    @Nullable
+    abstract LogType getType();
+
+}

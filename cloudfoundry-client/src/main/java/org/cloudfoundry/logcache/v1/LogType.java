@@ -16,7 +16,47 @@
 
 package org.cloudfoundry.logcache.v1;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 public enum LogType {
-    OUT,
-    ERR
+
+    /**
+     * {@code STDERR}
+     */
+    ERR("ERR"),
+
+    /**
+     * {@code STDOUT}
+     */
+    OUT("OUT");
+
+    private final String value;
+
+    LogType(String value) {
+        this.value = value;
+    }
+
+    @JsonCreator
+    public static LogType from(String s) {
+        switch (s.toLowerCase()) {
+            case "err":
+                return ERR;
+            case "out":
+                return OUT;
+            default:
+                throw new IllegalArgumentException(String.format("Unknown log type: %s", s));
+        }
+    }
+
+    @JsonValue
+    public String getValue() {
+        return this.value;
+    }
+
+    @Override
+    public String toString() {
+        return getValue();
+    }
+
 }

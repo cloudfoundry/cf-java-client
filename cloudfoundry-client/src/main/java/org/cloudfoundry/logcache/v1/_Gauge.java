@@ -27,8 +27,11 @@ import java.util.Map;
 @Value.Immutable
 abstract class _Gauge {
 
-    @AllowNulls
+    /**
+     * The gauge metrics
+     */
     @JsonProperty("metrics")
+    @AllowNulls
     abstract Map<String, Metric> getMetrics();
 
 }

@@ -22,15 +22,15 @@ import org.immutables.value.Value;
 @Value.Immutable
 abstract class _Event {
 
+    @JsonProperty("type")
+    public String getType() {
+        return "event";
+    }
+
     @JsonProperty("body")
     abstract String getBody();
 
     @JsonProperty("title")
     abstract String getTitle();
-
-    @JsonProperty("type")
-    public String getType() {
-        return "event";
-    }
 
 }

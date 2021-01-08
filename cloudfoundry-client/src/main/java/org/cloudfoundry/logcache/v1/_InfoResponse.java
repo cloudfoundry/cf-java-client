@@ -28,11 +28,18 @@ import org.immutables.value.Value;
 @Value.Immutable
 abstract class _InfoResponse {
 
+    /**
+     * The info version
+     */
     @JsonProperty("version")
     @Nullable
     abstract String getVersion();
 
+    /**
+     * The vm uptime
+     */
     @JsonProperty("vm_uptime")
     @Nullable
     abstract Long vmUptime();
+
 }

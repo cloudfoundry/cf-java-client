@@ -35,6 +35,10 @@ public class LogCacheTestApplication {
         this.objectMapper = objectMapper;
     }
 
+    public static void main(String[] args) {
+        SpringApplication.run(LogCacheTestApplication.class, args);
+    }
+
     @RequestMapping("/counter")
     public String counter(@RequestParam("name") String name, @RequestParam("delta") Long delta) throws Exception {
         final String json = this.objectMapper.writeValueAsString(Counter.builder()
@@ -76,10 +80,6 @@ public class LogCacheTestApplication {
         final String output = "{\"type\":\"event\",\"title\":\"Test Title\",\"body\":\"Test Body\"}";
         System.out.println(output);
         return output;
-    }
-
-    public static void main(String[] args) {
-        SpringApplication.run(LogCacheTestApplication.class, args);
     }
 
 }

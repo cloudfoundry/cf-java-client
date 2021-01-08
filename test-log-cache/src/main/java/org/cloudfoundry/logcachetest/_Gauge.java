@@ -22,15 +22,15 @@ import org.immutables.value.Value;
 @Value.Immutable
 abstract class _Gauge {
 
+    @JsonProperty("type")
+    public String getType() {
+        return "gauge";
+    }
+
     @JsonProperty("name")
     abstract String getName();
 
     @JsonProperty("value")
     abstract Double getValue();
-
-    @JsonProperty("type")
-    public String getType() {
-        return "gauge";
-    }
 
 }

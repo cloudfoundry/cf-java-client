@@ -25,16 +25,25 @@ import org.immutables.value.Value;
 @Value.Immutable
 abstract class _Timer {
 
-    @Nullable
+    /**
+     * The timer name
+     */
     @JsonProperty("name")
+    @Nullable
     abstract String getName();
 
-    @Nullable
+    /**
+     * The timer start
+     */
     @JsonProperty("start")
+    @Nullable
     abstract Long getStart();
 
-    @Nullable
+    /**
+     * The timer stop
+     */
     @JsonProperty("stop")
+    @Nullable
     abstract Long getStop();
 
 }

@@ -22,10 +22,10 @@ import org.immutables.value.Value;
 @Value.Immutable
 abstract class _EventRequest {
 
-    @QueryParameter("title")
-    abstract String getTitle();
-
     @QueryParameter("body")
     abstract String getBody();
+
+    @QueryParameter("title")
+    abstract String getTitle();
 
 }

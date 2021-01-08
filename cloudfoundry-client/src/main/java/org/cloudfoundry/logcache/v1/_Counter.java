@@ -25,16 +25,25 @@ import org.immutables.value.Value;
 @Value.Immutable
 abstract class _Counter {
 
-    @Nullable
-    @JsonProperty("name")
-    abstract String getName();
-
-    @Nullable
+    /**
+     * The amount by which to increment the counter
+     */
     @JsonProperty("delta")
+    @Nullable
     abstract Long getDelta();
 
+    /**
+     * The name of the counter. Must be consistent for downstream consumers to associate events semantically.
+     */
+    @JsonProperty("name")
     @Nullable
+    abstract String getName();
+
+    /**
+     * The total value of the counter. This will be overridden by Metron, which internally tracks the total of each named Counter it receives.
+     */
     @JsonProperty("total")
+    @Nullable
     abstract Long getTotal();
 
 }

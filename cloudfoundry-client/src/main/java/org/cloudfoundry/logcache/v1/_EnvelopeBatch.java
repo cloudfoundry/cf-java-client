@@ -18,6 +18,7 @@ package org.cloudfoundry.logcache.v1;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.doppler.HttpStartStop;
 import org.immutables.value.Value;
 
 import java.util.List;
@@ -26,6 +27,9 @@ import java.util.List;
 @Value.Immutable
 abstract class _EnvelopeBatch {
 
+    /**
+     * The batch
+     */
     @JsonProperty("batch")
     abstract List<Envelope> getBatch();
 

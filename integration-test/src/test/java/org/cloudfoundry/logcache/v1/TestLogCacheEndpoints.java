@@ -62,17 +62,17 @@ public class TestLogCacheEndpoints extends AbstractReactorOperations {
             .build(), "log");
     }
 
+    private Function<UriComponentsBuilder, UriComponentsBuilder> buildPathSegments(String[] pathSegments) {
+        return builder -> builder.pathSegment(pathSegments);
+    }
+
     private Mono<Void> get(Object requestPayload, String... pathSegments) {
         return createOperator()
             .flatMap(operator -> operator.get()
                 .uri(buildPathSegments(pathSegments).andThen(queryTransformer(requestPayload)))
                 .response()
                 .get())
-                .then();
-    }
-
-    private Function<UriComponentsBuilder, UriComponentsBuilder> buildPathSegments(String[] pathSegments) {
-        return builder -> builder.pathSegment(pathSegments);
+            .then();
     }
 
     private Function<UriComponentsBuilder, UriComponentsBuilder> queryTransformer(Object requestPayload) {

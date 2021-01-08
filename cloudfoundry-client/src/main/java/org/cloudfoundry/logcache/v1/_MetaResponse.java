@@ -29,6 +29,9 @@ import java.util.Map;
 @Value.Immutable
 abstract class _MetaResponse {
 
+    /**
+     * The meta data
+     */
     @JsonProperty("meta")
     abstract Map<String, Metadata> getMeta();
 

@@ -19,19 +19,26 @@ package org.cloudfoundry.logcache.v1;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.Nullable;
+import org.cloudfoundry.doppler.HttpStartStop;
 import org.immutables.value.Value;
 
 @JsonDeserialize
 @Value.Immutable
 abstract class _Event {
 
-    @Nullable
-    @JsonProperty("title")
-    abstract String getTitle();
-
-    @Nullable
+    /**
+     * The event body
+     */
     @JsonProperty("body")
+    @Nullable
     abstract String getBody();
+
+    /**
+     * The event title
+     */
+    @JsonProperty("title")
+    @Nullable
+    abstract String getTitle();
 
 }
 

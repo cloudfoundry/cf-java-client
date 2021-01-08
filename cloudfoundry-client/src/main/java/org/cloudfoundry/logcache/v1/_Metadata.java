@@ -18,7 +18,6 @@ package org.cloudfoundry.logcache.v1;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 import java.util.Optional;
@@ -27,15 +26,28 @@ import java.util.Optional;
 @Value.Immutable
 abstract class _Metadata {
 
+    /**
+     * The number of envelopes held in Log Cache
+     */
     @JsonProperty("count")
     abstract Long getCount();
 
+    /**
+     * The number of envelopes that have been pruned
+     */
     @JsonProperty("expired")
     abstract Optional<Long> getExpired();
 
+    /**
+     * Newest entry for the source, in nanoseconds since the Unix epoch
+     */
     @JsonProperty("newestTimestamp")
     abstract Long getNewestTimestamp();
 
+    /**
+     * Oldest entry for the source, in nanoseconds since the Unix epoch
+     */
     @JsonProperty("oldestTimestamp")
     abstract Long getOldestTimestamp();
+
 }

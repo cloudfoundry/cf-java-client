@@ -78,6 +78,11 @@ abstract class _ReactorLogCacheClient implements LogCacheClient {
             .orElseGet(cached::cache);
     }
 
+    /**
+     * The token provider
+     */
+    abstract TokenProvider getTokenProvider();
+
     private Mono<String> deriveLogCacheUrl() {
         return getConnectionContext().getRootProvider().getRoot(getConnectionContext())
             .map(root -> root.replace("api", "log-cache"))
@@ -85,10 +90,5 @@ abstract class _ReactorLogCacheClient implements LogCacheClient {
             .delayUntil(uri -> getConnectionContext().trust(uri.getHost(), uri.getPort()))
             .map(URI::toString);
     }
-
-    /**
-     * The token provider
-     */
-    abstract TokenProvider getTokenProvider();
 
 }

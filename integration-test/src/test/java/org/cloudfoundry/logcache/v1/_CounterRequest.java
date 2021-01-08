@@ -22,10 +22,10 @@ import org.immutables.value.Value;
 @Value.Immutable
 abstract class _CounterRequest {
 
-    @QueryParameter("name")
-    abstract String getName();
-
     @QueryParameter("delta")
     abstract Long getDelta();
+
+    @QueryParameter("name")
+    abstract String getName();
 
 }

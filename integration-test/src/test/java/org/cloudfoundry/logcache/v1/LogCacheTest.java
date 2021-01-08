@@ -43,6 +43,7 @@ public class LogCacheTest extends AbstractIntegrationTest implements Initializin
 
     @Autowired
     private Mono<ApplicationUtils.ApplicationMetadata> testLogCacheApp;
+
     private ApplicationUtils.ApplicationMetadata testLogCacheAppMetadata;
 
     @Autowired
@@ -139,6 +140,13 @@ public class LogCacheTest extends AbstractIntegrationTest implements Initializin
         assertThat(envelope.getCounter().getTotal()).isEqualTo(delta);
     }
 
+    private void assertEnvelope(Envelope envelope) {
+        assertThat(envelope).isNotNull();
+        assertThat(envelope.getInstanceId()).isEqualTo("0");
+        assertThat(envelope.getSourceId()).isEqualTo(this.testLogCacheAppMetadata.applicationId);
+        assertThat(envelope.getTimestamp()).isGreaterThan(0);
+    }
+
     private void assertEvent(Envelope envelope, String title, String body) {
         assertThat(envelope.getEvent().getBody()).isEqualTo(body);
         assertThat(envelope.getEvent().getTitle()).isEqualTo(title);
@@ -148,13 +156,6 @@ public class LogCacheTest extends AbstractIntegrationTest implements Initializin
         assertThat(envelope.getGauge().getMetrics().get(gaugeName).getValue())
             .isCloseTo(value, within(0.001));
     }
-
-    private void assertEnvelope(Envelope envelope) {
-        assertThat(envelope).isNotNull();
-        assertThat(envelope.getInstanceId()).isEqualTo("0");
-        assertThat(envelope.getSourceId()).isEqualTo(this.testLogCacheAppMetadata.applicationId);
-        assertThat(envelope.getTimestamp()).isGreaterThan(0);
-      }
 
     private void assertResponse(ReadResponse readResponse) {
         assertThat(readResponse).isNotNull();
@@ -180,10 +181,10 @@ public class LogCacheTest extends AbstractIntegrationTest implements Initializin
 
     private Mono<Envelope> read(EnvelopeType envelopeType, Predicate<Envelope> filter) {
         return this.logCacheClient.read(ReadRequest.builder()
-                .sourceId(this.testLogCacheAppMetadata.applicationId)
-                .envelopeType(envelopeType)
-                .limit(1000)
-                .build())
+            .sourceId(this.testLogCacheAppMetadata.applicationId)
+            .envelopeType(envelopeType)
+            .limit(1000)
+            .build())
             .doOnNext(this::assertResponse)
             .flatMap(response -> Mono.justOrEmpty(response.getEnvelopes().getBatch().stream().filter(filter).findFirst()))
             .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(5), Duration.ofMinutes(1)))

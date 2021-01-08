@@ -25,12 +25,18 @@ import org.immutables.value.Value;
 @Value.Immutable
 abstract class _Metric {
 
-    @Nullable
+    /**
+     * The metric unit
+     */
     @JsonProperty("unit")
+    @Nullable
     abstract String getUnit();
 
-    @Nullable
+    /**
+     * The metric value
+     */
     @JsonProperty("value")
+    @Nullable
     abstract Double getValue();
 
 }

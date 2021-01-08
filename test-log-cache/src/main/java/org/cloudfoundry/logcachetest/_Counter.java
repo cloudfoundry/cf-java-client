@@ -22,15 +22,15 @@ import org.immutables.value.Value;
 @Value.Immutable
 abstract class _Counter {
 
-    @JsonProperty("name")
-    abstract String getName();
-
-    @JsonProperty("delta")
-    abstract Long getDelta();
-
     @JsonProperty("type")
     public String getType() {
         return "counter";
     }
+
+    @JsonProperty("delta")
+    abstract Long getDelta();
+
+    @JsonProperty("name")
+    abstract String getName();
 
 }

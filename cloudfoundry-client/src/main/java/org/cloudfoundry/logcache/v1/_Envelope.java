@@ -30,40 +30,67 @@ import java.util.Map;
 @JsonIgnoreProperties("deprecated_tags")
 abstract class _Envelope {
 
-    @Nullable
-    @JsonProperty("timestamp")
-    abstract Long getTimestamp();
-
-    @Nullable
-    @JsonProperty("source_id")
-    abstract String  getSourceId();
-
-    @Nullable
-    @JsonProperty("instance_id")
-    abstract String getInstanceId();
-
-    @AllowNulls
-    @JsonProperty("tags")
-    abstract Map<String, String> getTags();
-
-    @Nullable
-    @JsonProperty("log")
-    abstract Log getLog();
-
-    @Nullable
+    /**
+     * The enclosed {@link Counter}
+     */
     @JsonProperty("counter")
+    @Nullable
     abstract Counter getCounter();
 
+    /**
+     * The enclosed {@link Event}
+     */
+    @JsonProperty("event")
     @Nullable
+    abstract Event getEvent();
+
+    /**
+     * The enclosed {@link Gauge}
+     */
     @JsonProperty("gauge")
+    @Nullable
     abstract Gauge getGauge();
 
+    /**
+     * The instance id
+     */
+    @JsonProperty("instance_id")
     @Nullable
+    abstract String getInstanceId();
+
+    /**
+     * The enclosed {@link Log}
+     */
+    @JsonProperty("log")
+    @Nullable
+    abstract Log getLog();
+
+    /**
+     * The source id
+     */
+    @JsonProperty("source_id")
+    @Nullable
+    abstract String getSourceId();
+
+    /**
+     * Key/value tags to include additional identifying information
+     */
+    @JsonProperty("tags")
+    @AllowNulls
+    abstract Map<String, String> getTags();
+
+    /**
+     * The enclosed {@link Timer}
+     */
     @JsonProperty("timer")
+    @Nullable
     abstract Timer getTimer();
 
+    /**
+     * UNIX timestamp (in nanoseconds) event was wrapped in this Envelope.
+     */
+    @JsonProperty("timestamp")
     @Nullable
-    @JsonProperty("event")
-    abstract Event getEvent();
+    abstract Long getTimestamp();
 
 }

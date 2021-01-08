@@ -24,6 +24,9 @@ import org.immutables.value.Value;
 @Value.Immutable
 abstract class _ReadResponse {
 
+    /**
+     * The envelopes
+     */
     @JsonProperty("envelopes")
     @Value.Default
     EnvelopeBatch getEnvelopes() {
