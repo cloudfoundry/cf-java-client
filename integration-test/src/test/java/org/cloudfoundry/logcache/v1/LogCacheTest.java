@@ -18,6 +18,8 @@ package org.cloudfoundry.logcache.v1;
 
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.ApplicationUtils;
+import org.cloudfoundry.CloudFoundryVersion;
+import org.cloudfoundry.IfCloudFoundryVersion;
 import org.junit.Test;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +56,7 @@ public class LogCacheTest extends AbstractIntegrationTest implements Initializin
         this.testLogCacheAppMetadata = this.testLogCacheApp.block();
     }
 
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_8)
     @Test
     public void info() {
         this.logCacheClient.info(InfoRequest.builder().build())
