@@ -48,12 +48,7 @@ import org.cloudfoundry.client.v2.serviceplans.ListServicePlansRequest;
 import org.cloudfoundry.client.v2.serviceplans.ServicePlanResource;
 import org.cloudfoundry.client.v2.services.ListServicesRequest;
 import org.cloudfoundry.client.v2.services.ServiceResource;
-import org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainRequest;
-import org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainResponse;
 import org.cloudfoundry.routing.RoutingClient;
-import org.cloudfoundry.routing.v1.routergroups.ListRouterGroupsRequest;
-import org.cloudfoundry.routing.v1.routergroups.ListRouterGroupsResponse;
-import org.cloudfoundry.routing.v1.routergroups.RouterGroup;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.LastOperationUtils;
 import org.cloudfoundry.util.PaginationUtils;
@@ -624,41 +619,6 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listRoutesFilterByPort() {
-        String domainName = this.nameFactory.getDomainName();
-        Integer port = this.nameFactory.getPort();
-        String serviceInstanceName = this.nameFactory.getServiceInstanceName();
-
-        Mono.zip(this.organizationId, this.spaceId)
-            .flatMap(function((organizationId, spaceId) -> Mono.zip(
-                getRouterGroupId(this.routingClient, DEFAULT_ROUTER_GROUP)
-                    .flatMap(routerGroupId -> createTcpDomainId(this.cloudFoundryClient, domainName, routerGroupId)),
-                createServiceInstanceId(this.cloudFoundryClient, this.serviceBrokerId, serviceInstanceName, this.serviceName, spaceId),
-                Mono.just(spaceId)
-            )))
-            .flatMap(function((domainId, serviceInstanceId, spaceId) -> Mono.zip(
-                createRouteId(this.cloudFoundryClient, domainId, port, spaceId),
-                Mono.just(serviceInstanceId))
-            ))
-            .flatMap(function((routeId, serviceInstanceId) -> requestBindServiceInstanceRoute(this.cloudFoundryClient, routeId, serviceInstanceId)
-                .thenReturn(serviceInstanceId)))
-            .flatMapMany(serviceInstanceId -> Mono.zip(
-                Mono.just(serviceInstanceId),
-                PaginationUtils.requestClientV2Resources(page -> this.cloudFoundryClient.serviceInstances()
-                    .listRoutes(ListServiceInstanceRoutesRequest.builder()
-                        .page(page)
-                        .port(port.toString())
-                        .serviceInstanceId(serviceInstanceId)
-                        .build()))
-                    .map(resource -> ResourceUtils.getEntity(resource).getServiceInstanceId())
-                    .single()))
-            .as(StepVerifier::create)
-            .consumeNextWith(tupleEquality())
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
-    }
-
-    @Test
     public void listServiceBindings() {
         String applicationName = this.nameFactory.getApplicationName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
@@ -825,11 +785,6 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
             .map(ResourceUtils::getId);
     }
 
-    private static Mono<String> createRouteId(CloudFoundryClient cloudFoundryClient, String domainId, Integer port, String spaceId) {
-        return requestCreateRoute(cloudFoundryClient, domainId, port, spaceId)
-            .map(ResourceUtils::getId);
-    }
-
     private static Mono<String> createServiceBindingId(CloudFoundryClient cloudFoundryClient, String applicationId, String serviceInstanceId) {
         return requestCreateServiceBinding(cloudFoundryClient, applicationId, serviceInstanceId)
             .map(ResourceUtils::getId);
@@ -847,11 +802,6 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
             .map(ResourceUtils::getId);
     }
 
-    private static Mono<String> createTcpDomainId(CloudFoundryClient cloudFoundryClient, String name, String routerGroupId) {
-        return requestCreateTcpDomain(cloudFoundryClient, name, routerGroupId)
-            .map(ResourceUtils::getId);
-    }
-
     private static Mono<String> getPlanId(CloudFoundryClient cloudFoundryClient, String serviceBrokerId, String serviceName) {
         return requestListServices(cloudFoundryClient, serviceBrokerId, serviceName)
             .filter(resource -> serviceName.equals(ResourceUtils.getEntity(resource).getLabel()))
@@ -860,14 +810,6 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
             .flatMapMany(serviceId -> requestListServicePlans(cloudFoundryClient, serviceId))
             .single()
             .map(ResourceUtils::getId);
-    }
-
-    private static Mono<String> getRouterGroupId(RoutingClient routingClient, String routerGroupName) {
-        return requestListRouterGroups(routingClient)
-            .flatMapIterable(ListRouterGroupsResponse::getRouterGroups)
-            .filter(group -> routerGroupName.equals(group.getName()))
-            .single()
-            .map(RouterGroup::getRouterGroupId);
     }
 
     private static Mono<BindServiceInstanceRouteResponse> requestBindServiceInstanceRoute(CloudFoundryClient cloudFoundryClient, String routeId, String serviceInstanceId) {
@@ -891,15 +833,6 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
             .create(CreatePrivateDomainRequest.builder()
                 .name(name)
                 .owningOrganizationId(organizationId)
-                .build());
-    }
-
-    private static Mono<CreateRouteResponse> requestCreateRoute(CloudFoundryClient cloudFoundryClient, String domainId, Integer port, String spaceId) {
-        return cloudFoundryClient.routes()
-            .create(CreateRouteRequest.builder()
-                .domainId(domainId)
-                .port(port)
-                .spaceId(spaceId)
                 .build());
     }
 
@@ -936,20 +869,6 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
             .create(CreateServiceKeyRequest.builder()
                 .name(serviceKeyName)
                 .serviceInstanceId(serviceInstanceId)
-                .build());
-    }
-
-    private static Mono<CreateSharedDomainResponse> requestCreateTcpDomain(CloudFoundryClient cloudFoundryClient, String name, String routerGroupId) {
-        return cloudFoundryClient.sharedDomains()
-            .create(CreateSharedDomainRequest.builder()
-                .name(name)
-                .routerGroupId(routerGroupId)
-                .build());
-    }
-
-    private static Mono<ListRouterGroupsResponse> requestListRouterGroups(RoutingClient routingClient) {
-        return routingClient.routerGroups()
-            .list(ListRouterGroupsRequest.builder()
                 .build());
     }
 
