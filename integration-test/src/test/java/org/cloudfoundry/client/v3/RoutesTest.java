@@ -364,32 +364,6 @@ public final class RoutesTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: Establish router group availability. This test has not been verified.
-    public void listByPort() {
-        String domainName = this.nameFactory.getDomainName();
-        Integer port = this.nameFactory.getPort();
-
-        this.organizationId
-            .flatMap(organizationId -> Mono.zip(
-                createDomainId(this.cloudFoundryClient, domainName, organizationId),
-                this.spaceId
-            ))
-            .flatMap(function((domainId, spaceId) -> requestCreateRoute(this.cloudFoundryClient, domainId, null, "listByPort", null, port, spaceId)))
-            .thenMany(PaginationUtils.requestClientV3Resources(page ->
-                this.cloudFoundryClient.routesV3()
-                    .list(ListRoutesRequest.builder()
-                        .port(port)
-                        .page(page)
-                        .build())))
-            .filter(route -> route.getMetadata().getLabels().containsKey("test-listByPort-key"))
-            .map(RouteResource::getMetadata)
-            .map(Metadata::getLabels)
-            .as(StepVerifier::create)
-            .expectNext(Collections.singletonMap("test-listByPort-key", "test-listByPort-value"))
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
-    }
-
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
     @Test
     public void listBySpaceId() {

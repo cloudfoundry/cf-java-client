@@ -602,45 +602,6 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listRoutesFilterByPort() {
-        String applicationName = this.nameFactory.getApplicationName();
-        String domainName = this.nameFactory.getDomainName();
-
-        Mono
-            .zip(this.organizationId, this.spaceId)
-            .flatMap(function((organizationId, spaceId) -> Mono.zip(
-                Mono.just(organizationId),
-                Mono.just(spaceId),
-                createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
-            )))
-            .flatMap(function((organizationId, spaceId, applicationId) -> Mono.zip(
-                Mono.just(applicationId),
-                createApplicationRoute(this.cloudFoundryClient, organizationId, spaceId, domainName, applicationId)
-            )))
-            .flatMap(function((applicationId, routeResponse) -> Mono.zip(
-                Mono.just(ResourceUtils.getId(routeResponse)),
-                PaginationUtils
-                    .requestClientV2Resources(page -> {
-                        ListApplicationRoutesRequest.Builder builder = ListApplicationRoutesRequest.builder()
-                            .applicationId(applicationId)
-                            .page(page);
-
-                        Optional.ofNullable(ResourceUtils.getEntity(routeResponse).getPort()).ifPresent(builder::port);
-
-                        return this.cloudFoundryClient.applicationsV2()
-                            .listRoutes(builder
-                                .build());
-                    })
-                    .single()
-                    .map(ResourceUtils::getId)
-            )))
-            .as(StepVerifier::create)
-            .consumeNextWith(tupleEquality())
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
-    }
-
-    @Test
     public void listServiceBindings() {
         String applicationName = this.nameFactory.getApplicationName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
