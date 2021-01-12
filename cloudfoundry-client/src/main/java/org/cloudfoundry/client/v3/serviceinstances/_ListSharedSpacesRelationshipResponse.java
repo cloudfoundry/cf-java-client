@@ -14,37 +14,39 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.serviceInstances;
+package org.cloudfoundry.client.v3.serviceinstances;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v3.FilterParameter;
-import org.cloudfoundry.client.v3.PaginatedRequest;
+import org.cloudfoundry.client.v3.Link;
+import org.cloudfoundry.client.v3.Relationship;
 import org.immutables.value.Value;
 
 import java.util.List;
+import java.util.Map;
 
 /**
- * The request payload for the List Service Instances operation.
+ * The response payload for the List Shared Spaces Relationship operation
  */
+@JsonDeserialize
 @Value.Immutable
-abstract class _ListServiceInstancesRequest extends PaginatedRequest {
+abstract class _ListSharedSpacesRelationshipResponse {
 
     /**
-     * The metadata query
+     * The shared space
      */
-    @FilterParameter("label_selector")
+    @JsonProperty("data")
     @Nullable
-    abstract String getLabelSelector();
+    abstract List<Relationship> getData();
 
     /**
-     * The service instance names
+     * The links
      */
-    @FilterParameter("names")
-    abstract List<String> getServiceInstanceNames();
+    @AllowNulls
+    @JsonProperty("links")
+    @Nullable
+    abstract Map<String, Link> getLinks();
 
-    /**
-     * The space ids
-     */
-    @FilterParameter("space_guids")
-    abstract List<String> getSpaceIds();
 }

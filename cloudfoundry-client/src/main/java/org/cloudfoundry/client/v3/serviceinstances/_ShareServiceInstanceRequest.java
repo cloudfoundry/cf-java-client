@@ -14,17 +14,32 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.serviceInstances;
+package org.cloudfoundry.client.v3.serviceinstances;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.client.v3.PaginatedResponse;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.cloudfoundry.client.v3.Relationship;
 import org.immutables.value.Value;
 
-/**
- * The response payload for the List Service Instances operation
- */
-@JsonDeserialize
-@Value.Immutable
-abstract class _ListServiceInstancesResponse extends PaginatedResponse<ServiceInstanceResource> {
+import java.util.List;
 
+/**
+ * The request payload for the Share Service Instance operation.
+ */
+@JsonSerialize
+@Value.Immutable
+abstract class _ShareServiceInstanceRequest {
+
+    /**
+     * The spaces the service instance is shared to
+     */
+    @JsonProperty("data")
+    abstract List<Relationship> getData();
+
+    /**
+     * The service instance id
+     */
+    @JsonIgnore
+    abstract String getServiceInstanceId();
 }

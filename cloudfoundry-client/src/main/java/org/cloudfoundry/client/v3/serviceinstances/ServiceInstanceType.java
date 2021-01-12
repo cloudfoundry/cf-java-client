@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.serviceInstances;
+package org.cloudfoundry.client.v3.serviceinstances;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import org.cloudfoundry.client.v3.routes.Route;
 
 /**
  * The protocol of a {@link ServiceInstance}

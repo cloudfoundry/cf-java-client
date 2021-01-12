@@ -14,31 +14,31 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.serviceInstances;
+package org.cloudfoundry.client.v3.serviceinstances;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.cloudfoundry.client.v3.Metadata;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
+import org.cloudfoundry.client.v3.ToOneRelationship;
 import org.immutables.value.Value;
 
 /**
- * The request payload for the Update Application operation
+ * The service instance relationship
  */
-@JsonSerialize
+@JsonDeserialize
 @Value.Immutable
-abstract class _UpdateServiceInstanceRequest {
+abstract class _ServiceInstanceRelationships {
 
     /**
-     * The metadata
+     * The space relationship
      */
-    @JsonProperty("metadata")
-    abstract Metadata getMetadata();
+    @JsonProperty("service_plan")
+    @Nullable
+    abstract ToOneRelationship getServicePlan();
 
     /**
-     * The service instance id
+     * The space relationship
      */
-    @JsonIgnore
-    abstract String getServiceInstanceId();
-
+    @JsonProperty("space")
+    abstract ToOneRelationship getSpace();
 }
