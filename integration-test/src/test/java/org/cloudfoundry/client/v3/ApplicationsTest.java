@@ -503,41 +503,6 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: Establish router group availability. This test has not been verified.
-    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_10)
-    public void listApplicationRoutesByPort() {
-        String applicationName = this.nameFactory.getApplicationName();
-        String domainName = this.nameFactory.getDomainName();
-        Integer port = this.nameFactory.getPort();
-
-        this.organizationId
-            .flatMap(organizationId -> Mono.zip(
-                createDomainId(this.cloudFoundryClient, domainName, organizationId),
-                this.spaceId
-            ))
-
-            .flatMap(function((domainId, spaceId) -> Mono.zip(
-                createApplicationId(this.cloudFoundryClient, applicationName, spaceId),
-                createRouteId(this.cloudFoundryClient, domainId, null, "listApplicationRoutesByPort", null, port, spaceId)
-            )))
-            .flatMapMany(function((applicationId, routeId) -> requestReplaceDestinations(this.cloudFoundryClient, applicationId, routeId)
-                .thenReturn(applicationId)))
-            .flatMap(applicationId -> PaginationUtils.requestClientV3Resources(page ->
-                this.cloudFoundryClient.applicationsV3()
-                    .listRoutes(ListApplicationRoutesRequest.builder()
-                        .applicationId(applicationId)
-                        .port(port)
-                        .page(page)
-                        .build())))
-            .filter(route -> route.getMetadata().getLabels().containsKey("test-listApplicationRoutesByPort-key"))
-            .map(RouteResource::getMetadata)
-            .map(Metadata::getLabels)
-            .as(StepVerifier::create)
-            .expectNext(Collections.singletonMap("test-listApplicationRoutesByPort-key", "test-listApplicationRoutesByPort-value"))
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
-    }
-
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
     @Test
     public void listApplicationRoutesBySpaceId() {
@@ -989,23 +954,6 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .get(GetPackageRequest.builder()
                 .packageId(packageId)
                 .build());
-    }
-
-    private static Flux<ApplicationResource> requestListApplications(CloudFoundryClient cloudFoundryClient, String applicationName) {
-        return PaginationUtils.requestClientV3Resources(page ->
-            cloudFoundryClient.applicationsV3()
-                .list(ListApplicationsRequest.builder()
-                    .name(applicationName)
-                    .page(page)
-                    .build()));
-    }
-
-    private static Flux<DropletResource> requestListDroplets(CloudFoundryClient cloudFoundryClient) {
-        return PaginationUtils.requestClientV3Resources(page ->
-            cloudFoundryClient.droplets()
-                .list(ListDropletsRequest.builder()
-                    .page(page)
-                    .build()));
     }
 
     private static Mono<ReplaceRouteDestinationsResponse> requestReplaceDestinations(CloudFoundryClient cloudFoundryClient, String applicationId, String routeId) {

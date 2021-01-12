@@ -41,9 +41,6 @@ import org.cloudfoundry.client.v2.userprovidedserviceinstances.UpdateUserProvide
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UpdateUserProvidedServiceInstanceResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstanceResource;
 import org.cloudfoundry.routing.RoutingClient;
-import org.cloudfoundry.routing.v1.routergroups.ListRouterGroupsRequest;
-import org.cloudfoundry.routing.v1.routergroups.ListRouterGroupsResponse;
-import org.cloudfoundry.routing.v1.routergroups.RouterGroup;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import org.junit.Test;
@@ -279,39 +276,6 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listRoutesFilterByPort() {
-        String domainName = this.nameFactory.getDomainName();
-        String instanceName = this.nameFactory.getServiceInstanceName();
-        Integer port = this.nameFactory.getPort();
-
-        Mono.zip(
-            getRouterGroupId(this.routingClient, DEFAULT_ROUTER_GROUP)
-                .flatMap(routerGroupId -> createTcpDomainId(this.cloudFoundryClient, domainName, routerGroupId)),
-            this.spaceId
-        )
-            .flatMap(function((domainId, spaceId) -> Mono.zip(
-                createUserProvidedServiceInstanceId(this.cloudFoundryClient, instanceName, spaceId),
-                createRouteId(this.cloudFoundryClient, domainId, port, spaceId))
-            ))
-            .flatMap(function((instanceId, routeId) -> requestAssociateRoute(this.cloudFoundryClient, instanceId, routeId)
-                .thenReturn(instanceId)))
-            .flatMapMany(instanceId -> Mono.zip(
-                Mono.just(instanceId),
-                PaginationUtils.requestClientV2Resources(page -> this.cloudFoundryClient.userProvidedServiceInstances()
-                    .listRoutes(ListUserProvidedServiceInstanceRoutesRequest.builder()
-                        .page(page)
-                        .port(port.toString())
-                        .userProvidedServiceInstanceId(instanceId)
-                        .build()))
-                    .map(resource -> ResourceUtils.getEntity(resource).getServiceInstanceId())
-                    .single()))
-            .as(StepVerifier::create)
-            .consumeNextWith(tupleEquality())
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
-    }
-
-    @Test
     public void listServiceBindings() {
         String applicationName = this.nameFactory.getApplicationName();
         String instanceName = this.nameFactory.getServiceInstanceName();
@@ -394,27 +358,9 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
             .map(ResourceUtils::getId);
     }
 
-    private static Mono<String> createRouteId(CloudFoundryClient cloudFoundryClient, String domainId, Integer port, String spaceId) {
-        return requestCreateRoute(cloudFoundryClient, domainId, port, spaceId)
-            .map(ResourceUtils::getId);
-    }
-
-    private static Mono<String> createTcpDomainId(CloudFoundryClient cloudFoundryClient, String name, String routerGroupId) {
-        return requestCreateTcpDomain(cloudFoundryClient, name, routerGroupId)
-            .map(ResourceUtils::getId);
-    }
-
     private static Mono<String> createUserProvidedServiceInstanceId(CloudFoundryClient cloudFoundryClient, String instanceName, String spaceId) {
         return requestCreateUserProvidedServiceInstance(cloudFoundryClient, instanceName, spaceId)
             .map(ResourceUtils::getId);
-    }
-
-    private static Mono<String> getRouterGroupId(RoutingClient routingClient, String routerGroupName) {
-        return requestListRouterGroups(routingClient)
-            .flatMapIterable(ListRouterGroupsResponse::getRouterGroups)
-            .filter(group -> routerGroupName.equals(group.getName()))
-            .single()
-            .map(RouterGroup::getRouterGroupId);
     }
 
     private static Mono<AssociateUserProvidedServiceInstanceRouteResponse> requestAssociateRoute(CloudFoundryClient cloudFoundryClient, String instanceId, String routeId) {
@@ -451,35 +397,12 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
                 .build());
     }
 
-    private static Mono<CreateRouteResponse> requestCreateRoute(CloudFoundryClient cloudFoundryClient, String domainId, Integer port, String spaceId) {
-        return cloudFoundryClient.routes()
-            .create(CreateRouteRequest.builder()
-                .domainId(domainId)
-                .port(port)
-                .spaceId(spaceId)
-                .build());
-    }
-
-    private static Mono<CreateSharedDomainResponse> requestCreateTcpDomain(CloudFoundryClient cloudFoundryClient, String name, String routerGroupId) {
-        return cloudFoundryClient.sharedDomains()
-            .create(CreateSharedDomainRequest.builder()
-                .name(name)
-                .routerGroupId(routerGroupId)
-                .build());
-    }
-
     private static Mono<CreateUserProvidedServiceInstanceResponse> requestCreateUserProvidedServiceInstance(CloudFoundryClient cloudFoundryClient, String instanceName, String spaceId) {
         return cloudFoundryClient.userProvidedServiceInstances()
             .create(CreateUserProvidedServiceInstanceRequest.builder()
                 .name(instanceName)
                 .routeServiceUrl("https://test.url")
                 .spaceId(spaceId)
-                .build());
-    }
-
-    private static Mono<ListRouterGroupsResponse> requestListRouterGroups(RoutingClient routingClient) {
-        return routingClient.routerGroups()
-            .list(ListRouterGroupsRequest.builder()
                 .build());
     }
 
