@@ -35,6 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 import static org.cloudfoundry.util.DelayUtils.exponentialBackOff;
 
+@IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
 public class LogCacheTest extends AbstractIntegrationTest implements InitializingBean {
 
     @Autowired
@@ -56,7 +57,6 @@ public class LogCacheTest extends AbstractIntegrationTest implements Initializin
         this.testLogCacheAppMetadata = this.testLogCacheApp.block();
     }
 
-    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_8)
     @Test
     public void info() {
         this.logCacheClient.info(InfoRequest.builder().build())
