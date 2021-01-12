@@ -14,32 +14,40 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.serviceInstances;
+package org.cloudfoundry.client.v3.serviceinstances;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.AllowNulls;
+import org.cloudfoundry.Nullable;
+import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.Relationship;
 import org.immutables.value.Value;
 
 import java.util.List;
+import java.util.Map;
 
 /**
- * The request payload for the Share Service Instance operation.
+ * The response payload for the Share Service Instance operation
  */
-@JsonSerialize
+@JsonDeserialize
 @Value.Immutable
-abstract class _ShareServiceInstanceRequest {
+abstract class _ShareServiceInstanceResponse {
 
     /**
-     * The spaces the service instance is shared to
+     * The space
      */
     @JsonProperty("data")
+    @Nullable
     abstract List<Relationship> getData();
 
     /**
-     * The service instance id
+     * The links
      */
-    @JsonIgnore
-    abstract String getServiceInstanceId();
+    @AllowNulls
+    @JsonProperty("links")
+    @Nullable
+    abstract Map<String, Link> getLinks();
+
+
 }

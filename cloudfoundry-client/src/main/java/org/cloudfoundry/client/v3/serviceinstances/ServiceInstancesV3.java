@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.serviceInstances;
+package org.cloudfoundry.client.v3.serviceinstances;
 
 import reactor.core.publisher.Mono;
 

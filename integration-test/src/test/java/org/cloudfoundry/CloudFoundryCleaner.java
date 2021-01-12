@@ -69,9 +69,9 @@ import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServi
 import org.cloudfoundry.client.v2.users.UserResource;
 import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.Relationship;
-import org.cloudfoundry.client.v3.serviceInstances.ListSharedSpacesRelationshipRequest;
-import org.cloudfoundry.client.v3.serviceInstances.ListSharedSpacesRelationshipResponse;
-import org.cloudfoundry.client.v3.serviceInstances.UnshareServiceInstanceRequest;
+import org.cloudfoundry.client.v3.serviceinstances.ListSharedSpacesRelationshipRequest;
+import org.cloudfoundry.client.v3.serviceinstances.ListSharedSpacesRelationshipResponse;
+import org.cloudfoundry.client.v3.serviceinstances.UnshareServiceInstanceRequest;
 import org.cloudfoundry.client.v3.spaces.GetSpaceRequest;
 import org.cloudfoundry.client.v3.spaces.GetSpaceResponse;
 import org.cloudfoundry.client.v3.spaces.UpdateSpaceRequest;

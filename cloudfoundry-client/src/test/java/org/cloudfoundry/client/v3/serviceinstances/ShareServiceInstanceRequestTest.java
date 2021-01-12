@@ -17,7 +17,6 @@
 package org.cloudfoundry.client.v3.serviceinstances;
 
 import org.cloudfoundry.client.v3.Relationship;
-import org.cloudfoundry.client.v3.serviceInstances.ShareServiceInstanceRequest;
 import org.junit.Test;
 
 public class ShareServiceInstanceRequestTest {

@@ -14,27 +14,16 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.serviceInstances;
+package org.cloudfoundry.client.v3.serviceinstances;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.immutables.value.Value;
 
 /**
- * The request payload for the Unshare Service Instance operation.
+ * The resource response payload for the List Service Instances operation
  */
+@JsonSerialize
 @Value.Immutable
-abstract class _UnshareServiceInstanceRequest {
-
-    /**
-     * The service instance id
-     */
-    @JsonIgnore
-    abstract String getServiceInstanceId();
-
-    /**
-     * The space id
-     */
-    @JsonIgnore
-    abstract String getSpaceId();
+abstract class _ServiceInstanceResource extends ServiceInstance {
 
 }
