@@ -37,6 +37,10 @@ abstract class _UpdateSpaceRequest {
     @Nullable
     abstract Metadata getMetadata();
 
+    @JsonProperty("name")
+    @Nullable
+    abstract String getName();
+
     /**
      * The space id
      */
