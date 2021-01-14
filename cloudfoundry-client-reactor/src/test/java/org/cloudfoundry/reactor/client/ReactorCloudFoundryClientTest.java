@@ -141,6 +141,11 @@ public final class ReactorCloudFoundryClientTest extends AbstractRestTest {
     }
 
     @Test
+    public void rolesV3() {
+        assertThat(this.client.rolesV3()).isNotNull();
+    }
+
+    @Test
     public void routeMappings() {
         assertThat(this.client.routeMappings()).isNotNull();
     }
