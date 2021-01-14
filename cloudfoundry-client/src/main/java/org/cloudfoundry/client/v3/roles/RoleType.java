@@ -31,14 +31,14 @@ import java.util.stream.Collectors;
 public enum RoleType {
 
     /**
-     * organization_user role type
-     */
-    ORGANIZATION_USER,
-
-    /**
      * organization_auditor role type
      */
     ORGANIZATION_AUDITOR,
+
+    /**
+     * organization_billing_manager role type
+     */
+    ORGANIZATION_BILLING_MANAGER,
 
     /**
      * organization_manager role type
@@ -46,9 +46,9 @@ public enum RoleType {
     ORGANIZATION_MANAGER,
 
     /**
-     * organization_billing_manager role type
+     * organization_user role type
      */
-    ORGANIZATION_BILLING_MANAGER,
+    ORGANIZATION_USER,
 
     /**
      * space_auditor role type
@@ -65,8 +65,8 @@ public enum RoleType {
      */
     SPACE_MANAGER;
 
-    public static final Set<RoleType> ORGANIZATION_ROLE_TYPES = EnumSet.of(ORGANIZATION_USER, ORGANIZATION_AUDITOR,
-        ORGANIZATION_MANAGER, ORGANIZATION_BILLING_MANAGER);
+    public static final Set<RoleType> ORGANIZATION_ROLE_TYPES = EnumSet.of(ORGANIZATION_AUDITOR, ORGANIZATION_BILLING_MANAGER, ORGANIZATION_MANAGER, ORGANIZATION_USER);
+
     public static final Set<RoleType> SPACE_ROLE_TYPES = EnumSet.of(SPACE_AUDITOR, SPACE_DEVELOPER, SPACE_MANAGER);
 
     private static final Map<String, RoleType> NAMES_TO_VALUES = Arrays.stream(RoleType.values())

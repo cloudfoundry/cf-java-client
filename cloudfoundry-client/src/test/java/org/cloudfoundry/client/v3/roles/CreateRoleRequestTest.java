@@ -37,6 +37,46 @@ public class CreateRoleRequestTest {
     }
 
     @Test(expected = IllegalStateException.class)
+    public void invalidWithMissingSpaceRelationship() {
+        CreateRoleRequest.builder()
+            .type(RoleType.SPACE_AUDITOR)
+            .relationships(RoleRelationships.builder()
+                .user(ToOneRelationship.builder()
+                    .data(Relationship.builder()
+                        .id("test-user-id")
+                        .build())
+                    .build())
+                .build())
+            .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void invalidWithNoRelationships() {
+        CreateRoleRequest.builder()
+            .type(RoleType.ORGANIZATION_AUDITOR)
+            .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void invalidWithOrgRelationship() {
+        CreateRoleRequest.builder()
+            .type(RoleType.SPACE_AUDITOR)
+            .relationships(RoleRelationships.builder()
+                .user(ToOneRelationship.builder()
+                    .data(Relationship.builder()
+                        .id("test-user-id")
+                        .build())
+                    .build())
+                .organization(ToOneRelationship.builder()
+                    .data(Relationship.builder()
+                        .id("test-org-id")
+                        .build())
+                    .build())
+                .build())
+            .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
     public void invalidWithSpaceRelationship() {
         CreateRoleRequest.builder()
             .type(RoleType.ORGANIZATION_AUDITOR)
@@ -56,52 +96,12 @@ public class CreateRoleRequestTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void invalidWithNoRelationships() {
-        CreateRoleRequest.builder()
-            .type(RoleType.ORGANIZATION_AUDITOR)
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
     public void invalidWithoutType() {
         CreateRoleRequest.builder()
             .relationships(RoleRelationships.builder()
                 .user(ToOneRelationship.builder()
                     .data(Relationship.builder()
                         .id("test-user-id")
-                        .build())
-                    .build())
-                .build())
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void invalidWithMissingSpaceRelationship() {
-        CreateRoleRequest.builder()
-            .type(RoleType.SPACE_AUDITOR)
-            .relationships(RoleRelationships.builder()
-                .user(ToOneRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("test-user-id")
-                        .build())
-                    .build())
-                .build())
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void invalidWithOrgRelationship() {
-        CreateRoleRequest.builder()
-            .type(RoleType.SPACE_AUDITOR)
-            .relationships(RoleRelationships.builder()
-                .user(ToOneRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("test-user-id")
-                        .build())
-                    .build())
-                .organization(ToOneRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("test-org-id")
                         .build())
                     .build())
                 .build())

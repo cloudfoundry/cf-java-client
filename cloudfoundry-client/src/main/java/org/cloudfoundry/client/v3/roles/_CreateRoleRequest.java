@@ -27,18 +27,6 @@ import org.immutables.value.Value;
 @Value.Immutable
 abstract class _CreateRoleRequest {
 
-    /**
-     * The type
-     */
-    @JsonProperty("type")
-    abstract RoleType getType();
-
-    /**
-     * The relationships
-     */
-    @JsonProperty("relationships")
-    abstract RoleRelationships getRelationships();
-
     @Value.Check
     protected void validateRelationships() {
         if (RoleType.ORGANIZATION_ROLE_TYPES.contains(getType()) && getRelationships().getOrganization() == null) {
@@ -48,5 +36,17 @@ abstract class _CreateRoleRequest {
             throw new IllegalStateException("A space relationship is required for a " + getType() + " role");
         }
     }
+
+    /**
+     * The relationships
+     */
+    @JsonProperty("relationships")
+    abstract RoleRelationships getRelationships();
+
+    /**
+     * The type
+     */
+    @JsonProperty("type")
+    abstract RoleType getType();
 
 }

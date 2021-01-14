@@ -32,13 +32,13 @@ abstract class _ListRolesRequest extends PaginatedRequest {
      * The role ids filter
      */
     @FilterParameter("guids")
-    abstract List<String> getIds();
+    abstract List<String> getRoleIds();
 
     /**
-     * The types filter
+     * The organization ids filter
      */
-    @FilterParameter("types")
-    abstract List<RoleType> getTypes();
+    @FilterParameter("organization_guids")
+    abstract List<String> getOrganizationIds();
 
     /**
      * The space ids filter
@@ -47,10 +47,10 @@ abstract class _ListRolesRequest extends PaginatedRequest {
     abstract List<String> getSpaceIds();
 
     /**
-     * The organization ids filter
+     * The types filter
      */
-    @FilterParameter("organization_guids")
-    abstract List<String> getOrganizationIds();
+    @FilterParameter("types")
+    abstract List<RoleType> getTypes();
 
     /**
      * The user ids filter

@@ -18,6 +18,7 @@ package org.cloudfoundry.client.v3.roles;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.ToOneRelationship;
 import org.immutables.value.Value;
@@ -30,10 +31,11 @@ import org.immutables.value.Value;
 abstract class _RoleRelationships {
 
     /**
-     * The user relationship
+     * The organization relationship
      */
-    @JsonProperty("user")
-    abstract ToOneRelationship getUser();
+    @JsonProperty("organization")
+    @Nullable
+    abstract ToOneRelationship getOrganization();
 
     /**
      * The space relationship
@@ -43,10 +45,9 @@ abstract class _RoleRelationships {
     abstract ToOneRelationship getSpace();
 
     /**
-     * The organization relationship
+     * The user relationship
      */
-    @JsonProperty("organization")
-    @Nullable
-    abstract ToOneRelationship getOrganization();
+    @JsonProperty("user")
+    abstract ToOneRelationship getUser();
 
 }

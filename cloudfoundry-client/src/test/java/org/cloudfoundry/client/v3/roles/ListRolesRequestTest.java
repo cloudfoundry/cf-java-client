@@ -16,25 +16,14 @@
 
 package org.cloudfoundry.client.v3.roles;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v3.Resource;
+import org.junit.Test;
 
-/**
- * Base class for responses that are roles
- */
-public abstract class Role extends Resource {
+public class ListRolesRequestTest {
 
-    /**
-     * Relationships of the role
-     */
-    @JsonProperty("relationships")
-    public abstract RoleRelationships getRelationships();
-
-    /**
-     * The type
-     */
-    @JsonProperty("type")
-    public abstract RoleType getType();
+    @Test
+    public void valid() {
+        ListRolesRequest.builder()
+            .build();
+    }
 
 }
