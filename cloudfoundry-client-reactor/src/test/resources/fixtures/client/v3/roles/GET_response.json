@@ -1,0 +1,82 @@
+{
+  "pagination": {
+    "total_results": 3,
+    "total_pages": 2,
+    "first": {
+      "href": "https://api.example.org/v3/roles?page=1&per_page=2"
+    },
+    "last": {
+      "href": "https://api.example.org/v3/roles?page=2&per_page=2"
+    },
+    "next": {
+      "href": "https://api.example.org/v3/roles?page=2&per_page=2"
+    },
+    "previous": null
+  },
+  "resources": [
+    {
+      "guid": "40557c70-d1bd-4976-a2ab-a85f5e882418",
+      "created_at": "2019-10-10T17:19:12Z",
+      "updated_at": "2019-10-10T17:19:12Z",
+      "type": "organization_auditor",
+      "relationships": {
+        "user": {
+          "data": {
+            "guid": "test-user-id"
+          }
+        },
+        "organization": {
+          "data": {
+            "guid": "test-organization-id"
+          }
+        },
+        "space": {
+          "data": null
+        }
+      },
+      "links": {
+        "self": {
+          "href": "https://api.example.org/v3/roles/40557c70-d1bd-4976-a2ab-a85f5e882418"
+        },
+        "user": {
+          "href": "https://api.example.org/v3/users/test-user-id"
+        },
+        "organization": {
+          "href": "https://api.example.org/v3/organizations/test-organization-id"
+        }
+      }
+    },
+    {
+      "guid": "12347c70-d1bd-4976-a2ab-a85f5e882418",
+      "created_at": "2047-11-10T17:19:12Z",
+      "updated_at": "2047-11-10T17:19:12Z",
+      "type": "space_auditor",
+      "relationships": {
+        "user": {
+          "data": {
+            "guid": "test-user-id"
+          }
+        },
+        "organization": {
+          "data": null
+        },
+        "space": {
+          "data": {
+            "guid": "test-space-id"
+          }
+        }
+      },
+      "links": {
+        "self": {
+          "href": "https://api.example.org/v3/roles/12347c70-d1bd-4976-a2ab-a85f5e882418"
+        },
+        "user": {
+          "href": "https://api.example.org/v3/users/test-user-id"
+        },
+        "space": {
+          "href": "https://api.example.org/v3/spaces/test-space-id"
+        }
+      }
+    }
+  ]
+}
