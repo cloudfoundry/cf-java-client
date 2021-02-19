@@ -84,6 +84,7 @@ public abstract class Deployment extends Resource {
      */
     @Deprecated
     @JsonProperty("state")
+    @Nullable
     public abstract DeploymentState getState();
 
     /**
