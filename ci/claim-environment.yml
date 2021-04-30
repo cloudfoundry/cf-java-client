@@ -4,17 +4,17 @@ platform: linux
 image_resource:
   type: registry-image
   source:
-    repository: cfje/java-buildpack-system-test
+    repository: cfje/cf-java-client
 
 inputs:
-- name: java-buildpack-system-test
+- name: cf-java-client
 - name: om
 
 outputs:
 - name: environment
 
 run:
-  path: java-buildpack-system-test/ci/claim-environment.sh
+  path: cf-java-client/ci/claim-environment.sh
 
 params:
   API_TOKEN:

@@ -4,14 +4,14 @@ platform: linux
 image_resource:
   type: registry-image
   source:
-    repository: cfje/java-buildpack-system-test
+    repository: cfje/cf-java-client
 
 inputs:
 - name: environment
-- name: java-buildpack-system-test
+- name: cf-java-client
 
 run:
-  path: java-buildpack-system-test/ci/unclaim-environment.sh
+  path: cf-java-client/ci/unclaim-environment.sh
 
 params:
   API_TOKEN:
