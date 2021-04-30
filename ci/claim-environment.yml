@@ -18,3 +18,4 @@ run:
 
 params:
   API_TOKEN:
+  POOL:

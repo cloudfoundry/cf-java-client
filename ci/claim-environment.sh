@@ -5,16 +5,7 @@ set -euo pipefail
 # shellcheck source=common.sh
 source "$(dirname "$0")"/common.sh
 
-POOL_NAME=$(curl \
-  --fail \
-  --location \
-  --show-error \
-  --silent \
-  --header 'Accept: application/json' \
-  "https://environments.toolsmiths.cf-app.com/pool_names" \
-  | jq -r '.pool_names.gcp | map(select(contains("us"))) | last')
-
-printf "Claiming environment from %s\n" "${POOL_NAME}"
+printf "Claiming environment from %s\n" "${POOL}"
 
 CLAIM=$(curl \
   --fail \
@@ -23,7 +14,7 @@ CLAIM=$(curl \
   --silent \
   --header 'Accept: application/json' \
   --request "POST" \
-  "https://environments.toolsmiths.cf-app.com/pooled_gcp_engineering_environments/claim?api_token=${API_TOKEN}&pool_name=${POOL_NAME}&notes=Claimed%20by%20Java%20Buildpack%20CI")
+  "https://environments.toolsmiths.cf-app.com/pooled_gcp_engineering_environments/claim?api_token=${API_TOKEN}&pool_name=${POOL}&notes=Claimed%20by%20Java%20Buildpack%20CI")
 
 printf "Claimed %s\n" "$(jq -n -r --argjson claim "${CLAIM}" '$claim.name')"
 
