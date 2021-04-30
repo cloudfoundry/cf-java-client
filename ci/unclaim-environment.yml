@@ -1,0 +1,17 @@
+---
+platform: linux
+
+image_resource:
+  type: registry-image
+  source:
+    repository: cfje/java-buildpack-system-test
+
+inputs:
+- name: environment
+- name: java-buildpack-system-test
+
+run:
+  path: java-buildpack-system-test/ci/unclaim-environment.sh
+
+params:
+  API_TOKEN:
