@@ -2,6 +2,9 @@
 
 set -euo pipefail
 
+# update & install jq
+apt-get update && apt-get -y install jq
+
 [[ -d $PWD/maven && ! -d $HOME/.m2 ]] && ln -s $PWD/maven $HOME/.m2
 
 ROOT=$(realpath "$(dirname "${BASH_SOURCE[0]}")"/../..)
