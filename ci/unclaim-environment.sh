@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+ROOT=$(realpath "$(dirname "${BASH_SOURCE[0]}")"/../..)
+
 CREDENTIALS=$(cat "${ROOT}"/environment/credentials.json)
 
 printf "Unclaiming %s\n" "$(jq -n -r --argjson credentials "${CREDENTIALS}" '$credentials.name')"
