@@ -18,13 +18,13 @@ fi
 CF_CREDS=$(cat "${ROOT}"/environment/cf-creds.json)
 
 TEST_APIHOST=$(jq -n -r --argjson credentials "${CF_CREDS}" '"api.sys.\($credentials.name).cf-app.com"')
-export TEST_HOST
+export TEST_APIHOST
 
 TEST_ADMIN_USERNAME=$(jq -n -r --argjson credentials "${CF_CREDS}" '$credentials.username')
-export TEST_USERNAME
+export TEST_ADMIN_USERNAME
 
 TEST_ADMIN_PASSWORD=$(jq -n -r --argjson credentials "${CF_CREDS}" '$credentials.password')
-export TEST_PASSWORD
+export TEST_ADMIN_PASSWORD
 
 UAA_CREDS=$(cat "${ROOT}"/environment/uaa-creds.json)
 
