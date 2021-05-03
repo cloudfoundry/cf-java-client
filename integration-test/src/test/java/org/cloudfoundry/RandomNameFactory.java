@@ -26,9 +26,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 final class RandomNameFactory implements NameFactory {
 
-    private static final int PORT_MAXIMUM = 61_099;
+    private static final int PORT_MAXIMUM = 1123;
 
-    private static final int PORT_MINIMUM = 61_001;
+    private static final int PORT_MINIMUM = 1024;
 
     private final Random random;
 
