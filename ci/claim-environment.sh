@@ -2,8 +2,13 @@
 
 set -euo pipefail
 
-# shellcheck source=common.sh
-source "$(dirname "$0")"/common.sh
+ROOT=$(realpath "$(dirname "${BASH_SOURCE[0]}")"/../..)
+
+if [[ -d "${ROOT}"/om ]]; then
+  printf "➜ Expanding om\n"
+  tar xzf "${ROOT}"/om/om-linux-*.tar.gz -C "${ROOT}"/om
+  export PATH="${ROOT}"/om:${PATH}
+fi
 
 printf "Claiming environment from %s\n" "${POOL}"
 
