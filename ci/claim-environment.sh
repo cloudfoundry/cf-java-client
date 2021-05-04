@@ -67,13 +67,17 @@ om \
 
 TCP_ROUTES_LB="$(jq -n -r --argjson claim "${CLAIM}" '$claim.tcp_router_pool')"
 
+pwd
+ls -la .
+ls -la ../
+
 om \
   --target "$(jq -n -r --argjson claim "${CLAIM}" '$claim.ops_manager.url')" \
   --username "$(jq -n -r --argjson claim "${CLAIM}" '$claim.ops_manager.username')" \
   --password "$(jq -n -r --argjson claim "${CLAIM}" '$claim.ops_manager.password')" \
   configure-product \
   --config=/tmp/cf.yml
-  --ops-file="${ROOT}"/cf-java-client/ci/tcp-routes.yml
+  --ops-file=cf-java-client/ci/tcp-routes.yml
   --var=TCP_ROUTES_LB="tcp:${TCP_ROUTES_LB}"
 
 om \
