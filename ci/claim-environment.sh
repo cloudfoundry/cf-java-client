@@ -55,3 +55,32 @@ CREDENTIALS=$(om \
     --argjson credentials "${CREDENTIALS}" \
     '{ client: $credentials.identity, secret: $credentials.password }' \
     > "${ROOT}"/environment/uaa-creds.json
+
+printf "Patching for TCP Routing Support"
+
+om \
+  --target "$(jq -n -r --argjson claim "${CLAIM}" '$claim.ops_manager.url')" \
+  --username "$(jq -n -r --argjson claim "${CLAIM}" '$claim.ops_manager.username')" \
+  --password "$(jq -n -r --argjson claim "${CLAIM}" '$claim.ops_manager.password')" \
+  staged-config \
+  --product-name cf > /tmp/cf.yml
+
+TCP_ROUTES_LB="$(jq -n -r --argjson claim "${CLAIM}" '$claim.tcp_router_pool')"
+
+om \
+  --target "$(jq -n -r --argjson claim "${CLAIM}" '$claim.ops_manager.url')" \
+  --username "$(jq -n -r --argjson claim "${CLAIM}" '$claim.ops_manager.username')" \
+  --password "$(jq -n -r --argjson claim "${CLAIM}" '$claim.ops_manager.password')" \
+  configure-product \
+  --config=/tmp/cf.yml
+  --ops-file="${ROOT}"/cf-java-client/ci/tcp-routes.yml
+  --var=TCP_ROUTES_LB="tcp:${TCP_ROUTES_LB}"
+
+om \
+  --target "$(jq -n -r --argjson claim "${CLAIM}" '$claim.ops_manager.url')" \
+  --username "$(jq -n -r --argjson claim "${CLAIM}" '$claim.ops_manager.username')" \
+  --password "$(jq -n -r --argjson claim "${CLAIM}" '$claim.ops_manager.password')" \
+  apply-changes \
+  -n cf
+
+printf "Environment updated with TCP Routes"
