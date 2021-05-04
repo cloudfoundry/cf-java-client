@@ -1,0 +1,20 @@
+---
+- type: replace
+  path: /product-properties/.properties.tcp_routing
+  value:
+    selected_option: enable
+    value: enable
+- type: replace
+  path: /product-properties/.properties.tcp_routing.enable.request_timeout_in_seconds?
+  value:
+    value: 300
+- type: replace
+  path: /product-properties/.properties.tcp_routing.enable.reservable_ports?
+  value:
+    value: 1024-1123
+- type: replace
+  path: /resource-config/tcp_router/elb_names/-
+  value: "((TCP_ROUTES_LB))"
+- type: replace
+  path: /resource-config/tcp_router/instances
+  value: automatic

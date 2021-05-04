@@ -152,7 +152,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                     .build()))
             .map(GetOrganizationDefaultDomainResponse::getName)
             .as(StepVerifier::create)
-            .consumeNextWith(name -> assertThat(name).contains("apps.", ".springapps.io"))
+            .consumeNextWith(name -> assertThat(name).contains("apps.", ".cf-app.com"))
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
