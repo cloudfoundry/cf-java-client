@@ -57,12 +57,12 @@ public final class RouterGroupsTest extends AbstractIntegrationTest {
         getRouterGroupId(this.routingClient, DEFAULT_ROUTER_GROUP)
             .flatMap(routerGroupId -> this.routingClient.routerGroups()
                 .update(UpdateRouterGroupRequest.builder()
-                    .reservablePorts("61001-61099")
+                    .reservablePorts("1025-1122")
                     .routerGroupId(routerGroupId)
                     .build()))
             .map(UpdateRouterGroupResponse::getReservablePorts)
             .as(StepVerifier::create)
-            .expectNext("61001-61099")
+            .expectNext("1025-1122")
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
