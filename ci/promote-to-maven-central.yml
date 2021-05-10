@@ -9,6 +9,7 @@ image_resource:
 inputs:
 - name: build-info
 - name: cf-java-client
+- name: artifactory-repo
 
 run:
   path: cf-java-client/ci/promote-to-maven-central.sh

@@ -1,4 +1,4 @@
-ARG base_image=ubuntu:bionic
+ARG base_image=openjdk:8-jre
 FROM ${base_image}
 
 ADD https://repo.spring.io/libs-release/io/spring/concourse/releasescripts/concourse-release-scripts/0.3.2/concourse-release-scripts-0.3.2.jar /opt/
