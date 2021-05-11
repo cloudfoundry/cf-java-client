@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
-java -jar /opt/spring-boot-release-scripts.jar publishToCentral 'RELEASE' build-info/build-info.json artifactory-repo
+export BUILD_INFO_LOCATION=$(pwd)/build-info/build-info.json
+
+java -jar /opt/concourse-release-scripts.jar publishToCentral 'RELEASE' "$BUILD_INFO_LOCATION" artifactory-repo
 
 echo "Sync complete"
