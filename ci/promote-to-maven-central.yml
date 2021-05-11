@@ -7,7 +7,6 @@ image_resource:
     repository: cfje/cf-java-client
 
 inputs:
-- name: build-info
 - name: cf-java-client
 - name: artifactory-repo
 
