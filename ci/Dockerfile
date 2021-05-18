@@ -10,4 +10,5 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     gnupg \
     && rm -rf /var/lib/apt/lists/*
 
-RUN curl -fL https://getcli.jfrog.io | sh
+RUN curl -fL https://getcli.jfrog.io | sh && \
+    mv jfrog /usr/local/bin/
