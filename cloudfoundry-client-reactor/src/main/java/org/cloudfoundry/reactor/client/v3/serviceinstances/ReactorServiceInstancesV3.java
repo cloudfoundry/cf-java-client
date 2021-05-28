@@ -16,6 +16,10 @@
 
 package org.cloudfoundry.reactor.client.v3.serviceinstances;
 
+import org.cloudfoundry.client.v3.serviceinstances.GetManagedServiceParametersRequest;
+import org.cloudfoundry.client.v3.serviceinstances.GetManagedServiceParametersResponse;
+import org.cloudfoundry.client.v3.serviceinstances.GetUserProvidedCredentialsRequest;
+import org.cloudfoundry.client.v3.serviceinstances.GetUserProvidedCredentialsResponse;
 import org.cloudfoundry.client.v3.serviceinstances.ListServiceInstancesRequest;
 import org.cloudfoundry.client.v3.serviceinstances.ListServiceInstancesResponse;
 import org.cloudfoundry.client.v3.serviceinstances.ListSharedSpacesRelationshipRequest;
@@ -48,6 +52,18 @@ public final class ReactorServiceInstancesV3 extends AbstractClientV3Operations 
      */
     public ReactorServiceInstancesV3(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
+    }
+
+    @Override
+    public Mono<GetManagedServiceParametersResponse> getManagedServiceParameters(GetManagedServiceParametersRequest request) {
+	return get(request, GetManagedServiceParametersResponse.class, builder -> builder.pathSegment("service_instances", request.getServiceInstanceId(), "parameters"))
+	    .checkpoint();
+    }
+
+    @Override
+    public Mono<GetUserProvidedCredentialsResponse> getUserProvidedCredentials(GetUserProvidedCredentialsRequest request) {
+	return get(request, GetUserProvidedCredentialsResponse.class, builder -> builder.pathSegment("service_instances", request.getServiceInstanceId(), "credentials"))
+	    .checkpoint();
     }
 
     @Override
