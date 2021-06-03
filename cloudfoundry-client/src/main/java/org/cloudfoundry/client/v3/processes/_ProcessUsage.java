@@ -37,13 +37,13 @@ abstract class _ProcessUsage {
      * The disk
      */
     @JsonProperty("disk")
-    abstract Integer getDisk();
+    abstract Long getDisk();
 
     /**
      * The memory
      */
     @JsonProperty("mem")
-    abstract Integer getMemory();
+    abstract Long getMemory();
 
     /**
      * The time
