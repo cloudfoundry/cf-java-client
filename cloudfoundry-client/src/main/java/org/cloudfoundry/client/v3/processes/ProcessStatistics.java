@@ -37,18 +37,21 @@ public abstract class ProcessStatistics {
      * The disk quota
      */
     @JsonProperty("disk_quota")
+    @Nullable
     public abstract Long getDiskQuota();
 
     /**
      * The file descriptor quota
      */
     @JsonProperty("fds_quota")
+    @Nullable
     public abstract Long getFileDescriptorQuota();
 
     /**
      * The host
      */
     @JsonProperty("host")
+    @Nullable
     public abstract String getHost();
 
     /**
@@ -74,6 +77,7 @@ public abstract class ProcessStatistics {
      * The memory quota
      */
     @JsonProperty("mem_quota")
+    @Nullable
     public abstract Long getMemoryQuota();
 
     /**
@@ -99,6 +103,7 @@ public abstract class ProcessStatistics {
      * The usage
      */
     @JsonProperty("usage")
+    @Nullable
     public abstract ProcessUsage getUsage();
 
 }
