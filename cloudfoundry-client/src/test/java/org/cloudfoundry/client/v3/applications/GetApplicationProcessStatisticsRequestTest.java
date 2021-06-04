@@ -16,6 +16,9 @@
 
 package org.cloudfoundry.client.v3.applications;
 
+import org.cloudfoundry.client.v3.processes.ProcessState;
+import org.cloudfoundry.client.v3.processes.ProcessStatisticsResource;
+import org.cloudfoundry.client.v3.processes.ProcessUsage;
 import org.junit.Test;
 
 public final class GetApplicationProcessStatisticsRequestTest {
@@ -42,4 +45,53 @@ public final class GetApplicationProcessStatisticsRequestTest {
             .build();
     }
 
+    @Test
+    public void validDownResource() {
+        ProcessStatisticsResource processStatisticsResource = ProcessStatisticsResource.builder()
+            .type("web")
+            .index(0)
+            .state(ProcessState.DOWN)
+            .uptime(0L)
+            .build();
+        GetApplicationProcessStatisticsResponse.builder()
+            .resource(processStatisticsResource)
+            .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void invalidRunningResource() {
+        ProcessStatisticsResource processStatisticsResource = ProcessStatisticsResource.builder()
+            .type("web")
+            .index(0)
+            .state(ProcessState.RUNNING)
+            .uptime(0L)
+            .build();
+        GetApplicationProcessStatisticsResponse.builder()
+            .resource(processStatisticsResource)
+            .build();
+    }
+
+    @Test
+    public void validRunningResponse() {
+        ProcessUsage processUsage = ProcessUsage.builder()
+            .time("")
+            .cpu(new Double("0.00038711029163348665"))
+            .memory(19177472L)
+            .disk(69705728L)
+            .build();
+        ProcessStatisticsResource processStatisticsResource = ProcessStatisticsResource.builder()
+            .type("web")
+            .index(0)
+            .state(ProcessState.RUNNING)
+            .host("10.244.16.10")
+            .usage(processUsage)
+            .uptime(9042L)
+            .memoryQuota(268435456L)
+            .diskQuota(1073741824L)
+            .fileDescriptorQuota(16384L)
+            .build();
+        GetApplicationProcessStatisticsResponse.builder()
+            .resource(processStatisticsResource)
+            .build();
+    }
 }
