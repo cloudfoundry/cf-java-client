@@ -234,6 +234,20 @@ The above example is more complicated:
 1. `.flatMapIterable(...)` – Substitutes the original `Mono` with a `Flux` of the `Resource`s returned by the requested page.
 1. `.map(...)` – Maps the `Resource` to an `OrganizationSummary` type.
 
+## Troubleshooting
+
+If you are having issues with the cf-java-client in your applications, it is helpful to capture the following information:
+
+1. The version of cf-java-client you are using
+2. If you are using Spring Boot & if so, the version
+3. A description of the problem behavior.
+4. A list of things, if any, you have recently changed in your project (even if seemingly unrelated)
+5. If you are getting failures with an operation or client request, capture the request and response information.
+    - You may capture basic request and response information by setting the log level for `cloudfoundry-client` to `DEBUG`. For example with Spring Boot, set `logging.level.cloudfoundry-client=debug`.
+    - You may perform a wire capture by setting the log level for `cloudfoundry-client.wire` to `TRACE`. For example with Spring Boot, set `logging.level.cloudfoundry-client.wire=trace`.
+
+If you open a Github issue with a request for help, please include as much of the information above as possible and do not forget to sanitize any request/response data posted.
+
 ## Development
 The project depends on Java 8. To build from source and install to your local Maven cache, run the following:
 
