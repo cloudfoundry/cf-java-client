@@ -236,7 +236,11 @@ The above example is more complicated:
 
 ## Troubleshooting
 
-If you are having issues with the cf-java-client in your applications, it is helpful to capture the following information:
+If you are having issues with the cf-java-client in your applications...
+
+First, [read this article on debugging reactive applications](https://spring.io/blog/2019/03/28/reactor-debugging-experience) and watch this [Spring Tips Video](https://spring.io/blog/2019/05/29/spring-tips-debugging-reactor-applications) also on debugging reactive apps.
+
+Beyond that, it is helpful to capture the following information:
 
 1. The version of cf-java-client you are using
 2. If you are using Spring Boot & if so, the version
