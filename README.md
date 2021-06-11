@@ -269,7 +269,7 @@ $ ./mvnw -Pintegration-test clean test
 ```
 
 **IMPORTANT**
-Integration tests should be run against an empty Cloud Foundry instance. The integration tests are destructive, affecting nearly everything on an instance given the chance.
+Integration tests require admin access and should be run against an empty Cloud Foundry instance. The integration tests are destructive, affecting nearly everything on an instance given the chance.
 
 The integration tests require a running instance of Cloud Foundry to test against. To configure the integration tests with the appropriate connection information use the following environment variables:
 
@@ -285,6 +285,14 @@ Name | Description
 `TEST_PROXY_PORT` | _(Optional)_ The port of a proxy to route all requests through. Defaults to `8080`.
 `TEST_PROXY_USERNAME` | _(Optional)_ The username for a proxy to route all requests through
 `TEST_SKIPSSLVALIDATION` | _(Optional)_ Whether to skip SSL validation when connecting to the Cloud Foundry instance.  Defaults to `false`.
+
+If you do not have access to a CloudFoundry instance with admin access, you can run one locally using [bosh-deployment](https://github.com/cloudfoundry/bosh-deployment) & [cf-deployment](https://github.com/cloudfoundry/cf-deployment/) and Virtualbox.
+
+For instructions installing Bosh in VirtualBox using `bosh-deployment`, see the [Install Section to install Bosh](https://bosh.io/docs/bosh-lite/).
+
+With Bosh installed, follow the [deployment guide to get CF installed](https://github.com/cloudfoundry/cf-deployment/blob/main/texts/deployment-guide.md). You can skip to step 4, since you're installing into VirtualBox. Be sure to read the entire document before you begin, however pay specific attention to [this section which has specific instructions for running locally](https://github.com/cloudfoundry/cf-deployment/blob/main/texts/deployment-guide.md#for-operators-deploying-cf-to-local-bosh-lite).
+
+Lastly before running the tests, it is strongly recommended that you take a snapshot of the VMs in the environment. This allows for the quick rollback of the environment should the tests break something (they don't generally, integration tests should clean up after themselves).
 
 ## Contributing
 [Pull requests][u] and [Issues][e] are welcome.
