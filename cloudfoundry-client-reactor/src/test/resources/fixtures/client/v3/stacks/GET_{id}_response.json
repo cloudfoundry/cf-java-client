@@ -1,0 +1,16 @@
+{
+  "guid": "11c916c9-c2f9-440e-8e73-102e79c4704d",
+  "created_at": "2018-11-09T22:43:28Z",
+  "updated_at": "2018-11-09T22:43:28Z",
+  "name": "test-stack-name",
+  "description": "test-stack-description",
+  "metadata": {
+    "labels": { },
+    "annotations": { }
+  },
+  "links": {
+    "self": {
+      "href": "https://api.example.com/v3/stacks/11c916c9-c2f9-440e-8e73-102e79c4704d"
+    }
+  }
+}

@@ -67,6 +67,7 @@ import org.cloudfoundry.client.v3.servicebindings.ServiceBindingsV3;
 import org.cloudfoundry.client.v3.serviceofferings.ServiceOfferingsV3;
 import org.cloudfoundry.client.v3.serviceplans.ServicePlansV3;
 import org.cloudfoundry.client.v3.spaces.SpacesV3;
+import org.cloudfoundry.client.v3.stacks.StacksV3;
 import org.cloudfoundry.client.v3.tasks.Tasks;
 
 /**
@@ -323,6 +324,11 @@ public interface CloudFoundryClient {
      * Main entry point to the Cloud Foundry Stacks Client API
      */
     Stacks stacks();
+
+    /**
+     * Main entry point to the Cloud Foundry Stacks V3 Client API
+     */
+    StacksV3 stacksV3();
 
     /**
      * Main entry point to the Cloud Foundry Tasks Client API
