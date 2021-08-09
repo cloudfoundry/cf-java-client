@@ -1,0 +1,18 @@
+{
+    "name": "my_service_broker",
+    "url": "https://example.service-broker.com",
+    "authentication": {
+      "type": "basic",
+      "credentials": {
+        "username": "us3rn4me",
+        "password": "p4ssw0rd"
+      }
+    },
+    "relationships": {
+      "space": {
+        "data": {
+          "guid": "2f35885d-0c9d-4423-83ad-fd05066f8576"
+        }
+      }
+    }
+}

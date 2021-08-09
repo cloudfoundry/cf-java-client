@@ -99,6 +99,16 @@ public abstract class AbstractClientV3Operations extends AbstractReactorOperatio
                 .parseBody(responseType));
     }
 
+    protected final Mono<String> patch(Object requestPayload, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+        return createOperator()
+            .flatMap(operator -> operator.patch()
+                .uri(queryTransformer(requestPayload).andThen(uriTransformer))
+                .send(requestPayload)
+                .response()
+                .get())
+            .map(AbstractClientV3Operations::extractJobId);
+    }
+
     protected final <T> Mono<T> post(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
                                      Consumer<MultipartHttpClientRequest> requestTransformer, Runnable onTerminate) {
         return createOperator()
