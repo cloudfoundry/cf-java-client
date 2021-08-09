@@ -268,6 +268,18 @@ To run the integration tests, run the following:
 $ ./mvnw -Pintegration-test clean test
 ```
 
+To run a specific integration test, run the following replacing with `-Dtest=org.cloudfoundry.TestClass#test-method` (`#test-method` is optional):
+
+```shell
+./mvnw -Pintegration-test clean test -Dtest=org.cloudfoundry.client.v3.ServiceBrokersTest#update
+```
+
+To run tests & enable HTTP trace output, execute:
+
+```shell
+CLIENT_LOGGING_LEVEL=trace ./mvnw -Pintegration-test clean test
+```
+
 **IMPORTANT**
 Integration tests require admin access and should be run against an empty Cloud Foundry instance. The integration tests are destructive, affecting nearly everything on an instance given the chance.
 
