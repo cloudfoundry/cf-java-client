@@ -1,6 +1,7 @@
 package org.cloudfoundry.reactor.client.v3.servicebrokers;
 
 import java.util.Map;
+import java.util.Optional;
 
 import org.cloudfoundry.client.v3.servicebrokers.CreateServiceBrokerRequest;
 import org.cloudfoundry.client.v3.servicebrokers.DeleteServiceBrokerRequest;
@@ -8,8 +9,10 @@ import org.cloudfoundry.client.v3.servicebrokers.GetServiceBrokerRequest;
 import org.cloudfoundry.client.v3.servicebrokers.GetServiceBrokerResponse;
 import org.cloudfoundry.client.v3.servicebrokers.ListServiceBrokersRequest;
 import org.cloudfoundry.client.v3.servicebrokers.ListServiceBrokersResponse;
+import org.cloudfoundry.client.v3.servicebrokers.ServiceBrokerResource;
 import org.cloudfoundry.client.v3.servicebrokers.ServiceBrokersV3;
 import org.cloudfoundry.client.v3.servicebrokers.UpdateServiceBrokerRequest;
+import org.cloudfoundry.client.v3.servicebrokers.UpdateServiceBrokerResponse;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
@@ -48,9 +51,14 @@ public final class ReactorServiceBrokersV3 extends AbstractClientV3Operations im
     }
 
     @Override
-    public Mono<String> update(UpdateServiceBrokerRequest request) {
-	return patch(request, builder -> builder.pathSegment("service_brokers", request.getServiceBrokerId()))
-		    .checkpoint();
+    public Mono<UpdateServiceBrokerResponse> update(UpdateServiceBrokerRequest request) {
+	return patchWithResponse(request, ServiceBrokerResource.class, builder -> builder.pathSegment("service_brokers", request.getServiceBrokerId()))
+		    .map(responseTuple -> UpdateServiceBrokerResponse.builder()
+		        .serviceBroker(responseTuple.getBody())
+		        .jobId(Optional.ofNullable(
+		            extractJobId(responseTuple.getResponse())))
+		        .build())
+		.checkpoint();
     }
 
 }

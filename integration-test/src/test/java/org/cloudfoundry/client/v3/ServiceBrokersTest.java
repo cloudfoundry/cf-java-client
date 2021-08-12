@@ -190,11 +190,50 @@ public final class ServiceBrokersTest extends AbstractIntegrationTest {
                 .serviceBrokerId(serviceBrokerMetadata.serviceBrokerId)
                 .name(serviceBrokerName2)
                 .build())
+            .filter(responseUpdate -> responseUpdate.jobId().isPresent())
+            .map(responseUpdate -> responseUpdate.jobId().get())
             .flatMap(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job))
             .then(PaginationUtils
                 .requestClientV3Resources(page -> this.cloudFoundryClient.serviceBrokersV3()
                     .list(ListServiceBrokersRequest.builder()
                         .name(serviceBrokerName2)
+                        .page(page)
+                        .build()))
+                .singleOrEmpty())
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+
+        deleteServiceBroker(this.cloudFoundryClient, serviceBrokerMetadata.applicationMetadata.applicationId)
+            .block(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void updateMetadata() {
+        String planName = this.nameFactory.getPlanName();
+        String serviceBrokerName = this.nameFactory.getServiceBrokerName();
+        String serviceName = this.nameFactory.getServiceName();
+        String spaceName = this.nameFactory.getSpaceName();
+
+        ServiceBrokerUtils.ServiceBrokerMetadata serviceBrokerMetadata = this.organizationId
+            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .flatMap(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, true))
+            .block(Duration.ofMinutes(5));
+
+        this.cloudFoundryClient.serviceBrokersV3()
+            .update(UpdateServiceBrokerRequest.builder()
+                .serviceBrokerId(serviceBrokerMetadata.serviceBrokerId)
+                .metadata(Metadata.builder().label("type", "dev").build())
+                .build())
+            .filter(responseUpdate -> responseUpdate.jobId().isPresent())
+            .map(responseUpdate -> responseUpdate.jobId().get())
+            .flatMap(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job))
+            .then(PaginationUtils
+                .requestClientV3Resources(page -> this.cloudFoundryClient.serviceBrokersV3()
+                    .list(ListServiceBrokersRequest.builder()
+                        .labelSelector("type=dev")
+                        .name(serviceBrokerName)
                         .page(page)
                         .build()))
                 .singleOrEmpty())

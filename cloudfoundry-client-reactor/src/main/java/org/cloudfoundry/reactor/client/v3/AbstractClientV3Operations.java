@@ -18,6 +18,7 @@ package org.cloudfoundry.reactor.client.v3;
 
 import io.netty.handler.codec.http.HttpHeaderNames;
 import org.cloudfoundry.reactor.ConnectionContext;
+import org.cloudfoundry.reactor.HttpClientResponseWithParsedBody;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.QueryBuilder;
 import org.cloudfoundry.reactor.util.AbstractReactorOperations;
@@ -99,14 +100,14 @@ public abstract class AbstractClientV3Operations extends AbstractReactorOperatio
                 .parseBody(responseType));
     }
 
-    protected final Mono<String> patch(Object requestPayload, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+    protected final <T> Mono<HttpClientResponseWithParsedBody<T>> patchWithResponse(Object requestPayload, Class<T> responseType,
+	                                                                            Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return createOperator()
             .flatMap(operator -> operator.patch()
                 .uri(queryTransformer(requestPayload).andThen(uriTransformer))
                 .send(requestPayload)
                 .response()
-                .get())
-            .map(AbstractClientV3Operations::extractJobId);
+                .parseBodyWithResponse(responseType));
     }
 
     protected final <T> Mono<T> post(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
@@ -148,9 +149,13 @@ public abstract class AbstractClientV3Operations extends AbstractReactorOperatio
                 .parseBody(responseType));
     }
 
-    private static String extractJobId(HttpClientResponse response) {
-        List<String> pathSegments = UriComponentsBuilder.fromUriString(response.responseHeaders().get(HttpHeaderNames.LOCATION)).build().getPathSegments();
+    protected static String extractJobId(HttpClientResponse response) {
+        String locationHeader = response.responseHeaders().get(HttpHeaderNames.LOCATION);
+        if (locationHeader == null) {
+            return null;
+        }
 
+        List<String> pathSegments = UriComponentsBuilder.fromUriString(locationHeader).build().getPathSegments();
         return pathSegments.get(pathSegments.size() - 1);
     }
 

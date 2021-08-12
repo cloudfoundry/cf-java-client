@@ -45,6 +45,6 @@ public interface ServiceBrokersV3 {
      * @param request the Update Service Broker request
      * @return the response from the Update Service Broker request
      */
-    Mono<String> update(UpdateServiceBrokerRequest request);
+    Mono<UpdateServiceBrokerResponse> update(UpdateServiceBrokerRequest request);
     
 }
