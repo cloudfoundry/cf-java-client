@@ -6,13 +6,13 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="cloudfoundry-client" />
         <module name="cloudfoundry-util" />
         <module name="cloudfoundry-client-reactor" />
-        <module name="test-log-cache" />
-        <module name="test-service-broker" />
         <module name="integration-test" />
+        <module name="test-service-broker" />
         <module name="cloudfoundry-operations" />
+        <module name="cloudfoundry-client" />
+        <module name="test-log-cache" />
       </profile>
     </annotationProcessing>
   </component>

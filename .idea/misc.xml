@@ -8,6 +8,9 @@
     <option name="originalFiles">
       <list>
         <option value="$PROJECT_DIR$/pom.xml" />
+        <option value="$PROJECT_DIR$/integration-test/pom.xml" />
+        <option value="$PROJECT_DIR$/test-log-cache/pom.xml" />
+        <option value="$PROJECT_DIR$/test-service-broker/pom.xml" />
       </list>
     </option>
   </component>
