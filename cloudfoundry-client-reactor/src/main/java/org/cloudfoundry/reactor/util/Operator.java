@@ -24,6 +24,7 @@ import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import org.cloudfoundry.reactor.HttpClientResponseWithBody;
 import org.cloudfoundry.reactor.HttpClientResponseWithConnection;
+import org.cloudfoundry.reactor.HttpClientResponseWithParsedBody;
 import org.reactivestreams.Publisher;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
@@ -42,6 +43,7 @@ import reactor.util.retry.Retry;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -171,30 +173,29 @@ public class Operator extends OperatorContextAware {
         }
 
         public <T> Mono<T> parseBody(Class<T> bodyType) {
-            addChannelHandler(response -> {
-                if (HttpHeaderValues.APPLICATION_JSON.contentEquals(response.responseHeaders().get(HttpHeaderNames.CONTENT_TYPE))) {
-                    return JsonCodec.createDecoder();
-                }
-
-                return null;
-            });
-
+            addJsonDecoderToChannelHandlers();
             return parseBodyToMono(responseWithBody -> deserialized(responseWithBody.getBody(), bodyType));
+        }
+
+        public <T> Mono<HttpClientResponseWithParsedBody<T>> parseBodyWithResponse(Class<T> bodyType) {
+            addJsonDecoderToChannelHandlers();
+            return this.responseReceiver.responseConnection((response, connection) -> Mono.just(HttpClientResponseWithConnection.of(connection, response)))
+                    .transform(this::processResponse)
+                    .flatMap(httpClientResponseWithConnection ->
+                          transformResponse(httpClientResponseWithConnection,
+                            (body, response) -> deserialized(body, bodyType)
+                                                .map(parsedBody -> HttpClientResponseWithParsedBody.of(Optional.of(parsedBody), response))
+                                                .defaultIfEmpty(HttpClientResponseWithParsedBody.of(Optional.empty(), response)))
+                    )
+                    .singleOrEmpty();
         }
 
         public <T> Flux<T> parseBodyToFlux(Function<HttpClientResponseWithBody, Publisher<T>> responseTransformer) {
             return this.responseReceiver.responseConnection((response, connection) -> Mono.just(HttpClientResponseWithConnection.of(connection, response)))
                 .transform(this::processResponse)
-                .flatMap(httpClientResponseWithConnection -> {
-                    Connection connection = httpClientResponseWithConnection.getConnection();
-                    HttpClientResponse response = httpClientResponseWithConnection.getResponse();
-
-                    attachChannelHandlers(response, connection);
-                    ByteBufFlux body = ByteBufFlux.fromInbound(connection.inbound().receive()
-                        .doFinally(signalType -> connection.dispose()));
-
-                    return Mono.just(HttpClientResponseWithBody.of(body, response));
-                })
+                .flatMap(httpClientResponseWithConnection ->
+                      transformResponse(httpClientResponseWithConnection, (body, response) -> Mono.just(HttpClientResponseWithBody.of(body, response)))
+                )
                 .flatMap(responseTransformer);
         }
 
@@ -206,20 +207,24 @@ public class Operator extends OperatorContextAware {
             return this.responseReceiver.responseConnection((response, connection) -> Mono.just(HttpClientResponseWithConnection.of(connection, response)))
                 .transform(this.context.getErrorPayloadMapper()
                     .orElse(ErrorPayloadMappers.fallback()))
-                .flatMap(httpClientResponseWithConnection -> {
-                    Connection connection = httpClientResponseWithConnection.getConnection();
-                    HttpClientResponse response = httpClientResponseWithConnection.getResponse();
-
-                    ByteBufFlux body = ByteBufFlux.fromInbound(connection.inbound().receive()
-                        .doFinally(signalType -> connection.dispose()));
-
-                    return Mono.just(HttpClientResponseWithBody.of(body, response));
-                })
+                .flatMap(httpClientResponseWithConnection ->
+                      transformResponse(httpClientResponseWithConnection, (body, response) -> Mono.just(HttpClientResponseWithBody.of(body, response)))
+                )
                 .flatMap(responseTransformer).singleOrEmpty();
         }
 
         private static boolean isUnauthorized(HttpClientResponseWithConnection response) {
             return response.getResponse().status() == HttpResponseStatus.UNAUTHORIZED;
+        }
+
+        private void addJsonDecoderToChannelHandlers() {
+            addChannelHandler(response -> {
+                if (HttpHeaderValues.APPLICATION_JSON.contentEquals(response.responseHeaders().get(HttpHeaderNames.CONTENT_TYPE))) {
+                    return JsonCodec.createDecoder();
+                }
+
+                return null;
+            });
         }
 
         private void attachChannelHandlers(HttpClientResponse response, Connection connection) {
@@ -251,6 +256,16 @@ public class Operator extends OperatorContextAware {
                 .retryWhen(Retry.max(this.context.getConnectionContext().getInvalidTokenRetries()).filter(InvalidTokenException.class::isInstance))
                 .transform(this.context.getErrorPayloadMapper()
                     .orElse(ErrorPayloadMappers.fallback()));
+        }
+
+        private <E> Mono<E> transformResponse(HttpClientResponseWithConnection httpClientResponseWithConnection, BiFunction<ByteBufFlux, HttpClientResponse, Mono<E>> transformResult) {
+            Connection connection = httpClientResponseWithConnection.getConnection();
+            HttpClientResponse response = httpClientResponseWithConnection.getResponse();
+
+            attachChannelHandlers(response, connection);
+            ByteBufFlux body = ByteBufFlux.fromInbound(connection.inbound().receive()
+                .doFinally(signalType -> connection.dispose()));
+            return transformResult.apply(body, response);
         }
 
         private static final class InvalidTokenException extends RuntimeException {

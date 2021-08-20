@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.client.v3.serviceinstances;
 
-import org.cloudfoundry.client.v3.serviceInstances.UnshareServiceInstanceRequest;
+import org.cloudfoundry.client.v3.serviceinstances.UnshareServiceInstanceRequest;
 import org.junit.Test;
 
 public class UnshareServiceInstanceRequestTest {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.serviceInstances;
+package org.cloudfoundry.client.v3.serviceinstances;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.immutables.value.Value;

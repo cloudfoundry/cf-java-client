@@ -16,16 +16,30 @@
 
 package org.cloudfoundry.reactor.client.v3.serviceinstances;
 
-import org.cloudfoundry.client.v3.serviceInstances.ListServiceInstancesRequest;
-import org.cloudfoundry.client.v3.serviceInstances.ListServiceInstancesResponse;
-import org.cloudfoundry.client.v3.serviceInstances.ListSharedSpacesRelationshipRequest;
-import org.cloudfoundry.client.v3.serviceInstances.ListSharedSpacesRelationshipResponse;
-import org.cloudfoundry.client.v3.serviceInstances.ServiceInstancesV3;
-import org.cloudfoundry.client.v3.serviceInstances.ShareServiceInstanceRequest;
-import org.cloudfoundry.client.v3.serviceInstances.ShareServiceInstanceResponse;
-import org.cloudfoundry.client.v3.serviceInstances.UnshareServiceInstanceRequest;
-import org.cloudfoundry.client.v3.serviceInstances.UpdateServiceInstanceRequest;
-import org.cloudfoundry.client.v3.serviceInstances.UpdateServiceInstanceResponse;
+import org.cloudfoundry.client.v3.serviceinstances.ListServiceInstancesRequest;
+import org.cloudfoundry.client.v3.serviceinstances.ListServiceInstancesResponse;
+import org.cloudfoundry.client.v3.serviceinstances.ListSharedSpacesRelationshipRequest;
+import org.cloudfoundry.client.v3.serviceinstances.ListSharedSpacesRelationshipResponse;
+import org.cloudfoundry.client.v3.serviceinstances.ServiceInstancesV3;
+import org.cloudfoundry.client.v3.serviceinstances.ShareServiceInstanceRequest;
+import org.cloudfoundry.client.v3.serviceinstances.ShareServiceInstanceResponse;
+import org.cloudfoundry.client.v3.serviceinstances.UnshareServiceInstanceRequest;
+import org.cloudfoundry.client.v3.serviceinstances.UpdateServiceInstanceRequest;
+import org.cloudfoundry.client.v3.serviceinstances.UpdateServiceInstanceResponse;
+import org.cloudfoundry.client.v3.serviceinstances.GetManagedServiceParametersRequest;
+import org.cloudfoundry.client.v3.serviceinstances.GetManagedServiceParametersResponse;
+import org.cloudfoundry.client.v3.serviceinstances.GetUserProvidedCredentialsRequest;
+import org.cloudfoundry.client.v3.serviceinstances.GetUserProvidedCredentialsResponse;
+import org.cloudfoundry.client.v3.serviceinstances.ListServiceInstancesRequest;
+import org.cloudfoundry.client.v3.serviceinstances.ListServiceInstancesResponse;
+import org.cloudfoundry.client.v3.serviceinstances.ListSharedSpacesRelationshipRequest;
+import org.cloudfoundry.client.v3.serviceinstances.ListSharedSpacesRelationshipResponse;
+import org.cloudfoundry.client.v3.serviceinstances.ServiceInstancesV3;
+import org.cloudfoundry.client.v3.serviceinstances.ShareServiceInstanceRequest;
+import org.cloudfoundry.client.v3.serviceinstances.ShareServiceInstanceResponse;
+import org.cloudfoundry.client.v3.serviceinstances.UnshareServiceInstanceRequest;
+import org.cloudfoundry.client.v3.serviceinstances.UpdateServiceInstanceRequest;
+import org.cloudfoundry.client.v3.serviceinstances.UpdateServiceInstanceResponse;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
@@ -48,6 +62,18 @@ public final class ReactorServiceInstancesV3 extends AbstractClientV3Operations 
      */
     public ReactorServiceInstancesV3(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
+    }
+
+    @Override
+    public Mono<GetManagedServiceParametersResponse> getManagedServiceParameters(GetManagedServiceParametersRequest request) {
+	return get(request, GetManagedServiceParametersResponse.class, builder -> builder.pathSegment("service_instances", request.getServiceInstanceId(), "parameters"))
+	    .checkpoint();
+    }
+
+    @Override
+    public Mono<GetUserProvidedCredentialsResponse> getUserProvidedCredentials(GetUserProvidedCredentialsRequest request) {
+	return get(request, GetUserProvidedCredentialsResponse.class, builder -> builder.pathSegment("service_instances", request.getServiceInstanceId(), "credentials"))
+	    .checkpoint();
     }
 
     @Override

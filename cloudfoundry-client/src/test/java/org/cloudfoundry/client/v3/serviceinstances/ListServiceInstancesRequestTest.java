@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.client.v3.serviceinstances;
 
-import org.cloudfoundry.client.v3.serviceInstances.ListServiceInstancesRequest;
+import org.cloudfoundry.client.v3.serviceinstances.ListServiceInstancesRequest;
 import org.junit.Test;
 
 public class ListServiceInstancesRequestTest {

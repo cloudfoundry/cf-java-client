@@ -1,0 +1,15 @@
+{
+    "name": "my_service_broker",
+    "url": "https://example.service-broker.com",
+    "authentication": {
+      "type": "basic",
+      "credentials": {
+        "username": "us3rn4me",
+        "password": "p4ssw0rd"
+      }
+    },
+    "metadata": {
+      "labels": {"key": "value"},
+      "annotations": {"note": "detailed information"}
+    }
+}
