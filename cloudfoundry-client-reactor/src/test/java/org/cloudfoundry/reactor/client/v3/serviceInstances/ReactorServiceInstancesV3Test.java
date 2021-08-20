@@ -21,6 +21,10 @@ import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.Pagination;
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.ToOneRelationship;
+import org.cloudfoundry.client.v3.serviceinstances.GetManagedServiceParametersRequest;
+import org.cloudfoundry.client.v3.serviceinstances.GetManagedServiceParametersResponse;
+import org.cloudfoundry.client.v3.serviceinstances.GetUserProvidedCredentialsRequest;
+import org.cloudfoundry.client.v3.serviceinstances.GetUserProvidedCredentialsResponse;
 import org.cloudfoundry.client.v3.serviceinstances.ListServiceInstancesRequest;
 import org.cloudfoundry.client.v3.serviceinstances.ListServiceInstancesResponse;
 import org.cloudfoundry.client.v3.serviceinstances.ListSharedSpacesRelationshipRequest;
@@ -36,11 +40,14 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
+import org.cloudfoundry.reactor.client.v3.serviceinstances.ReactorServiceInstancesV3;
 import org.junit.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
@@ -54,6 +61,63 @@ public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest {
 
     private final ReactorServiceInstancesV3 serviceInstances = new ReactorServiceInstancesV3(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
+    @Test
+    public void getManagedServiceParameters() {
+	Map<String, Object> parameters = new HashMap<>();
+	parameters.put("key_1", "value_1");
+	parameters.put("key_2", "value_2");
+	
+	mockRequest(InteractionContext.builder()
+	    .request(TestRequest.builder()
+		.method(GET).path("/service_instances/test-service-instance-id/parameters")
+		.build())
+	    .response(TestResponse.builder()
+		.status(OK)
+		.payload("fixtures/client/v3/serviceinstances/GET_{id}_parameters.json")
+		.build())
+	    .build());
+	
+	this.serviceInstances
+	    .getManagedServiceParameters(GetManagedServiceParametersRequest.builder()
+		 .serviceInstanceId("test-service-instance-id")
+		 .build())
+	    .as(StepVerifier::create)
+	    .expectNext(GetManagedServiceParametersResponse.builder()
+		 .parameters(parameters)
+		 .build())
+	    .expectComplete()
+	    .verify(Duration.ofSeconds(5));
+    }
+    
+    @Test
+    public void getUserProvidedCredentials() {
+	Map<String, Object> credentials = new HashMap<>();
+	credentials.put("username", "my-username");
+	credentials.put("password", "super-secret");
+	credentials.put("other", "credential");
+	
+	mockRequest(InteractionContext.builder()
+	    .request(TestRequest.builder()
+		.method(GET).path("/service_instances/test-service-instance-id/credentials")
+		.build())
+	    .response(TestResponse.builder()
+		.status(OK)
+		.payload("fixtures/client/v3/serviceinstances/GET_{id}_credentials.json")
+		.build())
+	    .build());
+	
+	this.serviceInstances
+	    .getUserProvidedCredentials(GetUserProvidedCredentialsRequest.builder()
+		 .serviceInstanceId("test-service-instance-id")
+		 .build())
+	    .as(StepVerifier::create)
+	    .expectNext(GetUserProvidedCredentialsResponse.builder()
+		 .credentials(credentials)
+		 .build())
+	    .expectComplete()
+	    .verify(Duration.ofSeconds(5));    
+    }
+    
     @Test
     public void list() {
         mockRequest(InteractionContext.builder()
