@@ -245,6 +245,9 @@ public class Operator extends OperatorContextAware {
                 .doOnNext(response -> {
                     if (isUnauthorized(response)) {
                         this.context.getTokenProvider().ifPresent(tokenProvider -> tokenProvider.invalidate(this.context.getConnectionContext()));
+                        // we don't need the body, but we need to consume the body so reactor-netty can reuse the connection
+                        //   if not, this will result in connections that don't close & the pool will fill up
+                        response.getConnection().inbound().receive().doOnNext(byteBuf -> {}).subscribe(byteBuf -> {}, ex -> {});
                         throw new InvalidTokenException();
                     }
                 });
