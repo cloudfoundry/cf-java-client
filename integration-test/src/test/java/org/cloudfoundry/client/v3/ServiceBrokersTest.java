@@ -18,6 +18,8 @@ package org.cloudfoundry.client.v3;
 
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.ApplicationUtils;
+import org.cloudfoundry.CloudFoundryVersion;
+import org.cloudfoundry.IfCloudFoundryVersion;
 import org.cloudfoundry.ServiceBrokerUtils;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v3.servicebrokers.BasicAuthentication;
@@ -47,6 +49,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.ServiceBrokerUtils.createServiceBroker;
 import static org.cloudfoundry.ServiceBrokerUtils.deleteServiceBroker;
 
+@IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_10)
 public final class ServiceBrokersTest extends AbstractIntegrationTest {
 
     @Autowired
