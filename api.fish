@@ -1,0 +1,6 @@
+set -x TEST_ADMIN_CLIENTID 'admin'
+set -x TEST_ADMIN_CLIENTSECRET 'fmy76eAqrKlUt4CCGN_lFQLT0e-wQUB7'
+set -x TEST_ADMIN_USERNAME 'admin'
+set -x TEST_ADMIN_PASSWORD 'XunNHOqMOT2KDd2n2HxOC3PTyItKc-dh'
+set -x TEST_APIHOST 'api.sys.pakistangreen.cf-app.com'
+set -x TEST_SKIPSSLVALIDATION 'false'
