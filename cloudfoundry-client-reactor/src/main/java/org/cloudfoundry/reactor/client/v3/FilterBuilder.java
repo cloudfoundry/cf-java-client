@@ -35,29 +35,24 @@ final class FilterBuilder implements UriQueryParameterBuilder {
             .filter(Objects::nonNull);
     }
 
-    private static UriQueryParameter processCollection(String name, Object value) {
-        return processValue(name, ((Collection<?>) value).stream()
+    private static UriQueryParameter processCollection(String name, Collection<?> collection) {
+        if (collection.isEmpty()) {
+            return null;
+        }
+        return processValue(name, collection.stream()
             .map(Object::toString)
             .map(String::trim)
-            .collect(Collectors.toList()));
+            .collect(Collectors.joining(",")));
     }
 
     private static UriQueryParameter processValue(AnnotatedValue<FilterParameter> annotatedValue) {
         FilterParameter filterParameter = annotatedValue.getAnnotation();
         Object value = annotatedValue.getValue();
         if (value instanceof Collection) {
-            return processCollection(filterParameter.value(), value);
+            return processCollection(filterParameter.value(), (Collection<?>) value);
         } else {
             return processValue(filterParameter.value(), value.toString());
         }
-    }
-
-    private static UriQueryParameter processValue(String name, Collection<String> collection) {
-        String value = String.join(",", collection);
-        if (!value.isEmpty()) {
-            return processValue(name, value);
-        }
-        return null;
     }
 
     private static UriQueryParameter processValue(String name, String value) {
