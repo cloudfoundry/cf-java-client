@@ -790,7 +790,10 @@ public final class DefaultApplications implements Applications {
         return requestApplications(cloudFoundryClient, manifest.getName(), spaceId)
             .singleOrEmpty()
             .flatMap(application -> {
-                Map<String, Object> environmentJsons = new HashMap<>(ResourceUtils.getEntity(application).getEnvironmentJsons());
+                Map<String, Object> entityEnvironmentJsons = ResourceUtils.getEntity(application).getEnvironmentJsons();
+                Map<String, Object> environmentJsons = Optional
+                    .ofNullable(entityEnvironmentJsons)
+                    .orElse(Collections.emptyMap());
                 Optional.ofNullable(manifest.getEnvironmentVariables()).ifPresent(environmentJsons::putAll);
 
                 return requestUpdateApplication(cloudFoundryClient, ResourceUtils.getId(application), environmentJsons, manifest, stackId)
