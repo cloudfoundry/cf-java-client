@@ -1442,6 +1442,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                     .manifest(ApplicationManifest.builder()
                         .path(testApplication)
                         .domain("test-shared-domain")
+                        .environmentVariable("test-key-1", "test-value-1")
                         .environmentVariable("test-key-2", "test-value-2")
                         .name("test-name")
                         .build())
