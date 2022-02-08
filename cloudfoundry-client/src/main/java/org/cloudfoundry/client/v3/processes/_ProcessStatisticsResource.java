@@ -31,20 +31,11 @@ abstract class _ProcessStatisticsResource extends ProcessStatistics {
         if (getState() == ProcessState.STARTING || getState() == ProcessState.RUNNING || getState() == ProcessState.CRASHED) {
             List<String> missing = new ArrayList<>();
 
-            if (getDiskQuota() == null) {
-                missing.add("diskQuota");
-            }
             if (getFileDescriptorQuota() == null) {
                 missing.add("fileDescriptorQuota");
             }
             if (getHost() == null) {
                 missing.add("host");
-            }
-            if (getMemoryQuota() == null) {
-                missing.add("memoryQuota");
-            }
-            if (getUsage() == null) {
-                missing.add("usage");
             }
 
             if (!missing.isEmpty()) {

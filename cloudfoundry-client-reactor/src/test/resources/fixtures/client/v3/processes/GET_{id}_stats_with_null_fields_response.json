@@ -1,0 +1,16 @@
+{
+  "resources": [
+    {
+      "type": "web",
+      "index": 0,
+      "state": "STARTING",
+      "usage": {},
+      "host": "",
+      "instance_ports": [],
+      "uptime": 4,
+      "mem_quota": null,
+      "disk_quota": null,
+      "fds_quota": 16384
+    }
+  ]
+}
