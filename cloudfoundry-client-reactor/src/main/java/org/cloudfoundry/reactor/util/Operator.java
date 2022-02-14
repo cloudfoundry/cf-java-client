@@ -214,7 +214,7 @@ public class Operator extends OperatorContextAware {
         }
 
         private static boolean isUnauthorized(HttpClientResponseWithConnection response) {
-            return response.getResponse().status() == HttpResponseStatus.UNAUTHORIZED;
+            return HttpResponseStatus.UNAUTHORIZED.equals(response.getResponse().status()); 
         }
 
         private void addJsonDecoderToChannelHandlers() {
