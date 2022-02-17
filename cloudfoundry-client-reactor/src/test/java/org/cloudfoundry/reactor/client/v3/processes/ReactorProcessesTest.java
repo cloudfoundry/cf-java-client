@@ -185,6 +185,38 @@ public final class ReactorProcessesTest extends AbstractClientApiTest {
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
+    
+    @Test
+    public void getProcessStatisticsWithNullFields() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(GET).path("/processes/test-id/stats")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v3/processes/GET_{id}_stats_with_null_fields_response.json")
+                .build())
+            .build());
+
+        this.processes
+            .getStatistics(GetProcessStatisticsRequest.builder()
+                .processId("test-id")
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(GetProcessStatisticsResponse.builder()
+                .resource(ProcessStatisticsResource.builder()
+                    .type("web")
+                    .index(0)
+                    .state(ProcessState.STARTING)
+                    .usage(ProcessUsage.builder().build())
+                    .host("")
+                    .uptime(4L)
+                    .fileDescriptorQuota(16384L)
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
 
     @Test
     public void list() {
