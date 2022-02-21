@@ -18,6 +18,7 @@ package org.cloudfoundry.client.v3.deployments;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.ToOneRelationship;
 import org.immutables.value.Value;
 
@@ -32,6 +33,7 @@ abstract class _DeploymentRelationships {
      * The app relationship
      */
     @JsonProperty("app")
+    @Nullable
     abstract ToOneRelationship getApp();
 
 }
