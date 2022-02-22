@@ -28,6 +28,7 @@ import org.cloudfoundry.client.v3.deployments.CreateDeploymentResponse;
 import org.cloudfoundry.client.v3.deployments.DeploymentRelationships;
 import org.cloudfoundry.client.v3.deployments.DeploymentResource;
 import org.cloudfoundry.client.v3.deployments.DeploymentState;
+import org.cloudfoundry.client.v3.deployments.DeploymentStatusReason;
 import org.cloudfoundry.client.v3.deployments.DeploymentStatusValue;
 import org.cloudfoundry.client.v3.deployments.GetDeploymentRequest;
 import org.cloudfoundry.client.v3.deployments.ListDeploymentsRequest;
@@ -60,8 +61,35 @@ public final class DeploymentsTest extends AbstractIntegrationTest {
     @Autowired
     private CloudFoundryOperations cloudFoundryOperations;
 
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_11)
+    public void cancel_2_11() throws Exception {
+        String name = this.nameFactory.getApplicationName();
+        Path path = new ClassPathResource("test-application.zip").getFile().toPath();
+
+        createApplicationId(this.cloudFoundryOperations, name, path)
+            .flatMap(applicationId -> Mono.zip(
+                Mono.just(applicationId),
+                getDropletId(this.cloudFoundryClient, applicationId)
+            ))
+            .flatMap(function((applicationId, dropletId) -> Mono.zip(
+                Mono.just(applicationId),
+                createDeploymentId(this.cloudFoundryClient, applicationId, dropletId)
+            )))
+            .flatMap(function((applicationId, deploymentId) -> this.cloudFoundryClient.deploymentsV3()
+                .cancel(CancelDeploymentRequest.builder()
+                    .deploymentId(deploymentId)
+                    .build())
+                .then(Mono.just(applicationId))))
+            .flatMapMany(applicationId -> requestListDeployments(this.cloudFoundryClient, applicationId))
+            .as(StepVerifier::create)
+            .consumeNextWith(deploymentResource -> assertThat(deploymentResource.getStatus().getReason()).isIn(DeploymentStatusReason.CANCELED, DeploymentStatusReason.CANCELING))
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
     @SuppressWarnings("deprecation")
     @Test
+    @IfCloudFoundryVersion(lessThanOrEqualTo = CloudFoundryVersion.PCF_2_10)
     public void cancel() throws Exception {
         String name = this.nameFactory.getApplicationName();
         Path path = new ClassPathResource("test-application.zip").getFile().toPath();
@@ -81,9 +109,8 @@ public final class DeploymentsTest extends AbstractIntegrationTest {
                     .build())
                 .then(Mono.just(applicationId))))
             .flatMapMany(applicationId -> requestListDeployments(this.cloudFoundryClient, applicationId))
-            .map(DeploymentResource::getState)
             .as(StepVerifier::create)
-            .consumeNextWith(isCancel())
+            .consumeNextWith(deploymentResource -> assertThat(deploymentResource.getState()).isIn(DeploymentState.CANCELING, DeploymentState.CANCELED))
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
@@ -253,10 +280,6 @@ public final class DeploymentsTest extends AbstractIntegrationTest {
     private static Mono<String> getDropletId(CloudFoundryClient cloudFoundryClient, String applicationId) {
         return requestCurrentDroplet(cloudFoundryClient, applicationId)
             .map(GetApplicationCurrentDropletResponse::getId);
-    }
-
-    private static Consumer<DeploymentState> isCancel() {
-        return state -> assertThat(state).isIn(DeploymentState.CANCELING, DeploymentState.CANCELED);
     }
 
     private static Mono<Void> requestCreateApplication(CloudFoundryOperations cloudFoundryOperations, String name, Path path) {
