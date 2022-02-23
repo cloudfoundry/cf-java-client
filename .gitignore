@@ -8,3 +8,4 @@ bin/
 .classpath
 .settings/
 .factorypath
+.gradle

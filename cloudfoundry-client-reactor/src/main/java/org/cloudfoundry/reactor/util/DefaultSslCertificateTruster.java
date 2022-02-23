@@ -20,6 +20,7 @@ import io.netty.handler.ssl.SslContextBuilder;
 import org.cloudfoundry.reactor.ProxyConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 import reactor.netty.resources.LoopResources;
 import reactor.netty.tcp.SslProvider.SslContextSpec;
@@ -27,6 +28,7 @@ import reactor.netty.tcp.TcpClient;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
+import javax.net.ssl.SSLException;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
@@ -120,7 +122,11 @@ public final class DefaultSslCertificateTruster implements SslCertificateTruster
     }
 
     private static void configureSsl(SslContextSpec sslContextSpec, CertificateCollectingTrustManager collector) {
-        sslContextSpec.sslContext(SslContextBuilder.forClient().trustManager(new StaticTrustManagerFactory(collector)));
+        try {
+           sslContextSpec.sslContext(SslContextBuilder.forClient().trustManager(new StaticTrustManagerFactory(collector)).build());
+        } catch (SSLException e) {
+            throw Exceptions.propagate(e);
+        }
     }
 
     private static TcpClient getTcpClient(Optional<ProxyConfiguration> proxyConfiguration, LoopResources threadPool, CertificateCollectingTrustManager collector, String host, int port) {
