@@ -15,7 +15,7 @@ The `cf-java-client` project is a Java language binding for interacting with a C
 * `cloudfoundry-operations` – An API and implementation that corresponds to the [Cloud Foundry CLI][c] operations.  This project builds on the `cloudfoundry-client` and therefore has a single implementation.
 
 ## Versions
-The Cloud Foundry Java Client has two active versions. The `5.x` line uses Spring Boot `2.4.x` just to manage its dependencies, while the `4.x` line uses Spring Boot `2.3.x`.
+The Cloud Foundry Java Client has two active versions. The `5.x` line is compatible with Spring Boot `2.4.x - 2.6.x` just to manage its dependencies, while the `4.x` line uses Spring Boot `2.3.x`.
 
 ## Dependencies
 Most projects will need two dependencies; the Operations API and an implementation of the Client API.  For Maven, the dependencies would be defined like this:
@@ -25,12 +25,12 @@ Most projects will need two dependencies; the Operations API and an implementati
     <dependency>
         <groupId>org.cloudfoundry</groupId>
         <artifactId>cloudfoundry-client-reactor</artifactId>
-        <version>5.0.0.RELEASE</version>
+        <version>latest.RELEASE</version>
     </dependency>
     <dependency>
         <groupId>org.cloudfoundry</groupId>
         <artifactId>cloudfoundry-operations</artifactId>
-        <version>5.0.0.RELEASE</version>
+        <version>latest.RELEASE</version>
     </dependency>
     ...
 </dependencies>
@@ -56,8 +56,8 @@ For Gradle, the dependencies would be defined like this:
 
 ```groovy
 dependencies {
-    compile 'org.cloudfoundry:cloudfoundry-client-reactor:5.0.0.RELEASE'
-    compile 'org.cloudfoundry:cloudfoundry-operations:5.0.0.RELEASE'
+    compile 'org.cloudfoundry:cloudfoundry-client-reactor:<latest>.RELEASE'
+    compile 'org.cloudfoundry:cloudfoundry-operations:<latest>.RELEASE'
     ...
 }
 ```

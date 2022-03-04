@@ -43,6 +43,7 @@ import javax.annotation.PreDestroy;
 import javax.management.JMException;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
+import javax.net.ssl.SSLException;
 import javax.net.ssl.TrustManagerFactory;
 import java.lang.management.ManagementFactory;
 import java.time.Duration;
@@ -283,12 +284,16 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
             .orElse(client);
     }
 
-    private void configureSsl(SslProvider.SslContextSpec ssl) {
-        SslProvider.Builder builder = ssl.sslContext(createSslContextBuilder()).defaultConfiguration(DefaultConfigurationType.TCP);
+    private void configureSsl(SslProvider.SslContextSpec ssl){
+        try{
+            SslProvider.Builder builder = ssl.sslContext(createSslContextBuilder().build());
 
-        getSslCloseNotifyReadTimeout().ifPresent(builder::closeNotifyReadTimeout);
-        getSslHandshakeTimeout().ifPresent(builder::handshakeTimeout);
-        getSslCloseNotifyFlushTimeout().ifPresent(builder::closeNotifyFlushTimeout);
+            getSslCloseNotifyReadTimeout().ifPresent(builder::closeNotifyReadTimeout);
+            getSslHandshakeTimeout().ifPresent(builder::handshakeTimeout);
+            getSslCloseNotifyFlushTimeout().ifPresent(builder::closeNotifyFlushTimeout);
+        } catch (SSLException e) {
+            this.logger.error("Unable to configure SSL", e);
+        }
     }
 
     private HttpClient createHttpClient() {
