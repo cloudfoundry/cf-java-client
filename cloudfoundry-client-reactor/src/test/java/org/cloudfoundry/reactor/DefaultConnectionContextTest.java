@@ -95,6 +95,7 @@ public final class DefaultConnectionContextTest extends AbstractRestTest {
     @Test
     public void configurationAlwaysApplied() {
         DefaultConnectionContext ctx = DefaultConnectionContext.builder()
+            .connectionPoolSize(24)
             .apiHost("api.example.com")
             .keepAlive(true)
             .proxyConfiguration(
