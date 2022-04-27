@@ -16,14 +16,21 @@
 
 package org.cloudfoundry.reactor;
 
+import io.netty.handler.logging.ByteBufFormat;
+import io.netty.handler.logging.LogLevel;
 import org.junit.After;
 import org.junit.Test;
+import reactor.netty.http.client.HttpClient;
+import reactor.netty.transport.ProxyProvider;
 import reactor.test.StepVerifier;
 
+import java.net.InetSocketAddress;
 import java.time.Duration;
+import java.util.Optional;
 
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public final class DefaultConnectionContextTest extends AbstractRestTest {
 
@@ -83,6 +90,37 @@ public final class DefaultConnectionContextTest extends AbstractRestTest {
 
         first.dispose();
         second.dispose();
+    }
+
+    @Test
+    public void configurationAlwaysApplied() {
+        DefaultConnectionContext ctx = DefaultConnectionContext.builder()
+            .apiHost("api.example.com")
+            .keepAlive(true)
+            .proxyConfiguration(
+                ProxyConfiguration.builder()
+                    .host("proxy.example.com")
+                    .port(8080)
+                    .username("foo")
+                    .password("bar")
+                    .build())
+            .skipSslValidation(true)
+            .build();
+
+        assertThat(ctx.getConnectionPoolSize()).isEqualTo(24);
+        assertThat(ctx.getApiHost()).isEqualTo("api.example.com");
+        assertThat(ctx.getSkipSslValidation()).isEqualTo(Optional.of(true));
+
+        HttpClient client = ctx.getHttpClient();
+        assertThat(client.configuration().isSecure()).isEqualTo(true);
+
+        InetSocketAddress addr = client.configuration().proxyProvider().getAddress().get();
+        assertThat(addr.getHostName()).isEqualTo("proxy.example.com");
+        assertThat(addr.getPort()).isEqualTo(8080);
+        assertThat(client.configuration().proxyProvider().getType()).isEqualTo(ProxyProvider.Proxy.HTTP);
+
+        assertThat(client.configuration().loggingHandler().level()).isEqualTo(LogLevel.TRACE);
+        assertThat(client.configuration().loggingHandler().byteBufFormat()).isEqualTo(ByteBufFormat.HEX_DUMP);
     }
 
 }
