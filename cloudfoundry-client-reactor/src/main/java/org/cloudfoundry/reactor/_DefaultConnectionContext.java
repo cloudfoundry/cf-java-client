@@ -36,7 +36,6 @@ import reactor.netty.http.client.HttpClient;
 import reactor.netty.resources.ConnectionProvider;
 import reactor.netty.resources.LoopResources;
 import reactor.netty.tcp.SslProvider;
-import reactor.netty.tcp.SslProvider.DefaultConfigurationType;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -103,10 +102,10 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
     @Override
     @Value.Default
     public HttpClient getHttpClient() {
-        HttpClient client = createHttpClient().compress(true)
-            .secure(this::configureSsl);
+        HttpClient client = configureHttpClient(createHttpClient().compress(true)
+            .secure(this::configureSsl));
 
-        return getAdditionalHttpClientConfiguration().map(configuration -> configuration.apply(configureHttpClient(client)))
+        return getAdditionalHttpClientConfiguration().map(configuration -> configuration.apply(client))
             .orElse(client);
     }
 
