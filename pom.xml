@@ -260,9 +260,9 @@
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
-            <id>central</id>
-            <name>bintray-plugins</name>
-            <url>https://jcenter.bintray.com</url>
+            <id>jfrog-jars</id>
+            <name>jfrog-jars</name>
+            <url>https://oss.jfrog.org/artifactory/jfrog-jars/</url>
         </pluginRepository>
     </pluginRepositories>
 
