@@ -80,4 +80,15 @@ public abstract class Build extends Resource {
     @JsonProperty("state")
     public abstract BuildState getState();
 
+    /**
+     * Memory used for the build (MB)
+     */
+    @JsonProperty("staging_memory_in_mb")
+    public abstract Integer getStagingMemory();
+
+    /**
+     * Disk space used for the build (MB)
+     */
+    @JsonProperty("staging_disk_in_mb")
+    public abstract Integer getStagingDisk();
 }

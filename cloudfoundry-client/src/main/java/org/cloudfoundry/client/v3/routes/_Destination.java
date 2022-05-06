@@ -55,4 +55,11 @@ abstract class _Destination {
     @Nullable
     abstract Integer getWeight();
 
+    /**
+     * The id
+     */
+    @JsonProperty("protocol")
+    @Nullable
+    abstract String getProtocol();
+
 }

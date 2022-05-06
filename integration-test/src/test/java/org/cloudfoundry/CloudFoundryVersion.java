@@ -54,6 +54,8 @@ public enum CloudFoundryVersion {
 
     PCF_2_12(Version.forIntegers(2, 171, 0)),
 
+    PCF_2_13(Version.forIntegers(2, 180, 0)),
+
     UNSPECIFIED(Version.forIntegers(0));
 
     private final Version version;
