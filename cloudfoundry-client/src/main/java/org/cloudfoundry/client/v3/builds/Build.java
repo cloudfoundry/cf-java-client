@@ -84,11 +84,13 @@ public abstract class Build extends Resource {
      * Memory used for the build (MB)
      */
     @JsonProperty("staging_memory_in_mb")
+    @Nullable
     public abstract Integer getStagingMemory();
 
     /**
      * Disk space used for the build (MB)
      */
     @JsonProperty("staging_disk_in_mb")
+    @Nullable
     public abstract Integer getStagingDisk();
 }
