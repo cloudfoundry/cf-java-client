@@ -43,6 +43,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.Collections.emptyMap;
+import static java.util.regex.Pattern.quote;
 import static java.util.stream.Collectors.toMap;
 
 /**
@@ -88,7 +89,7 @@ public final class ApplicationManifestUtils {
         Map<String, String> variables = deserialize(variablesPath.toAbsolutePath())
             .entrySet()
             .stream()
-            .collect(toMap(e -> String.format("\\(\\(%s\\)\\)", e.getKey()), e -> String.valueOf(e.getValue())));
+            .collect(toMap(e -> String.format("\\(\\(%s\\)\\)", quote(e.getKey())), e -> String.valueOf(e.getValue())));
 
         return doRead(path.toAbsolutePath(), variables);
     }
