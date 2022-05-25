@@ -456,6 +456,22 @@ public final class ApplicationManifestUtilsTest {
     }
 
     @Test
+    public void readWithVariableSubstitution() throws IOException {
+        List<ApplicationManifest> expected = Collections.singletonList(
+            ApplicationManifest.builder()
+                .name("papa-application")
+                .buildpack("papa-buildpack")
+                .instances(2)
+                .memory(1024)
+                .build());
+
+        List<ApplicationManifest> actual = ApplicationManifestUtils.read(new ClassPathResource("fixtures/manifest-papa.yml").getFile().toPath(), new ClassPathResource("fixtures/vars-papa.yml").getFile().toPath());
+
+        assertThat(actual).isEqualTo(expected);
+    }
+
+
+    @Test
     public void unixRead() throws IOException {
         assumeTrue(SystemUtils.IS_OS_UNIX);
         read("/alpha-path", "fixtures/manifest-alpha-unix.yml");
