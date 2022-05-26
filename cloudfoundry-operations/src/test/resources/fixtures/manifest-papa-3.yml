@@ -1,0 +1,4 @@
+---
+applications:
+- name: papa-3-application
+  buildpack: ((endless_1))

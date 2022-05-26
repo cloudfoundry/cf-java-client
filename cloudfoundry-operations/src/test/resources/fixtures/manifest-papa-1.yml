@@ -1,6 +1,6 @@
 ---
 applications:
-- name: papa-application
+- name: papa-1-application
   buildpack: papa-buildpack
   instances: ((instances))
   memory: ((memory))
