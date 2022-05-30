@@ -474,7 +474,7 @@ public final class ApplicationManifestUtilsTest {
     }
 
     @Test
-    public void readWithVariableSubstitution_regexInVariableKey() throws IOException {
+    public void readWithVariableSubstitution_dontEvaluateRegexInVariableKey() throws IOException {
         List<ApplicationManifest> expected = Collections.singletonList(
             ApplicationManifest.builder()
                 .name("papa-2-application")
@@ -489,7 +489,7 @@ public final class ApplicationManifestUtilsTest {
     }
 
     @Test
-    public void readWithVariableSubstitution_endlessSubstitution() throws IOException {
+    public void readWithVariableSubstitution_avoidEndlessSubstitution() throws IOException {
         List<ApplicationManifest> expected = Collections.singletonList(
             ApplicationManifest.builder()
                 .name("papa-3-application")
@@ -504,11 +504,11 @@ public final class ApplicationManifestUtilsTest {
     }
 
     @Test
-    public void readWithVariableSubstitution_injectionTest() throws IOException {
+    public void readWithVariableSubstitution_dontAllowInjectionTest() throws IOException {
         List<ApplicationManifest> expected = Collections.singletonList(
             ApplicationManifest.builder()
                 .name("papa-4-application")
-                .buildpack("injected")
+                .buildpack("((test))")
                 .build());
 
         List<ApplicationManifest> actual = ApplicationManifestUtils.read(
@@ -518,6 +518,35 @@ public final class ApplicationManifestUtilsTest {
         assertThat(actual).isEqualTo(expected);
     }
 
+    @Test
+    public void readWithVariableSubstitution_addMultipleVariablesInOneField() throws IOException {
+        List<ApplicationManifest> expected = Collections.singletonList(
+            ApplicationManifest.builder()
+                .name("papa-5-application")
+                .buildpack("one and two is a very nice buildpack name for three")
+                .build());
+
+        List<ApplicationManifest> actual = ApplicationManifestUtils.read(
+            new ClassPathResource("fixtures/manifest-papa-5.yml").getFile().toPath(),
+            new ClassPathResource("fixtures/vars-papa-5.yml").getFile().toPath());
+
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    public void readWithVariableSubstitution_noSubstitutionAtAll() throws IOException {
+        List<ApplicationManifest> expected = Collections.singletonList(
+            ApplicationManifest.builder()
+                .name("papa-6-application")
+                .buildpack("buildpack_papa_6")
+                .build());
+
+        List<ApplicationManifest> actual = ApplicationManifestUtils.read(
+            new ClassPathResource("fixtures/manifest-papa-6.yml").getFile().toPath(),
+            new ClassPathResource("fixtures/vars-papa-6.yml").getFile().toPath());
+
+        assertThat(actual).isEqualTo(expected);
+    }
 
 
     @Test

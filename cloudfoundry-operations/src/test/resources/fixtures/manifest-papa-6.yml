@@ -1,0 +1,4 @@
+---
+applications:
+- name: papa-6-application
+  buildpack: buildpack_papa_6

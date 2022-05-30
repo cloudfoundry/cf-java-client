@@ -39,6 +39,8 @@ import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -62,6 +64,8 @@ public final class ApplicationManifestUtils {
 
         YAML = new Yaml(dumperOptions);
     }
+
+    private static final Pattern VARIABLE = Pattern.compile("\\(\\(([a-zA-Z]\\w+)\\)\\)");
 
     private ApplicationManifestUtils() {
     }
@@ -89,7 +93,7 @@ public final class ApplicationManifestUtils {
         Map<String, String> variables = deserialize(variablesPath.toAbsolutePath())
             .entrySet()
             .stream()
-            .collect(toMap(e -> String.format("\\(\\(%s\\)\\)", quote(e.getKey())), e -> String.valueOf(e.getValue())));
+            .collect(toMap(Map.Entry::getKey,e -> String.valueOf(e.getValue())));
 
         return doRead(path.toAbsolutePath(), variables);
     }
@@ -150,11 +154,13 @@ public final class ApplicationManifestUtils {
         Optional.ofNullable(payload.get(key))
             .map(o -> {
                 if(o instanceof String) {
-                    String result = ((String) o);
-                    for(Map.Entry<String, String> e : variables.entrySet()) {
-                        result = result.replaceAll(e.getKey(), e.getValue());
+                    Matcher m = VARIABLE.matcher(((String) o));
+                    StringBuffer stringBuffer = new StringBuffer();
+                    while(m.find()){
+                        m.appendReplacement(stringBuffer, variables.getOrDefault(m.group(1), m.group(0)));
                     }
-                    return result;
+                    m.appendTail(stringBuffer);
+                    return stringBuffer.toString();
                 }
                 return o;
             })

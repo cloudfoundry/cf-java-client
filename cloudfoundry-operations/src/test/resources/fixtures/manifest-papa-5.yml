@@ -1,0 +1,4 @@
+---
+applications:
+- name: papa-5-application
+  buildpack: ((replace_1)) and ((replace_2)) is a very nice buildpack name for ((replace_3))
