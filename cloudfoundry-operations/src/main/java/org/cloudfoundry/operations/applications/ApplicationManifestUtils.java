@@ -45,7 +45,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.Collections.emptyMap;
-import static java.util.regex.Pattern.quote;
 import static java.util.stream.Collectors.toMap;
 
 /**
@@ -65,7 +64,7 @@ public final class ApplicationManifestUtils {
         YAML = new Yaml(dumperOptions);
     }
 
-    private static final Pattern VARIABLE = Pattern.compile("\\(\\(([a-zA-Z]\\w+)\\)\\)");
+    private static final Pattern FIND_VARIABLE_REGEX = Pattern.compile("\\(\\(([a-zA-Z]\\w+)\\)\\)");
 
     private ApplicationManifestUtils() {
     }
@@ -154,7 +153,7 @@ public final class ApplicationManifestUtils {
         Optional.ofNullable(payload.get(key))
             .map(o -> {
                 if(o instanceof String) {
-                    Matcher m = VARIABLE.matcher(((String) o));
+                    Matcher m = FIND_VARIABLE_REGEX.matcher(((String) o));
                     StringBuffer stringBuffer = new StringBuffer();
                     while(m.find()){
                         m.appendReplacement(stringBuffer, variables.getOrDefault(m.group(1), m.group(0)));
