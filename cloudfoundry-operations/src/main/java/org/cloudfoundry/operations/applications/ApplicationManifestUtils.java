@@ -34,13 +34,19 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.util.Collections.emptyMap;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * Utilities for dealing with {@link ApplicationManifest}s.  Includes the functionality to transform to and from standard CLI YAML files.
@@ -59,6 +65,8 @@ public final class ApplicationManifestUtils {
         YAML = new Yaml(dumperOptions);
     }
 
+    private static final Pattern FIND_VARIABLE_REGEX = Pattern.compile("\\(\\(([a-zA-Z]\\w+)\\)\\)");
+
     private ApplicationManifestUtils() {
     }
 
@@ -70,7 +78,24 @@ public final class ApplicationManifestUtils {
      * @return the resolved manifests
      */
     public static List<ApplicationManifest> read(Path path) {
-        return doRead(path.toAbsolutePath());
+        return doRead(path.toAbsolutePath(), emptyMap());
+    }
+
+    /**
+     * Reads a YAML manifest file (defined by the <a href="https://docs.cloudfoundry.org/devguide/deploy-apps/manifest.html">CLI</a>) from a {@link Path} and converts it into a collection of {@link
+     * ApplicationManifest}s.  Note that all resolution (both inheritance and common) is performed during read.
+     *
+     * @param path the path to read from
+     * @param variablesPath use variable substitution (described in <a href="https://docs.cloudfoundry.org/devguide/deploy-apps/manifest-attributes.html#variable-substitution">Add Variables to a Manifest</a>)
+     * @return the resolved manifests
+     */
+    public static List<ApplicationManifest> read(Path path, Path variablesPath) {
+        Map<String, String> variables = deserialize(variablesPath.toAbsolutePath())
+            .entrySet()
+            .stream()
+            .collect(toMap(Map.Entry::getKey,e -> String.valueOf(e.getValue())));
+
+        return doRead(path.toAbsolutePath(), variables);
     }
 
     /**
@@ -125,21 +150,33 @@ public final class ApplicationManifestUtils {
         }
     }
 
-    private static <T> void as(Map<String, Object> payload, String key, Function<Object, T> mapper, Consumer<T> consumer) {
+    private static <T> void as(Map<String, Object> payload, String key, Map<String, String> variables, Function<Object, T> mapper, Consumer<T> consumer) {
         Optional.ofNullable(payload.get(key))
+            .map(o -> {
+                if(o instanceof String) {
+                    Matcher m = FIND_VARIABLE_REGEX.matcher((String) o);
+                    StringBuffer stringBuffer = new StringBuffer();
+                    while(m.find()){
+                        m.appendReplacement(stringBuffer, Optional.ofNullable(variables.get(m.group(1)))
+                            .orElseThrow(() -> new NoSuchElementException("Expected to find variable: "+m.group(1))));
+                    }
+                    m.appendTail(stringBuffer);
+                    return stringBuffer.toString();
+                }
+                return o;
+            })
             .map(mapper)
             .ifPresent(consumer);
     }
 
-    private static void asBoolean(Map<String, Object> payload, String key, Consumer<Boolean> consumer) {
-        as(payload, key, Boolean.class::cast, consumer);
+    private static void asBoolean(Map<String, Object> payload, String key, Map<String, String> variables, Consumer<Boolean> consumer) {
+        as(payload, key, variables, Boolean.class::cast, consumer);
     }
 
     @SuppressWarnings("unchecked")
-    private static void asDocker(Map<String, Object> payload, String key, Consumer<Docker> consumer) {
-        as(payload, key, value -> {
+    private static void asDocker(Map<String, Object> payload, String key, Map<String, String> variables, Consumer<Docker> consumer) {
+        as(payload, key, variables, value -> {
             Map<String, String> docker = ((Map<String, String>) value);
-
             return Docker.builder()
                 .image(docker.get("image"))
                 .password(docker.get("password"))
@@ -148,35 +185,40 @@ public final class ApplicationManifestUtils {
         }, consumer);
     }
 
-    private static void asInteger(Map<String, Object> payload, String key, Consumer<Integer> consumer) {
-        as(payload, key, Integer.class::cast, consumer);
+    private static void asInteger(Map<String, Object> payload, String key, Map<String, String> variables, Consumer<Integer> consumer) {
+        as(payload, key, variables, (e) -> {
+            if(e instanceof String) {
+                return Integer.parseInt((String)e);
+            }
+            return (Integer) e;
+        }, consumer);
     }
 
     @SuppressWarnings("unchecked")
-    private static <T> void asList(Map<String, Object> payload, String key, Function<Object, T> mapper, Consumer<T> consumer) {
-        as(payload, key, value -> ((List<Object>) value).stream(),
+    private static <T> void asList(Map<String, Object> payload, String key, Map<String, String> variables, Function<Object, T> mapper, Consumer<T> consumer) {
+        as(payload, key, variables, value -> ((List<Object>) value).stream(),
             values -> values
                 .map(mapper)
                 .forEach(consumer));
     }
 
-    private static void asListOfString(Map<String, Object> payload, String key, Consumer<String> consumer) {
-        asList(payload, key, String.class::cast, consumer);
+    private static void asListOfString(Map<String, Object> payload, String key, Map<String, String> variables, Consumer<String> consumer) {
+        asList(payload, key, variables, String.class::cast, consumer);
     }
 
     @SuppressWarnings("unchecked")
-    private static <T> void asMap(Map<String, Object> payload, String key, Function<Object, T> valueMapper, Consumer2<String, T> consumer) {
-        as(payload, key, value -> ((Map<String, Object>) value),
+    private static <T> void asMap(Map<String, Object> payload, String key, Map<String, String> variables, Function<Object, T> valueMapper, Consumer2<String, T> consumer) {
+        as(payload, key, variables, value -> ((Map<String, Object>) value),
             values -> values.forEach((k, v) -> consumer.accept(k, valueMapper.apply(v))));
     }
 
-    private static void asMapOfStringString(Map<String, Object> payload, String key, Consumer2<String, String> consumer) {
-        asMap(payload, key, String::valueOf, consumer);
+    private static void asMapOfStringString(Map<String, Object> payload, String key, Map<String, String> variables, Consumer2<String, String> consumer) {
+        asMap(payload, key, variables, String::valueOf, consumer);
     }
 
     @SuppressWarnings("unchecked")
-    private static void asMemoryInteger(Map<String, Object> payload, String key, Consumer<Integer> consumer) {
-        as(payload, key, raw -> {
+    private static void asMemoryInteger(Map<String, Object> payload, String key, Map<String, String> variables, Consumer<Integer> consumer) {
+        as(payload, key, variables, raw -> {
             if (raw instanceof Integer) {
                 return (Integer) raw;
             } else if (raw instanceof String) {
@@ -199,8 +241,8 @@ public final class ApplicationManifestUtils {
         }, consumer);
     }
 
-    private static void asString(Map<String, Object> payload, String key, Consumer<String> consumer) {
-        as(payload, key, String.class::cast, consumer);
+    private static void asString(Map<String, Object> payload, String key, Map<String, String> variables, Consumer<String> consumer) {
+        as(payload, key, variables, String.class::cast, consumer);
     }
 
     @SuppressWarnings("unchecked")
@@ -213,7 +255,7 @@ public final class ApplicationManifestUtils {
             throw Exceptions.propagate(e);
         }
 
-        asString(root.get(), "inherit", inherit -> {
+        asString(root.get(), "inherit", emptyMap(), inherit -> {
             Map<String, Object> inherited = deserialize(path.getParent().resolve(inherit));
             merge(inherited, root.get());
             root.set(inherited);
@@ -223,17 +265,17 @@ public final class ApplicationManifestUtils {
     }
 
     @SuppressWarnings("unchecked")
-    private static List<ApplicationManifest> doRead(Path path) {
+    private static List<ApplicationManifest> doRead(Path path, Map<String, String> variables) {
         Map<String, Object> root = deserialize(path);
 
-        ApplicationManifest template = getTemplate(path, root);
+        ApplicationManifest template = getTemplate(path, root, variables);
 
         return Optional.ofNullable(root.get("applications"))
             .map(value -> ((List<Map<String, Object>>) value).stream())
             .orElseGet(Stream::empty)
             .map(application -> {
                 String name = getName(application);
-                return toApplicationManifest(application, ApplicationManifest.builder().from(template), path)
+                return toApplicationManifest(application, variables, ApplicationManifest.builder().from(template), path)
                     .name(name)
                     .build();
             })
@@ -265,8 +307,8 @@ public final class ApplicationManifestUtils {
         return Route.builder().route(route).build();
     }
 
-    private static ApplicationManifest getTemplate(Path path, Map<String, Object> root) {
-        return toApplicationManifest(root, ApplicationManifest.builder(), path)
+    private static ApplicationManifest getTemplate(Path path, Map<String, Object> root, Map<String, String> variables) {
+        return toApplicationManifest(root, variables, ApplicationManifest.builder(), path)
             .name("template")
             .build();
     }
@@ -322,30 +364,30 @@ public final class ApplicationManifestUtils {
     }
 
     @SuppressWarnings("unchecked")
-    private static ApplicationManifest.Builder toApplicationManifest(Map<String, Object> application, ApplicationManifest.Builder builder, Path root) {
-        asListOfString(application, "buildpacks", builder::buildpacks);
-        asString(application, "buildpack", builder::buildpacks);
-        asString(application, "command", builder::command);
-        asMemoryInteger(application, "disk_quota", builder::disk);
-        asDocker(application, "docker", builder::docker);
-        asString(application, "domain", builder::domain);
-        asListOfString(application, "domains", builder::domain);
-        asMapOfStringString(application, "env", builder::environmentVariable);
-        asString(application, "health-check-http-endpoint", builder::healthCheckHttpEndpoint);
-        asString(application, "health-check-type", healthCheckType -> builder.healthCheckType(ApplicationHealthCheck.from(healthCheckType)));
-        asString(application, "host", builder::host);
-        asListOfString(application, "hosts", builder::host);
-        asInteger(application, "instances", builder::instances);
-        asMemoryInteger(application, "memory", builder::memory);
-        asString(application, "name", builder::name);
-        asBoolean(application, "no-hostname", builder::noHostname);
-        asBoolean(application, "no-route", builder::noRoute);
-        asString(application, "path", path -> builder.path(root.getParent().resolve(path)));
-        asBoolean(application, "random-route", builder::randomRoute);
-        asList(application, "routes", raw -> getRoute((Map<String, Object>) raw), builder::route);
-        asListOfString(application, "services", builder::service);
-        asString(application, "stack", builder::stack);
-        asInteger(application, "timeout", builder::timeout);
+    private static ApplicationManifest.Builder toApplicationManifest(Map<String, Object> application, Map<String, String> variables, ApplicationManifest.Builder builder, Path root) {
+        asListOfString(application, "buildpacks", variables, builder::buildpacks);
+        asString(application, "buildpack", variables, builder::buildpacks);
+        asString(application, "command", variables, builder::command);
+        asMemoryInteger(application, "disk_quota", variables, builder::disk);
+        asDocker(application, "docker", variables, builder::docker);
+        asString(application, "domain", variables, builder::domain);
+        asListOfString(application, "domains", variables, builder::domain);
+        asMapOfStringString(application, "env", variables, builder::environmentVariable);
+        asString(application, "health-check-http-endpoint", variables, builder::healthCheckHttpEndpoint);
+        asString(application, "health-check-type", variables, healthCheckType -> builder.healthCheckType(ApplicationHealthCheck.from(healthCheckType)));
+        asString(application, "host", variables, builder::host);
+        asListOfString(application, "hosts", variables, builder::host);
+        asInteger(application, "instances", variables, builder::instances);
+        asMemoryInteger(application, "memory", variables, builder::memory);
+        asString(application, "name", variables, builder::name);
+        asBoolean(application, "no-hostname", variables, builder::noHostname);
+        asBoolean(application, "no-route", variables, builder::noRoute);
+        asString(application, "path", variables, path -> builder.path(root.getParent().resolve(path)));
+        asBoolean(application, "random-route", variables, builder::randomRoute);
+        asList(application, "routes", variables, raw -> getRoute((Map<String, Object>) raw), builder::route);
+        asListOfString(application, "services", variables, builder::service);
+        asString(application, "stack", variables, builder::stack);
+        asInteger(application, "timeout", variables, builder::timeout);
 
         return builder;
     }
