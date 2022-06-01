@@ -34,6 +34,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicReference;
@@ -153,10 +154,11 @@ public final class ApplicationManifestUtils {
         Optional.ofNullable(payload.get(key))
             .map(o -> {
                 if(o instanceof String) {
-                    Matcher m = FIND_VARIABLE_REGEX.matcher(((String) o));
+                    Matcher m = FIND_VARIABLE_REGEX.matcher((String) o);
                     StringBuffer stringBuffer = new StringBuffer();
                     while(m.find()){
-                        m.appendReplacement(stringBuffer, variables.getOrDefault(m.group(1), m.group(0)));
+                        m.appendReplacement(stringBuffer, Optional.ofNullable(variables.get(m.group(1)))
+                            .orElseThrow(() -> new NoSuchElementException("Expected to find variable: "+m.group(1))));
                     }
                     m.appendTail(stringBuffer);
                     return stringBuffer.toString();

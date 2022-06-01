@@ -27,11 +27,14 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.cloudfoundry.operations.applications.ApplicationHealthCheck.NONE;
 import static org.cloudfoundry.operations.applications.ApplicationHealthCheck.PORT;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assume.assumeTrue;
 
 public final class ApplicationManifestUtilsTest {
@@ -474,20 +477,28 @@ public final class ApplicationManifestUtilsTest {
     }
 
     @Test
-    public void readWithVariableSubstitution_dontEvaluateRegexInVariableKey() throws IOException {
+    public void readWithVariableSubstitution_throwExceptionOnMissing() throws IOException {
+        assertThatExceptionOfType(NoSuchElementException.class)
+            .isThrownBy(() -> {
+                ApplicationManifestUtils.read(
+                    new ClassPathResource("fixtures/manifest-papa-2.yml").getFile().toPath(),
+                    new ClassPathResource("fixtures/vars-papa-2.yml").getFile().toPath());
+            }).withMessageMatching("Expected to find variable: abcdef");
+    }
+    @Test
+    public void readWithVariableSubstitution_dontEvaluateRegex() throws IOException {
         List<ApplicationManifest> expected = Collections.singletonList(
             ApplicationManifest.builder()
-                .name("papa-2-application")
-                .buildpack("((abcdef))")
+                .name("papa-7-application")
+                .buildpack("((regex*))")
                 .build());
 
         List<ApplicationManifest> actual = ApplicationManifestUtils.read(
-            new ClassPathResource("fixtures/manifest-papa-2.yml").getFile().toPath(),
-            new ClassPathResource("fixtures/vars-papa-2.yml").getFile().toPath());
+            new ClassPathResource("fixtures/manifest-papa-7.yml").getFile().toPath(),
+            new ClassPathResource("fixtures/vars-papa-7.yml").getFile().toPath());
 
         assertThat(actual).isEqualTo(expected);
     }
-
     @Test
     public void readWithVariableSubstitution_avoidEndlessSubstitution() throws IOException {
         List<ApplicationManifest> expected = Collections.singletonList(

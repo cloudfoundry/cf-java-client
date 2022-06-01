@@ -1,0 +1,4 @@
+---
+applications:
+- name: papa-7-application
+  buildpack: ((regex*))
