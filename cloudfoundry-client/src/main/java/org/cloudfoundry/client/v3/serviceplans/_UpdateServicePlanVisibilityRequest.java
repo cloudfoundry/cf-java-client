@@ -14,32 +14,40 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.serviceinstances;
+package org.cloudfoundry.client.v3.serviceplans;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v3.ToOneRelationship;
 import org.immutables.value.Value;
 
+import java.util.List;
+
 /**
- * The service instance relationship
+ * The request payload for the Update Service Plan Visibility operation
  */
-@JsonDeserialize
+@JsonSerialize
 @Value.Immutable
-abstract class _ServiceInstanceRelationships {
+abstract class _UpdateServicePlanVisibilityRequest {
 
     /**
-     * The space relationship
+     * The service plan id
      */
-    @JsonProperty("service_plan")
-    @Nullable
-    abstract ToOneRelationship getServicePlan();
+    @JsonIgnore
+    abstract String getServicePlanId();
 
     /**
-     * The space relationship
+     * Denotes the visibility of the plan
      */
-    @JsonProperty("space")
+    @JsonProperty("type")
+    abstract Visibility getType();
+
+    /**
+     * The organizations where the service plan is visible
+     */
+    @JsonProperty("organizations")
     @Nullable
-    abstract ToOneRelationship getSpace();
+    abstract List<Organization> getOrganizations();
+
 }

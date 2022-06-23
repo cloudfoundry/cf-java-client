@@ -16,14 +16,21 @@
 
 package org.cloudfoundry.reactor.client.v3.serviceinstances;
 
+
+import org.cloudfoundry.client.v3.serviceinstances.CreateServiceInstanceRequest;
+import org.cloudfoundry.client.v3.serviceinstances.CreateServiceInstanceResponse;
+import org.cloudfoundry.client.v3.serviceinstances.DeleteServiceInstanceRequest;
 import org.cloudfoundry.client.v3.serviceinstances.GetManagedServiceParametersRequest;
 import org.cloudfoundry.client.v3.serviceinstances.GetManagedServiceParametersResponse;
+import org.cloudfoundry.client.v3.serviceinstances.GetServiceInstanceRequest;
+import org.cloudfoundry.client.v3.serviceinstances.GetServiceInstanceResponse;
 import org.cloudfoundry.client.v3.serviceinstances.GetUserProvidedCredentialsRequest;
 import org.cloudfoundry.client.v3.serviceinstances.GetUserProvidedCredentialsResponse;
 import org.cloudfoundry.client.v3.serviceinstances.ListServiceInstancesRequest;
 import org.cloudfoundry.client.v3.serviceinstances.ListServiceInstancesResponse;
 import org.cloudfoundry.client.v3.serviceinstances.ListSharedSpacesRelationshipRequest;
 import org.cloudfoundry.client.v3.serviceinstances.ListSharedSpacesRelationshipResponse;
+import org.cloudfoundry.client.v3.serviceinstances.ServiceInstanceResource;
 import org.cloudfoundry.client.v3.serviceinstances.ServiceInstancesV3;
 import org.cloudfoundry.client.v3.serviceinstances.ShareServiceInstanceRequest;
 import org.cloudfoundry.client.v3.serviceinstances.ShareServiceInstanceResponse;
@@ -31,11 +38,13 @@ import org.cloudfoundry.client.v3.serviceinstances.UnshareServiceInstanceRequest
 import org.cloudfoundry.client.v3.serviceinstances.UpdateServiceInstanceRequest;
 import org.cloudfoundry.client.v3.serviceinstances.UpdateServiceInstanceResponse;
 import org.cloudfoundry.reactor.ConnectionContext;
+import org.cloudfoundry.reactor.HttpClientResponseWithParsedBody;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * The Reactor-based implementation of {@link ServiceInstancesV3}
@@ -55,15 +64,42 @@ public final class ReactorServiceInstancesV3 extends AbstractClientV3Operations 
     }
 
     @Override
+    public Mono<CreateServiceInstanceResponse> create(CreateServiceInstanceRequest request) {
+        return postWithResponse(request, ServiceInstanceResource.class, builder -> builder.pathSegment("service_instances"))
+            .map(responseTuple -> CreateServiceInstanceResponse.builder()
+                .jobId(getJobId(responseTuple))
+                .serviceInstance(responseTuple.getBody())
+                .build())
+            .checkpoint();
+    }
+
+    private <T> Optional<String> getJobId(HttpClientResponseWithParsedBody<T> responseTuple) {
+        return Optional.ofNullable(extractJobId(responseTuple.getResponse()));
+    }
+
+    @Override
+    public Mono<GetServiceInstanceResponse> get(GetServiceInstanceRequest request) {
+        return get(request, GetServiceInstanceResponse.class, builder -> builder.pathSegment("service_instances", request.getServiceInstanceId()))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<Optional<String>> delete(DeleteServiceInstanceRequest request) {
+        return deleteWithResponse(request, String.class, builder -> builder.pathSegment("service_instances", request.getServiceInstanceId()))
+            .map(this::getJobId)
+            .checkpoint();
+    }
+
+    @Override
     public Mono<GetManagedServiceParametersResponse> getManagedServiceParameters(GetManagedServiceParametersRequest request) {
-	return get(request, GetManagedServiceParametersResponse.class, builder -> builder.pathSegment("service_instances", request.getServiceInstanceId(), "parameters"))
-	    .checkpoint();
+        return get(request, GetManagedServiceParametersResponse.class, builder -> builder.pathSegment("service_instances", request.getServiceInstanceId(), "parameters"))
+            .checkpoint();
     }
 
     @Override
     public Mono<GetUserProvidedCredentialsResponse> getUserProvidedCredentials(GetUserProvidedCredentialsRequest request) {
-	return get(request, GetUserProvidedCredentialsResponse.class, builder -> builder.pathSegment("service_instances", request.getServiceInstanceId(), "credentials"))
-	    .checkpoint();
+        return get(request, GetUserProvidedCredentialsResponse.class, builder -> builder.pathSegment("service_instances", request.getServiceInstanceId(), "credentials"))
+            .checkpoint();
     }
 
     @Override
@@ -92,6 +128,11 @@ public final class ReactorServiceInstancesV3 extends AbstractClientV3Operations 
 
     @Override
     public Mono<UpdateServiceInstanceResponse> update(UpdateServiceInstanceRequest request) {
-        return patch(request, UpdateServiceInstanceResponse.class, builder -> builder.pathSegment("service_instances", request.getServiceInstanceId()));
+        return patchWithResponse(request, ServiceInstanceResource.class, builder -> builder.pathSegment("service_instances", request.getServiceInstanceId()))
+            .map(responseTuple -> UpdateServiceInstanceResponse.builder()
+                .jobId(getJobId(responseTuple))
+                .serviceInstance(responseTuple.getBody())
+                .build())
+            .checkpoint();
     }
 }

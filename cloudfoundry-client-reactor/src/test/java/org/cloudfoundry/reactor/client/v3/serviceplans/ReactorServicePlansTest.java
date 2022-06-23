@@ -30,6 +30,7 @@ import org.cloudfoundry.client.v3.serviceplans.GetServicePlanResponse;
 import org.cloudfoundry.client.v3.serviceplans.ListServicePlansRequest;
 import org.cloudfoundry.client.v3.serviceplans.ListServicePlansResponse;
 import org.cloudfoundry.client.v3.serviceplans.MaintenanceInfo;
+import org.cloudfoundry.client.v3.serviceplans.Organization;
 import org.cloudfoundry.client.v3.serviceplans.Parameters;
 import org.cloudfoundry.client.v3.serviceplans.Schema;
 import org.cloudfoundry.client.v3.serviceplans.Schemas;
@@ -39,6 +40,8 @@ import org.cloudfoundry.client.v3.serviceplans.ServicePlanRelationships;
 import org.cloudfoundry.client.v3.serviceplans.ServicePlanResource;
 import org.cloudfoundry.client.v3.serviceplans.UpdateServicePlanRequest;
 import org.cloudfoundry.client.v3.serviceplans.UpdateServicePlanResponse;
+import org.cloudfoundry.client.v3.serviceplans.UpdateServicePlanVisibilityRequest;
+import org.cloudfoundry.client.v3.serviceplans.UpdateServicePlanVisibilityResponse;
 import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
@@ -54,6 +57,7 @@ import java.util.Map;
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.PATCH;
+import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
@@ -429,4 +433,36 @@ public final class ReactorServicePlansTest extends AbstractClientApiTest {
             .verify(Duration.ofSeconds(5));
     }
 
+    @Test
+    public void updatePlanVisibility() {
+        mockRequest(InteractionContext.builder()
+            .request(TestRequest.builder()
+                .method(POST).path("/service_plans/bf7eb420-11e5-11ea-b7db-4b5d5e7976a9/visibility")
+                .payload("fixtures/client/v3/service_plans/POST_{id}_request_update_plan.json")
+                .build())
+            .response(TestResponse.builder()
+                .status(OK)
+                .payload("fixtures/client/v3/service_plans/POST_{id}_response_update_plan.json")
+                .build())
+            .build());
+
+        this.servicePlans
+            .updateVisibility(UpdateServicePlanVisibilityRequest.builder()
+                .servicePlanId("bf7eb420-11e5-11ea-b7db-4b5d5e7976a9")
+                .type(ORGANIZATION)
+                .organization(Organization.builder()
+                    .guid("0fc1ad4f-e1d7-4436-8e23-6b20f03c6482")
+                    .build())
+                .build())
+            .as(StepVerifier::create)
+            .expectNext(UpdateServicePlanVisibilityResponse.builder()
+                .type(ORGANIZATION)
+                .organization(Organization.builder()
+                    .guid("0fc1ad4f-e1d7-4436-8e23-6b20f03c6482")
+                    .name("other_org")
+                    .build())
+                .build())
+            .expectComplete()
+            .verify(Duration.ofSeconds(5));
+    }
 }

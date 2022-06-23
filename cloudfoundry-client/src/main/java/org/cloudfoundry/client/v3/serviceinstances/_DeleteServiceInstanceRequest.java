@@ -16,20 +16,19 @@
 
 package org.cloudfoundry.client.v3.serviceinstances;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.immutables.value.Value;
 
-import java.util.Optional;
-
 /**
- * The response payload for the Update Service operation
+ * The request payload for the Create Service operation
  */
-@JsonDeserialize
 @Value.Immutable
-abstract class _UpdateServiceInstanceResponse {
+abstract class _DeleteServiceInstanceRequest {
 
-    abstract Optional<String> getJobId();
-
-    abstract Optional<ServiceInstanceResource> getServiceInstance();
+    /**
+     * The service instance id
+     */
+    @JsonIgnore
+    abstract String getServiceInstanceId();
 
 }
