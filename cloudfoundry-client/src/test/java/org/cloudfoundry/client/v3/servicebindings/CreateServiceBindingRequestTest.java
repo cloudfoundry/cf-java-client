@@ -16,8 +16,8 @@
 
 package org.cloudfoundry.client.v3.servicebindings;
 
-
 import org.cloudfoundry.client.v3.Relationship;
+import org.cloudfoundry.client.v3.ToOneRelationship;
 import org.junit.Test;
 
 public final class CreateServiceBindingRequestTest {
@@ -33,11 +33,15 @@ public final class CreateServiceBindingRequestTest {
     public void noType() {
         CreateServiceBindingRequest.builder()
             .relationships(ServiceBindingRelationships.builder()
-                .application(Relationship.builder()
-                    .id("test-id")
+                .application(ToOneRelationship.builder()
+                    .data(Relationship.builder()
+                        .id("test-id")
+                        .build())
                     .build())
-                .serviceInstance(Relationship.builder()
-                    .id("test-id")
+                .serviceInstance(ToOneRelationship.builder()
+                    .data(Relationship.builder()
+                        .id("test-id")
+                        .build())
                     .build())
                 .build())
             .build();
@@ -47,11 +51,15 @@ public final class CreateServiceBindingRequestTest {
     public void valid() {
         CreateServiceBindingRequest.builder()
             .relationships(ServiceBindingRelationships.builder()
-                .application(Relationship.builder()
-                    .id("test-id")
+                .application(ToOneRelationship.builder()
+                    .data(Relationship.builder()
+                        .id("test-id")
+                        .build())
                     .build())
-                .serviceInstance(Relationship.builder()
-                    .id("test-id")
+                .serviceInstance(ToOneRelationship.builder()
+                    .data(Relationship.builder()
+                        .id("test-id")
+                        .build())
                     .build())
                 .build())
             .type(ServiceBindingType.APPLICATION)

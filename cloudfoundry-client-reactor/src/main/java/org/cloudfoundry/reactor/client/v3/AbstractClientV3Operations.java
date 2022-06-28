@@ -62,7 +62,7 @@ public abstract class AbstractClientV3Operations extends AbstractReactorOperatio
                 .send(requestPayload)
                 .response()
                 .get())
-            .map(AbstractClientV3Operations::extractJobId);
+            .flatMap(response -> Mono.justOrEmpty(extractJobId(response)));
     }
 
     protected final <T> Mono<HttpClientResponseWithParsedBody<T>> deleteWithResponse(Object requestPayload, Class<T> responseType,
@@ -141,7 +141,7 @@ public abstract class AbstractClientV3Operations extends AbstractReactorOperatio
     }
 
     protected final <T> Mono<HttpClientResponseWithParsedBody<T>> postWithResponse(Object requestPayload, Class<T> responseType,
-                                                                                    Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+                                                                                   Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return createOperator()
             .flatMap(operator -> operator.post()
                 .uri(queryTransformer(requestPayload).andThen(uriTransformer))
@@ -157,7 +157,7 @@ public abstract class AbstractClientV3Operations extends AbstractReactorOperatio
                 .send(requestPayload)
                 .response()
                 .get())
-            .map(AbstractClientV3Operations::extractJobId);
+            .flatMap(response -> Mono.justOrEmpty(extractJobId(response)));
     }
 
     protected final <T> Mono<T> put(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {

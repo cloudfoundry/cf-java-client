@@ -18,6 +18,8 @@ package org.cloudfoundry.client.v3.servicebindings;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.cloudfoundry.Nullable;
+import org.cloudfoundry.client.v3.LastOperation;
+import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.Resource;
 
 /**
@@ -26,17 +28,36 @@ import org.cloudfoundry.client.v3.Resource;
 public abstract class ServiceBinding extends Resource {
 
     /**
-     * The datas
+     * The name
      */
-    @JsonProperty("data")
+    @JsonProperty("name")
     @Nullable
-    public abstract ServiceBindingData getData();
+    public abstract String getName();
 
     /**
      * The type
      */
     @JsonProperty("type")
+    public abstract ServiceBindingType getType();
+
+    /**
+     * The last operation
+     */
+    @JsonProperty("last_operation")
     @Nullable
-    public abstract String getType();
+    abstract LastOperation getLastOperation();
+
+    /**
+     * The relationships
+     */
+    @JsonProperty("relationships")
+    public abstract ServiceBindingRelationships getRelationships();
+
+    /**
+     * The metadata
+     */
+    @JsonProperty("metadata")
+    @Nullable
+    public abstract Metadata getMetadata();
 
 }

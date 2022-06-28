@@ -2,15 +2,14 @@
   "type": "app",
   "relationships": {
     "app": {
-      "guid": "74f7c078-0934-470f-9883-4fddss5b8f13"
+      "data": {
+        "guid": "74f7c078-0934-470f-9883-4fddss5b8f13"
+      }
     },
     "service_instance": {
-      "guid": "8bfe4c1b-9e18-45b1-83be-124163f31f9e"
-    }
-  },
-  "data": {
-    "parameters": {
-      "some_object_id": "for_the_service_broker"
+      "data": {
+        "guid": "8bfe4c1b-9e18-45b1-83be-124163f31f9e"
+      }
     }
   }
 }

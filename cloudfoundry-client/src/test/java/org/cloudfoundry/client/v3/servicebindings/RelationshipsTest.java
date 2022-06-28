@@ -17,15 +17,18 @@
 package org.cloudfoundry.client.v3.servicebindings;
 
 import org.cloudfoundry.client.v3.Relationship;
+import org.cloudfoundry.client.v3.ToOneRelationship;
 import org.junit.Test;
 
 public final class RelationshipsTest {
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void noApplication() {
         ServiceBindingRelationships.builder()
-            .application(Relationship.builder()
-                .id("test-id")
+            .serviceInstance(ToOneRelationship.builder()
+                .data(Relationship.builder()
+                    .id("test-id")
+                    .build())
                 .build())
             .build();
     }
@@ -33,8 +36,10 @@ public final class RelationshipsTest {
     @Test(expected = IllegalStateException.class)
     public void noServiceInstance() {
         ServiceBindingRelationships.builder()
-            .serviceInstance(Relationship.builder()
-                .id("test-id")
+            .application(ToOneRelationship.builder()
+                .data(Relationship.builder()
+                    .id("test-id")
+                    .build())
                 .build())
             .build();
     }
@@ -42,11 +47,15 @@ public final class RelationshipsTest {
     @Test
     public void valid() {
         ServiceBindingRelationships.builder()
-            .application(Relationship.builder()
-                .id("test-id")
+            .application(ToOneRelationship.builder()
+                .data(Relationship.builder()
+                    .id("test-id")
+                    .build())
                 .build())
-            .serviceInstance(Relationship.builder()
-                .id("test-id")
+            .serviceInstance(ToOneRelationship.builder()
+                .data(Relationship.builder()
+                    .id("test-id")
+                    .build())
                 .build())
             .build();
     }

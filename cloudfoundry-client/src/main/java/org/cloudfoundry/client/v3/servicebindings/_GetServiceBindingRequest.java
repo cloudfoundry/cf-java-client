@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.client.v3.servicebindings;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.immutables.value.Value;
 

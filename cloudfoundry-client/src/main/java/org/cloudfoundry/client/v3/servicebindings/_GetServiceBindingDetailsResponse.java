@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,24 +17,39 @@
 package org.cloudfoundry.client.v3.servicebindings;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
+import java.util.List;
 import java.util.Map;
 
 /**
- * The data to use when created a {@link ServiceBinding}
+ * The response payload for the Get Service Binding Details operation
  */
+@JsonDeserialize
 @Value.Immutable
-abstract class _CreateServiceBindingData {
+abstract class _GetServiceBindingDetailsResponse {
 
     /**
-     * The parameters
+     * The credentials
      */
+    @JsonProperty("credentials")
     @AllowNulls
-    @JsonProperty("parameters")
+    abstract Map<String, Object> getCredentials();
+
+    /**
+     * The syslog drain url
+     */
+    @JsonProperty("syslog_drain_log")
     @Nullable
-    abstract Map<String, Object> getParameters();
+    abstract String getSyslogDrainUrl();
+
+    /**
+     * The volume mounts
+     */
+    @JsonProperty("volume_mounts")
+    abstract List<String> getVolumeMounts();
 
 }
