@@ -1,0 +1,26 @@
+{
+  "name": "my_service_instance",
+  "parameters": {
+    "foo": "bar",
+    "baz": "qux"
+  },
+  "tags": ["foo", "bar", "baz"],
+  "relationships": {
+    "service_plan": {
+      "data": {
+        "guid": "f2b6ba9c-a4d2-11ea-8ae6-48bf6bec2d78"
+      }
+    }
+  },
+  "maintenance_info": {
+    "version": "1.0.0"
+  },
+  "metadata": {
+    "annotations": {
+      "note": "detailed information"
+    },
+    "labels": {
+      "key": "value"
+    }
+  }
+}

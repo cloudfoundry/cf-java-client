@@ -18,11 +18,41 @@ package org.cloudfoundry.client.v3.serviceinstances;
 
 import reactor.core.publisher.Mono;
 
+import java.util.Optional;
+
 /**
  * Main entry point to the Cloud Foundry Service Instances V3 Client API
  */
 public interface ServiceInstancesV3 {
-    
+
+    /**
+     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/release-candidate/#create-a-service-instance">
+     * Create A Service Instance</a> request
+     *
+     * @param request the Create Service Instance request
+     * @return the response from Create Service Instance request
+     */
+    Mono<CreateServiceInstanceResponse> create(CreateServiceInstanceRequest request);
+
+    /**
+     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/release-candidate/#get-a-service-instance">
+     * Get A Service Instance</a> request
+     *
+     * @param request the Get Service Instance request
+     * @return the response from Get Service Instance request
+     */
+    Mono<GetServiceInstanceResponse> get(GetServiceInstanceRequest request);
+
+
+    /**
+     * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/release-candidate/#delete-a-service-instance">
+     * Delete A Service Instance</a> request
+     *
+     * @param request the Delete Service Instance request
+     * @return the response from Delete Service Instance request
+     */
+    Mono<Optional<String>> delete(DeleteServiceInstanceRequest request);
+
     /**
      * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/release-candidate/#get-parameters-for-a-managed-service-instance">
      * Get parameters for a managed service instance</a> request

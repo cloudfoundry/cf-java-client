@@ -14,22 +14,33 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.serviceinstances;
+package org.cloudfoundry.client.v3.serviceplans;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
-import java.util.Optional;
+import java.util.List;
 
 /**
- * The response payload for the Update Service operation
+ * The response payload for the Update Service Plan operation
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _UpdateServiceInstanceResponse {
+abstract class _UpdateServicePlanVisibilityResponse {
 
-    abstract Optional<String> getJobId();
+    /**
+     * Denotes the visibility of the plan
+     */
+    @JsonProperty("type")
+    abstract Visibility getType();
 
-    abstract Optional<ServiceInstanceResource> getServiceInstance();
+    /**
+     * The organizations where the service plan is visible
+     */
+    @JsonProperty("organizations")
+    @Nullable
+    abstract List<Organization> getOrganizations();
 
 }

@@ -24,6 +24,8 @@ import org.cloudfoundry.client.v3.serviceplans.ListServicePlansResponse;
 import org.cloudfoundry.client.v3.serviceplans.ServicePlansV3;
 import org.cloudfoundry.client.v3.serviceplans.UpdateServicePlanRequest;
 import org.cloudfoundry.client.v3.serviceplans.UpdateServicePlanResponse;
+import org.cloudfoundry.client.v3.serviceplans.UpdateServicePlanVisibilityRequest;
+import org.cloudfoundry.client.v3.serviceplans.UpdateServicePlanVisibilityResponse;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
@@ -72,4 +74,9 @@ public final class ReactorServicePlansV3 extends AbstractClientV3Operations impl
             .checkpoint();
     }
 
+    @Override
+    public Mono<UpdateServicePlanVisibilityResponse> updateVisibility(UpdateServicePlanVisibilityRequest request) {
+        return post(request, UpdateServicePlanVisibilityResponse.class, builder -> builder.pathSegment("service_plans", request.getServicePlanId(), "visibility"))
+            .checkpoint();
+    }
 }

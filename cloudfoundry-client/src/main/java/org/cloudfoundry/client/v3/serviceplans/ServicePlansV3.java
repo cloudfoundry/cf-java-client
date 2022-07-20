@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 public interface ServicePlansV3 {
 
     /**
-     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.88.0/index.html#delete-a-service-plan">Delete Service Plan</a> request
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#delete-a-service-plan">Delete Service Plan</a> request
      *
      * @param request the Delete Service Plan request
      * @return the response from the Delete Service Plan request
@@ -32,7 +32,7 @@ public interface ServicePlansV3 {
     Mono<Void> delete(DeleteServicePlanRequest request);
 
     /**
-     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.88.0/index.html#get-a-service-plan">Get Service Plan</a> request
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#get-a-service-plan">Get Service Plan</a> request
      *
      * @param request the Get Service Plan request
      * @return the response from the Get Service Plan request
@@ -40,7 +40,7 @@ public interface ServicePlansV3 {
     Mono<GetServicePlanResponse> get(GetServicePlanRequest request);
 
     /**
-     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.88.0/index.html#list-service-plans">List Service Plan</a> request
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#list-service-plans">List Service Plan</a> request
      *
      * @param request the List Service Plans request
      * @return the response from the List Service Plans request
@@ -48,11 +48,19 @@ public interface ServicePlansV3 {
     Mono<ListServicePlansResponse> list(ListServicePlansRequest request);
 
     /**
-     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.88.0/index.html#update-a-service-plan"> Upload Service Plan</a> request
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#update-a-service-plan"> Upload Service Plan</a> request
      *
      * @param request the Update Service Plan request
      * @return the response from the Update Service Plan request
      */
     Mono<UpdateServicePlanResponse> update(UpdateServicePlanRequest request);
+
+    /**
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#update-a-service-plan-visibility"> Upload Service Plan</a> request
+     *
+     * @param request the Update Service Plan Visibility request
+     * @return the response from the Update Service Plan Visibility request
+     */
+    Mono<UpdateServicePlanVisibilityResponse> updateVisibility(UpdateServicePlanVisibilityRequest request);
 
 }

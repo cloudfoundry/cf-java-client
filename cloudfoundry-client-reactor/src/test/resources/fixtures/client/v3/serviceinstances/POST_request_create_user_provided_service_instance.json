@@ -1,0 +1,26 @@
+{
+  "type": "user-provided",
+  "name": "my-user-provided-instance",
+  "credentials": {
+    "foo": "bar",
+    "baz": "qux"
+  },
+  "tags": ["sql"],
+  "syslog_drain_url": "https://syslog.com/drain",
+  "route_service_url": "https://route.com/service",
+  "metadata": {
+    "annotations": {
+      "foo": "bar"
+    },
+    "labels": {
+      "baz": "qux"
+    }
+  },
+  "relationships": {
+    "space": {
+      "data": {
+        "guid": "7304bc3c-7010-11ea-8840-48bf6bec2d78"
+      }
+    }
+  }
+}

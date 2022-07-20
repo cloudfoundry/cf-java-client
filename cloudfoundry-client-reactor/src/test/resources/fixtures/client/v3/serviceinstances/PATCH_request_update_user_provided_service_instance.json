@@ -1,0 +1,18 @@
+{
+  "name": "my-user-provided-instance",
+  "credentials": {
+    "foo": "bar",
+    "baz": "qux"
+  },
+  "tags": ["foo", "bar", "baz"],
+  "syslog_drain_url": "https://syslog.com/drain",
+  "route_service_url": "https://route.com/service",
+  "metadata": {
+    "annotations": {
+      "foo": "bar"
+    },
+    "labels": {
+      "baz": "qux"
+    }
+  }
+}

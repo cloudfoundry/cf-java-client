@@ -1,0 +1,33 @@
+{
+  "type": "managed",
+  "name": "my_service_instance",
+  "parameters": {
+    "foo": "bar",
+    "baz": "qux"
+  },
+  "tags": [
+    "foo",
+    "bar",
+    "baz"
+  ],
+  "metadata": {
+    "annotations": {
+      "foo": "bar"
+    },
+    "labels": {
+      "baz": "qux"
+    }
+  },
+  "relationships": {
+    "space": {
+      "data": {
+        "guid": "7304bc3c-7010-11ea-8840-48bf6bec2d78"
+      }
+    },
+    "service_plan": {
+      "data": {
+        "guid": "e0e4417c-74ee-11ea-a604-48bf6bec2d78"
+      }
+    }
+  }
+}

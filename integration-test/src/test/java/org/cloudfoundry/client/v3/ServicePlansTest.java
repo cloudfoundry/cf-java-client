@@ -27,6 +27,8 @@ import org.cloudfoundry.client.v3.serviceplans.GetServicePlanResponse;
 import org.cloudfoundry.client.v3.serviceplans.ListServicePlansRequest;
 import org.cloudfoundry.client.v3.serviceplans.ServicePlanResource;
 import org.cloudfoundry.client.v3.serviceplans.UpdateServicePlanRequest;
+import org.cloudfoundry.client.v3.serviceplans.UpdateServicePlanVisibilityRequest;
+import org.cloudfoundry.client.v3.serviceplans.Visibility;
 import org.cloudfoundry.client.v3.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v3.spaces.CreateSpaceResponse;
 import org.cloudfoundry.client.v3.spaces.SpaceRelationships;
@@ -103,9 +105,9 @@ public final class ServicePlansTest extends AbstractIntegrationTest {
     @Test
     public void list() {
         PaginationUtils.requestClientV3Resources(page -> this.cloudFoundryClient.servicePlansV3()
-            .list(ListServicePlansRequest.builder()
-                .page(page)
-                .build()))
+                .list(ListServicePlansRequest.builder()
+                    .page(page)
+                    .build()))
             .filter(response -> this.planName.equals(response.getName()))
             .map(ServicePlanResource::getDescription)
             .as(StepVerifier::create)
@@ -128,6 +130,20 @@ public final class ServicePlansTest extends AbstractIntegrationTest {
             .as(StepVerifier::create)
             .expectNextCount(1)
             .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void updateServicePlanVisibilityWithSame() {
+        this.serviceBrokerId
+            .flatMap(serviceBrokerId -> getServicePlanId(this.cloudFoundryClient, serviceBrokerId))
+            .flatMap(servicePlanId -> this.cloudFoundryClient
+                .servicePlansV3().updateVisibility(UpdateServicePlanVisibilityRequest.builder()
+                    .servicePlanId(servicePlanId)
+                    .type(Visibility.SPACE)
+                    .build()))
+            .as(StepVerifier::create)
+            .expectError()
             .verify(Duration.ofMinutes(5));
     }
 

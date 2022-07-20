@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,32 +16,16 @@
 
 package org.cloudfoundry.client.v3.serviceinstances;
 
-import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.ToOneRelationship;
 import org.junit.Test;
 
-public class UpdateServiceInstanceRequestTest {
-
-    @Test
-    public void testServiceInstanceIdOnly() {
-        UpdateServiceInstanceRequest.builder()
-            .serviceInstanceId("test-service-instance-id")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noServiceInstanceId() {
-        UpdateServiceInstanceRequest.builder()
-            .metadata(Metadata.builder().build())
-            .build();
-    }
+public class CreateServiceInstanceRequestTest {
 
     @Test
     public void validManagedServiceInstance() {
-        UpdateServiceInstanceRequest.builder()
-            .metadata(Metadata.builder().build())
-            .serviceInstanceId("test-service-instance-id")
+        CreateServiceInstanceRequest.builder()
+            .type(ServiceInstanceType.MANAGED)
             .name("test-service-instance-name")
             .relationships(ServiceInstanceRelationships.builder()
                 .servicePlan(ToOneRelationship.builder()
@@ -60,5 +44,36 @@ public class UpdateServiceInstanceRequestTest {
             .build();
     }
 
+    @Test
+    public void validUserProvidedServiceInstance() {
+        CreateServiceInstanceRequest.builder()
+            .type(ServiceInstanceType.USER_PROVIDED)
+            .syslogDrainUrl("https://syslog.com")
+            .routeServiceUrl("https://route.com")
+            .credential("key", "value")
+            .name("test-user-provided-name")
+            .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testWithMissingName() {
+        CreateServiceInstanceRequest.builder()
+            .type(ServiceInstanceType.MANAGED)
+            .relationships(ServiceInstanceRelationships.builder()
+                .servicePlan(ToOneRelationship.builder()
+                    .data(Relationship.builder()
+                        .id("test-service-plan-id")
+                        .build())
+                    .build())
+                .space(ToOneRelationship.builder()
+                    .data(Relationship.builder()
+                        .id("test-space-id")
+                        .build())
+                    .build())
+                .build())
+            .tags("foo", "bar")
+            .parameter("key", "value")
+            .build();
+    }
 
 }

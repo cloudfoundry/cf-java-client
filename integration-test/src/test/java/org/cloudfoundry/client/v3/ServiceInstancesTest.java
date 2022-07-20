@@ -20,23 +20,30 @@ import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.CloudFoundryVersion;
 import org.cloudfoundry.IfCloudFoundryVersion;
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v2.serviceinstances.CreateServiceInstanceRequest;
-import org.cloudfoundry.client.v2.serviceinstances.CreateServiceInstanceResponse;
-import org.cloudfoundry.client.v2.serviceplans.ListServicePlansRequest;
-import org.cloudfoundry.client.v2.serviceplans.ServicePlanResource;
-import org.cloudfoundry.client.v2.services.ListServicesRequest;
-import org.cloudfoundry.client.v2.services.ServiceResource;
+import org.cloudfoundry.client.v3.serviceinstances.CreateServiceInstanceRequest;
+import org.cloudfoundry.client.v3.serviceinstances.CreateServiceInstanceResponse;
+import org.cloudfoundry.client.v3.serviceinstances.DeleteServiceInstanceRequest;
+import org.cloudfoundry.client.v3.serviceinstances.GetServiceInstanceRequest;
+import org.cloudfoundry.client.v3.serviceinstances.GetUserProvidedCredentialsRequest;
 import org.cloudfoundry.client.v3.serviceinstances.ListServiceInstancesRequest;
 import org.cloudfoundry.client.v3.serviceinstances.ListSharedSpacesRelationshipRequest;
 import org.cloudfoundry.client.v3.serviceinstances.ListSharedSpacesRelationshipResponse;
+import org.cloudfoundry.client.v3.serviceinstances.ServiceInstanceRelationships;
+import org.cloudfoundry.client.v3.serviceinstances.ServiceInstanceType;
 import org.cloudfoundry.client.v3.serviceinstances.ShareServiceInstanceRequest;
 import org.cloudfoundry.client.v3.serviceinstances.ShareServiceInstanceResponse;
 import org.cloudfoundry.client.v3.serviceinstances.UnshareServiceInstanceRequest;
+import org.cloudfoundry.client.v3.serviceinstances.UpdateServiceInstanceRequest;
+import org.cloudfoundry.client.v3.serviceinstances.UpdateServiceInstanceResponse;
+import org.cloudfoundry.client.v3.serviceofferings.ListServiceOfferingsRequest;
+import org.cloudfoundry.client.v3.serviceofferings.ServiceOfferingResource;
+import org.cloudfoundry.client.v3.serviceplans.ListServicePlansRequest;
+import org.cloudfoundry.client.v3.serviceplans.ServicePlanResource;
 import org.cloudfoundry.client.v3.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v3.spaces.CreateSpaceResponse;
 import org.cloudfoundry.client.v3.spaces.SpaceRelationships;
+import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
-import org.cloudfoundry.util.ResourceUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
@@ -44,6 +51,9 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
@@ -66,11 +76,91 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
     private Mono<String> spaceId;
 
     @Test
-    public void list() {
+    public void createManagedServiceInstance() {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
+        this.spaceId
+            .flatMap(spaceId -> createManagedServiceInstanceId(this.cloudFoundryClient, this.serviceBrokerId, serviceInstanceName, this.serviceName, spaceId))
+            .flatMap(serviceInstanceId -> this.cloudFoundryClient.serviceInstancesV3()
+                .get(GetServiceInstanceRequest.builder()
+                    .serviceInstanceId(serviceInstanceId)
+                    .build()))
+            .filter(resource -> serviceInstanceName.equals(resource.getName()))
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void getUserProvidedServiceCredentials() {
+        String serviceInstanceName = this.nameFactory.getServiceInstanceName();
+        Map<String, Object> credentials = new HashMap<>();
+        credentials.put("foo", "bar");
+        this.spaceId
+            .flatMap(spaceId -> createUserProvidedServiceInstance(this.cloudFoundryClient, serviceInstanceName, credentials, spaceId))
+            .map(getServiceInstanceResponse -> getServiceInstanceResponse.getServiceInstance().get().getId())
+            .flatMap(serviceInstanceId -> this.cloudFoundryClient.serviceInstancesV3()
+                .getUserProvidedCredentials(GetUserProvidedCredentialsRequest.builder()
+                    .serviceInstanceId(serviceInstanceId)
+                    .build()))
+            .filter(resource -> credentials.equals(resource.getCredentials()))
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void delete() {
+        String serviceInstanceName = this.nameFactory.getServiceInstanceName();
+        this.spaceId
+            .flatMap(spaceId -> createManagedServiceInstanceId(this.cloudFoundryClient, this.serviceBrokerId, serviceInstanceName, this.serviceName, spaceId))
+            .flatMap(serviceInstanceId -> this.cloudFoundryClient.serviceInstancesV3()
+                .get(GetServiceInstanceRequest.builder()
+                    .serviceInstanceId(serviceInstanceId)
+                    .build()))
+            .filter(resource -> serviceInstanceName.equals(resource.getName()))
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
 
         this.spaceId
-            .flatMap(spaceId -> createServiceInstanceId(this.cloudFoundryClient, this.serviceBrokerId, serviceInstanceName, this.serviceName, spaceId))
+            .flatMap(spaceId -> deleteServiceInstanceByName(this.cloudFoundryClient, serviceInstanceName, spaceId))
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void update() {
+        String serviceInstanceName = this.nameFactory.getServiceInstanceName();
+        this.spaceId
+            .flatMap(spaceId -> createManagedServiceInstanceId(this.cloudFoundryClient, this.serviceBrokerId, serviceInstanceName, this.serviceName, spaceId))
+            .flatMap(serviceInstanceId -> this.cloudFoundryClient.serviceInstancesV3()
+                .get(GetServiceInstanceRequest.builder()
+                    .serviceInstanceId(serviceInstanceId)
+                    .build()))
+            .filter(resource -> serviceInstanceName.equals(resource.getName()))
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+
+        this.spaceId
+            .flatMap(spaceId -> updateServiceInstanceByName(this.cloudFoundryClient, serviceInstanceName, spaceId))
+            .as(StepVerifier::create)
+            .expectNextCount(1)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void list() {
+        String serviceInstanceName = this.nameFactory.getServiceInstanceName();
+        this.spaceId
+            .flatMap(spaceId -> createManagedServiceInstanceId(this.cloudFoundryClient, this.serviceBrokerId, serviceInstanceName, this.serviceName, spaceId))
             .thenMany(PaginationUtils
                 .requestClientV3Resources(page -> this.cloudFoundryClient.serviceInstancesV3()
                     .list(ListServiceInstancesRequest.builder()
@@ -90,7 +180,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
 
         Mono.zip(this.organizationId, this.spaceId)
             .flatMap(function((organizationId, spaceId) -> Mono.zip(
-                createServiceInstanceId(this.cloudFoundryClient, this.serviceBrokerId, serviceInstanceName, this.serviceName + "-shareable", spaceId),
+                createManagedServiceInstanceId(this.cloudFoundryClient, this.serviceBrokerId, serviceInstanceName, this.serviceName + "-shareable", spaceId),
                 createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
             ))
             .flatMap(function((serviceInstanceId, newSpaceId) -> requestShareServiceInstance(this.cloudFoundryClient, newSpaceId, serviceInstanceId)
@@ -113,7 +203,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
 
         Mono.zip(this.organizationId, this.spaceId)
             .flatMap(function((organizationId, spaceId) -> Mono.zip(
-                createServiceInstanceId(this.cloudFoundryClient, this.serviceBrokerId, serviceInstanceName, this.serviceName + "-shareable", spaceId),
+                createManagedServiceInstanceId(this.cloudFoundryClient, this.serviceBrokerId, serviceInstanceName, this.serviceName + "-shareable", spaceId),
                 createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
             ))
             .flatMapMany(function((serviceInstanceId, newSpaceId) -> Mono.zip(
@@ -141,7 +231,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
 
         Mono.zip(this.organizationId, this.spaceId)
             .flatMap(function((organizationId, spaceId) -> Mono.zip(
-                createServiceInstanceId(this.cloudFoundryClient, this.serviceBrokerId, serviceInstanceName, this.serviceName + "-shareable", spaceId),
+                createManagedServiceInstanceId(this.cloudFoundryClient, this.serviceBrokerId, serviceInstanceName, this.serviceName + "-shareable", spaceId),
                 createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
             ))
             .delayUntil(function((serviceInstanceId, newSpaceId) -> requestShareServiceInstance(this.cloudFoundryClient, newSpaceId, serviceInstanceId)))
@@ -159,11 +249,91 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
-    private static Mono<String> createServiceInstanceId(CloudFoundryClient cloudFoundryClient, Mono<String> serviceBrokerId, String serviceInstanceName, String serviceName, String spaceId) {
+    private static Mono<String> deleteServiceInstanceByName(CloudFoundryClient cloudFoundryClient, String serviceInstanceName, String spaceId) {
+        return cloudFoundryClient.serviceInstancesV3()
+            .list(ListServiceInstancesRequest.builder()
+                .spaceId(spaceId)
+                .serviceInstanceName(serviceInstanceName)
+                .build())
+            .map(serviceInstances -> serviceInstances.getResources().get(0))
+            .flatMap(serviceInstance -> deleteServiceInstanceById(cloudFoundryClient, serviceInstance.getId()));
+    }
+
+    private static Mono<String> deleteServiceInstanceById(CloudFoundryClient cloudFoundryClient, String serviceInstanceId) {
+        return cloudFoundryClient.serviceInstancesV3()
+            .delete(DeleteServiceInstanceRequest.builder()
+                .serviceInstanceId(serviceInstanceId)
+                .build())
+            .map(Optional::get);
+    }
+
+    private static Mono<String> updateServiceInstanceByName(CloudFoundryClient cloudFoundryClient, String serviceInstanceName, String spaceId) {
+        return cloudFoundryClient.serviceInstancesV3()
+            .list(ListServiceInstancesRequest.builder()
+                .spaceId(spaceId)
+                .serviceInstanceName(serviceInstanceName)
+                .build())
+            .map(serviceInstances -> serviceInstances.getResources().get(0))
+            .flatMap(serviceInstance -> updateServiceInstanceById(cloudFoundryClient, serviceInstance.getId()))
+            .flatMap(serviceInstance -> waitForCompletionOnUpdate(cloudFoundryClient, serviceInstance, serviceInstanceName));
+    }
+
+    private static Mono<UpdateServiceInstanceResponse> updateServiceInstanceById(CloudFoundryClient cloudFoundryClient, String serviceInstanceId) {
+        return cloudFoundryClient.serviceInstancesV3()
+            .update(UpdateServiceInstanceRequest.builder()
+                .serviceInstanceId(serviceInstanceId)
+                .parameter("foo", "bar")
+                .tag("baz")
+                .build());
+    }
+
+
+    private static Mono<String> waitForCompletionOnUpdate(CloudFoundryClient cloudFoundryClient, UpdateServiceInstanceResponse updateServiceInstanceResponse, String serviceInstanceName) {
+        if (updateServiceInstanceResponse.getJobId().isPresent()) {
+            JobUtils.waitForCompletion(cloudFoundryClient, Duration.ofMinutes(1), updateServiceInstanceResponse.getJobId().get());
+        }
+        return getServiceInstanceIdByName(cloudFoundryClient, serviceInstanceName);
+    }
+
+    private static Mono<String> createManagedServiceInstanceId(CloudFoundryClient cloudFoundryClient, Mono<String> serviceBrokerId, String serviceInstanceName, String serviceName, String spaceId) {
         return serviceBrokerId
-            .flatMap(s -> getPlanId(cloudFoundryClient, s, serviceName))
+            .flatMap(brokerId -> getPlanId(cloudFoundryClient, brokerId, serviceName))
             .flatMap(planId -> requestCreateServiceInstance(cloudFoundryClient, planId, serviceInstanceName, spaceId))
-            .map(ResourceUtils::getId);
+            .flatMap(serviceInstance -> waitForCompletionOnCreate(cloudFoundryClient, serviceInstance, serviceInstanceName));
+    }
+
+    private static Mono<String> waitForCompletionOnCreate(CloudFoundryClient cloudFoundryClient, CreateServiceInstanceResponse createServiceInstanceResponse, String serviceInstanceName) {
+        if (createServiceInstanceResponse.getJobId().isPresent()) {
+            JobUtils.waitForCompletion(cloudFoundryClient, Duration.ofMinutes(1), createServiceInstanceResponse.getJobId().get());
+        }
+        return getServiceInstanceIdByName(cloudFoundryClient, serviceInstanceName);
+    }
+
+    private static Mono<String> getServiceInstanceIdByName(CloudFoundryClient cloudFoundryClient, String serviceInstanceName) {
+        return cloudFoundryClient.serviceInstancesV3()
+            .list(ListServiceInstancesRequest.builder()
+                .serviceInstanceName(serviceInstanceName)
+                .build())
+            .map(serviceInstances -> serviceInstances.getResources()
+                .get(0)
+                .getId());
+    }
+
+    private static Mono<CreateServiceInstanceResponse> createUserProvidedServiceInstance(CloudFoundryClient cloudFoundryClient, String serviceInstanceName, Map<String, Object> credentials,
+                                                                                         String spaceId) {
+        return cloudFoundryClient.serviceInstancesV3()
+            .create(CreateServiceInstanceRequest.builder()
+                .name(serviceInstanceName)
+                .type(ServiceInstanceType.USER_PROVIDED)
+                .relationships(ServiceInstanceRelationships.builder()
+                    .space(ToOneRelationship.builder()
+                        .data(Relationship.builder()
+                            .id(spaceId)
+                            .build())
+                        .build())
+                    .build())
+                .credentials(credentials)
+                .build());
     }
 
     private static Mono<String> createSpaceId(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceName) {
@@ -172,21 +342,31 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
     }
 
     private static Mono<String> getPlanId(CloudFoundryClient cloudFoundryClient, String serviceBrokerId, String serviceName) {
-        return requestListServices(cloudFoundryClient, serviceBrokerId)
-            .filter(resource -> serviceName.equals(resource.getEntity().getLabel()))
+        return requestListServiceOfferings(cloudFoundryClient, serviceBrokerId)
+            .filter(serviceOfferingResource -> serviceName.equals(serviceOfferingResource.getName()))
             .single()
-            .map(ResourceUtils::getId)
+            .map(ServiceOfferingResource::getId)
             .flatMapMany(serviceId -> requestListServicePlans(cloudFoundryClient, serviceId))
             .single()
-            .map(ResourceUtils::getId);
+            .map(ServicePlanResource::getId);
     }
 
     private static Mono<CreateServiceInstanceResponse> requestCreateServiceInstance(CloudFoundryClient cloudFoundryClient, String planId, String serviceInstanceName, String spaceId) {
-        return cloudFoundryClient.serviceInstances()
+        return cloudFoundryClient.serviceInstancesV3()
             .create(CreateServiceInstanceRequest.builder()
                 .name(serviceInstanceName)
-                .servicePlanId(planId)
-                .spaceId(spaceId)
+                .type(ServiceInstanceType.MANAGED)
+                .relationships(ServiceInstanceRelationships.builder()
+                    .servicePlan(ToOneRelationship.builder()
+                        .data(Relationship.builder()
+                            .id(planId).build())
+                        .build())
+                    .space(ToOneRelationship.builder()
+                        .data(Relationship.builder()
+                            .id(spaceId)
+                            .build())
+                        .build())
+                    .build())
                 .build());
     }
 
@@ -206,17 +386,17 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
 
     private static Flux<ServicePlanResource> requestListServicePlans(CloudFoundryClient cloudFoundryClient, String serviceId) {
         return PaginationUtils
-            .requestClientV2Resources(page -> cloudFoundryClient.servicePlans()
+            .requestClientV3Resources(page -> cloudFoundryClient.servicePlansV3()
                 .list(ListServicePlansRequest.builder()
                     .page(page)
-                    .serviceId(serviceId)
+                    .serviceOfferingId(serviceId)
                     .build()));
     }
 
-    private static Flux<ServiceResource> requestListServices(CloudFoundryClient cloudFoundryClient, String serviceBrokerId) {
+    private static Flux<ServiceOfferingResource> requestListServiceOfferings(CloudFoundryClient cloudFoundryClient, String serviceBrokerId) {
         return PaginationUtils
-            .requestClientV2Resources(page -> cloudFoundryClient.services()
-                .list(ListServicesRequest.builder()
+            .requestClientV3Resources(page -> cloudFoundryClient.serviceOfferingsV3()
+                .list(ListServiceOfferingsRequest.builder()
                     .page(page)
                     .serviceBrokerId(serviceBrokerId)
                     .build()));

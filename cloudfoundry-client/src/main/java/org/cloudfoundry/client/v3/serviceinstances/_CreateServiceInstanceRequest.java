@@ -16,11 +16,9 @@
 
 package org.cloudfoundry.client.v3.serviceinstances;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v3.MaintenanceInfo;
 import org.cloudfoundry.client.v3.Metadata;
 import org.immutables.value.Value;
 
@@ -28,30 +26,22 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The request payload for the Update Service operation
+ * The request payload for the Create Service operation
  */
 @JsonSerialize
 @Value.Immutable
-abstract class _UpdateServiceInstanceRequest {
+abstract class _CreateServiceInstanceRequest {
 
     /**
-     * The service instance id
+     * The type of the service instance
      */
-    @JsonIgnore
-    abstract String getServiceInstanceId();
-
-    /**
-     * The metadata
-     */
-    @JsonProperty("metadata")
-    @Nullable
-    abstract Metadata getMetadata();
+    @JsonProperty("type")
+    abstract ServiceInstanceType getType();
 
     /**
      * The name
      */
     @JsonProperty("name")
-    @Nullable
     abstract String getName();
 
     /**
@@ -76,6 +66,13 @@ abstract class _UpdateServiceInstanceRequest {
     abstract Map<String, Object> getParameters();
 
     /**
+     * The metadata
+     */
+    @JsonProperty("metadata")
+    @Nullable
+    abstract Metadata getMetadata();
+
+    /**
      * The user provided service credentials
      */
     @JsonProperty("credentials")
@@ -95,12 +92,5 @@ abstract class _UpdateServiceInstanceRequest {
     @JsonProperty("route_service_url")
     @Nullable
     abstract String getRouteServiceUrl();
-
-    /**
-     * The maintenance info object
-     */
-    @JsonProperty("maintenance_info")
-    @Nullable
-    abstract MaintenanceInfo maintenanceInfo();
 
 }

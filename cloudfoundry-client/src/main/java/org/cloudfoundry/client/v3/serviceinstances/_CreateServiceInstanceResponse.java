@@ -26,10 +26,9 @@ import java.util.Optional;
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _UpdateServiceInstanceResponse {
+abstract class _CreateServiceInstanceResponse {
 
     abstract Optional<String> getJobId();
 
     abstract Optional<ServiceInstanceResource> getServiceInstance();
-
 }
