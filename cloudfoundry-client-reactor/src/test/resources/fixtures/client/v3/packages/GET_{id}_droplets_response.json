@@ -1,6 +1,6 @@
 {
   "pagination": {
-    "total_results": 2,
+    "total_results": 3,
     "total_pages": 1,
     "first": {
       "href": "https://api.example.org/v3/packages/7b34f1cf-7e73-428a-bb5a-8a17a8058396/droplets?page=1&per_page=50"
@@ -50,6 +50,50 @@
         },
         "assign_current_droplet": {
           "href": "https://api.example.org/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058396/relationships/current_droplet",
+          "method": "PATCH"
+        }
+      }
+    },
+    {
+      "guid": "585bc3c1-3743-497d-88b0-403ad6b56d17",
+      "state": "STAGED",
+      "error": null,
+      "lifecycle": {
+        "type": "kpack",
+        "data": {
+          "buildpacks": ["foo", "bar"]
+        }
+      },
+      "image": null,
+      "execution_metadata": "PRIVATE DATA HIDDEN",
+      "process_types": {
+        "redacted_message": "[PRIVATE DATA HIDDEN IN LISTS]"
+      },
+      "checksum": {
+        "type": "sha256",
+        "value": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "buildpacks": [
+        {
+          "name": "ruby_buildpack",
+          "detect_output": "ruby 1.6.14"
+        }
+      ],
+      "stack": "cflinuxfs2",
+      "created_at": "2016-03-28T23:39:34Z",
+      "updated_at": "2016-03-28T23:39:47Z",
+      "links": {
+        "self": {
+          "href": "https://api.example.org/v3/droplets/585bc3c1-3743-497d-88b0-403ad6b56d17"
+        },
+        "package": {
+          "href": "https://api.example.org/v3/packages/8222f76a-9e09-4360-b3aa-1ed329945e93"
+        },
+        "app": {
+          "href": "https://api.example.org/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058397"
+        },
+        "assign_current_droplet": {
+          "href": "https://api.example.org/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058397/relationships/current_droplet",
           "method": "PATCH"
         }
       }
