@@ -23,7 +23,9 @@ public enum LifecycleType {
 
     BUILDPACK("buildpack"),
 
-    DOCKER("docker");
+    DOCKER("docker"),
+
+    KPACK( "kpack");
 
     private final String value;
 
@@ -38,6 +40,8 @@ public enum LifecycleType {
                 return BUILDPACK;
             case "docker":
                 return DOCKER;
+            case "kpack":
+                return KPACK;
             default:
                 throw new IllegalArgumentException(String.format("Unknown lifecycle type: %s", s));
         }
