@@ -275,7 +275,9 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
                 .build())
             .map(serviceInstances -> serviceInstances.getResources().get(0))
             .flatMap(serviceInstance -> updateServiceInstanceById(cloudFoundryClient, serviceInstance.getId()))
-            .flatMap(serviceInstance -> waitForCompletionOnUpdate(cloudFoundryClient, serviceInstance, serviceInstanceName));
+            .map(response -> response.getJobId().get())
+            .flatMap(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, Duration.ofMinutes(5), jobId))
+            .then(getServiceInstanceIdByName(cloudFoundryClient, serviceInstanceName));
     }
 
     private static Mono<UpdateServiceInstanceResponse> updateServiceInstanceById(CloudFoundryClient cloudFoundryClient, String serviceInstanceId) {
@@ -287,26 +289,14 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
                 .build());
     }
 
-
-    private static Mono<String> waitForCompletionOnUpdate(CloudFoundryClient cloudFoundryClient, UpdateServiceInstanceResponse updateServiceInstanceResponse, String serviceInstanceName) {
-        if (updateServiceInstanceResponse.getJobId().isPresent()) {
-            JobUtils.waitForCompletion(cloudFoundryClient, Duration.ofMinutes(1), updateServiceInstanceResponse.getJobId().get());
-        }
-        return getServiceInstanceIdByName(cloudFoundryClient, serviceInstanceName);
-    }
-
     private static Mono<String> createManagedServiceInstanceId(CloudFoundryClient cloudFoundryClient, Mono<String> serviceBrokerId, String serviceInstanceName, String serviceName, String spaceId) {
         return serviceBrokerId
             .flatMap(brokerId -> getPlanId(cloudFoundryClient, brokerId, serviceName))
             .flatMap(planId -> requestCreateServiceInstance(cloudFoundryClient, planId, serviceInstanceName, spaceId))
-            .flatMap(serviceInstance -> waitForCompletionOnCreate(cloudFoundryClient, serviceInstance, serviceInstanceName));
-    }
-
-    private static Mono<String> waitForCompletionOnCreate(CloudFoundryClient cloudFoundryClient, CreateServiceInstanceResponse createServiceInstanceResponse, String serviceInstanceName) {
-        if (createServiceInstanceResponse.getJobId().isPresent()) {
-            JobUtils.waitForCompletion(cloudFoundryClient, Duration.ofMinutes(1), createServiceInstanceResponse.getJobId().get());
-        }
-        return getServiceInstanceIdByName(cloudFoundryClient, serviceInstanceName);
+            .map(response -> response.getJobId()
+                .get())
+            .flatMap(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, Duration.ofMinutes(5), jobId))
+            .then(getServiceInstanceIdByName(cloudFoundryClient, serviceInstanceName));
     }
 
     private static Mono<String> getServiceInstanceIdByName(CloudFoundryClient cloudFoundryClient, String serviceInstanceName) {
