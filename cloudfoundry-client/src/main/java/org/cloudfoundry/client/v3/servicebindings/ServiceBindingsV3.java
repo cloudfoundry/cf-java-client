@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 public interface ServiceBindingsV3 {
 
     /**
-     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#create-a-service-binding">Create a service binding</a> request
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#create-a-service-credential-binding">Create a service credential binding</a> request
      *
      * @param request the Create Service Binding request
      * @return the response from the Create Service Binding request
@@ -32,15 +32,15 @@ public interface ServiceBindingsV3 {
     Mono<CreateServiceBindingResponse> create(CreateServiceBindingRequest request);
 
     /**
-     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#delete-a-service-binding">Delete a service binding</a> request
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#delete-a-service-credential-binding">Delete a service credential binding</a> request
      *
      * @param request the Delete Service Binding request
      * @return the response from the Delete Service Binding request
      */
-    Mono<Void> delete(DeleteServiceBindingRequest request);
+    Mono<String> delete(DeleteServiceBindingRequest request);
 
     /**
-     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#get-a-service-binding">Get a Service Binding</a> request
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#get-a-service-credential-binding">Get a service credential binding</a> request
      *
      * @param request the Get Service Binding request
      * @return the response from the Get Service Binding request
@@ -48,11 +48,35 @@ public interface ServiceBindingsV3 {
     Mono<GetServiceBindingResponse> get(GetServiceBindingRequest request);
 
     /**
-     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#list-service-bindings">List service bindings</a> request
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#get-a-service-credential-binding-detials">Get a service credential binding details</a> request
+     *
+     * @param request the Get Service Binding Details request
+     * @return the response from the Get Service Binding Details request
+     */
+    Mono<GetServiceBindingDetailsResponse> getDetails(GetServiceBindingDetailsRequest request);
+
+    /**
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#get-parameters-for-a-service-credential-binding">Get parameters a service credential binding</a> request
+     *
+     * @param request the Get Service Binding Parameters request
+     * @return the response from the Get Service Binding Parameters request
+     */
+    Mono<GetServiceBindingParametersResponse> getParameters(GetServiceBindingParametersRequest request);
+
+    /**
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#list-service-credential-bindings">List service credential bindings</a> request
      *
      * @param request the List Service Bindings request
      * @return the response from the List Service Bindings request
      */
     Mono<ListServiceBindingsResponse> list(ListServiceBindingsRequest request);
+
+    /**
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#update-a-service-credential-binding">Update a service credential bindings</a> request
+     *
+     * @param request the Update Service Bindings request
+     * @return the response from the Update Service Bindings request
+     */
+    Mono<UpdateServiceBindingResponse> update(UpdateServiceBindingRequest request);
 
 }

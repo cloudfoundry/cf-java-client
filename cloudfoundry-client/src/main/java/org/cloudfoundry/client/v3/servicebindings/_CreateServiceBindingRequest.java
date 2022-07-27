@@ -16,11 +16,14 @@
 
 package org.cloudfoundry.client.v3.servicebindings;
 
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
+import org.cloudfoundry.client.v3.Metadata;
 import org.immutables.value.Value;
+
+import java.util.Map;
 
 /**
  * The request payload for the Create Service Binding operation.
@@ -30,11 +33,11 @@ import org.immutables.value.Value;
 abstract class _CreateServiceBindingRequest {
 
     /**
-     * The data
+     * The name
      */
-    @JsonProperty("data")
+    @JsonProperty("name")
     @Nullable
-    abstract CreateServiceBindingData getData();
+    abstract String getName();
 
     /**
      * The relationships
@@ -48,4 +51,25 @@ abstract class _CreateServiceBindingRequest {
     @JsonProperty("type")
     abstract ServiceBindingType getType();
 
+    /**
+     * The parameters
+     */
+    @JsonProperty("parameters")
+    @Nullable
+    @AllowNulls
+    abstract Map<String, Object> getParameters();
+
+    /**
+     * The metadata
+     */
+    @JsonProperty("metadata")
+    @Nullable
+    abstract Metadata getMetadata();
+
+    @Value.Check
+    void validateParameters() {
+        if (ServiceBindingType.KEY.equals(getType()) && getName() == null) {
+            throw new IllegalStateException("A name is required for a service binding of type 'key'");
+        }
+    }
 }

@@ -16,14 +16,18 @@
 
 package org.cloudfoundry.client.v3.servicebindings;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.immutables.value.Value;
+
+import java.util.Optional;
 
 /**
  * The response payload for Create Service Binding
  */
-@JsonDeserialize
 @Value.Immutable
-abstract class _CreateServiceBindingResponse extends ServiceBinding {
+abstract class _CreateServiceBindingResponse {
+
+    public abstract Optional<String> getJobId();
+
+    public abstract Optional<ServiceBindingResource> getServiceBinding();
 
 }

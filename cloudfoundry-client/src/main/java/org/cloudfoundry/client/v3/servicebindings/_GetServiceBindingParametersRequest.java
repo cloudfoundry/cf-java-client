@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,19 @@
 
 package org.cloudfoundry.client.v3.servicebindings;
 
-import org.junit.Test;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.immutables.value.Value;
 
-public final class CreateServiceBindingDataTest {
+/**
+ * The request payload for the Get Service Binding Parameters operation.
+ */
+@Value.Immutable
+abstract class _GetServiceBindingParametersRequest {
 
-    @Test
-    public void valid() {
-        CreateServiceBindingData.builder()
-            .build();
-    }
+    /**
+     * The service binding id
+     */
+    @JsonIgnore
+    abstract String getServiceBindingId();
 
 }

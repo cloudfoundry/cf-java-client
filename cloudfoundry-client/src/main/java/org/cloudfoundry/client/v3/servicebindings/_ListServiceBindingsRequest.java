@@ -17,6 +17,7 @@
 package org.cloudfoundry.client.v3.servicebindings;
 
 
+import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.FilterParameter;
 import org.cloudfoundry.client.v3.PaginatedRequest;
 import org.immutables.value.Value;
@@ -30,10 +31,10 @@ import java.util.List;
 abstract class _ListServiceBindingsRequest extends PaginatedRequest {
 
     /**
-     * The application ids
+     * The names
      */
-    @FilterParameter("app_guids")
-    abstract List<String> getApplicationIds();
+    @FilterParameter("names")
+    abstract List<String> getNames();
 
     /**
      * The service instance ids
@@ -41,4 +42,58 @@ abstract class _ListServiceBindingsRequest extends PaginatedRequest {
     @FilterParameter("service_instance_guids")
     abstract List<String> getServiceInstanceIds();
 
+    /**
+     * The service instance names
+     */
+    @FilterParameter("service_instance_names")
+    abstract List<String> getServiceInstanceNames();
+
+    /**
+     * The application ids
+     */
+    @FilterParameter("app_guids")
+    abstract List<String> getApplicationIds();
+
+    /**
+     * The application names
+     */
+    @FilterParameter("app_names")
+    abstract List<String> getAppNames();
+
+    /**
+     * The service plan ids
+     */
+    @FilterParameter("service_plan_guids")
+    abstract List<String> getServicePlanIds();
+
+    /**
+     * The service plan names
+     */
+    @FilterParameter("service_plan_names")
+    abstract List<String> getServicePlanNames();
+
+    /**
+     * The service offering ids
+     */
+    @FilterParameter("service_offering_guids")
+    abstract List<String> getServiceOfferingIds();
+
+    /**
+     * The service offering names
+     */
+    @FilterParameter("service_offering_names")
+    abstract List<String> getServiceOfferingNames();
+
+    /**
+     * The type
+     */
+    @FilterParameter("type")
+    @Nullable
+    abstract ServiceBindingType getType();
+
+    /**
+     * The ids
+     */
+    @FilterParameter("guids")
+    abstract List<String> getIds();
 }

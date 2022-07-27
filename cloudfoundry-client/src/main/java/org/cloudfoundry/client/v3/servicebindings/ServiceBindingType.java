@@ -19,14 +19,19 @@ package org.cloudfoundry.client.v3.servicebindings;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * The service binding type of the {@link CreateServiceBindingRequest}
+ * The service credential binding type
  */
 public enum ServiceBindingType {
 
     /**
      * Indicates that the service binding is to an application
      */
-    APPLICATION("app");
+    APPLICATION("app"),
+
+    /**
+     * Indicates that the service binding is a key
+     */
+    KEY("key");
 
     private final String value;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,30 +16,30 @@
 
 package org.cloudfoundry.client.v3.servicebindings;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v3.ToOneRelationship;
+import org.cloudfoundry.client.v3.Metadata;
 import org.immutables.value.Value;
 
 /**
- * The relationships for the Create Service Binding request
+ * The request payload for the Update Service Binding operation
  */
+@JsonSerialize
 @Value.Immutable
-@JsonDeserialize
-abstract class _ServiceBindingRelationships {
+abstract class _UpdateServiceBindingRequest {
 
     /**
-     * The application relationship
+     * The service binding id
      */
-    @JsonProperty("app")
+    @JsonIgnore
+    abstract String getServiceBindingId();
+
+    /**
+     * The metadata
+     */
+    @JsonProperty("metadata")
     @Nullable
-    abstract ToOneRelationship getApplication();
-
-    /**
-     * The service instance relationship
-     */
-    @JsonProperty("service_instance")
-    abstract ToOneRelationship getServiceInstance();
-
+    abstract Metadata getMetadata();
 }
