@@ -42,7 +42,7 @@ abstract class _GetServiceBindingDetailsResponse {
     /**
      * The syslog drain url
      */
-    @JsonProperty("syslog_drain_log")
+    @JsonProperty("syslog_drain_url")
     @Nullable
     abstract String getSyslogDrainUrl();
 
