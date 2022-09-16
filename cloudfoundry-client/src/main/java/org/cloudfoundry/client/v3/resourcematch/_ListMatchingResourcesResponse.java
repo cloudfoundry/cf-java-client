@@ -14,27 +14,27 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.operations.applications;
+package org.cloudfoundry.client.v3.resourcematch;
 
-
-import org.cloudfoundry.Nullable;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import org.immutables.value.Value;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
- * An application manifest that captures some of the details of how an application is deployed.  See <a href="https://docs.cloudfoundry.org/devguide/deploy-apps/manifest.html">the manifest
- * definition</a> for more details.
+ * The response payload for the List Matching Resources operation
  */
+@JsonDeserialize
 @Value.Immutable
-abstract class _ApplicationManifest extends _ApplicationManifestCommon {
-
-    public abstract static class Builder implements _ApplicationManifestCommon.Builder{}
+abstract class _ListMatchingResourcesResponse {
 
     /**
-     * The collection of service names bound to the application
+     * The resources
      */
-    @Nullable
-    abstract List<String> getServices();
-
+    abstract List<MatchedResource> getResources();
 }

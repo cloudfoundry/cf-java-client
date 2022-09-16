@@ -31,7 +31,7 @@ import java.util.List;
 abstract class _UploadApplicationRequest {
 
     /**
-     * A binary zip file containing the application bits
+     * A binary zip file or a directory containing the application bits to upload
      */
     @JsonIgnore
     abstract Path getApplication();

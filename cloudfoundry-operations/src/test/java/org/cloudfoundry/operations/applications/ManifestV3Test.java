@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,37 +14,34 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.packages;
+package org.cloudfoundry.operations.applications;
 
 import org.junit.Test;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
+public class ManifestV3Test {
 
-public final class UploadPackageRequestTest {
-
-    private static final Path TEST_PACKAGE = Paths.get("/");
+    private final ManifestV3Application testApplication = ManifestV3Application.builder()
+        .name("test-application-name")
+        .build();
 
     @Test(expected = IllegalStateException.class)
-    public void neitherBitsNorResources() {
-        UploadPackageRequest.builder()
-            .packageId("test-package-id")
+    public void illegalVersion() {
+        ManifestV3.builder()
+            .version(2)
+            .application(testApplication)
             .build();
     }
 
     @Test(expected = IllegalStateException.class)
-    public void noPackageId() {
-        UploadPackageRequest.builder()
-            .bits(TEST_PACKAGE)
+    public void noApplications() {
+        ManifestV3.builder()
             .build();
     }
 
     @Test
     public void valid() {
-        UploadPackageRequest.builder()
-            .bits(TEST_PACKAGE)
-            .packageId("test-package-id")
+        ManifestV3.builder()
+            .application(testApplication)
             .build();
     }
-
 }

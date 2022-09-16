@@ -20,21 +20,14 @@ package org.cloudfoundry.operations.applications;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
-import java.util.List;
-
-/**
- * An application manifest that captures some of the details of how an application is deployed.  See <a href="https://docs.cloudfoundry.org/devguide/deploy-apps/manifest.html">the manifest
- * definition</a> for more details.
- */
 @Value.Immutable
-abstract class _ApplicationManifest extends _ApplicationManifestCommon {
+abstract class _ManifestV3Service {
+    abstract String getName();
 
-    public abstract static class Builder implements _ApplicationManifestCommon.Builder{}
-
-    /**
-     * The collection of service names bound to the application
-     */
     @Nullable
-    abstract List<String> getServices();
+    abstract String getBindingName();
+
+    @Nullable
+    abstract Object getParameters();
 
 }

@@ -56,6 +56,8 @@ import org.cloudfoundry.client.v3.applications.ListApplicationTasksRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationTasksResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsResponse;
+import org.cloudfoundry.client.v3.applications.RestartApplicationRequest;
+import org.cloudfoundry.client.v3.applications.RestartApplicationResponse;
 import org.cloudfoundry.client.v3.applications.ScaleApplicationRequest;
 import org.cloudfoundry.client.v3.applications.ScaleApplicationResponse;
 import org.cloudfoundry.client.v3.applications.SetApplicationCurrentDropletRequest;
@@ -230,6 +232,12 @@ public final class ReactorApplicationsV3 extends AbstractClientV3Operations impl
     @Override
     public Mono<StartApplicationResponse> start(StartApplicationRequest request) {
         return post(request, StartApplicationResponse.class, builder -> builder.pathSegment("apps", request.getApplicationId(), "actions", "start"))
+            .checkpoint();
+    }
+
+    @Override
+    public Mono<RestartApplicationResponse> restart(RestartApplicationRequest request) {
+        return post(request, RestartApplicationResponse.class, builder -> builder.pathSegment("apps", request.getApplicationId(), "actions", "restart"))
             .checkpoint();
     }
 

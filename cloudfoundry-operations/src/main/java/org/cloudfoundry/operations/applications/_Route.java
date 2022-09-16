@@ -18,6 +18,7 @@ package org.cloudfoundry.operations.applications;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
@@ -32,5 +33,12 @@ abstract class _Route {
      */
     @JsonProperty("route")
     abstract String getRoute();
+
+    /**
+     * The protocol
+     */
+    @JsonProperty("protocol")
+    @Nullable
+    abstract ManifestV3RouteProtocol getProtocol();
 
 }

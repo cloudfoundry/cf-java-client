@@ -31,6 +31,7 @@ import org.cloudfoundry.client.v3.packages.ListPackagesResponse;
 import org.cloudfoundry.client.v3.packages.Packages;
 import org.cloudfoundry.client.v3.packages.UploadPackageRequest;
 import org.cloudfoundry.client.v3.packages.UploadPackageResponse;
+import org.cloudfoundry.client.v3.resourcematch.MatchedResource;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
@@ -44,6 +45,7 @@ import reactor.netty.ByteBufFlux;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -129,15 +131,22 @@ public final class ReactorPackages extends AbstractClientV3Operations implements
     }
 
     private Mono<UploadPackageResponse> upload(UploadPackageRequest request, Runnable onTerminate) {
-        return post(request, UploadPackageResponse.class, builder -> builder.pathSegment("packages", request.getPackageId(), "upload"), outbound -> upload(request.getBits(), outbound), onTerminate)
+        return post(request, UploadPackageResponse.class, builder -> builder.pathSegment("packages", request.getPackageId(), "upload"), outbound -> upload(request.getBits(), request.getResources(), outbound), onTerminate)
             .checkpoint();
     }
 
-    private void upload(Path bits, MultipartHttpClientRequest r) {
-        r.addPart(part -> part.setName("bits")
-            .setContentType(APPLICATION_ZIP)
-            .sendFile(bits))
-            .done();
-    }
+    private void upload(Path bits, List<MatchedResource> resources, MultipartHttpClientRequest r) {
+        if (bits != null) {
+            r.addPart(part -> part.setName("bits")
+                .setContentType(APPLICATION_ZIP)
+                .sendFile(bits));
+        }
 
+        if (resources != null && !resources.isEmpty()) {
+            r.addPart(part -> part.setName("resources")
+                .send(resources));
+        }
+
+        r.done();
+    }
 }

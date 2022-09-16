@@ -17,20 +17,37 @@
 package org.cloudfoundry.client.v3.packages;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.cloudfoundry.Nullable;
+import org.cloudfoundry.client.v3.resourcematch.MatchedResource;
 import org.immutables.value.Value;
 
 import java.nio.file.Path;
+import java.util.List;
 
 /**
  * The request payload for the Upload Package operation
  */
 @Value.Immutable
 abstract class _UploadPackageRequest {
+    @Value.Check
+    void check() {
+        if (getBits() == null && (getResources() == null || getResources().isEmpty())) {
+            throw new IllegalStateException("At least one of resources or bits are required");
+        }
+    }
+
+    /**
+     * The resources
+     */
+    @JsonIgnore
+    @Nullable
+    abstract List<MatchedResource> getResources();
 
     /**
      * The bits
      */
     @JsonIgnore
+    @Nullable
     abstract Path getBits();
 
     /**
