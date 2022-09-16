@@ -138,6 +138,8 @@ public interface Applications {
      */
     Mono<Void> pushManifest(PushApplicationManifestRequest request);
 
+    Mono<Void> pushManifestV3(PushManifestV3Request request);
+
     /**
      * Rename a specific application
      *

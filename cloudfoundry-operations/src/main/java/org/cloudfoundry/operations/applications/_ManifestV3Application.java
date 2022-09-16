@@ -17,24 +17,56 @@
 package org.cloudfoundry.operations.applications;
 
 
+import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * An application manifest that captures some of the details of how an application is deployed.  See <a href="https://docs.cloudfoundry.org/devguide/deploy-apps/manifest.html">the manifest
  * definition</a> for more details.
  */
 @Value.Immutable
-abstract class _ApplicationManifest extends _ApplicationManifestCommon {
-
+abstract class _ManifestV3Application extends _ApplicationManifestCommon {
     public abstract static class Builder implements _ApplicationManifestCommon.Builder{}
 
     /**
-     * The collection of service names bound to the application
+     * The collection of processes configured for this application
      */
     @Nullable
-    abstract List<String> getServices();
+    abstract List<ManifestV3Process> getProcesses();
 
+    /**
+     * Generate a default route based on the application name
+     */
+    @Nullable
+    abstract Boolean getDefaultRoute();
+
+    /**
+     * The collection of services bound to the application
+     */
+    @Nullable
+    abstract List<ManifestV3Service> getServices();
+
+    /**
+     * The collection of sidecars configured for this application
+     */
+    @Nullable
+    abstract List<ManifestV3Sidecar> getSidecars();
+
+    /**
+     * The labels configured for this application
+     */
+    @AllowNulls
+    @Nullable
+    abstract Map<String, String> getLabels();
+
+    /**
+     * The annotations configured for this application
+     */
+    @AllowNulls
+    @Nullable
+    abstract Map<String, String> getAnnotations();
 }

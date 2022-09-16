@@ -37,6 +37,7 @@ import reactor.netty.http.client.HttpClientForm;
 import reactor.netty.http.client.HttpClientRequest;
 import reactor.netty.http.client.HttpClientResponse;
 
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -146,6 +147,21 @@ public abstract class AbstractClientV3Operations extends AbstractReactorOperatio
             .flatMap(operator -> operator.post()
                 .uri(queryTransformer(requestPayload).andThen(uriTransformer))
                 .send(requestPayload)
+                .response()
+                .parseBodyWithResponse(responseType));
+    }
+    protected <T> Mono<HttpClientResponseWithParsedBody<T>> postRawWithResponse(byte[] requestPayload, String contentType, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+        return createOperator()
+            .flatMap(operator -> operator.post()
+                .uri(queryTransformer(requestPayload).andThen(uriTransformer))
+                .send((request, outbound) -> {
+                    String contentLength = String.valueOf(requestPayload.length);
+                    Mono<byte[]> body = Mono.just(requestPayload);
+
+                    request.header(HttpHeaderNames.CONTENT_LENGTH, contentLength);
+                    request.header(HttpHeaderNames.CONTENT_TYPE, contentType);
+                    return outbound.sendByteArray(body);
+                })
                 .response()
                 .parseBodyWithResponse(responseType));
     }

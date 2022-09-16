@@ -16,6 +16,9 @@
 
 package org.cloudfoundry.reactor.client.v3.spaces;
 
+import org.cloudfoundry.client.v3.servicebrokers.UpdateServiceBrokerResponse;
+import org.cloudfoundry.client.v3.spaces.ApplyManifestRequest;
+import org.cloudfoundry.client.v3.spaces.ApplyManifestResponse;
 import org.cloudfoundry.client.v3.spaces.AssignSpaceIsolationSegmentRequest;
 import org.cloudfoundry.client.v3.spaces.AssignSpaceIsolationSegmentResponse;
 import org.cloudfoundry.client.v3.spaces.CreateSpaceRequest;
@@ -37,6 +40,7 @@ import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * The Reactor-based implementation of {@link SpacesV3}
@@ -103,4 +107,12 @@ public final class ReactorSpacesV3 extends AbstractClientV3Operations implements
             .checkpoint();
     }
 
+    @Override
+    public Mono<ApplyManifestResponse> applyManifest(ApplyManifestRequest request) {
+        return postRawWithResponse(request.manifest(), "application/x-yaml", ApplyManifestResponse.class, builder -> builder.pathSegment("spaces", request.getSpaceId(), "actions", "apply_manifest"))
+            .map(responseTuple -> ApplyManifestResponse.builder()
+                .jobId(Optional.ofNullable(
+                    extractJobId(responseTuple.getResponse())))
+                .build());
+    }
 }

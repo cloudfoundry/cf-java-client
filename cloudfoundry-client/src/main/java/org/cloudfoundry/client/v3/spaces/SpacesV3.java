@@ -87,4 +87,6 @@ public interface SpacesV3 {
      */
     Mono<UpdateSpaceResponse> update(UpdateSpaceRequest request);
 
+    Mono<ApplyManifestResponse> applyManifest(ApplyManifestRequest request);
+
 }

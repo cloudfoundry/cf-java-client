@@ -14,32 +14,20 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3;
+package org.cloudfoundry.client.v3.resourcematch;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.Nullable;
-import org.immutables.value.Value;
+import reactor.core.publisher.Mono;
 
 /**
- * A checksum payload
+ * Main entry point to the Cloud Foundry Resource Matching Client API
  */
-@JsonDeserialize
-@Value.Immutable
-abstract class _Checksum {
+public interface ResourceMatchV3 {
 
     /**
-     * The type
+     * Makes the List Matching Resources request
+     *
+     * @param request the List Matching Resources request
+     * @return the response from the List Matching Resources request
      */
-    @JsonProperty("type")
-    @Nullable
-    abstract ChecksumType getType();
-
-    /**
-     * The value
-     */
-    @JsonProperty("value")
-    @Nullable
-    abstract String getValue();
-
+    Mono<ListMatchingResourcesResponse> list(ListMatchingResourcesRequest request);
 }

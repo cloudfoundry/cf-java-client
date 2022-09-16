@@ -14,37 +14,31 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.packages;
+package org.cloudfoundry.client.v3.spaces;
 
 import org.junit.Test;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
-public final class UploadPackageRequestTest {
-
-    private static final Path TEST_PACKAGE = Paths.get("/");
+public final class ApplyManifestRequestTest {
 
     @Test(expected = IllegalStateException.class)
-    public void neitherBitsNorResources() {
-        UploadPackageRequest.builder()
-            .packageId("test-package-id")
+    public void noSpaceId() {
+        ApplyManifestRequest.builder()
+            .manifest("test-manifest".getBytes())
             .build();
     }
 
     @Test(expected = IllegalStateException.class)
-    public void noPackageId() {
-        UploadPackageRequest.builder()
-            .bits(TEST_PACKAGE)
+    public void noManifest() {
+        ApplyManifestRequest.builder()
+            .spaceId("test-space-id")
             .build();
     }
 
     @Test
     public void valid() {
-        UploadPackageRequest.builder()
-            .bits(TEST_PACKAGE)
-            .packageId("test-package-id")
+        ApplyManifestRequest.builder()
+            .spaceId("test-space-id")
+            .manifest("test-manifest".getBytes())
             .build();
     }
-
 }

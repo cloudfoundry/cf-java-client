@@ -14,27 +14,18 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.operations.applications;
+package org.cloudfoundry.client.v3.spaces;
 
-
-import org.cloudfoundry.Nullable;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.immutables.value.Value;
 
-import java.util.List;
+import java.util.Optional;
 
 /**
- * An application manifest that captures some of the details of how an application is deployed.  See <a href="https://docs.cloudfoundry.org/devguide/deploy-apps/manifest.html">the manifest
- * definition</a> for more details.
+ * The response payload for the Update Space operation
  */
+@JsonDeserialize
 @Value.Immutable
-abstract class _ApplicationManifest extends _ApplicationManifestCommon {
-
-    public abstract static class Builder implements _ApplicationManifestCommon.Builder{}
-
-    /**
-     * The collection of service names bound to the application
-     */
-    @Nullable
-    abstract List<String> getServices();
-
+abstract class _ApplyManifestResponse {
+    public abstract Optional<String> jobId();
 }
