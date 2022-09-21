@@ -21,13 +21,13 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.immutables.value.Value;
 
 /**
- * The response payload for the Update Space operation
+ * The response payload for the apply manifest operation
  */
 @JsonSerialize
 @Value.Immutable
 abstract class _ApplyManifestRequest {
     /**
-     * The space id
+     * The manifest to apply
      */
     @JsonIgnore
     abstract byte[] manifest();

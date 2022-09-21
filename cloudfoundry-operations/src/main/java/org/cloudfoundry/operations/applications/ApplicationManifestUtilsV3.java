@@ -149,6 +149,7 @@ public final class ApplicationManifestUtilsV3 extends ApplicationManifestUtilsCo
         asList(application, "sidecars", variables, raw -> getSidecar((Map<String, Object>) raw, variables), builder::sidecar);
         as(application, "labels", variables, Map.class::cast, builder::labels);
         as(application, "annotations", variables, Map.class::cast, builder::annotations);
+        asBoolean(application, "default-route", variables, builder::defaultRoute);
 
         return builder;
     }

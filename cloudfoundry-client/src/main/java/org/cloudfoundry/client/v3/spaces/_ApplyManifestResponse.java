@@ -22,10 +22,14 @@ import org.immutables.value.Value;
 import java.util.Optional;
 
 /**
- * The response payload for the Update Space operation
+ * The response payload for the apply manifest operation
  */
 @JsonDeserialize
 @Value.Immutable
 abstract class _ApplyManifestResponse {
+
+    /**
+     * The Job ID
+     */
     public abstract Optional<String> jobId();
 }
