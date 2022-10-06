@@ -26,25 +26,25 @@ import java.util.List;
 abstract class _ManifestV3Sidecar {
 
     /**
-     * The route URI
-     */
-    abstract String getName();
-
-    /**
      * The command to launch this sidecar
      */
     @Nullable
     abstract String getCommand();
 
     /**
-     * List of processes to associate sidecar with
-     */
-    @Nullable
-    abstract List<String> getProcessTypes();
-
-    /**
      * Memory in MB that the sidecar will be allocated
      */
     @Nullable
     abstract Integer getMemory();
+
+    /**
+     * The route URI
+     */
+    abstract String getName();
+
+    /**
+     * List of processes to associate sidecar with
+     */
+    @Nullable
+    abstract List<String> getProcessTypes();
 }

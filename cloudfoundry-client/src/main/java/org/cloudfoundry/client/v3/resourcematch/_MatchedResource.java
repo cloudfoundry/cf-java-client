@@ -45,16 +45,16 @@ abstract class _MatchedResource {
     abstract String getMode();
 
     /**
-     * The size
-     */
-    @JsonProperty("size_in_bytes")
-    @Nullable
-    abstract Integer getSize();
-
-    /**
      * The path relative to app root
      */
     @JsonProperty("path")
     @Nullable
     abstract String getPath();
+
+    /**
+     * The size
+     */
+    @JsonProperty("size_in_bytes")
+    @Nullable
+    abstract Integer getSize();
 }

@@ -51,12 +51,13 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.util.StreamUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import sun.misc.IOUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -276,7 +277,10 @@ public final class SpacesTest extends AbstractIntegrationTest {
     public void applyManifest() throws IOException {
         String spaceName = this.nameFactory.getSpaceName();
 
-        byte[] manifest = IOUtils.readAllBytes(new ClassPathResource("test-manifest.yml").getInputStream());
+        byte[] manifest;
+        try (InputStream inputStream = new ClassPathResource("test-manifest.yml").getInputStream()) {
+            manifest = StreamUtils.copyToByteArray(inputStream);
+        }
 
         this.organizationId
             .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
@@ -284,7 +288,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
                     .spaceId(spaceId)
                     .manifest(manifest)
                     .build())
-                .map(response -> response.jobId().orElseThrow(() -> new IllegalStateException("No jobId returned for applying v3 manifest")))
+                .map(response -> response.getJobId().orElseThrow(() -> new IllegalStateException("No jobId returned for applying v3 manifest")))
                 .flatMap(jobId -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), jobId))
                 .then(Mono.just(spaceId)))
             .flatMap(spaceId -> this.cloudFoundryClient.applicationsV3().list(ListApplicationsRequest.builder()

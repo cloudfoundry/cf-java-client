@@ -25,11 +25,6 @@ import org.immutables.value.Value;
 abstract class _ManifestV3Process {
 
     /**
-     * The type of this process
-     */
-    abstract String getType();
-
-    /**
      * The command to launch this process
      */
     @Nullable
@@ -76,4 +71,9 @@ abstract class _ManifestV3Process {
      */
     @Nullable
     abstract Integer getTimeout();
+
+    /**
+     * The type of this process
+     */
+    abstract String getType();
 }

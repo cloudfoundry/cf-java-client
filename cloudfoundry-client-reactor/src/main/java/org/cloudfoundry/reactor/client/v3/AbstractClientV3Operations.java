@@ -51,6 +51,16 @@ public abstract class AbstractClientV3Operations extends AbstractReactorOperatio
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
+    protected static String extractJobId(HttpClientResponse response) {
+        String locationHeader = response.responseHeaders().get(HttpHeaderNames.LOCATION);
+        if (locationHeader == null) {
+            return null;
+        }
+
+        List<String> pathSegments = UriComponentsBuilder.fromUriString(locationHeader).build().getPathSegments();
+        return pathSegments.get(pathSegments.size() - 1);
+    }
+
     @Override
     protected Mono<Operator> createOperator() {
         return super.createOperator().map(this::attachErrorPayloadMapper);
@@ -66,6 +76,15 @@ public abstract class AbstractClientV3Operations extends AbstractReactorOperatio
             .flatMap(response -> Mono.justOrEmpty(extractJobId(response)));
     }
 
+    protected final <T> Mono<T> delete(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+        return createOperator()
+            .flatMap(operator -> operator.delete()
+                .uri(queryTransformer(requestPayload).andThen(uriTransformer))
+                .send(requestPayload)
+                .response()
+                .parseBody(responseType));
+    }
+
     protected final <T> Mono<HttpClientResponseWithParsedBody<T>> deleteWithResponse(Object requestPayload, Class<T> responseType,
                                                                                      Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return createOperator()
@@ -74,15 +93,6 @@ public abstract class AbstractClientV3Operations extends AbstractReactorOperatio
                 .send(requestPayload)
                 .response()
                 .parseBodyWithResponse(responseType));
-    }
-
-    protected final <T> Mono<T> delete(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
-        return createOperator()
-            .flatMap(operator -> operator.delete()
-                .uri(queryTransformer(requestPayload).andThen(uriTransformer))
-                .send(requestPayload)
-                .response()
-                .parseBody(responseType));
     }
 
     protected final <T> Flux<T> get(Object requestPayload, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer, Function<ByteBufFlux, Flux<T>> bodyTransformer) {
@@ -112,7 +122,7 @@ public abstract class AbstractClientV3Operations extends AbstractReactorOperatio
     }
 
     protected final <T> Mono<HttpClientResponseWithParsedBody<T>> patchWithResponse(Object requestPayload, Class<T> responseType,
-	                                                                            Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+                                                                                    Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return createOperator()
             .flatMap(operator -> operator.patch()
                 .uri(queryTransformer(requestPayload).andThen(uriTransformer))
@@ -141,16 +151,18 @@ public abstract class AbstractClientV3Operations extends AbstractReactorOperatio
                 .parseBody(responseType));
     }
 
-    protected final <T> Mono<HttpClientResponseWithParsedBody<T>> postWithResponse(Object requestPayload, Class<T> responseType,
-                                                                                   Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+    protected final Mono<String> post(Object requestPayload, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return createOperator()
             .flatMap(operator -> operator.post()
                 .uri(queryTransformer(requestPayload).andThen(uriTransformer))
                 .send(requestPayload)
                 .response()
-                .parseBodyWithResponse(responseType));
+                .get())
+            .flatMap(response -> Mono.justOrEmpty(extractJobId(response)));
     }
-    protected <T> Mono<HttpClientResponseWithParsedBody<T>> postRawWithResponse(byte[] requestPayload, String contentType, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+
+    protected <T> Mono<HttpClientResponseWithParsedBody<T>> postRawWithResponse(byte[] requestPayload, String contentType, Class<T> responseType, Function<UriComponentsBuilder,
+        UriComponentsBuilder> uriTransformer) {
         return createOperator()
             .flatMap(operator -> operator.post()
                 .uri(queryTransformer(requestPayload).andThen(uriTransformer))
@@ -166,14 +178,14 @@ public abstract class AbstractClientV3Operations extends AbstractReactorOperatio
                 .parseBodyWithResponse(responseType));
     }
 
-    protected final Mono<String> post(Object requestPayload, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+    protected final <T> Mono<HttpClientResponseWithParsedBody<T>> postWithResponse(Object requestPayload, Class<T> responseType,
+                                                                                   Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return createOperator()
             .flatMap(operator -> operator.post()
                 .uri(queryTransformer(requestPayload).andThen(uriTransformer))
                 .send(requestPayload)
                 .response()
-                .get())
-            .flatMap(response -> Mono.justOrEmpty(extractJobId(response)));
+                .parseBodyWithResponse(responseType));
     }
 
     protected final <T> Mono<T> put(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
@@ -183,16 +195,6 @@ public abstract class AbstractClientV3Operations extends AbstractReactorOperatio
                 .send(requestPayload)
                 .response()
                 .parseBody(responseType));
-    }
-
-    protected static String extractJobId(HttpClientResponse response) {
-        String locationHeader = response.responseHeaders().get(HttpHeaderNames.LOCATION);
-        if (locationHeader == null) {
-            return null;
-        }
-
-        List<String> pathSegments = UriComponentsBuilder.fromUriString(locationHeader).build().getPathSegments();
-        return pathSegments.get(pathSegments.size() - 1);
     }
 
     private Operator attachErrorPayloadMapper(Operator operator) {
