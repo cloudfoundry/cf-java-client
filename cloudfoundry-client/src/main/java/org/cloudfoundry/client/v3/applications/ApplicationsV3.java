@@ -184,6 +184,14 @@ public interface ApplicationsV3 {
     Mono<ListApplicationTasksResponse> listTasks(ListApplicationTasksRequest request);
 
     /**
+     * Makes the Restart Application request
+     *
+     * @param request the Restart Application request
+     * @return the response from the Restart Application request
+     */
+    Mono<RestartApplicationResponse> restart(RestartApplicationRequest request);
+
+    /**
      * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/#scale-a-process">Scale Application</a> request
      *
      * @param request the Scale Application request
@@ -206,14 +214,6 @@ public interface ApplicationsV3 {
      * @return the response from the Start Application request
      */
     Mono<StartApplicationResponse> start(StartApplicationRequest request);
-
-    /**
-     * Makes the Restart Application request
-     *
-     * @param request the Restart Application request
-     * @return the response from the Restart Application request
-     */
-    Mono<RestartApplicationResponse> restart(RestartApplicationRequest request);
 
     /**
      * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#stop-an-app">Stop Application</a> request

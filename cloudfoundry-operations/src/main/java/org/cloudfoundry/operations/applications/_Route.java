@@ -29,16 +29,16 @@ import org.immutables.value.Value;
 abstract class _Route {
 
     /**
-     * The route
-     */
-    @JsonProperty("route")
-    abstract String getRoute();
-
-    /**
      * The protocol
      */
     @JsonProperty("protocol")
     @Nullable
     abstract ManifestV3RouteProtocol getProtocol();
+
+    /**
+     * The route
+     */
+    @JsonProperty("route")
+    abstract String getRoute();
 
 }

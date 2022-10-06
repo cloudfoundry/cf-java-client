@@ -30,7 +30,7 @@ abstract class _ApplyManifestRequest {
      * The manifest to apply
      */
     @JsonIgnore
-    abstract byte[] manifest();
+    abstract byte[] getManifest();
 
     /**
      * The space id

@@ -28,6 +28,13 @@ import java.util.List;
 @Value.Immutable
 abstract class _ManifestV3 {
 
+    public abstract List<ManifestV3Application> getApplications();
+
+    @Value.Default
+    public Integer getVersion() {
+        return 1;
+    }
+
     @Value.Check
     void check() {
         if (getVersion() != 1) {
@@ -37,11 +44,4 @@ abstract class _ManifestV3 {
             throw new IllegalStateException("At least one application is required");
         }
     }
-
-    @Value.Default
-    public Integer getVersion() {
-        return 1;
-    };
-
-    public abstract List<ManifestV3Application> getApplications();
 }

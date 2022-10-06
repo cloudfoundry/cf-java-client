@@ -22,10 +22,11 @@ import org.immutables.value.Value;
 
 @Value.Immutable
 abstract class _ManifestV3Service {
-    abstract String getName();
 
     @Nullable
     abstract String getBindingName();
+
+    abstract String getName();
 
     @Nullable
     abstract Object getParameters();

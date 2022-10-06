@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.reactor.client.v3.spaces;
 
-import org.cloudfoundry.client.v3.servicebrokers.UpdateServiceBrokerResponse;
 import org.cloudfoundry.client.v3.spaces.ApplyManifestRequest;
 import org.cloudfoundry.client.v3.spaces.ApplyManifestResponse;
 import org.cloudfoundry.client.v3.spaces.AssignSpaceIsolationSegmentRequest;
@@ -57,6 +56,16 @@ public final class ReactorSpacesV3 extends AbstractClientV3Operations implements
      */
     public ReactorSpacesV3(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
+    }
+
+    @Override
+    public Mono<ApplyManifestResponse> applyManifest(ApplyManifestRequest request) {
+        return postRawWithResponse(request.getManifest(), "application/x-yaml", ApplyManifestResponse.class, builder -> builder.pathSegment("spaces", request.getSpaceId(), "actions",
+            "apply_manifest"))
+            .map(responseTuple -> ApplyManifestResponse.builder()
+                .jobId(Optional.ofNullable(
+                    extractJobId(responseTuple.getResponse())))
+                .build());
     }
 
     @Override
@@ -105,14 +114,5 @@ public final class ReactorSpacesV3 extends AbstractClientV3Operations implements
     public Mono<UpdateSpaceResponse> update(UpdateSpaceRequest request) {
         return patch(request, UpdateSpaceResponse.class, builder -> builder.pathSegment("spaces", request.getSpaceId()))
             .checkpoint();
-    }
-
-    @Override
-    public Mono<ApplyManifestResponse> applyManifest(ApplyManifestRequest request) {
-        return postRawWithResponse(request.manifest(), "application/x-yaml", ApplyManifestResponse.class, builder -> builder.pathSegment("spaces", request.getSpaceId(), "actions", "apply_manifest"))
-            .map(responseTuple -> ApplyManifestResponse.builder()
-                .jobId(Optional.ofNullable(
-                    extractJobId(responseTuple.getResponse())))
-                .build());
     }
 }

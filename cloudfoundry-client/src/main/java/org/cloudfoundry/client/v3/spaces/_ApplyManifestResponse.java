@@ -31,5 +31,5 @@ abstract class _ApplyManifestResponse {
     /**
      * The Job ID
      */
-    public abstract Optional<String> jobId();
+    public abstract Optional<String> getJobId();
 }

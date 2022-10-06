@@ -23,6 +23,8 @@ import reactor.core.publisher.Mono;
  */
 public interface SpacesV3 {
 
+    Mono<ApplyManifestResponse> applyManifest(ApplyManifestRequest request);
+
     /**
      * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#assign-an-isolation-segment">Assign an Isolation Segment</a> request
      *
@@ -86,7 +88,5 @@ public interface SpacesV3 {
      * @return the response from the Update Space request
      */
     Mono<UpdateSpaceResponse> update(UpdateSpaceRequest request);
-
-    Mono<ApplyManifestResponse> applyManifest(ApplyManifestRequest request);
 
 }

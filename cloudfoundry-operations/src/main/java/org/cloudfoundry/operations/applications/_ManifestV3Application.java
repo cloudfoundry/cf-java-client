@@ -30,19 +30,32 @@ import java.util.Map;
  */
 @Value.Immutable
 abstract class _ManifestV3Application extends _ApplicationManifestCommon {
-    public abstract static class Builder implements _ApplicationManifestCommon.Builder{}
 
     /**
-     * The collection of processes configured for this application
+     * The annotations configured for this application
      */
+    @AllowNulls
     @Nullable
-    abstract List<ManifestV3Process> getProcesses();
+    abstract Map<String, String> getAnnotations();
 
     /**
      * Generate a default route based on the application name
      */
     @Nullable
     abstract Boolean getDefaultRoute();
+
+    /**
+     * The labels configured for this application
+     */
+    @AllowNulls
+    @Nullable
+    abstract Map<String, String> getLabels();
+
+    /**
+     * The collection of processes configured for this application
+     */
+    @Nullable
+    abstract List<ManifestV3Process> getProcesses();
 
     /**
      * The collection of services bound to the application
@@ -56,17 +69,7 @@ abstract class _ManifestV3Application extends _ApplicationManifestCommon {
     @Nullable
     abstract List<ManifestV3Sidecar> getSidecars();
 
-    /**
-     * The labels configured for this application
-     */
-    @AllowNulls
-    @Nullable
-    abstract Map<String, String> getLabels();
+    public abstract static class Builder implements _ApplicationManifestCommon.Builder {
 
-    /**
-     * The annotations configured for this application
-     */
-    @AllowNulls
-    @Nullable
-    abstract Map<String, String> getAnnotations();
+    }
 }
