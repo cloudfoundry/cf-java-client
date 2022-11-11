@@ -30,7 +30,9 @@ import org.cloudfoundry.client.v3.jobs.JobState;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.cloudfoundry.util.DelayUtils.exponentialBackOff;
 
@@ -38,6 +40,8 @@ import static org.cloudfoundry.util.DelayUtils.exponentialBackOff;
  * Utilities for Jobs
  */
 public final class JobUtils {
+
+    private static final Set<JobState> FINAL_STATES = EnumSet.of(JobState.COMPLETE, JobState.FAILED);
 
     private static final Integer STATUS_OK = 200;
 
@@ -92,7 +96,7 @@ public final class JobUtils {
      */
     public static Mono<Void> waitForCompletion(CloudFoundryClient cloudFoundryClient, Duration completionTimeout, String jobId) {
         return requestJobV3(cloudFoundryClient, jobId)
-            .filter(job -> JobState.PROCESSING != job.getState())
+            .filter(job -> FINAL_STATES.contains(job.getState()))
             .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), completionTimeout))
             .filter(job -> JobState.FAILED == job.getState())
             .flatMap(JobUtils::getError);
