@@ -45,7 +45,7 @@ public abstract class ServiceBinding extends Resource {
      */
     @JsonProperty("last_operation")
     @Nullable
-    abstract LastOperation getLastOperation();
+    public abstract LastOperation getLastOperation();
 
     /**
      * The relationships
