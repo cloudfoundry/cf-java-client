@@ -42,14 +42,14 @@ public abstract class ServiceInstance extends Resource {
      */
     @JsonProperty("last_operation")
     @Nullable
-    abstract LastOperation getLastOperation();
+    public abstract LastOperation getLastOperation();
 
     /**
      * The maintenance info
      */
     @JsonProperty("maintenance_info")
     @Nullable
-    abstract MaintenanceInfo getMaintenanceInfo();
+    public abstract MaintenanceInfo getMaintenanceInfo();
 
     /**
      * The metadata
