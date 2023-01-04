@@ -84,10 +84,10 @@ import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
 import org.cloudfoundry.client.v2.stacks.StackResource;
 import org.cloudfoundry.client.v3.BuildpackData;
 import org.cloudfoundry.client.v3.Lifecycle;
+import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.Resource;
-import org.cloudfoundry.client.v3.applications.ApplicationResource;
-import org.cloudfoundry.client.v3.applications.GetApplicationResponse;
-import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
+import org.cloudfoundry.client.v3.applications.*;
+import org.cloudfoundry.client.v3.builds.*;
 import org.cloudfoundry.client.v3.tasks.CancelTaskRequest;
 import org.cloudfoundry.client.v3.tasks.CancelTaskResponse;
 import org.cloudfoundry.client.v3.tasks.CreateTaskRequest;
@@ -457,6 +457,66 @@ public final class DefaultApplications implements Applications {
                 ())))
             .transform(OperationsLogging.log("Restage Application"))
             .checkpoint();
+    }
+
+    private static Mono<Void> restageApplicationV3(CloudFoundryClient cloudFoundryClient, String application, String applicationId, Duration stagingTimeout, Duration startupTimeout) {
+        return requestApplicationsCurrentDroplet(cloudFoundryClient, applicationId)
+                .map(response -> {
+                    String link = response.getLinks().get("package").getHref();
+                    return link.substring(link.lastIndexOf("/"));
+                })
+                .flatMap(packageId -> requestCreateBuild(cloudFoundryClient, packageId))
+                .flatMap(response -> waitForBuildSucceed(cloudFoundryClient, application, applicationId, stagingTimeout))
+                .flatMap(buildId -> requestGetBuild(cloudFoundryClient, buildId))
+                // Update the app to use the new droplet guid
+                // Restart the app to run it with this new droplet
+                .then();
+    }
+
+    private static Mono<GetApplicationCurrentDropletResponse> requestApplicationsCurrentDroplet(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        return cloudFoundryClient.applicationsV3()
+                .getCurrentDroplet(GetApplicationCurrentDropletRequest.builder()
+                        .applicationId(applicationId)
+                        .build());
+    }
+
+
+    private static Mono<CreateBuildResponse> requestCreateBuild(CloudFoundryClient cloudFoundryClient, String packageId) {
+        return cloudFoundryClient.builds()
+                .create(CreateBuildRequest.builder()
+                        .getPackage(Relationship.builder()
+                                .id(packageId)
+                                .build())
+                        .build());
+    }
+
+    private static Mono<String> waitForBuildSucceed(CloudFoundryClient cloudFoundryClient, String application, String buildId, Duration stagingTimeout) {
+        Duration timeout = Optional.ofNullable(stagingTimeout).orElse(Duration.ofMinutes(15));
+
+        return requestGetBuild(cloudFoundryClient, buildId)
+                .map(GetBuildResponse::getState)
+                .filter(isBuildCompleted())
+                .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), timeout))
+                .filter(isBuildStaged())
+                .switchIfEmpty(ExceptionUtils.illegalState("Application %s failed during staging", application))
+                .onErrorResume(DelayTimeoutException.class, t -> ExceptionUtils.illegalState("Application %s timed out during staging", application))
+                .thenReturn(buildId);
+    }
+
+    private static Mono<GetBuildResponse> requestGetBuild(CloudFoundryClient cloudFoundryClient, String buildId) {
+        return cloudFoundryClient.builds()
+                .get(GetBuildRequest.builder()
+                        .buildId(buildId)
+                        .build())
+                .cast(GetBuildResponse.class);
+    }
+
+    private static Predicate<BuildState> isBuildCompleted() {
+        return state -> "STAGED".equals(state.getValue()) || "FAILED".equals(state.getValue());
+    }
+
+    private static Predicate<BuildState> isBuildStaged() {
+        return state -> "STAGED".equals(state.getValue());
     }
 
     @Override
