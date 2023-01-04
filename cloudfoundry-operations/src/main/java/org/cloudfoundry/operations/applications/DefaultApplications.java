@@ -180,6 +180,8 @@ public final class DefaultApplications implements Applications {
 
     private static final String STOPPED_STATE = "STOPPED";
 
+    private static final String APP_FEATURE_SSH = "ssh";
+
     private final Mono<CloudFoundryClient> cloudFoundryClient;
 
     private final Mono<DopplerClient> dopplerClient;
@@ -2625,7 +2627,7 @@ public final class DefaultApplications implements Applications {
     }
 
     private static Mono<ApplicationResource> requestUpdateApplicationSsh(CloudFoundryClient cloudFoundryClient, String applicationId, boolean enabled) {
-        return requestUpdateApplicationFeature(cloudFoundryClient, applicationId,builder -> builder.featureName("ssh").enabled(enabled));
+        return requestUpdateApplicationFeature(cloudFoundryClient, applicationId,builder -> builder.featureName(APP_FEATURE_SSH).enabled(enabled));
     }
 
     private static Mono<ApplicationResource> requestUpdateApplicationFeature(CloudFoundryClient cloudFoundryClient, String applicationId, UnaryOperator<UpdateApplicationFeatureRequest.Builder> modifier) {
