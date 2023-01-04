@@ -20,8 +20,6 @@ import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.OrderDirection;
 import org.cloudfoundry.client.v2.applications.AbstractApplicationResource;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
-import org.cloudfoundry.client.v2.applications.ApplicationEnvironmentRequest;
-import org.cloudfoundry.client.v2.applications.ApplicationEnvironmentResponse;
 import org.cloudfoundry.client.v2.applications.ApplicationInstanceInfo;
 import org.cloudfoundry.client.v2.applications.ApplicationInstancesRequest;
 import org.cloudfoundry.client.v2.applications.ApplicationInstancesResponse;
@@ -86,8 +84,13 @@ import org.cloudfoundry.client.v3.BuildpackData;
 import org.cloudfoundry.client.v3.Lifecycle;
 import org.cloudfoundry.client.v3.Resource;
 import org.cloudfoundry.client.v3.applications.ApplicationResource;
+import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentRequest;
+import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationResponse;
+import org.cloudfoundry.client.v3.applications.GetApplicationSshEnabledRequest;
+import org.cloudfoundry.client.v3.applications.GetApplicationSshEnabledResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
+import org.cloudfoundry.client.v3.applications.UpdateApplicationFeatureRequest;
 import org.cloudfoundry.client.v3.tasks.CancelTaskRequest;
 import org.cloudfoundry.client.v3.tasks.CancelTaskResponse;
 import org.cloudfoundry.client.v3.tasks.CreateTaskRequest;
@@ -227,8 +230,14 @@ public final class DefaultApplications implements Applications {
             .zip(this.cloudFoundryClient, this.spaceId)
             .flatMap(function((cloudFoundryClient, spaceId) -> Mono.zip(
                 Mono.just(cloudFoundryClient),
-                getApplicationIdWhere(cloudFoundryClient, request.getName(), spaceId, sshEnabled(true))
+                getApplicationIdV3(cloudFoundryClient, request.getName(), spaceId)
             )))
+            .flatMap(function((cloudFoundryClient, applicationId) -> Mono.zip(
+                Mono.just(cloudFoundryClient),
+                Mono.just(applicationId),
+                getSshEnabled(cloudFoundryClient, applicationId)
+            )))
+            .filter(predicate((cloudFoundryClient,applicationId,sshEnabled) -> sshEnabled.equals(true)))
             .flatMap(function((cloudFoundryClient, applicationId) -> requestUpdateApplicationSsh(cloudFoundryClient, applicationId, false)))
             .then()
             .transform(OperationsLogging.log("Disable Application SSH"))
@@ -241,8 +250,14 @@ public final class DefaultApplications implements Applications {
             .zip(this.cloudFoundryClient, this.spaceId)
             .flatMap(function((cloudFoundryClient, spaceId) -> Mono.zip(
                 Mono.just(cloudFoundryClient),
-                getApplicationIdWhere(cloudFoundryClient, request.getName(), spaceId, sshEnabled(false))
+                getApplicationIdV3(cloudFoundryClient, request.getName(), spaceId)
             )))
+            .flatMap(function((cloudFoundryClient, applicationId) -> Mono.zip(
+                Mono.just(cloudFoundryClient),
+                Mono.just(applicationId),
+                getSshEnabled(cloudFoundryClient, applicationId)
+            )))
+            .filter(predicate((cloudFoundryClient,applicationId,sshEnabled) -> sshEnabled.equals(false)))
             .flatMap(function((cloudFoundryClient, applicationId) -> requestUpdateApplicationSsh(cloudFoundryClient, applicationId, true)))
             .then()
             .transform(OperationsLogging.log("Enable Application SSH"))
@@ -292,7 +307,7 @@ public final class DefaultApplications implements Applications {
             .zip(this.cloudFoundryClient, this.spaceId)
             .flatMap(function((cloudFoundryClient, spaceId) -> Mono.zip(
                 Mono.just(cloudFoundryClient),
-                getApplicationId(cloudFoundryClient, request.getName(), spaceId)
+                getApplicationIdV3(cloudFoundryClient, request.getName(), spaceId)
             )))
             .flatMap(function(DefaultApplications::requestApplicationEnvironment))
             .map(DefaultApplications::toApplicationEnvironments)
@@ -557,10 +572,19 @@ public final class DefaultApplications implements Applications {
     public Mono<Boolean> sshEnabled(ApplicationSshEnabledRequest request) {
         return Mono
             .zip(this.cloudFoundryClient, this.spaceId)
-            .flatMap(function((cloudFoundryClient, spaceId) -> getApplication(cloudFoundryClient, request.getName(), spaceId)))
-            .map(applicationResource -> ResourceUtils.getEntity(applicationResource).getEnableSsh())
+            .flatMap(function((cloudFoundryClient, spaceId) -> Mono.zip(
+                Mono.just(cloudFoundryClient),
+                getApplicationIdV3(cloudFoundryClient, request.getName(), spaceId))))
+            .flatMap(function(DefaultApplications::getSshEnabled))
             .transform(OperationsLogging.log("Is Application SSH Enabled"))
             .checkpoint();
+    }
+
+    private static Mono<Boolean> getSshEnabled(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        return cloudFoundryClient.applicationsV3()
+            .getSshEnabled(GetApplicationSshEnabledRequest.builder()
+                .applicationId(applicationId).build())
+            .map(GetApplicationSshEnabledResponse::getEnabled);
     }
 
     @Override
@@ -1222,11 +1246,11 @@ public final class DefaultApplications implements Applications {
             .then();
     }
 
-    private static Mono<ApplicationEnvironmentResponse> requestApplicationEnvironment(CloudFoundryClient cloudFoundryClient, String applicationId) {
-        return cloudFoundryClient.applicationsV2()
-            .environment(ApplicationEnvironmentRequest.builder()
-                .applicationId(applicationId)
-                .build());
+    private static Mono<GetApplicationEnvironmentResponse> requestApplicationEnvironment(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        return cloudFoundryClient.applicationsV3()
+            .getEnvironment(GetApplicationEnvironmentRequest.builder()
+            .applicationId(applicationId)
+            .build());
     }
 
     private static Mono<ApplicationInstancesResponse> requestApplicationInstances(CloudFoundryClient cloudFoundryClient, String applicationId) {
@@ -1662,8 +1686,16 @@ public final class DefaultApplications implements Applications {
         return requestUpdateApplication(cloudFoundryClient, applicationId, builder -> builder.diskQuota(disk).instances(instances).memory(memory));
     }
 
-    private static Mono<AbstractApplicationResource> requestUpdateApplicationSsh(CloudFoundryClient cloudFoundryClient, String applicationId, Boolean enabled) {
-        return requestUpdateApplication(cloudFoundryClient, applicationId, builder -> builder.enableSsh(enabled));
+    private static Mono<ApplicationResource> requestUpdateApplicationSsh(CloudFoundryClient cloudFoundryClient, String applicationId, boolean enabled) {
+        return requestUpdateApplicationFeature(cloudFoundryClient, applicationId,builder -> builder.featureName("ssh").enabled(enabled));
+    }
+
+    private static Mono<ApplicationResource> requestUpdateApplicationFeature(CloudFoundryClient cloudFoundryClient, String applicationId, UnaryOperator<UpdateApplicationFeatureRequest.Builder> modifier) {
+        return cloudFoundryClient.applicationsV3()
+            .updateFeature(modifier.apply(org.cloudfoundry.client.v3.applications.UpdateApplicationFeatureRequest.builder()
+                .applicationId(applicationId))
+                .build())
+            .cast(ApplicationResource.class);
     }
 
     private static Mono<AbstractApplicationResource> requestUpdateApplicationState(CloudFoundryClient cloudFoundryClient, String applicationId, String state) {
@@ -1709,10 +1741,6 @@ public final class DefaultApplications implements Applications {
         return !Optional.ofNullable(request.getNoStart()).orElse(false);
     }
 
-    private static Predicate<AbstractApplicationResource> sshEnabled(Boolean enabled) {
-        return resource -> enabled.equals(ResourceUtils.getEntity(resource).getEnableSsh());
-    }
-
     private static Mono<Void> startApplicationAndWait(CloudFoundryClient cloudFoundryClient, String application, String applicationId, Duration stagingTimeout, Duration startupTimeout) {
         return requestUpdateApplicationState(cloudFoundryClient, applicationId, STARTED_STATE)
             .flatMap(response -> waitForStaging(cloudFoundryClient, application, applicationId, stagingTimeout))
@@ -1755,12 +1783,12 @@ public final class DefaultApplications implements Applications {
             .build();
     }
 
-    private static ApplicationEnvironments toApplicationEnvironments(ApplicationEnvironmentResponse response) {
+    private static ApplicationEnvironments toApplicationEnvironments(GetApplicationEnvironmentResponse response) {
         return ApplicationEnvironments.builder()
-            .running(response.getRunningEnvironmentJsons())
-            .staging(response.getStagingEnvironmentJsons())
-            .systemProvided(response.getSystemEnvironmentJsons())
-            .userProvided(response.getEnvironmentJsons())
+            .running(response.getRunningEnvironmentVariables())
+            .staging(response.getStagingEnvironmentVariables())
+            .systemProvided(response.getSystemEnvironmentVariables())
+            .userProvided(response.getEnvironmentVariables())
             .build();
     }
 
