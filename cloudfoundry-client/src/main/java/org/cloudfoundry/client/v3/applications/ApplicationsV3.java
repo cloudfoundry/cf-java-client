@@ -207,6 +207,12 @@ public interface ApplicationsV3 {
      */
     Mono<StartApplicationResponse> start(StartApplicationRequest request);
 
+    /**
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.130.0/#restart-an-app">Restart Application</a> request
+     *
+     * @param request the Restart Application request
+     * @return the response from the Restart Application request
+     */
     Mono<RestartApplicationResponse> restart(RestartApplicationRequest request);
 
     /**
