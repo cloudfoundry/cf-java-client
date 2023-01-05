@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.immutables.value.Value;
 
 /**
- * The request payload for the Start Application operation
+ * The request payload for the Restart Application operation
  */
 @Value.Immutable
 abstract class _RestartApplicationRequest {
