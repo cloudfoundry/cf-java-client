@@ -207,6 +207,8 @@ public interface ApplicationsV3 {
      */
     Mono<StartApplicationResponse> start(StartApplicationRequest request);
 
+    Mono<StartApplicationResponse> restart(StartApplicationRequest request;
+
     /**
      * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#stop-an-app">Stop Application</a> request
      *
