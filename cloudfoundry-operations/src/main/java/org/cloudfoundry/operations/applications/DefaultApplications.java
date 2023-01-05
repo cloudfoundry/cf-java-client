@@ -451,9 +451,9 @@ public final class DefaultApplications implements Applications {
             .zip(this.cloudFoundryClient, this.spaceId)
             .flatMap(function((cloudFoundryClient, spaceId) -> Mono.zip(
                 Mono.just(cloudFoundryClient),
-                getApplicationId(cloudFoundryClient, request.getName(), spaceId)
+                getApplicationIdV3(cloudFoundryClient, request.getName(), spaceId)
             )))
-            .flatMap(function((cloudFoundryClient, applicationId) -> restageApplication(cloudFoundryClient, request.getName(), applicationId, request.getStagingTimeout(), request.getStartupTimeout
+            .flatMap(function((cloudFoundryClient, applicationId) -> restageApplicationV3(cloudFoundryClient, request.getName(), applicationId, request.getStagingTimeout(), request.getStartupTimeout
                 ())))
             .transform(OperationsLogging.log("Restage Application"))
             .checkpoint();
@@ -469,15 +469,25 @@ public final class DefaultApplications implements Applications {
                 .flatMap(response -> waitForBuildSucceed(cloudFoundryClient, application, applicationId, stagingTimeout))
                 .flatMap(buildId -> requestGetBuild(cloudFoundryClient, buildId))
                 .flatMap(response -> requestSetApplicationCurrentDroplet(cloudFoundryClient, applicationId, response.getDroplet().getId()))
-                // Update the app to use the new droplet guid
-                // Restart the app to run it with this new droplet
-                .then();
+                .then(restartApplicationV3AndWait(cloudFoundryClient, application, applicationId, startupTimeout));
     }
 
-//    private static Mono requestRestartApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
-//        return cloudFoundryClient.applicationsV3()
-//                .start();
-//    }
+    private static Mono<Void> restartApplicationV3AndWait(CloudFoundryClient cloudFoundryClient, String application, String applicationId, Duration startupTimeout) {
+        return requestRestartApplication(cloudFoundryClient, applicationId)
+                .then(waitApplicationV3ForRunning(cloudFoundryClient, application, applicationId, startupTimeout));
+    }
+
+    private static Mono<Void> waitApplicationV3ForRunning(CloudFoundryClient cloudFoundryClient, String application, String applicationId, Duration startupTimeout) {
+        //fetch implementation from start stop branch
+        return Mono.empty();
+    }
+
+    private static Mono<RestartApplicationResponse> requestRestartApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        return cloudFoundryClient.applicationsV3()
+                .restart(org.cloudfoundry.client.v3.applications.RestartApplicationRequest.builder()
+                        .applicationId(applicationId)
+                        .build());
+    }
 
     private static Mono<SetApplicationCurrentDropletResponse> requestSetApplicationCurrentDroplet(CloudFoundryClient cloudFoundryClient, String applicationId, String dropletId) {
         return cloudFoundryClient.applicationsV3()
@@ -534,6 +544,7 @@ public final class DefaultApplications implements Applications {
     private static Predicate<BuildState> isBuildStaged() {
         return state -> "STAGED".equals(state.getValue());
     }
+
 
     @Override
     public Mono<Void> restart(RestartApplicationRequest request) {
