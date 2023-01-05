@@ -468,9 +468,25 @@ public final class DefaultApplications implements Applications {
                 .flatMap(packageId -> requestCreateBuild(cloudFoundryClient, packageId))
                 .flatMap(response -> waitForBuildSucceed(cloudFoundryClient, application, applicationId, stagingTimeout))
                 .flatMap(buildId -> requestGetBuild(cloudFoundryClient, buildId))
+                .flatMap(response -> requestSetApplicationCurrentDroplet(cloudFoundryClient, applicationId, response.getDroplet().getId()))
                 // Update the app to use the new droplet guid
                 // Restart the app to run it with this new droplet
                 .then();
+    }
+
+//    private static Mono requestRestartApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
+//        return cloudFoundryClient.applicationsV3()
+//                .start();
+//    }
+
+    private static Mono<SetApplicationCurrentDropletResponse> requestSetApplicationCurrentDroplet(CloudFoundryClient cloudFoundryClient, String applicationId, String dropletId) {
+        return cloudFoundryClient.applicationsV3()
+                .setCurrentDroplet(SetApplicationCurrentDropletRequest.builder()
+                        .data(Relationship.builder()
+                                .id(dropletId)
+                                .build())
+                        .applicationId(applicationId)
+                        .build());
     }
 
     private static Mono<GetApplicationCurrentDropletResponse> requestApplicationsCurrentDroplet(CloudFoundryClient cloudFoundryClient, String applicationId) {
