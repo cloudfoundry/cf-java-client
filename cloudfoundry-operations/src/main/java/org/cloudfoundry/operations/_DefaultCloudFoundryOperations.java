@@ -18,10 +18,10 @@ package org.cloudfoundry.operations;
 
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
-import org.cloudfoundry.client.v2.organizations.OrganizationResource;
-import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
-import org.cloudfoundry.client.v2.spaces.SpaceResource;
+import org.cloudfoundry.client.v3.organizations.ListOrganizationsRequest;
+import org.cloudfoundry.client.v3.organizations.OrganizationResource;
+import org.cloudfoundry.client.v3.spaces.ListSpacesRequest;
+import org.cloudfoundry.client.v3.spaces.SpaceResource;
 import org.cloudfoundry.doppler.DopplerClient;
 import org.cloudfoundry.networking.NetworkingClient;
 import org.cloudfoundry.operations.advanced.Advanced;
@@ -56,7 +56,6 @@ import org.cloudfoundry.routing.RoutingClient;
 import org.cloudfoundry.uaa.UaaClient;
 import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.PaginationUtils;
-import org.cloudfoundry.util.ResourceUtils;
 import org.immutables.value.Value;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -211,7 +210,7 @@ abstract class _DefaultCloudFoundryOperations implements CloudFoundryOperations 
 
         if (hasText(organization)) {
             Mono<String> cached = getOrganization(getCloudFoundryClientPublisher(), organization)
-                .map(ResourceUtils::getId);
+                .map(OrganizationResource::getId);
 
             return getCacheDuration()
                 .map(cached::cache)
@@ -247,7 +246,7 @@ abstract class _DefaultCloudFoundryOperations implements CloudFoundryOperations 
         if (hasText(getSpace())) {
             Mono<String> cached = getOrganizationId()
                 .flatMap(organizationId -> getSpace(getCloudFoundryClientPublisher(), organizationId, space))
-                .map(ResourceUtils::getId);
+                .map(SpaceResource::getId);
 
             return getCacheDuration()
                 .map(cached::cache)
@@ -308,7 +307,7 @@ abstract class _DefaultCloudFoundryOperations implements CloudFoundryOperations 
     private static Flux<OrganizationResource> requestOrganizations(Mono<CloudFoundryClient> cloudFoundryClientPublisher, String organization) {
         return cloudFoundryClientPublisher
             .flatMapMany(cloudFoundryClient -> PaginationUtils
-                .requestClientV2Resources(page -> cloudFoundryClient.organizations()
+                .requestClientV3Resources(page -> cloudFoundryClient.organizationsV3()
                     .list(ListOrganizationsRequest.builder()
                         .name(organization)
                         .page(page)
@@ -318,7 +317,7 @@ abstract class _DefaultCloudFoundryOperations implements CloudFoundryOperations 
     private static Flux<SpaceResource> requestSpaces(Mono<CloudFoundryClient> cloudFoundryClientPublisher, String organizationId, String space) {
         return cloudFoundryClientPublisher
             .flatMapMany(cloudFoundryClient -> PaginationUtils
-                .requestClientV2Resources(page -> cloudFoundryClient.spaces()
+                .requestClientV3Resources(page -> cloudFoundryClient.spacesV3()
                     .list(ListSpacesRequest.builder()
                         .organizationId(organizationId)
                         .name(space)
