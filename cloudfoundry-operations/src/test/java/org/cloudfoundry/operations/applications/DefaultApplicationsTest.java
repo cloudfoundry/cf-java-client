@@ -127,8 +127,14 @@ import org.cloudfoundry.client.v3.BuildpackData;
 import org.cloudfoundry.client.v3.DockerData;
 import org.cloudfoundry.client.v3.Lifecycle;
 import org.cloudfoundry.client.v3.applications.ApplicationState;
+import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentRequest;
+import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentResponse;
+import org.cloudfoundry.client.v3.applications.GetApplicationSshEnabledRequest;
+import org.cloudfoundry.client.v3.applications.GetApplicationSshEnabledResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsResponse;
+import org.cloudfoundry.client.v3.applications.UpdateApplicationFeatureRequest;
+import org.cloudfoundry.client.v3.applications.UpdateApplicationFeatureResponse;
 import org.cloudfoundry.client.v3.tasks.CancelTaskRequest;
 import org.cloudfoundry.client.v3.tasks.CancelTaskResponse;
 import org.cloudfoundry.client.v3.tasks.CreateTaskRequest;
@@ -405,10 +411,11 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    void disableSsh() {
-        requestApplications(
-                this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "test-metadata-id");
-        requestUpdateApplicationSsh(this.cloudFoundryClient, "test-metadata-id", false);
+    public void disableSsh() {
+        requestApplicationsV3(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "test-application-id");
+        requestGetSshEnabled(this.cloudFoundryClient,"test-application-id",true);
+        requestUpdateApplicationSshV3(this.cloudFoundryClient, "test-application-id", false);
+
 
         this.applications
                 .disableSsh(DisableApplicationSshRequest.builder().name("test-app-name").build())
@@ -418,8 +425,9 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    void disableSshAlreadyDisabled() {
-        requestApplicationsWithSsh(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, false);
+    public void disableSshAlreadyDisabled() {
+        requestApplicationsV3(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "test-application-id");
+        requestGetSshEnabled(this.cloudFoundryClient,"test-application-id",false);
 
         this.applications
                 .disableSsh(DisableApplicationSshRequest.builder().name("test-app-name").build())
@@ -429,8 +437,8 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    void disableSshNoApp() {
-        requestApplicationsEmpty(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
+    public void disableSshNoApp() {
+        requestApplicationsEmptyV3(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
 
         this.applications
                 .disableSsh(DisableApplicationSshRequest.builder().name("test-app-name").build())
@@ -444,10 +452,10 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    void enableSsh() {
-        requestApplications(
-                this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "test-metadata-id");
-        requestUpdateApplicationSsh(this.cloudFoundryClient, "test-application-id", true);
+    public void enableSsh() {
+        requestApplicationsV3(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "test-application-id");
+        requestGetSshEnabled(this.cloudFoundryClient,"test-application-id",false);
+        requestUpdateApplicationSshV3(this.cloudFoundryClient, "test-application-id", true);
 
         this.applications
                 .enableSsh(EnableApplicationSshRequest.builder().name("test-app-name").build())
@@ -457,8 +465,9 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    void enableSshAlreadyEnabled() {
-        requestApplicationsWithSsh(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, true);
+    public void enableSshAlreadyEnabled() {
+        requestApplicationsV3(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "test-application-id");
+        requestGetSshEnabled(this.cloudFoundryClient,"test-application-id",true);
 
         this.applications
                 .enableSsh(EnableApplicationSshRequest.builder().name("test-app-name").build())
@@ -468,8 +477,8 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    void enableSshNoApp() {
-        requestApplicationsEmpty(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
+    public void enableSshNoApp() {
+        requestApplicationsEmptyV3(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
 
         this.applications
                 .enableSsh(EnableApplicationSshRequest.builder().name("test-app-name").build())
@@ -721,8 +730,8 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    void getEnvironments() {
-        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
+    public void getEnvironments() {
+        requestApplicationsV3(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
         requestApplicationEnvironment(this.cloudFoundryClient, "test-metadata-id");
 
         this.applications
@@ -753,8 +762,8 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    void getEnvironmentsNoApp() {
-        requestApplicationsEmpty(this.cloudFoundryClient, "test-app", TEST_SPACE_ID);
+    public void getEnvironmentsNoApp() {
+        requestApplicationsEmptyV3(this.cloudFoundryClient, "test-app", TEST_SPACE_ID);
 
         this.applications
                 .getEnvironments(
@@ -3733,9 +3742,9 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    void sshEnabled() {
-        requestApplications(
-                this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "test-metadata-id");
+    public void sshEnabled() {
+        requestApplicationsV3(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "test-application-id");
+        requestGetSshEnabled(this.cloudFoundryClient,"test-application-id",true);
 
         this.applications
                 .sshEnabled(ApplicationSshEnabledRequest.builder().name("test-app-name").build())
@@ -3746,8 +3755,8 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    void sshEnabledNoApp() {
-        requestApplicationsEmpty(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
+    public void sshEnabledNoApp() {
+        requestApplicationsEmptyV3(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
 
         this.applications
                 .sshEnabled(ApplicationSshEnabledRequest.builder().name("test-app-name").build())
@@ -3759,6 +3768,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                         .hasMessage("Application test-app-name does not exist"))
                 .verify(Duration.ofSeconds(5));
     }
+
 
     @Test
     void startApplicationFailurePartial() {
@@ -4046,27 +4056,19 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .thenReturn(Mono.just(ApplicationStatisticsResponse.builder().build()));
     }
 
-    private static void requestApplicationEnvironment(
-            CloudFoundryClient cloudFoundryClient, String applicationId) {
-        when(cloudFoundryClient
-                        .applicationsV2()
-                        .environment(
-                                ApplicationEnvironmentRequest.builder()
-                                        .applicationId(applicationId)
-                                        .build()))
-                .thenReturn(
-                        Mono.just(
-                                ApplicationEnvironmentResponse.builder()
-                                        .runningEnvironmentJson(
-                                                "running-env-name", "running-env-value")
-                                        .applicationEnvironmentJson(
-                                                "application-env-name", "application-env-value")
-                                        .stagingEnvironmentJson(
-                                                "staging-env-name", "staging-env-value")
-                                        .environmentJson("env-name", "env-value")
-                                        .systemEnvironmentJson(
-                                                "system-env-name", "system-env-value")
-                                        .build()));
+    private static void requestApplicationEnvironment(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        when(cloudFoundryClient.applicationsV3()
+            .getEnvironment(GetApplicationEnvironmentRequest.builder()
+                .applicationId(applicationId)
+                .build()))
+            .thenReturn(Mono
+                .just(GetApplicationEnvironmentResponse.builder()
+                    .runningEnvironmentVariable("running-env-name", "running-env-value")
+                    .applicationEnvironmentVariable("application-env-name", "application-env-value")
+                    .stagingEnvironmentVariable("staging-env-name", "staging-env-value")
+                    .environmentVariable("env-name", "env-value")
+                    .systemEnvironmentVariable("system-env-name", "system-env-value")
+                    .build()));
     }
 
     private static void requestApplicationInstances(
@@ -4661,33 +4663,33 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .thenReturn(Mono.just(fill(ListSpaceApplicationsResponse.builder()).build()));
     }
 
-    private static void requestApplicationsSpecificState(
-            CloudFoundryClient cloudFoundryClient,
-            String application,
-            String spaceId,
-            String stateReturned) {
-        when(cloudFoundryClient
-                        .spaces()
-                        .listApplications(
-                                ListSpaceApplicationsRequest.builder()
-                                        .name(application)
-                                        .page(1)
-                                        .spaceId(spaceId)
-                                        .build()))
-                .thenReturn(
-                        Mono.just(
-                                fill(ListSpaceApplicationsResponse.builder())
-                                        .resource(
-                                                fill(ApplicationResource.builder(), "application-")
-                                                        .entity(
-                                                                fill(
-                                                                                ApplicationEntity
-                                                                                        .builder(),
-                                                                                "application-entity-")
-                                                                        .state(stateReturned)
-                                                                        .build())
-                                                        .build())
-                                        .build()));
+    private static void requestApplicationsEmptyV3(CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
+        when(cloudFoundryClient.applicationsV3()
+            .list(ListApplicationsRequest.builder()
+                .name(application)
+                .spaceId(spaceId)
+                .page(1)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(ListApplicationsResponse.builder())
+                    .build()));
+    }
+
+    private static void requestApplicationsSpecificState(CloudFoundryClient cloudFoundryClient, String application, String spaceId, String stateReturned) {
+        when(cloudFoundryClient.spaces()
+            .listApplications(ListSpaceApplicationsRequest.builder()
+                .name(application)
+                .page(1)
+                .spaceId(spaceId)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(ListSpaceApplicationsResponse.builder())
+                    .resource(fill(ApplicationResource.builder(), "application-")
+                        .entity(fill(ApplicationEntity.builder(), "application-entity-")
+                            .state(stateReturned)
+                            .build())
+                        .build())
+                    .build()));
     }
 
     private static void requestApplicationsV3(
@@ -5850,8 +5852,34 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                         .build()));
     }
 
-    private static void requestUpdateApplicationState(
-            CloudFoundryClient cloudFoundryClient, String applicationId, String state) {
+    private static void requestUpdateApplicationSshV3(CloudFoundryClient cloudFoundryClient, String applicationId, Boolean enabled) {
+
+        when(cloudFoundryClient.applicationsV3()
+            .updateFeature(UpdateApplicationFeatureRequest.builder()
+                .applicationId(applicationId)
+                .featureName(APP_FEATURE_SSH)
+                .enabled(enabled)
+                .build()))
+            .thenReturn(Mono
+                .just(fill(UpdateApplicationFeatureResponse.builder())
+                    .description("test-description")
+                    .name("test-application-name")
+                    .enabled(enabled)
+                    .build()));
+    }
+
+    private static void requestGetSshEnabled(CloudFoundryClient cloudFoundryClient, String applicationId,boolean status) {
+        when(cloudFoundryClient.applicationsV3()
+            .getSshEnabled(GetApplicationSshEnabledRequest.builder()
+                .applicationId(applicationId).build()))
+            .thenReturn(Mono
+                .just(fill(GetApplicationSshEnabledResponse.builder())
+                    .reason("test-reason")
+                    .enabled(status)
+                    .build()));
+    }
+
+    private static void requestUpdateApplicationState(CloudFoundryClient cloudFoundryClient, String applicationId, String state) {
         requestUpdateApplicationState(cloudFoundryClient, applicationId, state, 1);
     }
 

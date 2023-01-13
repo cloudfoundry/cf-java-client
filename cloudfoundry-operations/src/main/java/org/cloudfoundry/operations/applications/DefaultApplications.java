@@ -109,6 +109,7 @@ import org.cloudfoundry.client.v3.Lifecycle;
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.Resource;
 import org.cloudfoundry.client.v3.ToOneRelationship;
+import org.cloudfoundry.client.v3.applications.ApplicationFeature;
 import org.cloudfoundry.client.v3.applications.ApplicationResource;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentResponse;
@@ -2626,16 +2627,16 @@ public final class DefaultApplications implements Applications {
                 builder -> builder.healthCheckType(type.getValue()));
     }
 
-    private static Mono<ApplicationResource> requestUpdateApplicationSsh(CloudFoundryClient cloudFoundryClient, String applicationId, boolean enabled) {
+    private static Mono<ApplicationFeature> requestUpdateApplicationSsh(CloudFoundryClient cloudFoundryClient, String applicationId, boolean enabled) {
         return requestUpdateApplicationFeature(cloudFoundryClient, applicationId,builder -> builder.featureName(APP_FEATURE_SSH).enabled(enabled));
     }
 
-    private static Mono<ApplicationResource> requestUpdateApplicationFeature(CloudFoundryClient cloudFoundryClient, String applicationId, UnaryOperator<UpdateApplicationFeatureRequest.Builder> modifier) {
+    private static Mono<ApplicationFeature> requestUpdateApplicationFeature(CloudFoundryClient cloudFoundryClient, String applicationId, UnaryOperator<UpdateApplicationFeatureRequest.Builder> modifier) {
         return cloudFoundryClient.applicationsV3()
             .updateFeature(modifier.apply(org.cloudfoundry.client.v3.applications.UpdateApplicationFeatureRequest.builder()
                 .applicationId(applicationId))
                 .build())
-            .cast(ApplicationResource.class);
+            .cast(ApplicationFeature.class);
     }
 
     private static Mono<AbstractApplicationResource> requestUpdateApplicationScale(
