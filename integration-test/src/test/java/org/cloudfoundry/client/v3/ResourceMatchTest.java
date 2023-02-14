@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 the original author or authors.
+ * Copyright 2013-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,16 +17,22 @@
 package org.cloudfoundry.client.v3;
 
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.CloudFoundryVersion;
+import org.cloudfoundry.IfCloudFoundryVersion;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v3.applications.Application;
-import org.cloudfoundry.client.v3.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.ApplicationRelationships;
+import org.cloudfoundry.client.v3.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v3.packages.CreatePackageRequest;
 import org.cloudfoundry.client.v3.packages.GetPackageRequest;
+import org.cloudfoundry.client.v3.packages.GetPackageResponse;
 import org.cloudfoundry.client.v3.packages.Package;
+import org.cloudfoundry.client.v3.packages.PackageState;
 import org.cloudfoundry.client.v3.packages.PackageType;
 import org.cloudfoundry.client.v3.packages.UploadPackageRequest;
-import org.junit.Ignore;
+import org.cloudfoundry.util.DelayTimeoutException;
+import org.cloudfoundry.util.ExceptionUtils;
+import org.cloudfoundry.util.ResourceMatchingUtilsV3;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -36,13 +42,12 @@ import reactor.test.StepVerifier;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.EnumSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.cloudfoundry.client.v3.packages.PackageState.PROCESSING_UPLOAD;
-import static org.cloudfoundry.client.v3.packages.PackageState.READY;
+import static org.cloudfoundry.util.DelayUtils.exponentialBackOff;
 
-@Ignore("Until Packages are no longer experimental")
-public final class PackagesTest extends AbstractIntegrationTest {
+public class ResourceMatchTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
@@ -50,11 +55,23 @@ public final class PackagesTest extends AbstractIntegrationTest {
     @Autowired
     private Mono<String> spaceId;
 
+    //TODO how to check if resource matching is enabled on this CF instance?
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.UNSPECIFIED) //TODO how to select this version?
     @Test
-    public void upload() {
+    public void upload() throws IOException {
+        createAndUploadPackage()
+            .flatMap(this::waitForReady)
+            .then(ResourceMatchingUtilsV3.getMatchedResources(this.cloudFoundryClient, new ClassPathResource("test-application.zip").getFile().toPath()))
+            .as(StepVerifier::create)
+            .consumeNextWith(matchedResources -> assertThat(matchedResources).isNotEmpty())
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    private Mono<String> createAndUploadPackage() {
         String applicationName = this.nameFactory.getApplicationName();
 
-        this.spaceId
+        return this.spaceId
             .flatMap(spaceId -> this.cloudFoundryClient.applicationsV3()
                 .create(CreateApplicationRequest.builder()
                     .name(applicationName)
@@ -80,19 +97,18 @@ public final class PackagesTest extends AbstractIntegrationTest {
                             .bits(new ClassPathResource("test-application.zip").getFile().toPath())
                             .build());
                 } catch (IOException e) {
-                    throw Exceptions.propagate(e);
+                    return Mono.error(Exceptions.propagate(e));
                 }
             })
-            .map(Package::getId)
-            .flatMap(packageId -> this.cloudFoundryClient.packages()
-                .get(GetPackageRequest.builder()
-                    .packageId(packageId)
-                    .build()))
-            .map(Package::getState)
-            .as(StepVerifier::create)
-            .consumeNextWith(state -> assertThat(state).isIn(PROCESSING_UPLOAD, READY))
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+            .map(Package::getId);
     }
 
+    private Mono<GetPackageResponse> waitForReady(String packageId) {
+        return this.cloudFoundryClient.packages().get(GetPackageRequest.builder().packageId(packageId).build())
+            .filter(packageResponse -> EnumSet.of(PackageState.READY, PackageState.FAILED, PackageState.EXPIRED).contains(packageResponse.getState()))
+            .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)))
+            .filter(packageResponse -> packageResponse.getState() == PackageState.READY)
+            .switchIfEmpty(ExceptionUtils.illegalState("Package %s failed upload processing", packageId))
+            .onErrorResume(DelayTimeoutException.class, t -> ExceptionUtils.illegalState("Package %s timed out during upload processing", packageId));
+    }
 }

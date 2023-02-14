@@ -139,6 +139,14 @@ public interface Applications {
     Mono<Void> pushManifest(PushApplicationManifestRequest request);
 
     /**
+     * Push a manifest using the V3 API
+     *
+     * @param request the push manifest V3 request
+     * @return a completion indicator
+     */
+    Mono<Void> pushManifestV3(PushManifestV3Request request);
+
+    /**
      * Rename a specific application
      *
      * @param request the rename application request

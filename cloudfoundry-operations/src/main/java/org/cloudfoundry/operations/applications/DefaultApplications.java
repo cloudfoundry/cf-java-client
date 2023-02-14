@@ -84,10 +84,37 @@ import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
 import org.cloudfoundry.client.v2.stacks.StackResource;
 import org.cloudfoundry.client.v3.BuildpackData;
 import org.cloudfoundry.client.v3.Lifecycle;
-import org.cloudfoundry.client.v3.Resource;
+import org.cloudfoundry.client.v3.Relationship;
+import org.cloudfoundry.client.v3.ToOneRelationship;
 import org.cloudfoundry.client.v3.applications.ApplicationResource;
 import org.cloudfoundry.client.v3.applications.GetApplicationResponse;
+import org.cloudfoundry.client.v3.applications.ListApplicationProcessesRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
+import org.cloudfoundry.client.v3.applications.SetApplicationCurrentDropletRequest;
+import org.cloudfoundry.client.v3.builds.BuildState;
+import org.cloudfoundry.client.v3.builds.CreateBuildRequest;
+import org.cloudfoundry.client.v3.builds.CreateBuildResponse;
+import org.cloudfoundry.client.v3.builds.GetBuildRequest;
+import org.cloudfoundry.client.v3.builds.GetBuildResponse;
+import org.cloudfoundry.client.v3.domains.DomainResource;
+import org.cloudfoundry.client.v3.domains.ListDomainsRequest;
+import org.cloudfoundry.client.v3.packages.BitsData;
+import org.cloudfoundry.client.v3.packages.CreatePackageRequest;
+import org.cloudfoundry.client.v3.packages.CreatePackageResponse;
+import org.cloudfoundry.client.v3.packages.DockerData;
+import org.cloudfoundry.client.v3.packages.GetPackageRequest;
+import org.cloudfoundry.client.v3.packages.GetPackageResponse;
+import org.cloudfoundry.client.v3.packages.PackageRelationships;
+import org.cloudfoundry.client.v3.packages.PackageState;
+import org.cloudfoundry.client.v3.packages.PackageType;
+import org.cloudfoundry.client.v3.packages.UploadPackageRequest;
+import org.cloudfoundry.client.v3.processes.GetProcessStatisticsRequest;
+import org.cloudfoundry.client.v3.processes.GetProcessStatisticsResponse;
+import org.cloudfoundry.client.v3.processes.ProcessState;
+import org.cloudfoundry.client.v3.processes.ProcessStatisticsResource;
+import org.cloudfoundry.client.v3.Resource;
+import org.cloudfoundry.client.v3.resourcematch.MatchedResource;
+import org.cloudfoundry.client.v3.spaces.ApplyManifestRequest;
 import org.cloudfoundry.client.v3.tasks.CancelTaskRequest;
 import org.cloudfoundry.client.v3.tasks.CancelTaskResponse;
 import org.cloudfoundry.client.v3.tasks.CreateTaskRequest;
@@ -108,6 +135,7 @@ import org.cloudfoundry.util.FluentMap;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceMatchingUtils;
+import org.cloudfoundry.util.ResourceMatchingUtilsV3;
 import org.cloudfoundry.util.ResourceUtils;
 import org.cloudfoundry.util.SortingUtils;
 import reactor.core.Exceptions;
@@ -117,6 +145,7 @@ import reactor.util.function.Tuple2;
 import reactor.util.function.Tuple5;
 import reactor.util.function.Tuples;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -124,6 +153,7 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -432,6 +462,31 @@ public final class DefaultApplications implements Applications {
     }
 
     @Override
+    public Mono<Void> pushManifestV3(PushManifestV3Request request) {
+        byte[] manifestSerialized;
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            ApplicationManifestUtilsV3.write(baos, request.getManifest());
+            manifestSerialized = baos.toByteArray();
+        } catch (IOException e) {
+            throw new RuntimeException("Could not serialize manifest", e);
+        }
+
+        return Mono.zip(this.cloudFoundryClient, this.spaceId)
+            .flatMap(function((cloudFoundryClient, spaceId) ->
+                applyManifestAndWaitForCompletion(cloudFoundryClient, spaceId, manifestSerialized)
+                    .then(Mono.just(Tuples.of(cloudFoundryClient, spaceId)))))
+            .flatMapMany(function((cloudFoundryClient, spaceId) -> Flux.fromIterable(request.getManifest().getApplications())
+                .map(manifestApp -> Tuples.of(cloudFoundryClient, spaceId, manifestApp))))
+            .flatMap(function((cloudFoundryClient, spaceId, manifestApp) ->
+                getApplicationIdV3(cloudFoundryClient, manifestApp.getName(), spaceId)
+                    .flatMap(appId -> Mono.zip(Mono.just(appId), createPackage(cloudFoundryClient, appId, manifestApp)))
+                    .flatMap(function((appId, packageId) ->
+                        buildAndStage(cloudFoundryClient, manifestApp, packageId)
+                            .flatMap(dropletId -> applyDropletAndWaitForRunning(cloudFoundryClient, manifestApp.getName(), appId, dropletId))))))
+            .then();
+    }
+
+    @Override
     public Mono<Void> rename(RenameApplicationRequest request) {
         return Mono
             .zip(this.cloudFoundryClient, this.spaceId)
@@ -631,6 +686,24 @@ public final class DefaultApplications implements Applications {
             .build();
     }
 
+    private static Mono<Void> applyDropletAndWaitForRunning(CloudFoundryClient cloudFoundryClient, String appname, String appId, String dropletId) {
+        return cloudFoundryClient.applicationsV3().setCurrentDroplet(SetApplicationCurrentDropletRequest.builder()
+                .applicationId(appId)
+                .data(Relationship.builder().id(dropletId).build())
+                .build())
+            .then(cloudFoundryClient.applicationsV3().restart(org.cloudfoundry.client.v3.applications.RestartApplicationRequest.builder()
+                .applicationId(appId)
+                .build()))
+            .then(waitForRunningV3(cloudFoundryClient, appname, appId, null));
+    }
+
+    private static Mono<Void> applyManifestAndWaitForCompletion(CloudFoundryClient cloudFoundryClient, String spaceId, byte[] manifestSerialized) {
+        return cloudFoundryClient.spacesV3()
+            .applyManifest(ApplyManifestRequest.builder().manifest(manifestSerialized).spaceId(spaceId).build())
+            .map(response -> response.getJobId().orElseThrow(() -> new IllegalStateException("No jobId returned for applying v3 manifest")))
+            .flatMap(jobId -> JobUtils.waitForCompletion(cloudFoundryClient, Duration.ofMinutes(5), jobId));
+    }
+
     private static boolean areModifiersPresent(ScaleApplicationRequest request) {
         return request.getMemoryLimit() != null || request.getDiskLimit() != null || request.getInstances() != null;
     }
@@ -653,6 +726,15 @@ public final class DefaultApplications implements Applications {
             .flatMap(serviceInstanceId -> requestCreateServiceBinding(cloudFoundryClient, applicationId, serviceInstanceId)
                 .onErrorResume(ExceptionUtils.statusCode(CF_SERVICE_ALREADY_BOUND), t -> Mono.empty()))
             .then();
+    }
+
+    private static Mono<String> buildAndStage(CloudFoundryClient cloudFoundryClient, ManifestV3Application manifestApp, String packageId) {
+        return cloudFoundryClient.builds().create(CreateBuildRequest.builder()
+                .getPackage(Relationship.builder().id(packageId).build())
+                .build())
+            .map(CreateBuildResponse::getId)
+            .flatMap(buildId -> waitForBuildStaging(cloudFoundryClient, buildId, manifestApp.getName(), null))
+            .map(build -> build.getDroplet().getId());
     }
 
     private static String cleanName(ApplicationManifest manifest) {
@@ -693,6 +775,45 @@ public final class DefaultApplications implements Applications {
     private static Mono<Void> copyBits(CloudFoundryClient cloudFoundryClient, Duration completionTimeout, String sourceApplicationId, String targetApplicationId) {
         return requestCopyBits(cloudFoundryClient, sourceApplicationId, targetApplicationId)
             .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, completionTimeout, job));
+    }
+
+    private static Mono<String> createPackage(CloudFoundryClient cloudFoundryClient, String appId, ManifestV3Application manifestApp) {
+        if (manifestApp.getDocker() != null) {
+            return cloudFoundryClient.packages().create(CreatePackageRequest.builder()
+                    .type(PackageType.DOCKER)
+                    .data(DockerData.builder()
+                        .image(manifestApp.getDocker().getImage())
+                        .username(manifestApp.getDocker().getUsername())
+                        .password(manifestApp.getDocker().getPassword())
+                        .build())
+                    .relationships(PackageRelationships.builder()
+                        .application(ToOneRelationship.builder()
+                            .data(Relationship.builder()
+                                .id(appId)
+                                .build())
+                            .build())
+                        .build())
+                    .build())
+                .map(CreatePackageResponse::getId);
+        } else {
+            return cloudFoundryClient.packages().create(CreatePackageRequest.builder()
+                    .type(PackageType.BITS)
+                    .data(BitsData.builder().build())
+                    .relationships(PackageRelationships.builder()
+                        .application(ToOneRelationship.builder()
+                            .data(Relationship.builder()
+                                .id(appId)
+                                .build())
+                            .build())
+                        .build())
+                    .build())
+                .filter(p -> p.getState() == PackageState.AWAITING_UPLOAD)
+                .switchIfEmpty(ExceptionUtils.illegalState("Newly created package of application %s is not in state AWAITING_UPLOAD", manifestApp.getName()))
+                .map(CreatePackageResponse::getId)
+                .flatMap(packageId -> ResourceMatchingUtilsV3.getMatchedResources(cloudFoundryClient, manifestApp.getPath())
+                    .flatMap(matchedResources -> uploadPackageBitsAndWait(cloudFoundryClient, packageId, manifestApp.getPath(), matchedResources, Duration.ofMinutes(5)))
+                    .map(GetPackageResponse::getId));
+        }
     }
 
     private static Mono<Void> deleteRoute(CloudFoundryClient cloudFoundryClient, String routeId, Duration completionTimeout) {
@@ -1186,10 +1307,10 @@ public final class DefaultApplications implements Applications {
                 randomWords, spaceId)
                 .thenReturn(Tuples.of(applicationId, matchedResources))))
             .flatMap(function((applicationId, matchedResources) -> Mono.when(
-                bindServices(cloudFoundryClient, applicationId, manifest, spaceId),
-                updateBuildpacks(cloudFoundryClient, applicationId, manifest),
-                uploadApplicationAndWait(cloudFoundryClient, applicationId, manifest.getPath(), matchedResources, request.getStagingTimeout())
-            )
+                    bindServices(cloudFoundryClient, applicationId, manifest, spaceId),
+                    updateBuildpacks(cloudFoundryClient, applicationId, manifest),
+                    uploadApplicationAndWait(cloudFoundryClient, applicationId, manifest.getPath(), matchedResources, request.getStagingTimeout())
+                )
                 .thenReturn(applicationId)))
             .flatMap(applicationId -> stopAndStartApplication(cloudFoundryClient, applicationId, manifest.getName(), request));
     }
@@ -1417,6 +1538,14 @@ public final class DefaultApplications implements Applications {
             .cast(AbstractApplicationResource.class);
     }
 
+    private static Flux<DomainResource> requestListDomains(CloudFoundryClient cloudFoundryClient, String organizationId) {
+        return PaginationUtils
+            .requestClientV3Resources(page -> cloudFoundryClient.domainsV3()
+                .list(ListDomainsRequest.builder()
+                    .page(page)
+                    .build()));
+    }
+
     private static Flux<PrivateDomainResource> requestListPrivateDomains(CloudFoundryClient cloudFoundryClient, String organizationId) {
         return PaginationUtils
             .requestClientV2Resources(page -> cloudFoundryClient.organizations()
@@ -1641,7 +1770,7 @@ public final class DefaultApplications implements Applications {
     private static Mono<AbstractApplicationResource> requestUpdateApplication(CloudFoundryClient cloudFoundryClient, String applicationId, UnaryOperator<UpdateApplicationRequest.Builder> modifier) {
         return cloudFoundryClient.applicationsV2()
             .update(modifier.apply(UpdateApplicationRequest.builder()
-                .applicationId(applicationId))
+                    .applicationId(applicationId))
                 .build())
             .cast(AbstractApplicationResource.class);
     }
@@ -1688,6 +1817,15 @@ public final class DefaultApplications implements Applications {
 
         return cloudFoundryClient.applicationsV2()
             .upload(request);
+    }
+
+    private static Mono<Void> requestUploadPackage(CloudFoundryClient cloudFoundryClient, String packageId, Path bits, List<MatchedResource> matchedResources) {
+        return cloudFoundryClient.packages().upload(UploadPackageRequest.builder()
+                .packageId(packageId)
+                .bits(bits)
+                .resources(matchedResources)
+                .build())
+            .then();
     }
 
     private static Mono<Void> restageApplication(CloudFoundryClient cloudFoundryClient, String application, String applicationId, Duration stagingTimeout, Duration startupTimeout) {
@@ -1970,6 +2108,42 @@ public final class DefaultApplications implements Applications {
             .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, stagingTimeout, job));
     }
 
+    private static Mono<GetPackageResponse> uploadPackageBitsAndWait(CloudFoundryClient cloudFoundryClient, String packageId, Path application, List<MatchedResource> matchedResources,
+                                                                     Duration processingTimeout) {
+        return Mono
+            .defer(() -> {
+                if (matchedResources.isEmpty()) {
+                    return requestUploadPackage(cloudFoundryClient, packageId, application, matchedResources);
+                } else {
+                    List<String> paths = matchedResources.stream()
+                        .map(MatchedResource::getPath)
+                        .collect(Collectors.toList());
+
+                    return FileUtils.compress(application, p -> !paths.contains(p))
+                        .flatMap(filteredApplication -> requestUploadPackage(cloudFoundryClient, packageId, filteredApplication, matchedResources)
+                            .doOnTerminate(() -> {
+                                try {
+                                    Files.delete(filteredApplication);
+                                } catch (IOException e) {
+                                    throw Exceptions.propagate(e);
+                                }
+                            }));
+                }
+            })
+            .then(waitForUploadProcessingCompleted(cloudFoundryClient, packageId, processingTimeout));
+    }
+
+    private static Mono<GetBuildResponse> waitForBuildStaging(CloudFoundryClient cloudFoundryClient, String buildId, String applicationName, Duration stagingTimeout) {
+        Duration timeout = Optional.ofNullable(stagingTimeout).orElse(Duration.ofMinutes(15));
+        return cloudFoundryClient.builds()
+            .get(GetBuildRequest.builder().buildId(buildId).build())
+            .filter(build -> EnumSet.of(BuildState.STAGED, BuildState.FAILED).contains(build.getState()))
+            .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), timeout))
+            .filter(build -> build.getState() == BuildState.STAGED)
+            .switchIfEmpty(ExceptionUtils.illegalState("Build %s of Application %s failed during staging", buildId, applicationName))
+            .onErrorResume(DelayTimeoutException.class, t -> ExceptionUtils.illegalState("Build %s of Application %s timed out during staging", buildId, applicationName));
+    }
+
     private static Mono<Void> waitForRunning(CloudFoundryClient cloudFoundryClient, String application, String applicationId, Duration startupTimeout) {
         Duration timeout = Optional.ofNullable(startupTimeout).orElse(Duration.ofMinutes(5));
 
@@ -1982,6 +2156,31 @@ public final class DefaultApplications implements Applications {
             .filter(isRunning())
             .switchIfEmpty(ExceptionUtils.illegalState("Application %s failed during start", application))
             .onErrorResume(DelayTimeoutException.class, t -> ExceptionUtils.illegalState("Application %s timed out during start", application))
+            .then();
+    }
+
+    private static Mono<Void> waitForRunningV3(CloudFoundryClient cloudFoundryClient, String applicationName, String applicationId, Duration startupTimeout) {
+        Duration timeout = Optional.ofNullable(startupTimeout).orElse(Duration.ofMinutes(5));
+
+        return PaginationUtils.requestClientV3Resources(page ->
+                cloudFoundryClient.applicationsV3()
+                    .listProcesses(ListApplicationProcessesRequest.builder()
+                        .applicationId(applicationId)
+                        .page(page)
+                        .build()))
+            .filter(p -> p.getInstances() != 0)
+            .flatMap(process -> cloudFoundryClient.processes().getStatistics(GetProcessStatisticsRequest.builder()
+                    .processId(process.getId())
+                    .build())
+                .flatMapIterable(GetProcessStatisticsResponse::getResources)
+                .map(ProcessStatisticsResource::getState)
+                .filter(state -> EnumSet.of(ProcessState.RUNNING, ProcessState.CRASHED).contains(state))
+                .reduce((totalState, instanceState) ->
+                    totalState.ordinal() < instanceState.ordinal() ? totalState : instanceState) //CRASHED takes precedence over RUNNING
+                .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), timeout))
+                .filter(state -> state == ProcessState.RUNNING)
+                .switchIfEmpty(ExceptionUtils.illegalState("Process %s of Application %s failed during start", process.getId(), applicationName))
+                .onErrorResume(DelayTimeoutException.class, t -> ExceptionUtils.illegalState("Process %s of Application %s timed out during start", process.getId(), applicationName)))
             .then();
     }
 
@@ -1998,4 +2197,12 @@ public final class DefaultApplications implements Applications {
             .then();
     }
 
+    private static Mono<GetPackageResponse> waitForUploadProcessingCompleted(CloudFoundryClient cloudFoundryClient, String packageId, Duration processingTimeout) {
+        return cloudFoundryClient.packages().get(GetPackageRequest.builder().packageId(packageId).build())
+            .filter(packageResponse -> EnumSet.of(PackageState.READY, PackageState.FAILED, PackageState.EXPIRED).contains(packageResponse.getState()))
+            .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), processingTimeout))
+            .filter(packageResponse -> packageResponse.getState() == PackageState.READY)
+            .switchIfEmpty(ExceptionUtils.illegalState("Package %s failed upload processing", packageId))
+            .onErrorResume(DelayTimeoutException.class, t -> ExceptionUtils.illegalState("Package %s timed out during upload processing", packageId));
+    }
 }

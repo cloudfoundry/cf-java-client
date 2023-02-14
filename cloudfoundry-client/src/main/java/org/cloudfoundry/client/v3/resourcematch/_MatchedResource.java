@@ -14,32 +14,47 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3;
+package org.cloudfoundry.client.v3.resourcematch;
+
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.Nullable;
+import org.cloudfoundry.client.v3.Checksum;
 import org.immutables.value.Value;
 
 /**
- * A checksum payload
+ * A resource used for matching or has been matched
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _Checksum {
+abstract class _MatchedResource {
 
     /**
-     * The type
+     * The hash
      */
-    @JsonProperty("type")
+    @JsonProperty("checksum")
     @Nullable
-    abstract ChecksumType getType();
+    abstract Checksum getChecksum();
 
     /**
-     * The value
+     * The POSIX file mode in an octal representation
      */
-    @JsonProperty("value")
+    @JsonProperty("mode")
     @Nullable
-    abstract String getValue();
+    abstract String getMode();
 
+    /**
+     * The path relative to app root
+     */
+    @JsonProperty("path")
+    @Nullable
+    abstract String getPath();
+
+    /**
+     * The size
+     */
+    @JsonProperty("size_in_bytes")
+    @Nullable
+    abstract Integer getSize();
 }

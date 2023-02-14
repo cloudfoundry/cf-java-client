@@ -17,7 +17,6 @@
 package org.cloudfoundry.operations.applications;
 
 
-import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 import java.util.List;
@@ -27,14 +26,22 @@ import java.util.List;
  * definition</a> for more details.
  */
 @Value.Immutable
-abstract class _ApplicationManifest extends _ApplicationManifestCommon {
+abstract class _ManifestV3 {
 
-    public abstract static class Builder implements _ApplicationManifestCommon.Builder{}
+    public abstract List<ManifestV3Application> getApplications();
 
-    /**
-     * The collection of service names bound to the application
-     */
-    @Nullable
-    abstract List<String> getServices();
+    @Value.Default
+    public Integer getVersion() {
+        return 1;
+    }
 
+    @Value.Check
+    void check() {
+        if (getVersion() != 1) {
+            throw new IllegalStateException("Only version 1 is allowed");
+        }
+        if (getApplications().isEmpty()) {
+            throw new IllegalStateException("At least one application is required");
+        }
+    }
 }

@@ -45,6 +45,7 @@ import org.cloudfoundry.client.v3.applications.GetApplicationSshEnabledResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationFeaturesRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationRoutesRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
+import org.cloudfoundry.client.v3.applications.RestartApplicationRequest;
 import org.cloudfoundry.client.v3.applications.ScaleApplicationRequest;
 import org.cloudfoundry.client.v3.applications.SetApplicationCurrentDropletRequest;
 import org.cloudfoundry.client.v3.applications.SetApplicationCurrentDropletResponse;
@@ -95,15 +96,18 @@ import org.springframework.core.io.ClassPathResource;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import reactor.util.function.Tuples;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.client.v3.applications.ApplicationState.STARTED;
 import static org.cloudfoundry.client.v3.applications.ApplicationState.STOPPED;
+import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public final class ApplicationsTest extends AbstractIntegrationTest {
@@ -651,6 +655,30 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .map(GetApplicationResponse::getState)
             .as(StepVerifier::create)
             .expectNext(STARTED)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void restart() {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        this.spaceId
+            .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, applicationName, spaceId))
+            .delayUntil(applicationId -> prepareApplicationToStart(this.cloudFoundryClient, applicationId))
+            .delayUntil(applicationId -> requestStartApplication(this.cloudFoundryClient, applicationId))
+            .flatMap(applicationId -> requestGetApplication(this.cloudFoundryClient, applicationId)
+                .map(application -> Instant.parse(application.getUpdatedAt()))
+                .map(updatedAt -> Tuples.of(applicationId, updatedAt)))
+            .delayUntil(function((applicationId, oldUpdatedAt) -> this.cloudFoundryClient.applicationsV3()
+                .restart(RestartApplicationRequest.builder()
+                    .applicationId(applicationId)
+                    .build())))
+            .flatMap(function((applicationId, oldUpdatedAt) -> requestGetApplication(this.cloudFoundryClient, applicationId)
+                .map(application -> Instant.parse(application.getUpdatedAt()))
+                .map(newUpdatedAt -> Tuples.of(oldUpdatedAt, newUpdatedAt))))
+            .as(StepVerifier::create)
+            .consumeNextWith(consumer((oldUpdatedAt, newUpdatedAt) -> assertThat(newUpdatedAt).isAfter(oldUpdatedAt)))
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }

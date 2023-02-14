@@ -39,8 +39,11 @@ import org.cloudfoundry.operations.applications.GetApplicationManifestRequest;
 import org.cloudfoundry.operations.applications.GetApplicationRequest;
 import org.cloudfoundry.operations.applications.ListApplicationTasksRequest;
 import org.cloudfoundry.operations.applications.LogsRequest;
+import org.cloudfoundry.operations.applications.ManifestV3;
+import org.cloudfoundry.operations.applications.ManifestV3Application;
 import org.cloudfoundry.operations.applications.PushApplicationManifestRequest;
 import org.cloudfoundry.operations.applications.PushApplicationRequest;
+import org.cloudfoundry.operations.applications.PushManifestV3Request;
 import org.cloudfoundry.operations.applications.RenameApplicationRequest;
 import org.cloudfoundry.operations.applications.RestageApplicationRequest;
 import org.cloudfoundry.operations.applications.RestartApplicationInstanceRequest;
@@ -528,6 +531,63 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .map(ApplicationManifest::getBuildpacks)
             .as(StepVerifier::create)
             .expectNext(buildpacks)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.UNSPECIFIED) //TODO how to select this version?
+    public void pushManifestV3() throws IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        ManifestV3 manifest = ManifestV3.builder()
+            .application(ManifestV3Application.builder()
+                .buildpack("staticfile_buildpack")
+                .disk(512)
+                .healthCheckType(ApplicationHealthCheck.PORT)
+                .memory(64)
+                .name(applicationName)
+                .path(new ClassPathResource("test-application.zip").getFile().toPath())
+                .build())
+            .build();
+
+        this.cloudFoundryOperations.applications().pushManifestV3(PushManifestV3Request.builder()
+                .manifest(manifest)
+            .build())
+            .as(StepVerifier::create)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.UNSPECIFIED) //TODO how to select this version?
+    public void pushManifestV3MultipleApplications() throws IOException {
+        String applicationName1 = this.nameFactory.getApplicationName();
+        String applicationName2 = this.nameFactory.getApplicationName();
+
+        ManifestV3 manifest = ManifestV3.builder()
+            .application(ManifestV3Application.builder()
+                .buildpack("staticfile_buildpack")
+                .disk(512)
+                .healthCheckType(ApplicationHealthCheck.PORT)
+                .memory(64)
+                .name(applicationName1)
+                .path(new ClassPathResource("test-application.zip").getFile().toPath())
+                .build())
+            .application(ManifestV3Application.builder()
+                .buildpack("staticfile_buildpack")
+                .disk(512)
+                .healthCheckType(ApplicationHealthCheck.PORT)
+                .memory(64)
+                .name(applicationName2)
+                .path(new ClassPathResource("test-application").getFile().toPath())
+                .build())
+            .build();
+
+        this.cloudFoundryOperations.applications().pushManifestV3(PushManifestV3Request.builder()
+            .manifest(manifest)
+            .build())
+            .as(StepVerifier::create)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }
