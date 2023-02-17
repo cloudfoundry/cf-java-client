@@ -63,8 +63,6 @@ import org.cloudfoundry.client.v3.builds.GetBuildResponse;
 import org.cloudfoundry.client.v3.domains.CreateDomainRequest;
 import org.cloudfoundry.client.v3.domains.CreateDomainResponse;
 import org.cloudfoundry.client.v3.domains.DomainRelationships;
-import org.cloudfoundry.client.v3.droplets.DropletResource;
-import org.cloudfoundry.client.v3.droplets.ListDropletsRequest;
 import org.cloudfoundry.client.v3.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v3.organizations.CreateOrganizationResponse;
 import org.cloudfoundry.client.v3.packages.CreatePackageRequest;
@@ -93,7 +91,6 @@ import org.cloudfoundry.util.PaginationUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import reactor.util.function.Tuples;
@@ -667,16 +664,18 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, applicationName, spaceId))
             .delayUntil(applicationId -> prepareApplicationToStart(this.cloudFoundryClient, applicationId))
             .delayUntil(applicationId -> requestStartApplication(this.cloudFoundryClient, applicationId))
-            .flatMap(applicationId -> requestGetApplication(this.cloudFoundryClient, applicationId)
-                .map(application -> Instant.parse(application.getUpdatedAt()))
+            .flatMap(applicationId -> requestApplicationProcess(this.cloudFoundryClient, applicationId)
+                .map(process -> Instant.parse(process.getUpdatedAt()))
                 .map(updatedAt -> Tuples.of(applicationId, updatedAt)))
             .delayUntil(function((applicationId, oldUpdatedAt) -> this.cloudFoundryClient.applicationsV3()
                 .restart(RestartApplicationRequest.builder()
                     .applicationId(applicationId)
-                    .build())))
-            .flatMap(function((applicationId, oldUpdatedAt) -> requestGetApplication(this.cloudFoundryClient, applicationId)
-                .map(application -> Instant.parse(application.getUpdatedAt()))
-                .map(newUpdatedAt -> Tuples.of(oldUpdatedAt, newUpdatedAt))))
+                    .build())
+                .delaySubscription(Duration.ofSeconds(2))))
+            .flatMap(function((applicationId, oldUpdatedAt) -> requestApplicationProcess(this.cloudFoundryClient, applicationId)
+                .map(process -> Instant.parse(process.getUpdatedAt()))
+                .map(newUpdatedAt -> Tuples.of(oldUpdatedAt, newUpdatedAt))
+                .delaySubscription(Duration.ofSeconds(2))))
             .as(StepVerifier::create)
             .consumeNextWith(consumer((oldUpdatedAt, newUpdatedAt) -> assertThat(newUpdatedAt).isAfter(oldUpdatedAt)))
             .expectComplete()
@@ -817,6 +816,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     private static Mono<GetApplicationProcessResponse> requestApplicationProcess(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        System.out.println(Instant.now());
         return cloudFoundryClient.applicationsV3()
             .getProcess(GetApplicationProcessRequest.builder()
                 .applicationId(applicationId)
