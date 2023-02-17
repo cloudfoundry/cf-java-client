@@ -27,12 +27,14 @@ import org.cloudfoundry.client.v3.packages.CreatePackageRequest;
 import org.cloudfoundry.client.v3.packages.GetPackageRequest;
 import org.cloudfoundry.client.v3.packages.GetPackageResponse;
 import org.cloudfoundry.client.v3.packages.Package;
+import org.cloudfoundry.client.v3.packages.PackageRelationships;
 import org.cloudfoundry.client.v3.packages.PackageState;
 import org.cloudfoundry.client.v3.packages.PackageType;
 import org.cloudfoundry.client.v3.packages.UploadPackageRequest;
 import org.cloudfoundry.util.DelayTimeoutException;
 import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.ResourceMatchingUtilsV3;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -55,9 +57,9 @@ public class ResourceMatchTest extends AbstractIntegrationTest {
     @Autowired
     private Mono<String> spaceId;
 
-    //TODO how to check if resource matching is enabled on this CF instance?
-    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.UNSPECIFIED) //TODO how to select this version?
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
     @Test
+    @Ignore("Cloud Controller is configured not to cache resource smaller than 4k - Find a better way to test this")
     public void upload() throws IOException {
         createAndUploadPackage()
             .flatMap(this::waitForReady)
@@ -87,6 +89,13 @@ public class ResourceMatchTest extends AbstractIntegrationTest {
             .flatMap(applicationId -> this.cloudFoundryClient.packages()
                 .create(CreatePackageRequest.builder()
                     .type(PackageType.BITS)
+                    .relationships(PackageRelationships.builder()
+                        .application(ToOneRelationship.builder()
+                            .data(Relationship.builder()
+                                .id(applicationId)
+                                .build())
+                            .build())
+                        .build())
                     .build()))
             .map(Package::getId)
             .flatMap(packageId -> {
