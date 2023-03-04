@@ -111,7 +111,33 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
 
     @Override
     public final Mono<String> getToken(ConnectionContext connectionContext) {
-        return this.accessTokens.computeIfAbsent(connectionContext, this::token);
+        Mono<String> accessToken = this.accessTokens.get(connectionContext);
+        if(accessToken != null) {
+        	try {
+        	String token = this.accessTokens.get(connectionContext).map(s -> s.split(" ")[1]).block();
+            exctractClaimsFromToken(token)
+            .ifPresent(claims -> {
+            	Date expirationTime = claims.getExpiration();
+            	int i = expirationTime.compareTo(new Date());
+                long milliSeconds = expirationTime.getTime() - new Date().getTime();
+                // invalidate the token if it is going to be expired in one minute.
+                boolean isTokenInvalid = ((i <= 0) || (i == 1 && milliSeconds <= 60000));
+				if(isTokenInvalid) {
+					LOGGER.debug("Invalidating Access Token");
+                	invalidate(connectionContext);
+                	LOGGER.debug("Invalidated Access Token");
+                }
+            });
+             
+        }catch (Exception e) {
+        	LOGGER.debug("Invalidating Expired Access Token");
+        	invalidate(connectionContext);
+        	LOGGER.debug("Invalidated Expired Access Token");
+		}
+        	return this.accessTokens.get(connectionContext);	
+        }else {
+        	return this.accessTokens.computeIfAbsent(connectionContext, this::token);
+        }
     }
 
     @Override
@@ -274,5 +300,12 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
         private Sinks.Many<String> sink = Sinks.many().replay().latest();
 
     }
+    
+    private static Optional<Claims> exctractClaimsFromToken(String token) {
+        
+        String jws = token.substring(0, token.lastIndexOf('.') + 1);
+        return Optional.of(Jwts.parser().parseClaimsJwt(jws).getBody());
+    
+   }
 
 }
