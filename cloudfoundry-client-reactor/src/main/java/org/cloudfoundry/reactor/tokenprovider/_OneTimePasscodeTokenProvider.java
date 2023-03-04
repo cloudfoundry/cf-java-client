@@ -41,4 +41,8 @@ abstract class _OneTimePasscodeTokenProvider extends AbstractUaaTokenProvider {
             .attr("passcode", getPasscode());
     }
 
+	@Override
+	String getIdentityZoneSubdomain() {
+		return "client_id";
+	}
 }

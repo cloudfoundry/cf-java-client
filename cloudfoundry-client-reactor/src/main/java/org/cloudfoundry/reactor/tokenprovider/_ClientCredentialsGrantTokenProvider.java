@@ -36,4 +36,8 @@ abstract class _ClientCredentialsGrantTokenProvider extends AbstractUaaTokenProv
             .attr("response_type", "token");
     }
 
+	@Override
+	String getIdentityZoneSubdomain() {
+		return "client_id";
+	}
 }

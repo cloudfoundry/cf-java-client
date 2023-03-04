@@ -61,7 +61,8 @@ public final class UsernameProviderTest {
         String invalidToken = String.format("bearer %s", getToken(keyPair.getPrivate(), Instant.now().minus(Duration.ofHours(1))));
         String validToken = String.format("bearer %s", getToken(keyPair.getPrivate(), Instant.now().plus(Duration.ofHours(1))));
         when(this.tokenProvider.getToken(this.connectionContext)).thenReturn(Mono.just(invalidToken), Mono.just(validToken));
-
+        when(this.tokenProvider.getUserIdentityProperty()).thenReturn("user_name");
+        
         this.usernameProvider
             .get()
             .as(StepVerifier::create)
@@ -79,11 +80,29 @@ public final class UsernameProviderTest {
 
         String token = String.format("bearer %s", getToken(keyPair.getPrivate(), Instant.now().plus(Duration.ofHours(1))));
         when(this.tokenProvider.getToken(this.connectionContext)).thenReturn(Mono.just(token));
-
+        when(this.tokenProvider.getUserIdentityProperty()).thenReturn("user_name");
+        
         this.usernameProvider
             .get()
             .as(StepVerifier::create)
             .expectNext("test-username")
+            .expectComplete()
+            .verify(Duration.ofSeconds(1));
+    }
+    
+    @Test
+    public void getValidTokenWithClient() throws NoSuchAlgorithmException {
+        KeyPair keyPair = getKeyPair();
+        when(this.signingKeyResolver.resolveSigningKey(any(JwsHeader.class), any(Claims.class))).thenReturn(keyPair.getPublic());
+
+        String token = String.format("bearer %s", getToken(keyPair.getPrivate(), Instant.now().plus(Duration.ofHours(1))));
+        when(this.tokenProvider.getToken(this.connectionContext)).thenReturn(Mono.just(token));
+        when(this.tokenProvider.getUserIdentityProperty()).thenReturn("client_id");
+        
+        this.usernameProvider
+            .get()
+            .as(StepVerifier::create)
+            .expectNext("test-client")
             .expectComplete()
             .verify(Duration.ofSeconds(1));
     }
@@ -94,6 +113,7 @@ public final class UsernameProviderTest {
             .setHeader((Map<String, Object>) new DefaultJwsHeader().setKeyId("test-key"))
             .signWith(privateKey, SignatureAlgorithm.RS256)
             .claim("user_name", "test-username")
+            .claim("client_id", "test-client")
             .setExpiration(Date.from(expiration))
             .compact();
     }

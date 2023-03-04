@@ -55,4 +55,8 @@ abstract class _PasswordGrantTokenProvider extends AbstractUaaTokenProvider {
             .attr("login_hint", getLoginHint());
     }
 
+	@Override
+	String getIdentityZoneSubdomain() {
+		return "user_name";
+	}
 }
