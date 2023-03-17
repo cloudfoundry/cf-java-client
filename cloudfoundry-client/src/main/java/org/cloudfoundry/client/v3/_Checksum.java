@@ -32,6 +32,7 @@ abstract class _Checksum {
      * The type
      */
     @JsonProperty("type")
+    @Nullable
     abstract ChecksumType getType();
 
     /**

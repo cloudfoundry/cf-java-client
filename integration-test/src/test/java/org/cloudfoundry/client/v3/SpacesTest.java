@@ -20,6 +20,7 @@ import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.CloudFoundryVersion;
 import org.cloudfoundry.IfCloudFoundryVersion;
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.domains.CreateDomainRequest;
 import org.cloudfoundry.client.v3.domains.CreateDomainResponse;
 import org.cloudfoundry.client.v3.domains.DomainRelationships;
@@ -32,6 +33,7 @@ import org.cloudfoundry.client.v3.routes.CreateRouteResponse;
 import org.cloudfoundry.client.v3.routes.ListRoutesRequest;
 import org.cloudfoundry.client.v3.routes.RouteRelationships;
 import org.cloudfoundry.client.v3.routes.RouteResource;
+import org.cloudfoundry.client.v3.spaces.ApplyManifestRequest;
 import org.cloudfoundry.client.v3.spaces.AssignSpaceIsolationSegmentRequest;
 import org.cloudfoundry.client.v3.spaces.AssignSpaceIsolationSegmentResponse;
 import org.cloudfoundry.client.v3.spaces.CreateSpaceRequest;
@@ -48,10 +50,14 @@ import org.cloudfoundry.util.PaginationUtils;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.util.StreamUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -262,6 +268,36 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 assertThat(metadata.getAnnotations().get("annotationKey")).isEqualTo("annotationValue");
                 assertThat(metadata.getLabels().get("labelKey")).isEqualTo("labelValue");
             })
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.UNSPECIFIED) //TODO how to select this version?
+    @Test
+    public void applyManifest() throws IOException {
+        String spaceName = this.nameFactory.getSpaceName();
+
+        byte[] manifest;
+        try (InputStream inputStream = new ClassPathResource("test-manifest.yml").getInputStream()) {
+            manifest = StreamUtils.copyToByteArray(inputStream);
+        }
+
+        this.organizationId
+            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+            .flatMap(spaceId -> this.cloudFoundryClient.spacesV3().applyManifest(ApplyManifestRequest.builder()
+                    .spaceId(spaceId)
+                    .manifest(manifest)
+                    .build())
+                .map(response -> response.getJobId().orElseThrow(() -> new IllegalStateException("No jobId returned for applying v3 manifest")))
+                .flatMap(jobId -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), jobId))
+                .then(Mono.just(spaceId)))
+            .flatMap(spaceId -> this.cloudFoundryClient.applicationsV3().list(ListApplicationsRequest.builder()
+                    .spaceId(spaceId)
+                    .name("test-application")
+                    .build())
+                .single())
+            .as(StepVerifier::create)
+            .expectNextCount(1)
             .expectComplete()
             .verify(Duration.ofMinutes(5));
     }

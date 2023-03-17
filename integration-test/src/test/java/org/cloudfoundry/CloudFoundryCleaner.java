@@ -18,10 +18,7 @@ package org.cloudfoundry;
 
 import com.github.zafarkhaja.semver.Version;
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v2.applications.ApplicationResource;
-import org.cloudfoundry.client.v2.applications.DeleteApplicationRequest;
 import org.cloudfoundry.client.v2.applications.ListApplicationServiceBindingsRequest;
-import org.cloudfoundry.client.v2.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v2.applications.RemoveApplicationServiceBindingRequest;
 import org.cloudfoundry.client.v2.buildpacks.DeleteBuildpackRequest;
 import org.cloudfoundry.client.v2.buildpacks.ListBuildpacksRequest;
@@ -69,6 +66,9 @@ import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServi
 import org.cloudfoundry.client.v2.users.UserResource;
 import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.Relationship;
+import org.cloudfoundry.client.v3.applications.Application;
+import org.cloudfoundry.client.v3.applications.DeleteApplicationRequest;
+import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.serviceinstances.ListSharedSpacesRelationshipRequest;
 import org.cloudfoundry.client.v3.serviceinstances.ListSharedSpacesRelationshipResponse;
 import org.cloudfoundry.client.v3.serviceinstances.UnshareServiceInstanceRequest;
@@ -179,7 +179,7 @@ final class CloudFoundryCleaner {
                 cleanUsers(this.cloudFoundryClient, this.nameFactory)
             ))
             .thenMany(Mono.when(
-                cleanApplicationsV2(this.cloudFoundryClient, this.nameFactory), // After Routes, cannot run with other cleanApps
+                cleanApplicationsV3(this.cloudFoundryClient, this.nameFactory), // After Routes, cannot run with other cleanApps
                 cleanUsers(this.uaaClient, this.nameFactory) // After CF Users
             ))
             .thenMany(Mono.when( // After Routes/Applications
@@ -196,19 +196,20 @@ final class CloudFoundryCleaner {
             .block(Duration.ofMinutes(30));
     }
 
-    private static Flux<Void> cleanApplicationsV2(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
+    private static Flux<Void> cleanApplicationsV3(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
         return PaginationUtils
-            .requestClientV2Resources(page -> cloudFoundryClient.applicationsV2()
+            .requestClientV3Resources(page -> cloudFoundryClient.applicationsV3()
                 .list(ListApplicationsRequest.builder()
                     .page(page)
                     .build()))
-            .filter(application -> nameFactory.isApplicationName(ResourceUtils.getEntity(application).getName()))
+            .filter(application -> nameFactory.isApplicationName(application.getName()))
             .delayUntil(application -> removeApplicationServiceBindings(cloudFoundryClient, application))
-            .flatMap(application -> cloudFoundryClient.applicationsV2()
+            .flatMap(application -> cloudFoundryClient.applicationsV3()
                 .delete(DeleteApplicationRequest.builder()
-                    .applicationId(ResourceUtils.getId(application))
+                    .applicationId(application.getId())
                     .build())
-                .doOnError(t -> LOGGER.error("Unable to delete V2 application {}", ResourceUtils.getEntity(application).getName(), t)));
+                .then()
+                .doOnError(t -> LOGGER.error("Unable to delete V3 application {}", application.getName(), t)));
     }
 
     private static Flux<Void> cleanBuildpacks(CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
@@ -513,6 +514,7 @@ final class CloudFoundryCleaner {
             .flatMap(space -> cloudFoundryClient.spaces()
                 .delete(DeleteSpaceRequest.builder()
                     .async(true)
+                    .recursive(true)
                     .spaceId(ResourceUtils.getId(space))
                     .build())
                 .flatMapMany(job -> JobUtils.waitForCompletion(cloudFoundryClient, Duration.ofMinutes(5), job))
@@ -614,15 +616,15 @@ final class CloudFoundryCleaner {
         return nameFactory.isUserId(ResourceUtils.getId(resource)) || nameFactory.isUserName(ResourceUtils.getEntity(resource).getUsername());
     }
 
-    private static Flux<Void> removeApplicationServiceBindings(CloudFoundryClient cloudFoundryClient, ApplicationResource application) {
+    private static Flux<Void> removeApplicationServiceBindings(CloudFoundryClient cloudFoundryClient, Application application) {
         return PaginationUtils
             .requestClientV2Resources(page -> cloudFoundryClient.applicationsV2()
                 .listServiceBindings(ListApplicationServiceBindingsRequest.builder()
                     .page(page)
-                    .applicationId(ResourceUtils.getId(application))
+                    .applicationId(application.getId())
                     .build()))
-            .flatMap(serviceBinding -> requestRemoveServiceBinding(cloudFoundryClient, ResourceUtils.getId(application), ResourceUtils.getId(serviceBinding))
-                .doOnError(t -> LOGGER.error("Unable to remove service binding from {}", ResourceUtils.getEntity(application).getName(), t)));
+            .flatMap(serviceBinding -> requestRemoveServiceBinding(cloudFoundryClient, application.getId(), ResourceUtils.getId(serviceBinding))
+                .doOnError(t -> LOGGER.error("Unable to remove service binding from {}", application.getName(), t)));
     }
 
     private static Flux<Void> removeRouteAssociations(CloudFoundryClient cloudFoundryClient, ServiceInstanceResource serviceInstance) {

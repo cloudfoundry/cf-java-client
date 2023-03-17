@@ -36,7 +36,6 @@ import reactor.test.StepVerifier;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.client.v3.packages.PackageState.PROCESSING_UPLOAD;

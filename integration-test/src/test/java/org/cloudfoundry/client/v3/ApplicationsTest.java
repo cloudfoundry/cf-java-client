@@ -45,6 +45,7 @@ import org.cloudfoundry.client.v3.applications.GetApplicationSshEnabledResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationFeaturesRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationRoutesRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
+import org.cloudfoundry.client.v3.applications.RestartApplicationRequest;
 import org.cloudfoundry.client.v3.applications.ScaleApplicationRequest;
 import org.cloudfoundry.client.v3.applications.SetApplicationCurrentDropletRequest;
 import org.cloudfoundry.client.v3.applications.SetApplicationCurrentDropletResponse;
@@ -62,8 +63,6 @@ import org.cloudfoundry.client.v3.builds.GetBuildResponse;
 import org.cloudfoundry.client.v3.domains.CreateDomainRequest;
 import org.cloudfoundry.client.v3.domains.CreateDomainResponse;
 import org.cloudfoundry.client.v3.domains.DomainRelationships;
-import org.cloudfoundry.client.v3.droplets.DropletResource;
-import org.cloudfoundry.client.v3.droplets.ListDropletsRequest;
 import org.cloudfoundry.client.v3.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v3.organizations.CreateOrganizationResponse;
 import org.cloudfoundry.client.v3.packages.CreatePackageRequest;
@@ -92,18 +91,20 @@ import org.cloudfoundry.util.PaginationUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import reactor.util.function.Tuples;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.client.v3.applications.ApplicationState.STARTED;
 import static org.cloudfoundry.client.v3.applications.ApplicationState.STOPPED;
+import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public final class ApplicationsTest extends AbstractIntegrationTest {
@@ -656,6 +657,32 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
+    public void restart() {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        this.spaceId
+            .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, applicationName, spaceId))
+            .delayUntil(applicationId -> prepareApplicationToStart(this.cloudFoundryClient, applicationId))
+            .delayUntil(applicationId -> requestStartApplication(this.cloudFoundryClient, applicationId))
+            .flatMap(applicationId -> requestApplicationProcess(this.cloudFoundryClient, applicationId)
+                .map(process -> Instant.parse(process.getUpdatedAt()))
+                .map(updatedAt -> Tuples.of(applicationId, updatedAt)))
+            .delayUntil(function((applicationId, oldUpdatedAt) -> this.cloudFoundryClient.applicationsV3()
+                .restart(RestartApplicationRequest.builder()
+                    .applicationId(applicationId)
+                    .build())
+                .delaySubscription(Duration.ofSeconds(2))))
+            .flatMap(function((applicationId, oldUpdatedAt) -> requestApplicationProcess(this.cloudFoundryClient, applicationId)
+                .map(process -> Instant.parse(process.getUpdatedAt()))
+                .map(newUpdatedAt -> Tuples.of(oldUpdatedAt, newUpdatedAt))
+                .delaySubscription(Duration.ofSeconds(2))))
+            .as(StepVerifier::create)
+            .consumeNextWith(consumer((oldUpdatedAt, newUpdatedAt) -> assertThat(newUpdatedAt).isAfter(oldUpdatedAt)))
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
     public void stop() {
         String applicationName = this.nameFactory.getApplicationName();
 
@@ -789,6 +816,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     private static Mono<GetApplicationProcessResponse> requestApplicationProcess(CloudFoundryClient cloudFoundryClient, String applicationId) {
+        System.out.println(Instant.now());
         return cloudFoundryClient.applicationsV3()
             .getProcess(GetApplicationProcessRequest.builder()
                 .applicationId(applicationId)

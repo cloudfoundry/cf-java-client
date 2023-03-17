@@ -26,7 +26,7 @@ public final class UploadPackageRequestTest {
     private static final Path TEST_PACKAGE = Paths.get("/");
 
     @Test(expected = IllegalStateException.class)
-    public void noBits() {
+    public void neitherBitsNorResources() {
         UploadPackageRequest.builder()
             .packageId("test-package-id")
             .build();
