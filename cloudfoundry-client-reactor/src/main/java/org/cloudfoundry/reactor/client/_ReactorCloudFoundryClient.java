@@ -34,6 +34,7 @@ import org.cloudfoundry.client.v2.resourcematch.ResourceMatch;
 import org.cloudfoundry.client.v2.routemappings.RouteMappings;
 import org.cloudfoundry.client.v2.routes.Routes;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroups;
+import org.cloudfoundry.client.v3.securitygroups.SecurityGroupsV3;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingsV2;
 import org.cloudfoundry.client.v2.servicebrokers.ServiceBrokers;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstances;
@@ -91,6 +92,7 @@ import org.cloudfoundry.reactor.client.v2.resourcematch.ReactorResourceMatch;
 import org.cloudfoundry.reactor.client.v2.routemappings.ReactorRouteMappings;
 import org.cloudfoundry.reactor.client.v2.routes.ReactorRoutes;
 import org.cloudfoundry.reactor.client.v2.securitygroups.ReactorSecurityGroups;
+import org.cloudfoundry.reactor.client.v3.securitygroups.ReactorSecurityGroupsV3;
 import org.cloudfoundry.reactor.client.v2.servicebindings.ReactorServiceBindingsV2;
 import org.cloudfoundry.reactor.client.v2.servicebrokers.ReactorServiceBrokers;
 import org.cloudfoundry.reactor.client.v2.serviceinstances.ReactorServiceInstances;
@@ -151,7 +153,8 @@ abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
     @Override
     @Value.Derived
     public ApplicationUsageEvents applicationUsageEvents() {
-        return new ReactorApplicationUsageEvents(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
+        return new ReactorApplicationUsageEvents(getConnectionContext(), getRootV2(), getTokenProvider(),
+                getRequestTags());
     }
 
     @Override
@@ -228,7 +231,8 @@ abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
     @Override
     @Value.Derived
     public EnvironmentVariableGroups environmentVariableGroups() {
-        return new ReactorEnvironmentVariableGroups(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
+        return new ReactorEnvironmentVariableGroups(getConnectionContext(), getRootV2(), getTokenProvider(),
+                getRequestTags());
     }
 
     @Override
@@ -270,7 +274,8 @@ abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
     @Override
     @Value.Derived
     public OrganizationQuotaDefinitions organizationQuotaDefinitions() {
-        return new ReactorOrganizationQuotaDefinitions(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
+        return new ReactorOrganizationQuotaDefinitions(getConnectionContext(), getRootV2(), getTokenProvider(),
+                getRequestTags());
     }
 
     @Override
@@ -347,6 +352,12 @@ abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
 
     @Override
     @Value.Derived
+    public SecurityGroupsV3 securityGroupsV3() {
+        return new ReactorSecurityGroupsV3(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
+    }
+
+    @Override
+    @Value.Derived
     public ServiceBindingsV2 serviceBindingsV2() {
         return new ReactorServiceBindingsV2(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
     }
@@ -366,7 +377,7 @@ abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
     @Override
     @Value.Derived
     public ServiceBrokersV3 serviceBrokersV3() {
-	return new ReactorServiceBrokersV3(getConnectionContext(), getRootV3(), getTokenProvider(), getRequestTags());
+        return new ReactorServiceBrokersV3(getConnectionContext(), getRootV3(), getTokenProvider(), getRequestTags());
     }
 
     @Override
@@ -396,7 +407,8 @@ abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
     @Override
     @Value.Derived
     public ServicePlanVisibilities servicePlanVisibilities() {
-        return new ReactorServicePlanVisibilities(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
+        return new ReactorServicePlanVisibilities(getConnectionContext(), getRootV2(), getTokenProvider(),
+                getRequestTags());
     }
 
     @Override
@@ -432,7 +444,8 @@ abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
     @Override
     @Value.Derived
     public SpaceQuotaDefinitions spaceQuotaDefinitions() {
-        return new ReactorSpaceQuotaDefinitions(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
+        return new ReactorSpaceQuotaDefinitions(getConnectionContext(), getRootV2(), getTokenProvider(),
+                getRequestTags());
     }
 
     @Override
@@ -468,7 +481,8 @@ abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
     @Override
     @Value.Derived
     public UserProvidedServiceInstances userProvidedServiceInstances() {
-        return new ReactorUserProvidedServiceInstances(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
+        return new ReactorUserProvidedServiceInstances(getConnectionContext(), getRootV2(), getTokenProvider(),
+                getRequestTags());
     }
 
     @Override
@@ -483,7 +497,8 @@ abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
     abstract ConnectionContext getConnectionContext();
 
     /**
-     * Map of http header name and value which will be added to every request to the controller
+     * Map of http header name and value which will be added to every request to the
+     * controller
      */
     @Value.Default
     Map<String, String> getRequestTags() {
