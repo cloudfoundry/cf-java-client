@@ -1,0 +1,84 @@
+{
+    "pagination": {
+        "total_results": 1,
+        "total_pages": 1,
+        "first": {
+            "href": "https://api.example.org/v3/spaces/c5048979-53b9-4d2a-9fca-78e6bc07c041/running_security_groups?page=1&per_page=50"
+        },
+        "last": {
+            "href": "https://api.example.org/v3/spaces/c5048979-53b9-4d2a-9fca-78e6bc07c041/running_security_groups?page=1&per_page=50"
+        },
+        "next": null,
+        "previous": null
+    },
+    "resources": [
+        {
+            "guid": "b85a788e-671f-4549-814d-e34cdb2f539a",
+            "created_at": "2020-02-20T17:42:08Z",
+            "updated_at": "2020-02-20T17:42:08Z",
+            "name": "my-group0",
+            "globally_enabled": {
+                "running": true,
+                "staging": false
+            },
+            "rules": [
+                {
+                    "protocol": "tcp",
+                    "destination": "10.10.10.0/24",
+                    "ports": "443,80,8080"
+                },
+                {
+                    "protocol": "icmp",
+                    "destination": "10.10.10.0/24",
+                    "type": 8,
+                    "code": 0,
+                    "description": "Allow ping requests to private services"
+                }
+            ],
+            "relationships": {
+                "staging_spaces": {
+                    "data": []
+                },
+                "running_spaces": {
+                    "data": [
+                        {
+                            "guid": "space-guid-1"
+                        },
+                        {
+                            "guid": "space-guid-2"
+                        }
+                    ]
+                }
+            },
+            "links": {
+                "self": {
+                    "href": "https://api.example.org/v3/security_groups/b85a788e-671f-4549-814d-e34cdb2f539a"
+                }
+            }
+        },
+        {
+            "guid": "a89a788e-671f-4549-814d-e34c1b2f533a",
+            "created_at": "2020-02-20T17:42:08Z",
+            "updated_at": "2020-02-20T17:42:08Z",
+            "name": "my-group1",
+            "globally_enabled": {
+                "running": true,
+                "staging": true
+            },
+            "rules": [],
+            "relationships": {
+                "staging_spaces": {
+                    "data": []
+                },
+                "running_spaces": {
+                    "data": []
+                }
+            },
+            "links": {
+                "self": {
+                    "href": "https://api.example.org/v3/security_groups/a89a788e-671f-4549-814d-e34c1b2f533a"
+                }
+            }
+        }
+    ]
+}
