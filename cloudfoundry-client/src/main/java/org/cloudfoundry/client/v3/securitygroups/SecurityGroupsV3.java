@@ -25,8 +25,8 @@ public interface SecurityGroupsV3 {
      * "https://apidocs.cloudfoundry.org/latest-release/security_groups/creating_a_security_group.html">Creating
      * a Security Group</a> request.
      *
-     * @param request the create security group request
-     * @return the response from the create security group request
+     * @param request the Create Security Group request
+     * @return the response from the Create Security Group request
      */
     Mono<CreateSecurityGroupResponse> create(CreateSecurityGroupRequest request);
 
@@ -35,9 +35,20 @@ public interface SecurityGroupsV3 {
      * "https://v3-apidocs.cloudfoundry.org/version/3.140.0/index.html#get-a-security-group">Get
      * a Security Group</a> request.
      *
-     * @param request the get security group request
-     * @return the response from the get security group request
+     * @param request the Get Security Group request
+     * @return the response from the Get Security Group request
      */
     Mono<GetSecurityGroupResponse> get(GetSecurityGroupRequest request);
+
+    /**
+     * Makes the <a href=
+     *
+     * "https://v3-apidocs.cloudfoundry.org/version/3.140.0/index.html#list-security-groups">List
+     * Security Groups</a> request
+     *
+     * @param request the List Security Group request
+     * @return the response from the List Security Group request
+     */
+    Mono<ListSecurityGroupsResponse> list(ListSecurityGroupsRequest request);
 
 }

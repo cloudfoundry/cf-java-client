@@ -16,21 +16,16 @@
 
 package org.cloudfoundry.client.v3.securitygroups;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.immutables.value.Value;
 
-/**
- * The request payload for the Get Security Group operation
- */
-@JsonSerialize
-@Value.Immutable
-abstract class _GetSecurityGroupRequest {
+import org.cloudfoundry.client.v3.PaginatedResponse;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-    /**
-     * The Security Group id
-     */
-    @JsonIgnore
-    abstract String getSecurityGroupId();
+/**
+ * The response payload for the List Security Groups operation
+ */
+@JsonDeserialize
+@Value.Immutable
+abstract class _ListSecurityGroupsResponse extends PaginatedResponse<SecurityGroup> {
 
 }

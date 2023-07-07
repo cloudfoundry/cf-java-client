@@ -39,21 +39,18 @@ public abstract class SecurityGroup extends Resource {
      * The globally enabled
      */
     @JsonProperty("globally_enabled")
-    @Nullable
     abstract GloballyEnabled getGloballyEnabled();
 
     /**
      * The rules
      */
     @JsonProperty("rules")
-    @Nullable
     abstract List<Rule> getRules();
 
     /**
      * The space relationships
      */
     @JsonProperty("relationships")
-    @Nullable
     abstract Relationships getRelationships();
 
 }

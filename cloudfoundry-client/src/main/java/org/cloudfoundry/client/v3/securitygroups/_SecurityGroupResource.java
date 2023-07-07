@@ -16,21 +16,18 @@
 
 package org.cloudfoundry.client.v3.securitygroups;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
+import org.cloudfoundry.client.v3.Resource;
+import java.util.List;
 
 /**
- * The request payload for the Get Security Group operation
+ * The Resource response payload for the List SecurityGroups operation
  */
-@JsonSerialize
+@JsonDeserialize
 @Value.Immutable
-abstract class _GetSecurityGroupRequest {
-
-    /**
-     * The Security Group id
-     */
-    @JsonIgnore
-    abstract String getSecurityGroupId();
+abstract class _SecurityGroupResource extends SecurityGroup {
 
 }
