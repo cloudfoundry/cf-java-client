@@ -20,6 +20,7 @@ import org.cloudfoundry.client.v3.securitygroups.SecurityGroupsV3;
 import org.cloudfoundry.client.v3.securitygroups.CreateSecurityGroupRequest;
 import org.cloudfoundry.client.v3.securitygroups.CreateSecurityGroupResponse;
 import org.cloudfoundry.client.v3.securitygroups.GetSecurityGroupRequest;
+import org.cloudfoundry.client.v3.securitygroups.DeleteSecurityGroupRequest;
 import org.cloudfoundry.client.v3.securitygroups.UpdateSecurityGroupRequest;
 import org.cloudfoundry.client.v3.securitygroups.GetSecurityGroupResponse;
 import org.cloudfoundry.client.v3.securitygroups.UpdateSecurityGroupResponse;
@@ -80,5 +81,13 @@ public final class ReactorSecurityGroupsV3 extends AbstractClientV3Operations im
         return patch(request, UpdateSecurityGroupResponse.class,
                 builder -> builder.pathSegment("security_groups", request.getSecurityGroupId()))
                 .checkpoint();
+    }
+
+    @Override
+    public Mono<String> delete(DeleteSecurityGroupRequest request) {
+        return delete(request, String.class,
+                builder -> builder.pathSegment("security_groups", request.getSecurityGroupId()))
+                .checkpoint();
+
     }
 }

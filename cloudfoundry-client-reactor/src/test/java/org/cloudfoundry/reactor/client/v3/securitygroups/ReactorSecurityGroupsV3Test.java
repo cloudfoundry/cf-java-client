@@ -29,6 +29,7 @@ import org.cloudfoundry.client.v3.securitygroups.ListSecurityGroupsRequest;
 import org.cloudfoundry.client.v3.securitygroups.ListSecurityGroupsResponse;
 import org.cloudfoundry.client.v3.securitygroups.Protocol;
 import org.cloudfoundry.client.v3.securitygroups.Rule;
+import org.cloudfoundry.client.v3.securitygroups.DeleteSecurityGroupRequest;
 import org.cloudfoundry.client.v3.securitygroups.GetSecurityGroupRequest;
 import org.cloudfoundry.client.v3.securitygroups.UpdateSecurityGroupRequest;
 import org.cloudfoundry.client.v3.securitygroups.UpdateSecurityGroupResponse;
@@ -44,10 +45,12 @@ import java.time.Duration;
 import java.util.Collections;
 
 import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.DELETE;;
 import static io.netty.handler.codec.http.HttpMethod.PATCH;
 import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;;
 
 public final class ReactorSecurityGroupsV3Test extends AbstractClientApiTest {
 
@@ -349,5 +352,29 @@ public final class ReactorSecurityGroupsV3Test extends AbstractClientApiTest {
                                 .expectComplete()
                                 .verify(Duration.ofSeconds(5));
 
+        }
+
+        @Test
+        public void delete() {
+                mockRequest(InteractionContext.builder()
+                                .request(TestRequest.builder()
+                                                .method(DELETE)
+                                                .path("/security_groups/b85a788e-671f-4549-814d-e34cdb2f539a")
+                                                .build())
+                                .response(TestResponse.builder()
+                                                .status(ACCEPTED)
+                                                .header("Location",
+                                                                "https://api.example.org/v3/security_groups/b85a788e-671f-4549-814d-e34cdb2f539a")
+                                                .build())
+                                .build());
+
+                this.securityGroups
+                                .delete(DeleteSecurityGroupRequest.builder()
+                                                .securityGroupId("b85a788e-671f-4549-814d-e34cdb2f539a")
+                                                .build())
+                                .as(StepVerifier::create)
+                                .expectNext("b85a788e-671f-4549-814d-e34cdb2f539a")
+                                .expectComplete()
+                                .verify(Duration.ofSeconds(5));
         }
 }

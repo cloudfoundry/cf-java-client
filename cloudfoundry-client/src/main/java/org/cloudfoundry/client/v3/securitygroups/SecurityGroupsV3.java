@@ -42,7 +42,6 @@ public interface SecurityGroupsV3 {
 
     /**
      * Makes the <a href=
-     *
      * "https://v3-apidocs.cloudfoundry.org/version/3.140.0/index.html#list-security-groups">List
      * Security Groups</a> request
      *
@@ -53,7 +52,6 @@ public interface SecurityGroupsV3 {
 
     /**
      * Makes the <a href=
-     *
      * "https://v3-apidocs.cloudfoundry.org/version/3.140.0/index.html#update-a-security-group">Update
      * Security Groups</a> request
      *
@@ -61,4 +59,14 @@ public interface SecurityGroupsV3 {
      * @return the response from the List Security Group request
      */
     Mono<UpdateSecurityGroupResponse> update(UpdateSecurityGroupRequest request);
+
+    /**
+     * Makes the <a href=
+     * "https://v3-apidocs.cloudfoundry.org/version/3.140.0/index.html#update-a-security-group">Delete
+     * Security Groups</a> request
+     *
+     * @param request the Delete Security Group request
+     * @return the response from the List Security Group request
+     */
+    Mono<String> delete(DeleteSecurityGroupRequest request);
 }
