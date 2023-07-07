@@ -20,6 +20,7 @@ import org.immutables.value.Value;
 import java.util.List;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * The request payload for the Create a Security Group operation
@@ -27,6 +28,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonSerialize
 @Value.Immutable
 abstract class _UpdateSecurityGroupRequest {
+
+    /**
+     * Id of the security group
+     */
+    @JsonIgnore
+    abstract String getSecurityGroupId();
+
     /**
      * Name of the security group
      */
