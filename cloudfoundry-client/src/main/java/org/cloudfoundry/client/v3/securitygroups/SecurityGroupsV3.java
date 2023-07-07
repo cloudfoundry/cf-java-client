@@ -51,4 +51,14 @@ public interface SecurityGroupsV3 {
      */
     Mono<ListSecurityGroupsResponse> list(ListSecurityGroupsRequest request);
 
+    /**
+     * Makes the <a href=
+     *
+     * "https://v3-apidocs.cloudfoundry.org/version/3.140.0/index.html#update-a-security-group">Update
+     * Security Groups</a> request
+     *
+     * @param request the Update Security Group request
+     * @return the response from the List Security Group request
+     */
+    Mono<UpdateSecurityGroupResponse> update(UpdateSecurityGroupRequest request);
 }

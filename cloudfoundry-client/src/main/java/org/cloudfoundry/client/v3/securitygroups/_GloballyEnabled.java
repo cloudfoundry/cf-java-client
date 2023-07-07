@@ -2,6 +2,8 @@ package org.cloudfoundry.client.v3.securitygroups;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
@@ -17,6 +19,7 @@ abstract class _GloballyEnabled {
      * applications
      */
     @JsonProperty("running")
+    @Nullable
     abstract Boolean getRunning();
 
     /**
@@ -24,6 +27,7 @@ abstract class _GloballyEnabled {
      * applications
      */
     @JsonProperty("staging")
+    @Nullable
     abstract Boolean getStaging();
 
 }

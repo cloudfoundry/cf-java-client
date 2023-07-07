@@ -252,6 +252,7 @@ public final class ReactorSecurityGroupsV3Test extends AbstractClientApiTest {
                                                                 .id("a89a788e-671f-4549-814d-e34c1b2f533a")
                                                                 .createdAt("2020-02-20T17:42:08Z")
                                                                 .updatedAt("2020-02-20T17:42:08Z")
+                                                                .relationships(Relationships.builder().build())
                                                                 .globallyEnabled(GloballyEnabled
                                                                                 .builder()
                                                                                 .staging(true)
