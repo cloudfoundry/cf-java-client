@@ -25,7 +25,8 @@ import org.cloudfoundry.client.v3.securitygroups.CreateSecurityGroupResponse;
 import org.cloudfoundry.client.v3.securitygroups.GloballyEnabled;
 import org.cloudfoundry.client.v3.securitygroups.Protocol;
 import org.cloudfoundry.client.v3.securitygroups.Rule;
-import org.cloudfoundry.client.v3.securitygroups.CreateSecurityGroupRequest;
+import org.cloudfoundry.client.v3.securitygroups.GetSecurityGroupRequest;
+import org.cloudfoundry.client.v3.securitygroups.GetSecurityGroupResponse;
 import org.cloudfoundry.client.v3.ToManyRelationship;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import org.junit.Test;
@@ -36,9 +37,11 @@ import org.cloudfoundry.client.v3.Relationship;
 import java.time.Duration;
 import java.util.Collections;
 
+import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
 import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public final class ReactorSecurityGroupsV3Test extends AbstractClientApiTest {
 
@@ -115,6 +118,63 @@ public final class ReactorSecurityGroupsV3Test extends AbstractClientApiTest {
                                 .expectComplete()
                                 .verify(Duration.ofSeconds(5));
 
+        }
+
+        @Test
+        public void get() {
+                mockRequest(InteractionContext.builder()
+                                .request(TestRequest.builder()
+                                                .method(GET)
+                                                .path("/security_groups/b85a788e-671f-4549-814d-e34cdb2f539a")
+                                                .build())
+                                .response(TestResponse.builder()
+                                                .status(OK)
+                                                .payload("fixtures/client/v3/security_groups/GET_{id}_response.json")
+                                                .build())
+                                .build());
+                this.securityGroups
+                                .get(GetSecurityGroupRequest.builder()
+                                                .securityGroupId("b85a788e-671f-4549-814d-e34cdb2f539a")
+                                                .build())
+                                .as(StepVerifier::create)
+                                .expectNext(GetSecurityGroupResponse.builder()
+                                                .name("my-group0")
+                                                .id("b85a788e-671f-4549-814d-e34cdb2f539a")
+                                                .createdAt("2020-02-20T17:42:08Z")
+                                                .updatedAt("2020-02-20T17:42:08Z")
+                                                .globallyEnabled(GloballyEnabled.builder()
+                                                                .staging(false)
+                                                                .running(true)
+                                                                .build())
+                                                .rules(Rule.builder()
+                                                                .protocol(Protocol.TCP)
+                                                                .destination("10.10.10.0/24")
+                                                                .ports("443,80,8080")
+                                                                .build())
+                                                .rules(Rule.builder()
+                                                                .protocol(Protocol.ICMP)
+                                                                .destination("10.10.10.0/24")
+                                                                .description("Allow ping requests to private services")
+                                                                .type(8)
+                                                                .code(0)
+                                                                .build())
+                                                .relationships(Relationships.builder()
+                                                                .stagingSpaces(ToManyRelationship.builder()
+                                                                                .data(Relationship.builder()
+                                                                                                .id("space-guid-1")
+                                                                                                .build())
+                                                                                .data(Relationship.builder()
+                                                                                                .id("space-guid-2")
+                                                                                                .build())
+                                                                                .build())
+                                                                .runningSpaces(ToManyRelationship.builder().build())
+                                                                .build())
+                                                .link("self", Link.builder()
+                                                                .href("https://api.example.org/v3/security_groups/b85a788e-671f-4549-814d-e34cdb2f539a")
+                                                                .build())
+                                                .build())
+                                .expectComplete()
+                                .verify(Duration.ofSeconds(5));
         }
 
 }

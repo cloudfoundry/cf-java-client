@@ -30,4 +30,14 @@ public interface SecurityGroupsV3 {
      */
     Mono<CreateSecurityGroupResponse> create(CreateSecurityGroupRequest request);
 
+    /**
+     * Makes the <a href=
+     * "https://v3-apidocs.cloudfoundry.org/version/3.140.0/index.html#get-a-security-group">Get
+     * a Security Group</a> request.
+     *
+     * @param request the get security group request
+     * @return the response from the get security group request
+     */
+    Mono<GetSecurityGroupResponse> get(GetSecurityGroupRequest request);
+
 }
