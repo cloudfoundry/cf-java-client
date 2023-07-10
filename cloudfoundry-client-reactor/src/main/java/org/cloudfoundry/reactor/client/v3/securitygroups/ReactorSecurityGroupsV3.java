@@ -26,6 +26,10 @@ import org.cloudfoundry.client.v3.securitygroups.GetSecurityGroupResponse;
 import org.cloudfoundry.client.v3.securitygroups.UpdateSecurityGroupResponse;
 import org.cloudfoundry.client.v3.securitygroups.ListSecurityGroupsRequest;
 import org.cloudfoundry.client.v3.securitygroups.ListSecurityGroupsResponse;
+import org.cloudfoundry.client.v3.securitygroups.BindRunningSecurityGroupRequest;
+import org.cloudfoundry.client.v3.securitygroups.BindRunningSecurityGroupResponse;
+import org.cloudfoundry.client.v3.securitygroups.BindStagingSecurityGroupRequest;
+import org.cloudfoundry.client.v3.securitygroups.BindStagingSecurityGroupResponse;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
@@ -89,5 +93,21 @@ public final class ReactorSecurityGroupsV3 extends AbstractClientV3Operations im
                 builder -> builder.pathSegment("security_groups", request.getSecurityGroupId()))
                 .checkpoint();
 
+    }
+
+    @Override
+    public Mono<BindRunningSecurityGroupResponse> bindRunningSecurityGroup(BindRunningSecurityGroupRequest request) {
+        return post(request, BindRunningSecurityGroupResponse.class,
+                builder -> builder.pathSegment("security_groups", request.getSecurityGroupId(), "relationships",
+                        "running_spaces"))
+                .checkpoint();
+    }
+
+    @Override
+    public Mono<BindStagingSecurityGroupResponse> bindStagingSecurityGroup(BindStagingSecurityGroupRequest request) {
+        return post(request, BindStagingSecurityGroupResponse.class,
+                builder -> builder.pathSegment("security_groups", request.getSecurityGroupId(), "relationships",
+                        "staging_spaces"))
+                .checkpoint();
     }
 }

@@ -16,7 +16,11 @@
 
 package org.cloudfoundry.client.v3.securitygroups;
 
+import java.util.Map;
+
+import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
+import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.ToManyRelationship;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -33,9 +37,9 @@ public abstract class AbstractBindSecurityGroupResponse {
     abstract ToManyRelationship getBoundSpaces();
 
     /**
-     * When the resource was last updated
+     * The links
      */
-    @JsonProperty("updated_at")
-    @Nullable
-    public abstract String getUpdatedAt();
+    @AllowNulls
+    @JsonProperty("links")
+    public abstract Map<String, Link> getLinks();
 }

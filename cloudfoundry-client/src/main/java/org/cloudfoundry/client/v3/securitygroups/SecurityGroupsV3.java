@@ -88,5 +88,5 @@ public interface SecurityGroupsV3 {
      * @param request the Bind Running Security Group request
      * @return the response from the Bind Running Security Group request
      */
-    Mono<BindStagingSecurityGroupResponse> bindRunningSecurityGroup(BindStagingSecurityGroupRequest request);
+    Mono<BindRunningSecurityGroupResponse> bindRunningSecurityGroup(BindRunningSecurityGroupRequest request);
 }

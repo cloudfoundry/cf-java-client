@@ -21,6 +21,10 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.client.v3.securitygroups.Relationships;
+import org.cloudfoundry.client.v3.securitygroups.BindStagingSecurityGroupRequest;
+import org.cloudfoundry.client.v3.securitygroups.BindStagingSecurityGroupResponse;
+import org.cloudfoundry.client.v3.securitygroups.BindRunningSecurityGroupRequest;
+import org.cloudfoundry.client.v3.securitygroups.BindRunningSecurityGroupResponse;
 import org.cloudfoundry.client.v3.securitygroups.CreateSecurityGroupRequest;
 import org.cloudfoundry.client.v3.securitygroups.CreateSecurityGroupResponse;
 import org.cloudfoundry.client.v3.securitygroups.SecurityGroupResource;
@@ -377,4 +381,81 @@ public final class ReactorSecurityGroupsV3Test extends AbstractClientApiTest {
                                 .expectComplete()
                                 .verify(Duration.ofSeconds(5));
         }
+
+        @Test
+        public void bindStagingSecurityGroup() {
+                mockRequest(InteractionContext.builder()
+                                .request(TestRequest.builder()
+                                                .method(POST)
+                                                .path("/security_groups/b85a788e-671f-4549-814d-e34cdb2f539a/relationships/staging_spaces")
+                                                .payload("fixtures/client/v3/security_groups/bind_staging/POST_request.json")
+                                                .build())
+                                .response(TestResponse.builder()
+                                                .status(OK)
+                                                .payload("fixtures/client/v3/security_groups/bind_staging/POST_response.json")
+                                                .build())
+                                .build());
+                this.securityGroups.bindStagingSecurityGroup(BindStagingSecurityGroupRequest.builder()
+                                .securityGroupId("b85a788e-671f-4549-814d-e34cdb2f539a")
+                                .boundSpaces(ToManyRelationship.builder()
+                                                .data(Relationship.builder().id("space-guid1").build())
+                                                .data(Relationship.builder().id("space-guid2").build())
+                                                .build())
+                                .build())
+                                .as(StepVerifier::create)
+                                .expectNext(BindStagingSecurityGroupResponse.builder()
+                                                .boundSpaces(ToManyRelationship.builder()
+                                                                .data(Relationship.builder().id("space-guid1").build())
+                                                                .data(Relationship.builder().id("space-guid2").build())
+                                                                .data(Relationship.builder().id("previous-space-guid")
+                                                                                .build())
+                                                                .build()
+
+                                                )
+                                                .link("self", Link.builder()
+                                                                .href("https://api.example.org/v3/security_groups/b85a788e-671f-4549-814d-e34cdb2f539a/relationships/staging_spaces")
+                                                                .build())
+                                                .build())
+                                .expectComplete()
+                                .verify(Duration.ofSeconds(5));
+        }
+
+        @Test
+        public void bindRunningSecurityGroup() {
+                mockRequest(InteractionContext.builder()
+                                .request(TestRequest.builder()
+                                                .method(POST)
+                                                .path("/security_groups/b85a788e-671f-4549-814d-e34cdb2f539a/relationships/running_spaces")
+                                                .payload("fixtures/client/v3/security_groups/bind_running/POST_request.json")
+                                                .build())
+                                .response(TestResponse.builder()
+                                                .status(OK)
+                                                .payload("fixtures/client/v3/security_groups/bind_running/POST_response.json")
+                                                .build())
+                                .build());
+                this.securityGroups.bindRunningSecurityGroup(BindRunningSecurityGroupRequest.builder()
+                                .securityGroupId("b85a788e-671f-4549-814d-e34cdb2f539a")
+                                .boundSpaces(ToManyRelationship.builder()
+                                                .data(Relationship.builder().id("space-guid1").build())
+                                                .data(Relationship.builder().id("space-guid2").build())
+                                                .build())
+                                .build())
+                                .as(StepVerifier::create)
+                                .expectNext(BindRunningSecurityGroupResponse.builder()
+                                                .boundSpaces(ToManyRelationship.builder()
+                                                                .data(Relationship.builder().id("space-guid1").build())
+                                                                .data(Relationship.builder().id("space-guid2").build())
+                                                                .data(Relationship.builder().id("previous-space-guid")
+                                                                                .build())
+                                                                .build()
+
+                                                )
+                                                .link("self", Link.builder()
+                                                                .href("https://api.example.org/v3/security_groups/b85a788e-671f-4549-814d-e34cdb2f539a/relationships/running_spaces")
+                                                                .build())
+                                                .build())
+                                .expectComplete()
+                                .verify(Duration.ofSeconds(5));
+        }
+
 }
