@@ -69,4 +69,24 @@ public interface SecurityGroupsV3 {
      * @return the response from the List Security Group request
      */
     Mono<String> delete(DeleteSecurityGroupRequest request);
+
+    /**
+     * Makes the <a href=
+     * "https://v3-apidocs.cloudfoundry.org/version/3.140.0/index.html#bind-a-staging-security-group-to-spaces">Bind
+     * Staging Security Group</a> request
+     *
+     * @param request the Bind Staging Security Group request
+     * @return the response from the Bind Staging Security Group request
+     */
+    Mono<BindStagingSecurityGroupResponse> bindStagingSecurityGroup(BindStagingSecurityGroupRequest request);
+
+    /**
+     * Makes the <a href=
+     * "https://v3-apidocs.cloudfoundry.org/version/3.140.0/index.html#bind-a-running-security-group-to-spaces">Bind
+     * Running Security Group</a> request
+     *
+     * @param request the Bind Running Security Group request
+     * @return the response from the Bind Running Security Group request
+     */
+    Mono<BindStagingSecurityGroupResponse> bindRunningSecurityGroup(BindStagingSecurityGroupRequest request);
 }
