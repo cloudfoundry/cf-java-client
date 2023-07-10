@@ -60,11 +60,13 @@ abstract class _ListSecurityGroupsRequest extends PaginatedRequest {
      * the security group running_space_guids filter
      */
     @FilterParameter("running_space_guids")
+    @Nullable
     abstract List<String> getRunningSpaceIds();
 
     /**
      * the security group staging_space_guids filter
      */
     @FilterParameter("staging_space_guids")
+    @Nullable
     abstract List<String> getStagingSpaceIds();
 }

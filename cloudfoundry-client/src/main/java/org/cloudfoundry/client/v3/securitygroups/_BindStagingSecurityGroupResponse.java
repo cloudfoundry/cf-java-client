@@ -17,7 +17,9 @@
 package org.cloudfoundry.client.v3.securitygroups;
 
 import org.immutables.value.Value;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
+@JsonDeserialize
 @Value.Immutable
 public abstract class _BindStagingSecurityGroupResponse extends AbstractBindSecurityGroupResponse {
 

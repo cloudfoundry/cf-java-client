@@ -62,7 +62,7 @@ public interface SecurityGroupsV3 {
 
     /**
      * Makes the <a href=
-     * "https://v3-apidocs.cloudfoundry.org/version/3.140.0/index.html#update-a-security-group">Delete
+     * "https://v3-apidocs.cloudfoundry.org/version/3.140.0/index.html#delete-a-security-group">Delete
      * Security Groups</a> request
      *
      * @param request the Delete Security Group request

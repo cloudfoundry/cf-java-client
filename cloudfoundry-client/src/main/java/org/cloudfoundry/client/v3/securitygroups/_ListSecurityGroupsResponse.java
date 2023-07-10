@@ -26,6 +26,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _ListSecurityGroupsResponse extends PaginatedResponse<SecurityGroup> {
+abstract class _ListSecurityGroupsResponse extends PaginatedResponse<SecurityGroupResource> {
 
 }

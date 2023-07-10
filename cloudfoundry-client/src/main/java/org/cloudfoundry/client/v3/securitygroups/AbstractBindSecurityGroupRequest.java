@@ -16,6 +16,9 @@
 
 package org.cloudfoundry.client.v3.securitygroups;
 
+import java.util.List;
+
+import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.ToManyRelationship;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -36,5 +39,5 @@ public abstract class AbstractBindSecurityGroupRequest {
      * applications during runtime
      */
     @JsonProperty("data")
-    abstract ToManyRelationship getBoundSpaces();
+    abstract List<Relationship> getBoundSpaces();
 }

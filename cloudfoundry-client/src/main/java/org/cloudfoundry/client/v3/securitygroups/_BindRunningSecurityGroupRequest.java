@@ -18,6 +18,9 @@ package org.cloudfoundry.client.v3.securitygroups;
 
 import org.immutables.value.Value;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+@JsonSerialize
 @Value.Immutable
 abstract class _BindRunningSecurityGroupRequest extends AbstractBindSecurityGroupRequest {
 

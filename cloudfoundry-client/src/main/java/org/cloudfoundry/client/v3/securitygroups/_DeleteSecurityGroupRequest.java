@@ -23,7 +23,6 @@ import org.immutables.value.Value;
 /**
  * The request payload for the Delete Security Group operation
  */
-@JsonSerialize
 @Value.Immutable
 abstract class _DeleteSecurityGroupRequest {
 

@@ -16,11 +16,13 @@
 
 package org.cloudfoundry.client.v3.securitygroups;
 
+import java.util.List;
 import java.util.Map;
 
 import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.Link;
+import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.ToManyRelationship;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -34,7 +36,7 @@ public abstract class AbstractBindSecurityGroupResponse {
      * applications during runtime
      */
     @JsonProperty("data")
-    abstract ToManyRelationship getBoundSpaces();
+    abstract List<Relationship> getBoundSpaces();
 
     /**
      * The links

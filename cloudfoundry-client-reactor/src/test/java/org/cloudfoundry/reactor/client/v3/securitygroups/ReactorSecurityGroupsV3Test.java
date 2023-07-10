@@ -262,7 +262,13 @@ public final class ReactorSecurityGroupsV3Test extends AbstractClientApiTest {
                                                                 .id("a89a788e-671f-4549-814d-e34c1b2f533a")
                                                                 .createdAt("2020-02-20T17:42:08Z")
                                                                 .updatedAt("2020-02-20T17:42:08Z")
-                                                                .relationships(Relationships.builder().build())
+                                                                .relationships(Relationships.builder()
+                                                                                .stagingSpaces(ToManyRelationship
+                                                                                                .builder().build())
+                                                                                .runningSpaces(ToManyRelationship
+                                                                                                .builder().build())
+
+                                                                                .build())
                                                                 .globallyEnabled(GloballyEnabled
                                                                                 .builder()
                                                                                 .staging(true)
@@ -286,7 +292,8 @@ public final class ReactorSecurityGroupsV3Test extends AbstractClientApiTest {
         public void update() {
                 mockRequest(InteractionContext.builder()
                                 .request(TestRequest.builder()
-                                                .method(PATCH).path("/security_groups")
+                                                .method(PATCH)
+                                                .path("/security_groups/b85a788e-671f-4549-814d-e34cdb2f539a")
                                                 .payload("fixtures/client/v3/security_groups/PATCH_{id}_request.json")
                                                 .build())
                                 .response(TestResponse.builder()
@@ -368,7 +375,7 @@ public final class ReactorSecurityGroupsV3Test extends AbstractClientApiTest {
                                 .response(TestResponse.builder()
                                                 .status(ACCEPTED)
                                                 .header("Location",
-                                                                "https://api.example.org/v3/security_groups/b85a788e-671f-4549-814d-e34cdb2f539a")
+                                                                "https://api.example.org/v3/jobs/b85a788e-671f-4549-814d-e34cdb2f539a")
                                                 .build())
                                 .build());
 
@@ -397,21 +404,15 @@ public final class ReactorSecurityGroupsV3Test extends AbstractClientApiTest {
                                 .build());
                 this.securityGroups.bindStagingSecurityGroup(BindStagingSecurityGroupRequest.builder()
                                 .securityGroupId("b85a788e-671f-4549-814d-e34cdb2f539a")
-                                .boundSpaces(ToManyRelationship.builder()
-                                                .data(Relationship.builder().id("space-guid1").build())
-                                                .data(Relationship.builder().id("space-guid2").build())
-                                                .build())
+                                .boundSpaces(Relationship.builder().id("space-guid1").build())
+                                .boundSpaces(Relationship.builder().id("space-guid2").build())
+
                                 .build())
                                 .as(StepVerifier::create)
                                 .expectNext(BindStagingSecurityGroupResponse.builder()
-                                                .boundSpaces(ToManyRelationship.builder()
-                                                                .data(Relationship.builder().id("space-guid1").build())
-                                                                .data(Relationship.builder().id("space-guid2").build())
-                                                                .data(Relationship.builder().id("previous-space-guid")
-                                                                                .build())
-                                                                .build()
-
-                                                )
+                                                .boundSpaces(Relationship.builder().id("space-guid1").build())
+                                                .boundSpaces(Relationship.builder().id("space-guid2").build())
+                                                .boundSpaces(Relationship.builder().id("previous-space-guid").build())
                                                 .link("self", Link.builder()
                                                                 .href("https://api.example.org/v3/security_groups/b85a788e-671f-4549-814d-e34cdb2f539a/relationships/staging_spaces")
                                                                 .build())
@@ -435,21 +436,14 @@ public final class ReactorSecurityGroupsV3Test extends AbstractClientApiTest {
                                 .build());
                 this.securityGroups.bindRunningSecurityGroup(BindRunningSecurityGroupRequest.builder()
                                 .securityGroupId("b85a788e-671f-4549-814d-e34cdb2f539a")
-                                .boundSpaces(ToManyRelationship.builder()
-                                                .data(Relationship.builder().id("space-guid1").build())
-                                                .data(Relationship.builder().id("space-guid2").build())
-                                                .build())
+                                .boundSpaces(Relationship.builder().id("space-guid1").build())
+                                .boundSpaces(Relationship.builder().id("space-guid2").build())
                                 .build())
                                 .as(StepVerifier::create)
                                 .expectNext(BindRunningSecurityGroupResponse.builder()
-                                                .boundSpaces(ToManyRelationship.builder()
-                                                                .data(Relationship.builder().id("space-guid1").build())
-                                                                .data(Relationship.builder().id("space-guid2").build())
-                                                                .data(Relationship.builder().id("previous-space-guid")
-                                                                                .build())
-                                                                .build()
-
-                                                )
+                                                .boundSpaces(Relationship.builder().id("space-guid1").build())
+                                                .boundSpaces(Relationship.builder().id("space-guid2").build())
+                                                .boundSpaces(Relationship.builder().id("previous-space-guid").build())
                                                 .link("self", Link.builder()
                                                                 .href("https://api.example.org/v3/security_groups/b85a788e-671f-4549-814d-e34cdb2f539a/relationships/running_spaces")
                                                                 .build())
