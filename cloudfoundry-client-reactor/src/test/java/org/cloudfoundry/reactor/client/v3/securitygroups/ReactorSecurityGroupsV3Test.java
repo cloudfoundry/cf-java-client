@@ -21,6 +21,8 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.client.v3.securitygroups.Relationships;
+import org.cloudfoundry.client.v3.securitygroups.UnbindRunningSecurityGroupRequest;
+import org.cloudfoundry.client.v3.securitygroups.UnbindStagingSecurityGroupRequest;
 import org.cloudfoundry.client.v3.securitygroups.BindStagingSecurityGroupRequest;
 import org.cloudfoundry.client.v3.securitygroups.BindStagingSecurityGroupResponse;
 import org.cloudfoundry.client.v3.securitygroups.BindRunningSecurityGroupRequest;
@@ -54,7 +56,8 @@ import static io.netty.handler.codec.http.HttpMethod.PATCH;
 import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
-import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;;
+import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
+import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;;
 
 public final class ReactorSecurityGroupsV3Test extends AbstractClientApiTest {
 
@@ -452,4 +455,45 @@ public final class ReactorSecurityGroupsV3Test extends AbstractClientApiTest {
                                 .verify(Duration.ofSeconds(5));
         }
 
+        @Test
+        public void unbindStagingSecurityGroup() {
+                mockRequest(InteractionContext.builder()
+                                .request(TestRequest.builder()
+                                                .method(DELETE)
+                                                .path("/security_groups/b85a788e-671f-4549-814d-e34cdb2f539a/relationships/staging_spaces/space-guid-1")
+                                                .build())
+                                .response(TestResponse.builder()
+                                                .status(NO_CONTENT)
+                                                .build())
+                                .build());
+                this.securityGroups
+                                .unbindStagingSecurityGroup(UnbindStagingSecurityGroupRequest.builder()
+                                                .securityGroupId("b85a788e-671f-4549-814d-e34cdb2f539a")
+                                                .spaceId("space-guid-1")
+                                                .build())
+                                .as(StepVerifier::create)
+                                .expectNextCount(0)
+                                .verifyComplete();
+        }
+
+        @Test
+        public void unbindRunningSecurityGroup() {
+                mockRequest(InteractionContext.builder()
+                                .request(TestRequest.builder()
+                                                .method(DELETE)
+                                                .path("/security_groups/b85a788e-671f-4549-814d-e34cdb2f539a/relationships/running_spaces/space-guid-1")
+                                                .build())
+                                .response(TestResponse.builder()
+                                                .status(NO_CONTENT)
+                                                .build())
+                                .build());
+                this.securityGroups
+                                .unbindRunningSecurityGroup(UnbindRunningSecurityGroupRequest.builder()
+                                                .securityGroupId("b85a788e-671f-4549-814d-e34cdb2f539a")
+                                                .spaceId("space-guid-1")
+                                                .build())
+                                .as(StepVerifier::create)
+                                .expectNextCount(0)
+                                .verifyComplete();
+        }
 }
