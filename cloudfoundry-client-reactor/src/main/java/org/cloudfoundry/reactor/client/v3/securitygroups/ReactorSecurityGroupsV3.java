@@ -27,6 +27,10 @@ import org.cloudfoundry.client.v3.securitygroups.UpdateSecurityGroupResponse;
 import org.cloudfoundry.client.v3.servicebindings.ServiceBindingsV3;
 import org.cloudfoundry.client.v3.securitygroups.ListSecurityGroupsRequest;
 import org.cloudfoundry.client.v3.securitygroups.ListSecurityGroupsResponse;
+import org.cloudfoundry.client.v3.securitygroups.ListRunningSecurityGroupsRequest;
+import org.cloudfoundry.client.v3.securitygroups.ListRunningSecurityGroupsResponse;
+import org.cloudfoundry.client.v3.securitygroups.ListStagingSecurityGroupsRequest;
+import org.cloudfoundry.client.v3.securitygroups.ListStagingSecurityGroupsResponse;
 import org.cloudfoundry.client.v3.securitygroups.BindRunningSecurityGroupRequest;
 import org.cloudfoundry.client.v3.securitygroups.BindRunningSecurityGroupResponse;
 import org.cloudfoundry.client.v3.securitygroups.BindStagingSecurityGroupRequest;
@@ -137,6 +141,22 @@ public final class ReactorSecurityGroupsV3 extends AbstractClientV3Operations im
                                 builder -> builder.pathSegment("security_groups", request.getSecurityGroupId(),
                                                 "relationships",
                                                 "running_spaces", request.getSpaceId()))
+                                .checkpoint();
+        }
+
+        @Override
+        public Mono<ListRunningSecurityGroupsResponse> listRunning(ListRunningSecurityGroupsRequest request) {
+                return get(request, ListRunningSecurityGroupsResponse.class,
+                                builder -> builder.pathSegment("spaces", request.getSpaceId(),
+                                                "running_security_groups"))
+                                .checkpoint();
+        }
+
+        @Override
+        public Mono<ListStagingSecurityGroupsResponse> listStaging(ListStagingSecurityGroupsRequest request) {
+                return get(request, ListStagingSecurityGroupsResponse.class,
+                                builder -> builder.pathSegment("spaces", request.getSpaceId(),
+                                                "staging_security_groups"))
                                 .checkpoint();
         }
 }

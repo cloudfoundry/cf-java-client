@@ -111,4 +111,24 @@ public interface SecurityGroupsV3 {
      * @return the response from the Unbind Running Security Group request
      */
     Mono<Void> unbindRunningSecurityGroup(UnbindRunningSecurityGroupRequest request);
+
+    /**
+     * Makes the <a href=
+     * "https://v3-apidocs.cloudfoundry.org/version/3.140.0/index.html#list-staging-security-groups-for-a-space">List
+     * Running Security Groups</a> request
+     *
+     * @param request the List Staging Security Group request
+     * @return the response from the List Staging Security Group request
+     */
+    Mono<ListStagingSecurityGroupsResponse> listStaging(ListStagingSecurityGroupsRequest request);
+
+    /**
+     * Makes the <a href=
+     * "https://v3-apidocs.cloudfoundry.org/version/3.140.0/index.html#list-running-security-groups-for-a-space">List
+     * Running Security Groups</a> request
+     *
+     * @param request the List Staging Security Group request
+     * @return the response from the List Running Security Group request
+     */
+    Mono<ListRunningSecurityGroupsResponse> listRunning(ListRunningSecurityGroupsRequest request);
 }
