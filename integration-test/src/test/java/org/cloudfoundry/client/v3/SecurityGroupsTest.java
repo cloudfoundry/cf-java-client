@@ -31,8 +31,8 @@ import org.cloudfoundry.client.v3.securitygroups.ListSecurityGroupsRequest;
 import org.cloudfoundry.client.v3.securitygroups.ListRunningSecurityGroupsRequest;
 import org.cloudfoundry.client.v3.securitygroups.ListStagingSecurityGroupsRequest;
 import org.cloudfoundry.util.JobUtils;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
@@ -53,8 +53,8 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
         @Autowired
         private Mono<String> spaceId;
 
-        @BeforeClass
-        public void settup() {
+        @Before
+        void settup() {
                 this.securityGroupName = this.nameFactory.getSecurityGroupName();
 
                 this.cloudFoundryClient.securityGroupsV3()
@@ -75,8 +75,8 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
                                 .verify(Duration.ofMinutes(5));
         }
 
-        @AfterClass
-        public void tearDown() {
+        @After
+        void tearDown() {
                 this.cloudFoundryClient.securityGroupsV3().delete(
                                 DeleteSecurityGroupRequest.builder()
                                                 .securityGroupId(this.securityGroupId.block())
