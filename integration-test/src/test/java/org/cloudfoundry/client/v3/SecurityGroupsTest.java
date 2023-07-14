@@ -47,9 +47,6 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
         @Autowired
         private CloudFoundryClient cloudFoundryClient;
 
-        @Autowired
-        private Mono<String> organizationId;
-
         private String securityGroupName;
         private Mono<String> securityGroupId;
 
