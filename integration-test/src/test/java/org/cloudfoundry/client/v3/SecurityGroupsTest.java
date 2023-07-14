@@ -16,35 +16,49 @@
 
 package org.cloudfoundry.client.v3;
 
-import org.cloudfoundry.CloudFoundryVersion;
-import org.cloudfoundry.IfCloudFoundryVersion;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v3.securitygroups.UnbindStagingSecurityGroupRequest;
+import org.cloudfoundry.client.v3.securitygroups.UnbindRunningSecurityGroupRequest;
+import org.cloudfoundry.client.v3.securitygroups.BindStagingSecurityGroupRequest;
+import org.cloudfoundry.client.v3.securitygroups.BindRunningSecurityGroupRequest;
 import org.cloudfoundry.client.v3.securitygroups.CreateSecurityGroupRequest;
-import org.cloudfoundry.client.v3.securitygroups.CreateSecurityGroupResponse;
 import org.cloudfoundry.client.v3.securitygroups.Rule;
+import org.cloudfoundry.client.v3.securitygroups.UpdateSecurityGroupRequest;
+import org.cloudfoundry.client.v3.securitygroups.DeleteSecurityGroupRequest;
+import org.cloudfoundry.client.v3.securitygroups.GetSecurityGroupRequest;
+import org.cloudfoundry.client.v3.securitygroups.ListSecurityGroupsRequest;
+import org.cloudfoundry.client.v3.securitygroups.ListRunningSecurityGroupsRequest;
+import org.cloudfoundry.client.v3.securitygroups.ListStagingSecurityGroupsRequest;
 import org.cloudfoundry.util.JobUtils;
-import org.cloudfoundry.util.PaginationUtils;
-import org.cloudfoundry.util.ResourceUtils;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
 
 import static org.cloudfoundry.client.v3.securitygroups.Protocol.TCP;
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 public final class SecurityGroupsTest extends AbstractIntegrationTest {
 
         @Autowired
         private CloudFoundryClient cloudFoundryClient;
 
-        @Test
-        public void create() {
-                String securityGroupName = this.nameFactory.getSecurityGroupName();
+        @Autowired
+        private Mono<String> organizationId;
+
+        private String securityGroupName;
+        private Mono<String> securityGroupId;
+
+        @Autowired
+        private Mono<String> spaceId;
+
+        @BeforeClass
+        public void settup() {
+                this.securityGroupName = this.nameFactory.getSecurityGroupName();
 
                 this.cloudFoundryClient.securityGroupsV3()
                                 .create(CreateSecurityGroupRequest.builder()
@@ -56,6 +70,7 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
                                                                 .protocol(TCP)
                                                                 .build())
                                                 .build())
+                                .doOnSuccess(response -> this.securityGroupId = Mono.just(response.getId()))
                                 .map(response -> response.getName())
                                 .as(StepVerifier::create)
                                 .expectNext(securityGroupName)
@@ -63,4 +78,132 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
                                 .verify(Duration.ofMinutes(5));
         }
 
+        @AfterClass
+        public void tearDown() {
+                this.cloudFoundryClient.securityGroupsV3().delete(
+                                DeleteSecurityGroupRequest.builder()
+                                                .securityGroupId(this.securityGroupId.block())
+                                                .build())
+                                .flatMap(
+                                                job -> JobUtils.waitForCompletion(this.cloudFoundryClient,
+                                                                Duration.ofMinutes(5), job))
+                                .as(StepVerifier::create)
+                                .expectComplete()
+                                .verify(Duration.ofMinutes(5));
+        }
+
+        @Test
+        public void update() {
+                this.cloudFoundryClient.securityGroupsV3().update(
+                                UpdateSecurityGroupRequest.builder()
+                                                .securityGroupId(securityGroupId.block())
+                                                .rule(Rule.builder()
+                                                                .destination("0.0.0.0/0")
+                                                                .ports("8080")
+                                                                .protocol(TCP)
+                                                                .build())
+                                                .build())
+                                .as(StepVerifier::create)
+                                .expectComplete()
+                                .verify(Duration.ofMinutes(5));
+
+        }
+
+        @Test
+        public void get() {
+                this.cloudFoundryClient.securityGroupsV3().get(
+                                GetSecurityGroupRequest.builder()
+                                                .securityGroupId(securityGroupId.block())
+                                                .build())
+                                .map(securityGroup -> securityGroup.getName())
+                                .as(StepVerifier::create)
+                                .expectNext(this.securityGroupName)
+                                .expectComplete()
+                                .verify(Duration.ofMinutes(5));
+
+        }
+
+        @Test
+        public void list() {
+                this.cloudFoundryClient.securityGroupsV3().list(
+                                ListSecurityGroupsRequest.builder()
+                                                .build())
+                                .as(StepVerifier::create)
+                                .expectComplete()
+                                .verify(Duration.ofMinutes(5));
+        }
+
+        @Test
+        public void listRunning() {
+                this.cloudFoundryClient.securityGroupsV3().listRunning(
+                                ListRunningSecurityGroupsRequest.builder()
+                                                .spaceId(this.spaceId.block())
+                                                .build())
+                                .as(StepVerifier::create)
+                                .expectComplete()
+                                .verify(Duration.ofMinutes(5));
+        }
+
+        @Test
+        public void listStaging() {
+                this.cloudFoundryClient.securityGroupsV3().listStaging(
+                                ListStagingSecurityGroupsRequest.builder()
+                                                .spaceId(this.spaceId.block())
+                                                .build())
+                                .as(StepVerifier::create)
+                                .expectComplete()
+                                .verify(Duration.ofMinutes(5));
+        }
+
+        @Test
+        public void bindStagingSecurityGroup() {
+                this.cloudFoundryClient.securityGroupsV3().bindStagingSecurityGroup(
+                                BindStagingSecurityGroupRequest.builder()
+                                                .securityGroupId(this.securityGroupId.block())
+                                                .boundSpaces(Relationship.builder()
+                                                                .id(this.spaceId.block())
+                                                                .build())
+                                                .build())
+                                .as(StepVerifier::create)
+                                .expectComplete()
+                                .verify(Duration.ofMinutes(5));
+        }
+
+        @Test
+        public void bindRunningSecurityGroup() {
+                this.cloudFoundryClient.securityGroupsV3().bindRunningSecurityGroup(
+                                BindRunningSecurityGroupRequest.builder()
+                                                .securityGroupId(this.securityGroupId.block())
+                                                .boundSpaces(Relationship.builder()
+                                                                .id(this.spaceId.block())
+                                                                .build())
+                                                .build())
+                                .as(StepVerifier::create)
+                                .expectComplete()
+                                .verify(Duration.ofMinutes(5));
+        }
+
+        @Test
+        public void unbindRunningSecurityGroup() {
+                this.cloudFoundryClient.securityGroupsV3().unbindRunningSecurityGroup(
+                                UnbindRunningSecurityGroupRequest.builder()
+                                                .securityGroupId(this.securityGroupId.block())
+                                                .spaceId(this.spaceId.block())
+                                                .build())
+                                .as(StepVerifier::create)
+                                .expectComplete()
+                                .verify(Duration.ofMinutes(5));
+        }
+
+        @Test
+        public void unbindStagingSecurityGroup() {
+                this.cloudFoundryClient.securityGroupsV3().unbindStagingSecurityGroup(
+                                UnbindStagingSecurityGroupRequest.builder()
+                                                .securityGroupId(this.securityGroupId.block())
+                                                .spaceId(this.spaceId.block())
+                                                .build())
+                                .as(StepVerifier::create)
+                                .expectComplete()
+                                .verify(Duration.ofMinutes(5));
+        }
 }
