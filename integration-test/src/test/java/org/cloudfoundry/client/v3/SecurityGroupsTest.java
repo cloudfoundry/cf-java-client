@@ -54,7 +54,7 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
         private Mono<String> spaceId;
 
         @Before
-        prublic void settup() {
+        public void settup() {
                 this.securityGroupName = this.nameFactory.getSecurityGroupName();
 
                 this.cloudFoundryClient.securityGroupsV3()
