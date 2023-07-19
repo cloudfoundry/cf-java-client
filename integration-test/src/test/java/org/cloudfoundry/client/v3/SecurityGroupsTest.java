@@ -23,22 +23,30 @@ import org.cloudfoundry.client.v3.securitygroups.UnbindRunningSecurityGroupReque
 import org.cloudfoundry.client.v3.securitygroups.BindStagingSecurityGroupRequest;
 import org.cloudfoundry.client.v3.securitygroups.BindRunningSecurityGroupRequest;
 import org.cloudfoundry.client.v3.securitygroups.CreateSecurityGroupRequest;
+import org.cloudfoundry.client.v3.securitygroups.CreateSecurityGroupResponse;
 import org.cloudfoundry.client.v3.securitygroups.Rule;
+import org.cloudfoundry.client.v3.securitygroups.SecurityGroup;
+import org.cloudfoundry.client.v3.ToManyRelationship;
+import org.cloudfoundry.client.v3.securitygroups.Relationships;
+import org.cloudfoundry.client.v3.securitygroups.GloballyEnabled;
+import org.cloudfoundry.client.v3.securitygroups.SecurityGroup;
 import org.cloudfoundry.client.v3.securitygroups.UpdateSecurityGroupRequest;
 import org.cloudfoundry.client.v3.securitygroups.DeleteSecurityGroupRequest;
 import org.cloudfoundry.client.v3.securitygroups.GetSecurityGroupRequest;
+import org.cloudfoundry.client.v3.securitygroups.GetSecurityGroupResponse;
 import org.cloudfoundry.client.v3.securitygroups.ListSecurityGroupsRequest;
 import org.cloudfoundry.client.v3.securitygroups.ListRunningSecurityGroupsRequest;
 import org.cloudfoundry.client.v3.securitygroups.ListStagingSecurityGroupsRequest;
 import org.cloudfoundry.util.JobUtils;
-import org.junit.After;
-import org.junit.Before;
+
 import org.junit.Test;
+import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
+import java.util.Arrays;
 
 import static org.cloudfoundry.client.v3.securitygroups.Protocol.TCP;
 
@@ -47,159 +55,198 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
         @Autowired
         private CloudFoundryClient cloudFoundryClient;
 
-        private String securityGroupName;
-        private Mono<String> securityGroupId;
-
         @Autowired
         private Mono<String> spaceId;
+        private Mono<CreateSecurityGroupResponse> securityGroup;
+        private String securityGroupName;
 
         @Before
         public void settup() {
                 this.securityGroupName = this.nameFactory.getSecurityGroupName();
-
-                this.cloudFoundryClient.securityGroupsV3()
+                String spaceID = this.spaceId.block();
+                this.securityGroup = this.cloudFoundryClient.securityGroupsV3()
                                 .create(CreateSecurityGroupRequest.builder()
-                                                .name(securityGroupName)
+                                                .name(this.securityGroupName)
+                                                .globallyEnabled(GloballyEnabled.builder()
+                                                                .staging(true)
+                                                                .running(true)
+                                                                .build())
                                                 .rule(Rule.builder()
                                                                 .destination("0.0.0.0/0")
                                                                 .log(false)
                                                                 .ports("2048-3000")
                                                                 .protocol(TCP)
                                                                 .build())
-                                                .build())
-                                .doOnSuccess(response -> this.securityGroupId = Mono.just(response.getId()))
-                                .map(response -> response.getName())
+                                                .build());
+        }
+
+        @Test
+        public void create() {
+                this.securityGroup
+                                .map(securityGroup -> securityGroup.getName())
                                 .as(StepVerifier::create)
-                                .expectNext(securityGroupName)
+                                .expectNext(this.securityGroupName)
                                 .expectComplete()
                                 .verify(Duration.ofMinutes(5));
         }
 
-        @After
-        public void tearDown() {
-                this.cloudFoundryClient.securityGroupsV3().delete(
-                                DeleteSecurityGroupRequest.builder()
-                                                .securityGroupId(this.securityGroupId.block())
-                                                .build())
-                                .flatMap(
-                                                job -> JobUtils.waitForCompletion(this.cloudFoundryClient,
-                                                                Duration.ofMinutes(5), job))
+        @Test
+        public void get() {
+                this.securityGroup
+                                .flatMap(securityGroup -> this.cloudFoundryClient.securityGroupsV3()
+                                                .get(GetSecurityGroupRequest.builder()
+                                                                .securityGroupId(securityGroup.getId())
+                                                                .build())
+                                                .map(sg -> sg.getName()))
                                 .as(StepVerifier::create)
+                                .expectNext(this.securityGroupName)
                                 .expectComplete()
                                 .verify(Duration.ofMinutes(5));
         }
 
         @Test
         public void update() {
-                this.cloudFoundryClient.securityGroupsV3().update(
-                                UpdateSecurityGroupRequest.builder()
-                                                .securityGroupId(securityGroupId.block())
-                                                .rule(Rule.builder()
-                                                                .destination("0.0.0.0/0")
-                                                                .ports("8080")
-                                                                .protocol(TCP)
-                                                                .build())
-                                                .build())
+                String newSecurityGroupName = this.nameFactory.getSecurityGroupName();
+                this.securityGroup
+                                .flatMap(securityGroup -> this.cloudFoundryClient.securityGroupsV3().update(
+                                                UpdateSecurityGroupRequest.builder()
+                                                                .securityGroupId(securityGroup.getId())
+                                                                .name(newSecurityGroupName)
+                                                                .build()))
+                                .map(securityGroup -> securityGroup.getName())
                                 .as(StepVerifier::create)
+                                .expectNext(newSecurityGroupName)
                                 .expectComplete()
                                 .verify(Duration.ofMinutes(5));
-
         }
 
         @Test
-        public void get() {
-                this.cloudFoundryClient.securityGroupsV3().get(
-                                GetSecurityGroupRequest.builder()
-                                                .securityGroupId(securityGroupId.block())
-                                                .build())
-                                .map(securityGroup -> securityGroup.getName())
+        public void delete() {
+                this.securityGroup
+                                .flatMap(securityGroup -> this.cloudFoundryClient.securityGroupsV3().delete(
+                                                DeleteSecurityGroupRequest.builder()
+                                                                .securityGroupId(securityGroup.getId())
+                                                                .build())
+                                                .map(id -> Arrays.asList(id)))
                                 .as(StepVerifier::create)
-                                .expectNext(this.securityGroupName)
+                                .expectNextCount(1)
                                 .expectComplete()
                                 .verify(Duration.ofMinutes(5));
-
         }
 
         @Test
         public void list() {
-                this.cloudFoundryClient.securityGroupsV3().list(
-                                ListSecurityGroupsRequest.builder()
-                                                .build())
+                this.securityGroup.map(
+                                securityGroup -> this.cloudFoundryClient.securityGroupsV3()
+                                                .list(ListSecurityGroupsRequest.builder()
+                                                                .names(Arrays.asList(securityGroup.getName()))
+                                                                .build()))
                                 .as(StepVerifier::create)
+                                .expectNextCount(1)
                                 .expectComplete()
                                 .verify(Duration.ofMinutes(5));
         }
 
         @Test
         public void listRunning() {
-                this.cloudFoundryClient.securityGroupsV3().listRunning(
-                                ListRunningSecurityGroupsRequest.builder()
-                                                .spaceId(this.spaceId.block())
-                                                .build())
+                Mono.zip(this.securityGroup, this.spaceId).flatMap(v -> this.cloudFoundryClient.securityGroupsV3()
+                                .listRunning(ListRunningSecurityGroupsRequest.builder()
+                                                .spaceId(v.getT2())
+                                                .names(Arrays.asList(v.getT1().getName())).build()))
                                 .as(StepVerifier::create)
+                                .expectNextCount(1)
                                 .expectComplete()
                                 .verify(Duration.ofMinutes(5));
         }
 
         @Test
         public void listStaging() {
-                this.cloudFoundryClient.securityGroupsV3().listStaging(
-                                ListStagingSecurityGroupsRequest.builder()
-                                                .spaceId(this.spaceId.block())
-                                                .build())
+                Mono.zip(this.securityGroup, this.spaceId).flatMap(v -> this.cloudFoundryClient.securityGroupsV3()
+                                .listStaging(ListStagingSecurityGroupsRequest.builder()
+                                                .spaceId(v.getT2())
+                                                .names(Arrays.asList(v.getT1().getName())).build()))
                                 .as(StepVerifier::create)
+                                .expectNextCount(1)
                                 .expectComplete()
                                 .verify(Duration.ofMinutes(5));
         }
 
         @Test
         public void bindStagingSecurityGroup() {
-                this.cloudFoundryClient.securityGroupsV3().bindStagingSecurityGroup(
-                                BindStagingSecurityGroupRequest.builder()
-                                                .securityGroupId(this.securityGroupId.block())
-                                                .boundSpaces(Relationship.builder()
-                                                                .id(this.spaceId.block())
-                                                                .build())
-                                                .build())
+                Mono.zip(this.securityGroup, this.spaceId)
+                                .flatMap(v -> this.cloudFoundryClient.securityGroupsV3()
+                                                .bindStagingSecurityGroup(BindStagingSecurityGroupRequest.builder()
+                                                                .securityGroupId(v.getT1().getId())
+                                                                .boundSpaces(Relationship.builder()
+                                                                                .id(v.getT2()).build())
+                                                                .build()))
                                 .as(StepVerifier::create)
-                                .expectComplete()
-                                .verify(Duration.ofMinutes(5));
-        }
-
-        @Test
-        public void bindRunningSecurityGroup() {
-                this.cloudFoundryClient.securityGroupsV3().bindRunningSecurityGroup(
-                                BindRunningSecurityGroupRequest.builder()
-                                                .securityGroupId(this.securityGroupId.block())
-                                                .boundSpaces(Relationship.builder()
-                                                                .id(this.spaceId.block())
-                                                                .build())
-                                                .build())
-                                .as(StepVerifier::create)
-                                .expectComplete()
-                                .verify(Duration.ofMinutes(5));
-        }
-
-        @Test
-        public void unbindRunningSecurityGroup() {
-                this.cloudFoundryClient.securityGroupsV3().unbindRunningSecurityGroup(
-                                UnbindRunningSecurityGroupRequest.builder()
-                                                .securityGroupId(this.securityGroupId.block())
-                                                .spaceId(this.spaceId.block())
-                                                .build())
-                                .as(StepVerifier::create)
+                                .expectNextCount(1)
                                 .expectComplete()
                                 .verify(Duration.ofMinutes(5));
         }
 
         @Test
         public void unbindStagingSecurityGroup() {
-                this.cloudFoundryClient.securityGroupsV3().unbindStagingSecurityGroup(
-                                UnbindStagingSecurityGroupRequest.builder()
-                                                .securityGroupId(this.securityGroupId.block())
-                                                .spaceId(this.spaceId.block())
-                                                .build())
+                Mono.zip(this.securityGroup, this.spaceId)
+                                .flatMap(v -> this.cloudFoundryClient.securityGroupsV3()
+                                                .bindStagingSecurityGroup(BindStagingSecurityGroupRequest.builder()
+                                                                .securityGroupId(v.getT1().getId())
+                                                                .boundSpaces(Relationship.builder().id(v.getT2())
+                                                                                .build())
+                                                                .build())
+                                                .then(this.cloudFoundryClient.securityGroupsV3()
+                                                                .unbindStagingSecurityGroup(
+                                                                                UnbindStagingSecurityGroupRequest
+                                                                                                .builder()
+                                                                                                .securityGroupId(v
+                                                                                                                .getT1()
+                                                                                                                .getId())
+                                                                                                .spaceId(v.getT2())
+                                                                                                .build())))
+
                                 .as(StepVerifier::create)
+                                .expectNextCount(0)
+                                .expectComplete()
+                                .verify(Duration.ofMinutes(5));
+        }
+
+        @Test
+        public void bindRunningSecurityGroup() {
+                Mono.zip(this.securityGroup, this.spaceId)
+                                .flatMap(v -> this.cloudFoundryClient.securityGroupsV3()
+                                                .bindRunningSecurityGroup(BindRunningSecurityGroupRequest.builder()
+                                                                .securityGroupId(v.getT1().getId())
+                                                                .boundSpaces(Relationship.builder().id(v.getT2())
+                                                                                .build())
+                                                                .build()))
+                                .as(StepVerifier::create)
+                                .expectNextCount(1)
+                                .expectComplete()
+                                .verify(Duration.ofMinutes(5));
+        }
+
+        @Test
+        public void unbindRunnungSecurityGroup() {
+                Mono.zip(this.securityGroup, this.spaceId)
+                                .flatMap(v -> this.cloudFoundryClient.securityGroupsV3()
+                                                .bindRunningSecurityGroup(BindRunningSecurityGroupRequest.builder()
+                                                                .securityGroupId(v.getT1().getId())
+                                                                .boundSpaces(Relationship.builder().id(v.getT2())
+                                                                                .build())
+                                                                .build())
+                                                .then(this.cloudFoundryClient.securityGroupsV3()
+                                                                .unbindRunningSecurityGroup(
+                                                                                UnbindRunningSecurityGroupRequest
+                                                                                                .builder()
+                                                                                                .securityGroupId(v
+                                                                                                                .getT1()
+                                                                                                                .getId())
+                                                                                                .spaceId(v.getT2())
+                                                                                                .build())))
+
+                                .as(StepVerifier::create)
+                                .expectNextCount(0)
                                 .expectComplete()
                                 .verify(Duration.ofMinutes(5));
         }

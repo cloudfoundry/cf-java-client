@@ -353,7 +353,7 @@ abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
     @Override
     @Value.Derived
     public SecurityGroupsV3 securityGroupsV3() {
-        return new ReactorSecurityGroupsV3(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
+        return new ReactorSecurityGroupsV3(getConnectionContext(), getRootV3(), getTokenProvider(), getRequestTags());
     }
 
     @Override
