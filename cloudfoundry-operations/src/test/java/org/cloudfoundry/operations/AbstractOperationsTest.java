@@ -20,6 +20,7 @@ import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.applications.ApplicationsV2;
 import org.cloudfoundry.client.v2.buildpacks.Buildpacks;
 import org.cloudfoundry.client.v2.domains.Domains;
+import org.cloudfoundry.client.v3.domains.DomainsV3;
 import org.cloudfoundry.client.v2.events.Events;
 import org.cloudfoundry.client.v2.featureflags.FeatureFlags;
 import org.cloudfoundry.client.v2.jobs.Jobs;
@@ -60,11 +61,14 @@ public abstract class AbstractOperationsTest {
 
     protected static final Mono<String> MISSING_ID = Mono.error(new java.lang.IllegalStateException("MISSING_ID"));
 
-    protected static final Mono<String> MISSING_ORGANIZATION_ID = Mono.error(new java.lang.IllegalStateException("MISSING_ORGANIZATION_ID"));
+    protected static final Mono<String> MISSING_ORGANIZATION_ID = Mono
+            .error(new java.lang.IllegalStateException("MISSING_ORGANIZATION_ID"));
 
-    protected static final Mono<String> MISSING_SPACE_ID = Mono.error(new java.lang.IllegalStateException("MISSING_SPACE_ID"));
+    protected static final Mono<String> MISSING_SPACE_ID = Mono
+            .error(new java.lang.IllegalStateException("MISSING_SPACE_ID"));
 
-    protected static final Mono<String> MISSING_USERNAME = Mono.error(new java.lang.IllegalStateException("MISSING_USERNAME"));
+    protected static final Mono<String> MISSING_USERNAME = Mono
+            .error(new java.lang.IllegalStateException("MISSING_USERNAME"));
 
     protected static final String TEST_ORGANIZATION_ID = "test-organization-id";
 
@@ -88,6 +92,8 @@ public abstract class AbstractOperationsTest {
 
     protected final Domains domains = mock(Domains.class, RETURNS_SMART_NULLS);
 
+    protected final DomainsV3 domainsV3 = mock(DomainsV3.class, RETURNS_SMART_NULLS);
+
     protected final DopplerClient dopplerClient = mock(DopplerClient.class, RETURNS_SMART_NULLS);
 
     protected final Events events = mock(Events.class, RETURNS_SMART_NULLS);
@@ -96,7 +102,8 @@ public abstract class AbstractOperationsTest {
 
     protected final Jobs jobs = mock(Jobs.class, RETURNS_SMART_NULLS);
 
-    protected final OrganizationQuotaDefinitions organizationQuotaDefinitions = mock(OrganizationQuotaDefinitions.class, RETURNS_SMART_NULLS);
+    protected final OrganizationQuotaDefinitions organizationQuotaDefinitions = mock(OrganizationQuotaDefinitions.class,
+            RETURNS_SMART_NULLS);
 
     protected final Organizations organizations = mock(Organizations.class, RETURNS_SMART_NULLS);
 
@@ -118,7 +125,8 @@ public abstract class AbstractOperationsTest {
 
     protected final ServiceKeys serviceKeys = mock(ServiceKeys.class, RETURNS_SMART_NULLS);
 
-    protected final ServicePlanVisibilities servicePlanVisibilities = mock(ServicePlanVisibilities.class, RETURNS_SMART_NULLS);
+    protected final ServicePlanVisibilities servicePlanVisibilities = mock(ServicePlanVisibilities.class,
+            RETURNS_SMART_NULLS);
 
     protected final ServicePlans servicePlans = mock(ServicePlans.class, RETURNS_SMART_NULLS);
 
@@ -126,7 +134,8 @@ public abstract class AbstractOperationsTest {
 
     protected final SharedDomains sharedDomains = mock(SharedDomains.class, RETURNS_SMART_NULLS);
 
-    protected final SpaceQuotaDefinitions spaceQuotaDefinitions = mock(SpaceQuotaDefinitions.class, RETURNS_SMART_NULLS);
+    protected final SpaceQuotaDefinitions spaceQuotaDefinitions = mock(SpaceQuotaDefinitions.class,
+            RETURNS_SMART_NULLS);
 
     protected final Spaces spaces = mock(Spaces.class, RETURNS_SMART_NULLS);
 
@@ -138,9 +147,11 @@ public abstract class AbstractOperationsTest {
 
     protected final UaaClient uaaClient = mock(UaaClient.class, RETURNS_SMART_NULLS);
 
-    protected final org.cloudfoundry.uaa.users.Users uaaUsers = mock(org.cloudfoundry.uaa.users.Users.class, RETURNS_SMART_NULLS);
+    protected final org.cloudfoundry.uaa.users.Users uaaUsers = mock(org.cloudfoundry.uaa.users.Users.class,
+            RETURNS_SMART_NULLS);
 
-    protected final UserProvidedServiceInstances userProvidedServiceInstances = mock(UserProvidedServiceInstances.class, RETURNS_SMART_NULLS);
+    protected final UserProvidedServiceInstances userProvidedServiceInstances = mock(UserProvidedServiceInstances.class,
+            RETURNS_SMART_NULLS);
 
     protected final Users users = mock(Users.class, RETURNS_SMART_NULLS);
 
@@ -150,6 +161,7 @@ public abstract class AbstractOperationsTest {
         when(this.cloudFoundryClient.applicationsV3()).thenReturn(this.applicationsV3);
         when(this.cloudFoundryClient.buildpacks()).thenReturn(this.buildpacks);
         when(this.cloudFoundryClient.domains()).thenReturn(this.domains);
+        when(this.cloudFoundryClient.domainsV3()).thenReturn(this.domainsV3);
         when(this.cloudFoundryClient.events()).thenReturn(this.events);
         when(this.cloudFoundryClient.featureFlags()).thenReturn(this.featureFlags);
         when(this.cloudFoundryClient.jobs()).thenReturn(this.jobs);
