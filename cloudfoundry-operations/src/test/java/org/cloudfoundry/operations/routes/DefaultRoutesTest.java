@@ -38,8 +38,7 @@ import org.cloudfoundry.client.v2.routes.ListRouteApplicationsRequest;
 import org.cloudfoundry.client.v2.routes.ListRouteApplicationsResponse;
 import org.cloudfoundry.client.v2.routes.ListRoutesResponse;
 import org.cloudfoundry.client.v2.routes.RouteEntity;
-import org.cloudfoundry.client.v3.domains.CheckReservedRoutesRequest;
-import org.cloudfoundry.client.v3.domains.CheckReservedRoutesResponse;
+import org.cloudfoundry.client.v2.routes.RouteExistsRequest;
 import org.cloudfoundry.client.v2.routes.RouteResource;
 import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.GetServiceInstanceResponse;
@@ -57,7 +56,6 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceServiceInstancesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceServiceInstancesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceEntity;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
-import org.cloudfoundry.client.v3.domains.CheckReservedRoutesResponse;
 import org.cloudfoundry.operations.AbstractOperationsTest;
 import org.junit.Test;
 import reactor.core.publisher.Mono;
@@ -829,489 +827,485 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
     }
 
     private static void requestApplications(CloudFoundryClient cloudFoundryClient, String routeId) {
-        when(cloudFoundryClient.routes()
-            .listApplications(ListRouteApplicationsRequest.builder()
-                .page(1)
-                .routeId(routeId)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(ListRouteApplicationsResponse.builder())
-                    .resource(fill(ApplicationResource.builder(), "application-")
-                        .build())
-                    .build()));
-    }
+         when(cloudFoundryClient.routes()
+             .listApplications(ListRouteApplicationsRequest.builder()
+                 .page(1)
+                 .routeId(routeId)
+                 .build()))
+             .thenReturn(Mono
+                 .just(fill(ListRouteApplicationsResponse.builder())
+                     .resource(fill(ApplicationResource.builder(), "application-")
+                         .build())
+                     .build()));
+     }
 
     private static void requestApplications(CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
-        when(cloudFoundryClient.spaces()
-            .listApplications(ListSpaceApplicationsRequest.builder()
-                .name(application)
-                .page(1)
-                .spaceId(spaceId)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(ListSpaceApplicationsResponse.builder())
-                    .resource(fill(ApplicationResource.builder(), "application-")
-                        .build())
-                    .build()));
-    }
+         when(cloudFoundryClient.spaces()
+             .listApplications(ListSpaceApplicationsRequest.builder()
+                 .name(application)
+                 .page(1)
+                 .spaceId(spaceId)
+                 .build()))
+             .thenReturn(Mono
+                 .just(fill(ListSpaceApplicationsResponse.builder())
+                     .resource(fill(ApplicationResource.builder(), "application-")
+                         .build())
+                     .build()));
+     }
 
     private static void requestApplicationsEmpty(CloudFoundryClient cloudFoundryClient, String routeId) {
-        when(cloudFoundryClient.routes()
-            .listApplications(ListRouteApplicationsRequest.builder()
-                .page(1)
-                .routeId(routeId)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(ListRouteApplicationsResponse.builder())
-                    .build()));
-    }
+         when(cloudFoundryClient.routes()
+             .listApplications(ListRouteApplicationsRequest.builder()
+                 .page(1)
+                 .routeId(routeId)
+                 .build()))
+             .thenReturn(Mono
+                 .just(fill(ListRouteApplicationsResponse.builder())
+                     .build()));
+     }
 
     private static void requestApplicationsEmpty(CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
-        when(cloudFoundryClient.spaces()
-            .listApplications(ListSpaceApplicationsRequest.builder()
-                .name(application)
-                .page(1)
-                .spaceId(spaceId)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(ListSpaceApplicationsResponse.builder())
-                    .build()));
-    }
+         when(cloudFoundryClient.spaces()
+             .listApplications(ListSpaceApplicationsRequest.builder()
+                 .name(application)
+                 .page(1)
+                 .spaceId(spaceId)
+                 .build()))
+             .thenReturn(Mono
+                 .just(fill(ListSpaceApplicationsResponse.builder())
+                     .build()));
+     }
 
     private static void requestAssociateRoute(CloudFoundryClient cloudFoundryClient, String applicationId, String routeId) {
-        when(cloudFoundryClient.applicationsV2()
-            .associateRoute(AssociateApplicationRouteRequest.builder()
-                .applicationId(applicationId)
-                .routeId(routeId)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(AssociateApplicationRouteResponse.builder())
-                    .build()));
-    }
+         when(cloudFoundryClient.applicationsV2()
+             .associateRoute(AssociateApplicationRouteRequest.builder()
+                 .applicationId(applicationId)
+                 .routeId(routeId)
+                 .build()))
+             .thenReturn(Mono
+                 .just(fill(AssociateApplicationRouteResponse.builder())
+                     .build()));
+     }
 
     private static void requestCreateRoute(CloudFoundryClient cloudFoundryClient, String domainId, String host, Boolean randomPort, String path, Integer port, String spaceId) {
-        when(cloudFoundryClient.routes()
-            .create(org.cloudfoundry.client.v2.routes.CreateRouteRequest.builder()
-                .domainId(domainId)
-                .generatePort(randomPort)
-                .host(host)
-                .path(path)
-                .port(port)
-                .spaceId(spaceId)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(CreateRouteResponse.builder(), "route-")
-                    .build()));
-    }
+         when(cloudFoundryClient.routes()
+             .create(org.cloudfoundry.client.v2.routes.CreateRouteRequest.builder()
+                 .domainId(domainId)
+                 .generatePort(randomPort)
+                 .host(host)
+                 .path(path)
+                 .port(port)
+                 .spaceId(spaceId)
+                 .build()))
+             .thenReturn(Mono
+                 .just(fill(CreateRouteResponse.builder(), "route-")
+                     .build()));
+     }
 
     private static void requestDeleteRoute(CloudFoundryClient cloudFoundryClient, String routeId) {
-        when(cloudFoundryClient.routes()
-            .delete(org.cloudfoundry.client.v2.routes.DeleteRouteRequest.builder()
-                .async(true)
-                .routeId(routeId)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(DeleteRouteResponse.builder())
-                    .entity(fill(JobEntity.builder(), "job-entity-")
-                        .build())
-                    .build()));
-    }
+         when(cloudFoundryClient.routes()
+             .delete(org.cloudfoundry.client.v2.routes.DeleteRouteRequest.builder()
+                 .async(true)
+                 .routeId(routeId)
+                 .build()))
+             .thenReturn(Mono
+                 .just(fill(DeleteRouteResponse.builder())
+                     .entity(fill(JobEntity.builder(), "job-entity-")
+                         .build())
+                     .build()));
+     }
 
     private static void requestJobFailure(CloudFoundryClient cloudFoundryClient, String jobId) {
-        when(cloudFoundryClient.jobs()
-            .get(GetJobRequest.builder()
-                .jobId(jobId)
-                .build()))
-            .thenReturn(Mono
-                .defer(new Supplier<Mono<GetJobResponse>>() {
-
-                    private final Queue<GetJobResponse> responses = new LinkedList<>(Arrays.asList(
-                        fill(GetJobResponse.builder(), "job-")
-                            .entity(fill(JobEntity.builder())
-                                .status("running")
-                                .build())
-                            .build(),
-                        fill(GetJobResponse.builder(), "job-")
-                            .entity(fill(JobEntity.builder())
-                                .errorDetails(fill(ErrorDetails.builder(), "error-details-")
-                                    .build())
-                                .status("failed")
-                                .build())
-                            .build()
-                    ));
-
-                    @Override
-                    public Mono<GetJobResponse> get() {
-                        return Mono.just(this.responses.poll());
-                    }
-
-                }));
-    }
+         when(cloudFoundryClient.jobs()
+             .get(GetJobRequest.builder()
+                 .jobId(jobId)
+                 .build()))
+             .thenReturn(Mono
+                 .defer(new Supplier<Mono<GetJobResponse>>() {
+ 
+                     private final Queue<GetJobResponse> responses = new LinkedList<>(Arrays.asList(
+                         fill(GetJobResponse.builder(), "job-")
+                             .entity(fill(JobEntity.builder())
+                                 .status("running")
+                                 .build())
+                             .build(),
+                         fill(GetJobResponse.builder(), "job-")
+                             .entity(fill(JobEntity.builder())
+                                 .errorDetails(fill(ErrorDetails.builder(), "error-details-")
+                                     .build())
+                                 .status("failed")
+                                 .build())
+                             .build()
+                     ));
+ 
+                     @Override
+                     public Mono<GetJobResponse> get() {
+                         return Mono.just(this.responses.poll());
+                     }
+ 
+                 }));
+     }
 
     private static void requestJobSuccess(CloudFoundryClient cloudFoundryClient, String jobId) {
-        when(cloudFoundryClient.jobs()
-            .get(GetJobRequest.builder()
-                .jobId(jobId)
-                .build()))
-            .thenReturn(Mono
-                .defer(new Supplier<Mono<GetJobResponse>>() {
-
-                    private final Queue<GetJobResponse> responses = new LinkedList<>(Arrays.asList(
-                        fill(GetJobResponse.builder(), "job-")
-                            .entity(fill(JobEntity.builder())
-                                .status("running")
-                                .build())
-                            .build(),
-                        fill(GetJobResponse.builder(), "job-")
-                            .entity(fill(JobEntity.builder())
-                                .status("finished")
-                                .build())
-                            .build()
-                    ));
-
-                    @Override
-                    public Mono<GetJobResponse> get() {
-                        return Mono.just(this.responses.poll());
-                    }
-
-                }));
-    }
+         when(cloudFoundryClient.jobs()
+             .get(GetJobRequest.builder()
+                 .jobId(jobId)
+                 .build()))
+             .thenReturn(Mono
+                 .defer(new Supplier<Mono<GetJobResponse>>() {
+ 
+                     private final Queue<GetJobResponse> responses = new LinkedList<>(Arrays.asList(
+                         fill(GetJobResponse.builder(), "job-")
+                             .entity(fill(JobEntity.builder())
+                                 .status("running")
+                                 .build())
+                             .build(),
+                         fill(GetJobResponse.builder(), "job-")
+                             .entity(fill(JobEntity.builder())
+                                 .status("finished")
+                                 .build())
+                             .build()
+                     ));
+ 
+                     @Override
+                     public Mono<GetJobResponse> get() {
+                         return Mono.just(this.responses.poll());
+                     }
+ 
+                 }));
+     }
 
     private static void requestOrganizationsRoutes(CloudFoundryClient cloudFoundryClient, String organizationId) {
-        when(cloudFoundryClient.routes()
-            .list(org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder()
-                .organizationId(organizationId)
-                .page(1)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(ListRoutesResponse.builder())
-                    .resource(fill(RouteResource.builder())
-                        .entity(fill(RouteEntity.builder(), "route-entity-")
-                            .domainId("test-domain-id")
-                            .build())
-                        .build())
-                    .build()));
-    }
+         when(cloudFoundryClient.routes()
+             .list(org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder()
+                 .organizationId(organizationId)
+                 .page(1)
+                 .build()))
+             .thenReturn(Mono
+                 .just(fill(ListRoutesResponse.builder())
+                     .resource(fill(RouteResource.builder())
+                         .entity(fill(RouteEntity.builder(), "route-entity-")
+                             .domainId("test-domain-id")
+                             .build())
+                         .build())
+                     .build()));
+     }
 
     private static void requestOrganizationsRoutesEmpty(CloudFoundryClient cloudFoundryClient, String organizationId) {
-        when(cloudFoundryClient.routes()
-            .list(org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder()
-                .organizationId(organizationId)
-                .page(1)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(ListRoutesResponse.builder())
-                    .build()));
-    }
+         when(cloudFoundryClient.routes()
+             .list(org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder()
+                 .organizationId(organizationId)
+                 .page(1)
+                 .build()))
+             .thenReturn(Mono
+                 .just(fill(ListRoutesResponse.builder())
+                     .build()));
+     }
 
     private static void requestPrivateDomains(CloudFoundryClient cloudFoundryClient, String organizationId, String domain) {
-        when(cloudFoundryClient.organizations()
-            .listPrivateDomains(ListOrganizationPrivateDomainsRequest.builder()
-                .name(domain)
-                .organizationId(organizationId)
-                .page(1)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(ListOrganizationPrivateDomainsResponse.builder())
-                    .resource(fill(PrivateDomainResource.builder(), "private-domain-")
-                        .metadata(fill(Metadata.builder(), "private-domain-metadata-")
-                            .build())
-                        .build())
-                    .build()));
-    }
+         when(cloudFoundryClient.organizations()
+             .listPrivateDomains(ListOrganizationPrivateDomainsRequest.builder()
+                 .name(domain)
+                 .organizationId(organizationId)
+                 .page(1)
+                 .build()))
+             .thenReturn(Mono
+                 .just(fill(ListOrganizationPrivateDomainsResponse.builder())
+                     .resource(fill(PrivateDomainResource.builder(), "private-domain-")
+                         .metadata(fill(Metadata.builder(), "private-domain-metadata-")
+                             .build())
+                         .build())
+                     .build()));
+     }
 
     private static void requestPrivateDomainsAll(CloudFoundryClient cloudFoundryClient, String organizationId) {
-        when(cloudFoundryClient.organizations()
-            .listPrivateDomains(ListOrganizationPrivateDomainsRequest.builder()
-                .organizationId(organizationId)
-                .page(1)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(ListOrganizationPrivateDomainsResponse.builder())
-                    .resource(fill(PrivateDomainResource.builder(), "private-domain-")
-                        .metadata(fill(Metadata.builder(), "private-domain-metadata-")
-                            .build())
-                        .build())
-                    .build()));
-    }
+         when(cloudFoundryClient.organizations()
+             .listPrivateDomains(ListOrganizationPrivateDomainsRequest.builder()
+                 .organizationId(organizationId)
+                 .page(1)
+                 .build()))
+             .thenReturn(Mono
+                 .just(fill(ListOrganizationPrivateDomainsResponse.builder())
+                     .resource(fill(PrivateDomainResource.builder(), "private-domain-")
+                         .metadata(fill(Metadata.builder(), "private-domain-metadata-")
+                             .build())
+                         .build())
+                     .build()));
+     }
 
     private static void requestPrivateDomainsEmpty(CloudFoundryClient cloudFoundryClient, String organizationId, String domain) {
-        when(cloudFoundryClient.organizations()
-            .listPrivateDomains(ListOrganizationPrivateDomainsRequest.builder()
-                .name(domain)
-                .organizationId(organizationId)
-                .page(1)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(ListOrganizationPrivateDomainsResponse.builder())
-                    .build()));
-    }
+         when(cloudFoundryClient.organizations()
+             .listPrivateDomains(ListOrganizationPrivateDomainsRequest.builder()
+                 .name(domain)
+                 .organizationId(organizationId)
+                 .page(1)
+                 .build()))
+             .thenReturn(Mono
+                 .just(fill(ListOrganizationPrivateDomainsResponse.builder())
+                     .build()));
+     }
 
     private static void requestRemoveRouteFromApplication(CloudFoundryClient cloudFoundryClient, String applicationId, String routeId) {
-        when(cloudFoundryClient.applicationsV2()
-            .removeRoute(RemoveApplicationRouteRequest.builder()
-                .applicationId(applicationId)
-                .routeId(routeId)
-                .build()))
-            .thenReturn(Mono.empty());
-    }
+         when(cloudFoundryClient.applicationsV2()
+             .removeRoute(RemoveApplicationRouteRequest.builder()
+                 .applicationId(applicationId)
+                 .routeId(routeId)
+                 .build()))
+             .thenReturn(Mono.empty());
+     }
 
     private static void requestRouteExistsFalse(CloudFoundryClient cloudFoundryClient, String domainId, String host, String path) {
-        when(cloudFoundryClient.domainsV3()
-            .checkReservedRoutes(CheckReservedRoutesRequest.builder()
-                .domainId(domainId)
-                .host(host)
-                .path(path)
-                .build()))
-            .thenReturn(Mono
-                .just(CheckReservedRoutesResponse.builder()
-                    .matchingRoute(false)
-                    .build()));
-    }
+         when(cloudFoundryClient.routes()
+             .exists(RouteExistsRequest.builder()
+                 .domainId(domainId)
+                 .host(host)
+                 .path(path)
+                 .build()))
+             .thenReturn(Mono
+                 .just(false));
+     }
 
     private static void requestRouteExistsTrue(CloudFoundryClient cloudFoundryClient, String domainId, String host, String path) {
-        when(cloudFoundryClient.domainsV3()
-            .checkReservedRoutes(CheckReservedRoutesRequest.builder()
-                .domainId(domainId)
-                .host(host)
-                .path(path)
-                .build()))
-            .thenReturn(Mono
-                .just(CheckReservedRoutesResponse.builder()
-                    .matchingRoute(true)
-                    .build()));
-    }
+         when(cloudFoundryClient.routes()
+             .exists(RouteExistsRequest.builder()
+                 .domainId(domainId)
+                 .host(host)
+                 .path(path)
+                 .build()))
+             .thenReturn(Mono
+                 .just(true));
+     }
 
     private static void requestRoutes(CloudFoundryClient cloudFoundryClient, String domainId, String host, String path, Integer port) {
-        when(cloudFoundryClient.routes()
-            .list(org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder()
-                .domainId(domainId)
-                .hosts(Optional.ofNullable(host).map(Collections::singletonList).orElse(null))
-                .page(1)
-                .paths(Optional.ofNullable(path).map(Collections::singletonList).orElse(null))
-                .port(Optional.ofNullable(port).orElse(null))
-                .build()))
-            .thenReturn(Mono
-                .just(fill(ListRoutesResponse.builder())
-                    .resource(fill(RouteResource.builder(), "route-")
-                        .entity(RouteEntity.builder()
-                            .host(host)
-                            .path(path == null ? "" : path)
-                            .port(port)
-                            .build())
-                        .build())
-                    .build()));
-    }
+         when(cloudFoundryClient.routes()
+             .list(org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder()
+                 .domainId(domainId)
+                 .hosts(Optional.ofNullable(host).map(Collections::singletonList).orElse(null))
+                 .page(1)
+                 .paths(Optional.ofNullable(path).map(Collections::singletonList).orElse(null))
+                 .port(Optional.ofNullable(port).orElse(null))
+                 .build()))
+             .thenReturn(Mono
+                 .just(fill(ListRoutesResponse.builder())
+                     .resource(fill(RouteResource.builder(), "route-")
+                         .entity(RouteEntity.builder()
+                             .host(host)
+                             .path(path == null ? "" : path)
+                             .port(port)
+                             .build())
+                         .build())
+                     .build()));
+     }
 
     private static void requestRoutesEmpty(CloudFoundryClient cloudFoundryClient, String domainId, String host, String path, Integer port) {
-        when(cloudFoundryClient.routes()
-            .list(org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder()
-                .domainId(domainId)
-                .hosts(Optional.ofNullable(host).map(Collections::singletonList).orElse(null))
-                .organizationId(null)
-                .page(1)
-                .paths(Optional.ofNullable(path).map(Collections::singletonList).orElse(null))
-                .port(Optional.ofNullable(port).orElse(null))
-                .build()))
-            .thenReturn(Mono
-                .just(fill(ListRoutesResponse.builder())
-                    .build()));
-    }
+         when(cloudFoundryClient.routes()
+             .list(org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder()
+                 .domainId(domainId)
+                 .hosts(Optional.ofNullable(host).map(Collections::singletonList).orElse(null))
+                 .organizationId(null)
+                 .page(1)
+                 .paths(Optional.ofNullable(path).map(Collections::singletonList).orElse(null))
+                 .port(Optional.ofNullable(port).orElse(null))
+                 .build()))
+             .thenReturn(Mono
+                 .just(fill(ListRoutesResponse.builder())
+                     .build()));
+     }
 
     private static void requestRoutesTwo(CloudFoundryClient cloudFoundryClient, String domainId, String host, String path) {
-        when(cloudFoundryClient.routes()
-            .list(org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder()
-                .domainId(domainId)
-                .hosts(Optional.ofNullable(host).map(Collections::singletonList).orElse(null))
-                .page(1)
-                .paths(Optional.ofNullable(path).map(Collections::singletonList).orElse(null))
-                .build()))
-            .thenReturn(Mono
-                .just(fill(ListRoutesResponse.builder())
-                    .resource(fill(RouteResource.builder(), "route-")
-                        .entity(RouteEntity.builder()
-                            .host(null)
-                            .path(null)
-                            .build())
-                        .build())
-                    .resource(fill(RouteResource.builder(), "route-")
-                        .entity(RouteEntity.builder()
-                            .host(host)
-                            .path(path == null ? "" : path)
-                            .build())
-                        .build())
-                    .build()));
-    }
+         when(cloudFoundryClient.routes()
+             .list(org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder()
+                 .domainId(domainId)
+                 .hosts(Optional.ofNullable(host).map(Collections::singletonList).orElse(null))
+                 .page(1)
+                 .paths(Optional.ofNullable(path).map(Collections::singletonList).orElse(null))
+                 .build()))
+             .thenReturn(Mono
+                 .just(fill(ListRoutesResponse.builder())
+                     .resource(fill(RouteResource.builder(), "route-")
+                         .entity(RouteEntity.builder()
+                             .host(null)
+                             .path(null)
+                             .build())
+                         .build())
+                     .resource(fill(RouteResource.builder(), "route-")
+                         .entity(RouteEntity.builder()
+                             .host(host)
+                             .path(path == null ? "" : path)
+                             .build())
+                         .build())
+                     .build()));
+     }
 
     private static void requestSharedDomains(CloudFoundryClient cloudFoundryClient, String domain) {
-        when(cloudFoundryClient.sharedDomains()
-            .list(ListSharedDomainsRequest.builder()
-                .name(domain)
-                .page(1)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(ListSharedDomainsResponse.builder())
-                    .resource(fill(SharedDomainResource.builder(), "shared-domain-")
-                        .metadata(fill(Metadata.builder(), "shared-domain-metadata-")
-                            .build())
-                        .build())
-                    .build()));
-
-    }
+         when(cloudFoundryClient.sharedDomains()
+             .list(ListSharedDomainsRequest.builder()
+                 .name(domain)
+                 .page(1)
+                 .build()))
+             .thenReturn(Mono
+                 .just(fill(ListSharedDomainsResponse.builder())
+                     .resource(fill(SharedDomainResource.builder(), "shared-domain-")
+                         .metadata(fill(Metadata.builder(), "shared-domain-metadata-")
+                             .build())
+                         .build())
+                     .build()));
+ 
+     }
 
     private static void requestSharedDomainsAll(CloudFoundryClient cloudFoundryClient) {
-        when(cloudFoundryClient.sharedDomains()
-            .list(ListSharedDomainsRequest.builder()
-                .page(1)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(ListSharedDomainsResponse.builder())
-                    .resource(fill(SharedDomainResource.builder(), "shared-domain-")
-                        .metadata(fill(Metadata.builder(), "shared-domain-metadata-")
-                            .id("test-domain-id")
-                            .build())
-                        .build())
-                    .build()));
-
-    }
+         when(cloudFoundryClient.sharedDomains()
+             .list(ListSharedDomainsRequest.builder()
+                 .page(1)
+                 .build()))
+             .thenReturn(Mono
+                 .just(fill(ListSharedDomainsResponse.builder())
+                     .resource(fill(SharedDomainResource.builder(), "shared-domain-")
+                         .metadata(fill(Metadata.builder(), "shared-domain-metadata-")
+                             .id("test-domain-id")
+                             .build())
+                         .build())
+                     .build()));
+ 
+     }
 
     private static void requestSharedDomainsEmpty(CloudFoundryClient cloudFoundryClient, String domain) {
-        when(cloudFoundryClient.sharedDomains()
-            .list(ListSharedDomainsRequest.builder()
-                .name(domain)
-                .page(1)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(ListSharedDomainsResponse.builder())
-                    .build()));
-    }
+         when(cloudFoundryClient.sharedDomains()
+             .list(ListSharedDomainsRequest.builder()
+                 .name(domain)
+                 .page(1)
+                 .build()))
+             .thenReturn(Mono
+                 .just(fill(ListSharedDomainsResponse.builder())
+                     .build()));
+     }
 
     private static void requestSpaceRoutes(CloudFoundryClient cloudFoundryClient, String spaceId) {
-        when(cloudFoundryClient.spaces()
-            .listRoutes(ListSpaceRoutesRequest.builder()
-                .page(1)
-                .spaceId(spaceId)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(ListSpaceRoutesResponse.builder())
-                    .resource(fill(RouteResource.builder(), "route-")
-                        .entity(fill(RouteEntity.builder(), "route-entity-")
-                            .domainId("test-domain-id")
-                            .serviceInstanceId(null)
-                            .build())
-                        .build())
-                    .build()));
-    }
+         when(cloudFoundryClient.spaces()
+             .listRoutes(ListSpaceRoutesRequest.builder()
+                 .page(1)
+                 .spaceId(spaceId)
+                 .build()))
+             .thenReturn(Mono
+                 .just(fill(ListSpaceRoutesResponse.builder())
+                     .resource(fill(RouteResource.builder(), "route-")
+                         .entity(fill(RouteEntity.builder(), "route-entity-")
+                             .domainId("test-domain-id")
+                             .serviceInstanceId(null)
+                             .build())
+                         .build())
+                     .build()));
+     }
 
     private static void requestSpaceRoutesEmpty(CloudFoundryClient cloudFoundryClient, String spaceId) {
-        when(cloudFoundryClient.spaces()
-            .listRoutes(ListSpaceRoutesRequest.builder()
-                .page(1)
-                .spaceId(spaceId)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(ListSpaceRoutesResponse.builder())
-                    .build()));
-    }
+         when(cloudFoundryClient.spaces()
+             .listRoutes(ListSpaceRoutesRequest.builder()
+                 .page(1)
+                 .spaceId(spaceId)
+                 .build()))
+             .thenReturn(Mono
+                 .just(fill(ListSpaceRoutesResponse.builder())
+                     .build()));
+     }
 
     private static void requestSpaceRoutesNoPath(CloudFoundryClient cloudFoundryClient, String spaceId) {
-        when(cloudFoundryClient.spaces()
-            .listRoutes(ListSpaceRoutesRequest.builder()
-                .page(1)
-                .spaceId(spaceId)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(ListSpaceRoutesResponse.builder())
-                    .resource(fill(RouteResource.builder(), "route-")
-                        .entity(fill(RouteEntity.builder(), "route-entity-")
-                            .domainId("test-domain-id")
-                            .path(null)
-                            .serviceInstanceId(null)
-                            .build())
-                        .build())
-                    .build()));
-    }
+         when(cloudFoundryClient.spaces()
+             .listRoutes(ListSpaceRoutesRequest.builder()
+                 .page(1)
+                 .spaceId(spaceId)
+                 .build()))
+             .thenReturn(Mono
+                 .just(fill(ListSpaceRoutesResponse.builder())
+                     .resource(fill(RouteResource.builder(), "route-")
+                         .entity(fill(RouteEntity.builder(), "route-entity-")
+                             .domainId("test-domain-id")
+                             .path(null)
+                             .serviceInstanceId(null)
+                             .build())
+                         .build())
+                     .build()));
+     }
 
     private static void requestSpaceRoutesService(CloudFoundryClient cloudFoundryClient, String spaceId) {
-        when(cloudFoundryClient.spaces()
-            .listRoutes(ListSpaceRoutesRequest.builder()
-                .page(1)
-                .spaceId(spaceId)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(ListSpaceRoutesResponse.builder())
-                    .resource(fill(RouteResource.builder(), "route-")
-                        .entity(fill(RouteEntity.builder(), "route-entity-")
-                            .domainId("test-domain-id")
-                            .serviceInstanceId("test-service-instance-id")
-                            .build())
-                        .build())
-                    .build()));
-    }
+         when(cloudFoundryClient.spaces()
+             .listRoutes(ListSpaceRoutesRequest.builder()
+                 .page(1)
+                 .spaceId(spaceId)
+                 .build()))
+             .thenReturn(Mono
+                 .just(fill(ListSpaceRoutesResponse.builder())
+                     .resource(fill(RouteResource.builder(), "route-")
+                         .entity(fill(RouteEntity.builder(), "route-entity-")
+                             .domainId("test-domain-id")
+                             .serviceInstanceId("test-service-instance-id")
+                             .build())
+                         .build())
+                     .build()));
+     }
 
     private static void requestSpaceServiceInstances(CloudFoundryClient cloudFoundryClient, String serviceInstanceId, String spaceId) {
-        when(cloudFoundryClient.spaces()
-            .listServiceInstances(ListSpaceServiceInstancesRequest.builder()
-                .page(1)
-                .returnUserProvidedServiceInstances(true)
-                .spaceId(spaceId)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(ListSpaceServiceInstancesResponse.builder())
-                    .resource(fill(UnionServiceInstanceResource.builder(), "service-instance-")
-                        .metadata(fill(Metadata.builder(), "service-instance-metadata-")
-                            .id(serviceInstanceId)
-                            .build())
-                        .entity(fill(UnionServiceInstanceEntity.builder(), "service-instance-entity")
-                            .spaceId(spaceId)
-                            .build())
-                        .build())
-                    .build()));
-    }
+         when(cloudFoundryClient.spaces()
+             .listServiceInstances(ListSpaceServiceInstancesRequest.builder()
+                 .page(1)
+                 .returnUserProvidedServiceInstances(true)
+                 .spaceId(spaceId)
+                 .build()))
+             .thenReturn(Mono
+                 .just(fill(ListSpaceServiceInstancesResponse.builder())
+                     .resource(fill(UnionServiceInstanceResource.builder(), "service-instance-")
+                         .metadata(fill(Metadata.builder(), "service-instance-metadata-")
+                             .id(serviceInstanceId)
+                             .build())
+                         .entity(fill(UnionServiceInstanceEntity.builder(), "service-instance-entity")
+                             .spaceId(spaceId)
+                             .build())
+                         .build())
+                     .build()));
+     }
 
     private static void requestSpaces(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
-        when(cloudFoundryClient.organizations()
-            .listSpaces(ListOrganizationSpacesRequest.builder()
-                .name(space)
-                .organizationId(organizationId)
-                .page(1)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(ListOrganizationSpacesResponse.builder())
-                    .resource(fill(SpaceResource.builder(), "space-").build())
-                    .build()));
-    }
+         when(cloudFoundryClient.organizations()
+             .listSpaces(ListOrganizationSpacesRequest.builder()
+                 .name(space)
+                 .organizationId(organizationId)
+                 .page(1)
+                 .build()))
+             .thenReturn(Mono
+                 .just(fill(ListOrganizationSpacesResponse.builder())
+                     .resource(fill(SpaceResource.builder(), "space-").build())
+                     .build()));
+     }
 
     private static void requestSpacesAll(CloudFoundryClient cloudFoundryClient, String organizationId) {
-        when(cloudFoundryClient.organizations()
-            .listSpaces(ListOrganizationSpacesRequest.builder()
-                .organizationId(organizationId)
-                .page(1)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(ListOrganizationSpacesResponse.builder())
-                    .resource(SpaceResource.builder()
-                        .metadata(fill(Metadata.builder(), "space-resource-")
-                            .id("test-route-entity-spaceId")
-                            .build())
-                        .entity(fill(SpaceEntity.builder(), "space-entity-")
-                            .name("test-space-entity-name")
-                            .organizationId(organizationId)
-                            .build())
-                        .build())
-                    .build()));
-    }
+         when(cloudFoundryClient.organizations()
+             .listSpaces(ListOrganizationSpacesRequest.builder()
+                 .organizationId(organizationId)
+                 .page(1)
+                 .build()))
+             .thenReturn(Mono
+                 .just(fill(ListOrganizationSpacesResponse.builder())
+                     .resource(SpaceResource.builder()
+                         .metadata(fill(Metadata.builder(), "space-resource-")
+                             .id("test-route-entity-spaceId")
+                             .build())
+                         .entity(fill(SpaceEntity.builder(), "space-entity-")
+                             .name("test-space-entity-name")
+                             .organizationId(organizationId)
+                             .build())
+                         .build())
+                     .build()));
+     }
 
     private static void requestSpacesEmpty(CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
-        when(cloudFoundryClient.organizations()
-            .listSpaces(ListOrganizationSpacesRequest.builder()
-                .name(space)
-                .organizationId(organizationId)
-                .page(1)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(ListOrganizationSpacesResponse.builder())
-                    .build()));
-    }
+         when(cloudFoundryClient.organizations()
+             .listSpaces(ListOrganizationSpacesRequest.builder()
+                 .name(space)
+                 .organizationId(organizationId)
+                 .page(1)
+                 .build()))
+             .thenReturn(Mono
+                 .just(fill(ListOrganizationSpacesResponse.builder())
+                     .build()));
+     }
 
 }
