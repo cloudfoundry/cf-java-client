@@ -23,7 +23,8 @@ import org.cloudfoundry.client.v3.spaces.SpaceResource;
 import org.cloudfoundry.client.v3.routes.RouteRelationships;
 import org.cloudfoundry.client.v3.ToOneRelationship;
 import org.cloudfoundry.client.v3.Relationship;
-
+import org.cloudfoundry.util.PaginationUtils;
+import org.cloudfoundry.util.ExceptionUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuples;
@@ -36,7 +37,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
-
+import java.util.NoSuchElementException;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 import static org.cloudfoundry.util.tuple.TupleUtils.predicate;
 import org.cloudfoundry.operations.util.OperationsLogging;
@@ -76,51 +77,59 @@ public final class DefaultRoutes implements Routes {
         @Override
         public Mono<Integer> create(CreateRouteRequest request) {
                 return Mono
-                                .zip(this.getSpaceId(request.getSpace()), this.getDomainId(request.getDomain()))
-                                .flatMap(function((spaceId, domainId) -> this.cloudFoundryClient.routesV3().create(
-                                                org.cloudfoundry.client.v3.routes.CreateRouteRequest.builder()
-                                                                .relationships(RouteRelationships.builder()
-                                                                                .space(ToOneRelationship.builder()
-                                                                                                .data(Relationship
+                                .zip(this.cloudFoundryClient, this.getSpaceId(request.getSpace()),
+                                                this.getDomainId(request.getDomain()))
+                                .flatMap(function((client, spaceId, domainId) -> client.routesV3()
+                                                .create(
+                                                                org.cloudfoundry.client.v3.routes.CreateRouteRequest
+                                                                                .builder()
+                                                                                .relationships(RouteRelationships
+                                                                                                .builder()
+                                                                                                .space(ToOneRelationship
                                                                                                                 .builder()
-                                                                                                                .id(spaceId)
+                                                                                                                .data(Relationship
+                                                                                                                                .builder()
+                                                                                                                                .id(spaceId)
+                                                                                                                                .build())
+                                                                                                                .build())
+                                                                                                .domain(ToOneRelationship
+                                                                                                                .builder()
+                                                                                                                .data(Relationship
+                                                                                                                                .builder()
+                                                                                                                                .id(domainId)
+                                                                                                                                .build())
                                                                                                                 .build())
                                                                                                 .build())
-                                                                                .domain(ToOneRelationship.builder()
-                                                                                                .data(Relationship
-                                                                                                                .builder()
-                                                                                                                .id(domainId)
-                                                                                                                .build())
-                                                                                                .build())
-                                                                                .build())
-                                                                .path(request.getPath())
-                                                                .host(request.getHost())
-                                                                .port(request.getPort())
-                                                                // .metadata(Metadata.builder().build())
-                                                                .build())))
+                                                                                .path(request.getPath())
+                                                                                .host(request.getHost())
+                                                                                .port(request.getPort())
+                                                                                // .metadata(Metadata.builder().build())
+                                                                                .build())))
                                 .flatMap(route -> Mono.justOrEmpty(route.getPort()))
                                 .transform(OperationsLogging.log("Create Route"))
                                 .checkpoint();
         }
+        // TODO replace the transformation space name -> space id via call to space
+        // operator
 
         private Mono<String> getSpaceId(String spaceName) {
-                return this.getSpaces(spaceName).flatMap(space -> space.getSpaceId());
+                return this.getSpace(spaceName).flatMap(space -> Mono.just(space.getId()));
         }
 
         private Mono<SpaceResource> getSpace(String spaceName) {
-                return Mono.zip(this, cloudFoundryClient, this.organizationId)
-                                .flatMap(client, organizationId -> PaginationUtils
-                                                .requestClientV3Resources(page -> cloudFoundryClient.spacesV3()
+                return Mono.zip(this.cloudFoundryClient, this.organizationId)
+                                .flatMap(function((client, organizationId) -> PaginationUtils
+                                                .requestClientV3Resources(page -> client.spacesV3()
                                                                 .list(ListSpacesRequest.builder()
                                                                                 .organizationId(organizationId)
                                                                                 .name(spaceName)
                                                                                 .page(page)
-                                                                                .build())))
-                                .single()
-                                .onErrorResume(NoSuchElementException.class,
-                                                t -> ExceptionUtils.illegalArgument(
-                                                                "Space %s does not exist",
-                                                                spaceName));
+                                                                                .build()))
+                                                .single()
+                                                .onErrorResume(NoSuchElementException.class,
+                                                                t -> ExceptionUtils.illegalArgument(
+                                                                                "Space %s does not exist",
+                                                                                spaceName))));
 
         }
 
