@@ -41,6 +41,7 @@ import java.util.NoSuchElementException;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 import static org.cloudfoundry.util.tuple.TupleUtils.predicate;
 import org.cloudfoundry.operations.util.OperationsLogging;
+import org.cloudfoundry.operations.v3.mapper.MapperUtils;
 
 public final class DefaultRoutes implements Routes {
 
@@ -76,9 +77,12 @@ public final class DefaultRoutes implements Routes {
 
         @Override
         public Mono<Integer> create(CreateRouteRequest request) {
-                return Mono
-                                .zip(this.cloudFoundryClient, this.getSpaceId(request.getSpace()),
-                                                this.getDomainId(request.getDomain()))
+                return Mono.zip(this.cloudFoundryClient, organizationId)
+                                .flatMap(function((client, orgId) -> Mono.zip(
+                                                this.cloudFoundryClient,
+                                                MapperUtils.getSpaceIdByName(client, orgId,
+                                                                request.getSpace()),
+                                                MapperUtils.getDomainIdByName(client, orgId, request.getDomain()))))
                                 .flatMap(function((client, spaceId, domainId) -> client.routesV3()
                                                 .create(
                                                                 org.cloudfoundry.client.v3.routes.CreateRouteRequest
@@ -108,33 +112,6 @@ public final class DefaultRoutes implements Routes {
                                 .flatMap(route -> Mono.justOrEmpty(route.getPort()))
                                 .transform(OperationsLogging.log("Create Route"))
                                 .checkpoint();
-        }
-        // TODO replace the transformation space name -> space id via call to space
-        // operator
-
-        private Mono<String> getSpaceId(String spaceName) {
-                return this.getSpace(spaceName).flatMap(space -> Mono.just(space.getId()));
-        }
-
-        private Mono<SpaceResource> getSpace(String spaceName) {
-                return Mono.zip(this.cloudFoundryClient, this.organizationId)
-                                .flatMap(function((client, organizationId) -> PaginationUtils
-                                                .requestClientV3Resources(page -> client.spacesV3()
-                                                                .list(ListSpacesRequest.builder()
-                                                                                .organizationId(organizationId)
-                                                                                .name(spaceName)
-                                                                                .page(page)
-                                                                                .build()))
-                                                .single()
-                                                .onErrorResume(NoSuchElementException.class,
-                                                                t -> ExceptionUtils.illegalArgument(
-                                                                                "Space %s does not exist",
-                                                                                spaceName))));
-
-        }
-
-        private Mono<String> getDomainId(String spaceName) {
-                return null;
         }
 
         @Override
