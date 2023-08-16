@@ -34,48 +34,49 @@ import java.util.NoSuchElementException;
 
 public final class MapperUtils {
 
-    /**
-     * Retrieves space id by given space name
-     */
-    public static Mono<String> getSpaceIdByName(CloudFoundryClient cloudFoundryClient, String organizationId,
-            String spaceName) {
-        return getSpace(cloudFoundryClient, organizationId, spaceName).flatMap(space -> Mono.just(space.getId()));
-    }
+        /**
+         * Retrieves space id by given space name
+         */
+        public static Mono<String> getSpaceIdByName(CloudFoundryClient cloudFoundryClient, String organizationId,
+                        String spaceName) {
+                return getSpace(cloudFoundryClient, organizationId, spaceName)
+                                .flatMap(space -> Mono.just(space.getId()));
+        }
 
-    public static Mono<String> getDomainIdByName(CloudFoundryClient cloudFoundryClient, String organizationId,
-            String domain) {
-        return getDomain(cloudFoundryClient, organizationId, domain)
-                .map(resource -> resource.getId());
-    }
+        public static Mono<String> getDomainIdByName(CloudFoundryClient cloudFoundryClient, String organizationId,
+                        String domain) {
+                return getDomain(cloudFoundryClient, organizationId, domain)
+                                .map(resource -> resource.getId());
+        }
 
-    private static Mono<SpaceResource> getSpace(CloudFoundryClient cloudFoundryClient, String organizationId,
-            String spaceName) {
-        return PaginationUtils.requestClientV3Resources(page -> cloudFoundryClient.spacesV3()
-                .list(ListSpacesRequest.builder()
-                        .organizationId(organizationId)
-                        .name(spaceName)
-                        .page(page)
-                        .build()))
-                .single()
-                .onErrorResume(NoSuchElementException.class,
-                        t -> ExceptionUtils.illegalArgument(
-                                "Space %s does not exist",
-                                spaceName));
+        private static Mono<SpaceResource> getSpace(CloudFoundryClient cloudFoundryClient, String organizationId,
+                        String spaceName) {
+                return PaginationUtils.requestClientV3Resources(page -> cloudFoundryClient.spacesV3()
+                                .list(ListSpacesRequest.builder()
+                                                .organizationId(organizationId)
+                                                .name(spaceName)
+                                                .page(page)
+                                                .build()))
+                                .single()
+                                .onErrorResume(NoSuchElementException.class,
+                                                t -> ExceptionUtils.illegalArgument(
+                                                                "Space %s does not exist",
+                                                                spaceName));
 
-    }
+        }
 
-    private static Mono<DomainResource> getDomain(CloudFoundryClient cloudFoundryClient,
-            String domainName, String organizationId) {
-        return PaginationUtils
-                .requestClientV3Resources(page -> cloudFoundryClient.organizationsV3().listDomains(
-                        ListOrganizationDomainsRequest.builder()
-                                .name(domainName)
-                                .page(page)
-                                .organizationId(organizationId).build()))
-                .single()
-                .onErrorResume(NoSuchElementException.class, t -> ExceptionUtils
-                        .illegalArgument("Domain %s does not exist", domainName));
+        private static Mono<DomainResource> getDomain(CloudFoundryClient cloudFoundryClient,
+                        String organizationId, String domainName) {
+                return PaginationUtils
+                                .requestClientV3Resources(page -> cloudFoundryClient.organizationsV3().listDomains(
+                                                ListOrganizationDomainsRequest.builder()
+                                                                .name(domainName)
+                                                                .page(page)
+                                                                .organizationId(organizationId).build()))
+                                .single()
+                                .onErrorResume(NoSuchElementException.class, t -> ExceptionUtils
+                                                .illegalArgument("Domain %s does not exist", domainName));
 
-    }
+        }
 
 }
