@@ -23,10 +23,12 @@ import org.cloudfoundry.client.v3.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v3.spaces.SpaceResource;
 import org.cloudfoundry.client.v3.routes.RouteRelationships;
 import org.cloudfoundry.client.v3.ToOneRelationship;
+import org.cloudfoundry.client.v3.organizations.ListOrganizationDomainsRequest;
+import org.cloudfoundry.client.v3.domains.DomainResource;
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ExceptionUtils;
-import org.cloudfoundry.util.ExceptionUtils;
+
 import reactor.core.publisher.Mono;
 import java.util.NoSuchElementException;
 
@@ -40,12 +42,10 @@ public final class MapperUtils {
         return getSpace(cloudFoundryClient, organizationId, spaceName).flatMap(space -> Mono.just(space.getId()));
     }
 
-    /**
-     * Retrieves domainb id by given domain name
-     */
     public static Mono<String> getDomainIdByName(CloudFoundryClient cloudFoundryClient, String organizationId,
-            String domainName) {
-        return null; // TODO
+            String domain) {
+        return getDomain(cloudFoundryClient, organizationId, domain)
+                .map(resource -> resource.getId());
     }
 
     private static Mono<SpaceResource> getSpace(CloudFoundryClient cloudFoundryClient, String organizationId,
@@ -61,6 +61,20 @@ public final class MapperUtils {
                         t -> ExceptionUtils.illegalArgument(
                                 "Space %s does not exist",
                                 spaceName));
+
+    }
+
+    private static Mono<DomainResource> getDomain(CloudFoundryClient cloudFoundryClient,
+            String domainName, String organizationId) {
+        return PaginationUtils
+                .requestClientV3Resources(page -> cloudFoundryClient.organizationsV3().listDomains(
+                        ListOrganizationDomainsRequest.builder()
+                                .name(domainName)
+                                .page(page)
+                                .organizationId(organizationId).build()))
+                .single()
+                .onErrorResume(NoSuchElementException.class, t -> ExceptionUtils
+                        .illegalArgument("Domain %s does not exist", domainName));
 
     }
 

@@ -26,6 +26,7 @@ import org.cloudfoundry.operations.AbstractOperationsTest;
 import org.cloudfoundry.operations.v3.mapper.MapperUtils;
 import org.junit.Test;
 import org.junit.Before;
+import org.junit.After;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -44,16 +45,17 @@ public final class CreateRouteTest extends AbstractOperationsTest {
     private final String TEST_HOST = "192.168.0,.1";
     private final Integer TEST_PORT = 8080;
     private final String TEST_DOMAIN_ID = "test-domain-id";
+    private MockedStatic<MapperUtils> mappingUtilitiesMock;
 
     @Before
     public void settup() {
 
-        MockedStatic<MapperUtils> mappingUtilities = Mockito.mockStatic(MapperUtils.class);
-        mappingUtilities
+        mappingUtilitiesMock = Mockito.mockStatic(MapperUtils.class);
+        mappingUtilitiesMock
                 .when(() -> MapperUtils.getSpaceIdByName(this.cloudFoundryClient, TEST_ORGANIZATION_ID,
                         TEST_SPACE_NAME))
                 .thenReturn(Mono.just(TEST_SPACE_ID));
-        mappingUtilities
+        mappingUtilitiesMock
                 .when(() -> MapperUtils.getDomainIdByName(this.cloudFoundryClient, TEST_ORGANIZATION_ID,
                         TEST_DOMAIN_NAME))
                 .thenReturn(Mono.just(TEST_DOMAIN_ID));
@@ -77,6 +79,11 @@ public final class CreateRouteTest extends AbstractOperationsTest {
                         .build()))
                 .thenReturn(Mono
                         .just(fill(org.cloudfoundry.client.v3.routes.CreateRouteResponse.builder()).build()));
+    }
+
+    @After
+    public void teardown() {
+        mappingUtilitiesMock.close();
     }
 
     @Test
