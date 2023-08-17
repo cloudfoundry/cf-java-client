@@ -43,54 +43,57 @@ public final class DomainIdByNameTest extends AbstractOperationsTest {
     private final String TEST_DOMAIN_ID = "3a5d3d89-3f89-4f05-8188-8a2b298c79d5";
     private final String TEST_DOMAIN_NAME = "domain-name";
 
-    @Before
-        public void settup() {
-                when(this.cloudFoundryClient.organizationsV3().listDomains(
-                        ListOrganizationDomainsRequest.builder()
-                                .name(TEST_DOMAIN_NAME)
-                                .page(1)
-                                .organizationId(TEST_ORGANIZATION_ID).build()))
-                        .thenReturn(Mono.just( ListOrganizationDomainsResponse.builder()
-                        .pagination(Pagination.builder()
-                            .totalResults(1)
-                            .totalPages(1)
-                            .first(Link.builder()
-                                .href("https://api.example.org/v3/domains?page=1&per_page=2")
-                                .build())
-                            .last(Link.builder()
-                                .href("https://api.example.org/v3/domains?page=1&per_page=2")
-                                .build())
-                            .build())
-                        .resource(DomainResource.builder()
-                            .id(TEST_DOMAIN_ID)
-                            .createdAt("2019-03-08T01:06:19Z")
-                            .updatedAt("2019-03-08T01:06:19Z")
+@Before
+    public void settup() {
+            when(this.cloudFoundryClient.organizationsV3().listDomains(
+                    ListOrganizationDomainsRequest.builder()
                             .name(TEST_DOMAIN_NAME)
-                            .isInternal(false)
-                            .relationships(DomainRelationships.builder()
-                                .organization(ToOneRelationship.builder()
-                                    .data(Relationship.builder()
-                                        .id(TEST_ORGANIZATION_ID)
-                                        .build())
-                                    .build())
-                                .sharedOrganizations(ToManyRelationship.builder().build())
-                                .build())
-                            .link("self", Link.builder()
-                                .href("https://api.example.org/v3/domains/3a5d3d89-3f89-4f05-8188-8a2b298c79d5")
-                                .build())
-                            .link("organization", Link.builder()
-                                .href("https://api.example.org/v3/organizations/test-organization-id")
-                                .build())
-                            .link("route_reservations", Link.builder()
-                                .href("https://api.example.org/v3/domains/3a5d3d89-3f89-4f05-8188-8a2b298c79d5/route_reservations")
-                                .build())
+                            .page(1)
+                            .organizationId(TEST_ORGANIZATION_ID).build()))
+                    .thenReturn(Mono.just( ListOrganizationDomainsResponse.builder()
+                    .pagination(Pagination.builder()
+                        .totalResults(1)
+                        .totalPages(1)
+                        .first(Link.builder()
+                            .href("https://api.example.org/v3/domains?page=1&per_page=2")
                             .build())
-                        .build()));
-        }
+                        .last(Link.builder()
+                            .href("https://api.example.org/v3/domains?page=1&per_page=2")
+                            .build())
+                        .build())
+                    .resource(DomainResource.builder()
+                        .id(TEST_DOMAIN_ID)
+                        .createdAt("2019-03-08T01:06:19Z")
+                        .updatedAt("2019-03-08T01:06:19Z")
+                        .name(TEST_DOMAIN_NAME)
+                        .isInternal(false)
+                        .relationships(DomainRelationships.builder()
+                            .organization(ToOneRelationship.builder()
+                                .data(Relationship.builder()
+                                    .id(TEST_ORGANIZATION_ID)
+                                    .build())
+                                .build())
+                            .sharedOrganizations(ToManyRelationship.builder().build())
+                            .build())
+                        .link("self", Link.builder()
+                            .href("https://api.example.org/v3/domains/3a5d3d89-3f89-4f05-8188-8a2b298c79d5")
+                            .build())
+                        .link("organization", Link.builder()
+                            .href("https://api.example.org/v3/organizations/test-organization-id")
+                            .build())
+                        .link("route_reservations", Link.builder()
+                            .href("https://api.example.org/v3/domains/3a5d3d89-3f89-4f05-8188-8a2b298c79d5/route_reservations")
+                            .build())
+                        .build())
+                    .build()));
+    }
 
     @Test
     public void getDomainIdByName() {
-        MapperUtils.getDomainIdByName(this.cloudFoundryClient, TEST_ORGANIZATION_ID, TEST_DOMAIN_NAME)
+        MapperUtils.getDomainIdByName(
+                this.cloudFoundryClient,
+                TEST_ORGANIZATION_ID,
+                TEST_DOMAIN_NAME)
                 .as(StepVerifier::create)
                 .expectNext(TEST_DOMAIN_ID)
                 .expectComplete()

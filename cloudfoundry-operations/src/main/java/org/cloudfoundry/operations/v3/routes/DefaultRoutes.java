@@ -21,6 +21,7 @@ import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v3.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v3.spaces.SpaceResource;
 import org.cloudfoundry.client.v3.routes.RouteRelationships;
+import org.cloudfoundry.client.v3.domains.CheckReservedRoutesRequest;
 import org.cloudfoundry.client.v3.ToOneRelationship;
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.util.PaginationUtils;
@@ -60,19 +61,16 @@ public final class DefaultRoutes implements Routes {
 
         @Override
         public Mono<Boolean> check(CheckRouteRequest request) {
-                return null;
-                // return Mono
-                // .zip(this.cloudFoundryClient, this.organizationId)
-                // .flatMap(function((cloudFoundryClient, organizationId) -> Mono.zip(
-                // Mono.just(cloudFoundryClient),
-                // getOptionalDomainId(cloudFoundryClient, organizationId,
-                // request.getDomain()))))
-                // .flatMap(function((cloudFoundryClient, domainId) -> requestRouteExists(
-                // cloudFoundryClient, domainId,
-                // request.getHost(), request.getPath())))
-                // .defaultIfEmpty(false)
-                // .transform(OperationsLogging.log("Check Route Exists"))
-                // .checkpoint();
+                return Mono.zip(this.cloudFoundryClient, this.organizationId)
+                                .flatMap(function((client, organizationId) -> Mono.zip(this.cloudFoundryClient,
+                                                MapperUtils.getOptionalDomainIdByName(
+                                                                client, organizationId,
+                                                                request.getDomain()))))
+                                .flatMap(function((client, domainId) -> routeExists(client, domainId, request.getHost(),
+                                                request.getPath())))
+                                .defaultIfEmpty(false)
+                                .transform(OperationsLogging.log("Check Route Exists"))
+                                .checkpoint();
         }
 
         @Override
@@ -83,32 +81,9 @@ public final class DefaultRoutes implements Routes {
                                                 MapperUtils.getSpaceIdByName(client, orgId,
                                                                 request.getSpace()),
                                                 MapperUtils.getDomainIdByName(client, orgId, request.getDomain()))))
-                                .flatMap(function((client, spaceId, domainId) -> client.routesV3()
-                                                .create(
-                                                                org.cloudfoundry.client.v3.routes.CreateRouteRequest
-                                                                                .builder()
-                                                                                .relationships(RouteRelationships
-                                                                                                .builder()
-                                                                                                .space(ToOneRelationship
-                                                                                                                .builder()
-                                                                                                                .data(Relationship
-                                                                                                                                .builder()
-                                                                                                                                .id(spaceId)
-                                                                                                                                .build())
-                                                                                                                .build())
-                                                                                                .domain(ToOneRelationship
-                                                                                                                .builder()
-                                                                                                                .data(Relationship
-                                                                                                                                .builder()
-                                                                                                                                .id(domainId)
-                                                                                                                                .build())
-                                                                                                                .build())
-                                                                                                .build())
-                                                                                .path(request.getPath())
-                                                                                .host(request.getHost())
-                                                                                .port(request.getPort())
-                                                                                // .metadata(Metadata.builder().build())
-                                                                                .build())))
+                                .flatMap(function((client, spaceId, domainId) -> createRoute(client,
+                                                spaceId, domainId, request.getPath(), request.getHost(),
+                                                request.getPort())))
                                 .flatMap(route -> Mono.justOrEmpty(route.getPort()))
                                 .transform(OperationsLogging.log("Create Route"))
                                 .checkpoint();
@@ -582,19 +557,6 @@ public final class DefaultRoutes implements Routes {
         // .build());
         // }
 
-        // private static Mono<Boolean> requestRouteExists(CloudFoundryClient
-        // cloudFoundryClient, String domainId,
-        // String host,
-        // String path) {
-        // return
-        // cloudFoundryClient.domainsV3().checkReservedRoutes(CheckReservedRoutesRequest.builder()
-        // .domainId(domainId)
-        // .host(host)
-        // .path(path)
-        // .build())
-        // .flatMap(response -> Mono.just(response.getMatchingRoute()));
-        // }
-
         // private static Flux<RouteResource> requestRoutes(CloudFoundryClient
         // cloudFoundryClient,
         // UnaryOperator<org.cloudfoundry.client.v2.routes.ListRoutesRequest.Builder>
@@ -675,5 +637,45 @@ public final class DefaultRoutes implements Routes {
         // return entity.getServiceInstanceId() == null ||
         // entity.getServiceInstanceId().isEmpty();
         // }
+
+        private static Mono<Boolean> routeExists(CloudFoundryClient cloudFoundryClient, String domainId,
+                        String host,
+                        String path) {
+                return cloudFoundryClient.domainsV3().checkReservedRoutes(CheckReservedRoutesRequest.builder()
+                                .domainId(domainId)
+                                .host(host)
+                                .path(path)
+                                .build())
+                                .flatMap(response -> Mono.just(response.getMatchingRoute()));
+        }
+
+        private static Mono<org.cloudfoundry.client.v3.routes.CreateRouteResponse> createRoute(
+                        CloudFoundryClient client,
+                        String spaceId, String domainId, String path, String host, Integer port) {
+                return client.routesV3().create(org.cloudfoundry.client.v3.routes.CreateRouteRequest
+                                .builder()
+                                .relationships(RouteRelationships
+                                                .builder()
+                                                .space(ToOneRelationship
+                                                                .builder()
+                                                                .data(Relationship
+                                                                                .builder()
+                                                                                .id(spaceId)
+                                                                                .build())
+                                                                .build())
+                                                .domain(ToOneRelationship
+                                                                .builder()
+                                                                .data(Relationship
+                                                                                .builder()
+                                                                                .id(domainId)
+                                                                                .build())
+                                                                .build())
+                                                .build())
+                                .path(path)
+                                .host(host)
+                                .port(port)
+                                // .metadata(Metadata.builder().build())
+                                .build());
+        }
 
 }

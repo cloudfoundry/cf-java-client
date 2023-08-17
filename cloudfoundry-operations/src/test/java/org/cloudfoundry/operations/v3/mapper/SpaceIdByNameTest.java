@@ -35,40 +35,43 @@ import static org.mockito.Mockito.when;
 
 public final class SpaceIdByNameTest extends AbstractOperationsTest {
 
-        @Before
-        public void settup() {
-                when(this.cloudFoundryClient.spacesV3().list(ListSpacesRequest.builder()
-                        .organizationId(TEST_ORGANIZATION_ID)
-                        .name(TEST_SPACE_NAME)
-                        .page(1)
-                        .build()))
-                        .thenReturn(Mono.just(ListSpacesResponse.builder()
-                                .pagination(   
-                                        Pagination.builder()
-                                        .totalResults(1)
-                                        .totalPages(1)
-                                        .first(Link.builder()
-                                                .href("https://api.example.org/v3/spaces?page=1&per_page=50")
-                                                .build())
-                                        .last(Link.builder()
-                                                .href("https://api.example.org/v3/spaces?page=1&per_page=50")
-                                                .build())
+@Before
+public void settup() {
+        when(this.cloudFoundryClient.spacesV3().list(ListSpacesRequest.builder()
+                .organizationId(TEST_ORGANIZATION_ID)
+                .name(TEST_SPACE_NAME)
+                .page(1)
+                .build()))
+                .thenReturn(Mono.just(ListSpacesResponse.builder()
+                        .pagination(   
+                                Pagination.builder()
+                                .totalResults(1)
+                                .totalPages(1)
+                                .first(Link.builder()
+                                        .href("https://api.example.org/v3/spaces?page=1&per_page=50")
                                         .build())
-                                .resource(SpaceResource.builder()
-                                .id(TEST_SPACE_ID)
-                                .createdAt("2017-02-01T01:33:58Z")
-                                .updatedAt("2017-02-01T01:33:58Z")
-                                .name(TEST_SPACE_NAME)
-                                .link("self", Link.builder()
-                                        .href("https://api.example.org/v3/spaces/"+TEST_SPACE_ID)
+                                .last(Link.builder()
+                                        .href("https://api.example.org/v3/spaces?page=1&per_page=50")
                                         .build())
                                 .build())
-                                .build()));
-        }
+                        .resource(SpaceResource.builder()
+                        .id(TEST_SPACE_ID)
+                        .createdAt("2017-02-01T01:33:58Z")
+                        .updatedAt("2017-02-01T01:33:58Z")
+                        .name(TEST_SPACE_NAME)
+                        .link("self", Link.builder()
+                                .href("https://api.example.org/v3/spaces/"+TEST_SPACE_ID)
+                                .build())
+                        .build())
+                        .build()));
+}
 
         @Test
         public void getSpaceIdByName() {
-                MapperUtils.getSpaceIdByName(this.cloudFoundryClient, TEST_ORGANIZATION_ID, TEST_SPACE_NAME)
+                MapperUtils.getSpaceIdByName(
+                                this.cloudFoundryClient,
+                                TEST_ORGANIZATION_ID,
+                                TEST_SPACE_NAME)
                                 .as(StepVerifier::create)
                                 .expectNext(TEST_SPACE_ID)
                                 .expectComplete()

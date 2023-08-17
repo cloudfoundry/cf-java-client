@@ -30,6 +30,7 @@ import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ExceptionUtils;
 
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.Flux;
 import java.util.NoSuchElementException;
 
 public final class MapperUtils {
@@ -46,6 +47,14 @@ public final class MapperUtils {
         public static Mono<String> getDomainIdByName(CloudFoundryClient cloudFoundryClient, String organizationId,
                         String domain) {
                 return getDomain(cloudFoundryClient, organizationId, domain)
+                                .map(resource -> resource.getId());
+        }
+
+        public static Mono<String> getOptionalDomainIdByName(CloudFoundryClient cloudFoundryClient,
+                        String organizationId,
+                        String domain) {
+                return listDomains(cloudFoundryClient, organizationId, new String[] { domain })
+                                .singleOrEmpty()
                                 .map(resource -> resource.getId());
         }
 
@@ -67,16 +76,21 @@ public final class MapperUtils {
 
         private static Mono<DomainResource> getDomain(CloudFoundryClient cloudFoundryClient,
                         String organizationId, String domainName) {
-                return PaginationUtils
-                                .requestClientV3Resources(page -> cloudFoundryClient.organizationsV3().listDomains(
-                                                ListOrganizationDomainsRequest.builder()
-                                                                .name(domainName)
-                                                                .page(page)
-                                                                .organizationId(organizationId).build()))
+                return listDomains(cloudFoundryClient, organizationId, new String[] { domainName })
                                 .single()
                                 .onErrorResume(NoSuchElementException.class, t -> ExceptionUtils
                                                 .illegalArgument("Domain %s does not exist", domainName));
 
+        }
+
+        private static Flux<DomainResource> listDomains(CloudFoundryClient cloudFoundryClient,
+                        String organizationId, String[] domainNamesFilter) {
+                return PaginationUtils
+                                .requestClientV3Resources(page -> cloudFoundryClient.organizationsV3().listDomains(
+                                                ListOrganizationDomainsRequest.builder()
+                                                                .names(domainNamesFilter)
+                                                                .page(page)
+                                                                .organizationId(organizationId).build()));
         }
 
 }
