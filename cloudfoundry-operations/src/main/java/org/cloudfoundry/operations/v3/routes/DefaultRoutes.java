@@ -26,6 +26,7 @@ import org.cloudfoundry.client.v3.ToOneRelationship;
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ExceptionUtils;
+import org.cloudfoundry.util.JobUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuples;
@@ -91,21 +92,16 @@ public final class DefaultRoutes implements Routes {
 
         @Override
         public Mono<Void> delete(DeleteRouteRequest request) {
-                return null;
-                // return Mono
-                // .zip(this.cloudFoundryClient, this.organizationId)
-                // .flatMap(function((cloudFoundryClient, organizationId) -> Mono.zip(
-                // Mono.just(cloudFoundryClient),
-                // getDomainId(cloudFoundryClient, organizationId, request.getDomain()))))
-                // .flatMap(function((cloudFoundryClient, domainId) -> Mono.zip(
-                // Mono.just(cloudFoundryClient),
-                // Mono.just(request.getCompletionTimeout()),
-                // getRouteId(cloudFoundryClient, request.getHost(), request.getDomain(),
-                // domainId,
-                // request.getPath(), request.getPort()))))
-                // .flatMap(function(DefaultRoutes::deleteRoute))
-                // .transform(OperationsLogging.log("Delete Route"))
-                // .checkpoint();
+                return Mono.zip(
+                                this.cloudFoundryClient, this.organizationId)
+                                .flatMap(function((client, orgId) -> Mono.zip(this.cloudFoundryClient,
+                                                MapperUtils.getRouteId(client, orgId, request.getDomain(),
+                                                                request.getHost(),
+                                                                request.getPort(), request.getPath()))))
+                                .flatMap(function((client, routeId) -> deleteRoute(client,
+                                                request.getCompletionTimeout(), routeId)))
+                                .transform(OperationsLogging.log("Delete Route"))
+                                .checkpoint();
         }
 
         @Override
@@ -210,13 +206,13 @@ public final class DefaultRoutes implements Routes {
                 // .checkpoint();
         }
 
-        // private static Mono<Void> deleteRoute(CloudFoundryClient cloudFoundryClient,
-        // Duration completionTimeout,
-        // String routeId) {
-        // return requestDeleteRoute(cloudFoundryClient, routeId)
-        // .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient,
-        // completionTimeout, job));
-        // }
+        private static Mono<Void> deleteRoute(CloudFoundryClient cloudFoundryClient,
+                        Duration completionTimeout,
+                        String routeId) {
+                return requestDeleteRoute(cloudFoundryClient, routeId)
+                                .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient,
+                                                completionTimeout, job));
+        }
 
         // private static Mono<Map<String, String>> getAllDomains(CloudFoundryClient
         // cloudFoundryClient,
@@ -513,15 +509,13 @@ public final class DefaultRoutes implements Routes {
         // .build());
         // }
 
-        // private static Mono<DeleteRouteResponse>
-        // requestDeleteRoute(CloudFoundryClient cloudFoundryClient,
-        // String routeId) {
-        // return cloudFoundryClient.routes()
-        // .delete(org.cloudfoundry.client.v2.routes.DeleteRouteRequest.builder()
-        // .async(true)
-        // .routeId(routeId)
-        // .build());
-        // }
+        private static Mono<String> requestDeleteRoute(CloudFoundryClient cloudFoundryClient,
+                        String routeId) {
+                return cloudFoundryClient.routesV3()
+                                .delete(org.cloudfoundry.client.v3.routes.DeleteRouteRequest.builder()
+                                                .routeId(routeId)
+                                                .build());
+        }
 
         // private static Flux<UnionServiceInstanceResource>
         // requestListSpaceServiceInstances(

@@ -22,6 +22,7 @@ import org.immutables.value.Value;
 import org.cloudfoundry.client.v3.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v3.spaces.SpaceResource;
 import org.cloudfoundry.client.v3.routes.RouteRelationships;
+import org.cloudfoundry.client.v3.routes.RouteResource;
 import org.cloudfoundry.client.v3.ToOneRelationship;
 import org.cloudfoundry.client.v3.organizations.ListOrganizationDomainsRequest;
 import org.cloudfoundry.client.v3.domains.DomainResource;
@@ -35,9 +36,23 @@ import java.util.NoSuchElementException;
 
 public final class MapperUtils {
 
-        /**
-         * Retrieves space id by given space name
-         */
+        public static Mono<String> getRouteId(CloudFoundryClient cloudFoundryClient, String organizationId,
+                        String domain,
+                        String host, Integer port, String path) {
+
+                return Mono.just(domain)
+                                .flatMap(name -> getDomainIdByName(cloudFoundryClient, organizationId, name))
+                                .flatMap(domainId -> listRoutes(cloudFoundryClient, null,
+                                                new String[] { organizationId }, new String[] { path },
+                                                new String[] { host }, new int[] { port },
+                                                new String[] { domainId })
+                                                .single()
+                                                .switchIfEmpty(ExceptionUtils.illegalArgument(
+                                                                "Route for %s does not exist",
+                                                                domain)))
+                                .flatMap(route -> Mono.just(route.getId()));
+        }
+
         public static Mono<String> getSpaceIdByName(CloudFoundryClient cloudFoundryClient, String organizationId,
                         String spaceName) {
                 return getSpace(cloudFoundryClient, organizationId, spaceName)
@@ -93,4 +108,20 @@ public final class MapperUtils {
                                                                 .organizationId(organizationId).build()));
         }
 
+        private static Flux<RouteResource> listRoutes(CloudFoundryClient cloudFoundryClient, String[] spaceIdFilter,
+                        String[] organizationIdFilter, String[] pathsFilter, String[] hostsFilter,
+                        int[] portsFilter, String[] domainIdFilter) {
+
+                return PaginationUtils
+                                .requestClientV3Resources(page -> cloudFoundryClient.routesV3()
+                                                .list(org.cloudfoundry.client.v3.routes.ListRoutesRequest.builder()
+                                                                .page(page)
+                                                                .spaceIds(spaceIdFilter)
+                                                                .organizationIds(organizationIdFilter)
+                                                                .ports(portsFilter)
+                                                                .hosts(hostsFilter)
+                                                                .paths(pathsFilter)
+                                                                .domainIds(domainIdFilter)
+                                                                .build()));
+        }
 }
