@@ -55,7 +55,7 @@ public final class MapperUtils {
 
         public static Mono<String> getSpaceIdByName(CloudFoundryClient cloudFoundryClient, String organizationId,
                         String spaceName) {
-                return getSpace(cloudFoundryClient, organizationId, spaceName)
+                return listSpaces(cloudFoundryClient, organizationId, new String[] { spaceName })
                                 .flatMap(space -> Mono.just(space.getId()));
         }
 
@@ -73,19 +73,19 @@ public final class MapperUtils {
                                 .map(resource -> resource.getId());
         }
 
-        private static Mono<SpaceResource> getSpace(CloudFoundryClient cloudFoundryClient, String organizationId,
-                        String spaceName) {
+        public static Mono<SpaceResource> listSpaces(CloudFoundryClient cloudFoundryClient, String organizationId,
+                        String[] spacesNameFilter) {
                 return PaginationUtils.requestClientV3Resources(page -> cloudFoundryClient.spacesV3()
                                 .list(ListSpacesRequest.builder()
                                                 .organizationId(organizationId)
-                                                .name(spaceName)
+                                                .names(spacesNameFilter)
                                                 .page(page)
                                                 .build()))
                                 .single()
                                 .onErrorResume(NoSuchElementException.class,
                                                 t -> ExceptionUtils.illegalArgument(
                                                                 "Space %s does not exist",
-                                                                spaceName));
+                                                                String.join(",", spacesNameFilter)));
 
         }
 
@@ -98,7 +98,7 @@ public final class MapperUtils {
 
         }
 
-        private static Flux<DomainResource> listDomains(CloudFoundryClient cloudFoundryClient,
+        public static Flux<DomainResource> listDomains(CloudFoundryClient cloudFoundryClient,
                         String organizationId, String[] domainNamesFilter) {
                 return PaginationUtils
                                 .requestClientV3Resources(page -> cloudFoundryClient.organizationsV3().listDomains(
@@ -108,7 +108,7 @@ public final class MapperUtils {
                                                                 .organizationId(organizationId).build()));
         }
 
-        private static Flux<RouteResource> listRoutes(CloudFoundryClient cloudFoundryClient, String[] spaceIdFilter,
+        public static Flux<RouteResource> listRoutes(CloudFoundryClient cloudFoundryClient, String[] spaceIdFilter,
                         String[] organizationIdFilter, String[] pathsFilter, String[] hostsFilter,
                         int[] portsFilter, String[] domainIdFilter) {
 
