@@ -60,12 +60,6 @@ abstract class _Route {
     abstract String getPort();
 
     /**
-     * The service of this route
-     */
-    @Nullable
-    abstract String getService();
-
-    /**
      * The name of the space of this route
      */
     abstract String getSpace();
