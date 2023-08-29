@@ -21,6 +21,11 @@ import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v3.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v3.spaces.SpaceResource;
 import org.cloudfoundry.client.v3.routes.Destination;
+import org.cloudfoundry.client.v3.routes.Application;
+import org.cloudfoundry.client.v3.routes.InsertRouteDestinationsRequest;
+import org.cloudfoundry.client.v3.routes.InsertRouteDestinationsResponse;
+import org.cloudfoundry.client.v3.routes.RemoveRouteDestinationsRequest;
+
 import org.cloudfoundry.client.v3.routes.RouteRelationships;
 import org.cloudfoundry.client.v3.routes.RouteResource;
 import org.cloudfoundry.client.v3.domains.CheckReservedRoutesRequest;
@@ -127,10 +132,11 @@ public final class DefaultRoutes implements Routes {
                 return Mono.zip(this.cloudFoundryClient, this.organizationId, this.spaceId)
                                 .flatMapMany(function((client, organizationId, spaceId) -> MapperUtils.listRoutes(
                                                 client,
+                                                new String[] { organizationId },
                                                 ((Level.SPACE == request.getLevel()) ? new String[] { spaceId }
                                                                 : null),
-                                                new String[] { organizationId },
-                                                null, null, null, null)))
+
+                                                null, null, null, null, null)))
                                 .map(route -> toRoute(route))
                                 .transform(OperationsLogging.log("List Routes"))
                                 .checkpoint();
@@ -138,44 +144,81 @@ public final class DefaultRoutes implements Routes {
 
         @Override
         public Mono<Integer> map(MapRouteRequest request) {
-                return null;
-                // return Mono
-                // .zip(this.cloudFoundryClient, this.organizationId, this.spaceId)
-                // .flatMap(function((cloudFoundryClient, organizationId, spaceId) -> Mono.zip(
-                // Mono.just(cloudFoundryClient),
-                // getOrCreateRoute(cloudFoundryClient, organizationId, spaceId,
-                // request.getDomain(),
-                // request.getHost(), request.getPath(), request.getPort(),
-                // request.getRandomPort()),
-                // getApplicationId(cloudFoundryClient, request.getApplicationName(),
-                // spaceId))))
-                // .flatMap(function((cloudFoundryClient, routeResource,
-                // applicationId) -> requestAssociateRoute(
-                // cloudFoundryClient, applicationId,
-                // ResourceUtils.getId(routeResource))))
-                // .then(Mono.justOrEmpty(request.getPort()))
-                // .transform(OperationsLogging.log("Map Route"))
-                // .checkpoint();
+                return Mono
+                                .zip(this.cloudFoundryClient, this.organizationId, this.spaceId)
+                                .flatMap(function((cloudFoundryClient, organizationId, spaceId) -> Mono.zip(
+                                                this.cloudFoundryClient,
+                                                getOrCreateRoute(cloudFoundryClient, organizationId, spaceId,
+                                                                request.getDomain(),
+                                                                request.getHost(), request.getPath(),
+                                                                request.getPort()),
+                                                MapperUtils.getApplicationIdByName(cloudFoundryClient,
+                                                                request.getApplicationName(),
+                                                                spaceId, organizationId))))
+                                .flatMap(function((cloudFoundryClient, routeResource,
+                                                applicationId) -> insertDestination(
+                                                                cloudFoundryClient, routeResource.getId(),
+                                                                Destination.builder()
+                                                                                .application(Application.builder()
+                                                                                                .applicationId(applicationId)
+                                                                                                .build())
+                                                                                .port(routeResource.getPort())
+                                                                                .protocol(routeResource.getProtocol()
+                                                                                                .toString())
+                                                                                .build())))
+                                .then(Mono.justOrEmpty(request.getPort()))
+                                .transform(OperationsLogging.log("Map Route"))
+                                .checkpoint();
+        }
+
+        private static Mono<org.cloudfoundry.client.v3.routes.Route> getOrCreateRoute(
+                        CloudFoundryClient cloudFoundryClient,
+                        String organizationId, String spaceId, String domain, String host, String path, Integer port) {
+                // create will assign random port, thus we need to create route every time
+                if (port == null) {
+                        return createRoute(cloudFoundryClient, spaceId, domain, path, host, port)
+                                        .cast(org.cloudfoundry.client.v3.routes.Route.class);
+
+                }
+
+                return MapperUtils.getDomainIdByName(cloudFoundryClient, organizationId, domain)
+                                .flatMap(domainId -> MapperUtils
+                                                .getRoute(cloudFoundryClient, organizationId, domainId, host,
+                                                                port, path, null)
+                                                .cast(org.cloudfoundry.client.v3.routes.Route.class)
+                                                .switchIfEmpty(createRoute(cloudFoundryClient, spaceId, domain, path,
+                                                                host, port)
+                                                                .cast(org.cloudfoundry.client.v3.routes.Route.class)));
         }
 
         @Override
         public Mono<Void> unmap(UnmapRouteRequest request) {
-                return null;
-                // return Mono
-                // .zip(this.cloudFoundryClient, this.organizationId, this.spaceId)
-                // .flatMap(function((cloudFoundryClient, organizationId, spaceId) -> Mono.zip(
-                // Mono.just(cloudFoundryClient),
-                // getApplicationId(cloudFoundryClient, request.getApplicationName(),
-                // spaceId),
-                // getDomainId(cloudFoundryClient, organizationId, request.getDomain())
-                // .flatMap(domainId -> getRouteId(cloudFoundryClient,
-                // request.getHost(),
-                // request.getDomain(), domainId,
-                // request.getPath(),
-                // request.getPort())))))
-                // .flatMap(function(DefaultRoutes::requestRemoveRouteFromApplication))
-                // .transform(OperationsLogging.log("Unmap Route"))
-                // .checkpoint();
+                return Mono
+                                .zip(this.cloudFoundryClient, this.organizationId, this.spaceId)
+                                .flatMap(function((cloudFoundryClient, organizationId, spaceId) -> Mono.zip(
+                                                this.cloudFoundryClient,
+                                                this.organizationId,
+                                                this.spaceId,
+                                                MapperUtils.getApplicationIdByName(cloudFoundryClient,
+                                                                request.getApplicationName(),
+                                                                spaceId, organizationId))))
+                                .flatMap(function((cloudFoundryClient, organizationId, spaceId, applicationId) -> Mono
+                                                .zip(
+                                                                this.cloudFoundryClient,
+                                                                MapperUtils.getRoute(cloudFoundryClient, organizationId,
+                                                                                request.getDomain(),
+                                                                                request.getHost(),
+                                                                                request.getPort(), request.getPath(),
+                                                                                applicationId),
+                                                                Mono.just(applicationId))))
+                                .flatMap(function((cloudFoundryClient, route,
+                                                applicationId) -> removeDestination(
+                                                                cloudFoundryClient, route,
+                                                                applicationId)))
+
+                                .transform(OperationsLogging.log("Unmap Route"))
+                                .checkpoint();
+
         }
 
         private static Mono<Void> deleteRoute(CloudFoundryClient cloudFoundryClient,
@@ -245,8 +288,30 @@ public final class DefaultRoutes implements Routes {
                                 .path(path)
                                 .host(host)
                                 .port(port)
-                                // .metadata(Metadata.builder().build())
+
                                 .build());
         }
 
+        private static Mono<InsertRouteDestinationsResponse> insertDestination(
+                        CloudFoundryClient cloudFoundryClient, String routeId, Destination destination) {
+                return cloudFoundryClient.routesV3()
+                                .insertDestinations(InsertRouteDestinationsRequest.builder()
+                                                .routeId(routeId)
+                                                .destination(destination)
+                                                .build());
+        }
+
+        private static Mono<Void> removeDestination(
+                        CloudFoundryClient cloudFoundryClient, RouteResource route, String applicationId) {
+                String destinationId = route.getDestinations().stream()
+                                .filter(destination -> destination.getApplication().getApplicationId() == applicationId)
+                                .map(destination -> destination.getDestinationId())
+                                .findAny().get();
+
+                return cloudFoundryClient.routesV3()
+                                .removeDestinations(RemoveRouteDestinationsRequest.builder()
+                                                .routeId(route.getId())
+                                                .destinationId(destinationId)
+                                                .build());
+        }
 }

@@ -19,6 +19,8 @@ package org.cloudfoundry.operations.v3.mapper;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.immutables.value.Value;
+import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
+import org.cloudfoundry.client.v3.applications.ApplicationResource;
 import org.cloudfoundry.client.v3.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v3.spaces.SpaceResource;
 import org.cloudfoundry.client.v3.routes.RouteRelationships;
@@ -40,17 +42,26 @@ public final class MapperUtils {
                         String domain,
                         String host, Integer port, String path) {
 
+                return getRoute(cloudFoundryClient, organizationId, domain, host, port, path, null)
+                                .flatMap(route -> Mono.just(route.getId()));
+        }
+
+        public static Mono<RouteResource> getRoute(CloudFoundryClient cloudFoundryClient, String organizationId,
+                        String domain,
+                        String host, Integer port, String path, String applicationId) {
+
                 return Mono.just(domain)
                                 .flatMap(name -> getDomainIdByName(cloudFoundryClient, organizationId, name))
-                                .flatMap(domainId -> listRoutes(cloudFoundryClient, null,
-                                                new String[] { organizationId }, new String[] { path },
+                                .flatMap(domainId -> listRoutes(cloudFoundryClient,
+                                                new String[] { organizationId }, null, new String[] { path },
                                                 new String[] { host }, new int[] { port },
-                                                new String[] { domainId })
+                                                new String[] { domainId },
+                                                (applicationId != null) ? new String[] { applicationId }
+                                                                : new String[] {})
                                                 .single()
                                                 .switchIfEmpty(ExceptionUtils.illegalArgument(
                                                                 "Route for %s does not exist",
-                                                                domain)))
-                                .flatMap(route -> Mono.just(route.getId()));
+                                                                domain)));
         }
 
         public static Mono<String> getSpaceIdByName(CloudFoundryClient cloudFoundryClient, String organizationId,
@@ -108,20 +119,49 @@ public final class MapperUtils {
                                                                 .organizationId(organizationId).build()));
         }
 
-        public static Flux<RouteResource> listRoutes(CloudFoundryClient cloudFoundryClient, String[] spaceIdFilter,
-                        String[] organizationIdFilter, String[] pathsFilter, String[] hostsFilter,
-                        int[] portsFilter, String[] domainIdFilter) {
+        public static Flux<RouteResource> listRoutes(CloudFoundryClient cloudFoundryClient,
+                        String[] organizationIdsFilter, String[] spaceIdFilter, String[] pathsFilter,
+                        String[] hostsFilter,
+                        int[] portsFilter, String[] domainIdFilter, String[] applicationIds) {
 
                 return PaginationUtils
                                 .requestClientV3Resources(page -> cloudFoundryClient.routesV3()
                                                 .list(org.cloudfoundry.client.v3.routes.ListRoutesRequest.builder()
                                                                 .page(page)
+                                                                .applicationIds(applicationIds)
                                                                 .spaceIds(spaceIdFilter)
-                                                                .organizationIds(organizationIdFilter)
+                                                                .organizationIds(organizationIdsFilter)
                                                                 .ports(portsFilter)
                                                                 .hosts(hostsFilter)
                                                                 .paths(pathsFilter)
                                                                 .domainIds(domainIdFilter)
                                                                 .build()));
         }
+
+        private static Flux<ApplicationResource> listApplications(CloudFoundryClient cloudFoundryClient,
+                        String[] nameFilter, String[] organizationIdsFilter, String[] spaceIdsFilter) {
+                return PaginationUtils
+                                .requestClientV3Resources(page -> cloudFoundryClient.applicationsV3()
+                                                .list(ListApplicationsRequest.builder()
+                                                                .names(nameFilter)
+                                                                .page(page)
+                                                                .spaceIds(spaceIdsFilter)
+                                                                .organizationIds(organizationIdsFilter)
+                                                                .build()));
+        }
+
+        public static Mono<String> getApplicationIdByName(CloudFoundryClient cloudFoundryClient,
+                        String name, String spaceId, String organizationId) {
+
+                return listApplications(cloudFoundryClient,
+                                new String[] { name },
+                                new String[] { organizationId },
+                                new String[] { spaceId })
+                                .single()
+                                .map(app -> app.getId())
+                                .switchIfEmpty(ExceptionUtils.illegalArgument(
+                                                "Application with name %s does not exist",
+                                                name));
+        }
+
 }

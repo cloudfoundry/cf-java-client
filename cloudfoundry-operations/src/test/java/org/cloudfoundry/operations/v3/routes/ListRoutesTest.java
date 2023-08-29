@@ -52,8 +52,8 @@ public final class ListRoutesTest extends AbstractOperationsTest {
 
                 mappingUtilitiesMock = Mockito.mockStatic(MapperUtils.class);
                 mappingUtilitiesMock.when(() -> MapperUtils.listRoutes(this.cloudFoundryClient,
-                                new String[] { TEST_SPACE_ID },
-                                new String[] { TEST_ORGANIZATION_ID }, null, null, null, null))
+                                new String[] { TEST_ORGANIZATION_ID },
+                                new String[] { TEST_SPACE_ID }, null, null, null, null, null))
                                 .thenReturn(Flux.just(fill(org.cloudfoundry.client.v3.routes.RouteResource.builder())
                                                 .build()));
 
