@@ -39,66 +39,65 @@ import org.mockito.MockedStatic;
 
 public final class CreateRouteTest extends AbstractOperationsTest {
 
-    private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient),
-            Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
-    private final String TEST_DOMAIN_NAME = "test-domain";
-    private final String TEST_HOST = "192.168.0,.1";
-    private final Integer TEST_PORT = 8080;
-    private final String TEST_DOMAIN_ID = "test-domain-id";
-    private MockedStatic<MapperUtils> mappingUtilitiesMock;
+        private final DefaultRoutes routes = new DefaultRoutes(Mono.just(this.cloudFoundryClient),
+                        Mono.just(TEST_ORGANIZATION_ID), Mono.just(TEST_SPACE_ID));
+        private final String TEST_DOMAIN_NAME = "test-domain";
+        private final String TEST_HOST = "192.168.0,.1";
+        private final Integer TEST_PORT = 8080;
+        private final String TEST_DOMAIN_ID = "test-domain-id";
+        private MockedStatic<MapperUtils> mappingUtilitiesMock;
 
-    @Before
-    public void settup() {
+        @Before
+        public void settup() {
 
-        mappingUtilitiesMock = Mockito.mockStatic(MapperUtils.class);
-        mappingUtilitiesMock
-                .when(() -> MapperUtils.getSpaceIdByName(this.cloudFoundryClient, TEST_ORGANIZATION_ID,
-                        TEST_SPACE_NAME))
-                .thenReturn(Mono.just(TEST_SPACE_ID));
-        mappingUtilitiesMock
-                .when(() -> MapperUtils.getDomainIdByName(this.cloudFoundryClient, TEST_ORGANIZATION_ID,
-                        TEST_DOMAIN_NAME))
-                .thenReturn(Mono.just(TEST_DOMAIN_ID));
+                mappingUtilitiesMock = Mockito.mockStatic(MapperUtils.class);
+                mappingUtilitiesMock
+                                .when(() -> MapperUtils.getSpaceIdByName(this.cloudFoundryClient, TEST_ORGANIZATION_ID,
+                                                TEST_SPACE_NAME))
+                                .thenReturn(Mono.just(TEST_SPACE_ID));
+                mappingUtilitiesMock
+                                .when(() -> MapperUtils.getDomainIdByName(this.cloudFoundryClient, TEST_ORGANIZATION_ID,
+                                                TEST_DOMAIN_NAME))
+                                .thenReturn(Mono.just(TEST_DOMAIN_ID));
 
-        when(this.cloudFoundryClient.routesV3()
-                .create(org.cloudfoundry.client.v3.routes.CreateRouteRequest.builder()
-                        .relationships(RouteRelationships.builder()
-                                .space(ToOneRelationship.builder()
-                                        .data(Relationship.builder()
-                                                .id(TEST_SPACE_ID)
-                                                .build())
-                                        .build())
-                                .domain(ToOneRelationship.builder()
-                                        .data(Relationship.builder()
-                                                .id(TEST_DOMAIN_ID)
-                                                .build())
-                                        .build())
+                when(this.cloudFoundryClient.routesV3()
+                                .create(org.cloudfoundry.client.v3.routes.CreateRouteRequest.builder()
+                                                .relationships(RouteRelationships.builder()
+                                                                .space(ToOneRelationship.builder()
+                                                                                .data(Relationship.builder()
+                                                                                                .id(TEST_SPACE_ID)
+                                                                                                .build())
+                                                                                .build())
+                                                                .domain(ToOneRelationship.builder()
+                                                                                .data(Relationship.builder()
+                                                                                                .id(TEST_DOMAIN_ID)
+                                                                                                .build())
+                                                                                .build())
+                                                                .build())
+                                                .host(TEST_HOST)
+                                                .build()))
+                                .thenReturn(Mono
+                                                .just(fill(org.cloudfoundry.client.v3.routes.CreateRouteResponse
+                                                                .builder()).build()));
+        }
+
+        @After
+        public void teardown() {
+                mappingUtilitiesMock.close();
+        }
+
+        @Test
+        public void createRoute() {
+
+                this.routes.create(CreateRouteRequest.builder()
+                                .host(TEST_HOST)
+                                .space(TEST_SPACE_NAME)
+                                .domain(TEST_DOMAIN_NAME)
                                 .build())
-                        .host(TEST_HOST)
-                        .port(TEST_PORT)
-                        .build()))
-                .thenReturn(Mono
-                        .just(fill(org.cloudfoundry.client.v3.routes.CreateRouteResponse.builder()).build()));
-    }
-
-    @After
-    public void teardown() {
-        mappingUtilitiesMock.close();
-    }
-
-    @Test
-    public void createRoute() {
-
-        this.routes.create(CreateRouteRequest.builder()
-                .host(TEST_HOST)
-                .port(TEST_PORT)
-                .space(TEST_SPACE_NAME)
-                .domain(TEST_DOMAIN_NAME)
-                .build())
-                .as(StepVerifier::create)
-                .expectNext(1)
-                .expectComplete()
-                .verify(Duration.ofSeconds(5));
-    }
+                                .as(StepVerifier::create)
+                                .expectNext(1)
+                                .expectComplete()
+                                .verify(Duration.ofSeconds(5));
+        }
 
 }
