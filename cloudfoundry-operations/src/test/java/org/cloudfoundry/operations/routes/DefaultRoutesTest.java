@@ -299,77 +299,6 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void deleteAssignedPort() {
-        requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
-        requestSharedDomains(this.cloudFoundryClient, "test-domain");
-        requestRoutes(this.cloudFoundryClient, "test-shared-domain-metadata-id", null, null, 9999);
-        requestDeleteRoute(this.cloudFoundryClient, "test-route-id");
-        requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
-
-        StepVerifier.withVirtualTime(() -> this.routes
-                .delete(DeleteRouteRequest.builder()
-                        .domain("test-domain")
-                        .port(9999)
-                        .build()))
-                .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
-                .expectComplete()
-                .verify(Duration.ofSeconds(5));
-    }
-
-    @Test
-    public void deleteFailure() {
-        requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
-        requestRoutes(this.cloudFoundryClient, "test-private-domain-metadata-id", "test-host", "test-path", null);
-        requestDeleteRoute(this.cloudFoundryClient, "test-route-id");
-        requestJobFailure(this.cloudFoundryClient, "test-job-entity-id");
-
-        StepVerifier.withVirtualTime(() -> this.routes
-                .delete(DeleteRouteRequest.builder()
-                        .domain("test-domain")
-                        .host("test-host")
-                        .path("test-path")
-                        .build()))
-                .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class)
-                        .hasMessage("test-error-details-errorCode(1): test-error-details-description"))
-                .verify(Duration.ofSeconds(5));
-    }
-
-    @Test
-    public void deleteInvalidDomain() {
-        requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
-        requestSharedDomainsEmpty(this.cloudFoundryClient, "test-domain");
-
-        this.routes
-                .delete(DeleteRouteRequest.builder()
-                        .domain("test-domain")
-                        .host("test-host")
-                        .path("test-path")
-                        .build())
-                .as(StepVerifier::create)
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class)
-                        .hasMessage("Domain test-domain does not exist"))
-                .verify(Duration.ofSeconds(5));
-    }
-
-    @Test
-    public void deleteInvalidRoute() {
-        requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
-        requestRoutesEmpty(this.cloudFoundryClient, "test-private-domain-metadata-id", "test-host", "test-path", null);
-
-        this.routes
-                .delete(DeleteRouteRequest.builder()
-                        .domain("test-domain")
-                        .host("test-host")
-                        .path("test-path")
-                        .build())
-                .as(StepVerifier::create)
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class)
-                        .hasMessage("Route for test-domain does not exist"))
-                .verify(Duration.ofSeconds(5));
-    }
-
-    @Test
     public void deleteOrphanedRoutes() {
         mockDeleteOrphanedRoutes(this.cloudFoundryClient);
 
@@ -390,40 +319,28 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void deletePrivateDomain() {
+    public void deleteRoute() {
         requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
         requestRoutes(this.cloudFoundryClient, "test-private-domain-metadata-id", "test-host", "test-path", null);
-        requestDeleteRoute(this.cloudFoundryClient, "test-route-id");
-        requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
+        mockDeleteRequest(this.cloudFoundryClient, "test-route-id");
 
-        StepVerifier.withVirtualTime(() -> this.routes
-                .delete(DeleteRouteRequest.builder()
-                        .domain("test-domain")
-                        .host("test-host")
-                        .path("test-path")
-                        .build()))
-                .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
+        this.routes.delete(DeleteRouteRequest.builder()
+                .host("test-host")
+                .path("test-path")
+                .domain("test-domain")
+                .build())
+                .as(StepVerifier::create)
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
     }
 
-    @Test
-    public void deleteSharedDomain() {
-        requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
-        requestSharedDomains(this.cloudFoundryClient, "test-domain");
-        requestRoutes(this.cloudFoundryClient, "test-shared-domain-metadata-id", "test-host", "test-path", null);
-        requestDeleteRoute(this.cloudFoundryClient, "test-route-id");
-        requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
-
-        StepVerifier.withVirtualTime(() -> this.routes
-                .delete(DeleteRouteRequest.builder()
-                        .domain("test-domain")
-                        .host("test-host")
-                        .path("test-path")
+    private static void mockDeleteRequest(CloudFoundryClient cloudFoundryClient,String routeId){
+        when(cloudFoundryClient.routesV3().delete(org.cloudfoundry.client.v3.routes.DeleteRouteRequest.builder()
+                        .routeId(routeId)
                         .build()))
-                .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
-                .expectComplete()
-                .verify(Duration.ofSeconds(5));
+        .thenReturn(Mono.just("test-delete-job"));
+        when(cloudFoundryClient.jobsV3().get(org.cloudfoundry.client.v3.jobs.GetJobRequest.builder().jobId("test-delete-job").build())).thenReturn(
+            Mono.just(fill(org.cloudfoundry.client.v3.jobs.GetJobResponse.builder()).state(org.cloudfoundry.client.v3.jobs.JobState.COMPLETE).build()));
     }
 
     @Test
@@ -868,19 +785,6 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
                 .build()))
             .thenReturn(Mono
                 .just(fill(CreateRouteResponse.builder(), "route-")
-                    .build()));
-    }
-
-    private static void requestDeleteRoute(CloudFoundryClient cloudFoundryClient, String routeId) {
-        when(cloudFoundryClient.routes()
-            .delete(org.cloudfoundry.client.v2.routes.DeleteRouteRequest.builder()
-                .async(true)
-                .routeId(routeId)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(DeleteRouteResponse.builder())
-                    .entity(fill(JobEntity.builder(), "job-entity-")
-                        .build())
                     .build()));
     }
 
