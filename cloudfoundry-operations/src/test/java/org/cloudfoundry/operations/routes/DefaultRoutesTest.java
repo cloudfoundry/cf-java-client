@@ -71,7 +71,7 @@ import org.cloudfoundry.client.v3.domains.DomainResource;
 import org.cloudfoundry.client.v3.spaces.DeleteUnmappedRoutesRequest;
 
 import org.cloudfoundry.operations.AbstractOperationsTest;
-import org.cloudfoundry.operations.v3.mapper.MapperUtils;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
