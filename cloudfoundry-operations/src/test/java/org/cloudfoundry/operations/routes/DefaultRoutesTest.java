@@ -68,6 +68,8 @@ import org.cloudfoundry.client.v3.domains.CheckReservedRoutesRequest;
 import org.cloudfoundry.client.v3.domains.CheckReservedRoutesResponse;
 import org.cloudfoundry.client.v3.domains.DomainRelationships;
 import org.cloudfoundry.client.v3.domains.DomainResource;
+import org.cloudfoundry.client.v3.spaces.DeleteUnmappedRoutesRequest;
+
 import org.cloudfoundry.operations.AbstractOperationsTest;
 import org.cloudfoundry.operations.v3.mapper.MapperUtils;
 import org.junit.After;
@@ -88,6 +90,8 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.function.Supplier;
 
+import javax.print.attribute.standard.JobState;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.operations.TestObjects.fill;
 import static org.mockito.Mockito.when;
@@ -102,6 +106,7 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
     private static final String TEST_PATH = "test-path";
     private static final String TEST_HOST = "192.168.0,.1";
     private static final Integer TEST_PORT = 8080;
+    private static final String TEST_JOB_ID = "test-job-id";
 
     @Test
     public void checkRoute() {
@@ -365,71 +370,23 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void deleteOrphanedRoutesAssociatedApplication() {
-        requestSpaceRoutes(this.cloudFoundryClient, TEST_SPACE_ID);
-        requestApplications(this.cloudFoundryClient, "test-route-id");
+    public void deleteOrphanedRoutes() {
+        mockDeleteOrphanedRoutes(this.cloudFoundryClient);
 
-        this.routes
-                .deleteOrphanedRoutes(DeleteOrphanedRoutesRequest.builder()
-                        .build())
+        this.routes.deleteOrphanedRoutes(DeleteOrphanedRoutesRequest.builder().build())
                 .as(StepVerifier::create)
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
     }
 
-    @Test
-    public void deleteOrphanedRoutesAssociatedService() {
-        requestSpaceRoutesService(this.cloudFoundryClient, TEST_SPACE_ID);
-
-        this.routes
-                .deleteOrphanedRoutes(DeleteOrphanedRoutesRequest.builder()
-                        .build())
-                .as(StepVerifier::create)
-                .expectComplete()
-                .verify(Duration.ofSeconds(5));
-    }
-
-    @Test
-    public void deleteOrphanedRoutesNoAssociations() {
-        requestSpaceRoutes(this.cloudFoundryClient, TEST_SPACE_ID);
-        requestApplicationsEmpty(this.cloudFoundryClient, "test-route-id");
-        requestDeleteRoute(this.cloudFoundryClient, "test-route-id");
-        requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
-
-        StepVerifier.withVirtualTime(() -> this.routes
-                .deleteOrphanedRoutes(DeleteOrphanedRoutesRequest.builder()
-                        .build()))
-                .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
-                .expectComplete()
-                .verify(Duration.ofSeconds(5));
-    }
-
-    @Test
-    public void deleteOrphanedRoutesNoAssociationsFailure() {
-        requestSpaceRoutes(this.cloudFoundryClient, TEST_SPACE_ID);
-        requestApplicationsEmpty(this.cloudFoundryClient, "test-route-id");
-        requestDeleteRoute(this.cloudFoundryClient, "test-route-id");
-        requestJobFailure(this.cloudFoundryClient, "test-job-entity-id");
-
-        StepVerifier.withVirtualTime(() -> this.routes
-                .deleteOrphanedRoutes(DeleteOrphanedRoutesRequest.builder()
-                        .build()))
-                .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
-                .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class)
-                        .hasMessage("test-error-details-errorCode(1): test-error-details-description"))
-                .verify(Duration.ofSeconds(5));
-    }
-
-    @Test
-    public void deleteOrphanedRoutesNoRoutes() {
-        requestSpaceRoutesEmpty(this.cloudFoundryClient, TEST_SPACE_ID);
-
-        this.routes
-                .deleteOrphanedRoutes(DeleteOrphanedRoutesRequest.builder()
-                        .build())
-                .as(StepVerifier::create)
-                .expectComplete()
-                .verify(Duration.ofSeconds(5));
+    private static void mockDeleteOrphanedRoutes(CloudFoundryClient cloudFoundryClient){
+          when(cloudFoundryClient.spacesV3()
+                                .deleteUnmappedRoutes(DeleteUnmappedRoutesRequest.builder()
+                                                .spaceId(TEST_SPACE_ID)
+                                                .build()))
+                                .thenReturn(Mono.just(TEST_JOB_ID));
+                when(cloudFoundryClient.jobsV3().get(org.cloudfoundry.client.v3.jobs.GetJobRequest.builder().jobId(TEST_JOB_ID).build())).thenReturn(
+                                Mono.just(fill(org.cloudfoundry.client.v3.jobs.GetJobResponse.builder()).state(org.cloudfoundry.client.v3.jobs.JobState.COMPLETE).build()));
     }
 
     @Test

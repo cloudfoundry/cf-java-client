@@ -42,6 +42,7 @@ import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.client.v3.domains.CheckReservedRoutesRequest;
 import org.cloudfoundry.client.v3.organizations.ListOrganizationDomainsRequest;
 import org.cloudfoundry.client.v3.domains.DomainResource;
+import org.cloudfoundry.client.v3.spaces.DeleteUnmappedRoutesRequest;
 import org.cloudfoundry.operations.util.OperationsLogging;
 import org.cloudfoundry.operations.v3.mapper.MapperUtils;
 import org.cloudfoundry.util.ExceptionUtils;
@@ -158,22 +159,39 @@ public final class DefaultRoutes implements Routes {
 
     @Override
     public Mono<Void> deleteOrphanedRoutes(DeleteOrphanedRoutesRequest request) {
-        return Mono
-                .zip(this.cloudFoundryClient, this.spaceId)
-                .flatMapMany(function((cloudFoundryClient, spaceId) -> requestSpaceRoutes(cloudFoundryClient, spaceId)
-                        .filter(route -> isRouteOrphan(ResourceUtils.getEntity(route)))
-                        .map(ResourceUtils::getId)
-                        .map(routeId -> Tuples.of(cloudFoundryClient, routeId))))
-                .flatMap(function((cloudFoundryClient, routeId) -> getApplications(cloudFoundryClient, routeId)
-                        .map(applicationResources -> Tuples.of(cloudFoundryClient, applicationResources, routeId))))
-                .filter(predicate((cloudFoundryClient, applicationResources,
-                        routeId) -> isApplicationOrphan(applicationResources)))
-                .flatMap(function((cloudFoundryClient, applicationResources, routeId) -> deleteRoute(cloudFoundryClient,
-                        request.getCompletionTimeout(), routeId)))
-                .then()
+        return Mono.zip(this.cloudFoundryClient, this.spaceId)
+                .flatMap(function((client, spaceId) -> Mono.zip(this.cloudFoundryClient,
+                        client.spacesV3().deleteUnmappedRoutes(
+                                DeleteUnmappedRoutesRequest.builder().spaceId(spaceId)
+                                        .build()))))
+                .flatMap(function((client, job) -> JobUtils.waitForCompletion(client,
+                        request.getCompletionTimeout(), job)))
                 .transform(OperationsLogging.log("Delete Orphaned Routes"))
                 .checkpoint();
+
     }
+    // @Override
+    // public Mono<Void> deleteOrphanedRoutes(DeleteOrphanedRoutesRequest request) {
+    // return Mono
+    // .zip(this.cloudFoundryClient, this.spaceId)
+    // .flatMapMany(function((cloudFoundryClient, spaceId) ->
+    // requestSpaceRoutes(cloudFoundryClient, spaceId)
+    // .filter(route -> isRouteOrphan(ResourceUtils.getEntity(route)))
+    // .map(ResourceUtils::getId)
+    // .map(routeId -> Tuples.of(cloudFoundryClient, routeId))))
+    // .flatMap(function((cloudFoundryClient, routeId) ->
+    // getApplications(cloudFoundryClient, routeId)
+    // .map(applicationResources -> Tuples.of(cloudFoundryClient,
+    // applicationResources, routeId))))
+    // .filter(predicate((cloudFoundryClient, applicationResources,
+    // routeId) -> isApplicationOrphan(applicationResources)))
+    // .flatMap(function((cloudFoundryClient, applicationResources, routeId) ->
+    // deleteRoute(cloudFoundryClient,
+    // request.getCompletionTimeout(), routeId)))
+    // .then()
+    // .transform(OperationsLogging.log("Delete Orphaned Routes"))
+    // .checkpoint();
+    // }
 
     @Override
     public Flux<Route> list(ListRoutesRequest request) {

@@ -24,6 +24,7 @@ import org.cloudfoundry.client.v3.domains.DomainsV3;
 import org.cloudfoundry.client.v2.events.Events;
 import org.cloudfoundry.client.v2.featureflags.FeatureFlags;
 import org.cloudfoundry.client.v2.jobs.Jobs;
+import org.cloudfoundry.client.v3.jobs.JobsV3;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.OrganizationQuotaDefinitions;
 import org.cloudfoundry.client.v2.organizations.Organizations;
 import org.cloudfoundry.client.v3.organizations.OrganizationsV3;
@@ -40,6 +41,7 @@ import org.cloudfoundry.client.v2.services.Services;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomains;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitions;
 import org.cloudfoundry.client.v2.spaces.Spaces;
+import org.cloudfoundry.client.v3.spaces.SpacesV3;
 import org.cloudfoundry.client.v2.stacks.Stacks;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstances;
 import org.cloudfoundry.client.v2.users.Users;
@@ -101,6 +103,7 @@ public abstract class AbstractOperationsTest {
     protected final FeatureFlags featureFlags = mock(FeatureFlags.class, RETURNS_SMART_NULLS);
 
     protected final Jobs jobs = mock(Jobs.class, RETURNS_SMART_NULLS);
+    protected final JobsV3 jobsV3 = mock(JobsV3.class, RETURNS_SMART_NULLS);
 
     protected final OrganizationQuotaDefinitions organizationQuotaDefinitions = mock(OrganizationQuotaDefinitions.class,
             RETURNS_SMART_NULLS);
@@ -139,6 +142,7 @@ public abstract class AbstractOperationsTest {
             RETURNS_SMART_NULLS);
 
     protected final Spaces spaces = mock(Spaces.class, RETURNS_SMART_NULLS);
+    protected final SpacesV3 spacesV3 = mock(SpacesV3.class, RETURNS_SMART_NULLS);
 
     protected final Stacks stacks = mock(Stacks.class, RETURNS_SMART_NULLS);
 
@@ -166,6 +170,7 @@ public abstract class AbstractOperationsTest {
         when(this.cloudFoundryClient.events()).thenReturn(this.events);
         when(this.cloudFoundryClient.featureFlags()).thenReturn(this.featureFlags);
         when(this.cloudFoundryClient.jobs()).thenReturn(this.jobs);
+        when(this.cloudFoundryClient.jobsV3()).thenReturn(this.jobsV3);
         when(this.cloudFoundryClient.organizations()).thenReturn(this.organizations);
         when(this.cloudFoundryClient.organizationsV3()).thenReturn(this.organizationsV3);
         when(this.cloudFoundryClient.organizationQuotaDefinitions()).thenReturn(this.organizationQuotaDefinitions);
@@ -182,6 +187,7 @@ public abstract class AbstractOperationsTest {
         when(this.cloudFoundryClient.sharedDomains()).thenReturn(this.sharedDomains);
         when(this.cloudFoundryClient.spaceQuotaDefinitions()).thenReturn(this.spaceQuotaDefinitions);
         when(this.cloudFoundryClient.spaces()).thenReturn(this.spaces);
+        when(this.cloudFoundryClient.spacesV3()).thenReturn(this.spacesV3);
         when(this.cloudFoundryClient.stacks()).thenReturn(this.stacks);
         when(this.cloudFoundryClient.tasks()).thenReturn(this.tasks);
         when(this.cloudFoundryClient.userProvidedServiceInstances()).thenReturn(this.userProvidedServiceInstances);
