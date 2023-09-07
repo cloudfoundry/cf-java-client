@@ -23,10 +23,10 @@ import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.applications.AssociateApplicationRouteRequest;
 import org.cloudfoundry.client.v2.applications.AssociateApplicationRouteResponse;
 import org.cloudfoundry.client.v2.applications.RemoveApplicationRouteRequest;
-import org.cloudfoundry.client.v2.jobs.ErrorDetails;
-import org.cloudfoundry.client.v2.jobs.GetJobRequest;
-import org.cloudfoundry.client.v2.jobs.GetJobResponse;
-import org.cloudfoundry.client.v2.jobs.JobEntity;
+
+import org.cloudfoundry.client.v3.jobs.GetJobRequest;
+import org.cloudfoundry.client.v3.jobs.GetJobResponse;
+import org.cloudfoundry.client.v3.jobs.JobState;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationPrivateDomainsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationPrivateDomainsResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesRequest;
@@ -89,8 +89,6 @@ import java.util.LinkedList;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.function.Supplier;
-
-import javax.print.attribute.standard.JobState;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.operations.TestObjects.fill;
@@ -314,8 +312,8 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
                                                 .spaceId(TEST_SPACE_ID)
                                                 .build()))
                                 .thenReturn(Mono.just(TEST_JOB_ID));
-                when(cloudFoundryClient.jobsV3().get(org.cloudfoundry.client.v3.jobs.GetJobRequest.builder().jobId(TEST_JOB_ID).build())).thenReturn(
-                                Mono.just(fill(org.cloudfoundry.client.v3.jobs.GetJobResponse.builder()).state(org.cloudfoundry.client.v3.jobs.JobState.COMPLETE).build()));
+                when(cloudFoundryClient.jobsV3().get( GetJobRequest.builder().jobId(TEST_JOB_ID).build())).thenReturn(
+                                Mono.just(fill( GetJobResponse.builder()).state( JobState.COMPLETE).build()));
     }
 
     @Test
@@ -788,66 +786,6 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
                     .build()));
     }
 
-    private static void requestJobFailure(CloudFoundryClient cloudFoundryClient, String jobId) {
-        when(cloudFoundryClient.jobs()
-            .get(GetJobRequest.builder()
-                .jobId(jobId)
-                .build()))
-            .thenReturn(Mono
-                .defer(new Supplier<Mono<GetJobResponse>>() {
-
-                    private final Queue<GetJobResponse> responses = new LinkedList<>(Arrays.asList(
-                        fill(GetJobResponse.builder(), "job-")
-                            .entity(fill(JobEntity.builder())
-                                .status("running")
-                                .build())
-                            .build(),
-                        fill(GetJobResponse.builder(), "job-")
-                            .entity(fill(JobEntity.builder())
-                                .errorDetails(fill(ErrorDetails.builder(), "error-details-")
-                                    .build())
-                                .status("failed")
-                                .build())
-                            .build()
-                    ));
-
-                    @Override
-                    public Mono<GetJobResponse> get() {
-                        return Mono.just(this.responses.poll());
-                    }
-
-                }));
-    }
-
-    private static void requestJobSuccess(CloudFoundryClient cloudFoundryClient, String jobId) {
-        when(cloudFoundryClient.jobs()
-            .get(GetJobRequest.builder()
-                .jobId(jobId)
-                .build()))
-            .thenReturn(Mono
-                .defer(new Supplier<Mono<GetJobResponse>>() {
-
-                    private final Queue<GetJobResponse> responses = new LinkedList<>(Arrays.asList(
-                        fill(GetJobResponse.builder(), "job-")
-                            .entity(fill(JobEntity.builder())
-                                .status("running")
-                                .build())
-                            .build(),
-                        fill(GetJobResponse.builder(), "job-")
-                            .entity(fill(JobEntity.builder())
-                                .status("finished")
-                                .build())
-                            .build()
-                    ));
-
-                    @Override
-                    public Mono<GetJobResponse> get() {
-                        return Mono.just(this.responses.poll());
-                    }
-
-                }));
-    }
-
     private static void requestOrganizationsRoutes(CloudFoundryClient cloudFoundryClient, String organizationId) {
         when(cloudFoundryClient.routes()
             .list(org.cloudfoundry.client.v2.routes.ListRoutesRequest.builder()
@@ -925,28 +863,6 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
                 .routeId(routeId)
                 .build()))
             .thenReturn(Mono.empty());
-    }
-
-    private static void requestRouteExistsFalse(CloudFoundryClient cloudFoundryClient, String domainId, String host, String path) {
-        when(cloudFoundryClient.routes()
-            .exists(RouteExistsRequest.builder()
-                .domainId(domainId)
-                .host(host)
-                .path(path)
-                .build()))
-            .thenReturn(Mono
-                .just(false));
-    }
-
-    private static void requestRouteExistsTrue(CloudFoundryClient cloudFoundryClient, String domainId, String host, String path) {
-        when(cloudFoundryClient.routes()
-            .exists(RouteExistsRequest.builder()
-                .domainId(domainId)
-                .host(host)
-                .path(path)
-                .build()))
-            .thenReturn(Mono
-                .just(true));
     }
 
     private static void requestRoutes(CloudFoundryClient cloudFoundryClient, String domainId, String host, String path, Integer port) {
