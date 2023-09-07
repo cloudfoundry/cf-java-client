@@ -170,28 +170,6 @@ public final class DefaultRoutes implements Routes {
                 .checkpoint();
 
     }
-    // @Override
-    // public Mono<Void> deleteOrphanedRoutes(DeleteOrphanedRoutesRequest request) {
-    // return Mono
-    // .zip(this.cloudFoundryClient, this.spaceId)
-    // .flatMapMany(function((cloudFoundryClient, spaceId) ->
-    // requestSpaceRoutes(cloudFoundryClient, spaceId)
-    // .filter(route -> isRouteOrphan(ResourceUtils.getEntity(route)))
-    // .map(ResourceUtils::getId)
-    // .map(routeId -> Tuples.of(cloudFoundryClient, routeId))))
-    // .flatMap(function((cloudFoundryClient, routeId) ->
-    // getApplications(cloudFoundryClient, routeId)
-    // .map(applicationResources -> Tuples.of(cloudFoundryClient,
-    // applicationResources, routeId))))
-    // .filter(predicate((cloudFoundryClient, applicationResources,
-    // routeId) -> isApplicationOrphan(applicationResources)))
-    // .flatMap(function((cloudFoundryClient, applicationResources, routeId) ->
-    // deleteRoute(cloudFoundryClient,
-    // request.getCompletionTimeout(), routeId)))
-    // .then()
-    // .transform(OperationsLogging.log("Delete Orphaned Routes"))
-    // .checkpoint();
-    // }
 
     @Override
     public Flux<Route> list(ListRoutesRequest request) {
@@ -287,12 +265,6 @@ public final class DefaultRoutes implements Routes {
     private static Mono<List<String>> getApplicationNames(CloudFoundryClient cloudFoundryClient, String routeId) {
         return requestApplications(cloudFoundryClient, routeId)
                 .map(resource -> ResourceUtils.getEntity(resource).getName())
-                .collectList();
-    }
-
-    private static Mono<List<ApplicationResource>> getApplications(CloudFoundryClient cloudFoundryClient,
-            String routeId) {
-        return requestApplications(cloudFoundryClient, routeId)
                 .collectList();
     }
 
@@ -405,10 +377,6 @@ public final class DefaultRoutes implements Routes {
 
     private static Mono<String> getSpaceName(Map<String, String> spaces, String spaceId) {
         return Mono.just(spaces.get(spaceId));
-    }
-
-    private static boolean isApplicationOrphan(List<ApplicationResource> applications) {
-        return applications.isEmpty();
     }
 
     private static boolean isIdentical(String s, String t) {
@@ -603,10 +571,6 @@ public final class DefaultRoutes implements Routes {
         service.ifPresent(builder::service);
 
         return builder.build();
-    }
-
-    private boolean isRouteOrphan(RouteEntity entity) {
-        return entity.getServiceInstanceId() == null || entity.getServiceInstanceId().isEmpty();
     }
 
 }
