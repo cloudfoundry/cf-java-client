@@ -62,7 +62,7 @@
         <java-semver.version>0.9.0</java-semver.version>
         <jjwt.version>0.11.2</jjwt.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <wire.version>2.2.0</wire.version>
+        <wire.version>4.8.1</wire.version>
     </properties>
 
     <dependencyManagement>
