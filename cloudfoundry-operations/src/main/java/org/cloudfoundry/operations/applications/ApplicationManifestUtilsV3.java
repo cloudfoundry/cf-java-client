@@ -216,6 +216,7 @@ public final class ApplicationManifestUtilsV3 extends ApplicationManifestUtilsCo
         putIfPresent(yaml, "default-route", application.getDefaultRoute());
         putIfPresent(yaml, "services", convertCollection(application.getServices(), ApplicationManifestUtilsV3::toServiceYaml));
         putIfPresent(yaml, "sidecars", convertCollection(application.getSidecars(), ApplicationManifestUtilsV3::toSidecarsYaml));
+        putIfPresent(yaml, "metadata", application, ApplicationManifestUtilsV3::toMetadataYamlBackwardsCompatible);
         putIfPresent(yaml, "metadata", application.getMetadata(), ApplicationManifestUtilsV3::toMetadataYaml);
         return yaml;
     }
@@ -260,5 +261,17 @@ public final class ApplicationManifestUtilsV3 extends ApplicationManifestUtilsCo
         putIfPresent(yaml, "annotations", metadata.getAnnotations());
         putIfPresent(yaml, "labels", metadata.getLabels());
         return yaml;
+    }
+
+    @SuppressWarnings("deprecation")
+    private static Map<String, Object> toMetadataYamlBackwardsCompatible(ManifestV3Application application) {
+        Map<String, String> labels = application.getLabels();
+        Map<String, String> annotations = application.getAnnotations();
+        if (labels == null && annotations == null) return null;
+        ManifestV3Metadata metadata = ManifestV3Metadata.builder()
+            .labels(labels)
+            .annotations(annotations)
+            .build();
+        return toMetadataYaml(metadata);
     }
 }

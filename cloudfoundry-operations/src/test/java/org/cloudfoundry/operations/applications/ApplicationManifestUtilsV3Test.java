@@ -572,6 +572,12 @@ public final class ApplicationManifestUtilsV3Test {
     }
 
     @Test
+    public void unixWriteBackwardsCompatible() throws IOException {
+        assumeTrue(SystemUtils.IS_OS_UNIX);
+        writeBackwardsCompatible("/alpha-path", "fixtures/manifestv3-echo-unix.yml");
+    }
+
+    @Test
     public void windowsRead() throws IOException {
         assumeTrue(SystemUtils.IS_OS_WINDOWS);
         read("c:\\alpha-path", "fixtures/manifestv3-alpha-windows.yml");
@@ -581,6 +587,12 @@ public final class ApplicationManifestUtilsV3Test {
     public void windowsWrite() throws IOException {
         assumeTrue(SystemUtils.IS_OS_WINDOWS);
         write("c:\\alpha-path", "fixtures/manifestv3-echo-windows.yml");
+    }
+
+    @Test
+    public void windowsWriteBackwardsCompatible() throws IOException {
+        assumeTrue(SystemUtils.IS_OS_WINDOWS);
+        writeBackwardsCompatible("c:\\alpha-path", "fixtures/manifestv3-echo-windows.yml");
     }
 
     private void read(String path, String expectedManifest) throws IOException {
@@ -655,6 +667,70 @@ public final class ApplicationManifestUtilsV3Test {
                     .annotation("ALPHA_ANNOTATION_1","alpha_annotation_value_1")
                     .annotation("ALPHA_ANNOTATION_2","alpha_annotation_value_2")
                     .build())
+                .build(),
+            ManifestV3Application.builder()
+                .name("alpha-application-2")
+                .buildpack("alpha-buildpack")
+                .command("alpha-command")
+                .domain("alpha-domain")
+                .domain("alpha-domains-1")
+                .domain("alpha-domains-2")
+                .healthCheckHttpEndpoint("alpha-health-check-http-endpoint")
+                .healthCheckType(PORT)
+                .host("alpha-host")
+                .host("alpha-hosts-1")
+                .host("alpha-hosts-2")
+                .instances(-1)
+                .noHostname(true)
+                .noRoute(true)
+                .path(Paths.get(path))
+                .randomRoute(true)
+                .stack("alpha-stack")
+                .timeout(-1)
+                .environmentVariable("ALPHA_KEY_1", "alpha-value-1")
+                .environmentVariable("ALPHA_KEY_2", "alpha-value-2")
+                .service(ManifestV3Service.builder().name("alpha-instance-1").build())
+                .service(ManifestV3Service.builder().name("alpha-instance-2").build())
+                .build()).build());
+
+        List<String> expected = Files.readAllLines(new ClassPathResource(expectedManifest).getFile().toPath());
+        List<String> actual = Files.readAllLines(out);
+
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @SuppressWarnings("deprecation")
+    private void writeBackwardsCompatible(String path, String expectedManifest) throws IOException {
+        Path out = Files.createTempFile("test-manifest-", ".yml");
+
+        ApplicationManifestUtilsV3.write(out, ManifestV3.builder().applications(
+            ManifestV3Application.builder()
+                .name("alpha-application-1")
+                .buildpack("alpha-buildpack")
+                .command("alpha-command")
+                .disk(512)
+                .healthCheckHttpEndpoint("alpha-health-check-http-endpoint")
+                .instances(-1)
+                .memory(512)
+                .noRoute(true)
+                .path(Paths.get(path))
+                .randomRoute(true)
+                .route(Route.builder()
+                    .route("alpha-route-1")
+                    .build())
+                .route(Route.builder()
+                    .route("alpha-route-2")
+                    .build())
+                .stack("alpha-stack")
+                .timeout(-1)
+                .environmentVariable("ALPHA_KEY_1", "alpha-value-1")
+                .environmentVariable("ALPHA_KEY_2", "alpha-value-2")
+                .service(ManifestV3Service.builder().name("alpha-instance-1").build())
+                .service(ManifestV3Service.builder().name("alpha-instance-2").build())
+                .label("ALPHA_LABEL_1", "alpha_label_value_1")
+                .label("ALPHA_LABEL_2", "alpha_label_value_2")
+                .annotation("ALPHA_ANNOTATION_1","alpha_annotation_value_1")
+                .annotation("ALPHA_ANNOTATION_2","alpha_annotation_value_2")
                 .build(),
             ManifestV3Application.builder()
                 .name("alpha-application-2")

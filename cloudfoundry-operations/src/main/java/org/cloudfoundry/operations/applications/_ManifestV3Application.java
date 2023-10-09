@@ -60,6 +60,24 @@ abstract class _ManifestV3Application extends _ApplicationManifestCommon {
     @Nullable
     abstract List<ManifestV3Sidecar> getSidecars();
 
+    /**
+     * The annotations configured for this application
+     * @deprecated use metadata().getAnnotations() instead
+     */
+    @AllowNulls
+    @Nullable
+    @Deprecated
+    abstract Map<String, String> getAnnotations();
+
+    /**
+     * The labels configured for this application
+      @deprecated use metadata().getLabels() instead
+     */
+    @AllowNulls
+    @Nullable
+    @Deprecated
+    abstract Map<String, String> getLabels();
+
     public abstract static class Builder implements _ApplicationManifestCommon.Builder {
 
     }
