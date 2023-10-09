@@ -1,0 +1,32 @@
+---
+applications:
+- name: alpha-application-1
+  buildpacks:
+  - alpha-buildpack
+  command: alpha-command
+  disk_quota: -1
+  health-check-http-endpoint: alpha-health-check-http-endpoint
+  health-check-type: none
+  instances: -1
+  memory: 1M
+  path: /alpha-path
+  no-route: true
+  random-route: true
+  routes:
+  - route: alpha-route-1
+  - route: alpha-route-2
+  stack: alpha-stack
+  timeout: -1
+  env:
+    ALPHA_KEY_1: alpha-value-1
+    ALPHA_KEY_2: alpha-value-2
+  services:
+  - alpha-instance-1
+  - alpha-instance-2
+  metadata:
+    labels:
+      ALPHA_LABEL_1: alpha_label_value_1
+      ALPHA_LABEL_2: alpha_label_value_2
+    annotations:
+      ALPHA_ANNOTATION_1: alpha_annotation_value_1
+      ALPHA_ANNOTATION_2: alpha_annotation_value_2
