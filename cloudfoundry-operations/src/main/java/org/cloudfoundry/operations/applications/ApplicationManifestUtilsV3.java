@@ -147,11 +147,17 @@ public final class ApplicationManifestUtilsV3 extends ApplicationManifestUtilsCo
         asList(application, "processes", variables, raw -> getProcess((Map<String, Object>) raw, variables), builder::processe);
         asList(application, "services", variables, raw -> getService(raw, variables), builder::service);
         asList(application, "sidecars", variables, raw -> getSidecar((Map<String, Object>) raw, variables), builder::sidecar);
-        as(application, "labels", variables, Map.class::cast, builder::labels);
-        as(application, "annotations", variables, Map.class::cast, builder::annotations);
+        as(application, "metadata", variables, raw -> getMetadata((Map<String, Object>)raw, variables), builder::metadata);
         asBoolean(application, "default-route", variables, builder::defaultRoute);
 
         return builder;
+    }
+
+    private static ManifestV3Metadata getMetadata(Map<String, Object> raw, Map<String, String> variables) {
+        ManifestV3Metadata.Builder builder = ManifestV3Metadata.builder();
+        asMapOfStringString(raw, "labels", variables, builder::label);
+        asMapOfStringString(raw, "annotations", variables, builder::annotation);
+        return builder.build();
     }
 
     private static ManifestV3Sidecar getSidecar(Map<String, Object> raw, Map<String, String> variables) {
@@ -210,8 +216,8 @@ public final class ApplicationManifestUtilsV3 extends ApplicationManifestUtilsCo
         putIfPresent(yaml, "default-route", application.getDefaultRoute());
         putIfPresent(yaml, "services", convertCollection(application.getServices(), ApplicationManifestUtilsV3::toServiceYaml));
         putIfPresent(yaml, "sidecars", convertCollection(application.getSidecars(), ApplicationManifestUtilsV3::toSidecarsYaml));
-        putIfPresent(yaml, "labels", application.getLabels());
-        putIfPresent(yaml, "annotations", application.getAnnotations());
+        putIfPresent(yaml, "metadata", application, ApplicationManifestUtilsV3::toMetadataYamlBackwardsCompatible);
+        putIfPresent(yaml, "metadata", application.getMetadata(), ApplicationManifestUtilsV3::toMetadataYaml);
         return yaml;
     }
 
@@ -247,5 +253,25 @@ public final class ApplicationManifestUtilsV3 extends ApplicationManifestUtilsCo
         putIfPresent(yaml, "memory", process.getMemory());
         putIfPresent(yaml, "timeout", process.getTimeout());
         return yaml;
+    }
+
+    private static Map<String, Object> toMetadataYaml(ManifestV3Metadata metadata) {
+        if (metadata == null) return null;
+        Map<String, Object> yaml = new TreeMap<>();
+        putIfPresent(yaml, "annotations", metadata.getAnnotations());
+        putIfPresent(yaml, "labels", metadata.getLabels());
+        return yaml;
+    }
+
+    @SuppressWarnings("deprecation")
+    private static Map<String, Object> toMetadataYamlBackwardsCompatible(ManifestV3Application application) {
+        Map<String, String> labels = application.getLabels();
+        Map<String, String> annotations = application.getAnnotations();
+        if (labels == null && annotations == null) return null;
+        ManifestV3Metadata metadata = ManifestV3Metadata.builder()
+            .labels(labels)
+            .annotations(annotations)
+            .build();
+        return toMetadataYaml(metadata);
     }
 }
