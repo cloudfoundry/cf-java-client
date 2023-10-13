@@ -1,0 +1,30 @@
+name: Java CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [ 8, 11, 17, 21 ]
+    name: Java ${{ matrix.java }} build
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare multi-module build
+        run: |
+          git submodule update --init --recursive
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: liberica
+          java-version: ${{ matrix.java }}
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+      - name: Build with Maven
+        run: ./mvnw clean install -Dgpg.skip
+
