@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.client.v3.spaces;
 
-import org.cloudfoundry.client.v3.routes.DeleteRouteRequest;
 import org.junit.Test;
 
 public class DeleteUnmappedRoutesRequestTest {

@@ -18,7 +18,6 @@ package org.cloudfoundry.logcache.v1;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.doppler.HttpStartStop;
 import org.immutables.value.Value;
 
 import java.util.List;

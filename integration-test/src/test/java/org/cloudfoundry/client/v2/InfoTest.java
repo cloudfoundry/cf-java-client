@@ -25,7 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
-import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.client.CloudFoundryClient.SUPPORTED_API_VERSION;

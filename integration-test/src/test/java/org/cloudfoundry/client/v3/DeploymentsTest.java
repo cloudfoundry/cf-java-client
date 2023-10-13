@@ -47,7 +47,6 @@ import reactor.test.StepVerifier;
 
 import java.nio.file.Path;
 import java.time.Duration;
-import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;

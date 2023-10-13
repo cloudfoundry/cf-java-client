@@ -23,7 +23,7 @@
     <artifactId>cloudfoundry-java-client</artifactId>
     <name>Cloud Foundry Java Client Parent</name>
     <description>A Java language binding for interacting with a Cloud Foundry instance</description>
-    <version>5.11.0.BUILD-SNAPSHOT</version>
+    <version>5.12.0.BUILD-SNAPSHOT</version>
     <packaging>pom</packaging>
     <url>https://github.com/cloudfoundry/cf-java-client</url>
 
@@ -55,14 +55,24 @@
     </modules>
 
     <properties>
-        <commons-compress.version>1.21</commons-compress.version>
-        <dependencies.version>2.4.2</dependencies.version>
-        <evo-inflector.version>1.3</evo-inflector.version>
-        <immutables.version>2.8.8</immutables.version>
-        <java-semver.version>0.9.0</java-semver.version>
-        <jjwt.version>0.11.2</jjwt.version>
+        <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <wire.version>2.2.0</wire.version>
+
+        <dependencies.version>2.7.16</dependencies.version>
+
+        <commons-compress.version>1.24.0</commons-compress.version>
+        <commons-lang3.version>3.13.0</commons-lang3.version>
+        <evo-inflector.version>1.3</evo-inflector.version>
+        <immutables.version>2.10.0</immutables.version>
+        <jackson.version>2.15.2</jackson.version>
+        <java-semver.version>0.9.0</java-semver.version>
+        <jjwt.version>0.11.5</jjwt.version>
+        <junit-jupiter.version>5.10.0</junit-jupiter.version>
+        <mockito.version>5.6.0</mockito.version>
+        <snakeyaml.version>2.2</snakeyaml.version>
+        <wire.version>3.7.1</wire.version>
+        <wire.plugin.version>3.0.2</wire.plugin.version>
+        <wire.suffix></wire.suffix>
     </properties>
 
     <dependencyManagement>
@@ -83,6 +93,11 @@
             <dependency>
                 <groupId>com.squareup.wire</groupId>
                 <artifactId>wire-runtime</artifactId>
+                <version>${wire.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup.wire</groupId>
+                <artifactId>wire-runtime-jvm</artifactId>
                 <version>${wire.version}</version>
             </dependency>
             <dependency>
@@ -126,7 +141,7 @@
                 <plugin>
                     <groupId>com.squareup.wire</groupId>
                     <artifactId>wire-maven-plugin</artifactId>
-                    <version>2.2.0</version>
+                    <version>${wire.plugin.version}</version>
                     <executions>
                         <execution>
                             <phase>generate-sources</phase>
@@ -139,34 +154,33 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.8.1</version>
+                    <version>3.11.0</version>
                     <configuration>
                         <compilerArgs>
-                            <arg>-Werror</arg>
                             <arg>-Xlint:all</arg>
                             <arg>-Xlint:-options</arg>
                             <arg>-Xlint:-processing</arg>
                             <arg>-Xlint:-serial</arg>
                         </compilerArgs>
                         <showWarnings>true</showWarnings>
-                        <source>1.8</source>
-                        <target>1.8</target>
+                        <source>${java.version}</source>
+                        <target>${java.version}</target>
                     </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>3.3.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
-                    <version>2.8.2</version>
+                    <version>3.1.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>3.6.0</version>
                     <configuration>
                         <links>
                             <link>https://projectreactor.io/docs/core/release/api/</link>
@@ -186,7 +200,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
-                    <version>3.2.1</version>
+                    <version>3.3.0</version>
                     <executions>
                         <execution>
                             <id>attach-sources</id>
@@ -199,7 +213,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.22.2</version>
+                    <version>3.1.2</version>
                     <configuration>
                         <runOrder>random</runOrder>
                     </configuration>
@@ -211,7 +225,7 @@
             <plugin>
                 <groupId>org.jfrog.buildinfo</groupId>
                 <artifactId>artifactory-maven-plugin</artifactId>
-                <version>2.7.0</version>
+                <version>3.6.1</version>
                 <inherited>false</inherited>
                 <executions>
                     <execution>
@@ -235,7 +249,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
-                <version>3.0.1</version>
+                <version>3.1.0</version>
                 <executions>
                     <execution>
                         <id>sign-artifacts</id>
@@ -299,6 +313,74 @@
             <modules>
                 <module>test-service-broker</module>
             </modules>
+        </profile>
+
+        <profile>
+            <id>jdk-17</id>
+            <activation>
+                <jdk>17</jdk>
+            </activation>
+            <properties>
+                <java.version>17</java.version>
+                <dependencies.version>3.1.4</dependencies.version>
+                <wire.version>4.9.1</wire.version>
+                <wire.plugin.version>3.0.2</wire.plugin.version>
+                <wire.suffix>-jvm</wire.suffix>
+            </properties>
+            <build>
+                <finalName>${project.artifactId}-jdk17-${project.version}</finalName>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <version>3.11.0</version>
+                        <!-- @see https://github.com/immutables/immutables/issues/1339#issuecomment-1016125673 -->
+                        <configuration>
+                            <fork>true</fork>
+                            <compilerArgs combine.children="append">
+                                <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
+                            </compilerArgs>
+                            <showWarnings>true</showWarnings>
+                            <source>${java.version}</source>
+                            <target>${java.version}</target>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>jdk-21</id>
+            <activation>
+                <jdk>21</jdk>
+            </activation>
+            <properties>
+                <java.version>21</java.version>
+                <dependencies.version>3.1.4</dependencies.version>
+                <wire.version>4.9.1</wire.version>
+                <wire.plugin.version>3.0.2</wire.plugin.version>
+                <wire.suffix>-jvm</wire.suffix>
+            </properties>
+            <build>
+                <finalName>${project.artifactId}-jdk21-${project.version}</finalName>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <version>3.11.0</version>
+                        <!-- @see https://github.com/immutables/immutables/issues/1339#issuecomment-1016125673 -->
+                        <configuration>
+                            <fork>true</fork>
+                            <compilerArgs combine.children="append">
+                                <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
+                            </compilerArgs>
+                            <showWarnings>true</showWarnings>
+                            <source>${java.version}</source>
+                            <target>${java.version}</target>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 

@@ -41,7 +41,6 @@ import reactor.test.StepVerifier;
 
 import java.time.Duration;
 import java.util.Collections;
-import java.util.concurrent.TimeoutException;
 
 import static org.mockito.Mockito.RETURNS_SMART_NULLS;
 import static org.mockito.Mockito.mock;

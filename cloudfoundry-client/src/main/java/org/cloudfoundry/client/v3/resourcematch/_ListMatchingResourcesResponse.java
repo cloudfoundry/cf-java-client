@@ -16,14 +16,9 @@
 
 package org.cloudfoundry.client.v3.resourcematch;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import org.immutables.value.Value;
 
-import java.io.IOException;
 import java.util.List;
 
 /**

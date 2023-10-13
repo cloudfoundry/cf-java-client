@@ -17,7 +17,6 @@
 package org.cloudfoundry.client.v3.roles;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.Resource;
 
 /**

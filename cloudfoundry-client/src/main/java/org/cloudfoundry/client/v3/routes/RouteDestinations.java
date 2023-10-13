@@ -1,7 +1,6 @@
 package org.cloudfoundry.client.v3.routes;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.client.v3.Link;
 

@@ -18,7 +18,6 @@ package org.cloudfoundry.client.v3.roles;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.ToOneRelationship;
 import org.immutables.value.Value;
