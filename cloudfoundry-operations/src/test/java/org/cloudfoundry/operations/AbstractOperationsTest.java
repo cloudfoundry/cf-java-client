@@ -1,17 +1,15 @@
 /*
  * Copyright 2013-2021 the original author or authors.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package org.cloudfoundry.operations;
@@ -63,106 +61,109 @@ import static org.mockito.Mockito.when;
 
 public abstract class AbstractOperationsTest {
 
-        protected static final Mono<String> MISSING_ID = Mono.error(new java.lang.IllegalStateException("MISSING_ID"));
+    protected static final Mono<String> MISSING_ID =
+            Mono.error(new java.lang.IllegalStateException("MISSING_ID"));
 
-        protected static final Mono<String> MISSING_ORGANIZATION_ID = Mono
-                        .error(new java.lang.IllegalStateException("MISSING_ORGANIZATION_ID"));
+    protected static final Mono<String> MISSING_ORGANIZATION_ID =
+            Mono.error(new java.lang.IllegalStateException("MISSING_ORGANIZATION_ID"));
 
-        protected static final Mono<String> MISSING_SPACE_ID = Mono
-                        .error(new java.lang.IllegalStateException("MISSING_SPACE_ID"));
+    protected static final Mono<String> MISSING_SPACE_ID =
+            Mono.error(new java.lang.IllegalStateException("MISSING_SPACE_ID"));
 
-        protected static final Mono<String> MISSING_USERNAME = Mono
-                        .error(new java.lang.IllegalStateException("MISSING_USERNAME"));
+    protected static final Mono<String> MISSING_USERNAME =
+            Mono.error(new java.lang.IllegalStateException("MISSING_USERNAME"));
 
-        protected static final String TEST_ORGANIZATION_ID = "test-organization-id";
+    protected static final String TEST_ORGANIZATION_ID = "test-organization-id";
 
-        protected static final String TEST_ORGANIZATION_NAME = "test-organization-name";
+    protected static final String TEST_ORGANIZATION_NAME = "test-organization-name";
 
-        protected static final String TEST_SPACE_ID = "test-space-id";
+    protected static final String TEST_SPACE_ID = "test-space-id";
 
-        protected static final String TEST_SPACE_NAME = "test-space-name";
+    protected static final String TEST_SPACE_NAME = "test-space-name";
 
-        protected static final String TEST_USERNAME = "test-username";
+    protected static final String TEST_USERNAME = "test-username";
 
-        protected final ApplicationsV2 applications = mock(ApplicationsV2.class, RETURNS_SMART_NULLS);
+    protected final ApplicationsV2 applications = mock(ApplicationsV2.class, RETURNS_SMART_NULLS);
 
-        protected final ApplicationsV3 applicationsV3 = mock(ApplicationsV3.class, RETURNS_SMART_NULLS);
+    protected final ApplicationsV3 applicationsV3 = mock(ApplicationsV3.class, RETURNS_SMART_NULLS);
 
-        protected final Authorizations authorizations = mock(Authorizations.class, RETURNS_SMART_NULLS);
+    protected final Authorizations authorizations = mock(Authorizations.class, RETURNS_SMART_NULLS);
 
-        protected final Buildpacks buildpacks = mock(Buildpacks.class, RETURNS_SMART_NULLS);
+    protected final Buildpacks buildpacks = mock(Buildpacks.class, RETURNS_SMART_NULLS);
 
-        protected final CloudFoundryClient cloudFoundryClient = mock(CloudFoundryClient.class, RETURNS_SMART_NULLS);
+    protected final CloudFoundryClient cloudFoundryClient =
+            mock(CloudFoundryClient.class, RETURNS_SMART_NULLS);
 
-        protected final Domains domains = mock(Domains.class, RETURNS_SMART_NULLS);
-        protected final DomainsV3 domainsV3 = mock(DomainsV3.class, RETURNS_SMART_NULLS);
+    protected final Domains domains = mock(Domains.class, RETURNS_SMART_NULLS);
+    protected final DomainsV3 domainsV3 = mock(DomainsV3.class, RETURNS_SMART_NULLS);
 
-        protected final DopplerClient dopplerClient = mock(DopplerClient.class, RETURNS_SMART_NULLS);
+    protected final DopplerClient dopplerClient = mock(DopplerClient.class, RETURNS_SMART_NULLS);
 
-        protected final Events events = mock(Events.class, RETURNS_SMART_NULLS);
+    protected final Events events = mock(Events.class, RETURNS_SMART_NULLS);
 
-        protected final FeatureFlags featureFlags = mock(FeatureFlags.class, RETURNS_SMART_NULLS);
+    protected final FeatureFlags featureFlags = mock(FeatureFlags.class, RETURNS_SMART_NULLS);
 
-        protected final Jobs jobs = mock(Jobs.class, RETURNS_SMART_NULLS);
-        protected final JobsV3 jobsV3 = mock(JobsV3.class, RETURNS_SMART_NULLS);
+    protected final Jobs jobs = mock(Jobs.class, RETURNS_SMART_NULLS);
+    protected final JobsV3 jobsV3 = mock(JobsV3.class, RETURNS_SMART_NULLS);
 
-        protected final OrganizationQuotaDefinitions organizationQuotaDefinitions = mock(
-                        OrganizationQuotaDefinitions.class,
-                        RETURNS_SMART_NULLS);
+    protected final OrganizationQuotaDefinitions organizationQuotaDefinitions =
+            mock(OrganizationQuotaDefinitions.class, RETURNS_SMART_NULLS);
 
-        protected final Organizations organizations = mock(Organizations.class, RETURNS_SMART_NULLS);
-        protected final OrganizationsV3 organizationsV3 = mock(OrganizationsV3.class, RETURNS_SMART_NULLS);
+    protected final Organizations organizations = mock(Organizations.class, RETURNS_SMART_NULLS);
+    protected final OrganizationsV3 organizationsV3 =
+            mock(OrganizationsV3.class, RETURNS_SMART_NULLS);
 
-        protected final PrivateDomains privateDomains = mock(PrivateDomains.class, RETURNS_SMART_NULLS);
+    protected final PrivateDomains privateDomains = mock(PrivateDomains.class, RETURNS_SMART_NULLS);
 
-        protected final ResourceMatch resourceMatch = mock(ResourceMatch.class, RETURNS_SMART_NULLS);
+    protected final ResourceMatch resourceMatch = mock(ResourceMatch.class, RETURNS_SMART_NULLS);
 
-        protected final RouterGroups routerGroups = mock(RouterGroups.class, RETURNS_SMART_NULLS);
+    protected final RouterGroups routerGroups = mock(RouterGroups.class, RETURNS_SMART_NULLS);
 
-        protected final Routes routes = mock(Routes.class, RETURNS_SMART_NULLS);
-        protected final RoutesV3 routesV3 = mock(RoutesV3.class, RETURNS_SMART_NULLS);
+    protected final Routes routes = mock(Routes.class, RETURNS_SMART_NULLS);
+    protected final RoutesV3 routesV3 = mock(RoutesV3.class, RETURNS_SMART_NULLS);
 
-        protected final RoutingClient routingClient = mock(RoutingClient.class, RETURNS_SMART_NULLS);
+    protected final RoutingClient routingClient = mock(RoutingClient.class, RETURNS_SMART_NULLS);
 
-        protected final ServiceBindingsV2 serviceBindingsV2 = mock(ServiceBindingsV2.class, RETURNS_SMART_NULLS);
+    protected final ServiceBindingsV2 serviceBindingsV2 =
+            mock(ServiceBindingsV2.class, RETURNS_SMART_NULLS);
 
-        protected final ServiceBrokers serviceBrokers = mock(ServiceBrokers.class, RETURNS_SMART_NULLS);
+    protected final ServiceBrokers serviceBrokers = mock(ServiceBrokers.class, RETURNS_SMART_NULLS);
 
-        protected final ServiceInstances serviceInstances = mock(ServiceInstances.class, RETURNS_SMART_NULLS);
+    protected final ServiceInstances serviceInstances =
+            mock(ServiceInstances.class, RETURNS_SMART_NULLS);
 
-        protected final ServiceKeys serviceKeys = mock(ServiceKeys.class, RETURNS_SMART_NULLS);
+    protected final ServiceKeys serviceKeys = mock(ServiceKeys.class, RETURNS_SMART_NULLS);
 
-        protected final ServicePlanVisibilities servicePlanVisibilities = mock(ServicePlanVisibilities.class,
-                        RETURNS_SMART_NULLS);
+    protected final ServicePlanVisibilities servicePlanVisibilities =
+            mock(ServicePlanVisibilities.class, RETURNS_SMART_NULLS);
 
-        protected final ServicePlans servicePlans = mock(ServicePlans.class, RETURNS_SMART_NULLS);
+    protected final ServicePlans servicePlans = mock(ServicePlans.class, RETURNS_SMART_NULLS);
 
-        protected final Services services = mock(Services.class, RETURNS_SMART_NULLS);
+    protected final Services services = mock(Services.class, RETURNS_SMART_NULLS);
 
-        protected final SharedDomains sharedDomains = mock(SharedDomains.class, RETURNS_SMART_NULLS);
+    protected final SharedDomains sharedDomains = mock(SharedDomains.class, RETURNS_SMART_NULLS);
 
-        protected final SpaceQuotaDefinitions spaceQuotaDefinitions = mock(SpaceQuotaDefinitions.class,
-                        RETURNS_SMART_NULLS);
+    protected final SpaceQuotaDefinitions spaceQuotaDefinitions =
+            mock(SpaceQuotaDefinitions.class, RETURNS_SMART_NULLS);
 
-        protected final Spaces spaces = mock(Spaces.class, RETURNS_SMART_NULLS);
-        protected final SpacesV3 spacesV3 = mock(SpacesV3.class, RETURNS_SMART_NULLS);
+    protected final Spaces spaces = mock(Spaces.class, RETURNS_SMART_NULLS);
+    protected final SpacesV3 spacesV3 = mock(SpacesV3.class, RETURNS_SMART_NULLS);
 
-        protected final Stacks stacks = mock(Stacks.class, RETURNS_SMART_NULLS);
+    protected final Stacks stacks = mock(Stacks.class, RETURNS_SMART_NULLS);
 
-        protected final Tasks tasks = mock(Tasks.class, RETURNS_SMART_NULLS);
+    protected final Tasks tasks = mock(Tasks.class, RETURNS_SMART_NULLS);
 
-        protected final Tokens tokens = mock(Tokens.class, RETURNS_SMART_NULLS);
+    protected final Tokens tokens = mock(Tokens.class, RETURNS_SMART_NULLS);
 
-        protected final UaaClient uaaClient = mock(UaaClient.class, RETURNS_SMART_NULLS);
+    protected final UaaClient uaaClient = mock(UaaClient.class, RETURNS_SMART_NULLS);
 
-        protected final org.cloudfoundry.uaa.users.Users uaaUsers = mock(org.cloudfoundry.uaa.users.Users.class,
-                        RETURNS_SMART_NULLS);
+    protected final org.cloudfoundry.uaa.users.Users uaaUsers =
+            mock(org.cloudfoundry.uaa.users.Users.class, RETURNS_SMART_NULLS);
 
-        protected final UserProvidedServiceInstances userProvidedServiceInstances = mock(
-                        UserProvidedServiceInstances.class,
-                        RETURNS_SMART_NULLS);
+    protected final UserProvidedServiceInstances userProvidedServiceInstances =
+            mock(UserProvidedServiceInstances.class, RETURNS_SMART_NULLS);
 
-        protected final Users users = mock(Users.class, RETURNS_SMART_NULLS);
+    protected final Users users = mock(Users.class, RETURNS_SMART_NULLS);
 
     @Before
     public final void mockClient() {
