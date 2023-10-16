@@ -16,18 +16,22 @@
 
 package org.cloudfoundry.client.v2.privatedomains;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class DeletePrivateDomainRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noPrivateDomainId() {
-        DeletePrivateDomainRequest.builder()
-            .build();
+final class DeletePrivateDomainRequestTest {
+
+    @Test
+    void noPrivateDomainId() {
+        assertThrows(IllegalStateException.class, () -> {
+            DeletePrivateDomainRequest.builder()
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         DeletePrivateDomainRequest.builder()
             .privateDomainId("test-private-domain-id")
             .build();

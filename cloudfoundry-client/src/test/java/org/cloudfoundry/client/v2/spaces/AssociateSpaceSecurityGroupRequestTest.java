@@ -16,26 +16,32 @@
 
 package org.cloudfoundry.client.v2.spaces;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class AssociateSpaceSecurityGroupRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noSecurityGroupId() {
-        AssociateSpaceSecurityGroupRequest.builder()
-            .spaceId("test-space-id")
-            .build();
-    }
+final class AssociateSpaceSecurityGroupRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noSpaceId() {
-        AssociateSpaceSecurityGroupRequest.builder()
-            .securityGroupId("test-security-group-id")
-            .build();
+    @Test
+    void noSecurityGroupId() {
+        assertThrows(IllegalStateException.class, () -> {
+            AssociateSpaceSecurityGroupRequest.builder()
+                .spaceId("test-space-id")
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noSpaceId() {
+        assertThrows(IllegalStateException.class, () -> {
+            AssociateSpaceSecurityGroupRequest.builder()
+                .securityGroupId("test-security-group-id")
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         AssociateSpaceSecurityGroupRequest.builder()
             .securityGroupId("test-security-group-id")
             .spaceId("test-space-id")

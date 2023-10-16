@@ -16,26 +16,32 @@
 
 package org.cloudfoundry.client.v2.applications;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class RemoveApplicationServiceBindingRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noApplicationId() {
-        RemoveApplicationServiceBindingRequest.builder()
-            .serviceBindingId("test-service-binding-id")
-            .build();
-    }
+final class RemoveApplicationServiceBindingRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noServiceBindingId() {
-        RemoveApplicationServiceBindingRequest.builder()
-            .applicationId("test-application-id")
-            .build();
+    @Test
+    void noApplicationId() {
+        assertThrows(IllegalStateException.class, () -> {
+            RemoveApplicationServiceBindingRequest.builder()
+                .serviceBindingId("test-service-binding-id")
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noServiceBindingId() {
+        assertThrows(IllegalStateException.class, () -> {
+            RemoveApplicationServiceBindingRequest.builder()
+                .applicationId("test-application-id")
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         RemoveApplicationServiceBindingRequest.builder()
             .applicationId("test-application-id")
             .serviceBindingId("test-service-binding-id")

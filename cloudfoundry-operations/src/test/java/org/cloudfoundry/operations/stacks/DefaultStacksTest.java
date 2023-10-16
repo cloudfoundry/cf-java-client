@@ -21,7 +21,7 @@ import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
 import org.cloudfoundry.client.v2.stacks.ListStacksResponse;
 import org.cloudfoundry.client.v2.stacks.StackResource;
 import org.cloudfoundry.operations.AbstractOperationsTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -30,12 +30,12 @@ import java.time.Duration;
 import static org.cloudfoundry.operations.TestObjects.fill;
 import static org.mockito.Mockito.when;
 
-public final class DefaultStacksTest extends AbstractOperationsTest {
+final class DefaultStacksTest extends AbstractOperationsTest {
 
     private final DefaultStacks stacks = new DefaultStacks(Mono.just(this.cloudFoundryClient));
 
     @Test
-    public void getStack() {
+    void getStack() {
         requestStacks(this.cloudFoundryClient, "test-stack-name");
 
         this.stacks
@@ -50,7 +50,7 @@ public final class DefaultStacksTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void listStacks() {
+    void listStacks() {
         requestStacks(this.cloudFoundryClient);
 
         this.stacks.list()

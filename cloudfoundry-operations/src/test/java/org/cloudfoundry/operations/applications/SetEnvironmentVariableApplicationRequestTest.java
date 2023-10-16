@@ -16,36 +16,44 @@
 
 package org.cloudfoundry.operations.applications;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class SetEnvironmentVariableApplicationRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        SetEnvironmentVariableApplicationRequest.builder()
-            .variableName("test-variable-name")
-            .variableValue("test-variable-value")
-            .build();
-    }
+final class SetEnvironmentVariableApplicationRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noVariableName() {
-        SetEnvironmentVariableApplicationRequest.builder()
-            .name("test-name")
-            .variableValue("test-variable-value")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noVariableValue() {
-        SetEnvironmentVariableApplicationRequest.builder()
-            .name("test-name")
-            .variableName("test-variable-name")
-            .build();
+    @Test
+    void noName() {
+        assertThrows(IllegalStateException.class, () -> {
+            SetEnvironmentVariableApplicationRequest.builder()
+                .variableName("test-variable-name")
+                .variableValue("test-variable-value")
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noVariableName() {
+        assertThrows(IllegalStateException.class, () -> {
+            SetEnvironmentVariableApplicationRequest.builder()
+                .name("test-name")
+                .variableValue("test-variable-value")
+                .build();
+        });
+    }
+
+    @Test
+    void noVariableValue() {
+        assertThrows(IllegalStateException.class, () -> {
+            SetEnvironmentVariableApplicationRequest.builder()
+                .name("test-name")
+                .variableName("test-variable-name")
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         SetEnvironmentVariableApplicationRequest.builder()
             .name("test-name")
             .variableName("test-variable-name")

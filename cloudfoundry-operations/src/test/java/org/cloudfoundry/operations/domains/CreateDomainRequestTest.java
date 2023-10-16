@@ -16,26 +16,32 @@
 
 package org.cloudfoundry.operations.domains;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class CreateDomainRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noDomain() {
-        CreateDomainRequest.builder()
-            .organization("test-organization")
-            .build();
-    }
+final class CreateDomainRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noOrganization() {
-        CreateDomainRequest.builder()
-            .domain("test-domain")
-            .build();
+    @Test
+    void noDomain() {
+        assertThrows(IllegalStateException.class, () -> {
+            CreateDomainRequest.builder()
+                .organization("test-organization")
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noOrganization() {
+        assertThrows(IllegalStateException.class, () -> {
+            CreateDomainRequest.builder()
+                .domain("test-domain")
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         CreateDomainRequest.builder()
             .domain("test-domain")
             .organization("test-organization")

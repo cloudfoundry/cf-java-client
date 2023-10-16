@@ -16,57 +16,65 @@
 
 package org.cloudfoundry.uaa.identityzones;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class UpdateIdentityZoneRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noIdentityZoneId() {
-        UpdateIdentityZoneRequest.builder()
-            .configuration(IdentityZoneConfiguration.builder().build())
-            .description("test-new-description")
-            .name("test-name")
-            .subdomain("test-sub-domain")
-            .version(1)
-            .build();
+class UpdateIdentityZoneRequestTest {
+
+    @Test
+    void noIdentityZoneId() {
+        assertThrows(IllegalStateException.class, () -> {
+            UpdateIdentityZoneRequest.builder()
+                .configuration(IdentityZoneConfiguration.builder().build())
+                .description("test-new-description")
+                .name("test-name")
+                .subdomain("test-sub-domain")
+                .version(1)
+                .build();
+        });
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
+    @Test
+    void noName() {
+        assertThrows(IllegalStateException.class, () -> {
+            UpdateIdentityZoneRequest.builder()
+                .configuration(IdentityZoneConfiguration.builder().build())
+                .description("test-new-description")
+                .identityZoneId("test-id")
+                .subdomain("test-sub-domain")
+                .version(1)
+                .build();
+        });
+    }
+
+    @Test
+    void noSubdomain() {
+        assertThrows(IllegalStateException.class, () -> {
+            UpdateIdentityZoneRequest.builder()
+                .configuration(IdentityZoneConfiguration.builder().build())
+                .description("test-new-description")
+                .identityZoneId("test-id")
+                .name("test-name")
+                .version(1)
+                .build();
+        });
+    }
+
+    @Test
+    void validMax() {
         UpdateIdentityZoneRequest.builder()
             .configuration(IdentityZoneConfiguration.builder().build())
             .description("test-new-description")
             .identityZoneId("test-id")
-            .subdomain("test-sub-domain")
-            .version(1)
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noSubdomain() {
-        UpdateIdentityZoneRequest.builder()
-            .configuration(IdentityZoneConfiguration.builder().build())
-            .description("test-new-description")
-            .identityZoneId("test-id")
             .name("test-name")
+            .subdomain("test-sub-domain")
             .version(1)
             .build();
     }
 
     @Test
-    public void validMax() {
-        UpdateIdentityZoneRequest.builder()
-            .configuration(IdentityZoneConfiguration.builder().build())
-            .description("test-new-description")
-            .identityZoneId("test-id")
-            .name("test-name")
-            .subdomain("test-sub-domain")
-            .version(1)
-            .build();
-    }
-
-    @Test
-    public void validMin() {
+    void validMin() {
         UpdateIdentityZoneRequest.builder()
             .identityZoneId("test-id")
             .name("test-name")

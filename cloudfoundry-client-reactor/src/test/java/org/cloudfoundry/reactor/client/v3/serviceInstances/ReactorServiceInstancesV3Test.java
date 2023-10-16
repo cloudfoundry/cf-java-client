@@ -48,7 +48,7 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
@@ -66,12 +66,12 @@ import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest {
+final class ReactorServiceInstancesV3Test extends AbstractClientApiTest {
 
     private final ReactorServiceInstancesV3 serviceInstances = new ReactorServiceInstancesV3(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void getManagedServiceParameters() {
+    void getManagedServiceParameters() {
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("key_1", "value_1");
         parameters.put("key_2", "value_2");
@@ -99,7 +99,7 @@ public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void getUserProvidedCredentials() {
+    void getUserProvidedCredentials() {
         Map<String, Object> credentials = new HashMap<>();
         credentials.put("username", "my-username");
         credentials.put("password", "super-secret");
@@ -128,7 +128,7 @@ public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/service_instances/c89b3280-fe8d-4aa0-a42e-44465bb1c61c")
@@ -202,7 +202,7 @@ public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/service_instances?names=test-service-instance-name&space_guids=test-space-id&page=1")
@@ -284,7 +284,7 @@ public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void listSharedSpaces() {
+    void listSharedSpaces() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/service_instances/test-service-instance-id/relationships/shared_spaces")
@@ -316,7 +316,7 @@ public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void share() {
+    void share() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(POST).path("/service_instances/test-service-instance-id/relationships/shared_spaces")
@@ -355,7 +355,7 @@ public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void unshare() {
+    void unshare() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/service_instances/test-service-instance-id/relationships/shared_spaces/test-space-id")
@@ -376,7 +376,7 @@ public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void createManagedServiceInstance() {
+    void createManagedServiceInstance() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(POST).path("/service_instances")
@@ -421,7 +421,7 @@ public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void testCreateUserProvidedService() {
+    void testCreateUserProvidedService() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(POST).path("/service_instances")
@@ -505,7 +505,7 @@ public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void updateManagedServiceInstance() {
+    void updateManagedServiceInstance() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PATCH).path("/service_instances/c89b3280-fe8d-4aa0-a42e-44465bb1c61c")
@@ -604,7 +604,7 @@ public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void updateManagedServiceInstanceAsync() {
+    void updateManagedServiceInstanceAsync() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PATCH).path("/service_instances/c89b3280-fe8d-4aa0-a42e-44465bb1c61c")
@@ -647,7 +647,7 @@ public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void updateUserProvidedServiceInstance() {
+    void updateUserProvidedServiceInstance() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PATCH).path("/service_instances/88ce23e5-27c3-4381-a2df-32a28ec43133")
@@ -725,7 +725,7 @@ public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void deleteManagedServiceInstance() {
+    void deleteManagedServiceInstance() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/service_instances/88ce23e5-27c3-4381-a2df-32a28ec43133")
@@ -747,7 +747,7 @@ public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void deleteUserProvidedServiceInstance() {
+    void deleteUserProvidedServiceInstance() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/service_instances/88ce23e5-27c3-4381-a2df-32a28ec43133")

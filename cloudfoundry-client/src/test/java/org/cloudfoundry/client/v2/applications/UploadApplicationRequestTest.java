@@ -16,31 +16,37 @@
 
 package org.cloudfoundry.client.v2.applications;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public final class UploadApplicationRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+final class UploadApplicationRequestTest {
 
     private static final Path TEST_APPLICATION = Paths.get("/");
 
-    @Test(expected = IllegalStateException.class)
-    public void noApplication() {
-        UploadApplicationRequest.builder()
-            .applicationId("test-application-id")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noApplicationId() {
-        UploadApplicationRequest.builder()
-            .application(TEST_APPLICATION)
-            .build();
+    @Test
+    void noApplication() {
+        assertThrows(IllegalStateException.class, () -> {
+            UploadApplicationRequest.builder()
+                .applicationId("test-application-id")
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noApplicationId() {
+        assertThrows(IllegalStateException.class, () -> {
+            UploadApplicationRequest.builder()
+                .application(TEST_APPLICATION)
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         UploadApplicationRequest.builder()
             .application(TEST_APPLICATION)
             .applicationId("test-application-id")

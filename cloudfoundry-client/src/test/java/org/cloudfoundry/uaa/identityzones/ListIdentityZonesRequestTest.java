@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.uaa.identityzones;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class ListIdentityZonesRequestTest {
+final class ListIdentityZonesRequestTest {
 
     @Test
-    public void valid() {
+    void valid() {
         ListIdentityZonesRequest.builder()
             .build();
     }

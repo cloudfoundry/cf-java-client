@@ -16,26 +16,32 @@
 
 package org.cloudfoundry.routing.v1.routergroups;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class UpdateRouterGroupRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noId() {
-        UpdateRouterGroupRequest.builder()
-            .reservablePorts("999-9999")
-            .build();
-    }
+class UpdateRouterGroupRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noReservablePorts() {
-        UpdateRouterGroupRequest.builder()
-            .routerGroupId("test-router-group-id")
-            .build();
+    @Test
+    void noId() {
+        assertThrows(IllegalStateException.class, () -> {
+            UpdateRouterGroupRequest.builder()
+                .reservablePorts("999-9999")
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noReservablePorts() {
+        assertThrows(IllegalStateException.class, () -> {
+            UpdateRouterGroupRequest.builder()
+                .routerGroupId("test-router-group-id")
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         UpdateRouterGroupRequest.builder()
             .reservablePorts("999-9999")
             .routerGroupId("test-router-group-id")

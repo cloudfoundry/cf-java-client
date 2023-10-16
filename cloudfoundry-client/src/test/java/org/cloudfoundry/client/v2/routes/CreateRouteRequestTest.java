@@ -16,26 +16,32 @@
 
 package org.cloudfoundry.client.v2.routes;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class CreateRouteRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noDomainId() {
-        CreateRouteRequest.builder()
-            .spaceId("test-space-id")
-            .build();
-    }
+final class CreateRouteRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noSpaceId() {
-        CreateRouteRequest.builder()
-            .domainId("test-domain-id")
-            .build();
+    @Test
+    void noDomainId() {
+        assertThrows(IllegalStateException.class, () -> {
+            CreateRouteRequest.builder()
+                .spaceId("test-space-id")
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noSpaceId() {
+        assertThrows(IllegalStateException.class, () -> {
+            CreateRouteRequest.builder()
+                .domainId("test-domain-id")
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         CreateRouteRequest.builder()
             .domainId("test-domain-id")
             .spaceId("test-space-id")

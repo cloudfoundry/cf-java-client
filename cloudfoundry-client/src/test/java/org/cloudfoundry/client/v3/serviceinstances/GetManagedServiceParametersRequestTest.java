@@ -1,11 +1,11 @@
 package org.cloudfoundry.client.v3.serviceinstances;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class GetManagedServiceParametersRequestTest {
+class GetManagedServiceParametersRequestTest {
 
     @Test
-    public void valid() {
+    void valid() {
         GetManagedServiceParametersRequest.builder()
             .serviceInstanceId("test-service-instance-id")
             .build();

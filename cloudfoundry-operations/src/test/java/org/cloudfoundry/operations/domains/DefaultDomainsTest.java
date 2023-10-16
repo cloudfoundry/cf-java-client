@@ -37,7 +37,7 @@ import org.cloudfoundry.operations.AbstractOperationsTest;
 import org.cloudfoundry.routing.RoutingClient;
 import org.cloudfoundry.routing.v1.routergroups.ListRouterGroupsRequest;
 import org.cloudfoundry.routing.v1.routergroups.ListRouterGroupsResponse;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -47,12 +47,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.operations.TestObjects.fill;
 import static org.mockito.Mockito.when;
 
-public final class DefaultDomainsTest extends AbstractOperationsTest {
+final class DefaultDomainsTest extends AbstractOperationsTest {
 
     private final DefaultDomains domains = new DefaultDomains(Mono.just(this.cloudFoundryClient), Mono.just(this.routingClient));
 
     @Test
-    public void createDomain() {
+    void createDomain() {
         requestOrganizations(this.cloudFoundryClient, "test-organization");
         requestCreatePrivateDomain(this.cloudFoundryClient, "test-domain", "test-organization-id");
 
@@ -67,7 +67,7 @@ public final class DefaultDomainsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void createSharedDomain() {
+    void createSharedDomain() {
         requestCreateSharedDomain(this.cloudFoundryClient, "test-domain");
 
         this.domains
@@ -80,7 +80,7 @@ public final class DefaultDomainsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void listDomains() {
+    void listDomains() {
         requestPrivateDomains(this.cloudFoundryClient);
         requestSharedDomains(this.cloudFoundryClient);
 
@@ -102,7 +102,7 @@ public final class DefaultDomainsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void listDomainsOnlyPrivate() {
+    void listDomainsOnlyPrivate() {
         requestPrivateDomains(this.cloudFoundryClient);
         requestSharedDomainsEmpty(this.cloudFoundryClient);
 
@@ -119,7 +119,7 @@ public final class DefaultDomainsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void listDomainsOnlyShared() {
+    void listDomainsOnlyShared() {
         requestSharedDomains(this.cloudFoundryClient);
         requestPrivateDomainsEmpty(this.cloudFoundryClient);
 
@@ -136,7 +136,7 @@ public final class DefaultDomainsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void listDomainsTcp() {
+    void listDomainsTcp() {
         requestPrivateDomains(this.cloudFoundryClient);
         requestSharedDomainsTcp(this.cloudFoundryClient);
 
@@ -159,7 +159,7 @@ public final class DefaultDomainsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void listRouterGroups() {
+    void listRouterGroups() {
         requestListRouterGroups(this.routingClient);
 
         this.domains
@@ -175,7 +175,7 @@ public final class DefaultDomainsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void shareDomain() {
+    void shareDomain() {
         requestListPrivateDomains(this.cloudFoundryClient, "test-domain", "test-domain-id");
         requestOrganizations(this.cloudFoundryClient, "test-organization");
         requestAssociateOrganizationPrivateDomain(this.cloudFoundryClient, "test-domain-id", "test-organization-id");
@@ -191,7 +191,7 @@ public final class DefaultDomainsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void shareDomainSharedDomain() {
+    void shareDomainSharedDomain() {
         requestListPrivateDomainsEmpty(this.cloudFoundryClient, "test-domain");
         requestOrganizations(this.cloudFoundryClient, "test-organization");
 
@@ -206,7 +206,7 @@ public final class DefaultDomainsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void unshareDomain() {
+    void unshareDomain() {
         requestListPrivateDomains(this.cloudFoundryClient, "test-domain", "test-domain-id");
         requestOrganizations(this.cloudFoundryClient, "test-organization");
         requestRemoveOrganizationPrivateDomain(this.cloudFoundryClient, "test-domain-id", "test-organization-id");

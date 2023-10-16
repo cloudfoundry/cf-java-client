@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.networking.v1.tags;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class ListTagsRequestTest {
+class ListTagsRequestTest {
 
     @Test
-    public void valid() {
+    void valid() {
         ListTagsRequest.builder()
             .build();
     }

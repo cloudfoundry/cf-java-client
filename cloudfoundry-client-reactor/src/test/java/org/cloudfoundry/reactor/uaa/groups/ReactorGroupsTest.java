@@ -56,7 +56,7 @@ import org.cloudfoundry.uaa.groups.UserEntity;
 import org.cloudfoundry.uaa.users.Email;
 import org.cloudfoundry.uaa.users.Meta;
 import org.cloudfoundry.uaa.users.Name;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
@@ -70,12 +70,12 @@ import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static org.cloudfoundry.uaa.SortOrder.ASCENDING;
 
-public final class ReactorGroupsTest extends AbstractUaaApiTest {
+final class ReactorGroupsTest extends AbstractUaaApiTest {
 
     private final ReactorGroups groups = new ReactorGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void addMember() {
+    void addMember() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(POST).path("/Groups/test-group-id/members")
@@ -105,7 +105,7 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void checkMember() {
+    void checkMember() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/Groups/test-group-id/members/test-member-id")
@@ -132,7 +132,7 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void create() {
+    void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .header("X-Identity-Zone-Id", "uaa")
@@ -179,7 +179,7 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .header("If-Match", "*")
@@ -219,7 +219,7 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/Groups/test-group-id")
@@ -257,7 +257,7 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET)
@@ -308,7 +308,7 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void listExternalGroupMappings() {
+    void listExternalGroupMappings() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET)
@@ -345,7 +345,7 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void listMembers() {
+    void listMembers() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET)
@@ -400,7 +400,7 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void listMembersNoEntity() {
+    void listMembersNoEntity() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET)
@@ -430,7 +430,7 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void mapExternalGroup() {
+    void mapExternalGroup() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(POST).path("/Groups/External")
@@ -465,7 +465,7 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void removeMember() {
+    void removeMember() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/Groups/test-group-id/members/40bc8ef1-0719-4a0c-9f60-e9f843cd4af2")
@@ -492,7 +492,7 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void success() {
+    void success() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PUT).path("/Groups/test-group-id")
@@ -542,7 +542,7 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void unmapExternalGroupByGroupDisplayName() {
+    void unmapExternalGroupByGroupDisplayName() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/Groups/External/displayName/Group%20For%20Testing%20Deleting%20External%20Group%20Mapping%20By%20Name/externalGroup/external%20group/origin/ldap")
@@ -577,7 +577,7 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void unmapExternalGroupByGroupId() {
+    void unmapExternalGroupByGroupId() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/Groups/External/groupId/d68167b4-81b3-490d-9838-94092d5c89f6/externalGroup/external%20group/origin/ldap")

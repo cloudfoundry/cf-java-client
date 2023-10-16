@@ -49,7 +49,7 @@ import org.cloudfoundry.routing.v1.routergroups.RouterGroups;
 import org.cloudfoundry.uaa.UaaClient;
 import org.cloudfoundry.uaa.authorizations.Authorizations;
 import org.cloudfoundry.uaa.tokens.Tokens;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import reactor.core.publisher.Mono;
 
 import static org.mockito.Mockito.RETURNS_SMART_NULLS;
@@ -144,7 +144,7 @@ public abstract class AbstractOperationsTest {
 
     protected final Users users = mock(Users.class, RETURNS_SMART_NULLS);
 
-    @Before
+    @BeforeEach
     public final void mockClient() {
         when(this.cloudFoundryClient.applicationsV2()).thenReturn(this.applications);
         when(this.cloudFoundryClient.applicationsV3()).thenReturn(this.applicationsV3);

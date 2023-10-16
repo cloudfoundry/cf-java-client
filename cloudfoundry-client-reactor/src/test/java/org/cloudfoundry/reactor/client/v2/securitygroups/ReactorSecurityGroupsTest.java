@@ -52,7 +52,7 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
@@ -70,12 +70,12 @@ import static org.cloudfoundry.client.v2.securitygroups.Protocol.ICMP;
 import static org.cloudfoundry.client.v2.securitygroups.Protocol.TCP;
 import static org.cloudfoundry.client.v2.securitygroups.Protocol.UDP;
 
-public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
+final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
 
     private final ReactorSecurityGroups securityGroups = new ReactorSecurityGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void associateSpace() {
+    void associateSpace() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PUT).path("/security_groups/1452e164-0c3e-4a6c-b3c3-c40ad9fd0159/spaces/1305ec2b-a31c-4d2e-adc8-d9b764237e96")
@@ -112,7 +112,7 @@ public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void create() {
+    void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(POST).path("/security_groups")
@@ -189,7 +189,7 @@ public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/security_groups/test-id")
@@ -209,7 +209,7 @@ public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void deleteAsync() {
+    void deleteAsync() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/security_groups/test-id?async=true")
@@ -242,7 +242,7 @@ public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void deleteRunning() {
+    void deleteRunning() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/config/running_security_groups/test-id")
@@ -262,7 +262,7 @@ public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void deleteStaging() {
+    void deleteStaging() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/config/staging_security_groups/test-id")
@@ -282,7 +282,7 @@ public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/security_groups/1452e164-0c3e-4a6c-b3c3-c40ad9fd0159")
@@ -319,7 +319,7 @@ public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/security_groups")
@@ -425,7 +425,7 @@ public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void listRunning() {
+    void listRunning() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/config/running_security_groups")
@@ -466,7 +466,7 @@ public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void listSpaces() {
+    void listSpaces() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/security_groups/1452e164-0c3e-4a6c-b3c3-c40ad9fd0159/spaces?space_guid=09a060b2-f97a-4a57-b7d2-35e06ad71050")
@@ -517,7 +517,7 @@ public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void listStaging() {
+    void listStaging() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/config/staging_security_groups")
@@ -558,7 +558,7 @@ public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void removeSpace() {
+    void removeSpace() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/security_groups/1452e164-0c3e-4a6c-b3c3-c40ad9fd0159/spaces/ca8f04d1-bc2b-40ef-975e-fda2cc785c2a")
@@ -579,7 +579,7 @@ public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void setRunning() {
+    void setRunning() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PUT).path("/config/running_security_groups/test-security-group-default-id")
@@ -618,7 +618,7 @@ public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void setStaging() {
+    void setStaging() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PUT).path("/config/staging_security_groups/test-security-group-default-id")
@@ -657,7 +657,7 @@ public final class ReactorSecurityGroupsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void update() {
+    void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PUT).path("/security_groups/1452e164-0c3e-4a6c-b3c3-c40ad9fd0159")

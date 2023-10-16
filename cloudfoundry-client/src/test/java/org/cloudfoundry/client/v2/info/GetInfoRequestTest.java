@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.client.v2.info;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class GetInfoRequestTest {
+final class GetInfoRequestTest {
 
     @Test
-    public void valid() {
+    void valid() {
         GetInfoRequest.builder()
             .build();
     }

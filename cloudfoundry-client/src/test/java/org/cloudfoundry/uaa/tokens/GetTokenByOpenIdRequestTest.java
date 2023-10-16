@@ -16,53 +16,61 @@
 
 package org.cloudfoundry.uaa.tokens;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class GetTokenByOpenIdRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noAuthorizationCode() {
-        GetTokenByOpenIdRequest.builder()
-            .clientId("test-client-id")
-            .clientSecret("test-client-secret")
-            .redirectUri("test-redirect-uri")
-            .tokenFormat(TokenFormat.OPAQUE)
-            .build();
+final class GetTokenByOpenIdRequestTest {
+
+    @Test
+    void noAuthorizationCode() {
+        assertThrows(IllegalStateException.class, () -> {
+            GetTokenByOpenIdRequest.builder()
+                .clientId("test-client-id")
+                .clientSecret("test-client-secret")
+                .redirectUri("test-redirect-uri")
+                .tokenFormat(TokenFormat.OPAQUE)
+                .build();
+        });
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void noClientId() {
-        GetTokenByOpenIdRequest.builder()
-            .authorizationCode("test-authorization-code")
-            .clientSecret("test-client-secret")
-            .redirectUri("test-redirect-uri")
-            .tokenFormat(TokenFormat.OPAQUE)
-            .build();
+    @Test
+    void noClientId() {
+        assertThrows(IllegalStateException.class, () -> {
+            GetTokenByOpenIdRequest.builder()
+                .authorizationCode("test-authorization-code")
+                .clientSecret("test-client-secret")
+                .redirectUri("test-redirect-uri")
+                .tokenFormat(TokenFormat.OPAQUE)
+                .build();
+        });
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void noClientSecret() {
+    @Test
+    void noClientSecret() {
+        assertThrows(IllegalStateException.class, () -> {
+            GetTokenByOpenIdRequest.builder()
+                .authorizationCode("test-authorization-code")
+                .clientId("test-client-id")
+                .redirectUri("test-redirect-uri")
+                .tokenFormat(TokenFormat.OPAQUE)
+                .build();
+        });
+    }
+
+    @Test
+    void validMax() {
         GetTokenByOpenIdRequest.builder()
             .authorizationCode("test-authorization-code")
             .clientId("test-client-id")
+            .clientSecret("test-client-secret")
             .redirectUri("test-redirect-uri")
             .tokenFormat(TokenFormat.OPAQUE)
             .build();
     }
 
     @Test
-    public void validMax() {
-        GetTokenByOpenIdRequest.builder()
-            .authorizationCode("test-authorization-code")
-            .clientId("test-client-id")
-            .clientSecret("test-client-secret")
-            .redirectUri("test-redirect-uri")
-            .tokenFormat(TokenFormat.OPAQUE)
-            .build();
-    }
-
-    @Test
-    public void validMin() {
+    void validMin() {
         GetTokenByOpenIdRequest.builder()
             .authorizationCode("test-authorization-code")
             .clientId("test-client-id")

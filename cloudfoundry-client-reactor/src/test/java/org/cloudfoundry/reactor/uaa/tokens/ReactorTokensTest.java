@@ -41,7 +41,7 @@ import org.cloudfoundry.uaa.tokens.RefreshTokenRequest;
 import org.cloudfoundry.uaa.tokens.RefreshTokenResponse;
 import org.cloudfoundry.uaa.tokens.TokenFormat;
 import org.cloudfoundry.uaa.tokens.TokenKey;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
@@ -52,12 +52,12 @@ import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public final class ReactorTokensTest extends AbstractUaaApiTest {
+final class ReactorTokensTest extends AbstractUaaApiTest {
 
     private final ReactorTokens tokens = new ReactorTokens(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void check() {
+    void check() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(POST).path("/check_token?scopes=password.write%2Cscim.userids&token=f9f2f98d88e04ff7bb1f69041d3c0346")
@@ -104,7 +104,7 @@ public final class ReactorTokensTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void getKey() {
+    void getKey() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/token_key")
@@ -143,7 +143,7 @@ public final class ReactorTokensTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void getTokenByAuthorizationCode() {
+    void getTokenByAuthorizationCode() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(POST).path("/oauth/token?code=zI6Z1X&client_id=login&client_secret=loginsecret&redirect_uri=https%3A%2F%2Fuaa.cloudfoundry.com%2Fredirect%2Fcf" +
@@ -179,7 +179,7 @@ public final class ReactorTokensTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void getTokenByClientCredentials() {
+    void getTokenByClientCredentials() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(POST).path("/oauth/token?client_id=login&client_secret=loginsecret&token_format=opaque&grant_type=client_credentials&response_type=token")
@@ -211,7 +211,7 @@ public final class ReactorTokensTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void getTokenByOneTimePasscode() {
+    void getTokenByOneTimePasscode() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(POST).path("/oauth/token?client_id=app&client_secret=appclientsecret&passcode=qcZNkd&token_format=opaque&grant_type=password&response_type=token")
@@ -245,7 +245,7 @@ public final class ReactorTokensTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void getTokenByOpenId() {
+    void getTokenByOpenId() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(POST).path("/oauth/token?code=NAlA1d&client_id=app&client_secret=appclientsecret&redirect_uri=https%3A%2F%2Fuaa.cloudfoundry.com%2Fredirect%2Fcf&token_format=opaque" +
@@ -282,7 +282,7 @@ public final class ReactorTokensTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void getTokenByPassword() {
+    void getTokenByPassword() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(POST).path("/oauth/token?client_id=app&client_secret=appclientsecret&password=secr3T&token_format=opaque&" +
@@ -318,7 +318,7 @@ public final class ReactorTokensTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void listKeys() {
+    void listKeys() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/token_keys")
@@ -359,7 +359,7 @@ public final class ReactorTokensTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void refreshToken() {
+    void refreshToken() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(POST).path("/oauth/token?client_id=app&client_secret=appclientsecret&refresh_token=6af5fc07a8b74c2eafb0079ff477bb11-r&token_format=opaque&grant_type=refresh_token")

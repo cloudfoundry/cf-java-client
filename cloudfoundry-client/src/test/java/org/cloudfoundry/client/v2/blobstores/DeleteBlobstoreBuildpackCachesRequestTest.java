@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.client.v2.blobstores;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class DeleteBlobstoreBuildpackCachesRequestTest {
+final class DeleteBlobstoreBuildpackCachesRequestTest {
 
     @Test
-    public void valid() {
+    void valid() {
         DeleteBlobstoreBuildpackCachesRequest.builder()
             .build();
     }

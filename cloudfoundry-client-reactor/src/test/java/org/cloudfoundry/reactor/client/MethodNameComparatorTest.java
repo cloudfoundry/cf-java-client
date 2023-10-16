@@ -16,19 +16,19 @@
 
 package org.cloudfoundry.reactor.client;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-public final class MethodNameComparatorTest {
+final class MethodNameComparatorTest {
 
     private final MethodNameComparator comparator = MethodNameComparator.INSTANCE;
 
     @Test
-    public void test() throws NoSuchMethodException {
+    void test() throws NoSuchMethodException {
         Method alpha = this.getClass().getDeclaredMethod("alpha");
         Method bravo = this.getClass().getDeclaredMethod("bravo");
 

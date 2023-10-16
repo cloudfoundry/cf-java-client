@@ -102,7 +102,7 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
@@ -117,12 +117,12 @@ import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public final class ReactorOrganizationsTest extends AbstractClientApiTest {
+final class ReactorOrganizationsTest extends AbstractClientApiTest {
 
     private final ReactorOrganizations organizations = new ReactorOrganizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void associateOrganizationAuditor() {
+    void associateOrganizationAuditor() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PUT).path("/organizations/test-organization-id/auditors/uaa-id-71")
@@ -167,7 +167,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void associateOrganizationAuditorByUsername() {
+    void associateOrganizationAuditorByUsername() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PUT).path("/organizations/test-organization-id/auditors")
@@ -213,7 +213,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void associateOrganizationBillingManager() {
+    void associateOrganizationBillingManager() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PUT).path("/organizations/test-organization-id/billing_managers/test-billing-manager-id")
@@ -258,7 +258,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void associateOrganizationBillingManagerByUsername() {
+    void associateOrganizationBillingManagerByUsername() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PUT).path("/organizations/test-organization-id/billing_managers")
@@ -304,7 +304,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void associateOrganizationManager() {
+    void associateOrganizationManager() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PUT).path("/organizations/test-organization-id/managers/test-manager-id")
@@ -349,7 +349,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void associateOrganizationManagerByUsername() {
+    void associateOrganizationManagerByUsername() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PUT).path("/organizations/test-organization-id/managers")
@@ -395,7 +395,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void associateOrganizationUser() {
+    void associateOrganizationUser() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PUT).path("/organizations/test-organization-id/users/test-user-id")
@@ -440,7 +440,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void associateOrganizationUserByUsername() {
+    void associateOrganizationUserByUsername() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PUT).path("/organizations/test-organization-id/users")
@@ -486,7 +486,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void associatePrivateDomain() {
+    void associatePrivateDomain() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PUT).path("/organizations/test-organization-id/private_domains/test-private-domain-id")
@@ -531,7 +531,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void create() {
+    void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(POST).path("/organizations")
@@ -577,7 +577,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/organizations/test-organization-id")
@@ -597,7 +597,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void deleteAsync() {
+    void deleteAsync() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/organizations/test-organization-id?async=true")
@@ -630,7 +630,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/organizations/test-organization-id")
@@ -674,7 +674,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void getInstanceUsage() {
+    void getInstanceUsage() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/organizations/test-organization-id/instance_usage")
@@ -698,7 +698,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void getMemoryUsage() {
+    void getMemoryUsage() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/organizations/test-organization-id/memory_usage")
@@ -722,7 +722,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void getUserRoles() {
+    void getUserRoles() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/organizations/test-organization-id/user_roles?page=-1")
@@ -773,7 +773,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/organizations?q=name%3Atest-name&page=-1")
@@ -822,7 +822,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void listAuditors() {
+    void listAuditors() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/organizations/test-organization-id/auditors?page=-1")
@@ -868,7 +868,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void listBillingManagers() {
+    void listBillingManagers() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/organizations/test-organization-id/billing_managers?page=-1")
@@ -914,7 +914,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void listDomains() {
+    void listDomains() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/organizations/test-organization-id/domains?page=-1")
@@ -960,7 +960,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void listManagers() {
+    void listManagers() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/organizations/test-organization-id/managers?page=-1")
@@ -1025,7 +1025,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void listPrivateDomains() {
+    void listPrivateDomains() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/organizations/test-organization-id/private_domains?page=-1")
@@ -1065,7 +1065,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void listServices() {
+    void listServices() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/organizations/test-organization-id/services?page=-1")
@@ -1110,7 +1110,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void listSpaceQuotaDefinitions() {
+    void listSpaceQuotaDefinitions() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/organizations/test-organization-id/space_quota_definitions?page=-1")
@@ -1154,7 +1154,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void listSpaces() {
+    void listSpaces() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/organizations/test-organization-id/spaces?page=-1")
@@ -1204,7 +1204,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void listUsers() {
+    void listUsers() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/organizations/test-organization-id/users?page=-1")
@@ -1250,7 +1250,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void removeAuditor() {
+    void removeAuditor() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/organizations/test-organization-id/auditors/test-auditor-id")
@@ -1271,7 +1271,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void removeAuditorByUsername() {
+    void removeAuditorByUsername() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/organizations/test-organization-id/auditors")
@@ -1293,7 +1293,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void removeBillingManager() {
+    void removeBillingManager() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/organizations/test-organization-id/billing_managers/test-billing-manager-id")
@@ -1314,7 +1314,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void removeManager() {
+    void removeManager() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/organizations/test-organization-id/managers/test-manager-id")
@@ -1335,7 +1335,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void removeOrganizationBillingManagerByUsername() {
+    void removeOrganizationBillingManagerByUsername() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/organizations/test-organization-id/billing_managers")
@@ -1357,7 +1357,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void removeOrganizationManagerByUsername() {
+    void removeOrganizationManagerByUsername() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/organizations/test-organization-id/managers")
@@ -1379,7 +1379,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void removePrivateDomain() {
+    void removePrivateDomain() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/organizations/test-organization-id/private_domains/test-private-domain-id")
@@ -1400,7 +1400,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void removeUser() {
+    void removeUser() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/organizations/test-organization-id/users/test-user-id")
@@ -1421,7 +1421,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void removeUserByUsername() {
+    void removeUserByUsername() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/organizations/test-organization-id/users")
@@ -1443,7 +1443,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void summary() {
+    void summary() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/organizations/test-organization-id/summary")
@@ -1477,7 +1477,7 @@ public final class ReactorOrganizationsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void update() {
+    void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PUT).path("/organizations/test-organization-id")

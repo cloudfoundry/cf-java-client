@@ -47,7 +47,7 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
@@ -62,12 +62,12 @@ import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public final class ReactorRoutesTest extends AbstractClientApiTest {
+final class ReactorRoutesTest extends AbstractClientApiTest {
 
     private final ReactorRoutes routes = new ReactorRoutes(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void associateApplication() {
+    void associateApplication() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PUT).path("/routes/test-route-id/apps/test-app-id")
@@ -107,7 +107,7 @@ public final class ReactorRoutesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void create() {
+    void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(POST).path("/routes")
@@ -149,7 +149,7 @@ public final class ReactorRoutesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/routes/test-route-id")
@@ -169,7 +169,7 @@ public final class ReactorRoutesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void deleteAsync() {
+    void deleteAsync() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/routes/test-route-id?async=true")
@@ -202,7 +202,7 @@ public final class ReactorRoutesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void exists() {
+    void exists() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/routes/reserved/domain/test-domain-id/host/test-host?path=test-path")
@@ -225,7 +225,7 @@ public final class ReactorRoutesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/routes/test-route-id")
@@ -266,7 +266,7 @@ public final class ReactorRoutesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/routes?page=-1")
@@ -312,7 +312,7 @@ public final class ReactorRoutesTest extends AbstractClientApiTest {
 
     @SuppressWarnings("deprecation")
     @Test
-    public void listApplications() {
+    void listApplications() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/routes/81464707-0f48-4ab9-87dc-667ef15489fb/apps?app_guid=6e62b293-f4c8-405a-be2b-b719e2848984")
@@ -371,7 +371,7 @@ public final class ReactorRoutesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void listMappings() {
+    void listMappings() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/routes/521c375d-a7e2-4f87-9527-7fd1db1b2010/route_mappings")
@@ -410,7 +410,7 @@ public final class ReactorRoutesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void removeApplication() {
+    void removeApplication() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/routes/test-route-id/apps/test-app-id")
@@ -431,7 +431,7 @@ public final class ReactorRoutesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void update() {
+    void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PUT).path("/routes/test-route-id")

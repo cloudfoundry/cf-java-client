@@ -20,7 +20,7 @@ import org.cloudfoundry.reactor.AbstractRestTest;
 import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
 import reactor.netty.ByteBufFlux;
 import reactor.netty.Connection;
@@ -32,10 +32,10 @@ import java.time.Duration;
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public final class EventStreamCodecTest extends AbstractRestTest {
+final class EventStreamCodecTest extends AbstractRestTest {
 
     @Test
-    public void allData() {
+    void allData() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET)
@@ -67,7 +67,7 @@ public final class EventStreamCodecTest extends AbstractRestTest {
     }
 
     @Test
-    public void colonSpacing() {
+    void colonSpacing() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET)
@@ -95,7 +95,7 @@ public final class EventStreamCodecTest extends AbstractRestTest {
     }
 
     @Test
-    public void randomColons() {
+    void randomColons() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET)
@@ -124,7 +124,7 @@ public final class EventStreamCodecTest extends AbstractRestTest {
     }
 
     @Test
-    public void threeLines() {
+    void threeLines() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET)
@@ -151,7 +151,7 @@ public final class EventStreamCodecTest extends AbstractRestTest {
     }
 
     @Test
-    public void withComment() {
+    void withComment() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET)
@@ -184,7 +184,7 @@ public final class EventStreamCodecTest extends AbstractRestTest {
     }
 
     @Test
-    public void withEventTypes() {
+    void withEventTypes() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET)

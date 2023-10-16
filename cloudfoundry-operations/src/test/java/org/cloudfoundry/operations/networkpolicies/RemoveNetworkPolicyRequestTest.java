@@ -16,48 +16,58 @@
 
 package org.cloudfoundry.operations.networkpolicies;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class RemoveNetworkPolicyRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noDestination() {
-        RemoveNetworkPolicyRequest.builder()
-            .protocol("test-protocol")
-            .startPort(1234)
-            .source("test-source")
-            .build();
-    }
+final class RemoveNetworkPolicyRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noPort() {
-        RemoveNetworkPolicyRequest.builder()
-            .destination("test-destination")
-            .protocol("test-protocol")
-            .source("test-source")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noProtocol() {
-        RemoveNetworkPolicyRequest.builder()
-            .destination("test-destination")
-            .startPort(1234)
-            .source("test-source")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noSource() {
-        RemoveNetworkPolicyRequest.builder()
-            .destination("test-destination")
-            .protocol("test-protocol")
-            .startPort(1234)
-            .build();
+    @Test
+    void noDestination() {
+        assertThrows(IllegalStateException.class, () -> {
+            RemoveNetworkPolicyRequest.builder()
+                .protocol("test-protocol")
+                .startPort(1234)
+                .source("test-source")
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noPort() {
+        assertThrows(IllegalStateException.class, () -> {
+            RemoveNetworkPolicyRequest.builder()
+                .destination("test-destination")
+                .protocol("test-protocol")
+                .source("test-source")
+                .build();
+        });
+    }
+
+    @Test
+    void noProtocol() {
+        assertThrows(IllegalStateException.class, () -> {
+            RemoveNetworkPolicyRequest.builder()
+                .destination("test-destination")
+                .startPort(1234)
+                .source("test-source")
+                .build();
+        });
+    }
+
+    @Test
+    void noSource() {
+        assertThrows(IllegalStateException.class, () -> {
+            RemoveNetworkPolicyRequest.builder()
+                .destination("test-destination")
+                .protocol("test-protocol")
+                .startPort(1234)
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         RemoveNetworkPolicyRequest.builder()
             .destination("test-destination")
             .protocol("test-protocol")

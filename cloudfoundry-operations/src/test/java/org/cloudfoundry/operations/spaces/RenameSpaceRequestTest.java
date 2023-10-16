@@ -16,26 +16,32 @@
 
 package org.cloudfoundry.operations.spaces;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class RenameSpaceRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        RenameSpaceRequest.builder()
-            .newName("new-name")
-            .build();
-    }
+final class RenameSpaceRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noNewName() {
-        RenameSpaceRequest.builder()
-            .name("name")
-            .build();
+    @Test
+    void noName() {
+        assertThrows(IllegalStateException.class, () -> {
+            RenameSpaceRequest.builder()
+                .newName("new-name")
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noNewName() {
+        assertThrows(IllegalStateException.class, () -> {
+            RenameSpaceRequest.builder()
+                .name("name")
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         RenameSpaceRequest.builder()
             .name("test-name")
             .newName("test-new-name")

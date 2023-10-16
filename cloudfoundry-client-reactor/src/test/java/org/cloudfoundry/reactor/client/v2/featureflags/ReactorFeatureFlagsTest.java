@@ -27,7 +27,7 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
@@ -37,12 +37,12 @@ import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.PUT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public final class ReactorFeatureFlagsTest extends AbstractClientApiTest {
+final class ReactorFeatureFlagsTest extends AbstractClientApiTest {
 
     private final ReactorFeatureFlags featureFlags = new ReactorFeatureFlags(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void getAppScaling() {
+    void getAppScaling() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/config/feature_flags/app_scaling")
@@ -68,7 +68,7 @@ public final class ReactorFeatureFlagsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void getUserRoles() {
+    void getUserRoles() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/config/feature_flags/set_roles_by_username")
@@ -94,7 +94,7 @@ public final class ReactorFeatureFlagsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/config/feature_flags")
@@ -189,7 +189,7 @@ public final class ReactorFeatureFlagsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void set() {
+    void set() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PUT).path("/config/feature_flags/user_org_creation")

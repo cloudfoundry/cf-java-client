@@ -18,12 +18,14 @@ package org.cloudfoundry.client.v3.deployments;
 
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.ToOneRelationship;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class CreateDeploymentRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+final class CreateDeploymentRequestTest {
 
     @Test
-    public void noDropletValid() {
+    void noDropletValid() {
         CreateDeploymentRequest.builder()
             .relationships(DeploymentRelationships.builder()
                 .app(ToOneRelationship.builder()
@@ -35,15 +37,17 @@ public final class CreateDeploymentRequestTest {
             .build();
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void noRelationships() {
-        CreateDeploymentRequest.builder()
-            .droplet(Relationship.builder().id("droplet-id").build())
-            .build();
+    @Test
+    void noRelationships() {
+        assertThrows(IllegalStateException.class, () -> {
+            CreateDeploymentRequest.builder()
+                .droplet(Relationship.builder().id("droplet-id").build())
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         CreateDeploymentRequest.builder()
             .droplet(Relationship.builder().id("droplet-id").build())
             .relationships(DeploymentRelationships.builder()

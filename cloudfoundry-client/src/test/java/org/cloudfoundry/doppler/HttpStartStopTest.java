@@ -16,14 +16,16 @@
 
 package org.cloudfoundry.doppler;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
-public final class HttpStartStopTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+final class HttpStartStopTest {
 
     @Test
-    public void dropsonde() {
+    void dropsonde() {
         HttpStartStop.from(new org.cloudfoundry.dropsonde.events.HttpStartStop.Builder()
             .contentLength(0L)
             .method(org.cloudfoundry.dropsonde.events.Method.GET)
@@ -41,134 +43,152 @@ public final class HttpStartStopTest {
             .build());
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void noContentLength() {
-        HttpStartStop.builder()
-            .peerType(PeerType.CLIENT)
-            .remoteAddress("test-remote-address")
-            .requestId(UUID.randomUUID())
-            .startTimestamp(0L)
-            .statusCode(0)
-            .stopTimestamp(0L)
-            .uri("test-uri")
-            .userAgent("test-user-agent")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noPeerType() {
-        HttpStartStop.builder()
-            .contentLength(0L)
-            .remoteAddress("test-remote-address")
-            .requestId(UUID.randomUUID())
-            .startTimestamp(0L)
-            .statusCode(0)
-            .stopTimestamp(0L)
-            .uri("test-uri")
-            .userAgent("test-user-agent")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noRemoteAddress() {
-        HttpStartStop.builder()
-            .contentLength(0L)
-            .peerType(PeerType.CLIENT)
-            .requestId(UUID.randomUUID())
-            .startTimestamp(0L)
-            .statusCode(0)
-            .stopTimestamp(0L)
-            .uri("test-uri")
-            .userAgent("test-user-agent")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noRequestId() {
-        HttpStartStop.builder()
-            .contentLength(0L)
-            .peerType(PeerType.CLIENT)
-            .remoteAddress("test-remote-address")
-            .startTimestamp(0L)
-            .statusCode(0)
-            .stopTimestamp(0L)
-            .uri("test-uri")
-            .userAgent("test-user-agent")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noStartTimestamp() {
-        HttpStartStop.builder()
-            .contentLength(0L)
-            .peerType(PeerType.CLIENT)
-            .remoteAddress("test-remote-address")
-            .requestId(UUID.randomUUID())
-            .statusCode(0)
-            .stopTimestamp(0L)
-            .uri("test-uri")
-            .userAgent("test-user-agent")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noStatusCode() {
-        HttpStartStop.builder()
-            .contentLength(0L)
-            .peerType(PeerType.CLIENT)
-            .remoteAddress("test-remote-address")
-            .requestId(UUID.randomUUID())
-            .startTimestamp(0L)
-            .stopTimestamp(0L)
-            .uri("test-uri")
-            .userAgent("test-user-agent")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noStopTimestamp() {
-        HttpStartStop.builder()
-            .contentLength(0L)
-            .peerType(PeerType.CLIENT)
-            .remoteAddress("test-remote-address")
-            .requestId(UUID.randomUUID())
-            .startTimestamp(0L)
-            .statusCode(0)
-            .uri("test-uri")
-            .userAgent("test-user-agent")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noUri() {
-        HttpStartStop.builder()
-            .contentLength(0L)
-            .peerType(PeerType.CLIENT)
-            .remoteAddress("test-remote-address")
-            .requestId(UUID.randomUUID())
-            .startTimestamp(0L)
-            .statusCode(0)
-            .stopTimestamp(0L)
-            .userAgent("test-user-agent")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noUserAgent() {
-        HttpStartStop.builder()
-            .contentLength(0L)
-            .peerType(PeerType.CLIENT)
-            .remoteAddress("test-remote-address")
-            .requestId(UUID.randomUUID())
-            .startTimestamp(0L)
-            .statusCode(0)
-            .stopTimestamp(0L)
-            .uri("test-uri")
-            .build();
+    @Test
+    void noContentLength() {
+        assertThrows(IllegalStateException.class, () -> {
+            HttpStartStop.builder()
+                .peerType(PeerType.CLIENT)
+                .remoteAddress("test-remote-address")
+                .requestId(UUID.randomUUID())
+                .startTimestamp(0L)
+                .statusCode(0)
+                .stopTimestamp(0L)
+                .uri("test-uri")
+                .userAgent("test-user-agent")
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noPeerType() {
+        assertThrows(IllegalStateException.class, () -> {
+            HttpStartStop.builder()
+                .contentLength(0L)
+                .remoteAddress("test-remote-address")
+                .requestId(UUID.randomUUID())
+                .startTimestamp(0L)
+                .statusCode(0)
+                .stopTimestamp(0L)
+                .uri("test-uri")
+                .userAgent("test-user-agent")
+                .build();
+        });
+    }
+
+    @Test
+    void noRemoteAddress() {
+        assertThrows(IllegalStateException.class, () -> {
+            HttpStartStop.builder()
+                .contentLength(0L)
+                .peerType(PeerType.CLIENT)
+                .requestId(UUID.randomUUID())
+                .startTimestamp(0L)
+                .statusCode(0)
+                .stopTimestamp(0L)
+                .uri("test-uri")
+                .userAgent("test-user-agent")
+                .build();
+        });
+    }
+
+    @Test
+    void noRequestId() {
+        assertThrows(IllegalStateException.class, () -> {
+            HttpStartStop.builder()
+                .contentLength(0L)
+                .peerType(PeerType.CLIENT)
+                .remoteAddress("test-remote-address")
+                .startTimestamp(0L)
+                .statusCode(0)
+                .stopTimestamp(0L)
+                .uri("test-uri")
+                .userAgent("test-user-agent")
+                .build();
+        });
+    }
+
+    @Test
+    void noStartTimestamp() {
+        assertThrows(IllegalStateException.class, () -> {
+            HttpStartStop.builder()
+                .contentLength(0L)
+                .peerType(PeerType.CLIENT)
+                .remoteAddress("test-remote-address")
+                .requestId(UUID.randomUUID())
+                .statusCode(0)
+                .stopTimestamp(0L)
+                .uri("test-uri")
+                .userAgent("test-user-agent")
+                .build();
+        });
+    }
+
+    @Test
+    void noStatusCode() {
+        assertThrows(IllegalStateException.class, () -> {
+            HttpStartStop.builder()
+                .contentLength(0L)
+                .peerType(PeerType.CLIENT)
+                .remoteAddress("test-remote-address")
+                .requestId(UUID.randomUUID())
+                .startTimestamp(0L)
+                .stopTimestamp(0L)
+                .uri("test-uri")
+                .userAgent("test-user-agent")
+                .build();
+        });
+    }
+
+    @Test
+    void noStopTimestamp() {
+        assertThrows(IllegalStateException.class, () -> {
+            HttpStartStop.builder()
+                .contentLength(0L)
+                .peerType(PeerType.CLIENT)
+                .remoteAddress("test-remote-address")
+                .requestId(UUID.randomUUID())
+                .startTimestamp(0L)
+                .statusCode(0)
+                .uri("test-uri")
+                .userAgent("test-user-agent")
+                .build();
+        });
+    }
+
+    @Test
+    void noUri() {
+        assertThrows(IllegalStateException.class, () -> {
+            HttpStartStop.builder()
+                .contentLength(0L)
+                .peerType(PeerType.CLIENT)
+                .remoteAddress("test-remote-address")
+                .requestId(UUID.randomUUID())
+                .startTimestamp(0L)
+                .statusCode(0)
+                .stopTimestamp(0L)
+                .userAgent("test-user-agent")
+                .build();
+        });
+    }
+
+    @Test
+    void noUserAgent() {
+        assertThrows(IllegalStateException.class, () -> {
+            HttpStartStop.builder()
+                .contentLength(0L)
+                .peerType(PeerType.CLIENT)
+                .remoteAddress("test-remote-address")
+                .requestId(UUID.randomUUID())
+                .startTimestamp(0L)
+                .statusCode(0)
+                .stopTimestamp(0L)
+                .uri("test-uri")
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         HttpStartStop.builder()
             .contentLength(0L)
             .peerType(PeerType.CLIENT)

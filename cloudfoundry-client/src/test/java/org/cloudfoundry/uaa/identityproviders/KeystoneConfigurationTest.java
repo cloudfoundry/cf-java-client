@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.uaa.identityproviders;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class KeystoneConfigurationTest {
+final class KeystoneConfigurationTest {
 
     @Test
-    public void valid() {
+    void valid() {
         KeystoneConfiguration.builder()
             .build();
     }

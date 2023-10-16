@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.client.v2.stacks;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class ListStacksRequestTest {
+final class ListStacksRequestTest {
 
     @Test
-    public void valid() {
+    void valid() {
         ListStacksRequest.builder()
             .build();
     }

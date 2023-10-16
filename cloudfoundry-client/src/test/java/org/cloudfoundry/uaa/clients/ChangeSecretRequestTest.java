@@ -16,26 +16,32 @@
 
 package org.cloudfoundry.uaa.clients;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class ChangeSecretRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noClientId() {
-        ChangeSecretRequest.builder()
-            .secret("test-secret")
-            .build();
-    }
+final class ChangeSecretRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noSecret() {
-        ChangeSecretRequest.builder()
-            .clientId("test-client-id")
-            .build();
+    @Test
+    void noClientId() {
+        assertThrows(IllegalStateException.class, () -> {
+            ChangeSecretRequest.builder()
+                .secret("test-secret")
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noSecret() {
+        assertThrows(IllegalStateException.class, () -> {
+            ChangeSecretRequest.builder()
+                .clientId("test-client-id")
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         ChangeSecretRequest.builder()
             .clientId("test-client-id")
             .oldSecret("test-old-secret")

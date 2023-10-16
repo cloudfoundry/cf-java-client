@@ -50,7 +50,7 @@ import org.cloudfoundry.uaa.identityzones.TokenPolicy;
 import org.cloudfoundry.uaa.identityzones.UpdateIdentityZoneRequest;
 import org.cloudfoundry.uaa.identityzones.UpdateIdentityZoneResponse;
 import org.cloudfoundry.uaa.identityzones.UserConfig;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
@@ -64,12 +64,12 @@ import static io.netty.handler.codec.http.HttpMethod.PUT;
 import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public final class ReactorIdentityZonesTest extends AbstractUaaApiTest {
+final class ReactorIdentityZonesTest extends AbstractUaaApiTest {
 
     private final ReactorIdentityZones identityZones = new ReactorIdentityZones(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void create() {
+    void create() {
         IdentityZoneConfiguration testConfiguration = IdentityZoneConfiguration.builder()
             .clientSecretPolicy(ClientSecretPolicy.builder()
                 .minimumLength(-1)
@@ -226,7 +226,7 @@ public final class ReactorIdentityZonesTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/identity-zones/twiglet-delete")
@@ -334,7 +334,7 @@ public final class ReactorIdentityZonesTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/identity-zones/twiglet-get")
@@ -482,7 +482,7 @@ public final class ReactorIdentityZonesTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/identity-zones")
@@ -584,7 +584,7 @@ public final class ReactorIdentityZonesTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void update() {
+    void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PUT).path("/identity-zones/twiglet-update")

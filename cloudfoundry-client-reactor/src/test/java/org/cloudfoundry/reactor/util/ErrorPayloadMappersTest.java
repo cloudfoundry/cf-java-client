@@ -22,7 +22,7 @@ import org.cloudfoundry.client.v2.ClientV2Exception;
 import org.cloudfoundry.client.v3.ClientV3Exception;
 import org.cloudfoundry.reactor.HttpClientResponseWithConnection;
 import org.cloudfoundry.uaa.UaaException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 import reactor.core.publisher.Flux;
 import reactor.netty.ByteBufFlux;
@@ -42,7 +42,7 @@ import static org.mockito.Mockito.RETURNS_SMART_NULLS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public final class ErrorPayloadMappersTest {
+final class ErrorPayloadMappersTest {
 
     private final Connection connection = mock(Connection.class, RETURNS_SMART_NULLS);
 
@@ -53,7 +53,7 @@ public final class ErrorPayloadMappersTest {
     private final HttpClientResponse response = mock(HttpClientResponse.class, RETURNS_SMART_NULLS);
 
     @Test
-    public void clientV2BadPayload() throws IOException {
+    void clientV2BadPayload() throws IOException {
         when(this.connection.inbound()).thenReturn(this.inbound);
         when(this.inbound.receive()).thenReturn(ByteBufFlux.fromPath(new ClassPathResource("fixtures/invalid_error_response.json").getFile().toPath()));
         when(this.response.status()).thenReturn(BAD_REQUEST);
@@ -70,7 +70,7 @@ public final class ErrorPayloadMappersTest {
     }
 
     @Test
-    public void clientV2ClientError() throws IOException {
+    void clientV2ClientError() throws IOException {
         when(this.connection.inbound()).thenReturn(this.inbound);
         when(this.inbound.receive()).thenReturn(ByteBufFlux.fromPath(new ClassPathResource("fixtures/client/v2/error_response.json").getFile().toPath()));
         when(this.response.status()).thenReturn(BAD_REQUEST);
@@ -89,7 +89,7 @@ public final class ErrorPayloadMappersTest {
     }
 
     @Test
-    public void clientV2NoError() {
+    void clientV2NoError() {
         when(this.response.status()).thenReturn(OK);
         HttpClientResponseWithConnection responseWithConnection = buildResponseWithConnection(this.connection);
 
@@ -102,7 +102,7 @@ public final class ErrorPayloadMappersTest {
     }
 
     @Test
-    public void clientV2ServerError() throws IOException {
+    void clientV2ServerError() throws IOException {
         when(this.connection.inbound()).thenReturn(this.inbound);
         when(this.inbound.receive()).thenReturn(ByteBufFlux.fromPath(new ClassPathResource("fixtures/client/v2/error_response.json").getFile().toPath()));
         when(this.response.status()).thenReturn(INTERNAL_SERVER_ERROR);
@@ -121,7 +121,7 @@ public final class ErrorPayloadMappersTest {
     }
 
     @Test
-    public void clientV3BadPayload() throws IOException {
+    void clientV3BadPayload() throws IOException {
         when(this.connection.inbound()).thenReturn(this.inbound);
         when(this.inbound.receive()).thenReturn(ByteBufFlux.fromPath(new ClassPathResource("fixtures/invalid_error_response.json").getFile().toPath()));
         when(this.response.status()).thenReturn(BAD_REQUEST);
@@ -138,7 +138,7 @@ public final class ErrorPayloadMappersTest {
     }
 
     @Test
-    public void clientV3ClientError() throws IOException {
+    void clientV3ClientError() throws IOException {
         when(this.connection.inbound()).thenReturn(this.inbound);
         when(this.inbound.receive()).thenReturn(ByteBufFlux.fromPath(new ClassPathResource("fixtures/client/v3/error_response.json").getFile().toPath()));
         when(this.response.status()).thenReturn(BAD_REQUEST);
@@ -162,7 +162,7 @@ public final class ErrorPayloadMappersTest {
     }
 
     @Test
-    public void clientV3NoError() {
+    void clientV3NoError() {
         when(this.response.status()).thenReturn(OK);
         HttpClientResponseWithConnection responseWithConnection = buildResponseWithConnection(this.connection);
 
@@ -175,7 +175,7 @@ public final class ErrorPayloadMappersTest {
     }
 
     @Test
-    public void clientV3ServerError() throws IOException {
+    void clientV3ServerError() throws IOException {
         when(this.connection.inbound()).thenReturn(this.inbound);
         when(this.inbound.receive()).thenReturn(ByteBufFlux.fromPath(new ClassPathResource("fixtures/client/v3/error_response.json").getFile().toPath()));
         when(this.response.status()).thenReturn(INTERNAL_SERVER_ERROR);
@@ -199,7 +199,7 @@ public final class ErrorPayloadMappersTest {
     }
 
     @Test
-    public void uaaBadPayload() throws IOException {
+    void uaaBadPayload() throws IOException {
         when(this.connection.inbound()).thenReturn(this.inbound);
         when(this.inbound.receive()).thenReturn(ByteBufFlux.fromPath(new ClassPathResource("fixtures/invalid_error_response.json").getFile().toPath()));
         when(this.response.status()).thenReturn(BAD_REQUEST);
@@ -216,7 +216,7 @@ public final class ErrorPayloadMappersTest {
     }
 
     @Test
-    public void uaaClientError() throws IOException {
+    void uaaClientError() throws IOException {
         when(this.connection.inbound()).thenReturn(this.inbound);
         when(this.inbound.receive()).thenReturn(ByteBufFlux.fromPath(new ClassPathResource("fixtures/uaa/error_response.json").getFile().toPath()));
         when(this.response.status()).thenReturn(BAD_REQUEST);
@@ -233,7 +233,7 @@ public final class ErrorPayloadMappersTest {
     }
 
     @Test
-    public void uaaNoError() {
+    void uaaNoError() {
         when(this.response.status()).thenReturn(OK);
         HttpClientResponseWithConnection responseWithConnection = buildResponseWithConnection(this.connection);
 
@@ -246,7 +246,7 @@ public final class ErrorPayloadMappersTest {
     }
 
     @Test
-    public void uaaServerError() throws IOException {
+    void uaaServerError() throws IOException {
         when(this.connection.inbound()).thenReturn(this.inbound);
         when(this.inbound.receive()).thenReturn(ByteBufFlux.fromPath(new ClassPathResource("fixtures/uaa/error_response.json").getFile().toPath()));
         when(this.response.status()).thenReturn(INTERNAL_SERVER_ERROR);

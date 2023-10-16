@@ -16,34 +16,40 @@
 
 package org.cloudfoundry.doppler;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class CounterEventTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+final class CounterEventTest {
 
     @Test
-    public void dropsonde() {
+    void dropsonde() {
         CounterEvent.from(new org.cloudfoundry.dropsonde.events.CounterEvent.Builder()
             .delta(0L)
             .name("test-name")
             .build());
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void noDelta() {
-        CounterEvent.builder()
-            .name("test-name")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        CounterEvent.builder()
-            .delta(0L)
-            .build();
+    @Test
+    void noDelta() {
+        assertThrows(IllegalStateException.class, () -> {
+            CounterEvent.builder()
+                .name("test-name")
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noName() {
+        assertThrows(IllegalStateException.class, () -> {
+            CounterEvent.builder()
+                .delta(0L)
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         CounterEvent.builder()
             .delta(0L)
             .name("test-name")

@@ -16,18 +16,22 @@
 
 package org.cloudfoundry.logcache.v1;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class ReadRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noSourceId() {
-        ReadRequest.builder()
-            .build();
+class ReadRequestTest {
+
+    @Test
+    void noSourceId() {
+        assertThrows(IllegalStateException.class, () -> {
+            ReadRequest.builder()
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         ReadRequest.builder()
             .sourceId("test")
             .build();

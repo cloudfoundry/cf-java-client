@@ -16,18 +16,22 @@
 
 package org.cloudfoundry.client.v3.packages;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class ListPackageDropletsRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noPackageId() {
-        ListPackageDropletsRequest.builder()
-            .build();
+final class ListPackageDropletsRequestTest {
+
+    @Test
+    void noPackageId() {
+        assertThrows(IllegalStateException.class, () -> {
+            ListPackageDropletsRequest.builder()
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         ListPackageDropletsRequest.builder()
             .packageId("test-package-id")
             .build();

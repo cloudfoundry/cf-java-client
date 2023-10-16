@@ -17,21 +17,25 @@
 package org.cloudfoundry.client.v3.organizations;
 
 import org.cloudfoundry.client.v3.Relationship;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class AssignOrganizationDefaultIsolationSegmentRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noOrganizationId() {
-        AssignOrganizationDefaultIsolationSegmentRequest.builder()
-            .data(Relationship.builder()
-                .id("test-isolation-segment-id")
-                .build())
-            .build();
+final class AssignOrganizationDefaultIsolationSegmentRequestTest {
+
+    @Test
+    void noOrganizationId() {
+        assertThrows(IllegalStateException.class, () -> {
+            AssignOrganizationDefaultIsolationSegmentRequest.builder()
+                .data(Relationship.builder()
+                    .id("test-isolation-segment-id")
+                    .build())
+                .build();
+        });
     }
 
     @Test
-    public void validData() {
+    void validData() {
         AssignOrganizationDefaultIsolationSegmentRequest.builder()
             .data(Relationship.builder()
                 .id("test-isolation-segment-id")
@@ -41,7 +45,7 @@ public final class AssignOrganizationDefaultIsolationSegmentRequestTest {
     }
 
     @Test
-    public void validNoData() {
+    void validNoData() {
         AssignOrganizationDefaultIsolationSegmentRequest.builder()
             .organizationId("test-organization-id")
             .build();

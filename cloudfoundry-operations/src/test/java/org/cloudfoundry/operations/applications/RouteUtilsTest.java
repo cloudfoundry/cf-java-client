@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.operations.applications;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
@@ -25,11 +25,12 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class RouteUtilsTest {
+class RouteUtilsTest {
 
     @Test
-    public void complexHit() {
+    void complexHit() {
         List<DomainSummary> availableDomains = new ArrayList<>();
         availableDomains.add(DomainSummary.builder()
             .id("1")
@@ -52,7 +53,7 @@ public class RouteUtilsTest {
     }
 
     @Test
-    public void complexPathHit() {
+    void complexPathHit() {
         List<DomainSummary> availableDomains = new ArrayList<>();
         availableDomains.add(DomainSummary.builder()
             .id("1")
@@ -75,76 +76,84 @@ public class RouteUtilsTest {
             .verify(Duration.ofSeconds(5));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void empty() {
-        List<DomainSummary> availableDomains = Collections.emptyList();
+    @Test
+    void empty() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            List<DomainSummary> availableDomains = Collections.emptyList();
 
-        RouteUtils.decomposeRoute(availableDomains, "test.test.com", null)
-            .as(StepVerifier::create)
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("The route test.test.com did not match any existing domains"))
-            .verify(Duration.ofSeconds(5));
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void partialMatchMiss() {
-        List<DomainSummary> availableDomains = new ArrayList<>();
-        availableDomains.add(DomainSummary.builder()
-            .id("1")
-            .name("test.something.com")
-            .build());
-        availableDomains.add(DomainSummary.builder()
-            .id("2")
-            .name("something.com")
-            .build());
-        availableDomains.add(DomainSummary.builder()
-            .id("3")
-            .name("hing.com")
-            .build());
-
-        RouteUtils.decomposeRoute(availableDomains, "thing.com", null)
-            .as(StepVerifier::create)
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("The route thing.com did not match any existing domains"))
-            .verify(Duration.ofSeconds(5));
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void partialMiss() {
-        List<DomainSummary> availableDomains = new ArrayList<>();
-        availableDomains.add(DomainSummary.builder()
-            .id("1")
-            .name("test.com")
-            .build());
-        availableDomains.add(DomainSummary.builder()
-            .id("2")
-            .name("test.test.com")
-            .build());
-
-        RouteUtils.decomposeRoute(availableDomains, "est.com", null)
-            .as(StepVerifier::create)
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("The route est.com did not match any existing domains"))
-            .verify(Duration.ofSeconds(5));
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void pathMiss() {
-        List<DomainSummary> availableDomains = new ArrayList<>();
-        availableDomains.add(DomainSummary.builder()
-            .id("1")
-            .name("test.com")
-            .build());
-        availableDomains.add(DomainSummary.builder()
-            .id("2")
-            .name("test.test.com")
-            .build());
-
-        RouteUtils.decomposeRoute(availableDomains, "miss.com/path", null)
-            .as(StepVerifier::create)
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("The route miss.com/path did not match any existing domains"))
-            .verify(Duration.ofSeconds(5));
+            RouteUtils.decomposeRoute(availableDomains, "test.test.com", null)
+                .as(StepVerifier::create)
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("The route test.test.com did not match any existing domains"))
+                .verify(Duration.ofSeconds(5));
+        });
     }
 
     @Test
-    public void routeDecompositionPathHit() {
+    void partialMatchMiss() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            List<DomainSummary> availableDomains = new ArrayList<>();
+            availableDomains.add(DomainSummary.builder()
+                .id("1")
+                .name("test.something.com")
+                .build());
+            availableDomains.add(DomainSummary.builder()
+                .id("2")
+                .name("something.com")
+                .build());
+            availableDomains.add(DomainSummary.builder()
+                .id("3")
+                .name("hing.com")
+                .build());
+
+            RouteUtils.decomposeRoute(availableDomains, "thing.com", null)
+                .as(StepVerifier::create)
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("The route thing.com did not match any existing domains"))
+                .verify(Duration.ofSeconds(5));
+        });
+    }
+
+    @Test
+    void partialMiss() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            List<DomainSummary> availableDomains = new ArrayList<>();
+            availableDomains.add(DomainSummary.builder()
+                .id("1")
+                .name("test.com")
+                .build());
+            availableDomains.add(DomainSummary.builder()
+                .id("2")
+                .name("test.test.com")
+                .build());
+
+            RouteUtils.decomposeRoute(availableDomains, "est.com", null)
+                .as(StepVerifier::create)
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("The route est.com did not match any existing domains"))
+                .verify(Duration.ofSeconds(5));
+        });
+    }
+
+    @Test
+    void pathMiss() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            List<DomainSummary> availableDomains = new ArrayList<>();
+            availableDomains.add(DomainSummary.builder()
+                .id("1")
+                .name("test.com")
+                .build());
+            availableDomains.add(DomainSummary.builder()
+                .id("2")
+                .name("test.test.com")
+                .build());
+
+            RouteUtils.decomposeRoute(availableDomains, "miss.com/path", null)
+                .as(StepVerifier::create)
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("The route miss.com/path did not match any existing domains"))
+                .verify(Duration.ofSeconds(5));
+        });
+    }
+
+    @Test
+    void routeDecompositionPathHit() {
         List<DomainSummary> availableDomains = new ArrayList<>();
         availableDomains.add(DomainSummary.builder()
             .id("1")
@@ -168,7 +177,7 @@ public class RouteUtilsTest {
     }
 
     @Test
-    public void simpleHit() {
+    void simpleHit() {
         List<DomainSummary> availableDomains = new ArrayList<>();
         availableDomains.add(DomainSummary.builder()
             .id("1")
@@ -191,7 +200,7 @@ public class RouteUtilsTest {
     }
 
     @Test
-    public void simpleHostHit() {
+    void simpleHostHit() {
         List<DomainSummary> availableDomains = new ArrayList<>();
         availableDomains.add(DomainSummary.builder()
             .id("1")
@@ -215,7 +224,7 @@ public class RouteUtilsTest {
     }
 
     @Test
-    public void simpleHostPathHit() {
+    void simpleHostPathHit() {
         List<DomainSummary> availableDomains = new ArrayList<>();
         availableDomains.add(DomainSummary.builder()
             .id("1")
@@ -239,26 +248,28 @@ public class RouteUtilsTest {
             .verify(Duration.ofSeconds(5));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void simpleMiss() {
-        List<DomainSummary> availableDomains = new ArrayList<>();
-        availableDomains.add(DomainSummary.builder()
-            .id("1")
-            .name("test.com")
-            .build());
-        availableDomains.add(DomainSummary.builder()
-            .id("2")
-            .name("test.test.com")
-            .build());
+    @Test
+    void simpleMiss() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            List<DomainSummary> availableDomains = new ArrayList<>();
+            availableDomains.add(DomainSummary.builder()
+                .id("1")
+                .name("test.com")
+                .build());
+            availableDomains.add(DomainSummary.builder()
+                .id("2")
+                .name("test.test.com")
+                .build());
 
-        RouteUtils.decomposeRoute(availableDomains, "miss.com", null)
-            .as(StepVerifier::create)
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("The route miss.com did not match any existing domains"))
-            .verify(Duration.ofSeconds(5));
+            RouteUtils.decomposeRoute(availableDomains, "miss.com", null)
+                .as(StepVerifier::create)
+                .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("The route miss.com did not match any existing domains"))
+                .verify(Duration.ofSeconds(5));
+        });
     }
 
     @Test
-    public void simplePathOverride() {
+    void simplePathOverride() {
         List<DomainSummary> availableDomains = new ArrayList<>();
         availableDomains.add(DomainSummary.builder()
             .id("1")

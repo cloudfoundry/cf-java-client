@@ -33,7 +33,6 @@ import org.cloudfoundry.uaa.identityproviders.TlsConfiguration;
 import org.cloudfoundry.uaa.identityproviders.UpdateIdentityProviderRequest;
 import org.cloudfoundry.uaa.identityzones.CreateIdentityZoneRequest;
 import org.cloudfoundry.uaa.identityzones.CreateIdentityZoneResponse;
-import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;

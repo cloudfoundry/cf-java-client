@@ -20,12 +20,11 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
-import okhttp3.mockwebserver.Dispatcher;
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
-import okhttp3.mockwebserver.RecordedRequest;
-import org.junit.After;
-import org.junit.ComparisonFailure;
+import mockwebserver3.Dispatcher;
+import mockwebserver3.MockResponse;
+import mockwebserver3.MockWebServer;
+import mockwebserver3.RecordedRequest;
+import org.junit.jupiter.api.AfterEach;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import reactor.core.publisher.Mono;
 
@@ -66,12 +65,12 @@ public abstract class AbstractRestTest {
         this.root = Mono.just(this.mockWebServer.url("/").uri().toString());
     }
 
-    @After
+    @AfterEach
     public final void shutdown() throws IOException {
         this.mockWebServer.shutdown();
     }
 
-    @After
+    @AfterEach
     public final void verify() {
         this.multipleRequestDispatcher.verify();
     }
@@ -109,7 +108,7 @@ public abstract class AbstractRestTest {
             try {
                 interactionContext.getRequest().assertEquals(request);
                 return interactionContext.getResponse().getMockResponse();
-            } catch (ComparisonFailure e) {
+            } catch (AssertionError e) {
                 e.printStackTrace();
                 return new MockResponse().setResponseCode(400);
             }

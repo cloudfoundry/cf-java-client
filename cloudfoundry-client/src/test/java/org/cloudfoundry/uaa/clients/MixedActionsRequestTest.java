@@ -16,27 +16,32 @@
 
 package org.cloudfoundry.uaa.clients;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.cloudfoundry.uaa.tokens.GrantType.IMPLICIT;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class MixedActionsRequestTest {
+final class MixedActionsRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void emptyAction() {
-        MixedActionsRequest.builder()
-            .actions()
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noAction() {
-        MixedActionsRequest.builder()
-            .build();
+    @Test
+    void emptyAction() {
+        assertThrows(IllegalStateException.class, () -> {
+            MixedActionsRequest.builder()
+                .actions()
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noAction() {
+        assertThrows(IllegalStateException.class, () -> {
+            MixedActionsRequest.builder()
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         MixedActionsRequest.builder()
             .action(CreateClientAction.builder()
                 .authorizedGrantType(IMPLICIT)

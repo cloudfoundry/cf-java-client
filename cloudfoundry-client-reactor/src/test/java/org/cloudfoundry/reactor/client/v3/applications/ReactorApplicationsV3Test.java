@@ -117,7 +117,7 @@ import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import org.cloudfoundry.util.FluentMap;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
@@ -134,12 +134,12 @@ import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static org.cloudfoundry.client.v3.routes.Protocol.HTTP;
 
-public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
+final class ReactorApplicationsV3Test extends AbstractClientApiTest {
 
     private final ReactorApplicationsV3 applications = new ReactorApplicationsV3(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void create() {
+    void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(POST).path("/apps")
@@ -232,7 +232,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/apps/test-application-id")
@@ -254,7 +254,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/apps/test-application-id")
@@ -336,7 +336,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void getCurrentDroplet() {
+    void getCurrentDroplet() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/apps/test-application-id/droplets/current")
@@ -395,7 +395,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void getCurrentDropletRelationship() {
+    void getCurrentDropletRelationship() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/apps/test-application-id/relationships/current_droplet")
@@ -427,7 +427,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void getEnvironment() {
+    void getEnvironment() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/apps/test-application-id/env")
@@ -479,7 +479,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void getEnvironmentVariables() {
+    void getEnvironmentVariables() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/apps/test-application-id/environment_variables")
@@ -509,7 +509,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void getFeature() {
+    void getFeature() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/apps/test-application-id/features/test-feature-name")
@@ -536,7 +536,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void getPermissions() {
+    void getPermissions() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/apps/test-application-id/permissions")
@@ -561,7 +561,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void getProcess() {
+    void getProcess() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/apps/test-application-id/processes/test-type")
@@ -622,7 +622,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void getProcessStatistics() {
+    void getProcessStatistics() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/apps/test-id/processes/test-type/stats")
@@ -668,7 +668,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void getSshEnabled() {
+    void getSshEnabled() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/apps/test-application-id/ssh_enabled")
@@ -693,7 +693,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/apps")
@@ -844,7 +844,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void listBuilds() {
+    void listBuilds() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/apps/test-application-id/builds")
@@ -905,7 +905,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void listDroplets() {
+    void listDroplets() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/apps/test-application-id/droplets")
@@ -1005,7 +1005,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void listFeatures() {
+    void listFeatures() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/apps/test-application-id/features")
@@ -1048,7 +1048,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void listPackages() {
+    void listPackages() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/apps/test-application-id/packages")
@@ -1109,7 +1109,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void listProcesses() {
+    void listProcesses() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/apps/test-application-id/processes")
@@ -1223,7 +1223,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void listRoutes() {
+    void listRoutes() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/apps/test-application-id/routes")
@@ -1315,7 +1315,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void listTasks() {
+    void listTasks() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/apps/test-application-id/tasks")
@@ -1404,7 +1404,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void scale() {
+    void scale() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(POST).path("/apps/test-application-id/processes/test-type/actions/scale")
@@ -1469,7 +1469,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void setCurrentDroplet() {
+    void setCurrentDroplet() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PATCH).path("/apps/test-application-id/relationships/current_droplet")
@@ -1505,7 +1505,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void start() {
+    void start() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(POST).path("/apps/test-application-id/actions/start")
@@ -1582,7 +1582,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void stop() {
+    void stop() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(POST).path("/apps/test-application-id/actions/stop")
@@ -1659,7 +1659,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void terminateInstance() {
+    void terminateInstance() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/apps/test-application-id/processes/test-type/instances/test-index")
@@ -1681,7 +1681,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void update() {
+    void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PATCH).path("/apps/test-application-id")
@@ -1776,7 +1776,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void updateEnvironmentVariables() {
+    void updateEnvironmentVariables() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PATCH).path("/apps/test-application-id/environment_variables")
@@ -1809,7 +1809,7 @@ public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void updateFeature() {
+    void updateFeature() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PATCH).path("/apps/test-application-id/features/ssh")

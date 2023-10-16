@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.client.v2.routemappings;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class ListRouteMappingsRequestTest {
+final class ListRouteMappingsRequestTest {
 
     @Test
-    public void valid() {
+    void valid() {
         ListRouteMappingsRequest.builder()
             .build();
     }

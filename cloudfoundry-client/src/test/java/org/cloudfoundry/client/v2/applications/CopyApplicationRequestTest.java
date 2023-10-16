@@ -16,26 +16,32 @@
 
 package org.cloudfoundry.client.v2.applications;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class CopyApplicationRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noApplicationId() {
-        CopyApplicationRequest.builder()
-            .sourceApplicationId("test-source-application-id")
-            .build();
-    }
+final class CopyApplicationRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noSourceApplicationId() {
-        CopyApplicationRequest.builder()
-            .applicationId("test-application id")
-            .build();
+    @Test
+    void noApplicationId() {
+        assertThrows(IllegalStateException.class, () -> {
+            CopyApplicationRequest.builder()
+                .sourceApplicationId("test-source-application-id")
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noSourceApplicationId() {
+        assertThrows(IllegalStateException.class, () -> {
+            CopyApplicationRequest.builder()
+                .applicationId("test-application id")
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         CopyApplicationRequest.builder()
             .applicationId("test-application-id")
             .sourceApplicationId("test-source-application-id")

@@ -16,18 +16,22 @@
 
 package org.cloudfoundry.client.v2.serviceplanvisibilities;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class GetServicePlanVisibilityRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noServicePlanVisibilityId() {
-        GetServicePlanVisibilityRequest.builder()
-            .build();
+final class GetServicePlanVisibilityRequestTest {
+
+    @Test
+    void noServicePlanVisibilityId() {
+        assertThrows(IllegalStateException.class, () -> {
+            GetServicePlanVisibilityRequest.builder()
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         GetServicePlanVisibilityRequest.builder()
             .servicePlanVisibilityId("test-service-plan-visibility-id")
             .build();

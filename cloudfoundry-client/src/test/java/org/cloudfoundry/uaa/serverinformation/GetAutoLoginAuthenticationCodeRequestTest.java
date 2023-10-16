@@ -16,48 +16,58 @@
 
 package org.cloudfoundry.uaa.serverinformation;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class GetAutoLoginAuthenticationCodeRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noClientId() {
-        GetAutoLoginAuthenticationCodeRequest.builder()
-            .clientSecret("test-client-secret")
-            .password("test-password")
-            .username("test-username")
-            .build();
-    }
+final class GetAutoLoginAuthenticationCodeRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noClientSecret() {
-        GetAutoLoginAuthenticationCodeRequest.builder()
-            .clientId("test-client-id")
-            .password("test-password")
-            .username("test-username")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noPassword() {
-        GetAutoLoginAuthenticationCodeRequest.builder()
-            .clientId("test-client-id")
-            .clientSecret("test-client-secret")
-            .username("test-username")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noUsername() {
-        GetAutoLoginAuthenticationCodeRequest.builder()
-            .clientId("test-client-id")
-            .clientSecret("test-client-secret")
-            .password("test-password")
-            .build();
+    @Test
+    void noClientId() {
+        assertThrows(IllegalStateException.class, () -> {
+            GetAutoLoginAuthenticationCodeRequest.builder()
+                .clientSecret("test-client-secret")
+                .password("test-password")
+                .username("test-username")
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noClientSecret() {
+        assertThrows(IllegalStateException.class, () -> {
+            GetAutoLoginAuthenticationCodeRequest.builder()
+                .clientId("test-client-id")
+                .password("test-password")
+                .username("test-username")
+                .build();
+        });
+    }
+
+    @Test
+    void noPassword() {
+        assertThrows(IllegalStateException.class, () -> {
+            GetAutoLoginAuthenticationCodeRequest.builder()
+                .clientId("test-client-id")
+                .clientSecret("test-client-secret")
+                .username("test-username")
+                .build();
+        });
+    }
+
+    @Test
+    void noUsername() {
+        assertThrows(IllegalStateException.class, () -> {
+            GetAutoLoginAuthenticationCodeRequest.builder()
+                .clientId("test-client-id")
+                .clientSecret("test-client-secret")
+                .password("test-password")
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         GetAutoLoginAuthenticationCodeRequest.builder()
             .clientId("test-client-id")
             .clientSecret("test-client-secret")

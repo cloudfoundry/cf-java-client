@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.uaa.identityproviders;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class ListIdentityProvidersRequestTest {
+final class ListIdentityProvidersRequestTest {
 
     @Test
-    public void valid() {
+    void valid() {
         ListIdentityProvidersRequest.builder()
             .identityZoneId("text-identity-zone-id")
             .build();

@@ -16,27 +16,33 @@
 
 package org.cloudfoundry.client.v2.serviceinstances;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
-public final class BindServiceInstanceRouteRequestTest {
+final class BindServiceInstanceRouteRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noRouteId() {
-        BindServiceInstanceRouteRequest.builder()
-            .serviceInstanceId("test-service-instance-id")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noServiceInstanceId() {
-        BindServiceInstanceRouteRequest.builder()
-            .routeId("test-route-id")
-            .build();
+    @Test
+    void noRouteId() {
+        assertThrows(IllegalStateException.class, () -> {
+            BindServiceInstanceRouteRequest.builder()
+                .serviceInstanceId("test-service-instance-id")
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noServiceInstanceId() {
+        assertThrows(IllegalStateException.class, () -> {
+            BindServiceInstanceRouteRequest.builder()
+                .routeId("test-route-id")
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         BindServiceInstanceRouteRequest.builder()
             .serviceInstanceId("test-service-instance-id")
             .routeId("test-route-id")

@@ -16,18 +16,22 @@
 
 package org.cloudfoundry.client.v2.routemappings;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class DeleteRouteMappingRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noRouteMappingId() {
-        DeleteRouteMappingRequest.builder()
-            .build();
+final class DeleteRouteMappingRequestTest {
+
+    @Test
+    void noRouteMappingId() {
+        assertThrows(IllegalStateException.class, () -> {
+            DeleteRouteMappingRequest.builder()
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         DeleteRouteMappingRequest.builder()
             .routeMappingId("route-mapping-id")
             .build();

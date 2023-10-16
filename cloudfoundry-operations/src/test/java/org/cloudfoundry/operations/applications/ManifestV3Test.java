@@ -16,30 +16,36 @@
 
 package org.cloudfoundry.operations.applications;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class ManifestV3Test {
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+class ManifestV3Test {
 
     private final ManifestV3Application testApplication = ManifestV3Application.builder()
         .name("test-application-name")
         .build();
 
-    @Test(expected = IllegalStateException.class)
-    public void illegalVersion() {
-        ManifestV3.builder()
-            .version(2)
-            .application(testApplication)
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noApplications() {
-        ManifestV3.builder()
-            .build();
+    @Test
+    void illegalVersion() {
+        assertThrows(IllegalStateException.class, () -> {
+            ManifestV3.builder()
+                .version(2)
+                .application(testApplication)
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noApplications() {
+        assertThrows(IllegalStateException.class, () -> {
+            ManifestV3.builder()
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         ManifestV3.builder()
             .application(testApplication)
             .build();

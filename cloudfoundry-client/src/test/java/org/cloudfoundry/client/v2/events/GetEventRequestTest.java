@@ -16,18 +16,22 @@
 
 package org.cloudfoundry.client.v2.events;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class GetEventRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noEventId() {
-        GetEventRequest.builder()
-            .build();
+final class GetEventRequestTest {
+
+    @Test
+    void noEventId() {
+        assertThrows(IllegalStateException.class, () -> {
+            GetEventRequest.builder()
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         GetEventRequest.builder()
             .eventId("test-event-id")
             .build();

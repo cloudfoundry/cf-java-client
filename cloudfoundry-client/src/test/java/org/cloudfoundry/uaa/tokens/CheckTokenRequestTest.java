@@ -16,49 +16,57 @@
 
 package org.cloudfoundry.uaa.tokens;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class CheckTokenRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noClientId() {
-        CheckTokenRequest.builder()
-            .clientSecret("test-client-secret")
-            .token("test-token")
-            .scope("test-scope")
-            .build();
+final class CheckTokenRequestTest {
+
+    @Test
+    void noClientId() {
+        assertThrows(IllegalStateException.class, () -> {
+            CheckTokenRequest.builder()
+                .clientSecret("test-client-secret")
+                .token("test-token")
+                .scope("test-scope")
+                .build();
+        });
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void noClientSecret() {
-        CheckTokenRequest.builder()
-            .clientId("test-client-id")
-            .token("test-token")
-            .scope("test-scope")
-            .build();
+    @Test
+    void noClientSecret() {
+        assertThrows(IllegalStateException.class, () -> {
+            CheckTokenRequest.builder()
+                .clientId("test-client-id")
+                .token("test-token")
+                .scope("test-scope")
+                .build();
+        });
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void noToken() {
+    @Test
+    void noToken() {
+        assertThrows(IllegalStateException.class, () -> {
+            CheckTokenRequest.builder()
+                .clientId("test-client-id")
+                .clientSecret("test-client-secret")
+                .scope("test-scope")
+                .build();
+        });
+    }
+
+    @Test
+    void validMax() {
         CheckTokenRequest.builder()
             .clientId("test-client-id")
             .clientSecret("test-client-secret")
+            .token("test-token")
             .scope("test-scope")
             .build();
     }
 
     @Test
-    public void validMax() {
-        CheckTokenRequest.builder()
-            .clientId("test-client-id")
-            .clientSecret("test-client-secret")
-            .token("test-token")
-            .scope("test-scope")
-            .build();
-    }
-
-    @Test
-    public void validMin() {
+    void validMin() {
         CheckTokenRequest.builder()
             .clientId("test-client-id")
             .clientSecret("test-client-secret")

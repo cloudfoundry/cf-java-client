@@ -17,18 +17,22 @@
 package org.cloudfoundry.client.v3.domains;
 
 import org.cloudfoundry.client.v3.Metadata;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class UpdateDomainRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noDomainId() {
-        UpdateDomainRequest.builder()
-            .build();
+final class UpdateDomainRequestTest {
+
+    @Test
+    void noDomainId() {
+        assertThrows(IllegalStateException.class, () -> {
+            UpdateDomainRequest.builder()
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         UpdateDomainRequest.builder()
             .domainId("test-domain-id")
             .metadata(Metadata.builder()

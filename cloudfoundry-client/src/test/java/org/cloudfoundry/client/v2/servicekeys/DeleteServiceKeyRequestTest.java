@@ -16,18 +16,22 @@
 
 package org.cloudfoundry.client.v2.servicekeys;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class DeleteServiceKeyRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noServiceKeyId() {
-        DeleteServiceKeyRequest.builder()
-            .build();
+final class DeleteServiceKeyRequestTest {
+
+    @Test
+    void noServiceKeyId() {
+        assertThrows(IllegalStateException.class, () -> {
+            DeleteServiceKeyRequest.builder()
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         DeleteServiceKeyRequest.builder()
             .serviceKeyId("test-service-key-id")
             .build();

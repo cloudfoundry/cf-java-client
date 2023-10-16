@@ -78,7 +78,7 @@ import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import org.cloudfoundry.util.FluentMap;
 import org.cloudfoundry.util.OperationUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 import reactor.test.StepVerifier;
 
@@ -98,13 +98,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.client.v2.serviceinstances.Plan.builder;
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 
-public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
+final class ReactorApplicationsV2Test extends AbstractClientApiTest {
 
     private final ReactorApplicationsV2 applications = new ReactorApplicationsV2(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @SuppressWarnings("deprecation")
     @Test
-    public void associateRoute() {
+    void associateRoute() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PUT).path("/apps/test-application-id/routes/test-route-id")
@@ -161,7 +161,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void copy() {
+    void copy() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(POST).path("/apps/test-application-id/copy_bits")
@@ -196,7 +196,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
 
     @SuppressWarnings("deprecation")
     @Test
-    public void create() {
+    void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(POST).path("/apps")
@@ -256,7 +256,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/apps/test-application-id")
@@ -276,7 +276,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void download() {
+    void download() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/apps/test-application-id/download")
@@ -299,7 +299,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void downloadDroplet() {
+    void downloadDroplet() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/apps/test-application-id/droplet/download")
@@ -322,7 +322,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void environment() {
+    void environment() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/apps/test-application-id/env")
@@ -367,7 +367,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
 
     @SuppressWarnings("deprecation")
     @Test
-    public void get() {
+    void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/apps/test-application-id")
@@ -421,7 +421,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void getPermissions() {
+    void getPermissions() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/apps/6fd65993-fbd8-447c-8c04-6e4fe3ac561c/permissions")
@@ -446,7 +446,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void instances() {
+    void instances() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/apps/test-application-id/instances")
@@ -474,7 +474,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
 
     @SuppressWarnings("deprecation")
     @Test
-    public void list() {
+    void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/apps?q=name%3Atest-name&page=-1")
@@ -602,7 +602,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void listRoutes() {
+    void listRoutes() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/apps/test-application-id/routes?page=-1")
@@ -646,7 +646,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void listServiceBindings() {
+    void listServiceBindings() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/apps/test-application-id/service_bindings?q=service_instance_guid%3Atest-instance-id&page=-1")
@@ -689,7 +689,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void removeRoute() {
+    void removeRoute() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/apps/test-application-id/routes/test-route-id")
@@ -710,7 +710,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void removeServiceBinding() {
+    void removeServiceBinding() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/apps/test-application-id/service_bindings/test-service-binding-id")
@@ -732,7 +732,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
 
     @SuppressWarnings("deprecation")
     @Test
-    public void restage() {
+    void restage() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(POST).path("/apps/test-application-id/restage")
@@ -782,7 +782,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void statistics() {
+    void statistics() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/apps/test-application-id/stats")
@@ -826,7 +826,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
 
     @SuppressWarnings("deprecation")
     @Test
-    public void summary() {
+    void summary() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/apps/test-application-id/summary")
@@ -904,7 +904,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void terminateInstance() {
+    void terminateInstance() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/apps/test-application-id/instances/0")
@@ -926,7 +926,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
 
     @SuppressWarnings("deprecation")
     @Test
-    public void update() {
+    void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PUT).path("/apps/test-application-id")
@@ -985,7 +985,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void upload() throws IOException {
+    void upload() throws IOException {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PUT).path("/apps/test-application-id/bits")
@@ -1050,7 +1050,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void uploadDroplet() throws IOException {
+    void uploadDroplet() throws IOException {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PUT).path("/apps/test-application-id/droplet/upload")

@@ -18,7 +18,7 @@ package org.cloudfoundry.reactor;
 
 import org.cloudfoundry.reactor.util.AbstractReactorOperations;
 import org.cloudfoundry.reactor.util.Operator;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -28,7 +28,7 @@ import java.util.Collections;
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public final class CustomRequestTagTest extends AbstractRestTest {
+final class CustomRequestTagTest extends AbstractRestTest {
 
     private static final String CUSTOM_REQUEST_TAG_NAME = "test-header";
 
@@ -41,7 +41,7 @@ public final class CustomRequestTagTest extends AbstractRestTest {
         .build();
 
     @Test
-    public void addCustomHttpHeader() {
+    void addCustomHttpHeader() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/")

@@ -18,8 +18,8 @@ package org.cloudfoundry.reactor;
 
 import io.netty.handler.logging.ByteBufFormat;
 import io.netty.handler.logging.LogLevel;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.transport.ProxyProvider;
 import reactor.test.StepVerifier;
@@ -32,7 +32,7 @@ import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public final class DefaultConnectionContextTest extends AbstractRestTest {
+final class DefaultConnectionContextTest extends AbstractRestTest {
 
     private final DefaultConnectionContext connectionContext = DefaultConnectionContext.builder()
         .apiHost(this.mockWebServer.getHostName())
@@ -40,13 +40,13 @@ public final class DefaultConnectionContextTest extends AbstractRestTest {
         .secure(false)
         .build();
 
-    @After
-    public void dispose() {
+    @AfterEach
+    void dispose() {
         this.connectionContext.dispose();
     }
 
     @Test
-    public void getInfo() {
+    void getInfo() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/")
@@ -76,7 +76,7 @@ public final class DefaultConnectionContextTest extends AbstractRestTest {
     }
 
     @Test
-    public void multipleInstances() {
+    void multipleInstances() {
         DefaultConnectionContext first = DefaultConnectionContext.builder()
             .apiHost("test-host")
             .build();
@@ -93,7 +93,7 @@ public final class DefaultConnectionContextTest extends AbstractRestTest {
     }
 
     @Test
-    public void configurationAlwaysApplied() {
+    void configurationAlwaysApplied() {
         DefaultConnectionContext ctx = DefaultConnectionContext.builder()
             .connectionPoolSize(24)
             .apiHost("api.example.com")

@@ -21,7 +21,7 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
@@ -30,12 +30,12 @@ import java.util.Collections;
 import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
 
-public final class ReactorAdminV3Test extends AbstractClientApiTest {
+final class ReactorAdminV3Test extends AbstractClientApiTest {
 
     private final ReactorAdminV3 admin = new ReactorAdminV3(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void clearBuildpackCache() {
+    void clearBuildpackCache() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(POST).path("/admin/actions/clear_buildpack_cache")

@@ -16,28 +16,34 @@
 
 package org.cloudfoundry.uaa.users;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class InviteUsersRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noEmails() {
-        InviteUsersRequest.builder()
-            .clientId("test-client-id")
-            .redirectUri("test-redirect-uri")
-            .build();
-    }
+final class InviteUsersRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noRedirectId() {
-        InviteUsersRequest.builder()
-            .clientId("test-client-id")
-            .email("test-email")
-            .build();
+    @Test
+    void noEmails() {
+        assertThrows(IllegalStateException.class, () -> {
+            InviteUsersRequest.builder()
+                .clientId("test-client-id")
+                .redirectUri("test-redirect-uri")
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noRedirectId() {
+        assertThrows(IllegalStateException.class, () -> {
+            InviteUsersRequest.builder()
+                .clientId("test-client-id")
+                .email("test-email")
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         InviteUsersRequest.builder()
             .clientId("test-client-id")
             .email("test-email")

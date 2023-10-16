@@ -19,7 +19,7 @@ package org.cloudfoundry.reactor.client;
 import org.cloudfoundry.QueryParameter;
 import org.cloudfoundry.reactor.util.UriQueryParameter;
 import org.cloudfoundry.reactor.util.UriQueryParameters;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -30,10 +30,10 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public final class QueryBuilderTest {
+final class QueryBuilderTest {
 
     @Test
-    public void test() {
+    void test() {
         UriComponentsBuilder builder = UriComponentsBuilder.newInstance();
 
         Stream<UriQueryParameter> parameters = new QueryBuilder().build(new StubQueryParamsSubClass());

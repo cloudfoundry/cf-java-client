@@ -16,22 +16,22 @@
 
 package org.cloudfoundry.operations.applications;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-public final class WordListRandomWordsTest {
+final class WordListRandomWordsTest {
 
     private final WordListRandomWords randomWords = new WordListRandomWords();
 
     @Test
-    public void getAdjective() {
+    void getAdjective() {
         assertThat(this.randomWords.getAdjective()).isNotNull();
     }
 
     @Test
-    public void getNoun() {
+    void getNoun() {
         assertThat(this.randomWords.getNoun()).isNotNull();
     }
 

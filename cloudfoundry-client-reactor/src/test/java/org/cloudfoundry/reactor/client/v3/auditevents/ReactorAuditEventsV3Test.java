@@ -30,7 +30,7 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
@@ -39,12 +39,12 @@ import java.util.Collections;
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public class ReactorAuditEventsV3Test extends AbstractClientApiTest {
+class ReactorAuditEventsV3Test extends AbstractClientApiTest {
 
     private final ReactorAuditEventsV3 events = new ReactorAuditEventsV3(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void get() {
+    void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/audit_events/a595fe2f-01ff-4965-a50c-290258ab8582")
@@ -91,7 +91,7 @@ public class ReactorAuditEventsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/audit_events")

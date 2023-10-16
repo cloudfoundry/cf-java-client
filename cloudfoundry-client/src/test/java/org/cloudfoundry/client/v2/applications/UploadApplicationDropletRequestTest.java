@@ -16,31 +16,37 @@
 
 package org.cloudfoundry.client.v2.applications;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public final class UploadApplicationDropletRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+final class UploadApplicationDropletRequestTest {
 
     private static final Path TEST_DROPLET = Paths.get("/");
 
-    @Test(expected = IllegalStateException.class)
-    public void noApplication() {
-        UploadApplicationDropletRequest.builder()
-            .applicationId("test-application-id")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noApplicationId() {
-        UploadApplicationDropletRequest.builder()
-            .droplet(TEST_DROPLET)
-            .build();
+    @Test
+    void noApplication() {
+        assertThrows(IllegalStateException.class, () -> {
+            UploadApplicationDropletRequest.builder()
+                .applicationId("test-application-id")
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noApplicationId() {
+        assertThrows(IllegalStateException.class, () -> {
+            UploadApplicationDropletRequest.builder()
+                .droplet(TEST_DROPLET)
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         UploadApplicationDropletRequest.builder()
             .droplet(TEST_DROPLET)
             .applicationId("test-application-id")

@@ -16,30 +16,36 @@
 
 package org.cloudfoundry.operations.organizations;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class RenameOrganizationRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        RenameOrganizationRequest.builder()
-            .newName("new-name")
-            .build();
+final class RenameOrganizationRequestTest {
+
+    @Test
+    void noName() {
+        assertThrows(IllegalStateException.class, () -> {
+            RenameOrganizationRequest.builder()
+                .newName("new-name")
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         RenameOrganizationRequest.builder()
             .name("test-name")
             .newName("test-new-name")
             .build();
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void validNoNewName() {
-        RenameOrganizationRequest.builder()
-            .name("name")
-            .build();
+    @Test
+    void validNoNewName() {
+        assertThrows(IllegalStateException.class, () -> {
+            RenameOrganizationRequest.builder()
+                .name("name")
+                .build();
+        });
     }
 
 }

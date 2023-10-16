@@ -16,35 +16,43 @@
 
 package org.cloudfoundry.operations.useradmin;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class CreateUserRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void bothOriginAndPassword() {
-        CreateUserRequest.builder()
-            .origin("test-origin")
-            .password("test-password")
-            .username("test-username")
-            .build();
-    }
+final class CreateUserRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noOriginOrPassword() {
-        CreateUserRequest.builder()
-            .username("test-username")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noUsername() {
-        CreateUserRequest.builder()
-            .password("test-password")
-            .build();
+    @Test
+    void bothOriginAndPassword() {
+        assertThrows(IllegalStateException.class, () -> {
+            CreateUserRequest.builder()
+                .origin("test-origin")
+                .password("test-password")
+                .username("test-username")
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noOriginOrPassword() {
+        assertThrows(IllegalStateException.class, () -> {
+            CreateUserRequest.builder()
+                .username("test-username")
+                .build();
+        });
+    }
+
+    @Test
+    void noUsername() {
+        assertThrows(IllegalStateException.class, () -> {
+            CreateUserRequest.builder()
+                .password("test-password")
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         CreateUserRequest.builder()
             .password("test-password")
             .username("test-username")

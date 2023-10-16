@@ -16,19 +16,22 @@
 
 package org.cloudfoundry.client.v2.serviceinstances;
 
+import org.junit.jupiter.api.Test;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class ListServiceInstanceRoutesRequestTest {
+final class ListServiceInstanceRoutesRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noServiceInstanceId() {
-        ListServiceInstanceRoutesRequest.builder()
-            .build();
+    @Test
+    void noServiceInstanceId() {
+        assertThrows(IllegalStateException.class, () -> {
+            ListServiceInstanceRoutesRequest.builder()
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         ListServiceInstanceRoutesRequest.builder()
             .serviceInstanceId("test-service-instance-id")
             .build();

@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.client.v3.roles;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class ListRolesRequestTest {
+class ListRolesRequestTest {
 
     @Test
-    public void valid() {
+    void valid() {
         ListRolesRequest.builder()
             .build();
     }

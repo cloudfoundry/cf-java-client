@@ -16,26 +16,32 @@
 
 package org.cloudfoundry.operations.buildpacks;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class RenameBuildpackRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        RenameBuildpackRequest.builder()
-            .newName("test-buildpack-new-name")
-            .build();
-    }
+class RenameBuildpackRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noNewName() {
-        RenameBuildpackRequest.builder()
-            .name("test-buildpack-name")
-            .build();
+    @Test
+    void noName() {
+        assertThrows(IllegalStateException.class, () -> {
+            RenameBuildpackRequest.builder()
+                .newName("test-buildpack-new-name")
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noNewName() {
+        assertThrows(IllegalStateException.class, () -> {
+            RenameBuildpackRequest.builder()
+                .name("test-buildpack-name")
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         RenameBuildpackRequest.builder()
             .name("test-buildpack-name")
             .newName("test-buildpack-new-name")

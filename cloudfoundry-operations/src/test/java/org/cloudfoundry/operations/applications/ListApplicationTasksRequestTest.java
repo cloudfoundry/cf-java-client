@@ -16,18 +16,22 @@
 
 package org.cloudfoundry.operations.applications;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class ListApplicationTasksRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        ListApplicationTasksRequest.builder()
-            .build();
+final class ListApplicationTasksRequestTest {
+
+    @Test
+    void noName() {
+        assertThrows(IllegalStateException.class, () -> {
+            ListApplicationTasksRequest.builder()
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         ListApplicationTasksRequest.builder()
             .name("test-name")
             .build();

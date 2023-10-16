@@ -16,12 +16,14 @@
 
 package org.cloudfoundry.doppler;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class ValueMetricTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+final class ValueMetricTest {
 
     @Test
-    public void dropsonde() {
+    void dropsonde() {
         ValueMetric.from(new org.cloudfoundry.dropsonde.events.ValueMetric.Builder()
             .name("test-name")
             .unit("test-unit")
@@ -29,32 +31,38 @@ public final class ValueMetricTest {
             .build());
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        ValueMetric.builder()
-            .unit("test-unit")
-            .value(0.0)
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noUnit() {
-        ValueMetric.builder()
-            .name("test-name")
-            .value(0.0)
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noValue() {
-        ValueMetric.builder()
-            .name("test-name")
-            .unit("test-unit")
-            .build();
+    @Test
+    void noName() {
+        assertThrows(IllegalStateException.class, () -> {
+            ValueMetric.builder()
+                .unit("test-unit")
+                .value(0.0)
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noUnit() {
+        assertThrows(IllegalStateException.class, () -> {
+            ValueMetric.builder()
+                .name("test-name")
+                .value(0.0)
+                .build();
+        });
+    }
+
+    @Test
+    void noValue() {
+        assertThrows(IllegalStateException.class, () -> {
+            ValueMetric.builder()
+                .name("test-name")
+                .unit("test-unit")
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         ValueMetric.builder()
             .name("test-name")
             .unit("test-unit")

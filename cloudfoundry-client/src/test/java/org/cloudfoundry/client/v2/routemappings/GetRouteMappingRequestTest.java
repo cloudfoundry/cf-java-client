@@ -16,18 +16,22 @@
 
 package org.cloudfoundry.client.v2.routemappings;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class GetRouteMappingRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noRouteMappingId() {
-        GetRouteMappingRequest.builder()
-            .build();
+final class GetRouteMappingRequestTest {
+
+    @Test
+    void noRouteMappingId() {
+        assertThrows(IllegalStateException.class, () -> {
+            GetRouteMappingRequest.builder()
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         GetRouteMappingRequest.builder()
             .routeMappingId("route-mapping-id")
             .build();

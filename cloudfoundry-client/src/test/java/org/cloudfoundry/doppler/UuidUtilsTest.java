@@ -16,21 +16,22 @@
 
 package org.cloudfoundry.doppler;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
-public final class UuidUtilsTest {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+final class UuidUtilsTest {
 
     @Test
-    public void from() {
+    void from() {
         org.cloudfoundry.dropsonde.events.UUID dropsondeUuid = new org.cloudfoundry.dropsonde.events.UUID.Builder()
             .high(0x79d4c3b2020e67a5L)
             .low(0x7243cc580bc17af4L)
             .build();
 
-        Assert.assertEquals(UUID.fromString("f47ac10b-58cc-4372-a567-0e02b2c3d479"), UuidUtils.from(dropsondeUuid));
+        assertEquals(UUID.fromString("f47ac10b-58cc-4372-a567-0e02b2c3d479"), UuidUtils.from(dropsondeUuid));
     }
 
 }

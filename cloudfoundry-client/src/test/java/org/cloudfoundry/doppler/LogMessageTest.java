@@ -17,12 +17,14 @@
 package org.cloudfoundry.doppler;
 
 import okio.ByteString;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class LogMessageTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+final class LogMessageTest {
 
     @Test
-    public void dropsonde() {
+    void dropsonde() {
         LogMessage.from(new org.cloudfoundry.dropsonde.events.LogMessage.Builder()
             .message(ByteString.encodeUtf8("test-message"))
             .message_type(org.cloudfoundry.dropsonde.events.LogMessage.MessageType.ERR)
@@ -30,32 +32,38 @@ public final class LogMessageTest {
             .build());
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void noMessage() {
-        LogMessage.builder()
-            .messageType(MessageType.ERR)
-            .timestamp(0L)
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noMessageType() {
-        LogMessage.builder()
-            .message("test-message")
-            .timestamp(0L)
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noTimestamp() {
-        LogMessage.builder()
-            .message("test-message")
-            .messageType(MessageType.ERR)
-            .build();
+    @Test
+    void noMessage() {
+        assertThrows(IllegalStateException.class, () -> {
+            LogMessage.builder()
+                .messageType(MessageType.ERR)
+                .timestamp(0L)
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noMessageType() {
+        assertThrows(IllegalStateException.class, () -> {
+            LogMessage.builder()
+                .message("test-message")
+                .timestamp(0L)
+                .build();
+        });
+    }
+
+    @Test
+    void noTimestamp() {
+        assertThrows(IllegalStateException.class, () -> {
+            LogMessage.builder()
+                .message("test-message")
+                .messageType(MessageType.ERR)
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         LogMessage.builder()
             .message("test-message")
             .messageType(MessageType.ERR)

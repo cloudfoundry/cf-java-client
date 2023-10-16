@@ -16,18 +16,22 @@
 
 package org.cloudfoundry.client.v2.stacks;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class DeleteStackRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noStackId() {
-        DeleteStackRequest.builder()
-            .build();
+final class DeleteStackRequestTest {
+
+    @Test
+    void noStackId() {
+        assertThrows(IllegalStateException.class, () -> {
+            DeleteStackRequest.builder()
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         DeleteStackRequest.builder()
             .async(true)
             .stackId("test-stack-id")

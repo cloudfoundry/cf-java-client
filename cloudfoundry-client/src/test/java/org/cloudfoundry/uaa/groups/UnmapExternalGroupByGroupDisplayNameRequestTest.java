@@ -16,36 +16,44 @@
 
 package org.cloudfoundry.uaa.groups;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class UnmapExternalGroupByGroupDisplayNameRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noExternalGroup() {
-        UnmapExternalGroupByGroupDisplayNameRequest.builder()
-            .groupDisplayName("test-group-display-name")
-            .origin("test-origin")
-            .build();
-    }
+final class UnmapExternalGroupByGroupDisplayNameRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noGroupDisplayName() {
-        UnmapExternalGroupByGroupDisplayNameRequest.builder()
-            .externalGroup("test-external-group")
-            .origin("test-origin")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noOrigin() {
-        UnmapExternalGroupByGroupDisplayNameRequest.builder()
-            .groupDisplayName("test-group-display-name")
-            .externalGroup("test-external-group")
-            .build();
+    @Test
+    void noExternalGroup() {
+        assertThrows(IllegalStateException.class, () -> {
+            UnmapExternalGroupByGroupDisplayNameRequest.builder()
+                .groupDisplayName("test-group-display-name")
+                .origin("test-origin")
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noGroupDisplayName() {
+        assertThrows(IllegalStateException.class, () -> {
+            UnmapExternalGroupByGroupDisplayNameRequest.builder()
+                .externalGroup("test-external-group")
+                .origin("test-origin")
+                .build();
+        });
+    }
+
+    @Test
+    void noOrigin() {
+        assertThrows(IllegalStateException.class, () -> {
+            UnmapExternalGroupByGroupDisplayNameRequest.builder()
+                .groupDisplayName("test-group-display-name")
+                .externalGroup("test-external-group")
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         UnmapExternalGroupByGroupDisplayNameRequest.builder()
             .groupDisplayName("test-group-display-name")
             .externalGroup("test-external-group")

@@ -29,7 +29,7 @@ import org.cloudfoundry.uaa.authorizations.AuthorizeByOpenIdWithIdTokenRequest;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByOpenIdWithImplicitGrantRequest;
 import org.cloudfoundry.uaa.authorizations.GetOpenIdProviderConfigurationRequest;
 import org.cloudfoundry.uaa.authorizations.GetOpenIdProviderConfigurationResponse;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
@@ -40,12 +40,12 @@ import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpResponseStatus.FOUND;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public final class ReactorAuthorizationsTest extends AbstractUaaApiTest {
+final class ReactorAuthorizationsTest extends AbstractUaaApiTest {
 
     private final ReactorAuthorizations authorizations = new ReactorAuthorizations(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void authorizeByAuthorizationCodeGrantApi() {
+    void authorizeByAuthorizationCodeGrantApi() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/oauth/authorize?client_id=login&redirect_uri=https%3A%2F%2Fuaa.cloudfoundry.com%2Fredirect%2Fcf&state=v4LpFF&response_type=code")
@@ -69,7 +69,7 @@ public final class ReactorAuthorizationsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void authorizeByAuthorizationCodeGrantBrowser() {
+    void authorizeByAuthorizationCodeGrantBrowser() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/oauth/authorize?client_id=login&redirect_uri=https%3A%2F%2Fuaa.cloudfoundry.com%2Fredirect%2Fcf&scope=openid%20oauth.approvals&response_type=code")
@@ -94,7 +94,7 @@ public final class ReactorAuthorizationsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void authorizeByAuthorizationCodeGrantHybrid() {
+    void authorizeByAuthorizationCodeGrantHybrid() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/oauth/authorize?client_id=app&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fapp%2F&scope=openid&response_type=code%20id_token")
@@ -130,7 +130,7 @@ public final class ReactorAuthorizationsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void authorizeByImplicitGrantBrowser() {
+    void authorizeByImplicitGrantBrowser() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/oauth/authorize?client_id=app&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fapp%2F&scope=openid&response_type=token")
@@ -160,7 +160,7 @@ public final class ReactorAuthorizationsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void authorizeByOpenIdWithAuthorizationCodeGrant() {
+    void authorizeByOpenIdWithAuthorizationCodeGrant() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/oauth/authorize?client_id=app&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fapp%2F&scope=openid&response_type=code%20id_token")
@@ -184,7 +184,7 @@ public final class ReactorAuthorizationsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void authorizeByOpenIdWithToken() {
+    void authorizeByOpenIdWithToken() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/oauth/authorize?client_id=app&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fapp%2F&scope=openid&response_type=id_token")
@@ -221,7 +221,7 @@ public final class ReactorAuthorizationsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void authorizeByOpenIdWithimplicitGrant() {
+    void authorizeByOpenIdWithimplicitGrant() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/oauth/authorize?client_id=app&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fapp%2F&scope=openid&response_type=token%20id_token")
@@ -245,7 +245,7 @@ public final class ReactorAuthorizationsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void getOpenIdProviderConfigurationRequest() {
+    void getOpenIdProviderConfigurationRequest() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/.well-known/openid-configuration")

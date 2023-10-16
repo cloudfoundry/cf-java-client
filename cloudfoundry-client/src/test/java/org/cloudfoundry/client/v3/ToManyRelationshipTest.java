@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.client.v3;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class ToManyRelationshipTest {
+final class ToManyRelationshipTest {
 
     @Test
-    public void valid() {
+    void valid() {
         ToManyRelationship.builder()
             .build();
     }

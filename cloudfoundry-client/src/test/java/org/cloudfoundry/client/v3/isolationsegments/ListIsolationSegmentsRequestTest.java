@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.client.v3.isolationsegments;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class ListIsolationSegmentsRequestTest {
+final class ListIsolationSegmentsRequestTest {
 
     @Test
-    public void valid() {
+    void valid() {
         ListIsolationSegmentsRequest.builder()
             .build();
     }

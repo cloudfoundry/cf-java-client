@@ -16,38 +16,46 @@
 
 package org.cloudfoundry.operations.buildpacks;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.nio.file.Paths;
 
-public class CreateBuildpackRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noBuildpack() {
-        CreateBuildpackRequest.builder()
-            .name("test-name")
-            .position(0)
-            .build();
-    }
+class CreateBuildpackRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        CreateBuildpackRequest.builder()
-            .buildpack(Paths.get("test-buildpack"))
-            .position(0)
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noPosition() {
-        CreateBuildpackRequest.builder()
-            .buildpack(Paths.get("test-buildpack"))
-            .name("test-name")
-            .build();
+    @Test
+    void noBuildpack() {
+        assertThrows(IllegalStateException.class, () -> {
+            CreateBuildpackRequest.builder()
+                .name("test-name")
+                .position(0)
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noName() {
+        assertThrows(IllegalStateException.class, () -> {
+            CreateBuildpackRequest.builder()
+                .buildpack(Paths.get("test-buildpack"))
+                .position(0)
+                .build();
+        });
+    }
+
+    @Test
+    void noPosition() {
+        assertThrows(IllegalStateException.class, () -> {
+            CreateBuildpackRequest.builder()
+                .buildpack(Paths.get("test-buildpack"))
+                .name("test-name")
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         CreateBuildpackRequest.builder()
             .buildpack(Paths.get("test-buildpack"))
             .name("test-name")

@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.reactor;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
@@ -24,7 +24,7 @@ import java.time.Duration;
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public final class RootPayloadRootProviderTest extends AbstractRestTest {
+final class RootPayloadRootProviderTest extends AbstractRestTest {
 
     private final RootPayloadRootProvider rootProvider = RootPayloadRootProvider.builder()
         .apiHost("localhost")
@@ -34,7 +34,7 @@ public final class RootPayloadRootProviderTest extends AbstractRestTest {
         .build();
 
     @Test
-    public void getRoot() {
+    void getRoot() {
         this.rootProvider
             .getRoot(CONNECTION_CONTEXT)
             .as(StepVerifier::create)
@@ -44,7 +44,7 @@ public final class RootPayloadRootProviderTest extends AbstractRestTest {
     }
 
     @Test
-    public void getRootKey() {
+    void getRootKey() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/")
@@ -64,7 +64,7 @@ public final class RootPayloadRootProviderTest extends AbstractRestTest {
     }
 
     @Test
-    public void getRootKeyNoKey() {
+    void getRootKeyNoKey() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/")

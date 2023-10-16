@@ -16,18 +16,22 @@
 
 package org.cloudfoundry.client.v2.organizations;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class GetOrganizationMemoryUsageRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noOrganizationId() {
-        GetOrganizationMemoryUsageRequest.builder()
-            .build();
+final class GetOrganizationMemoryUsageRequestTest {
+
+    @Test
+    void noOrganizationId() {
+        assertThrows(IllegalStateException.class, () -> {
+            GetOrganizationMemoryUsageRequest.builder()
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         GetOrganizationMemoryUsageRequest.builder()
             .organizationId("test-organization-id")
             .build();

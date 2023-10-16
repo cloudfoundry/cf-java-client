@@ -28,7 +28,7 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
@@ -39,12 +39,12 @@ import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public final class ReactorApplicationUsageEventsTest extends AbstractClientApiTest {
+final class ReactorApplicationUsageEventsTest extends AbstractClientApiTest {
 
     private final ReactorApplicationUsageEvents applicationUsageEvents = new ReactorApplicationUsageEvents(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void get() {
+    void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/app_usage_events/caac0ed4-febf-48a4-951f-c0a7fadf6a68")
@@ -86,7 +86,7 @@ public final class ReactorApplicationUsageEventsTest extends AbstractClientApiTe
     }
 
     @Test
-    public void list() {
+    void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/app_usage_events?after_guid=f1d8ddec-d36a-4670-acb8-6082a1f1a95f&results-per-page=1")
@@ -134,7 +134,7 @@ public final class ReactorApplicationUsageEventsTest extends AbstractClientApiTe
     }
 
     @Test
-    public void purgeAndReseed() {
+    void purgeAndReseed() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(POST).path("/app_usage_events/destructively_purge_all_and_reseed_started_apps")

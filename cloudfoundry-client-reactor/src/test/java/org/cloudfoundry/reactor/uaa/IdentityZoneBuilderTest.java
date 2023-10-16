@@ -18,18 +18,18 @@ package org.cloudfoundry.reactor.uaa;
 
 import io.netty.handler.codec.http.HttpHeaders;
 import org.cloudfoundry.uaa.IdentityZoned;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
-public final class IdentityZoneBuilderTest {
+final class IdentityZoneBuilderTest {
 
     private final HttpHeaders outbound = mock(HttpHeaders.class);
 
     @Test
-    public void augment() {
+    void augment() {
         IdentityZoneBuilder.augment(this.outbound, new StubIdentityZoned());
 
         verify(this.outbound).set("X-Identity-Zone-Id", "test-identity-zone-id");
@@ -37,7 +37,7 @@ public final class IdentityZoneBuilderTest {
     }
 
     @Test
-    public void augmentNotIdentityZoned() {
+    void augmentNotIdentityZoned() {
         IdentityZoneBuilder.augment(this.outbound, new Object());
 
         verifyNoInteractions(this.outbound);

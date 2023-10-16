@@ -18,42 +18,50 @@ package org.cloudfoundry.client.v3.routes;
 
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.ToOneRelationship;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class CreateRouteRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void invalidWithMissingDomainRelationship() {
-        CreateRouteRequest.builder()
-            .relationships(RouteRelationships.builder()
-                .space(ToOneRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("test-space-id")
-                        .build()).build())
-                .build())
-            .build();
-    }
+final class CreateRouteRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void invalidWithMissingRelationship() {
-        CreateRouteRequest.builder()
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void invalidWithMissingSpaceRelationship() {
-        CreateRouteRequest.builder()
-            .relationships(RouteRelationships.builder()
-                .domain(ToOneRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("test-domain-id")
-                        .build()).build())
-                .build())
-            .build();
+    @Test
+    void invalidWithMissingDomainRelationship() {
+        assertThrows(IllegalStateException.class, () -> {
+            CreateRouteRequest.builder()
+                .relationships(RouteRelationships.builder()
+                    .space(ToOneRelationship.builder()
+                        .data(Relationship.builder()
+                            .id("test-space-id")
+                            .build()).build())
+                    .build())
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void invalidWithMissingRelationship() {
+        assertThrows(IllegalStateException.class, () -> {
+            CreateRouteRequest.builder()
+                .build();
+        });
+    }
+
+    @Test
+    void invalidWithMissingSpaceRelationship() {
+        assertThrows(IllegalStateException.class, () -> {
+            CreateRouteRequest.builder()
+                .relationships(RouteRelationships.builder()
+                    .domain(ToOneRelationship.builder()
+                        .data(Relationship.builder()
+                            .id("test-domain-id")
+                            .build()).build())
+                    .build())
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         CreateRouteRequest.builder()
             .relationships(RouteRelationships.builder()
                 .domain(ToOneRelationship.builder()

@@ -51,7 +51,7 @@ import org.cloudfoundry.uaa.users.UserInfoRequest;
 import org.cloudfoundry.uaa.users.UserInfoResponse;
 import org.cloudfoundry.uaa.users.VerifyUserRequest;
 import org.cloudfoundry.uaa.users.VerifyUserResponse;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
@@ -69,12 +69,12 @@ import static org.cloudfoundry.uaa.users.ApprovalStatus.APPROVED;
 import static org.cloudfoundry.uaa.users.ApprovalStatus.DENIED;
 import static org.cloudfoundry.uaa.users.MembershipType.DIRECT;
 
-public final class ReactorUsersTest extends AbstractUaaApiTest {
+final class ReactorUsersTest extends AbstractUaaApiTest {
 
     private final ReactorUsers users = new ReactorUsers(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void changePassword() {
+    void changePassword() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PUT).path("/Users/9140c37c-c5d9-4c4d-a265-b6fe2f9dd02d/password")
@@ -102,7 +102,7 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void create() {
+    void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(POST).path("/Users")
@@ -232,7 +232,7 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/Users/421225f4-318e-4a4d-9219-4b6a0ed3678a")
@@ -360,7 +360,7 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void expirePassword() {
+    void expirePassword() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PATCH).path("/Users/9022f2cf-2663-479e-82e6-d2ccc348a1e4/status")
@@ -386,7 +386,7 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void getVerificationLink() {
+    void getVerificationLink() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/Users/1faa46a0-0c6f-4e13-8334-d1f6e5f2e1dd/verify-link?redirect_uri=http%3A%2F%2Fredirect.to%2Fapp")
@@ -411,7 +411,7 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void inviteUsers() {
+    void inviteUsers() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(POST).path("/invite_users?client_id=u7ptqw&redirect_uri=example.com")
@@ -451,7 +451,7 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path(
@@ -580,7 +580,7 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void lookup() {
+    void lookup() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path(
@@ -623,7 +623,7 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void update() {
+    void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PUT).path("/Users/test-user-id")
@@ -721,7 +721,7 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void userInfo() {
+    void userInfo() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/userinfo")
@@ -753,7 +753,7 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void verifyUser() {
+    void verifyUser() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/Users/c0d42e48-9b69-461d-a77b-f75d3a5948b6/verify")

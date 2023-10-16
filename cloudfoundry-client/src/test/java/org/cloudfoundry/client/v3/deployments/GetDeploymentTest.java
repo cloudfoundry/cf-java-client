@@ -16,18 +16,22 @@
 
 package org.cloudfoundry.client.v3.deployments;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class GetDeploymentTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noDeploymentId() {
-        GetDeploymentRequest.builder()
-            .build();
+final class GetDeploymentTest {
+
+    @Test
+    void noDeploymentId() {
+        assertThrows(IllegalStateException.class, () -> {
+            GetDeploymentRequest.builder()
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         GetDeploymentRequest.builder()
             .deploymentId("deployment-id")
             .build();

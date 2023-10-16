@@ -16,18 +16,22 @@
 
 package org.cloudfoundry.uaa.groups;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class DeleteGroupRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noId() {
-        DeleteGroupRequest.builder()
-            .build();
+final class DeleteGroupRequestTest {
+
+    @Test
+    void noId() {
+        assertThrows(IllegalStateException.class, () -> {
+            DeleteGroupRequest.builder()
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         DeleteGroupRequest.builder()
             .groupId("test-group-id")
             .build();

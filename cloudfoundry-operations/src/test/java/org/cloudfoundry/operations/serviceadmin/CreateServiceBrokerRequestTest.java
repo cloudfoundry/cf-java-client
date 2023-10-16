@@ -16,48 +16,58 @@
 
 package org.cloudfoundry.operations.serviceadmin;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class CreateServiceBrokerRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        CreateServiceBrokerRequest.builder()
-            .url("test-broker-url")
-            .username("test-username")
-            .password("test-password")
-            .build();
-    }
+final class CreateServiceBrokerRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noPassword() {
-        CreateServiceBrokerRequest.builder()
-            .name("test-broker")
-            .url("test-broker-url")
-            .username("test-username")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noUrl() {
-        CreateServiceBrokerRequest.builder()
-            .name("test-broker")
-            .username("test-username")
-            .password("test-password")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noUsername() {
-        CreateServiceBrokerRequest.builder()
-            .name("test-broker")
-            .url("test-broker-url")
-            .password("test-password")
-            .build();
+    @Test
+    void noName() {
+        assertThrows(IllegalStateException.class, () -> {
+            CreateServiceBrokerRequest.builder()
+                .url("test-broker-url")
+                .username("test-username")
+                .password("test-password")
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noPassword() {
+        assertThrows(IllegalStateException.class, () -> {
+            CreateServiceBrokerRequest.builder()
+                .name("test-broker")
+                .url("test-broker-url")
+                .username("test-username")
+                .build();
+        });
+    }
+
+    @Test
+    void noUrl() {
+        assertThrows(IllegalStateException.class, () -> {
+            CreateServiceBrokerRequest.builder()
+                .name("test-broker")
+                .username("test-username")
+                .password("test-password")
+                .build();
+        });
+    }
+
+    @Test
+    void noUsername() {
+        assertThrows(IllegalStateException.class, () -> {
+            CreateServiceBrokerRequest.builder()
+                .name("test-broker")
+                .url("test-broker-url")
+                .password("test-password")
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         CreateServiceBrokerRequest.builder()
             .name("test-broker")
             .url("test-broker-url")

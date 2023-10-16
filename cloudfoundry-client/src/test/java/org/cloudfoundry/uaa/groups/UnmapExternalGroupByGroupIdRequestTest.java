@@ -16,36 +16,44 @@
 
 package org.cloudfoundry.uaa.groups;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class UnmapExternalGroupByGroupIdRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noExternalGroup() {
-        UnmapExternalGroupByGroupIdRequest.builder()
-            .groupId("test-group-id")
-            .origin("test-origin")
-            .build();
-    }
+final class UnmapExternalGroupByGroupIdRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noGroupId() {
-        UnmapExternalGroupByGroupIdRequest.builder()
-            .externalGroup("test-external-group")
-            .origin("test-origin")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noOrigin() {
-        UnmapExternalGroupByGroupIdRequest.builder()
-            .groupId("test-group-id")
-            .externalGroup("test-external-group")
-            .build();
+    @Test
+    void noExternalGroup() {
+        assertThrows(IllegalStateException.class, () -> {
+            UnmapExternalGroupByGroupIdRequest.builder()
+                .groupId("test-group-id")
+                .origin("test-origin")
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noGroupId() {
+        assertThrows(IllegalStateException.class, () -> {
+            UnmapExternalGroupByGroupIdRequest.builder()
+                .externalGroup("test-external-group")
+                .origin("test-origin")
+                .build();
+        });
+    }
+
+    @Test
+    void noOrigin() {
+        assertThrows(IllegalStateException.class, () -> {
+            UnmapExternalGroupByGroupIdRequest.builder()
+                .groupId("test-group-id")
+                .externalGroup("test-external-group")
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         UnmapExternalGroupByGroupIdRequest.builder()
             .groupId("test-group-id")
             .externalGroup("test-external-group")

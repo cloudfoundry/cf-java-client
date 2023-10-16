@@ -16,97 +16,112 @@
 
 package org.cloudfoundry.uaa.identityproviders;
 
+import org.junit.jupiter.api.Test;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class PasswordPolicyTest {
+final class PasswordPolicyTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noMaximumLength() {
-        PasswordPolicy.builder()
-            .minimumDigit(0)
-            .minimumLength(0)
-            .minimumLowerCaseCharacter(0)
-            .minimumSpecialCharacter(0)
-            .minimumUpperCaseCharacter(0)
-            .passwordExpirationInMonth(0)
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noMinimumDigit() {
-        PasswordPolicy.builder()
-            .maximumLength(0)
-            .minimumLength(0)
-            .minimumLowerCaseCharacter(0)
-            .minimumSpecialCharacter(0)
-            .minimumUpperCaseCharacter(0)
-            .passwordExpirationInMonth(0)
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noMinimumLength() {
-        PasswordPolicy.builder()
-            .maximumLength(0)
-            .minimumDigit(0)
-            .minimumLowerCaseCharacter(0)
-            .minimumSpecialCharacter(0)
-            .minimumUpperCaseCharacter(0)
-            .passwordExpirationInMonth(0)
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noMinimumLowerCaseCharacter() {
-        PasswordPolicy.builder()
-            .maximumLength(0)
-            .minimumDigit(0)
-            .minimumLength(0)
-            .minimumSpecialCharacter(0)
-            .minimumUpperCaseCharacter(0)
-            .passwordExpirationInMonth(0)
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noMinimumSpecialCharacter() {
-        PasswordPolicy.builder()
-            .maximumLength(0)
-            .minimumDigit(0)
-            .minimumLength(0)
-            .minimumLowerCaseCharacter(0)
-            .minimumUpperCaseCharacter(0)
-            .passwordExpirationInMonth(0)
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noMinimumUpperCaseCharacter() {
-        PasswordPolicy.builder()
-            .maximumLength(0)
-            .minimumDigit(0)
-            .minimumLength(0)
-            .minimumLowerCaseCharacter(0)
-            .minimumSpecialCharacter(0)
-            .passwordExpirationInMonth(0)
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noPasswordExpirationInMonth() {
-        PasswordPolicy.builder()
-            .maximumLength(0)
-            .minimumDigit(0)
-            .minimumLength(0)
-            .minimumLowerCaseCharacter(0)
-            .minimumSpecialCharacter(0)
-            .minimumUpperCaseCharacter(0)
-            .build();
+    @Test
+    void noMaximumLength() {
+        assertThrows(IllegalStateException.class, () -> {
+            PasswordPolicy.builder()
+                .minimumDigit(0)
+                .minimumLength(0)
+                .minimumLowerCaseCharacter(0)
+                .minimumSpecialCharacter(0)
+                .minimumUpperCaseCharacter(0)
+                .passwordExpirationInMonth(0)
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noMinimumDigit() {
+        assertThrows(IllegalStateException.class, () -> {
+            PasswordPolicy.builder()
+                .maximumLength(0)
+                .minimumLength(0)
+                .minimumLowerCaseCharacter(0)
+                .minimumSpecialCharacter(0)
+                .minimumUpperCaseCharacter(0)
+                .passwordExpirationInMonth(0)
+                .build();
+        });
+    }
+
+    @Test
+    void noMinimumLength() {
+        assertThrows(IllegalStateException.class, () -> {
+            PasswordPolicy.builder()
+                .maximumLength(0)
+                .minimumDigit(0)
+                .minimumLowerCaseCharacter(0)
+                .minimumSpecialCharacter(0)
+                .minimumUpperCaseCharacter(0)
+                .passwordExpirationInMonth(0)
+                .build();
+        });
+    }
+
+    @Test
+    void noMinimumLowerCaseCharacter() {
+        assertThrows(IllegalStateException.class, () -> {
+            PasswordPolicy.builder()
+                .maximumLength(0)
+                .minimumDigit(0)
+                .minimumLength(0)
+                .minimumSpecialCharacter(0)
+                .minimumUpperCaseCharacter(0)
+                .passwordExpirationInMonth(0)
+                .build();
+        });
+    }
+
+    @Test
+    void noMinimumSpecialCharacter() {
+        assertThrows(IllegalStateException.class, () -> {
+            PasswordPolicy.builder()
+                .maximumLength(0)
+                .minimumDigit(0)
+                .minimumLength(0)
+                .minimumLowerCaseCharacter(0)
+                .minimumUpperCaseCharacter(0)
+                .passwordExpirationInMonth(0)
+                .build();
+        });
+    }
+
+    @Test
+    void noMinimumUpperCaseCharacter() {
+        assertThrows(IllegalStateException.class, () -> {
+            PasswordPolicy.builder()
+                .maximumLength(0)
+                .minimumDigit(0)
+                .minimumLength(0)
+                .minimumLowerCaseCharacter(0)
+                .minimumSpecialCharacter(0)
+                .passwordExpirationInMonth(0)
+                .build();
+        });
+    }
+
+    @Test
+    void noPasswordExpirationInMonth() {
+        assertThrows(IllegalStateException.class, () -> {
+            PasswordPolicy.builder()
+                .maximumLength(0)
+                .minimumDigit(0)
+                .minimumLength(0)
+                .minimumLowerCaseCharacter(0)
+                .minimumSpecialCharacter(0)
+                .minimumUpperCaseCharacter(0)
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         PasswordPolicy.builder()
             .maximumLength(0)
             .minimumDigit(0)

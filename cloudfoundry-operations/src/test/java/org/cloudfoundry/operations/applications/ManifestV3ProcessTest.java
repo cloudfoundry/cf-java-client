@@ -16,17 +16,21 @@
 
 package org.cloudfoundry.operations.applications;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class ManifestV3ProcessTest {
-    @Test(expected = IllegalStateException.class)
-    public void noType() {
-        ManifestV3Process.builder()
-            .build();
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+class ManifestV3ProcessTest {
+    @Test
+    void noType() {
+        assertThrows(IllegalStateException.class, () -> {
+            ManifestV3Process.builder()
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         ManifestV3Process.builder()
             .type("test-type")
             .build();

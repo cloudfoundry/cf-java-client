@@ -37,7 +37,7 @@ import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import org.cloudfoundry.reactor.client.v3.builpacks.ReactorBuildpacksV3;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 import reactor.test.StepVerifier;
 
@@ -56,12 +56,12 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 
-public final class ReactorBuildpacksTest extends AbstractClientApiTest {
+final class ReactorBuildpacksTest extends AbstractClientApiTest {
 
     private final ReactorBuildpacksV3 buildpacks = new ReactorBuildpacksV3(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void create() {
+    void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(POST).path("/buildpacks")
@@ -109,7 +109,7 @@ public final class ReactorBuildpacksTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/buildpacks/test-buildpack-id")
@@ -131,7 +131,7 @@ public final class ReactorBuildpacksTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/buildpacks/test-buildpack-id")
@@ -174,7 +174,7 @@ public final class ReactorBuildpacksTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/buildpacks")
@@ -231,7 +231,7 @@ public final class ReactorBuildpacksTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void update() {
+    void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PATCH).path("/buildpacks/test-buildpack-id")
@@ -280,7 +280,7 @@ public final class ReactorBuildpacksTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void upload() throws IOException {
+    void upload() throws IOException {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(POST).path("/buildpacks/test-buildpack-id/upload")

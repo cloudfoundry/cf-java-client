@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.client.v2.shareddomains;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class ListSharedDomainsRequestTest {
+final class ListSharedDomainsRequestTest {
 
     @Test
-    public void valid() {
+    void valid() {
         ListSharedDomainsRequest.builder()
             .name("test-name")
             .build();

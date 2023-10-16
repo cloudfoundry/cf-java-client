@@ -41,7 +41,7 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
@@ -56,12 +56,12 @@ import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public final class ReactorSpaceQuotaDefinitionsTest extends AbstractClientApiTest {
+final class ReactorSpaceQuotaDefinitionsTest extends AbstractClientApiTest {
 
     private final ReactorSpaceQuotaDefinitions spaceQuotaDefinitions = new ReactorSpaceQuotaDefinitions(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void associateSpace() {
+    void associateSpace() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PUT).path("/space_quota_definitions/test-space-quota-definition-id/spaces/test-space-id")
@@ -102,7 +102,7 @@ public final class ReactorSpaceQuotaDefinitionsTest extends AbstractClientApiTes
     }
 
     @Test
-    public void create() {
+    void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(POST).path("/space_quota_definitions")
@@ -152,7 +152,7 @@ public final class ReactorSpaceQuotaDefinitionsTest extends AbstractClientApiTes
     }
 
     @Test
-    public void delete() {
+    void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/space_quota_definitions/test-space-quota-definition-id")
@@ -172,7 +172,7 @@ public final class ReactorSpaceQuotaDefinitionsTest extends AbstractClientApiTes
     }
 
     @Test
-    public void deleteAsync() {
+    void deleteAsync() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/space_quota_definitions/test-space-quota-definition-id?async=true")
@@ -205,7 +205,7 @@ public final class ReactorSpaceQuotaDefinitionsTest extends AbstractClientApiTes
     }
 
     @Test
-    public void getSpaceQuotaDefinition() {
+    void getSpaceQuotaDefinition() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/space_quota_definitions/test-space-quota-definition-id")
@@ -245,7 +245,7 @@ public final class ReactorSpaceQuotaDefinitionsTest extends AbstractClientApiTes
     }
 
     @Test
-    public void list() {
+    void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/space_quota_definitions?page=-1")
@@ -289,7 +289,7 @@ public final class ReactorSpaceQuotaDefinitionsTest extends AbstractClientApiTes
     }
 
     @Test
-    public void listSpaces() {
+    void listSpaces() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/space_quota_definitions/e37cdd97-af56-4417-a99d-060093057275/spaces")
@@ -341,7 +341,7 @@ public final class ReactorSpaceQuotaDefinitionsTest extends AbstractClientApiTes
     }
 
     @Test
-    public void removeSpace() {
+    void removeSpace() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/space_quota_definitions/test-space-quota-definition-id/spaces/test-space-id")
@@ -362,7 +362,7 @@ public final class ReactorSpaceQuotaDefinitionsTest extends AbstractClientApiTes
     }
 
     @Test
-    public void update() {
+    void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PUT).path("/space_quota_definitions/bbd837ac-309d-4f53-9d49-67cb75364904")

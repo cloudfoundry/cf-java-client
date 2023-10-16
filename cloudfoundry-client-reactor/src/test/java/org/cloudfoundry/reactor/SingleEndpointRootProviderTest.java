@@ -16,19 +16,19 @@
 
 package org.cloudfoundry.reactor;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
 
-public final class SingleEndpointRootProviderTest extends AbstractRestTest {
+final class SingleEndpointRootProviderTest extends AbstractRestTest {
 
     private final SingleEndpointRootProvider rootProvider = SingleEndpointRootProvider.builder()
         .apiHost("localhost")
         .build();
 
     @Test
-    public void getRoot() {
+    void getRoot() {
         this.rootProvider
             .getRoot(CONNECTION_CONTEXT)
             .as(StepVerifier::create)
@@ -38,7 +38,7 @@ public final class SingleEndpointRootProviderTest extends AbstractRestTest {
     }
 
     @Test
-    public void getRootKey() {
+    void getRootKey() {
         this.rootProvider
             .getRoot(null, CONNECTION_CONTEXT)
             .as(StepVerifier::create)

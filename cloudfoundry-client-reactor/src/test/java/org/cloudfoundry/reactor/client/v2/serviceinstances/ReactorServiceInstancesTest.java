@@ -55,7 +55,7 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
@@ -70,12 +70,12 @@ import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
+final class ReactorServiceInstancesTest extends AbstractClientApiTest {
 
     private final ReactorServiceInstances serviceInstances = new ReactorServiceInstances(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void bindRoute() {
+    void bindRoute() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PUT)
@@ -120,7 +120,7 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void create() {
+    void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(POST)
@@ -176,7 +176,7 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE)
@@ -199,7 +199,7 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void deleteAcceptsIncomplete() {
+    void deleteAcceptsIncomplete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE)
@@ -249,7 +249,7 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void deleteAsync() {
+    void deleteAsync() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE)
@@ -284,7 +284,7 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET)
@@ -340,7 +340,7 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void getParameters() {
+    void getParameters() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET)
@@ -369,7 +369,7 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void getPermissions() {
+    void getPermissions() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET)
@@ -395,7 +395,7 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET)
@@ -449,7 +449,7 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void listRoutes() {
+    void listRoutes() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET)
@@ -495,7 +495,7 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void listServiceBindings() {
+    void listServiceBindings() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET)
@@ -539,7 +539,7 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void listServiceKeys() {
+    void listServiceKeys() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET)
@@ -579,7 +579,7 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void unbindRoute() {
+    void unbindRoute() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE)
@@ -601,7 +601,7 @@ public final class ReactorServiceInstancesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void update() {
+    void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PUT)

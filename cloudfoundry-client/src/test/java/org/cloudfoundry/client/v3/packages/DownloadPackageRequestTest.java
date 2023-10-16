@@ -16,18 +16,22 @@
 
 package org.cloudfoundry.client.v3.packages;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class DownloadPackageRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noPackageId() {
-        DownloadPackageRequest.builder()
-            .build();
+final class DownloadPackageRequestTest {
+
+    @Test
+    void noPackageId() {
+        assertThrows(IllegalStateException.class, () -> {
+            DownloadPackageRequest.builder()
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         DownloadPackageRequest.builder()
             .packageId("test-package-id")
             .build();

@@ -16,36 +16,44 @@
 
 package org.cloudfoundry.operations.useradmin;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class UnsetOrganizationRoleRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noOrganizationName() {
-        UnsetOrganizationRoleRequest.builder()
-            .organizationRole(OrganizationRole.AUDITOR)
-            .username("test-username")
-            .build();
-    }
+final class UnsetOrganizationRoleRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noOrganizationRole() {
-        UnsetOrganizationRoleRequest.builder()
-            .organizationName("test-organization")
-            .username("test-username")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noUsername() {
-        UnsetOrganizationRoleRequest.builder()
-            .organizationName("test-organization")
-            .organizationRole(OrganizationRole.BILLING_MANAGER)
-            .build();
+    @Test
+    void noOrganizationName() {
+        assertThrows(IllegalStateException.class, () -> {
+            UnsetOrganizationRoleRequest.builder()
+                .organizationRole(OrganizationRole.AUDITOR)
+                .username("test-username")
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noOrganizationRole() {
+        assertThrows(IllegalStateException.class, () -> {
+            UnsetOrganizationRoleRequest.builder()
+                .organizationName("test-organization")
+                .username("test-username")
+                .build();
+        });
+    }
+
+    @Test
+    void noUsername() {
+        assertThrows(IllegalStateException.class, () -> {
+            UnsetOrganizationRoleRequest.builder()
+                .organizationName("test-organization")
+                .organizationRole(OrganizationRole.BILLING_MANAGER)
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         UnsetOrganizationRoleRequest.builder()
             .organizationName("test-organization")
             .organizationRole(OrganizationRole.MANAGER)

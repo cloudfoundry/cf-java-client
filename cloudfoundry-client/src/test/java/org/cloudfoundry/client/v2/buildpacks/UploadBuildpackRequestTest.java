@@ -16,41 +16,49 @@
 
 package org.cloudfoundry.client.v2.buildpacks;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public final class UploadBuildpackRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+final class UploadBuildpackRequestTest {
 
     private static final Path TEST_BUILDPACK = Paths.get("/");
 
-    @Test(expected = IllegalStateException.class)
-    public void noBuildpack() {
-        UploadBuildpackRequest.builder()
-            .buildpackId("test-buildpack-id")
-            .filename("test-filename")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noBuildpackId() {
-        UploadBuildpackRequest.builder()
-            .buildpack(TEST_BUILDPACK)
-            .filename("test-filename")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noFilename() {
-        UploadBuildpackRequest.builder()
-            .buildpack(TEST_BUILDPACK)
-            .buildpackId("test-buildpack-id")
-            .build();
+    @Test
+    void noBuildpack() {
+        assertThrows(IllegalStateException.class, () -> {
+            UploadBuildpackRequest.builder()
+                .buildpackId("test-buildpack-id")
+                .filename("test-filename")
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noBuildpackId() {
+        assertThrows(IllegalStateException.class, () -> {
+            UploadBuildpackRequest.builder()
+                .buildpack(TEST_BUILDPACK)
+                .filename("test-filename")
+                .build();
+        });
+    }
+
+    @Test
+    void noFilename() {
+        assertThrows(IllegalStateException.class, () -> {
+            UploadBuildpackRequest.builder()
+                .buildpack(TEST_BUILDPACK)
+                .buildpackId("test-buildpack-id")
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         UploadBuildpackRequest.builder()
             .buildpack(TEST_BUILDPACK)
             .buildpackId("test-buildpack-id")

@@ -16,26 +16,32 @@
 
 package org.cloudfoundry.client.v2.featureflags;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class SetFeatureFlagRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noEnabled() {
-        SetFeatureFlagRequest.builder()
-            .name("test-name")
-            .build();
-    }
+final class SetFeatureFlagRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        SetFeatureFlagRequest.builder()
-            .enabled(false)
-            .build();
+    @Test
+    void noEnabled() {
+        assertThrows(IllegalStateException.class, () -> {
+            SetFeatureFlagRequest.builder()
+                .name("test-name")
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noName() {
+        assertThrows(IllegalStateException.class, () -> {
+            SetFeatureFlagRequest.builder()
+                .enabled(false)
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         SetFeatureFlagRequest.builder()
             .enabled(false)
             .name("test-name")

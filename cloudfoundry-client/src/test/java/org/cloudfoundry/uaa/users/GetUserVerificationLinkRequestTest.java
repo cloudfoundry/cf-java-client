@@ -16,26 +16,32 @@
 
 package org.cloudfoundry.uaa.users;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class GetUserVerificationLinkRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noRedirectUri() {
-        GetUserVerificationLinkRequest.builder()
-            .userId("test-user-id")
-            .build();
-    }
+final class GetUserVerificationLinkRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noUserId() {
-        GetUserVerificationLinkRequest.builder()
-            .redirectUri("test-redirect-uri")
-            .build();
+    @Test
+    void noRedirectUri() {
+        assertThrows(IllegalStateException.class, () -> {
+            GetUserVerificationLinkRequest.builder()
+                .userId("test-user-id")
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noUserId() {
+        assertThrows(IllegalStateException.class, () -> {
+            GetUserVerificationLinkRequest.builder()
+                .redirectUri("test-redirect-uri")
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         GetUserVerificationLinkRequest.builder()
             .userId("test-user-id")
             .redirectUri("test-redirect-uri")

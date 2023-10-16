@@ -16,31 +16,37 @@
 
 package org.cloudfoundry.client.v3.buildpacks;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public final class UploadBuildpackRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+final class UploadBuildpackRequestTest {
 
     private static final Path TEST_BUILDPACK = Paths.get("/");
 
-    @Test(expected = IllegalStateException.class)
-    public void noBits() {
-        UploadBuildpackRequest.builder()
-            .buildpackId("test-buildpack-id")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noBuildpackId() {
-        UploadBuildpackRequest.builder()
-            .bits(TEST_BUILDPACK)
-            .build();
+    @Test
+    void noBits() {
+        assertThrows(IllegalStateException.class, () -> {
+            UploadBuildpackRequest.builder()
+                .buildpackId("test-buildpack-id")
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noBuildpackId() {
+        assertThrows(IllegalStateException.class, () -> {
+            UploadBuildpackRequest.builder()
+                .bits(TEST_BUILDPACK)
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         UploadBuildpackRequest.builder()
             .bits(TEST_BUILDPACK)
             .buildpackId("test-buildpack-id")

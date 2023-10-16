@@ -16,18 +16,22 @@
 
 package org.cloudfoundry.uaa.users;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class VerifyUserRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noUserId() {
-        VerifyUserRequest.builder()
-            .build();
+final class VerifyUserRequestTest {
+
+    @Test
+    void noUserId() {
+        assertThrows(IllegalStateException.class, () -> {
+            VerifyUserRequest.builder()
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         VerifyUserRequest.builder()
             .userId("test-user-id")
             .build();

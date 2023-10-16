@@ -16,26 +16,32 @@
 
 package org.cloudfoundry.operations.applications;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class RestartApplicationInstanceRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noInstanceIndex() {
-        RestartApplicationInstanceRequest.builder()
-            .name("test-name")
-            .build();
-    }
+final class RestartApplicationInstanceRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        RestartApplicationInstanceRequest.builder()
-            .instanceIndex(0)
-            .build();
+    @Test
+    void noInstanceIndex() {
+        assertThrows(IllegalStateException.class, () -> {
+            RestartApplicationInstanceRequest.builder()
+                .name("test-name")
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noName() {
+        assertThrows(IllegalStateException.class, () -> {
+            RestartApplicationInstanceRequest.builder()
+                .instanceIndex(0)
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         RestartApplicationInstanceRequest.builder()
             .instanceIndex(0)
             .name("test-name")

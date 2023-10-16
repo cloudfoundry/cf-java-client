@@ -16,18 +16,22 @@
 
 package org.cloudfoundry.client.v2.serviceplanvisibilities;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class DeleteServicePlanVisibilityRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noServicePlanVisibilityId() {
-        DeleteServicePlanVisibilityRequest.builder()
-            .build();
+final class DeleteServicePlanVisibilityRequestTest {
+
+    @Test
+    void noServicePlanVisibilityId() {
+        assertThrows(IllegalStateException.class, () -> {
+            DeleteServicePlanVisibilityRequest.builder()
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         DeleteServicePlanVisibilityRequest.builder()
             .servicePlanVisibilityId("test-service-plan-visibility-id")
             .build();

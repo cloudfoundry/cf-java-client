@@ -16,36 +16,44 @@
 
 package org.cloudfoundry.uaa.identityproviders;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class OAuth2ConfigurationTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noAuthUrl() {
-        OAuth2Configuration.builder()
-            .tokenUrl("test-token-url")
-            .relyingPartyId("test-relying-party-id")
-            .build();
-    }
+final class OAuth2ConfigurationTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noRelyingPartyId() {
-        OAuth2Configuration.builder()
-            .authUrl("test-auth-url")
-            .tokenUrl("test-token-url")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noTokenUrl() {
-        OAuth2Configuration.builder()
-            .authUrl("test-auth-url")
-            .relyingPartyId("test-relying-party-id")
-            .build();
+    @Test
+    void noAuthUrl() {
+        assertThrows(IllegalStateException.class, () -> {
+            OAuth2Configuration.builder()
+                .tokenUrl("test-token-url")
+                .relyingPartyId("test-relying-party-id")
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noRelyingPartyId() {
+        assertThrows(IllegalStateException.class, () -> {
+            OAuth2Configuration.builder()
+                .authUrl("test-auth-url")
+                .tokenUrl("test-token-url")
+                .build();
+        });
+    }
+
+    @Test
+    void noTokenUrl() {
+        assertThrows(IllegalStateException.class, () -> {
+            OAuth2Configuration.builder()
+                .authUrl("test-auth-url")
+                .relyingPartyId("test-relying-party-id")
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         OAuth2Configuration.builder()
             .authUrl("test-auth-url")
             .tokenUrl("test-token-url")

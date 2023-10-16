@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.client.v2.spaces;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class ListSpacesRequestTest {
+final class ListSpacesRequestTest {
 
     @Test
-    public void valid() {
+    void valid() {
         ListSpacesRequest.builder()
             .build();
     }

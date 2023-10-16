@@ -35,7 +35,7 @@ import org.cloudfoundry.uaa.users.Meta;
 import org.cloudfoundry.uaa.users.Name;
 import org.cloudfoundry.uaa.users.User;
 import org.cloudfoundry.uaa.users.Users;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -46,10 +46,10 @@ import static org.mockito.Mockito.RETURNS_SMART_NULLS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public final class PaginationUtilsTest {
+final class PaginationUtilsTest {
 
     @Test
-    public void requestClientV2Resources() {
+    void requestClientV2Resources() {
         Spaces spaces = mock(Spaces.class, RETURNS_SMART_NULLS);
 
         requestListSpaces(spaces, 1, 3);
@@ -68,7 +68,7 @@ public final class PaginationUtilsTest {
     }
 
     @Test
-    public void requestClientV2ResourcesEmpty() {
+    void requestClientV2ResourcesEmpty() {
         Spaces spaces = mock(Spaces.class, RETURNS_SMART_NULLS);
 
         requestListSpacesEmpty(spaces);
@@ -84,7 +84,7 @@ public final class PaginationUtilsTest {
     }
 
     @Test
-    public void requestClientV3Empty() {
+    void requestClientV3Empty() {
         Packages packages = mock(Packages.class, RETURNS_SMART_NULLS);
 
         requestListPackagesEmpty(packages);
@@ -100,7 +100,7 @@ public final class PaginationUtilsTest {
     }
 
     @Test
-    public void requestClientV3Resources() {
+    void requestClientV3Resources() {
         Packages packages = mock(Packages.class, RETURNS_SMART_NULLS);
 
         requestListPackages(packages, 1, 3);
@@ -119,7 +119,7 @@ public final class PaginationUtilsTest {
     }
 
     @Test
-    public void requestUaaResources() {
+    void requestUaaResources() {
         Users users = mock(Users.class, RETURNS_SMART_NULLS);
 
         requestListUsers(users, 1, 100, 250);
@@ -138,7 +138,7 @@ public final class PaginationUtilsTest {
     }
 
     @Test
-    public void requestUaaResourcesEmpty() {
+    void requestUaaResourcesEmpty() {
         Users users = mock(Users.class, RETURNS_SMART_NULLS);
 
         requestListUsersEmpty(users, 1, 100);

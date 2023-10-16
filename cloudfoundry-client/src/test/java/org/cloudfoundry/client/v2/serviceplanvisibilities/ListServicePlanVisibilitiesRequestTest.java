@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.client.v2.serviceplanvisibilities;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class ListServicePlanVisibilitiesRequestTest {
+final class ListServicePlanVisibilitiesRequestTest {
 
     @Test
-    public void valid() {
+    void valid() {
         ListServicePlanVisibilitiesRequest.builder()
             .build();
     }

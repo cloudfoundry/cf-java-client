@@ -16,18 +16,22 @@
 
 package org.cloudfoundry.operations.applications;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class GetApplicationEnvironmentsRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        GetApplicationEnvironmentsRequest.builder()
-            .build();
+final class GetApplicationEnvironmentsRequestTest {
+
+    @Test
+    void noName() {
+        assertThrows(IllegalStateException.class, () -> {
+            GetApplicationEnvironmentsRequest.builder()
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         GetApplicationEnvironmentsRequest.builder()
             .name("test-name")
             .build();

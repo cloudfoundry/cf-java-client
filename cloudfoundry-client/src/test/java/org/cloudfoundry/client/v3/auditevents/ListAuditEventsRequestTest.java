@@ -16,19 +16,23 @@
 
 package org.cloudfoundry.client.v3.auditevents;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class ListAuditEventsRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = Exception.class)
-    public void invalidWithNullableCollection() {
-        ListAuditEventsRequest.builder()
-            .organizationIds((String[]) null)
-            .build();
+class ListAuditEventsRequestTest {
+
+    @Test
+    void invalidWithNullableCollection() {
+        assertThrows(Exception.class, () -> {
+            ListAuditEventsRequest.builder()
+                .organizationIds((String[]) null)
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         ListAuditEventsRequest.builder()
             .organizationIds("organization-id-1", "organization-id-2")
             .type("test-type")
@@ -38,7 +42,7 @@ public class ListAuditEventsRequestTest {
     }
 
     @Test
-    public void validWithEmptyCollections() {
+    void validWithEmptyCollections() {
         ListAuditEventsRequest.builder()
             .build();
     }

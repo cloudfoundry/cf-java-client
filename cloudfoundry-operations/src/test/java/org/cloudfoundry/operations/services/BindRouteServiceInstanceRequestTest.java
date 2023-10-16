@@ -16,26 +16,32 @@
 
 package org.cloudfoundry.operations.services;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class BindRouteServiceInstanceRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noDomainName() {
-        BindRouteServiceInstanceRequest.builder()
-            .serviceInstanceName("test-service-instance-name")
-            .build();
-    }
+final class BindRouteServiceInstanceRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noServiceInstanceName() {
-        BindRouteServiceInstanceRequest.builder()
-            .domainName("test-domain-name")
-            .build();
+    @Test
+    void noDomainName() {
+        assertThrows(IllegalStateException.class, () -> {
+            BindRouteServiceInstanceRequest.builder()
+                .serviceInstanceName("test-service-instance-name")
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noServiceInstanceName() {
+        assertThrows(IllegalStateException.class, () -> {
+            BindRouteServiceInstanceRequest.builder()
+                .domainName("test-domain-name")
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         BindRouteServiceInstanceRequest.builder()
             .domainName("test-domain-name")
             .serviceInstanceName("test-service-instance-name")

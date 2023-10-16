@@ -16,26 +16,32 @@
 
 package org.cloudfoundry.client.v3.applications;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class GetApplicationProcessRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noApplicationId() {
-        GetApplicationProcessRequest.builder()
-            .type("test-type")
-            .build();
-    }
+final class GetApplicationProcessRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noType() {
-        GetApplicationProcessRequest.builder()
-            .applicationId("test-application-id")
-            .build();
+    @Test
+    void noApplicationId() {
+        assertThrows(IllegalStateException.class, () -> {
+            GetApplicationProcessRequest.builder()
+                .type("test-type")
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noType() {
+        assertThrows(IllegalStateException.class, () -> {
+            GetApplicationProcessRequest.builder()
+                .applicationId("test-application-id")
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         GetApplicationProcessRequest.builder()
             .applicationId("test-application-id")
             .type("test-type")

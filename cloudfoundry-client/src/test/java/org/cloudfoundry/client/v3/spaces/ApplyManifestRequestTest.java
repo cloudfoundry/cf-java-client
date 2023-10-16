@@ -16,26 +16,32 @@
 
 package org.cloudfoundry.client.v3.spaces;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class ApplyManifestRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noSpaceId() {
-        ApplyManifestRequest.builder()
-            .manifest("test-manifest".getBytes())
-            .build();
-    }
+final class ApplyManifestRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noManifest() {
-        ApplyManifestRequest.builder()
-            .spaceId("test-space-id")
-            .build();
+    @Test
+    void noSpaceId() {
+        assertThrows(IllegalStateException.class, () -> {
+            ApplyManifestRequest.builder()
+                .manifest("test-manifest".getBytes())
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noManifest() {
+        assertThrows(IllegalStateException.class, () -> {
+            ApplyManifestRequest.builder()
+                .spaceId("test-space-id")
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         ApplyManifestRequest.builder()
             .spaceId("test-space-id")
             .manifest("test-manifest".getBytes())

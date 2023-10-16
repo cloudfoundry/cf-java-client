@@ -28,7 +28,7 @@ import org.cloudfoundry.uaa.serverinformation.GetInfoRequest;
 import org.cloudfoundry.uaa.serverinformation.GetInfoResponse;
 import org.cloudfoundry.uaa.serverinformation.Links;
 import org.cloudfoundry.uaa.serverinformation.Prompts;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
@@ -42,12 +42,12 @@ import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpResponseStatus.FOUND;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public final class ReactorServerInformationTest extends AbstractUaaApiTest {
+final class ReactorServerInformationTest extends AbstractUaaApiTest {
 
     private final ReactorServerInformation info = new ReactorServerInformation(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void autoLogin() {
+    void autoLogin() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/autologin?client_id=admin&code=NaOjAprtCK")
@@ -68,7 +68,7 @@ public final class ReactorServerInformationTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void getAutoLoginAuthenticationCode() {
+    void getAutoLoginAuthenticationCode() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(POST).path("/autologin")
@@ -97,7 +97,7 @@ public final class ReactorServerInformationTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void getInfo() {
+    void getInfo() {
         Map<String, String> ipDefinitions = new HashMap<>();
         ipDefinitions.put("SAMLMetadataUrl", "http://localhost:8080/uaa/saml/discovery?returnIDParam=idp&entityID=cloudfoundry-saml-login&idp=SAMLMetadataUrl&isPassive=true");
         ipDefinitions.put("SAML", "http://localhost:8080/uaa/saml/discovery?returnIDParam=idp&entityID=cloudfoundry-saml-login&idp=SAML&isPassive=true");

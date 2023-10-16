@@ -25,7 +25,7 @@ import org.cloudfoundry.uaa.tokens.ListTokenKeysRequest;
 import org.cloudfoundry.uaa.tokens.ListTokenKeysResponse;
 import org.cloudfoundry.uaa.tokens.TokenKey;
 import org.cloudfoundry.uaa.tokens.Tokens;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 
 import java.security.KeyPair;
@@ -35,17 +35,18 @@ import java.security.PublicKey;
 import java.util.Base64;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public final class UaaSigningKeyResolverTest {
+final class UaaSigningKeyResolverTest {
 
     private final Tokens tokens = mock(Tokens.class);
 
     private final UaaSigningKeyResolver signingKeyResolver = new UaaSigningKeyResolver(this.tokens);
 
     @Test
-    public void resolveExistingKey() throws NoSuchAlgorithmException {
+    void resolveExistingKey() throws NoSuchAlgorithmException {
         PublicKey publicKey = getKeyPair().getPublic();
 
         when(
@@ -73,7 +74,7 @@ public final class UaaSigningKeyResolverTest {
     }
 
     @Test
-    public void resolveRefreshedKey() throws NoSuchAlgorithmException {
+    void resolveRefreshedKey() throws NoSuchAlgorithmException {
         PublicKey publicKey = getKeyPair().getPublic();
 
         when(
@@ -99,20 +100,22 @@ public final class UaaSigningKeyResolverTest {
         assertThat(this.signingKeyResolver.resolveSigningKey(header, claims)).isNotNull();
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void resolveUnknownKey() {
-        when(
-            this.tokens.listKeys(ListTokenKeysRequest.builder()
-                .build())
-        ).thenReturn(
-            Mono.just(ListTokenKeysResponse.builder()
-                .build())
-        );
+    @Test
+    void resolveUnknownKey() {
+        assertThrows(IllegalStateException.class, () -> {
+            when(
+                this.tokens.listKeys(ListTokenKeysRequest.builder()
+                    .build())
+            ).thenReturn(
+                Mono.just(ListTokenKeysResponse.builder()
+                    .build())
+            );
 
-        JwsHeader<?> header = new DefaultJwsHeader().setKeyId("test-key-id");
-        Claims claims = new DefaultClaims();
+            JwsHeader<?> header = new DefaultJwsHeader().setKeyId("test-key-id");
+            Claims claims = new DefaultClaims();
 
-        this.signingKeyResolver.resolveSigningKey(header, claims);
+            this.signingKeyResolver.resolveSigningKey(header, claims);
+        });
     }
 
     private static String getEncoded(PublicKey publicKey) {

@@ -16,18 +16,22 @@
 
 package org.cloudfoundry.client.v3.spaces;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class DeleteUnmappedRoutesRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noSpaceId() {
-        DeleteUnmappedRoutesRequest.builder()
-            .build();
+class DeleteUnmappedRoutesRequestTest {
+
+    @Test
+    void noSpaceId() {
+        assertThrows(IllegalStateException.class, () -> {
+            DeleteUnmappedRoutesRequest.builder()
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         DeleteUnmappedRoutesRequest.builder()
             .spaceId("test-space-id")
             .build();

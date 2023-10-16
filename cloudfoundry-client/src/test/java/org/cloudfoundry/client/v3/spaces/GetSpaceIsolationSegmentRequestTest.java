@@ -16,18 +16,22 @@
 
 package org.cloudfoundry.client.v3.spaces;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class GetSpaceIsolationSegmentRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noOrganizationId() {
-        GetSpaceIsolationSegmentRequest.builder()
-            .build();
+final class GetSpaceIsolationSegmentRequestTest {
+
+    @Test
+    void noOrganizationId() {
+        assertThrows(IllegalStateException.class, () -> {
+            GetSpaceIsolationSegmentRequest.builder()
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         GetSpaceIsolationSegmentRequest.builder()
             .spaceId("test-space-id")
             .build();

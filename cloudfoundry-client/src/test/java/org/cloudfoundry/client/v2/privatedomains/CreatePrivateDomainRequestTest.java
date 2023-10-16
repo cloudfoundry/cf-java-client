@@ -16,26 +16,32 @@
 
 package org.cloudfoundry.client.v2.privatedomains;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class CreatePrivateDomainRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        CreatePrivateDomainRequest.builder()
-            .owningOrganizationId("test-owning-organization-id")
-            .build();
-    }
+final class CreatePrivateDomainRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noOwningOrganizationId() {
-        CreatePrivateDomainRequest.builder()
-            .name("test-name")
-            .build();
+    @Test
+    void noName() {
+        assertThrows(IllegalStateException.class, () -> {
+            CreatePrivateDomainRequest.builder()
+                .owningOrganizationId("test-owning-organization-id")
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noOwningOrganizationId() {
+        assertThrows(IllegalStateException.class, () -> {
+            CreatePrivateDomainRequest.builder()
+                .name("test-name")
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         CreatePrivateDomainRequest.builder()
             .name("test-name")
             .owningOrganizationId("test-owning-organization-id")

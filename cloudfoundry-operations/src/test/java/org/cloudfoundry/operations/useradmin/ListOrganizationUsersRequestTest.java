@@ -16,18 +16,22 @@
 
 package org.cloudfoundry.operations.useradmin;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class ListOrganizationUsersRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noOrganizationName() {
-        ListOrganizationUsersRequest.builder()
-            .build();
+final class ListOrganizationUsersRequestTest {
+
+    @Test
+    void noOrganizationName() {
+        assertThrows(IllegalStateException.class, () -> {
+            ListOrganizationUsersRequest.builder()
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         ListOrganizationUsersRequest.builder()
             .organizationName("test-organization")
             .build();

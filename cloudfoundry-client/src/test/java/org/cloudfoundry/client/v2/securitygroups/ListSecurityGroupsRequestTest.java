@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.client.v2.securitygroups;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class ListSecurityGroupsRequestTest {
+final class ListSecurityGroupsRequestTest {
 
     @Test
-    public void valid() {
+    void valid() {
         ListSecurityGroupsRequest.builder()
             .build();
     }

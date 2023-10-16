@@ -26,7 +26,7 @@ import org.cloudfoundry.doppler.RecentLogsRequest;
 import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
@@ -35,12 +35,12 @@ import java.util.Collections;
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public final class ReactorDopplerClientTest extends AbstractDopplerApiTest {
+final class ReactorDopplerClientTest extends AbstractDopplerApiTest {
 
     private final ReactorDopplerEndpoints dopplerEndpoints = new ReactorDopplerEndpoints(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void containerMetrics() {
+    void containerMetrics() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/apps/test-application-id/containermetrics")
@@ -94,7 +94,7 @@ public final class ReactorDopplerClientTest extends AbstractDopplerApiTest {
     }
 
     @Test
-    public void containerMetricsLarge() {
+    void containerMetricsLarge() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/apps/test-application-id/containermetrics")
@@ -117,7 +117,7 @@ public final class ReactorDopplerClientTest extends AbstractDopplerApiTest {
     }
 
     @Test
-    public void recentLogs() {
+    void recentLogs() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/apps/test-application-id/recentlogs")
@@ -175,7 +175,7 @@ public final class ReactorDopplerClientTest extends AbstractDopplerApiTest {
     }
 
     @Test
-    public void recentLogsLarge() {
+    void recentLogsLarge() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/apps/test-application-id/recentlogs")

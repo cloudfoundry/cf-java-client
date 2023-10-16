@@ -16,26 +16,32 @@
 
 package org.cloudfoundry.operations.applications;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class TerminateApplicationTaskRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noApplicationName() {
-        TerminateApplicationTaskRequest.builder()
-            .sequenceId(1)
-            .build();
-    }
+final class TerminateApplicationTaskRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noSequenceId() {
-        TerminateApplicationTaskRequest.builder()
-            .applicationName("test-application-name")
-            .build();
+    @Test
+    void noApplicationName() {
+        assertThrows(IllegalStateException.class, () -> {
+            TerminateApplicationTaskRequest.builder()
+                .sequenceId(1)
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noSequenceId() {
+        assertThrows(IllegalStateException.class, () -> {
+            TerminateApplicationTaskRequest.builder()
+                .applicationName("test-application-name")
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         TerminateApplicationTaskRequest.builder()
             .applicationName("test-application-name")
             .sequenceId(1)

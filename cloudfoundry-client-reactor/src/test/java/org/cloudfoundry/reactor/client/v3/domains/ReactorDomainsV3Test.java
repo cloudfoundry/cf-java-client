@@ -40,7 +40,7 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
@@ -55,12 +55,12 @@ import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public final class ReactorDomainsV3Test extends AbstractClientApiTest {
+final class ReactorDomainsV3Test extends AbstractClientApiTest {
 
     private final ReactorDomainsV3 domains = new ReactorDomainsV3(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void create() {
+    void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(POST).path("/domains")
@@ -104,7 +104,7 @@ public final class ReactorDomainsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/domains/test-domain-id")
@@ -126,7 +126,7 @@ public final class ReactorDomainsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/domains/test-domain-id")
@@ -185,7 +185,7 @@ public final class ReactorDomainsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/domains")
@@ -241,7 +241,7 @@ public final class ReactorDomainsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void share() {
+    void share() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(POST).path("/domains/test-domain-id/relationships/shared_organizations")
@@ -277,7 +277,7 @@ public final class ReactorDomainsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void unshare() {
+    void unshare() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/domains/test-domain-id/relationships/shared_organizations/test-org-id")
@@ -299,7 +299,7 @@ public final class ReactorDomainsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void update() {
+    void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PATCH).path("/domains/test-domain-id")

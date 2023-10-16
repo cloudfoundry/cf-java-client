@@ -18,32 +18,38 @@ package org.cloudfoundry.client.v3.spaces;
 
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.ToOneRelationship;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class CreateSpaceRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        CreateSpaceRequest.builder()
-            .relationships(SpaceRelationships.builder()
-                .organization(ToOneRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("test-id")
+final class CreateSpaceRequestTest {
+
+    @Test
+    void noName() {
+        assertThrows(IllegalStateException.class, () -> {
+            CreateSpaceRequest.builder()
+                .relationships(SpaceRelationships.builder()
+                    .organization(ToOneRelationship.builder()
+                        .data(Relationship.builder()
+                            .id("test-id")
+                            .build())
                         .build())
                     .build())
-                .build())
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noRelationships() {
-        CreateSpaceRequest.builder()
-            .name("test-name")
-            .build();
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noRelationships() {
+        assertThrows(IllegalStateException.class, () -> {
+            CreateSpaceRequest.builder()
+                .name("test-name")
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         CreateSpaceRequest.builder()
             .name("test-name")
             .relationships(SpaceRelationships.builder()

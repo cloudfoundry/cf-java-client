@@ -32,7 +32,7 @@ import org.cloudfoundry.logcache.v1.ReadResponse;
 import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
@@ -41,12 +41,12 @@ import java.util.Collections;
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public class ReactorLogCacheClientTest extends AbstractLogCacheApiTest {
+class ReactorLogCacheClientTest extends AbstractLogCacheApiTest {
 
     private final ReactorLogCacheEndpoints logCacheEndpoints = new ReactorLogCacheEndpoints(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void info() {
+    void info() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/api/v1/info")
@@ -69,7 +69,7 @@ public class ReactorLogCacheClientTest extends AbstractLogCacheApiTest {
     }
 
     @Test
-    public void meta() {
+    void meta() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/api/v1/meta")
@@ -102,7 +102,7 @@ public class ReactorLogCacheClientTest extends AbstractLogCacheApiTest {
     }
 
     @Test
-    public void read() {
+    void read() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/api/v1/read/test-source-id")

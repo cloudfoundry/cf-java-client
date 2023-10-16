@@ -16,18 +16,22 @@
 
 package org.cloudfoundry.uaa.clients;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class GetMetadataRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noClientId() {
-        GetMetadataRequest.builder()
-            .build();
+final class GetMetadataRequestTest {
+
+    @Test
+    void noClientId() {
+        assertThrows(IllegalStateException.class, () -> {
+            GetMetadataRequest.builder()
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         GetMetadataRequest.builder()
             .clientId("test-client-id")
             .build();

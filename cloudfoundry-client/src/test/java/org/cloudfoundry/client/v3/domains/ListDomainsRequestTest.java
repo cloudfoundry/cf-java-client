@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.client.v3.domains;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class ListDomainsRequestTest {
+final class ListDomainsRequestTest {
 
     @Test
-    public void valid() {
+    void valid() {
         ListDomainsRequest.builder()
             .build();
     }

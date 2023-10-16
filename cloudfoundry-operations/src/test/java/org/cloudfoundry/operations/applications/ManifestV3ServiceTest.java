@@ -16,17 +16,21 @@
 
 package org.cloudfoundry.operations.applications;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class ManifestV3ServiceTest {
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        ManifestV3Service.builder()
-            .build();
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+class ManifestV3ServiceTest {
+    @Test
+    void noName() {
+        assertThrows(IllegalStateException.class, () -> {
+            ManifestV3Service.builder()
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         ManifestV3Service.builder()
             .name("test-service-name")
             .build();

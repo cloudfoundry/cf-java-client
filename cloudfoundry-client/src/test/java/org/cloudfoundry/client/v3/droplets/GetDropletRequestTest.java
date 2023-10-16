@@ -16,18 +16,22 @@
 
 package org.cloudfoundry.client.v3.droplets;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class GetDropletRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noDropletId() {
-        GetDropletRequest.builder()
-            .build();
+final class GetDropletRequestTest {
+
+    @Test
+    void noDropletId() {
+        assertThrows(IllegalStateException.class, () -> {
+            GetDropletRequest.builder()
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         GetDropletRequest.builder()
             .dropletId("test-droplet-id")
             .build();

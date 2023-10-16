@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.uaa.clients;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class ListClientsRequestTest {
+final class ListClientsRequestTest {
 
     @Test
-    public void valid() {
+    void valid() {
         ListClientsRequest.builder()
             .build();
     }

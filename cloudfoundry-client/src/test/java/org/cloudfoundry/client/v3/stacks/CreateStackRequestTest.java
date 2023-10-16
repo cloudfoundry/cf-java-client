@@ -17,60 +17,68 @@
 package org.cloudfoundry.client.v3.stacks;
 
 import org.cloudfoundry.client.v3.Metadata;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class CreateStackRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void invalidNameLengthTest() {
-        String invalidName = Stream.generate(() -> "aaa")
-            .limit(251)
-            .collect(Collectors.joining());
+class CreateStackRequestTest {
 
-        CreateStackRequest.builder()
-            .name(invalidName)
-            .build();
+    @Test
+    void invalidNameLengthTest() {
+        assertThrows(IllegalStateException.class, () -> {
+            String invalidName = Stream.generate(() -> "aaa")
+                .limit(251)
+                .collect(Collectors.joining());
+
+            CreateStackRequest.builder()
+                .name(invalidName)
+                .build();
+        });
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void invalidDescriptionLengthTest() {
-        String invalidDescription = Stream.generate(() -> "aaa")
-            .limit(251)
-            .collect(Collectors.joining());
+    @Test
+    void invalidDescriptionLengthTest() {
+        assertThrows(IllegalStateException.class, () -> {
+            String invalidDescription = Stream.generate(() -> "aaa")
+                .limit(251)
+                .collect(Collectors.joining());
 
+            CreateStackRequest.builder()
+                .name("valid name")
+                .description(invalidDescription)
+                .build();
+        });
+    }
+
+    @Test
+    void invalidNameAndDescriptionLengthTest() {
+        assertThrows(IllegalStateException.class, () -> {
+            String invalidName = Stream.generate(() -> "aaa")
+                .limit(251)
+                .collect(Collectors.joining());
+            String invalidDescription = Stream.generate(() -> "aaa")
+                .limit(251)
+                .collect(Collectors.joining());
+
+            CreateStackRequest.builder()
+                .name(invalidName)
+                .description(invalidDescription)
+                .build();
+        });
+    }
+
+    @Test
+    void validRequestTest() {
         CreateStackRequest.builder()
             .name("valid name")
-            .description(invalidDescription)
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void invalidNameAndDescriptionLengthTest() {
-        String invalidName = Stream.generate(() -> "aaa")
-            .limit(251)
-            .collect(Collectors.joining());
-        String invalidDescription = Stream.generate(() -> "aaa")
-            .limit(251)
-            .collect(Collectors.joining());
-
-        CreateStackRequest.builder()
-            .name(invalidName)
-            .description(invalidDescription)
             .build();
     }
 
     @Test
-    public void validRequestTest() {
-        CreateStackRequest.builder()
-            .name("valid name")
-            .build();
-    }
-
-    @Test
-    public void validRequestWithDescriptionTest() {
+    void validRequestWithDescriptionTest() {
         CreateStackRequest.builder()
             .name("valid name")
             .description("valid description")
@@ -78,7 +86,7 @@ public class CreateStackRequestTest {
     }
 
     @Test
-    public void validRequestWithMetadataTest() {
+    void validRequestWithMetadataTest() {
         CreateStackRequest.builder()
             .name("valid name")
             .metadata(Metadata.builder()
@@ -88,7 +96,7 @@ public class CreateStackRequestTest {
     }
 
     @Test
-    public void validRequestWithAllFieldsTest() {
+    void validRequestWithAllFieldsTest() {
         CreateStackRequest.builder()
             .name("valid name")
             .description("valid description")

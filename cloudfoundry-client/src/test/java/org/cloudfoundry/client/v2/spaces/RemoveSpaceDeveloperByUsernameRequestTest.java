@@ -16,26 +16,32 @@
 
 package org.cloudfoundry.client.v2.spaces;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class RemoveSpaceDeveloperByUsernameRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noSpaceId() {
-        RemoveSpaceDeveloperByUsernameRequest.builder()
-            .username("test-username")
-            .build();
-    }
+final class RemoveSpaceDeveloperByUsernameRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noUsername() {
-        RemoveSpaceDeveloperByUsernameRequest.builder()
-            .spaceId("test-space-id")
-            .build();
+    @Test
+    void noSpaceId() {
+        assertThrows(IllegalStateException.class, () -> {
+            RemoveSpaceDeveloperByUsernameRequest.builder()
+                .username("test-username")
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noUsername() {
+        assertThrows(IllegalStateException.class, () -> {
+            RemoveSpaceDeveloperByUsernameRequest.builder()
+                .spaceId("test-space-id")
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         RemoveSpaceDeveloperByUsernameRequest.builder()
             .spaceId("test-space-id")
             .username("test-username")

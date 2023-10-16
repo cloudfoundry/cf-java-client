@@ -16,58 +16,68 @@
 
 package org.cloudfoundry.operations.routes;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class MapRouteRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noApplicationName() {
-        MapRouteRequest.builder()
-            .domain("test-domain")
-            .host("test-host")
-            .path("test-path")
-            .build();
+final class MapRouteRequestTest {
+
+    @Test
+    void noApplicationName() {
+        assertThrows(IllegalStateException.class, () -> {
+            MapRouteRequest.builder()
+                .domain("test-domain")
+                .host("test-host")
+                .path("test-path")
+                .build();
+        });
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void noDomain() {
+    @Test
+    void noDomain() {
+        assertThrows(IllegalStateException.class, () -> {
+            MapRouteRequest.builder()
+                .applicationName("test-applicationName")
+                .host("test-host")
+                .path("test-path")
+                .build();
+        });
+    }
+
+    @Test
+    void portConflict() {
+        assertThrows(IllegalStateException.class, () -> {
+            MapRouteRequest.builder()
+                .domain("test-domain")
+                .port(123)
+                .randomPort(true)
+                .build();
+        });
+    }
+
+    @Test
+    void setupConflict() {
+        assertThrows(IllegalStateException.class, () -> {
+            MapRouteRequest.builder()
+                .domain("test-domain")
+                .host("test-hostname")
+                .port(123)
+                .build();
+        });
+    }
+
+    @Test
+    void validMax() {
         MapRouteRequest.builder()
             .applicationName("test-applicationName")
+            .domain("test-domain")
             .host("test-host")
             .path("test-path")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void portConflict() {
-        MapRouteRequest.builder()
-            .domain("test-domain")
-            .port(123)
-            .randomPort(true)
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void setupConflict() {
-        MapRouteRequest.builder()
-            .domain("test-domain")
-            .host("test-hostname")
-            .port(123)
             .build();
     }
 
     @Test
-    public void validMax() {
-        MapRouteRequest.builder()
-            .applicationName("test-applicationName")
-            .domain("test-domain")
-            .host("test-host")
-            .path("test-path")
-            .build();
-    }
-
-    @Test
-    public void validMin() {
+    void validMin() {
         MapRouteRequest.builder()
             .applicationName("test-applicationName")
             .domain("test-domain")

@@ -16,18 +16,22 @@
 
 package org.cloudfoundry.client.v3;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class RelationshipTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noId() {
-        Relationship.builder()
-            .build();
+final class RelationshipTest {
+
+    @Test
+    void noId() {
+        assertThrows(IllegalStateException.class, () -> {
+            Relationship.builder()
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         Relationship.builder()
             .id("test-id")
             .build();

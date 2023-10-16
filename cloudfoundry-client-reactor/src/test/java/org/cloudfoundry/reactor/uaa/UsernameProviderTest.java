@@ -24,7 +24,7 @@ import io.jsonwebtoken.SigningKeyResolver;
 import io.jsonwebtoken.impl.DefaultJwsHeader;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -42,7 +42,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public final class UsernameProviderTest {
+final class UsernameProviderTest {
 
     private final ConnectionContext connectionContext = mock(ConnectionContext.class);
 
@@ -54,7 +54,7 @@ public final class UsernameProviderTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void getInvalidToken() throws NoSuchAlgorithmException {
+    void getInvalidToken() throws NoSuchAlgorithmException {
         KeyPair keyPair = getKeyPair();
         when(this.signingKeyResolver.resolveSigningKey(any(JwsHeader.class), any(Claims.class))).thenReturn(keyPair.getPublic());
 
@@ -73,7 +73,7 @@ public final class UsernameProviderTest {
     }
 
     @Test
-    public void getValidToken() throws NoSuchAlgorithmException {
+    void getValidToken() throws NoSuchAlgorithmException {
         KeyPair keyPair = getKeyPair();
         when(this.signingKeyResolver.resolveSigningKey(any(JwsHeader.class), any(Claims.class))).thenReturn(keyPair.getPublic());
 

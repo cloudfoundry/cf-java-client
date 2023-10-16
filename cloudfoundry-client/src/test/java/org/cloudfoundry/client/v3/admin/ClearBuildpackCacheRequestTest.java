@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.client.v3.admin;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class ClearBuildpackCacheRequestTest {
+class ClearBuildpackCacheRequestTest {
 
     @Test
-    public void valid() {
+    void valid() {
         ClearBuildpackCacheRequest.builder()
             .build();
     }

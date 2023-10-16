@@ -16,18 +16,22 @@
 
 package org.cloudfoundry.client.v3.processes;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class ScaleProcessRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noProcessId() {
-        ScaleProcessRequest.builder()
-            .build();
+final class ScaleProcessRequestTest {
+
+    @Test
+    void noProcessId() {
+        assertThrows(IllegalStateException.class, () -> {
+            ScaleProcessRequest.builder()
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         ScaleProcessRequest.builder()
             .processId("test-process-id")
             .build();

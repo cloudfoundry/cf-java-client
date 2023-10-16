@@ -16,13 +16,13 @@
 
 package org.cloudfoundry.client.v2.servicebrokers;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 
-public final class ListServiceBrokersRequestTest {
+final class ListServiceBrokersRequestTest {
 
     @Test
-    public void valid() {
+    void valid() {
         ListServiceBrokersRequest.builder()
             .build();
     }

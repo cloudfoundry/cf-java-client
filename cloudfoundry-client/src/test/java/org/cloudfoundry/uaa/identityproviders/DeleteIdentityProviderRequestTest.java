@@ -16,19 +16,23 @@
 
 package org.cloudfoundry.uaa.identityproviders;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class DeleteIdentityProviderRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noIdentityProviderId() {
-        DeleteIdentityProviderRequest.builder()
-            .identityZoneId("test-identity-zone-id")
-            .build();
+final class DeleteIdentityProviderRequestTest {
+
+    @Test
+    void noIdentityProviderId() {
+        assertThrows(IllegalStateException.class, () -> {
+            DeleteIdentityProviderRequest.builder()
+                .identityZoneId("test-identity-zone-id")
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         DeleteIdentityProviderRequest.builder()
             .identityProviderId("test-identity-provider-id")
             .identityZoneId("test-identity-zone-id")

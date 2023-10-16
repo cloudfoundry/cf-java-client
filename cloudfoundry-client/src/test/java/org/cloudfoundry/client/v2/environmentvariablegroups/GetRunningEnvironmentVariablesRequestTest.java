@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.client.v2.environmentvariablegroups;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class GetRunningEnvironmentVariablesRequestTest {
+final class GetRunningEnvironmentVariablesRequestTest {
 
     @Test
-    public void valid() {
+    void valid() {
         GetRunningEnvironmentVariablesRequest.builder()
             .build();
     }

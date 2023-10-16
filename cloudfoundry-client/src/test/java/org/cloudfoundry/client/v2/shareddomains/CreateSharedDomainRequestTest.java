@@ -16,18 +16,22 @@
 
 package org.cloudfoundry.client.v2.shareddomains;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class CreateSharedDomainRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        CreateSharedDomainRequest.builder()
-            .build();
+final class CreateSharedDomainRequestTest {
+
+    @Test
+    void noName() {
+        assertThrows(IllegalStateException.class, () -> {
+            CreateSharedDomainRequest.builder()
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         CreateSharedDomainRequest.builder()
             .name("test-test-name")
             .build();

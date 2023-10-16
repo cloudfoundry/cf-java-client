@@ -16,43 +16,53 @@
 
 package org.cloudfoundry.uaa.clients;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class BatchChangeSecretRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void emptyChangeSecrets() {
-        BatchChangeSecretRequest.builder()
-            .changeSecrets()
-            .build();
-    }
+final class BatchChangeSecretRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noChangeSecrets() {
-        BatchChangeSecretRequest.builder()
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noClientId() {
-        BatchChangeSecretRequest.builder()
-            .changeSecret(ChangeSecret.builder()
-                .secret("test-secret")
-                .build())
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noSecret() {
-        BatchChangeSecretRequest.builder()
-            .changeSecret(ChangeSecret.builder()
-                .clientId("test-client-id")
-                .build())
-            .build();
+    @Test
+    void emptyChangeSecrets() {
+        assertThrows(IllegalStateException.class, () -> {
+            BatchChangeSecretRequest.builder()
+                .changeSecrets()
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noChangeSecrets() {
+        assertThrows(IllegalStateException.class, () -> {
+            BatchChangeSecretRequest.builder()
+                .build();
+        });
+    }
+
+    @Test
+    void noClientId() {
+        assertThrows(IllegalStateException.class, () -> {
+            BatchChangeSecretRequest.builder()
+                .changeSecret(ChangeSecret.builder()
+                    .secret("test-secret")
+                    .build())
+                .build();
+        });
+    }
+
+    @Test
+    void noSecret() {
+        assertThrows(IllegalStateException.class, () -> {
+            BatchChangeSecretRequest.builder()
+                .changeSecret(ChangeSecret.builder()
+                    .clientId("test-client-id")
+                    .build())
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         BatchChangeSecretRequest.builder()
             .changeSecret(ChangeSecret.builder()
                 .clientId("test-client-id")

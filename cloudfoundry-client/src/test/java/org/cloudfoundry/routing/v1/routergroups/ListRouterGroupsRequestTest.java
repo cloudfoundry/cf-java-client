@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.routing.v1.routergroups;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class ListRouterGroupsRequestTest {
+class ListRouterGroupsRequestTest {
 
     @Test
-    public void valid() {
+    void valid() {
         ListRouterGroupsRequest.builder()
             .build();
     }

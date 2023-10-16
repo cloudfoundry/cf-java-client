@@ -28,7 +28,7 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
@@ -38,12 +38,12 @@ import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.PUT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public class ReactorEnvironmentVariableGroupsTest extends AbstractClientApiTest {
+class ReactorEnvironmentVariableGroupsTest extends AbstractClientApiTest {
 
     private ReactorEnvironmentVariableGroups environmentVariableGroups = new ReactorEnvironmentVariableGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void getRunningEnvironmentVariables() {
+    void getRunningEnvironmentVariables() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/config/environment_variable_groups/running")
@@ -67,7 +67,7 @@ public class ReactorEnvironmentVariableGroupsTest extends AbstractClientApiTest 
     }
 
     @Test
-    public void getStagingEnvironmentVariables() {
+    void getStagingEnvironmentVariables() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/config/environment_variable_groups/staging")
@@ -91,7 +91,7 @@ public class ReactorEnvironmentVariableGroupsTest extends AbstractClientApiTest 
     }
 
     @Test
-    public void updateRunningEnvironmentVariables() {
+    void updateRunningEnvironmentVariables() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PUT).path("/config/environment_variable_groups/running")
@@ -118,7 +118,7 @@ public class ReactorEnvironmentVariableGroupsTest extends AbstractClientApiTest 
     }
 
     @Test
-    public void updateRunningEnvironmentVariablesEmpty() {
+    void updateRunningEnvironmentVariablesEmpty() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PUT).path("/config/environment_variable_groups/running")
@@ -143,7 +143,7 @@ public class ReactorEnvironmentVariableGroupsTest extends AbstractClientApiTest 
     }
 
     @Test
-    public void updateStagingEnvironmentVariables() {
+    void updateStagingEnvironmentVariables() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PUT).path("/config/environment_variable_groups/staging")
@@ -170,7 +170,7 @@ public class ReactorEnvironmentVariableGroupsTest extends AbstractClientApiTest 
     }
 
     @Test
-    public void updateStagingEnvironmentVariablesEmpty() {
+    void updateStagingEnvironmentVariablesEmpty() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PUT).path("/config/environment_variable_groups/staging")

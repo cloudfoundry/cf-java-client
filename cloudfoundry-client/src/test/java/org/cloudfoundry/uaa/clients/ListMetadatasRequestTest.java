@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.uaa.clients;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class ListMetadatasRequestTest {
+final class ListMetadatasRequestTest {
 
     @Test
-    public void valid() {
+    void valid() {
         ListMetadatasRequest.builder()
             .build();
     }

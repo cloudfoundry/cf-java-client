@@ -16,47 +16,57 @@
 
 package org.cloudfoundry.operations.routes;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class CreateRouteRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noDomain() {
-        CreateRouteRequest.builder()
-            .space("test-space")
-            .build();
-    }
+final class CreateRouteRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noSpace() {
-        CreateRouteRequest.builder()
-            .domain("test-domain")
-            .host("test-hostname")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void portConflict() {
-        CreateRouteRequest.builder()
-            .domain("test-domain")
-            .port(123)
-            .randomPort(true)
-            .space("test-space")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void setupConflict() {
-        CreateRouteRequest.builder()
-            .domain("test-domain")
-            .host("test-hostname")
-            .port(123)
-            .space("test-space")
-            .build();
+    @Test
+    void noDomain() {
+        assertThrows(IllegalStateException.class, () -> {
+            CreateRouteRequest.builder()
+                .space("test-space")
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noSpace() {
+        assertThrows(IllegalStateException.class, () -> {
+            CreateRouteRequest.builder()
+                .domain("test-domain")
+                .host("test-hostname")
+                .build();
+        });
+    }
+
+    @Test
+    void portConflict() {
+        assertThrows(IllegalStateException.class, () -> {
+            CreateRouteRequest.builder()
+                .domain("test-domain")
+                .port(123)
+                .randomPort(true)
+                .space("test-space")
+                .build();
+        });
+    }
+
+    @Test
+    void setupConflict() {
+        assertThrows(IllegalStateException.class, () -> {
+            CreateRouteRequest.builder()
+                .domain("test-domain")
+                .host("test-hostname")
+                .port(123)
+                .space("test-space")
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         CreateRouteRequest.builder()
             .domain("test-domain")
             .space("test-space")

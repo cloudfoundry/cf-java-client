@@ -16,20 +16,24 @@
 
 package org.cloudfoundry.uaa.authorizations;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class AuthorizeByImplicitGrantBrowserRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noClientId() {
-        AuthorizeByImplicitGrantBrowserRequest.builder()
-            .redirectUri("http://redirect.to/app")
-            .scope("test-scope")
-            .build();
+final class AuthorizeByImplicitGrantBrowserRequestTest {
+
+    @Test
+    void noClientId() {
+        assertThrows(IllegalStateException.class, () -> {
+            AuthorizeByImplicitGrantBrowserRequest.builder()
+                .redirectUri("http://redirect.to/app")
+                .scope("test-scope")
+                .build();
+        });
     }
 
     @Test
-    public void validMax() {
+    void validMax() {
         AuthorizeByImplicitGrantBrowserRequest.builder()
             .clientId("test-client-id")
             .redirectUri("http://redirect.to/app")
@@ -38,7 +42,7 @@ public final class AuthorizeByImplicitGrantBrowserRequestTest {
     }
 
     @Test
-    public void validMin() {
+    void validMin() {
         AuthorizeByImplicitGrantBrowserRequest.builder()
             .clientId("test-client-id")
             .build();

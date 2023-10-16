@@ -16,18 +16,22 @@
 
 package org.cloudfoundry.client.v3.buildpacks;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class CreateBuildpackRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        CreateBuildpackRequest.builder()
-            .build();
+final class CreateBuildpackRequestTest {
+
+    @Test
+    void noName() {
+        assertThrows(IllegalStateException.class, () -> {
+            CreateBuildpackRequest.builder()
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         CreateBuildpackRequest.builder()
             .name("test-buildpack-name")
             .build();

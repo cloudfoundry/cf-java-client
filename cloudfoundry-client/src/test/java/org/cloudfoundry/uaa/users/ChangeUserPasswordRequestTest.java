@@ -16,26 +16,32 @@
 
 package org.cloudfoundry.uaa.users;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class ChangeUserPasswordRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noPassword() {
-        ChangeUserPasswordRequest.builder()
-            .userId("test-user-id")
-            .build();
-    }
+final class ChangeUserPasswordRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noUserId() {
-        ChangeUserPasswordRequest.builder()
-            .password("test-password")
-            .build();
+    @Test
+    void noPassword() {
+        assertThrows(IllegalStateException.class, () -> {
+            ChangeUserPasswordRequest.builder()
+                .userId("test-user-id")
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noUserId() {
+        assertThrows(IllegalStateException.class, () -> {
+            ChangeUserPasswordRequest.builder()
+                .password("test-password")
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         ChangeUserPasswordRequest.builder()
             .password("test-password")
             .userId("test-user-id")

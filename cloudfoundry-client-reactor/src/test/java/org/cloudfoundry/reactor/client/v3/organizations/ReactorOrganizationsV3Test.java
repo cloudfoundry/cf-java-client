@@ -49,7 +49,7 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
@@ -63,12 +63,12 @@ import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static org.cloudfoundry.client.v3.routes.Protocol.HTTP;
 
-public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
+class ReactorOrganizationsV3Test extends AbstractClientApiTest {
 
     private final ReactorOrganizationsV3 organizations = new ReactorOrganizationsV3(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void assignDefaultIsolationSegment() {
+    void assignDefaultIsolationSegment() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PATCH).path("/organizations/test-organization-id/relationships/default_isolation_segment")
@@ -104,7 +104,7 @@ public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void create() {
+    void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(POST).path("/organizations")
@@ -139,7 +139,7 @@ public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/organizations/test-organization-id")
@@ -161,7 +161,7 @@ public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/organizations/24637893-3b77-489d-bb79-8466f0d88b52")
@@ -195,7 +195,7 @@ public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void getDefaultDomain() {
+    void getDefaultDomain() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/organizations/test-organization-id/domains/default")
@@ -255,7 +255,7 @@ public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void getDefaultIsolationSegment() {
+    void getDefaultIsolationSegment() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/organizations/test-organization-id/relationships/default_isolation_segment")
@@ -287,7 +287,7 @@ public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void getUsageSummary() {
+    void getUsageSummary() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/organizations/test-organization-id/usage_summary")
@@ -320,7 +320,7 @@ public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/organizations")
@@ -372,7 +372,7 @@ public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void listDomains() {
+    void listDomains() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/organizations/test-organization-id/domains")
@@ -436,7 +436,7 @@ public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void update() {
+    void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PATCH).path("/organizations/test-organization-id")

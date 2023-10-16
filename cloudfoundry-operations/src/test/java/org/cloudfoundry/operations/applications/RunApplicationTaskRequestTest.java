@@ -16,26 +16,32 @@
 
 package org.cloudfoundry.operations.applications;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class RunApplicationTaskRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noApplicationName() {
-        RunApplicationTaskRequest.builder()
-            .command("test-command")
-            .build();
-    }
+final class RunApplicationTaskRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noCommand() {
-        RunApplicationTaskRequest.builder()
-            .applicationName("test-application-name")
-            .build();
+    @Test
+    void noApplicationName() {
+        assertThrows(IllegalStateException.class, () -> {
+            RunApplicationTaskRequest.builder()
+                .command("test-command")
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noCommand() {
+        assertThrows(IllegalStateException.class, () -> {
+            RunApplicationTaskRequest.builder()
+                .applicationName("test-application-name")
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         RunApplicationTaskRequest.builder()
             .applicationName("test-application-name")
             .command("test-command")

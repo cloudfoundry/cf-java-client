@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.uaa.authorizations;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class GetOpenIdProviderConfigurationRequestTest {
+final class GetOpenIdProviderConfigurationRequestTest {
 
     @Test
-    public void valid() {
+    void valid() {
         GetOpenIdProviderConfigurationRequest.builder()
             .build();
     }

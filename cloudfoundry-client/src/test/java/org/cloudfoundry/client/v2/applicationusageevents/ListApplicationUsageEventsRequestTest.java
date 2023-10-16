@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.client.v2.applicationusageevents;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class ListApplicationUsageEventsRequestTest {
+final class ListApplicationUsageEventsRequestTest {
 
     @Test
-    public void valid() {
+    void valid() {
         ListApplicationUsageEventsRequest.builder()
             .build();
     }

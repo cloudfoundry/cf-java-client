@@ -16,20 +16,24 @@
 
 package org.cloudfoundry.uaa.authorizations;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class AuthorizeByOpenIdWithIdTokenRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noClientId() {
-        AuthorizeByOpenIdWithIdTokenRequest.builder()
-            .redirectUri("http://redirect.to/app")
-            .scope("test-scope")
-            .build();
+final class AuthorizeByOpenIdWithIdTokenRequestTest {
+
+    @Test
+    void noClientId() {
+        assertThrows(IllegalStateException.class, () -> {
+            AuthorizeByOpenIdWithIdTokenRequest.builder()
+                .redirectUri("http://redirect.to/app")
+                .scope("test-scope")
+                .build();
+        });
     }
 
     @Test
-    public void validMax() {
+    void validMax() {
         AuthorizeByOpenIdWithIdTokenRequest.builder()
             .clientId("test-client-id")
             .redirectUri("http://redirect.to/app")
@@ -38,7 +42,7 @@ public final class AuthorizeByOpenIdWithIdTokenRequestTest {
     }
 
     @Test
-    public void validMin() {
+    void validMin() {
         AuthorizeByOpenIdWithIdTokenRequest.builder()
             .clientId("test-client-id")
             .build();

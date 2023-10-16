@@ -54,7 +54,7 @@ import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import org.cloudfoundry.util.OperationUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 import reactor.test.StepVerifier;
 
@@ -72,12 +72,12 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 
-public final class ReactorPackagesTest extends AbstractClientApiTest {
+final class ReactorPackagesTest extends AbstractClientApiTest {
 
     private final ReactorPackages packages = new ReactorPackages(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void copy() {
+    void copy() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(POST).path("/packages?source_guid=test-source-package-id")
@@ -134,7 +134,7 @@ public final class ReactorPackagesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void create() {
+    void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(POST).path("/packages")
@@ -191,7 +191,7 @@ public final class ReactorPackagesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/packages/test-package-id")
@@ -213,7 +213,7 @@ public final class ReactorPackagesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void download() {
+    void download() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/packages/test-package-id/download")
@@ -236,7 +236,7 @@ public final class ReactorPackagesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/packages/test-package-id")
@@ -285,7 +285,7 @@ public final class ReactorPackagesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/packages")
@@ -363,7 +363,7 @@ public final class ReactorPackagesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void listDroplets() {
+    void listDroplets() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/packages/test-package-id/droplets")
@@ -501,7 +501,7 @@ public final class ReactorPackagesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void upload() throws IOException {
+    void upload() throws IOException {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(POST).path("/packages/test-package-id/upload")

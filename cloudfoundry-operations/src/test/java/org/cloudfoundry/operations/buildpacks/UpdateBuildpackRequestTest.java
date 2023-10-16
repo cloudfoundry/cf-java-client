@@ -16,20 +16,24 @@
 
 package org.cloudfoundry.operations.buildpacks;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.nio.file.Paths;
 
-public class UpdateBuildpackRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        UpdateBuildpackRequest.builder()
-            .build();
+class UpdateBuildpackRequestTest {
+
+    @Test
+    void noName() {
+        assertThrows(IllegalStateException.class, () -> {
+            UpdateBuildpackRequest.builder()
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         UpdateBuildpackRequest.builder()
             .buildpack(Paths.get("test-buildpack"))
             .enable(false)

@@ -43,7 +43,7 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
@@ -58,12 +58,12 @@ import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public final class ReactorUserProvidedServiceInstancesTest extends AbstractClientApiTest {
+final class ReactorUserProvidedServiceInstancesTest extends AbstractClientApiTest {
 
     private final ReactorUserProvidedServiceInstances userProvidedServiceInstances = new ReactorUserProvidedServiceInstances(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void associateRoute() {
+    void associateRoute() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PUT).path("/user_provided_service_instances/5badd282-6e07-4fc6-a8c4-78be99040774/routes/237d9236-7997-4b1a-be8d-2aaf2d85421a")
@@ -104,7 +104,7 @@ public final class ReactorUserProvidedServiceInstancesTest extends AbstractClien
     }
 
     @Test
-    public void create() {
+    void create() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(POST).path("/user_provided_service_instances")
@@ -150,7 +150,7 @@ public final class ReactorUserProvidedServiceInstancesTest extends AbstractClien
     }
 
     @Test
-    public void delete() {
+    void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/user_provided_service_instances/5b6b45c8-89be-48d2-affd-f64346ad4d93")
@@ -170,7 +170,7 @@ public final class ReactorUserProvidedServiceInstancesTest extends AbstractClien
     }
 
     @Test
-    public void get() {
+    void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/user_provided_service_instances/8c12fd06-6639-4844-b5e7-a6831cadbbcc")
@@ -210,7 +210,7 @@ public final class ReactorUserProvidedServiceInstancesTest extends AbstractClien
     }
 
     @Test
-    public void list() {
+    void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/user_provided_service_instances?page=-1")
@@ -252,7 +252,7 @@ public final class ReactorUserProvidedServiceInstancesTest extends AbstractClien
     }
 
     @Test
-    public void listRoutes() {
+    void listRoutes() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/user_provided_service_instances/500e64c6-7f70-4e3b-ab7b-940a6303d79b/routes")
@@ -297,7 +297,7 @@ public final class ReactorUserProvidedServiceInstancesTest extends AbstractClien
     }
 
     @Test
-    public void listServiceBindings() {
+    void listServiceBindings() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/user_provided_service_instances/test-user-provided-service-instance-id/service_bindings?page=-1")
@@ -340,7 +340,7 @@ public final class ReactorUserProvidedServiceInstancesTest extends AbstractClien
     }
 
     @Test
-    public void removeRoute() {
+    void removeRoute() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/user_provided_service_instances/fd195229-117c-4bbe-9418-c5df97131eae/routes/c3bc74b0-9465-413d-b5e6-3b305fb439cc")
@@ -361,7 +361,7 @@ public final class ReactorUserProvidedServiceInstancesTest extends AbstractClien
     }
 
     @Test
-    public void update() {
+    void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PUT).path("/user_provided_service_instances/e2c198b1-fa15-414e-a9a4-31537996b39d")
@@ -404,7 +404,7 @@ public final class ReactorUserProvidedServiceInstancesTest extends AbstractClien
     }
 
     @Test
-    public void updateWithEmptyCredentials() {
+    void updateWithEmptyCredentials() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PUT).path("/user_provided_service_instances/e2c198b1-fa15-414e-a9a4-31537996b39d")

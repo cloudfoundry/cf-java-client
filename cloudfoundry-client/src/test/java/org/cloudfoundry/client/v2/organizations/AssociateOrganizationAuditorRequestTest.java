@@ -16,26 +16,32 @@
 
 package org.cloudfoundry.client.v2.organizations;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class AssociateOrganizationAuditorRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noAuditorId() {
-        AssociateOrganizationAuditorRequest.builder()
-            .organizationId("test-organization-id")
-            .build();
-    }
+final class AssociateOrganizationAuditorRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noOrganizationId() {
-        AssociateOrganizationAuditorRequest.builder()
-            .auditorId("test-auditor-id")
-            .build();
+    @Test
+    void noAuditorId() {
+        assertThrows(IllegalStateException.class, () -> {
+            AssociateOrganizationAuditorRequest.builder()
+                .organizationId("test-organization-id")
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noOrganizationId() {
+        assertThrows(IllegalStateException.class, () -> {
+            AssociateOrganizationAuditorRequest.builder()
+                .auditorId("test-auditor-id")
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         AssociateOrganizationAuditorRequest.builder()
             .auditorId("test-auditor-id")
             .organizationId("test-organization-id")

@@ -16,49 +16,57 @@
 
 package org.cloudfoundry.uaa.tokens;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class RefreshTokenRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noClientId() {
-        RefreshTokenRequest.builder()
-            .clientSecret("test-client-secret")
-            .refreshToken("test-refresh-token")
-            .tokenFormat(TokenFormat.OPAQUE)
-            .build();
+final class RefreshTokenRequestTest {
+
+    @Test
+    void noClientId() {
+        assertThrows(IllegalStateException.class, () -> {
+            RefreshTokenRequest.builder()
+                .clientSecret("test-client-secret")
+                .refreshToken("test-refresh-token")
+                .tokenFormat(TokenFormat.OPAQUE)
+                .build();
+        });
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void noClientSecret() {
-        RefreshTokenRequest.builder()
-            .clientId("test-client-id")
-            .refreshToken("test-refresh-token")
-            .tokenFormat(TokenFormat.OPAQUE)
-            .build();
+    @Test
+    void noClientSecret() {
+        assertThrows(IllegalStateException.class, () -> {
+            RefreshTokenRequest.builder()
+                .clientId("test-client-id")
+                .refreshToken("test-refresh-token")
+                .tokenFormat(TokenFormat.OPAQUE)
+                .build();
+        });
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void noRefreshToken() {
+    @Test
+    void noRefreshToken() {
+        assertThrows(IllegalStateException.class, () -> {
+            RefreshTokenRequest.builder()
+                .clientId("test-client-id")
+                .clientSecret("test-client-secret")
+                .tokenFormat(TokenFormat.OPAQUE)
+                .build();
+        });
+    }
+
+    @Test
+    void validMax() {
         RefreshTokenRequest.builder()
             .clientId("test-client-id")
             .clientSecret("test-client-secret")
+            .refreshToken("test-refresh-token")
             .tokenFormat(TokenFormat.OPAQUE)
             .build();
     }
 
     @Test
-    public void validMax() {
-        RefreshTokenRequest.builder()
-            .clientId("test-client-id")
-            .clientSecret("test-client-secret")
-            .refreshToken("test-refresh-token")
-            .tokenFormat(TokenFormat.OPAQUE)
-            .build();
-    }
-
-    @Test
-    public void validMin() {
+    void validMin() {
         RefreshTokenRequest.builder()
             .clientId("test-client-id")
             .clientSecret("test-client-secret")

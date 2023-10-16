@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.uaa.clients;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class UpdateMetadataRequestTest {
+final class UpdateMetadataRequestTest {
 
     @Test
-    public void valid() {
+    void valid() {
         UpdateMetadataRequest.builder()
             .appIcon("test-icon")
             .appLaunchUrl("test-app-launch-url")

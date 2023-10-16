@@ -16,18 +16,22 @@
 
 package org.cloudfoundry.client.v3.roles;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class GetRoleRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noRoleId() {
-        GetRoleRequest.builder()
-            .build();
+class GetRoleRequestTest {
+
+    @Test
+    void noRoleId() {
+        assertThrows(IllegalStateException.class, () -> {
+            GetRoleRequest.builder()
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         GetRoleRequest.builder()
             .roleId("test-role-id")
             .build();

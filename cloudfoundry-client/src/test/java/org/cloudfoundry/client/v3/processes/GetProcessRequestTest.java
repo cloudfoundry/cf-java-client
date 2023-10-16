@@ -16,18 +16,22 @@
 
 package org.cloudfoundry.client.v3.processes;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class GetProcessRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noProcessId() {
-        GetProcessRequest.builder()
-            .build();
+final class GetProcessRequestTest {
+
+    @Test
+    void noProcessId() {
+        assertThrows(IllegalStateException.class, () -> {
+            GetProcessRequest.builder()
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         GetProcessRequest.builder()
             .processId("test-process-id")
             .build();

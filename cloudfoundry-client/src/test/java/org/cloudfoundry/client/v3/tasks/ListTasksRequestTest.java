@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.client.v3.tasks;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class ListTasksRequestTest {
+final class ListTasksRequestTest {
 
     @Test
-    public void valid() {
+    void valid() {
         ListTasksRequest.builder()
             .build();
     }

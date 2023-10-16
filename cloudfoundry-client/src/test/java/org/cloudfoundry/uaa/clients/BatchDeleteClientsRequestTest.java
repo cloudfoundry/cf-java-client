@@ -16,25 +16,31 @@
 
 package org.cloudfoundry.uaa.clients;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class BatchDeleteClientsRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void emptyClientIds() {
-        BatchDeleteClientsRequest.builder()
-            .clientIds()
-            .build();
-    }
+final class BatchDeleteClientsRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noClientIds() {
-        BatchDeleteClientsRequest.builder()
-            .build();
+    @Test
+    void emptyClientIds() {
+        assertThrows(IllegalStateException.class, () -> {
+            BatchDeleteClientsRequest.builder()
+                .clientIds()
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noClientIds() {
+        assertThrows(IllegalStateException.class, () -> {
+            BatchDeleteClientsRequest.builder()
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         BatchDeleteClientsRequest.builder()
             .clientId("test-client-id")
             .build();

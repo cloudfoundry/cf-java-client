@@ -25,7 +25,7 @@ import org.cloudfoundry.routing.v1.routergroups.ListRouterGroupsResponse;
 import org.cloudfoundry.routing.v1.routergroups.RouterGroup;
 import org.cloudfoundry.routing.v1.routergroups.UpdateRouterGroupRequest;
 import org.cloudfoundry.routing.v1.routergroups.UpdateRouterGroupResponse;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
@@ -35,12 +35,12 @@ import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpMethod.PUT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public final class ReactorRouterGroupsTest extends AbstractRoutingApiTest {
+final class ReactorRouterGroupsTest extends AbstractRoutingApiTest {
 
     private final ReactorRouterGroups routerGroups = new ReactorRouterGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void list() {
+    void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/v1/router_groups")
@@ -68,7 +68,7 @@ public final class ReactorRouterGroupsTest extends AbstractRoutingApiTest {
     }
 
     @Test
-    public void update() {
+    void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PUT).path("/v1/router_groups/abc123")

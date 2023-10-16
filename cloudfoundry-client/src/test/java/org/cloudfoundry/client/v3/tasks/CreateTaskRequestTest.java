@@ -16,26 +16,32 @@
 
 package org.cloudfoundry.client.v3.tasks;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class CreateTaskRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noApplicationId() {
-        CreateTaskRequest.builder()
-            .command("test-command")
-            .build();
-    }
+final class CreateTaskRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noCommand() {
-        CreateTaskRequest.builder()
-            .applicationId("test-application-id")
-            .build();
+    @Test
+    void noApplicationId() {
+        assertThrows(IllegalStateException.class, () -> {
+            CreateTaskRequest.builder()
+                .command("test-command")
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noCommand() {
+        assertThrows(IllegalStateException.class, () -> {
+            CreateTaskRequest.builder()
+                .applicationId("test-application-id")
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         CreateTaskRequest.builder()
             .applicationId("test-application-id")
             .command("test-command")

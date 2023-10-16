@@ -16,27 +16,33 @@
 
 package org.cloudfoundry.client.v2.domains;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class CreateDomainRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        CreateDomainRequest.builder()
-            .wildcard(true)
-            .build();
-    }
+final class CreateDomainRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noWildcard() {
-        CreateDomainRequest.builder()
-            .name("test-name")
-            .owningOrganizationId("test-owning-organization-id")
-            .build();
+    @Test
+    void noName() {
+        assertThrows(IllegalStateException.class, () -> {
+            CreateDomainRequest.builder()
+                .wildcard(true)
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noWildcard() {
+        assertThrows(IllegalStateException.class, () -> {
+            CreateDomainRequest.builder()
+                .name("test-name")
+                .owningOrganizationId("test-owning-organization-id")
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         CreateDomainRequest.builder()
             .name("test-name")
             .wildcard(true)

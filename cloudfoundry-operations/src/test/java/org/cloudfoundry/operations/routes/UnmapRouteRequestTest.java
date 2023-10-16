@@ -16,35 +16,43 @@
 
 package org.cloudfoundry.operations.routes;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class UnmapRouteRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noApplicationName() {
-        UnmapRouteRequest.builder()
-            .domain("test-domain")
-            .build();
-    }
+final class UnmapRouteRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noDomain() {
-        UnmapRouteRequest.builder()
-            .applicationName("test-applicationName")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void setupConflict() {
-        UnmapRouteRequest.builder()
-            .domain("test-domain")
-            .host("test-hostname")
-            .port(123)
-            .build();
+    @Test
+    void noApplicationName() {
+        assertThrows(IllegalStateException.class, () -> {
+            UnmapRouteRequest.builder()
+                .domain("test-domain")
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noDomain() {
+        assertThrows(IllegalStateException.class, () -> {
+            UnmapRouteRequest.builder()
+                .applicationName("test-applicationName")
+                .build();
+        });
+    }
+
+    @Test
+    void setupConflict() {
+        assertThrows(IllegalStateException.class, () -> {
+            UnmapRouteRequest.builder()
+                .domain("test-domain")
+                .host("test-hostname")
+                .port(123)
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         UnmapRouteRequest.builder()
             .applicationName("test-applicationName")
             .domain("test-domain")

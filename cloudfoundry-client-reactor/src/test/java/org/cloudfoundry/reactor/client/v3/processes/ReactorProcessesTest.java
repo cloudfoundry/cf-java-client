@@ -43,7 +43,7 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
@@ -56,12 +56,12 @@ import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-public final class ReactorProcessesTest extends AbstractClientApiTest {
+final class ReactorProcessesTest extends AbstractClientApiTest {
 
     private final ReactorProcesses processes = new ReactorProcesses(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void deleteInstance() {
+    void deleteInstance() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/processes/test-process-id/instances/test-index")
@@ -82,7 +82,7 @@ public final class ReactorProcessesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/processes/test-process-id")
@@ -142,7 +142,7 @@ public final class ReactorProcessesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void getProcessStatistics() {
+    void getProcessStatistics() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/processes/test-id/stats")
@@ -185,9 +185,9 @@ public final class ReactorProcessesTest extends AbstractClientApiTest {
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
-    
+
     @Test
-    public void getProcessStatisticsWithNullFields() {
+    void getProcessStatisticsWithNullFields() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/processes/test-id/stats")
@@ -219,7 +219,7 @@ public final class ReactorProcessesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(GET).path("/processes")
@@ -332,7 +332,7 @@ public final class ReactorProcessesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void scale() {
+    void scale() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(POST).path("/processes/test-process-id/actions/scale")
@@ -396,7 +396,7 @@ public final class ReactorProcessesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void update() {
+    void update() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(PATCH).path("/processes/test-process-id")

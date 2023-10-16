@@ -16,26 +16,32 @@
 
 package org.cloudfoundry.client.v3.serviceinstances;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class UnshareServiceInstanceRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noServiceInstanceId() {
-        UnshareServiceInstanceRequest.builder()
-            .spaceId("test-space-id")
-            .build();
-    }
+class UnshareServiceInstanceRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noSpaceId() {
-        UnshareServiceInstanceRequest.builder()
-            .serviceInstanceId("test-service-instance-id")
-            .build();
+    @Test
+    void noServiceInstanceId() {
+        assertThrows(IllegalStateException.class, () -> {
+            UnshareServiceInstanceRequest.builder()
+                .spaceId("test-space-id")
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noSpaceId() {
+        assertThrows(IllegalStateException.class, () -> {
+            UnshareServiceInstanceRequest.builder()
+                .serviceInstanceId("test-service-instance-id")
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         UnshareServiceInstanceRequest.builder()
             .serviceInstanceId("test-service-instance-id")
             .spaceId("test-space-id")

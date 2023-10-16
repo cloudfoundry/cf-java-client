@@ -16,49 +16,57 @@
 
 package org.cloudfoundry.uaa.tokens;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class GetTokenByOneTimePasscodeRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noClientId() {
-        GetTokenByOneTimePasscodeRequest.builder()
-            .clientSecret("test-client-secret")
-            .passcode("test-passcode")
-            .tokenFormat(TokenFormat.OPAQUE)
-            .build();
+final class GetTokenByOneTimePasscodeRequestTest {
+
+    @Test
+    void noClientId() {
+        assertThrows(IllegalStateException.class, () -> {
+            GetTokenByOneTimePasscodeRequest.builder()
+                .clientSecret("test-client-secret")
+                .passcode("test-passcode")
+                .tokenFormat(TokenFormat.OPAQUE)
+                .build();
+        });
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void noClientSecret() {
-        GetTokenByOneTimePasscodeRequest.builder()
-            .clientId("test-client-id")
-            .passcode("test-passcode")
-            .tokenFormat(TokenFormat.OPAQUE)
-            .build();
+    @Test
+    void noClientSecret() {
+        assertThrows(IllegalStateException.class, () -> {
+            GetTokenByOneTimePasscodeRequest.builder()
+                .clientId("test-client-id")
+                .passcode("test-passcode")
+                .tokenFormat(TokenFormat.OPAQUE)
+                .build();
+        });
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void noPasscode() {
+    @Test
+    void noPasscode() {
+        assertThrows(IllegalStateException.class, () -> {
+            GetTokenByOneTimePasscodeRequest.builder()
+                .clientId("test-client-id")
+                .clientSecret("test-client-secret")
+                .tokenFormat(TokenFormat.OPAQUE)
+                .build();
+        });
+    }
+
+    @Test
+    void validMax() {
         GetTokenByOneTimePasscodeRequest.builder()
             .clientId("test-client-id")
             .clientSecret("test-client-secret")
+            .passcode("test-passcode")
             .tokenFormat(TokenFormat.OPAQUE)
             .build();
     }
 
     @Test
-    public void validMax() {
-        GetTokenByOneTimePasscodeRequest.builder()
-            .clientId("test-client-id")
-            .clientSecret("test-client-secret")
-            .passcode("test-passcode")
-            .tokenFormat(TokenFormat.OPAQUE)
-            .build();
-    }
-
-    @Test
-    public void validMin() {
+    void validMin() {
         GetTokenByOneTimePasscodeRequest.builder()
             .clientId("test-client-id")
             .clientSecret("test-client-secret")

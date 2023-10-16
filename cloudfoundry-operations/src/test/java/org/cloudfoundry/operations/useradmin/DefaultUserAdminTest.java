@@ -64,7 +64,7 @@ import org.cloudfoundry.uaa.users.Email;
 import org.cloudfoundry.uaa.users.Meta;
 import org.cloudfoundry.uaa.users.Name;
 import org.cloudfoundry.uaa.users.User;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import reactor.test.scheduler.VirtualTimeScheduler;
@@ -79,12 +79,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.operations.TestObjects.fill;
 import static org.mockito.Mockito.when;
 
-public final class DefaultUserAdminTest extends AbstractOperationsTest {
+final class DefaultUserAdminTest extends AbstractOperationsTest {
 
     private final DefaultUserAdmin userAdmin = new DefaultUserAdmin(Mono.just(this.cloudFoundryClient), Mono.just(this.uaaClient));
 
     @Test
-    public void createUaaUserExists() {
+    void createUaaUserExists() {
         requestCreateUaaUserAlreadyExists(this.uaaClient);
         requestCreateUser(this.cloudFoundryClient);
 
@@ -99,7 +99,7 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void createWithPassword() {
+    void createWithPassword() {
         requestCreateUaaUser(this.uaaClient);
         requestCreateUser(this.cloudFoundryClient);
 
@@ -114,7 +114,7 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         requestListUser(this.uaaClient);
         requestDeleteUser(this.cloudFoundryClient);
         requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
@@ -130,7 +130,7 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void deleteFailure() {
+    void deleteFailure() {
         requestListUser(this.uaaClient);
         requestDeleteUser(this.cloudFoundryClient);
         requestJobFailure(this.cloudFoundryClient, "test-job-entity-id");
@@ -146,7 +146,7 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void deleteNoCfUser() {
+    void deleteNoCfUser() {
         requestListUser(this.uaaClient);
         requestDeleteUserEmpty(this.cloudFoundryClient);
         requestDeleteUaaUser(this.uaaClient);
@@ -161,7 +161,7 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void deleteNoUaaUser() {
+    void deleteNoUaaUser() {
         requestListUserEmpty(this.uaaClient);
 
         this.userAdmin
@@ -174,7 +174,7 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void listOrganizationUsersAllFound() {
+    void listOrganizationUsersAllFound() {
         requestOrganization(this.cloudFoundryClient);
         requestListOrganizationAuditors(this.cloudFoundryClient);
         requestListOrganizationBillingManagers(this.cloudFoundryClient);
@@ -195,7 +195,7 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void listOrganizationUsersNoneFound() {
+    void listOrganizationUsersNoneFound() {
         requestOrganization(this.cloudFoundryClient);
         requestListOrganizationAuditorsEmpty(this.cloudFoundryClient);
         requestListOrganizationBillingManagersEmpty(this.cloudFoundryClient);
@@ -213,7 +213,7 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void listOrganizationUsersOrganizationNotFound() {
+    void listOrganizationUsersOrganizationNotFound() {
         requestOrganizationEmpty(this.cloudFoundryClient);
 
         this.userAdmin
@@ -226,7 +226,7 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void listSpaceUsersAllFound() {
+    void listSpaceUsersAllFound() {
         requestOrganization(this.cloudFoundryClient);
         requestSpace(this.cloudFoundryClient);
         requestListSpaceAuditors(this.cloudFoundryClient);
@@ -249,7 +249,7 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void listSpaceUsersNoneFound() {
+    void listSpaceUsersNoneFound() {
         requestOrganization(this.cloudFoundryClient);
         requestSpace(this.cloudFoundryClient);
         requestListSpaceAuditorsEmpty(this.cloudFoundryClient);
@@ -269,7 +269,7 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void listSpaceUsersNullsFound() {
+    void listSpaceUsersNullsFound() {
         requestOrganization(this.cloudFoundryClient);
         requestSpace(this.cloudFoundryClient);
         requestListSpaceAuditorsNulls(this.cloudFoundryClient);
@@ -289,7 +289,7 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void listSpaceUsersOrganizationNotFound() {
+    void listSpaceUsersOrganizationNotFound() {
         requestOrganizationEmpty(this.cloudFoundryClient);
 
         this.userAdmin
@@ -303,7 +303,7 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void listSpaceUsersSpaceNotFound() {
+    void listSpaceUsersSpaceNotFound() {
         requestOrganization(this.cloudFoundryClient);
         requestSpaceEmpty(this.cloudFoundryClient);
 
@@ -318,7 +318,7 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void setOrganizationRole() {
+    void setOrganizationRole() {
         requestGetFeatureFlag(this.cloudFoundryClient, "set_roles_by_username", true);
         requestListOrganizations(this.cloudFoundryClient, "test-organization-name");
         requestAssociateOrganizationUserByUsername(this.cloudFoundryClient, "test-organization-id", "test-username");
@@ -336,7 +336,7 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void setOrganizationRoleFeatureDisabled() {
+    void setOrganizationRoleFeatureDisabled() {
         requestGetFeatureFlag(this.cloudFoundryClient, "set_roles_by_username", false);
 
         this.userAdmin
@@ -351,7 +351,7 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void setOrganizationRoleInvalidOrganization() {
+    void setOrganizationRoleInvalidOrganization() {
         requestGetFeatureFlag(this.cloudFoundryClient, "set_roles_by_username", true);
         requestListOrganizationsEmpty(this.cloudFoundryClient, "test-organization-name");
 
@@ -367,7 +367,7 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void setSpaceRole() {
+    void setSpaceRole() {
         requestGetFeatureFlag(this.cloudFoundryClient, "set_roles_by_username", true);
         requestListOrganizations(this.cloudFoundryClient, "test-organization-name");
         requestListOrganizationSpaces(this.cloudFoundryClient, "test-organization-id", "test-space-name");
@@ -387,7 +387,7 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void setSpaceRoleFeatureDisabled() {
+    void setSpaceRoleFeatureDisabled() {
         requestGetFeatureFlag(this.cloudFoundryClient, "set_roles_by_username", false);
 
         this.userAdmin
@@ -403,7 +403,7 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void setSpaceRoleInvalidOrganization() {
+    void setSpaceRoleInvalidOrganization() {
         requestGetFeatureFlag(this.cloudFoundryClient, "set_roles_by_username", true);
         requestListOrganizationsEmpty(this.cloudFoundryClient, "test-organization-name");
 
@@ -420,7 +420,7 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void setSpaceRoleInvalidSpace() {
+    void setSpaceRoleInvalidSpace() {
         requestGetFeatureFlag(this.cloudFoundryClient, "set_roles_by_username", true);
         requestListOrganizations(this.cloudFoundryClient, "test-organization-name");
         requestListOrganizationSpacesEmpty(this.cloudFoundryClient, "test-organization-id", "test-space-name");
@@ -438,7 +438,7 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void unsetOrganizationRole() {
+    void unsetOrganizationRole() {
         requestGetFeatureFlag(this.cloudFoundryClient, "unset_roles_by_username", true);
         requestListOrganizations(this.cloudFoundryClient, "test-organization-name");
         requestRemoveOrganizationManagerByUsername(this.cloudFoundryClient, "test-organization-id", "test-username");
@@ -455,7 +455,7 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void unsetOrganizationRoleFeatureDisabled() {
+    void unsetOrganizationRoleFeatureDisabled() {
         requestGetFeatureFlag(this.cloudFoundryClient, "unset_roles_by_username", false);
 
         this.userAdmin
@@ -470,7 +470,7 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void unsetOrganizationRoleInvalidOrganization() {
+    void unsetOrganizationRoleInvalidOrganization() {
         requestGetFeatureFlag(this.cloudFoundryClient, "unset_roles_by_username", true);
         requestListOrganizationsEmpty(this.cloudFoundryClient, "test-organization-name");
 
@@ -486,7 +486,7 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void unsetSpaceRole() {
+    void unsetSpaceRole() {
         requestGetFeatureFlag(this.cloudFoundryClient, "unset_roles_by_username", true);
         requestListOrganizations(this.cloudFoundryClient, "test-organization-name");
         requestListOrganizationSpaces(this.cloudFoundryClient, "test-organization-id", "test-space-name");
@@ -505,7 +505,7 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void unsetSpaceRoleFeatureDisabled() {
+    void unsetSpaceRoleFeatureDisabled() {
         requestGetFeatureFlag(this.cloudFoundryClient, "unset_roles_by_username", false);
 
         this.userAdmin
@@ -522,7 +522,7 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
 
 
     @Test
-    public void unsetSpaceRoleInvalidOrganization() {
+    void unsetSpaceRoleInvalidOrganization() {
         requestGetFeatureFlag(this.cloudFoundryClient, "unset_roles_by_username", true);
         requestListOrganizationsEmpty(this.cloudFoundryClient, "test-organization-name");
 
@@ -539,7 +539,7 @@ public final class DefaultUserAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void unsetSpaceRoleInvalidSpace() {
+    void unsetSpaceRoleInvalidSpace() {
         requestGetFeatureFlag(this.cloudFoundryClient, "unset_roles_by_username", true);
         requestListOrganizations(this.cloudFoundryClient, "test-organization-name");
         requestListOrganizationSpacesEmpty(this.cloudFoundryClient, "test-organization-id", "test-space-name");

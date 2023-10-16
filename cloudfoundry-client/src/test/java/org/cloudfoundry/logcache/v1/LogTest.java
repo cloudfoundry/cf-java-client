@@ -16,22 +16,22 @@
 
 package org.cloudfoundry.logcache.v1;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class LogTest {
+class LogTest {
 
     @Test
-    public void valid() {
+    void valid() {
         Log.builder().build();
     }
 
     @Test
-    public void getPayloadAsText() {
+    void getPayloadAsText() {
         final String payload = "This is a test.";
         final String encodedPayload = Base64.getEncoder().encodeToString(payload.getBytes(StandardCharsets.UTF_8));
 

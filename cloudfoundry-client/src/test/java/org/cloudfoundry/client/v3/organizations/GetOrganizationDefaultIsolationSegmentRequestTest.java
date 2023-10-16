@@ -16,18 +16,22 @@
 
 package org.cloudfoundry.client.v3.organizations;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class GetOrganizationDefaultIsolationSegmentRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noOrganizationId() {
-        GetOrganizationDefaultIsolationSegmentRequest.builder()
-            .build();
+final class GetOrganizationDefaultIsolationSegmentRequestTest {
+
+    @Test
+    void noOrganizationId() {
+        assertThrows(IllegalStateException.class, () -> {
+            GetOrganizationDefaultIsolationSegmentRequest.builder()
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         GetOrganizationDefaultIsolationSegmentRequest.builder()
             .organizationId("test-organization-id")
             .build();

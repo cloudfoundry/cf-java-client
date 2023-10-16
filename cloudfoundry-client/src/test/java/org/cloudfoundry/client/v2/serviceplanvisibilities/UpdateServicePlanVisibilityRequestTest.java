@@ -16,36 +16,44 @@
 
 package org.cloudfoundry.client.v2.serviceplanvisibilities;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class UpdateServicePlanVisibilityRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noOrganizationId() {
-        UpdateServicePlanVisibilityRequest.builder()
-            .servicePlanId("service-plan-id")
-            .servicePlanVisibilityId("test-service-plan-visibility-id")
-            .build();
-    }
+final class UpdateServicePlanVisibilityRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noServicePlanId() {
-        UpdateServicePlanVisibilityRequest.builder()
-            .organizationId("organization-id")
-            .servicePlanVisibilityId("test-service-plan-visibility-id")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noServicePlanVisibilityId() {
-        UpdateServicePlanVisibilityRequest.builder()
-            .organizationId("organization-id")
-            .servicePlanId("service-plan-id")
-            .build();
+    @Test
+    void noOrganizationId() {
+        assertThrows(IllegalStateException.class, () -> {
+            UpdateServicePlanVisibilityRequest.builder()
+                .servicePlanId("service-plan-id")
+                .servicePlanVisibilityId("test-service-plan-visibility-id")
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noServicePlanId() {
+        assertThrows(IllegalStateException.class, () -> {
+            UpdateServicePlanVisibilityRequest.builder()
+                .organizationId("organization-id")
+                .servicePlanVisibilityId("test-service-plan-visibility-id")
+                .build();
+        });
+    }
+
+    @Test
+    void noServicePlanVisibilityId() {
+        assertThrows(IllegalStateException.class, () -> {
+            UpdateServicePlanVisibilityRequest.builder()
+                .organizationId("organization-id")
+                .servicePlanId("service-plan-id")
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         UpdateServicePlanVisibilityRequest.builder()
             .organizationId("organization-id")
             .servicePlanId("service-plan-id")

@@ -16,19 +16,23 @@
 
 package org.cloudfoundry.client.v2.servicebrokers;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
-public final class DeleteServiceBrokerRequestTest {
+final class DeleteServiceBrokerRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noServiceBrokerId() {
-        DeleteServiceBrokerRequest.builder()
-            .build();
+    @Test
+    void noServiceBrokerId() {
+        assertThrows(IllegalStateException.class, () -> {
+            DeleteServiceBrokerRequest.builder()
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         DeleteServiceBrokerRequest.builder()
             .serviceBrokerId("test-service-broker-id")
             .build();

@@ -16,26 +16,32 @@
 
 package org.cloudfoundry.operations.services;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class BindServiceInstanceRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noApplicationName() {
-        BindServiceInstanceRequest.builder()
-            .serviceInstanceName("test-service-instance-name")
-            .build();
-    }
+final class BindServiceInstanceRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noServiceInstanceName() {
-        BindServiceInstanceRequest.builder()
-            .applicationName("test-application-name")
-            .build();
+    @Test
+    void noApplicationName() {
+        assertThrows(IllegalStateException.class, () -> {
+            BindServiceInstanceRequest.builder()
+                .serviceInstanceName("test-service-instance-name")
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noServiceInstanceName() {
+        assertThrows(IllegalStateException.class, () -> {
+            BindServiceInstanceRequest.builder()
+                .applicationName("test-application-name")
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         BindServiceInstanceRequest.builder()
             .applicationName("test-application-name")
             .serviceInstanceName("test-service-instance-name")

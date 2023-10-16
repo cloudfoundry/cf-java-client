@@ -16,49 +16,59 @@
 
 package org.cloudfoundry.operations.useradmin;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class SetSpaceRoleRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noOrganizationName() {
-        SetSpaceRoleRequest.builder()
-            .spaceName("test-space")
-            .spaceRole(SpaceRole.AUDITOR)
-            .username("test-username")
-            .build();
-    }
+final class SetSpaceRoleRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noSpaceName() {
-        SetSpaceRoleRequest.builder()
-            .organizationName("test-organization")
-            .spaceRole(SpaceRole.MANAGER)
-            .username("test-username")
-            .build();
-    }
-
-
-    @Test(expected = IllegalStateException.class)
-    public void noSpaceRole() {
-        SetSpaceRoleRequest.builder()
-            .organizationName("test-organization")
-            .spaceName("test-space")
-            .username("test-username")
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noUsername() {
-        SetSpaceRoleRequest.builder()
-            .organizationName("test-organization")
-            .spaceName("test-space")
-            .spaceRole(SpaceRole.DEVELOPER)
-            .build();
+    @Test
+    void noOrganizationName() {
+        assertThrows(IllegalStateException.class, () -> {
+            SetSpaceRoleRequest.builder()
+                .spaceName("test-space")
+                .spaceRole(SpaceRole.AUDITOR)
+                .username("test-username")
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noSpaceName() {
+        assertThrows(IllegalStateException.class, () -> {
+            SetSpaceRoleRequest.builder()
+                .organizationName("test-organization")
+                .spaceRole(SpaceRole.MANAGER)
+                .username("test-username")
+                .build();
+        });
+    }
+
+
+    @Test
+    void noSpaceRole() {
+        assertThrows(IllegalStateException.class, () -> {
+            SetSpaceRoleRequest.builder()
+                .organizationName("test-organization")
+                .spaceName("test-space")
+                .username("test-username")
+                .build();
+        });
+    }
+
+    @Test
+    void noUsername() {
+        assertThrows(IllegalStateException.class, () -> {
+            SetSpaceRoleRequest.builder()
+                .organizationName("test-organization")
+                .spaceName("test-space")
+                .spaceRole(SpaceRole.DEVELOPER)
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         SetSpaceRoleRequest.builder()
             .organizationName("test-organization")
             .spaceName("test-space")

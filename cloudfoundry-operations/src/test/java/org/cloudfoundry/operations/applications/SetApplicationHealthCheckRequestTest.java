@@ -16,26 +16,32 @@
 
 package org.cloudfoundry.operations.applications;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class SetApplicationHealthCheckRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        SetApplicationHealthCheckRequest.builder()
-            .type(ApplicationHealthCheck.NONE)
-            .build();
-    }
+final class SetApplicationHealthCheckRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noType() {
-        SetApplicationHealthCheckRequest.builder()
-            .name("test-name")
-            .build();
+    @Test
+    void noName() {
+        assertThrows(IllegalStateException.class, () -> {
+            SetApplicationHealthCheckRequest.builder()
+                .type(ApplicationHealthCheck.NONE)
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noType() {
+        assertThrows(IllegalStateException.class, () -> {
+            SetApplicationHealthCheckRequest.builder()
+                .name("test-name")
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         SetApplicationHealthCheckRequest.builder()
             .name("test-name")
             .type(ApplicationHealthCheck.NONE)

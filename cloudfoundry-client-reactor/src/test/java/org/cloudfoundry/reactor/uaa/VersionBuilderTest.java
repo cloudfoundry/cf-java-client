@@ -18,31 +18,31 @@ package org.cloudfoundry.reactor.uaa;
 
 import io.netty.handler.codec.http.HttpHeaders;
 import org.cloudfoundry.uaa.Versioned;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
 
-public final class VersionBuilderTest {
+final class VersionBuilderTest {
 
     private final HttpHeaders outbound = mock(HttpHeaders.class);
 
     @Test
-    public void augment() {
+    void augment() {
         VersionBuilder.augment(this.outbound, new StubVersioned("test-version"));
         verify(this.outbound).set("If-Match", "test-version");
     }
 
     @Test
-    public void augmentNotVersioned() {
+    void augmentNotVersioned() {
         VersionBuilder.augment(this.outbound, new Object());
         verifyNoInteractions(this.outbound);
     }
 
     @Test
-    public void augmentNullVersion() {
+    void augmentNullVersion() {
         VersionBuilder.augment(this.outbound, new StubVersioned(null));
         verifyNoInteractions(this.outbound);
     }

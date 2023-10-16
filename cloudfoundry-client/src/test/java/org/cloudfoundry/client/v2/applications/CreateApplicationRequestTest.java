@@ -16,26 +16,32 @@
 
 package org.cloudfoundry.client.v2.applications;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class CreateApplicationRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        CreateApplicationRequest.builder()
-            .spaceId("test-space-id")
-            .build();
-    }
+final class CreateApplicationRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noSpaceId() {
-        CreateApplicationRequest.builder()
-            .name("test-name")
-            .build();
+    @Test
+    void noName() {
+        assertThrows(IllegalStateException.class, () -> {
+            CreateApplicationRequest.builder()
+                .spaceId("test-space-id")
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noSpaceId() {
+        assertThrows(IllegalStateException.class, () -> {
+            CreateApplicationRequest.builder()
+                .name("test-name")
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         CreateApplicationRequest.builder()
             .name("test-name")
             .spaceId("test-space-id")

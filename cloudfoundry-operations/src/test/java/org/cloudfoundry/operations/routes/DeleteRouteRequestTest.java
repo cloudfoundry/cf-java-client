@@ -16,27 +16,33 @@
 
 package org.cloudfoundry.operations.routes;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class DeleteRouteRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noDomain() {
-        DeleteRouteRequest.builder()
-            .build();
-    }
+final class DeleteRouteRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void setupConflict() {
-        DeleteRouteRequest.builder()
-            .domain("test-domain")
-            .host("test-hostname")
-            .port(123)
-            .build();
+    @Test
+    void noDomain() {
+        assertThrows(IllegalStateException.class, () -> {
+            DeleteRouteRequest.builder()
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void setupConflict() {
+        assertThrows(IllegalStateException.class, () -> {
+            DeleteRouteRequest.builder()
+                .domain("test-domain")
+                .host("test-hostname")
+                .port(123)
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         DeleteRouteRequest.builder()
             .domain("test-domain")
             .build();

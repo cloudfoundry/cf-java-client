@@ -46,7 +46,7 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
@@ -65,12 +65,12 @@ import static org.cloudfoundry.client.v3.serviceplans.Visibility.ADMIN;
 import static org.cloudfoundry.client.v3.serviceplans.Visibility.ORGANIZATION;
 import static org.cloudfoundry.client.v3.serviceplans.Visibility.PUBLIC;
 
-public final class ReactorServicePlansTest extends AbstractClientApiTest {
+final class ReactorServicePlansTest extends AbstractClientApiTest {
 
     private final ReactorServicePlansV3 servicePlans = new ReactorServicePlansV3(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void delete() {
+    void delete() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(DELETE).path("/service_plans/test-service-plan-id")
@@ -90,7 +90,7 @@ public final class ReactorServicePlansTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         Map<String, String> details = new HashMap<>();
         details.put("description", "Billing account number used to charge use of shared fake server.");
         details.put("type", "string");
@@ -180,7 +180,7 @@ public final class ReactorServicePlansTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         Map<String, String> details = new HashMap<>();
         details.put("description", "Billing account number used to charge use of shared fake server.");
         details.put("type", "string");
@@ -339,7 +339,7 @@ public final class ReactorServicePlansTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void update() {
+    void update() {
         Map<String, String> details = new HashMap<>();
         details.put("description", "Billing account number used to charge use of shared fake server.");
         details.put("type", "string");
@@ -434,7 +434,7 @@ public final class ReactorServicePlansTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void updatePlanVisibility() {
+    void updatePlanVisibility() {
         mockRequest(InteractionContext.builder()
             .request(TestRequest.builder()
                 .method(POST).path("/service_plans/bf7eb420-11e5-11ea-b7db-4b5d5e7976a9/visibility")

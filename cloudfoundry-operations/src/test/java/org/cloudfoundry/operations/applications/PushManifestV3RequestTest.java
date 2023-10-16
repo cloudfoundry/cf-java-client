@@ -16,18 +16,22 @@
 
 package org.cloudfoundry.operations.applications;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class PushManifestV3RequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noManifest() {
-        PushManifestV3Request.builder()
-            .build();
+class PushManifestV3RequestTest {
+
+    @Test
+    void noManifest() {
+        assertThrows(IllegalStateException.class, () -> {
+            PushManifestV3Request.builder()
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         PushManifestV3Request.builder()
             .manifest(ManifestV3.builder()
                 .application(ManifestV3Application.builder()

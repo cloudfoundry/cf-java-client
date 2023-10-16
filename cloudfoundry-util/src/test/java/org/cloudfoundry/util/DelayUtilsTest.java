@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.util;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -25,11 +25,11 @@ import reactor.test.scheduler.VirtualTimeScheduler;
 
 import java.time.Duration;
 
-public final class DelayUtilsTest {
+final class DelayUtilsTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void exponentialBackOff() {
+    void exponentialBackOff() {
         StepVerifier.withVirtualTime(() -> (Publisher<Long>) DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(5), Duration.ofSeconds(5))
             .apply(Flux.just(1L, 2L, 3L)))
             .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(2)))
@@ -44,7 +44,7 @@ public final class DelayUtilsTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void exponentialBackOffMaximum() {
+    void exponentialBackOffMaximum() {
         StepVerifier.withVirtualTime(() -> (Publisher<Long>) DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(1), Duration.ofSeconds(5))
             .apply(Flux.just(1L, 2L, 3L)))
             .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(1)))
@@ -58,7 +58,7 @@ public final class DelayUtilsTest {
     }
 
     @Test
-    public void exponentialBackOffTimeout() {
+    void exponentialBackOffTimeout() {
         StepVerifier.create(DelayUtils.exponentialBackOff(Duration.ofMillis(500), Duration.ofMillis(500), Duration.ofMillis(100))
             .apply(Mono.delay(Duration.ofMillis(200))
                 .thenMany(Flux.just(1L))))
@@ -68,7 +68,7 @@ public final class DelayUtilsTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void fixed() {
+    void fixed() {
         StepVerifier.withVirtualTime(() -> (Publisher<Long>) DelayUtils.fixed(Duration.ofSeconds(1))
             .apply(Flux.just(1L, 2L, 3L)))
             .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(1)))
@@ -83,7 +83,7 @@ public final class DelayUtilsTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void instant() {
+    void instant() {
         StepVerifier.withVirtualTime(() -> (Publisher<Long>) DelayUtils.instant()
             .apply(Flux.just(1L, 2L, 3L)))
             .expectNext(0L)

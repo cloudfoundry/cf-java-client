@@ -16,18 +16,22 @@
 
 package org.cloudfoundry.client.v2.jobs;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class GetJobRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noJobId() {
-        GetJobRequest.builder()
-            .build();
+final class GetJobRequestTest {
+
+    @Test
+    void noJobId() {
+        assertThrows(IllegalStateException.class, () -> {
+            GetJobRequest.builder()
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         GetJobRequest.builder()
             .jobId("test-job-id")
             .build();

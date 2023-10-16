@@ -16,18 +16,22 @@
 
 package org.cloudfoundry.client.v3.serviceinstances;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class ListSharedSpacesRelationshipTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noServiceInstanceId() {
-        ListSharedSpacesRelationshipRequest.builder()
-            .build();
+class ListSharedSpacesRelationshipTest {
+
+    @Test
+    void noServiceInstanceId() {
+        assertThrows(IllegalStateException.class, () -> {
+            ListSharedSpacesRelationshipRequest.builder()
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         ListSharedSpacesRelationshipRequest.builder()
             .serviceInstanceId("test-service-instance-id")
             .build();

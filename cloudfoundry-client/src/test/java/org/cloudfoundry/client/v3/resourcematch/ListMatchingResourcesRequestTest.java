@@ -17,18 +17,22 @@
 package org.cloudfoundry.client.v3.resourcematch;
 
 import org.cloudfoundry.client.v3.Checksum;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class ListMatchingResourcesRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noResources() {
-        ListMatchingResourcesRequest.builder()
-            .build();
+class ListMatchingResourcesRequestTest {
+
+    @Test
+    void noResources() {
+        assertThrows(IllegalStateException.class, () -> {
+            ListMatchingResourcesRequest.builder()
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         ListMatchingResourcesRequest.builder()
             .resource(MatchedResource.builder()
                 .checksum(Checksum.builder()

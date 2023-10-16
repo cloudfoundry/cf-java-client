@@ -16,15 +16,15 @@
 
 package org.cloudfoundry.util.tuple;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.util.function.Tuples;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public final class TupleUtilsTest {
+final class TupleUtilsTest {
 
     @Test
-    public void consumer2() {
+    void consumer2() {
         TupleUtils
             .consumer((first, second) -> {
                 assertThat(first).isEqualTo(1);
@@ -34,7 +34,7 @@ public final class TupleUtilsTest {
     }
 
     @Test
-    public void consumer3() {
+    void consumer3() {
         TupleUtils
             .consumer((first, second, third) -> {
                 assertThat(first).isEqualTo(1);
@@ -45,7 +45,7 @@ public final class TupleUtilsTest {
     }
 
     @Test
-    public void consumer4() {
+    void consumer4() {
         TupleUtils
             .consumer((first, second, third, fourth) -> {
                 assertThat(first).isEqualTo(1);
@@ -57,7 +57,7 @@ public final class TupleUtilsTest {
     }
 
     @Test
-    public void consumer5() {
+    void consumer5() {
         TupleUtils
             .consumer((first, second, third, fourth, fifth) -> {
                 assertThat(first).isEqualTo(1);
@@ -70,7 +70,7 @@ public final class TupleUtilsTest {
     }
 
     @Test
-    public void consumer6() {
+    void consumer6() {
         TupleUtils
             .consumer((first, second, third, fourth, fifth, sixth) -> {
                 assertThat(first).isEqualTo(1);
@@ -84,7 +84,7 @@ public final class TupleUtilsTest {
     }
 
     @Test
-    public void consumer7() {
+    void consumer7() {
         TupleUtils
             .consumer((first, second, third, fourth, fifth, sixth, seventh) -> {
                 assertThat(first).isEqualTo(1);
@@ -99,7 +99,7 @@ public final class TupleUtilsTest {
     }
 
     @Test
-    public void consumer8() {
+    void consumer8() {
         TupleUtils
             .consumer((first, second, third, fourth, fifth, sixth, seventh, eighth) -> {
                 assertThat(first).isEqualTo(1);
@@ -115,7 +115,7 @@ public final class TupleUtilsTest {
     }
 
     @Test
-    public void function2() {
+    void function2() {
         int result = TupleUtils
             .function((first, second) -> {
                 assertThat(first).isEqualTo(1);
@@ -129,7 +129,7 @@ public final class TupleUtilsTest {
     }
 
     @Test
-    public void function3() {
+    void function3() {
         int result = TupleUtils
             .function((first, second, third) -> {
                 assertThat(first).isEqualTo(1);
@@ -144,7 +144,7 @@ public final class TupleUtilsTest {
     }
 
     @Test
-    public void function4() {
+    void function4() {
         int result = TupleUtils
             .function((first, second, third, fourth) -> {
                 assertThat(first).isEqualTo(1);
@@ -160,7 +160,7 @@ public final class TupleUtilsTest {
     }
 
     @Test
-    public void function5() {
+    void function5() {
         int result = TupleUtils
             .function((first, second, third, fourth, fifth) -> {
                 assertThat(first).isEqualTo(1);
@@ -177,7 +177,7 @@ public final class TupleUtilsTest {
     }
 
     @Test
-    public void function6() {
+    void function6() {
         int result = TupleUtils
             .function((first, second, third, fourth, fifth, sixth) -> {
                 assertThat(first).isEqualTo(1);
@@ -195,7 +195,7 @@ public final class TupleUtilsTest {
     }
 
     @Test
-    public void function7() {
+    void function7() {
         int result = TupleUtils
             .function((first, second, third, fourth, fifth, sixth, seventh) -> {
                 assertThat(first).isEqualTo(1);
@@ -214,7 +214,7 @@ public final class TupleUtilsTest {
     }
 
     @Test
-    public void function8() {
+    void function8() {
         int result = TupleUtils
             .function((first, second, third, fourth, fifth, sixth, seventh, eighth) -> {
                 assertThat(first).isEqualTo(1);
@@ -234,7 +234,7 @@ public final class TupleUtilsTest {
     }
 
     @Test
-    public void predicate2() {
+    void predicate2() {
         boolean result = TupleUtils
             .predicate((first, second) -> {
                 assertThat(first).isEqualTo(1);
@@ -248,7 +248,7 @@ public final class TupleUtilsTest {
     }
 
     @Test
-    public void predicate3() {
+    void predicate3() {
         boolean result = TupleUtils
             .predicate((first, second, third) -> {
                 assertThat(first).isEqualTo(1);
@@ -263,7 +263,7 @@ public final class TupleUtilsTest {
     }
 
     @Test
-    public void predicate4() {
+    void predicate4() {
         boolean result = TupleUtils
             .predicate((first, second, third, fourth) -> {
                 assertThat(first).isEqualTo(1);
@@ -279,7 +279,7 @@ public final class TupleUtilsTest {
     }
 
     @Test
-    public void predicate5() {
+    void predicate5() {
         boolean result = TupleUtils
             .predicate((first, second, third, fourth, fifth) -> {
                 assertThat(first).isEqualTo(1);
@@ -296,7 +296,7 @@ public final class TupleUtilsTest {
     }
 
     @Test
-    public void predicate6() {
+    void predicate6() {
         boolean result = TupleUtils
             .predicate((first, second, third, fourth, fifth, sixth) -> {
                 assertThat(first).isEqualTo(1);
@@ -314,7 +314,7 @@ public final class TupleUtilsTest {
     }
 
     @Test
-    public void predicate7() {
+    void predicate7() {
         boolean result = TupleUtils
             .predicate((first, second, third, fourth, fifth, sixth, seventh) -> {
                 assertThat(first).isEqualTo(1);
@@ -333,7 +333,7 @@ public final class TupleUtilsTest {
     }
 
     @Test
-    public void predicate8() {
+    void predicate8() {
         boolean result = TupleUtils
             .predicate((first, second, third, fourth, fifth, sixth, seventh, eighth) -> {
                 assertThat(first).isEqualTo(1);

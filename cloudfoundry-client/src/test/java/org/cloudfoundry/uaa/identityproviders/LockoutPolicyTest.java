@@ -16,37 +16,44 @@
 
 package org.cloudfoundry.uaa.identityproviders;
 
+import org.junit.jupiter.api.Test;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class LockoutPolicyTest {
+final class LockoutPolicyTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noLockAccountPeriodInSecond() {
-        LockoutPolicy.builder()
-            .lockoutPeriodInSecond(0)
-            .numberOfAllowedFailures(0)
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noLockoutPeriodInSecond() {
-        LockoutPolicy.builder()
-            .lockAccountPeriodInSecond(0)
-            .numberOfAllowedFailures(0)
-            .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noNumberOfAllowedFailures() {
-        LockoutPolicy.builder()
-            .lockAccountPeriodInSecond(0)
-            .lockoutPeriodInSecond(0)
-            .build();
+    @Test
+    void noLockAccountPeriodInSecond() {
+        assertThrows(IllegalStateException.class, () -> {
+            LockoutPolicy.builder()
+                .lockoutPeriodInSecond(0)
+                .numberOfAllowedFailures(0)
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void noLockoutPeriodInSecond() {
+        assertThrows(IllegalStateException.class, () -> {
+            LockoutPolicy.builder()
+                .lockAccountPeriodInSecond(0)
+                .numberOfAllowedFailures(0)
+                .build();
+        });
+    }
+
+    @Test
+    void noNumberOfAllowedFailures() {
+        assertThrows(IllegalStateException.class, () -> {
+            LockoutPolicy.builder()
+                .lockAccountPeriodInSecond(0)
+                .lockoutPeriodInSecond(0)
+                .build();
+        });
+    }
+
+    @Test
+    void valid() {
         LockoutPolicy.builder()
             .lockAccountPeriodInSecond(0)
             .lockoutPeriodInSecond(0)

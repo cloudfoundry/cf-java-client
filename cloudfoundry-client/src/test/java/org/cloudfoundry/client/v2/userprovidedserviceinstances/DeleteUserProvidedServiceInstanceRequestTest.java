@@ -16,18 +16,22 @@
 
 package org.cloudfoundry.client.v2.userprovidedserviceinstances;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class DeleteUserProvidedServiceInstanceRequestTest {
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @Test(expected = IllegalStateException.class)
-    public void noUserProvidedServiceInstanceId() {
-        DeleteUserProvidedServiceInstanceRequest.builder()
-            .build();
+final class DeleteUserProvidedServiceInstanceRequestTest {
+
+    @Test
+    void noUserProvidedServiceInstanceId() {
+        assertThrows(IllegalStateException.class, () -> {
+            DeleteUserProvidedServiceInstanceRequest.builder()
+                .build();
+        });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         DeleteUserProvidedServiceInstanceRequest.builder()
             .userProvidedServiceInstanceId("test-user-provided-service-instance-id")
             .build();

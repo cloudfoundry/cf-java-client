@@ -30,7 +30,7 @@ import org.cloudfoundry.client.v2.jobs.GetJobRequest;
 import org.cloudfoundry.client.v2.jobs.GetJobResponse;
 import org.cloudfoundry.client.v2.jobs.JobEntity;
 import org.cloudfoundry.operations.AbstractOperationsTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import reactor.test.scheduler.VirtualTimeScheduler;
@@ -46,12 +46,12 @@ import java.util.function.Supplier;
 import static org.cloudfoundry.operations.TestObjects.fill;
 import static org.mockito.Mockito.when;
 
-public final class DefaultBuildpacksTest extends AbstractOperationsTest {
+final class DefaultBuildpacksTest extends AbstractOperationsTest {
 
     private final DefaultBuildpacks buildpacks = new DefaultBuildpacks(Mono.just(this.cloudFoundryClient));
 
     @Test
-    public void create() {
+    void create() {
         requestCreateBuildpack(this.cloudFoundryClient, "test-buildpack", 1, true);
         requestUploadBuildpack(this.cloudFoundryClient, "test-buildpack-id", Paths.get("test-buildpack"), "test-buildpack");
 
@@ -68,7 +68,7 @@ public final class DefaultBuildpacksTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         requestListBuildpacks(this.cloudFoundryClient, "test-buildpack");
         requestDeleteBuildpack(this.cloudFoundryClient, "test-buildpack-id");
         requestJobSuccess(this.cloudFoundryClient, "test-job-id");
@@ -83,7 +83,7 @@ public final class DefaultBuildpacksTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         requestBuildpacks(this.cloudFoundryClient);
 
         this.buildpacks
@@ -103,7 +103,7 @@ public final class DefaultBuildpacksTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void rename() {
+    void rename() {
         requestListBuildpacks(this.cloudFoundryClient, "test-buildpack");
         requestUpdateBuildpack(this.cloudFoundryClient, "test-buildpack-id", "test-buildpack-new");
 
@@ -118,7 +118,7 @@ public final class DefaultBuildpacksTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void update() {
+    void update() {
         requestListBuildpacks(this.cloudFoundryClient, "test-buildpack");
         requestUpdateBuildpack(this.cloudFoundryClient, "test-buildpack-id", true, true, 5);
 
@@ -135,7 +135,7 @@ public final class DefaultBuildpacksTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void updateWithBits() {
+    void updateWithBits() {
         requestListBuildpacks(this.cloudFoundryClient, "test-buildpack");
         requestUpdateBuildpack(this.cloudFoundryClient, "test-buildpack-id", true, true, 5);
         requestUploadBuildpack(this.cloudFoundryClient, "test-buildpack-id", Paths.get("test-buildpack"), "test-buildpack");
