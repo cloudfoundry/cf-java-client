@@ -58,7 +58,7 @@
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <dependencies.version>2.7.16</dependencies.version>
+        <dependencies.version>2.7.17</dependencies.version>
 
         <commons-compress.version>1.24.0</commons-compress.version>
         <commons-lang3.version>3.13.0</commons-lang3.version>
@@ -322,7 +322,7 @@
             </activation>
             <properties>
                 <java.version>17</java.version>
-                <dependencies.version>3.1.4</dependencies.version>
+                <dependencies.version>3.1.5</dependencies.version>
                 <wire.version>4.9.1</wire.version>
                 <wire.plugin.version>3.0.2</wire.plugin.version>
                 <wire.suffix>-jvm</wire.suffix>
@@ -356,7 +356,7 @@
             </activation>
             <properties>
                 <java.version>21</java.version>
-                <dependencies.version>3.1.4</dependencies.version>
+                <dependencies.version>3.1.5</dependencies.version>
                 <wire.version>4.9.1</wire.version>
                 <wire.plugin.version>3.0.2</wire.plugin.version>
                 <wire.suffix>-jvm</wire.suffix>

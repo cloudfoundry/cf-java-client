@@ -1,7 +1,4 @@
-.idea/libraries
-.idea/jarRepositories.xml
-.idea/tasks.xml
-.idea/workspace.xml
+.idea/
 target/
 bin/
 .project
@@ -9,3 +6,4 @@ bin/
 .settings/
 .factorypath
 .gradle
+.history
