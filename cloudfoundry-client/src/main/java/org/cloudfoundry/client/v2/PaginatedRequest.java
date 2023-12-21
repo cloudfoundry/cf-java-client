@@ -44,5 +44,4 @@ public abstract class PaginatedRequest {
     @Nullable
     @QueryParameter("results-per-page")
     public abstract Integer getResultsPerPage();
-
 }

@@ -22,35 +22,31 @@ public final class TerminateApplicationInstanceRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noApplicationId() {
-        TerminateApplicationInstanceRequest.builder()
-            .index("test-index")
-            .type("test-type")
-            .build();
+        TerminateApplicationInstanceRequest.builder().index("test-index").type("test-type").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noIndex() {
         TerminateApplicationInstanceRequest.builder()
-            .applicationId("test-application-id")
-            .type("test-type")
-            .build();
+                .applicationId("test-application-id")
+                .type("test-type")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noType() {
         TerminateApplicationInstanceRequest.builder()
-            .applicationId("test-application-id")
-            .index("test-index")
-            .build();
+                .applicationId("test-application-id")
+                .index("test-index")
+                .build();
     }
 
     @Test
     public void valid() {
         TerminateApplicationInstanceRequest.builder()
-            .applicationId("test-application-id")
-            .index("test-index")
-            .type("test-type")
-            .build();
+                .applicationId("test-application-id")
+                .index("test-index")
+                .type("test-type")
+                .build();
     }
-
 }

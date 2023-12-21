@@ -46,5 +46,4 @@ public interface LogCacheClient {
      * @return the read response
      */
     Mono<ReadResponse> read(ReadRequest request);
-
 }

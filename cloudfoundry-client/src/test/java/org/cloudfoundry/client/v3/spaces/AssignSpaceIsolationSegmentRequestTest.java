@@ -24,27 +24,20 @@ public final class AssignSpaceIsolationSegmentRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noOrganizationId() {
         AssignSpaceIsolationSegmentRequest.builder()
-            .data(Relationship.builder()
-                .id("test-isolation-segment-id")
-                .build())
-            .build();
+                .data(Relationship.builder().id("test-isolation-segment-id").build())
+                .build();
     }
 
     @Test
     public void validData() {
         AssignSpaceIsolationSegmentRequest.builder()
-            .data(Relationship.builder()
-                .id("test-isolation-segment-id")
-                .build())
-            .spaceId("test-space-id")
-            .build();
+                .data(Relationship.builder().id("test-isolation-segment-id").build())
+                .spaceId("test-space-id")
+                .build();
     }
 
     @Test
     public void validNoData() {
-        AssignSpaceIsolationSegmentRequest.builder()
-            .spaceId("test-space-id")
-            .build();
+        AssignSpaceIsolationSegmentRequest.builder().spaceId("test-space-id").build();
     }
-
 }

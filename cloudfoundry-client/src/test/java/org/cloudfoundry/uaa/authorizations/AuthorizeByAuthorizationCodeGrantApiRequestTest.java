@@ -23,25 +23,22 @@ public final class AuthorizeByAuthorizationCodeGrantApiRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noClientId() {
         AuthorizeByAuthorizationCodeGrantApiRequest.builder()
-            .redirectUri("http://redirect.to/app")
-            .state("test-state")
-            .build();
+                .redirectUri("http://redirect.to/app")
+                .state("test-state")
+                .build();
     }
 
     @Test
     public void validMax() {
         AuthorizeByAuthorizationCodeGrantApiRequest.builder()
-            .clientId("test-client-id")
-            .redirectUri("http://redirect.to/app")
-            .state("test-state")
-            .build();
+                .clientId("test-client-id")
+                .redirectUri("http://redirect.to/app")
+                .state("test-state")
+                .build();
     }
 
     @Test
     public void validMin() {
-        AuthorizeByAuthorizationCodeGrantApiRequest.builder()
-            .clientId("test-client-id")
-            .build();
+        AuthorizeByAuthorizationCodeGrantApiRequest.builder().clientId("test-client-id").build();
     }
-
 }

@@ -18,20 +18,15 @@ package org.cloudfoundry.client.v2.servicekeys;
 
 import org.junit.Test;
 
-
 public final class GetServiceKeyRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noServiceKeyId() {
-        GetServiceKeyRequest.builder()
-            .build();
+        GetServiceKeyRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        GetServiceKeyRequest.builder()
-            .serviceKeyId("test-service-key-id")
-            .build();
+        GetServiceKeyRequest.builder().serviceKeyId("test-service-key-id").build();
     }
-
 }

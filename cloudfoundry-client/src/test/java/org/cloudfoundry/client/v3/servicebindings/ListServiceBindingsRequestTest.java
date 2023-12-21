@@ -22,8 +22,6 @@ public final class ListServiceBindingsRequestTest {
 
     @Test
     public void valid() {
-        ListServiceBindingsRequest.builder()
-            .build();
+        ListServiceBindingsRequest.builder().build();
     }
-
 }

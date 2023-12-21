@@ -19,6 +19,4 @@ package org.cloudfoundry.uaa.groups;
 /**
  * An Entity for {@link Member}
  */
-public interface Entity {
-
-}
+public interface Entity {}

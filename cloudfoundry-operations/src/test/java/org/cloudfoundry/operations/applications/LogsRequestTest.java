@@ -22,15 +22,11 @@ public final class LogsRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noName() {
-        LogsRequest.builder()
-            .build();
+        LogsRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        LogsRequest.builder()
-            .name("test-name")
-            .build();
+        LogsRequest.builder().name("test-name").build();
     }
-
 }

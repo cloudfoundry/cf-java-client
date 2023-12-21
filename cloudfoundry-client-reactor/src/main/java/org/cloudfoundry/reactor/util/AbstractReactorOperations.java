@@ -16,15 +16,14 @@
 
 package org.cloudfoundry.reactor.util;
 
+import static io.netty.handler.codec.http.HttpHeaderNames.AUTHORIZATION;
+
 import io.netty.handler.codec.http.HttpHeaders;
+import java.util.Map;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
-
-import java.util.Map;
-
-import static io.netty.handler.codec.http.HttpHeaderNames.AUTHORIZATION;
 
 public abstract class AbstractReactorOperations {
 
@@ -38,7 +37,11 @@ public abstract class AbstractReactorOperations {
 
     protected final TokenProvider tokenProvider;
 
-    protected AbstractReactorOperations(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
+    protected AbstractReactorOperations(
+            ConnectionContext connectionContext,
+            Mono<String> root,
+            TokenProvider tokenProvider,
+            Map<String, String> requestTags) {
         this.connectionContext = connectionContext;
         this.root = root;
         this.tokenProvider = tokenProvider;
@@ -48,10 +51,11 @@ public abstract class AbstractReactorOperations {
     protected Mono<Operator> createOperator() {
         HttpClient httpClient = this.connectionContext.getHttpClient();
 
-        return this.root.map(this::buildOperatorContext)
-            .map(context -> new Operator(context, httpClient))
-            .map(operator -> operator.headers(this::addHeaders))
-            .map(operator -> operator.headersWhen(this::addHeadersWhen));
+        return this.root
+                .map(this::buildOperatorContext)
+                .map(context -> new Operator(context, httpClient))
+                .map(operator -> operator.headers(this::addHeaders))
+                .map(operator -> operator.headersWhen(this::addHeadersWhen));
     }
 
     private void addHeaders(HttpHeaders httpHeaders) {
@@ -61,16 +65,16 @@ public abstract class AbstractReactorOperations {
     }
 
     private Mono<? extends HttpHeaders> addHeadersWhen(HttpHeaders httpHeaders) {
-        return this.tokenProvider.getToken(this.connectionContext)
-            .map(token -> httpHeaders.set(AUTHORIZATION, token));
+        return this.tokenProvider
+                .getToken(this.connectionContext)
+                .map(token -> httpHeaders.set(AUTHORIZATION, token));
     }
 
     private OperatorContext buildOperatorContext(String root) {
         return OperatorContext.builder()
-            .connectionContext(this.connectionContext)
-            .root(root)
-            .tokenProvider(this.tokenProvider)
-            .build();
+                .connectionContext(this.connectionContext)
+                .root(root)
+                .tokenProvider(this.tokenProvider)
+                .build();
     }
-
 }

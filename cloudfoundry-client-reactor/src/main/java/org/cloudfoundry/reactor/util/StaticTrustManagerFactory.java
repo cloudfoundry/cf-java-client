@@ -17,10 +17,9 @@
 package org.cloudfoundry.reactor.util;
 
 import io.netty.handler.ssl.util.SimpleTrustManagerFactory;
-
+import java.security.KeyStore;
 import javax.net.ssl.ManagerFactoryParameters;
 import javax.net.ssl.TrustManager;
-import java.security.KeyStore;
 
 public final class StaticTrustManagerFactory extends SimpleTrustManagerFactory {
 
@@ -44,5 +43,4 @@ public final class StaticTrustManagerFactory extends SimpleTrustManagerFactory {
     protected void engineInit(KeyStore keyStore) {
         // Do nothing
     }
-
 }

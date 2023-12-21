@@ -22,15 +22,11 @@ public final class GetSpaceSummaryRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noSpaceId() {
-        GetSpaceSummaryRequest.builder()
-            .build();
+        GetSpaceSummaryRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        GetSpaceSummaryRequest.builder()
-            .spaceId("test-space-id")
-            .build();
+        GetSpaceSummaryRequest.builder().spaceId("test-space-id").build();
     }
-
 }

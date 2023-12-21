@@ -22,25 +22,20 @@ public final class ChangeSecretRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noClientId() {
-        ChangeSecretRequest.builder()
-            .secret("test-secret")
-            .build();
+        ChangeSecretRequest.builder().secret("test-secret").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noSecret() {
-        ChangeSecretRequest.builder()
-            .clientId("test-client-id")
-            .build();
+        ChangeSecretRequest.builder().clientId("test-client-id").build();
     }
 
     @Test
     public void valid() {
         ChangeSecretRequest.builder()
-            .clientId("test-client-id")
-            .oldSecret("test-old-secret")
-            .secret("test-secret")
-            .build();
+                .clientId("test-client-id")
+                .oldSecret("test-old-secret")
+                .secret("test-secret")
+                .build();
     }
-
 }

@@ -22,15 +22,11 @@ public final class GetMetadataRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noClientId() {
-        GetMetadataRequest.builder()
-            .build();
+        GetMetadataRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        GetMetadataRequest.builder()
-            .clientId("test-client-id")
-            .build();
+        GetMetadataRequest.builder().clientId("test-client-id").build();
     }
-
 }

@@ -80,5 +80,4 @@ public interface UaaClient {
      * Main entry point to the UAA User Client API
      */
     Users users();
-
 }

@@ -19,17 +19,16 @@ package org.cloudfoundry.reactor.doppler;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.http.HttpHeaderNames;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import reactor.core.publisher.Flux;
-import reactor.netty.ByteBufFlux;
-import reactor.netty.http.client.HttpClientResponse;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import reactor.core.publisher.Flux;
+import reactor.netty.ByteBufFlux;
+import reactor.netty.http.client.HttpClientResponse;
 
 final class MultipartCodec {
 
@@ -39,23 +38,25 @@ final class MultipartCodec {
 
     private static final int MAX_PAYLOAD_SIZE = 1024 * 1024;
 
-    private MultipartCodec() {
-    }
+    private MultipartCodec() {}
 
     static DelimiterBasedFrameDecoder createDecoder(HttpClientResponse response) {
         String boundary = extractMultipartBoundary(response);
 
-        return new DelimiterBasedFrameDecoder(MAX_PAYLOAD_SIZE,
-            Unpooled.copiedBuffer(String.format("--%s\r\n\r\n", boundary), Charset.defaultCharset()),
-            Unpooled.copiedBuffer(String.format("\r\n--%s\r\n\r\n", boundary), Charset.defaultCharset()),
-            Unpooled.copiedBuffer(String.format("\r\n--%s--", boundary), Charset.defaultCharset()),
-            Unpooled.copiedBuffer(String.format("\r\n--%s--\r\n", boundary), Charset.defaultCharset()));
+        return new DelimiterBasedFrameDecoder(
+                MAX_PAYLOAD_SIZE,
+                Unpooled.copiedBuffer(
+                        String.format("--%s\r\n\r\n", boundary), Charset.defaultCharset()),
+                Unpooled.copiedBuffer(
+                        String.format("\r\n--%s\r\n\r\n", boundary), Charset.defaultCharset()),
+                Unpooled.copiedBuffer(
+                        String.format("\r\n--%s--", boundary), Charset.defaultCharset()),
+                Unpooled.copiedBuffer(
+                        String.format("\r\n--%s--\r\n", boundary), Charset.defaultCharset()));
     }
 
     static Flux<InputStream> decode(ByteBufFlux body) {
-        return body.asInputStream()
-            .skip(1)
-            .doOnDiscard(InputStream.class, MultipartCodec::close);
+        return body.asInputStream().skip(1).doOnDiscard(InputStream.class, MultipartCodec::close);
     }
 
     private static void close(InputStream in) {
@@ -73,8 +74,10 @@ final class MultipartCodec {
         if (matcher.matches()) {
             return matcher.group(1);
         } else {
-            throw new IllegalStateException(String.format("Content-Type %s does not contain a valid multipart boundary", contentType));
+            throw new IllegalStateException(
+                    String.format(
+                            "Content-Type %s does not contain a valid multipart boundary",
+                            contentType));
         }
     }
-
 }

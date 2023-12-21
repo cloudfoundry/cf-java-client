@@ -21,6 +21,5 @@ import org.cloudfoundry.client.v2.Resource;
 /**
  * The response payload for the deprecated Create a Private Domain operation
  */
-public abstract class AbstractPrivateDomainResource extends Resource<org.cloudfoundry.client.v2.privatedomains.PrivateDomainEntity> {
-
-}
+public abstract class AbstractPrivateDomainResource
+        extends Resource<org.cloudfoundry.client.v2.privatedomains.PrivateDomainEntity> {}

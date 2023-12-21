@@ -22,8 +22,6 @@ public final class DeleteOrphanedRoutesRequestTest {
 
     @Test
     public void valid() {
-        DeleteOrphanedRoutesRequest.builder()
-            .build();
+        DeleteOrphanedRoutesRequest.builder().build();
     }
-
 }

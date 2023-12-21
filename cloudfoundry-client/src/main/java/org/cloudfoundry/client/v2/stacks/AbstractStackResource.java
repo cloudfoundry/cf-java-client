@@ -21,6 +21,5 @@ import org.cloudfoundry.client.v2.Resource;
 /**
  * The base class for Stack resources
  */
-public abstract class AbstractStackResource extends Resource<org.cloudfoundry.client.v2.stacks.StackEntity> {
-
-}
+public abstract class AbstractStackResource
+        extends Resource<org.cloudfoundry.client.v2.stacks.StackEntity> {}

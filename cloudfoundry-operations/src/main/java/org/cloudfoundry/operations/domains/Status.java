@@ -30,5 +30,4 @@ public enum Status {
      * Domain is shared
      */
     SHARED
-
 }

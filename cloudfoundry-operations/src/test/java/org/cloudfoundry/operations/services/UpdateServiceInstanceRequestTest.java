@@ -22,15 +22,13 @@ public final class UpdateServiceInstanceRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noServiceInstanceName() {
-        CreateServiceInstanceRequest.builder()
-            .build();
+        CreateServiceInstanceRequest.builder().build();
     }
 
     @Test
     public void valid() {
         UpdateServiceInstanceRequest.builder()
-            .serviceInstanceName("test-service-instance-name")
-            .build();
+                .serviceInstanceName("test-service-instance-name")
+                .build();
     }
-
 }

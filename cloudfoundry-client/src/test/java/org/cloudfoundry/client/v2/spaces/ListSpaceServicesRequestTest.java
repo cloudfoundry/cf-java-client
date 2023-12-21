@@ -22,15 +22,11 @@ public final class ListSpaceServicesRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noSpaceId() {
-        ListSpaceServicesRequest.builder()
-            .build();
+        ListSpaceServicesRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        ListSpaceServicesRequest.builder()
-            .spaceId("test-space-id")
-            .build();
+        ListSpaceServicesRequest.builder().spaceId("test-space-id").build();
     }
-
 }

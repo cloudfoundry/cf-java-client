@@ -22,17 +22,14 @@ public final class GetIdentityProviderRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noIdentityProviderId() {
-        GetIdentityProviderRequest.builder()
-            .identityZoneId("test-identity-zone-id")
-            .build();
+        GetIdentityProviderRequest.builder().identityZoneId("test-identity-zone-id").build();
     }
 
     @Test
     public void valid() {
         GetIdentityProviderRequest.builder()
-            .identityProviderId("test-identity-provider-id")
-            .identityZoneId("test-identity-zone-id")
-            .build();
+                .identityProviderId("test-identity-provider-id")
+                .identityZoneId("test-identity-zone-id")
+                .build();
     }
-
 }

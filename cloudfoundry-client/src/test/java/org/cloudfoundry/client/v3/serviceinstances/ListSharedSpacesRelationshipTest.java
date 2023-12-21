@@ -22,15 +22,13 @@ public class ListSharedSpacesRelationshipTest {
 
     @Test(expected = IllegalStateException.class)
     public void noServiceInstanceId() {
-        ListSharedSpacesRelationshipRequest.builder()
-            .build();
+        ListSharedSpacesRelationshipRequest.builder().build();
     }
 
     @Test
     public void valid() {
         ListSharedSpacesRelationshipRequest.builder()
-            .serviceInstanceId("test-service-instance-id")
-            .build();
+                .serviceInstanceId("test-service-instance-id")
+                .build();
     }
-
 }

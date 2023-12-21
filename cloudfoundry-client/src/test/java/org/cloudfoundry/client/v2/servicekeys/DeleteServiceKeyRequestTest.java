@@ -22,15 +22,11 @@ public final class DeleteServiceKeyRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noServiceKeyId() {
-        DeleteServiceKeyRequest.builder()
-            .build();
+        DeleteServiceKeyRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        DeleteServiceKeyRequest.builder()
-            .serviceKeyId("test-service-key-id")
-            .build();
+        DeleteServiceKeyRequest.builder().serviceKeyId("test-service-key-id").build();
     }
-
 }

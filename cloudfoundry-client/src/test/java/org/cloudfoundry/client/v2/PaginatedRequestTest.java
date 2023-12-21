@@ -16,11 +16,11 @@
 
 package org.cloudfoundry.client.v2;
 
-import org.junit.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.client.v2.OrderDirection.ASCENDING;
 import static org.cloudfoundry.client.v2.OrderDirection.DESCENDING;
+
+import org.junit.Test;
 
 public final class PaginatedRequestTest {
 
@@ -29,5 +29,4 @@ public final class PaginatedRequestTest {
         assertThat(ASCENDING.getValue()).isEqualTo("asc");
         assertThat(DESCENDING.getValue()).isEqualTo("desc");
     }
-
 }

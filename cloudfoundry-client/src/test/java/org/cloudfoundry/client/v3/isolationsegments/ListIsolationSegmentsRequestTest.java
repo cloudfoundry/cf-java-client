@@ -22,8 +22,6 @@ public final class ListIsolationSegmentsRequestTest {
 
     @Test
     public void valid() {
-        ListIsolationSegmentsRequest.builder()
-            .build();
+        ListIsolationSegmentsRequest.builder().build();
     }
-
 }

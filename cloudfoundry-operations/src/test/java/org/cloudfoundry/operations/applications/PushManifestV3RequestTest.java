@@ -22,18 +22,19 @@ public class PushManifestV3RequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noManifest() {
-        PushManifestV3Request.builder()
-            .build();
+        PushManifestV3Request.builder().build();
     }
 
     @Test
     public void valid() {
         PushManifestV3Request.builder()
-            .manifest(ManifestV3.builder()
-                .application(ManifestV3Application.builder()
-                    .name("test-application-name")
-                    .build())
-                .build())
-            .build();
+                .manifest(
+                        ManifestV3.builder()
+                                .application(
+                                        ManifestV3Application.builder()
+                                                .name("test-application-name")
+                                                .build())
+                                .build())
+                .build();
     }
 }

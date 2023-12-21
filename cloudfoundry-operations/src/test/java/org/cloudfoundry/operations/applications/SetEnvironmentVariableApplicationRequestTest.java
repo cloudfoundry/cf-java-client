@@ -23,34 +23,33 @@ public final class SetEnvironmentVariableApplicationRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noName() {
         SetEnvironmentVariableApplicationRequest.builder()
-            .variableName("test-variable-name")
-            .variableValue("test-variable-value")
-            .build();
+                .variableName("test-variable-name")
+                .variableValue("test-variable-value")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noVariableName() {
         SetEnvironmentVariableApplicationRequest.builder()
-            .name("test-name")
-            .variableValue("test-variable-value")
-            .build();
+                .name("test-name")
+                .variableValue("test-variable-value")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noVariableValue() {
         SetEnvironmentVariableApplicationRequest.builder()
-            .name("test-name")
-            .variableName("test-variable-name")
-            .build();
+                .name("test-name")
+                .variableName("test-variable-name")
+                .build();
     }
 
     @Test
     public void valid() {
         SetEnvironmentVariableApplicationRequest.builder()
-            .name("test-name")
-            .variableName("test-variable-name")
-            .variableValue("test-variable-value")
-            .build();
+                .name("test-name")
+                .variableName("test-variable-name")
+                .variableValue("test-variable-value")
+                .build();
     }
-
 }

@@ -23,34 +23,33 @@ public final class UnmapExternalGroupByGroupDisplayNameRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noExternalGroup() {
         UnmapExternalGroupByGroupDisplayNameRequest.builder()
-            .groupDisplayName("test-group-display-name")
-            .origin("test-origin")
-            .build();
+                .groupDisplayName("test-group-display-name")
+                .origin("test-origin")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noGroupDisplayName() {
         UnmapExternalGroupByGroupDisplayNameRequest.builder()
-            .externalGroup("test-external-group")
-            .origin("test-origin")
-            .build();
+                .externalGroup("test-external-group")
+                .origin("test-origin")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noOrigin() {
         UnmapExternalGroupByGroupDisplayNameRequest.builder()
-            .groupDisplayName("test-group-display-name")
-            .externalGroup("test-external-group")
-            .build();
+                .groupDisplayName("test-group-display-name")
+                .externalGroup("test-external-group")
+                .build();
     }
 
     @Test
     public void valid() {
         UnmapExternalGroupByGroupDisplayNameRequest.builder()
-            .groupDisplayName("test-group-display-name")
-            .externalGroup("test-external-group")
-            .origin("test-origin")
-            .build();
+                .groupDisplayName("test-group-display-name")
+                .externalGroup("test-external-group")
+                .origin("test-origin")
+                .build();
     }
-
 }

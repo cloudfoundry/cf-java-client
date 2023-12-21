@@ -22,8 +22,6 @@ public final class LdapConfigurationTest {
 
     @Test
     public void valid() {
-        LdapConfiguration.builder()
-            .build();
+        LdapConfiguration.builder().build();
     }
-
 }

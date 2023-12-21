@@ -24,27 +24,22 @@ public final class AssignOrganizationDefaultIsolationSegmentRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noOrganizationId() {
         AssignOrganizationDefaultIsolationSegmentRequest.builder()
-            .data(Relationship.builder()
-                .id("test-isolation-segment-id")
-                .build())
-            .build();
+                .data(Relationship.builder().id("test-isolation-segment-id").build())
+                .build();
     }
 
     @Test
     public void validData() {
         AssignOrganizationDefaultIsolationSegmentRequest.builder()
-            .data(Relationship.builder()
-                .id("test-isolation-segment-id")
-                .build())
-            .organizationId("test-organization-id")
-            .build();
+                .data(Relationship.builder().id("test-isolation-segment-id").build())
+                .organizationId("test-organization-id")
+                .build();
     }
 
     @Test
     public void validNoData() {
         AssignOrganizationDefaultIsolationSegmentRequest.builder()
-            .organizationId("test-organization-id")
-            .build();
+                .organizationId("test-organization-id")
+                .build();
     }
-
 }

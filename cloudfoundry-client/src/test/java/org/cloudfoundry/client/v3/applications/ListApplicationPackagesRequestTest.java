@@ -22,15 +22,11 @@ public final class ListApplicationPackagesRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noApplicationId() {
-        ListApplicationPackagesRequest.builder()
-            .build();
+        ListApplicationPackagesRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        ListApplicationPackagesRequest.builder()
-            .applicationId("test-application-id")
-            .build();
+        ListApplicationPackagesRequest.builder().applicationId("test-application-id").build();
     }
-
 }

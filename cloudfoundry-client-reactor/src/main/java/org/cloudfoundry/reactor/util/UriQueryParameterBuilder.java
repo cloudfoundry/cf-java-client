@@ -21,5 +21,4 @@ import java.util.stream.Stream;
 public interface UriQueryParameterBuilder {
 
     Stream<UriQueryParameter> build(Object request);
-
 }

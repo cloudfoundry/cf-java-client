@@ -22,24 +22,19 @@ public final class CreateRouteMappingRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noApplicationId() {
-        CreateRouteMappingRequest.builder()
-            .routeId("route-id")
-            .build();
+        CreateRouteMappingRequest.builder().routeId("route-id").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noRouteId() {
-        CreateRouteMappingRequest.builder()
-            .applicationId("application-id")
-            .build();
+        CreateRouteMappingRequest.builder().applicationId("application-id").build();
     }
 
     @Test
     public void valid() {
         CreateRouteMappingRequest.builder()
-            .applicationId("application-id")
-            .routeId("route-id")
-            .build();
+                .applicationId("application-id")
+                .routeId("route-id")
+                .build();
     }
-
 }

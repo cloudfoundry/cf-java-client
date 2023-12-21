@@ -23,7 +23,6 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * The file to be used for configuring the LDAP authentication.
  */
 public enum LdapProfileFile {
-
     SEARCH_AND_BIND("ldap/ldap-search-and-bind.xml"),
 
     SEARCH_AND_COMPARE("ldap/ldap-search-and-compare.xml"),
@@ -46,7 +45,8 @@ public enum LdapProfileFile {
             case "ldap/ldap-simple-bind.xml":
                 return SIMPLE_BIND;
             default:
-                throw new IllegalArgumentException(String.format("Unknown ldap profile file: %s", s));
+                throw new IllegalArgumentException(
+                        String.format("Unknown ldap profile file: %s", s));
         }
     }
 
@@ -59,5 +59,4 @@ public enum LdapProfileFile {
     public String toString() {
         return getValue();
     }
-
 }

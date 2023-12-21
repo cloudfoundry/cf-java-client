@@ -22,46 +22,39 @@ public final class UpdateGroupRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noDisplayName() {
-        UpdateGroupRequest.builder()
-            .groupId("test-group-id")
-            .version("*")
-            .build();
+        UpdateGroupRequest.builder().groupId("test-group-id").version("*").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noId() {
         UpdateGroupRequest.builder()
-            .identityZoneId("test-identity-zone-id")
-            .displayName("group-test")
-            .version("*")
-            .build();
+                .identityZoneId("test-identity-zone-id")
+                .displayName("group-test")
+                .version("*")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noIdentityZoneId() {
-        UpdateGroupRequest.builder()
-            .displayName("group-test")
-            .version("*")
-            .build();
+        UpdateGroupRequest.builder().displayName("group-test").version("*").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noVersion() {
         UpdateGroupRequest.builder()
-            .identityZoneId("test-identity-zone-id")
-            .displayName("group-test")
-            .groupId("test-group-id")
-            .build();
+                .identityZoneId("test-identity-zone-id")
+                .displayName("group-test")
+                .groupId("test-group-id")
+                .build();
     }
 
     @Test
     public void valid() {
         UpdateGroupRequest.builder()
-            .identityZoneId("test-identity-zone-id")
-            .displayName("group-test")
-            .groupId("test-group-id")
-            .version("*")
-            .build();
+                .identityZoneId("test-identity-zone-id")
+                .displayName("group-test")
+                .groupId("test-group-id")
+                .version("*")
+                .build();
     }
-
 }

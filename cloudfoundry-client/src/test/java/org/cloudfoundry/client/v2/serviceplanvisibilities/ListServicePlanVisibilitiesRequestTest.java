@@ -22,8 +22,6 @@ public final class ListServicePlanVisibilitiesRequestTest {
 
     @Test
     public void valid() {
-        ListServicePlanVisibilitiesRequest.builder()
-            .build();
+        ListServicePlanVisibilitiesRequest.builder().build();
     }
-
 }

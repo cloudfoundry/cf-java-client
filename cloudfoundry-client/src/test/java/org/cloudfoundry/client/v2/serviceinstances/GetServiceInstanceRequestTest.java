@@ -16,22 +16,17 @@
 
 package org.cloudfoundry.client.v2.serviceinstances;
 
-
 import org.junit.Test;
 
 public final class GetServiceInstanceRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noServiceInstanceId() {
-        GetServiceInstanceRequest.builder()
-            .build();
+        GetServiceInstanceRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        GetServiceInstanceRequest.builder()
-            .serviceInstanceId("test-service-instance-id")
-            .build();
+        GetServiceInstanceRequest.builder().serviceInstanceId("test-service-instance-id").build();
     }
-
 }

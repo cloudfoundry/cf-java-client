@@ -22,15 +22,11 @@ public class DeleteUnmappedRoutesRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noSpaceId() {
-        DeleteUnmappedRoutesRequest.builder()
-            .build();
+        DeleteUnmappedRoutesRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        DeleteUnmappedRoutesRequest.builder()
-            .spaceId("test-space-id")
-            .build();
+        DeleteUnmappedRoutesRequest.builder().spaceId("test-space-id").build();
     }
-
 }

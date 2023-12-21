@@ -19,6 +19,6 @@ package org.cloudfoundry.client.v2.applications;
 /**
  * The base class for Restage Application resources
  */
-public abstract class AbstractRestageApplicationResource extends org.cloudfoundry.client.v2.Resource<org.cloudfoundry.client.v2.applications.RestageApplicationEntity> {
-
-}
+public abstract class AbstractRestageApplicationResource
+        extends org.cloudfoundry.client.v2.Resource<
+                org.cloudfoundry.client.v2.applications.RestageApplicationEntity> {}

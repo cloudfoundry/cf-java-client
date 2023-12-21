@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v3.roles;
 
+import java.util.Map;
 import org.cloudfoundry.client.v3.roles.CreateRoleRequest;
 import org.cloudfoundry.client.v3.roles.CreateRoleResponse;
 import org.cloudfoundry.client.v3.roles.DeleteRoleRequest;
@@ -28,8 +29,6 @@ import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
 import reactor.core.publisher.Mono;
-
-import java.util.Map;
 
 /**
  * The Reactor-based implementation of {@link RolesV3}
@@ -44,32 +43,48 @@ public final class ReactorRolesV3 extends AbstractClientV3Operations implements 
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorRolesV3(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
+    public ReactorRolesV3(
+            ConnectionContext connectionContext,
+            Mono<String> root,
+            TokenProvider tokenProvider,
+            Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<CreateRoleResponse> create(CreateRoleRequest request) {
-        return post(request, CreateRoleResponse.class, uriComponentsBuilder -> uriComponentsBuilder.pathSegment("roles"))
-            .checkpoint();
+        return post(
+                        request,
+                        CreateRoleResponse.class,
+                        uriComponentsBuilder -> uriComponentsBuilder.pathSegment("roles"))
+                .checkpoint();
     }
 
     @Override
     public Mono<String> delete(DeleteRoleRequest request) {
-        return delete(request, uriComponentsBuilder -> uriComponentsBuilder.pathSegment("roles", request.getRoleId()))
-            .checkpoint();
+        return delete(
+                        request,
+                        uriComponentsBuilder ->
+                                uriComponentsBuilder.pathSegment("roles", request.getRoleId()))
+                .checkpoint();
     }
 
     @Override
     public Mono<GetRoleResponse> get(GetRoleRequest request) {
-        return get(request, GetRoleResponse.class, uriComponentsBuilder -> uriComponentsBuilder.pathSegment("roles", request.getRoleId()))
-            .checkpoint();
+        return get(
+                        request,
+                        GetRoleResponse.class,
+                        uriComponentsBuilder ->
+                                uriComponentsBuilder.pathSegment("roles", request.getRoleId()))
+                .checkpoint();
     }
 
     @Override
     public Mono<ListRolesResponse> list(ListRolesRequest request) {
-        return get(request, ListRolesResponse.class, uriComponentsBuilder -> uriComponentsBuilder.pathSegment("roles"))
-            .checkpoint();
+        return get(
+                        request,
+                        ListRolesResponse.class,
+                        uriComponentsBuilder -> uriComponentsBuilder.pathSegment("roles"))
+                .checkpoint();
     }
-
 }

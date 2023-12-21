@@ -23,35 +23,27 @@ public final class GetFeatureFlagRequestTest {
     @Test(expected = IllegalStateException.class)
     public void badName1() {
         GetFeatureFlagRequest.builder()
-            .name("mustn't have spaces or / chars (or quotes, or parentheses, or commas)")
-            .build();
+                .name("mustn't have spaces or / chars (or quotes, or parentheses, or commas)")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void badName2() {
-        GetFeatureFlagRequest.builder()
-            .name("good_name_with_bad_at_end ")
-            .build();
+        GetFeatureFlagRequest.builder().name("good_name_with_bad_at_end ").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void badName3() {
-        GetFeatureFlagRequest.builder()
-            .name("good_name_with_bad_at_end.")
-            .build();
+        GetFeatureFlagRequest.builder().name("good_name_with_bad_at_end.").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noName() {
-        GetFeatureFlagRequest.builder()
-            .build();
+        GetFeatureFlagRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        GetFeatureFlagRequest.builder()
-            .name("test_feature_flag_name")
-            .build();
+        GetFeatureFlagRequest.builder().name("test_feature_flag_name").build();
     }
-
 }

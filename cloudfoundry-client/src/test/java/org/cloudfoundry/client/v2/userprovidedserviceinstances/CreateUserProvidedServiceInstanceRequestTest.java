@@ -22,24 +22,16 @@ public final class CreateUserProvidedServiceInstanceRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noName() {
-        CreateUserProvidedServiceInstanceRequest.builder()
-            .spaceId("space-id")
-            .build();
+        CreateUserProvidedServiceInstanceRequest.builder().spaceId("space-id").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noSpaceId() {
-        CreateUserProvidedServiceInstanceRequest.builder()
-            .name("name")
-            .build();
+        CreateUserProvidedServiceInstanceRequest.builder().name("name").build();
     }
 
     @Test
     public void valid() {
-        CreateUserProvidedServiceInstanceRequest.builder()
-            .name("name")
-            .spaceId("space-id")
-            .build();
+        CreateUserProvidedServiceInstanceRequest.builder().name("name").spaceId("space-id").build();
     }
-
 }

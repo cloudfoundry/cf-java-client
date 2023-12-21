@@ -23,47 +23,46 @@ public final class RefreshTokenRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noClientId() {
         RefreshTokenRequest.builder()
-            .clientSecret("test-client-secret")
-            .refreshToken("test-refresh-token")
-            .tokenFormat(TokenFormat.OPAQUE)
-            .build();
+                .clientSecret("test-client-secret")
+                .refreshToken("test-refresh-token")
+                .tokenFormat(TokenFormat.OPAQUE)
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noClientSecret() {
         RefreshTokenRequest.builder()
-            .clientId("test-client-id")
-            .refreshToken("test-refresh-token")
-            .tokenFormat(TokenFormat.OPAQUE)
-            .build();
+                .clientId("test-client-id")
+                .refreshToken("test-refresh-token")
+                .tokenFormat(TokenFormat.OPAQUE)
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noRefreshToken() {
         RefreshTokenRequest.builder()
-            .clientId("test-client-id")
-            .clientSecret("test-client-secret")
-            .tokenFormat(TokenFormat.OPAQUE)
-            .build();
+                .clientId("test-client-id")
+                .clientSecret("test-client-secret")
+                .tokenFormat(TokenFormat.OPAQUE)
+                .build();
     }
 
     @Test
     public void validMax() {
         RefreshTokenRequest.builder()
-            .clientId("test-client-id")
-            .clientSecret("test-client-secret")
-            .refreshToken("test-refresh-token")
-            .tokenFormat(TokenFormat.OPAQUE)
-            .build();
+                .clientId("test-client-id")
+                .clientSecret("test-client-secret")
+                .refreshToken("test-refresh-token")
+                .tokenFormat(TokenFormat.OPAQUE)
+                .build();
     }
 
     @Test
     public void validMin() {
         RefreshTokenRequest.builder()
-            .clientId("test-client-id")
-            .clientSecret("test-client-secret")
-            .refreshToken("test-refresh-token")
-            .build();
+                .clientId("test-client-id")
+                .clientSecret("test-client-secret")
+                .refreshToken("test-refresh-token")
+                .build();
     }
-
 }

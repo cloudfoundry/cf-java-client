@@ -22,15 +22,11 @@ public final class ListDomainSpacesRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noApplicationId() {
-        ListDomainSpacesRequest.builder()
-            .build();
+        ListDomainSpacesRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        ListDomainSpacesRequest.builder()
-            .domainId("test-id")
-            .build();
+        ListDomainSpacesRequest.builder().domainId("test-id").build();
     }
-
 }

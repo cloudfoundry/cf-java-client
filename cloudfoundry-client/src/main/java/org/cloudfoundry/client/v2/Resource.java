@@ -39,5 +39,4 @@ public abstract class Resource<T> {
     @JsonProperty("metadata")
     @Nullable
     public abstract Metadata getMetadata();
-
 }

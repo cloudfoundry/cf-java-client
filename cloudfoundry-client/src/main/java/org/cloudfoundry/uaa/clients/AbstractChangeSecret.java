@@ -42,5 +42,4 @@ abstract class AbstractChangeSecret {
      */
     @JsonProperty("secret")
     abstract String getSecret();
-
 }

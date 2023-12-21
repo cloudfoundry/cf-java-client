@@ -22,15 +22,13 @@ public final class DeleteUserProvidedServiceInstanceRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noUserProvidedServiceInstanceId() {
-        DeleteUserProvidedServiceInstanceRequest.builder()
-            .build();
+        DeleteUserProvidedServiceInstanceRequest.builder().build();
     }
 
     @Test
     public void valid() {
         DeleteUserProvidedServiceInstanceRequest.builder()
-            .userProvidedServiceInstanceId("test-user-provided-service-instance-id")
-            .build();
+                .userProvidedServiceInstanceId("test-user-provided-service-instance-id")
+                .build();
     }
-
 }

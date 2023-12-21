@@ -22,24 +22,19 @@ public final class SetApplicationHealthCheckRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noName() {
-        SetApplicationHealthCheckRequest.builder()
-            .type(ApplicationHealthCheck.NONE)
-            .build();
+        SetApplicationHealthCheckRequest.builder().type(ApplicationHealthCheck.NONE).build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noType() {
-        SetApplicationHealthCheckRequest.builder()
-            .name("test-name")
-            .build();
+        SetApplicationHealthCheckRequest.builder().name("test-name").build();
     }
 
     @Test
     public void valid() {
         SetApplicationHealthCheckRequest.builder()
-            .name("test-name")
-            .type(ApplicationHealthCheck.NONE)
-            .build();
+                .name("test-name")
+                .type(ApplicationHealthCheck.NONE)
+                .build();
     }
-
 }

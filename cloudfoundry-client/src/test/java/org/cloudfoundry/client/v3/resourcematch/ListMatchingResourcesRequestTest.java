@@ -23,18 +23,16 @@ public class ListMatchingResourcesRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noResources() {
-        ListMatchingResourcesRequest.builder()
-            .build();
+        ListMatchingResourcesRequest.builder().build();
     }
 
     @Test
     public void valid() {
         ListMatchingResourcesRequest.builder()
-            .resource(MatchedResource.builder()
-                .checksum(Checksum.builder()
-                    .value("test-checksum")
-                    .build())
-                .build())
-            .build();
+                .resource(
+                        MatchedResource.builder()
+                                .checksum(Checksum.builder().value("test-checksum").build())
+                                .build())
+                .build();
     }
 }

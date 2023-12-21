@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v3.resourcematch;
 
+import java.util.Map;
 import org.cloudfoundry.client.v3.resourcematch.ListMatchingResourcesRequest;
 import org.cloudfoundry.client.v3.resourcematch.ListMatchingResourcesResponse;
 import org.cloudfoundry.client.v3.resourcematch.ResourceMatchV3;
@@ -24,12 +25,11 @@ import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
 import reactor.core.publisher.Mono;
 
-import java.util.Map;
-
 /**
  * The Reactor-based implementation of {@link ResourceMatchV3}
  */
-public final class ReactorResourceMatchV3 extends AbstractClientV3Operations implements ResourceMatchV3 {
+public final class ReactorResourceMatchV3 extends AbstractClientV3Operations
+        implements ResourceMatchV3 {
 
     /**
      * Creates an instance
@@ -39,13 +39,20 @@ public final class ReactorResourceMatchV3 extends AbstractClientV3Operations imp
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorResourceMatchV3(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
+    public ReactorResourceMatchV3(
+            ConnectionContext connectionContext,
+            Mono<String> root,
+            TokenProvider tokenProvider,
+            Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<ListMatchingResourcesResponse> list(ListMatchingResourcesRequest request) {
-        return post(request, ListMatchingResourcesResponse.class, builder -> builder.pathSegment("resource_matches"))
-            .checkpoint();
+        return post(
+                        request,
+                        ListMatchingResourcesResponse.class,
+                        builder -> builder.pathSegment("resource_matches"))
+                .checkpoint();
     }
 }

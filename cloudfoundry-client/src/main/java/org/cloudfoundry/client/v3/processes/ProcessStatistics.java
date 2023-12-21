@@ -17,9 +17,8 @@
 package org.cloudfoundry.client.v3.processes;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.cloudfoundry.Nullable;
-
 import java.util.List;
+import org.cloudfoundry.Nullable;
 
 /**
  * Process details statistics
@@ -105,6 +104,4 @@ public abstract class ProcessStatistics {
     @JsonProperty("usage")
     @Nullable
     public abstract ProcessUsage getUsage();
-
 }
-

@@ -22,8 +22,6 @@ public final class ToManyRelationshipTest {
 
     @Test
     public void valid() {
-        ToManyRelationship.builder()
-            .build();
+        ToManyRelationship.builder().build();
     }
-
 }

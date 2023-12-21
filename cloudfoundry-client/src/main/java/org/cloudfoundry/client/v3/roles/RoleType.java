@@ -18,7 +18,6 @@ package org.cloudfoundry.client.v3.roles;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Map;
@@ -65,12 +64,19 @@ public enum RoleType {
      */
     SPACE_MANAGER;
 
-    public static final Set<RoleType> ORGANIZATION_ROLE_TYPES = EnumSet.of(ORGANIZATION_AUDITOR, ORGANIZATION_BILLING_MANAGER, ORGANIZATION_MANAGER, ORGANIZATION_USER);
+    public static final Set<RoleType> ORGANIZATION_ROLE_TYPES =
+            EnumSet.of(
+                    ORGANIZATION_AUDITOR,
+                    ORGANIZATION_BILLING_MANAGER,
+                    ORGANIZATION_MANAGER,
+                    ORGANIZATION_USER);
 
-    public static final Set<RoleType> SPACE_ROLE_TYPES = EnumSet.of(SPACE_AUDITOR, SPACE_DEVELOPER, SPACE_MANAGER);
+    public static final Set<RoleType> SPACE_ROLE_TYPES =
+            EnumSet.of(SPACE_AUDITOR, SPACE_DEVELOPER, SPACE_MANAGER);
 
-    private static final Map<String, RoleType> NAMES_TO_VALUES = Arrays.stream(RoleType.values())
-        .collect(Collectors.toMap(RoleType::getValue, roleType -> roleType));
+    private static final Map<String, RoleType> NAMES_TO_VALUES =
+            Arrays.stream(RoleType.values())
+                    .collect(Collectors.toMap(RoleType::getValue, roleType -> roleType));
 
     @JsonCreator
     public static RoleType from(String s) {
@@ -90,5 +96,4 @@ public enum RoleType {
     public String toString() {
         return getValue();
     }
-
 }

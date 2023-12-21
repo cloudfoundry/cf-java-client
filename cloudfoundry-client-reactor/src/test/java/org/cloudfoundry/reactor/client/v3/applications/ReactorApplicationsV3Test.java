@@ -16,6 +16,19 @@
 
 package org.cloudfoundry.reactor.client.v3.applications;
 
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.PATCH;
+import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
+import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
+import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+import static org.cloudfoundry.client.v3.routes.Protocol.HTTP;
+
+import java.time.Duration;
+import java.util.Arrays;
+import java.util.Collections;
 import org.cloudfoundry.client.v3.BuildpackData;
 import org.cloudfoundry.client.v3.Checksum;
 import org.cloudfoundry.client.v3.ChecksumType;
@@ -120,1721 +133,2511 @@ import org.cloudfoundry.util.FluentMap;
 import org.junit.Test;
 import reactor.test.StepVerifier;
 
-import java.time.Duration;
-import java.util.Arrays;
-import java.util.Collections;
-
-import static io.netty.handler.codec.http.HttpMethod.DELETE;
-import static io.netty.handler.codec.http.HttpMethod.GET;
-import static io.netty.handler.codec.http.HttpMethod.PATCH;
-import static io.netty.handler.codec.http.HttpMethod.POST;
-import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
-import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
-import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
-import static io.netty.handler.codec.http.HttpResponseStatus.OK;
-import static org.cloudfoundry.client.v3.routes.Protocol.HTTP;
-
 public final class ReactorApplicationsV3Test extends AbstractClientApiTest {
 
-    private final ReactorApplicationsV3 applications = new ReactorApplicationsV3(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
+    private final ReactorApplicationsV3 applications =
+            new ReactorApplicationsV3(
+                    CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void create() {
-        mockRequest(InteractionContext.builder()
-            .request(TestRequest.builder()
-                .method(POST).path("/apps")
-                .payload("fixtures/client/v3/apps/POST_request.json")
-                .build())
-            .response(TestResponse.builder()
-                .status(CREATED)
-                .payload("fixtures/client/v3/apps/POST_response.json")
-                .build())
-            .build());
+        mockRequest(
+                InteractionContext.builder()
+                        .request(
+                                TestRequest.builder()
+                                        .method(POST)
+                                        .path("/apps")
+                                        .payload("fixtures/client/v3/apps/POST_request.json")
+                                        .build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(CREATED)
+                                        .payload("fixtures/client/v3/apps/POST_response.json")
+                                        .build())
+                        .build());
 
         this.applications
-            .create(CreateApplicationRequest.builder()
-                .name("my_app")
-                .relationships(ApplicationRelationships.builder()
-                    .space(ToOneRelationship.builder()
-                        .data(Relationship.builder()
-                            .id("2f35885d-0c9d-4423-83ad-fd05066f8576")
-                            .build())
-                        .build())
-                    .build())
-                .metadata(Metadata.builder()
-                    .annotation("version", "1.2.3")
-                    .label("isLive", "true")
-                    .build())
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(CreateApplicationResponse.builder()
-                .id("1cb006ee-fb05-47e1-b541-c34179ddc446")
-                .name("my_app")
-                .state(ApplicationState.STOPPED)
-                .createdAt("2016-03-17T21:41:30Z")
-                .updatedAt("2016-06-08T16:41:26Z")
-                .lifecycle(Lifecycle.builder()
-                    .type(LifecycleType.BUILDPACK)
-                    .data(BuildpackData.builder()
-                        .buildpack("java_buildpack")
-                        .stack("cflinuxfs2")
-                        .build())
-                    .build())
-                .relationships(ApplicationRelationships.builder()
-                    .space(ToOneRelationship.builder()
-                        .data(Relationship.builder()
-                            .id("2f35885d-0c9d-4423-83ad-fd05066f8576")
-                            .build())
-                        .build())
-                    .build())
-                .metadata(Metadata.builder()
-                    .annotation("version", "1.2.3")
-                    .label("isLive", "true")
-                    .build())
-                .link("self", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446")
-                    .build())
-                .link("space", Link.builder()
-                    .href("https://api.example.org/v3/spaces/2f35885d-0c9d-4423-83ad-fd05066f8576")
-                    .build())
-                .link("processes", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/processes")
-                    .build())
-                .link("route_mappings", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/route_mappings")
-                    .build())
-                .link("packages", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/packages")
-                    .build())
-                .link("environment_variables", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/environment_variables")
-                    .build())
-                .link("current_droplet", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/droplets/current")
-                    .build())
-                .link("droplets", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/droplets")
-                    .build())
-                .link("tasks", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/tasks")
-                    .build())
-                .link("start", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/actions/start")
-                    .method("POST")
-                    .build())
-                .link("stop", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/actions/stop")
-                    .method("POST")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .create(
+                        CreateApplicationRequest.builder()
+                                .name("my_app")
+                                .relationships(
+                                        ApplicationRelationships.builder()
+                                                .space(
+                                                        ToOneRelationship.builder()
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id(
+                                                                                        "2f35885d-0c9d-4423-83ad-fd05066f8576")
+                                                                                .build())
+                                                                .build())
+                                                .build())
+                                .metadata(
+                                        Metadata.builder()
+                                                .annotation("version", "1.2.3")
+                                                .label("isLive", "true")
+                                                .build())
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        CreateApplicationResponse.builder()
+                                .id("1cb006ee-fb05-47e1-b541-c34179ddc446")
+                                .name("my_app")
+                                .state(ApplicationState.STOPPED)
+                                .createdAt("2016-03-17T21:41:30Z")
+                                .updatedAt("2016-06-08T16:41:26Z")
+                                .lifecycle(
+                                        Lifecycle.builder()
+                                                .type(LifecycleType.BUILDPACK)
+                                                .data(
+                                                        BuildpackData.builder()
+                                                                .buildpack("java_buildpack")
+                                                                .stack("cflinuxfs2")
+                                                                .build())
+                                                .build())
+                                .relationships(
+                                        ApplicationRelationships.builder()
+                                                .space(
+                                                        ToOneRelationship.builder()
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id(
+                                                                                        "2f35885d-0c9d-4423-83ad-fd05066f8576")
+                                                                                .build())
+                                                                .build())
+                                                .build())
+                                .metadata(
+                                        Metadata.builder()
+                                                .annotation("version", "1.2.3")
+                                                .label("isLive", "true")
+                                                .build())
+                                .link(
+                                        "self",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446")
+                                                .build())
+                                .link(
+                                        "space",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/spaces/2f35885d-0c9d-4423-83ad-fd05066f8576")
+                                                .build())
+                                .link(
+                                        "processes",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/processes")
+                                                .build())
+                                .link(
+                                        "route_mappings",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/route_mappings")
+                                                .build())
+                                .link(
+                                        "packages",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/packages")
+                                                .build())
+                                .link(
+                                        "environment_variables",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/environment_variables")
+                                                .build())
+                                .link(
+                                        "current_droplet",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/droplets/current")
+                                                .build())
+                                .link(
+                                        "droplets",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/droplets")
+                                                .build())
+                                .link(
+                                        "tasks",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/tasks")
+                                                .build())
+                                .link(
+                                        "start",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/actions/start")
+                                                .method("POST")
+                                                .build())
+                                .link(
+                                        "stop",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/actions/stop")
+                                                .method("POST")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
     public void delete() {
-        mockRequest(InteractionContext.builder()
-            .request(TestRequest.builder()
-                .method(DELETE).path("/apps/test-application-id")
-                .build())
-            .response(TestResponse.builder()
-                .status(ACCEPTED)
-                .header("Location", "https://api.example.org/v3/jobs/[guid]")
-                .build())
-            .build());
+        mockRequest(
+                InteractionContext.builder()
+                        .request(
+                                TestRequest.builder()
+                                        .method(DELETE)
+                                        .path("/apps/test-application-id")
+                                        .build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(ACCEPTED)
+                                        .header(
+                                                "Location",
+                                                "https://api.example.org/v3/jobs/[guid]")
+                                        .build())
+                        .build());
 
         this.applications
-            .delete(DeleteApplicationRequest.builder()
-                .applicationId("test-application-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext("[guid]")
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .delete(
+                        DeleteApplicationRequest.builder()
+                                .applicationId("test-application-id")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext("[guid]")
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
     public void get() {
-        mockRequest(InteractionContext.builder()
-            .request(TestRequest.builder()
-                .method(GET).path("/apps/test-application-id")
-                .build())
-            .response(TestResponse.builder()
-                .status(OK)
-                .payload("fixtures/client/v3/apps/GET_{id}_response.json")
-                .build())
-            .build());
+        mockRequest(
+                InteractionContext.builder()
+                        .request(
+                                TestRequest.builder()
+                                        .method(GET)
+                                        .path("/apps/test-application-id")
+                                        .build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(OK)
+                                        .payload("fixtures/client/v3/apps/GET_{id}_response.json")
+                                        .build())
+                        .build());
 
         this.applications
-            .get(GetApplicationRequest.builder()
-                .applicationId("test-application-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(GetApplicationResponse.builder()
-                .id("1cb006ee-fb05-47e1-b541-c34179ddc446")
-                .name("my_app")
-                .state(ApplicationState.STOPPED)
-                .createdAt("2016-03-17T21:41:30Z")
-                .updatedAt("2016-06-08T16:41:26Z")
-                .lifecycle(Lifecycle.builder()
-                    .type(LifecycleType.BUILDPACK)
-                    .data(BuildpackData.builder()
-                        .buildpack("java_buildpack")
-                        .stack("cflinuxfs2")
-                        .build())
-                    .build())
-                .relationships(ApplicationRelationships.builder()
-                    .space(ToOneRelationship.builder()
-                        .data(Relationship.builder()
-                            .id("2f35885d-0c9d-4423-83ad-fd05066f8576")
-                            .build())
-                        .build())
-                    .build())
-                .metadata(Metadata.builder()
-                    .annotation("version", "1.2.4")
-                    .label("isLive", "false")
-                    .label("maintenance", "true")
-                    .build())
-                .link("self", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446")
-                    .build())
-                .link("space", Link.builder()
-                    .href("https://api.example.org/v3/spaces/2f35885d-0c9d-4423-83ad-fd05066f8576")
-                    .build())
-                .link("processes", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/processes")
-                    .build())
-                .link("route_mappings", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/route_mappings")
-                    .build())
-                .link("packages", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/packages")
-                    .build())
-                .link("environment_variables", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/environment_variables")
-                    .build())
-                .link("current_droplet", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/droplets/current")
-                    .build())
-                .link("droplets", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/droplets")
-                    .build())
-                .link("tasks", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/tasks")
-                    .build())
-                .link("start", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/actions/start")
-                    .method("POST")
-                    .build())
-                .link("stop", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/actions/stop")
-                    .method("POST")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .get(GetApplicationRequest.builder().applicationId("test-application-id").build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        GetApplicationResponse.builder()
+                                .id("1cb006ee-fb05-47e1-b541-c34179ddc446")
+                                .name("my_app")
+                                .state(ApplicationState.STOPPED)
+                                .createdAt("2016-03-17T21:41:30Z")
+                                .updatedAt("2016-06-08T16:41:26Z")
+                                .lifecycle(
+                                        Lifecycle.builder()
+                                                .type(LifecycleType.BUILDPACK)
+                                                .data(
+                                                        BuildpackData.builder()
+                                                                .buildpack("java_buildpack")
+                                                                .stack("cflinuxfs2")
+                                                                .build())
+                                                .build())
+                                .relationships(
+                                        ApplicationRelationships.builder()
+                                                .space(
+                                                        ToOneRelationship.builder()
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id(
+                                                                                        "2f35885d-0c9d-4423-83ad-fd05066f8576")
+                                                                                .build())
+                                                                .build())
+                                                .build())
+                                .metadata(
+                                        Metadata.builder()
+                                                .annotation("version", "1.2.4")
+                                                .label("isLive", "false")
+                                                .label("maintenance", "true")
+                                                .build())
+                                .link(
+                                        "self",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446")
+                                                .build())
+                                .link(
+                                        "space",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/spaces/2f35885d-0c9d-4423-83ad-fd05066f8576")
+                                                .build())
+                                .link(
+                                        "processes",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/processes")
+                                                .build())
+                                .link(
+                                        "route_mappings",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/route_mappings")
+                                                .build())
+                                .link(
+                                        "packages",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/packages")
+                                                .build())
+                                .link(
+                                        "environment_variables",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/environment_variables")
+                                                .build())
+                                .link(
+                                        "current_droplet",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/droplets/current")
+                                                .build())
+                                .link(
+                                        "droplets",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/droplets")
+                                                .build())
+                                .link(
+                                        "tasks",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/tasks")
+                                                .build())
+                                .link(
+                                        "start",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/actions/start")
+                                                .method("POST")
+                                                .build())
+                                .link(
+                                        "stop",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/actions/stop")
+                                                .method("POST")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
     public void getCurrentDroplet() {
-        mockRequest(InteractionContext.builder()
-            .request(TestRequest.builder()
-                .method(GET).path("/apps/test-application-id/droplets/current")
-                .build())
-            .response(TestResponse.builder()
-                .status(OK)
-                .payload("fixtures/client/v3/apps/GET_{id}_droplets_current_response.json")
-                .build())
-            .build());
+        mockRequest(
+                InteractionContext.builder()
+                        .request(
+                                TestRequest.builder()
+                                        .method(GET)
+                                        .path("/apps/test-application-id/droplets/current")
+                                        .build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(OK)
+                                        .payload(
+                                                "fixtures/client/v3/apps/GET_{id}_droplets_current_response.json")
+                                        .build())
+                        .build());
 
         this.applications
-            .getCurrentDroplet(GetApplicationCurrentDropletRequest.builder()
-                .applicationId("test-application-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(GetApplicationCurrentDropletResponse.builder()
-                .id("585bc3c1-3743-497d-88b0-403ad6b56d16")
-                .state(DropletState.STAGED)
-                .error(null)
-                .lifecycle(Lifecycle.builder()
-                    .type(LifecycleType.BUILDPACK)
-                    .data(BuildpackData.builder()
-                        .build())
-                    .build())
-                .executionMetadata("")
-                .processType("rake", "bundle exec rake")
-                .processType("web", "bundle exec rackup config.ru -p $PORT")
-                .checksum(Checksum.builder()
-                    .type(ChecksumType.SHA256)
-                    .value("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855")
-                    .build())
-                .buildpack(Buildpack.builder()
-                    .name("ruby_buildpack")
-                    .detectOutput("ruby 1.6.14")
-                    .build())
-                .stack("cflinuxfs2")
-                .image(null)
-                .createdAt("2016-03-28T23:39:34Z")
-                .updatedAt("2016-03-28T23:39:47Z")
-                .link("self", Link.builder()
-                    .href("https://api.example.org/v3/droplets/585bc3c1-3743-497d-88b0-403ad6b56d16")
-                    .build())
-                .link("package", Link.builder()
-                    .href("https://api.example.org/v3/packages/8222f76a-9e09-4360-b3aa-1ed329945e92")
-                    .build())
-                .link("app", Link.builder()
-                    .href("https://api.example.org/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058396")
-                    .build())
-                .link("assign_current_droplet", Link.builder()
-                    .href("https://api.example.org/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058396/relationships/current_droplet")
-                    .method("PATCH")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .getCurrentDroplet(
+                        GetApplicationCurrentDropletRequest.builder()
+                                .applicationId("test-application-id")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        GetApplicationCurrentDropletResponse.builder()
+                                .id("585bc3c1-3743-497d-88b0-403ad6b56d16")
+                                .state(DropletState.STAGED)
+                                .error(null)
+                                .lifecycle(
+                                        Lifecycle.builder()
+                                                .type(LifecycleType.BUILDPACK)
+                                                .data(BuildpackData.builder().build())
+                                                .build())
+                                .executionMetadata("")
+                                .processType("rake", "bundle exec rake")
+                                .processType("web", "bundle exec rackup config.ru -p $PORT")
+                                .checksum(
+                                        Checksum.builder()
+                                                .type(ChecksumType.SHA256)
+                                                .value(
+                                                        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855")
+                                                .build())
+                                .buildpack(
+                                        Buildpack.builder()
+                                                .name("ruby_buildpack")
+                                                .detectOutput("ruby 1.6.14")
+                                                .build())
+                                .stack("cflinuxfs2")
+                                .image(null)
+                                .createdAt("2016-03-28T23:39:34Z")
+                                .updatedAt("2016-03-28T23:39:47Z")
+                                .link(
+                                        "self",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/droplets/585bc3c1-3743-497d-88b0-403ad6b56d16")
+                                                .build())
+                                .link(
+                                        "package",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/packages/8222f76a-9e09-4360-b3aa-1ed329945e92")
+                                                .build())
+                                .link(
+                                        "app",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058396")
+                                                .build())
+                                .link(
+                                        "assign_current_droplet",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058396/relationships/current_droplet")
+                                                .method("PATCH")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
     public void getCurrentDropletRelationship() {
-        mockRequest(InteractionContext.builder()
-            .request(TestRequest.builder()
-                .method(GET).path("/apps/test-application-id/relationships/current_droplet")
-                .build())
-            .response(TestResponse.builder()
-                .status(OK)
-                .payload("fixtures/client/v3/apps/GET_{id}_relationships_current_droplet_response.json")
-                .build())
-            .build());
+        mockRequest(
+                InteractionContext.builder()
+                        .request(
+                                TestRequest.builder()
+                                        .method(GET)
+                                        .path(
+                                                "/apps/test-application-id/relationships/current_droplet")
+                                        .build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(OK)
+                                        .payload(
+                                                "fixtures/client/v3/apps/GET_{id}_relationships_current_droplet_response.json")
+                                        .build())
+                        .build());
 
         this.applications
-            .getCurrentDropletRelationship(GetApplicationCurrentDropletRelationshipRequest.builder()
-                .applicationId("test-application-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(GetApplicationCurrentDropletRelationshipResponse.builder()
-                .data(Relationship.builder()
-                    .id("9d8e007c-ce52-4ea7-8a57-f2825d2c6b39")
-                    .build())
-                .link("self", Link.builder()
-                    .href("https://api.example.org/v3/apps/d4c91047-7b29-4fda-b7f9-04033e5c9c9f/relationships/current_droplet")
-                    .build())
-                .link("related", Link.builder()
-                    .href("https://api.example.org/v3/apps/d4c91047-7b29-4fda-b7f9-04033e5c9c9f/droplets/current")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .getCurrentDropletRelationship(
+                        GetApplicationCurrentDropletRelationshipRequest.builder()
+                                .applicationId("test-application-id")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        GetApplicationCurrentDropletRelationshipResponse.builder()
+                                .data(
+                                        Relationship.builder()
+                                                .id("9d8e007c-ce52-4ea7-8a57-f2825d2c6b39")
+                                                .build())
+                                .link(
+                                        "self",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/d4c91047-7b29-4fda-b7f9-04033e5c9c9f/relationships/current_droplet")
+                                                .build())
+                                .link(
+                                        "related",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/d4c91047-7b29-4fda-b7f9-04033e5c9c9f/droplets/current")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
     public void getEnvironment() {
-        mockRequest(InteractionContext.builder()
-            .request(TestRequest.builder()
-                .method(GET).path("/apps/test-application-id/env")
-                .build())
-            .response(TestResponse.builder()
-                .status(OK)
-                .payload("fixtures/client/v3/apps/GET_{id}_env_response.json")
-                .build())
-            .build());
+        mockRequest(
+                InteractionContext.builder()
+                        .request(
+                                TestRequest.builder()
+                                        .method(GET)
+                                        .path("/apps/test-application-id/env")
+                                        .build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(OK)
+                                        .payload(
+                                                "fixtures/client/v3/apps/GET_{id}_env_response.json")
+                                        .build())
+                        .build());
 
         this.applications
-            .getEnvironment(GetApplicationEnvironmentRequest.builder()
-                .applicationId("test-application-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(GetApplicationEnvironmentResponse.builder()
-                .stagingEnvironmentVariable("GEM_CACHE", "http://gem-cache.example.org")
-                .runningEnvironmentVariable("HTTP_PROXY", "http://proxy.example.org")
-                .environmentVariable("RAILS_ENV", "production")
-                .systemEnvironmentVariable("VCAP_SERVICES", FluentMap.builder()
-                    .entry("mysql", Collections.singletonList(FluentMap.builder()
-                        .entry("name", "db-for-my-app")
-                        .entry("label", "mysql")
-                        .entry("tags", Arrays.asList("relational", "sql"))
-                        .entry("plan", "xlarge")
-                        .entry("credentials", FluentMap.builder()
-                            .entry("username", "user")
-                            .entry("password", "top-secret")
-                            .build())
-                        .entry("syslog_drain_url", "https://syslog.example.org/drain")
-                        .entry("provider", null)
-                        .build()))
-                    .build())
-                .applicationEnvironmentVariable("VCAP_APPLICATION", FluentMap.builder()
-                    .entry("limits", FluentMap.builder()
-                        .entry("fds", 16384)
-                        .build())
-                    .entry("application_name", "my_app")
-                    .entry("application_uris", Collections.singletonList("my_app.example.org"))
-                    .entry("name", "my_app")
-                    .entry("space_name", "my_space")
-                    .entry("space_id", "2f35885d-0c9d-4423-83ad-fd05066f8576")
-                    .entry("uris", Collections.singletonList("my_app.example.org"))
-                    .entry("users", null)
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .getEnvironment(
+                        GetApplicationEnvironmentRequest.builder()
+                                .applicationId("test-application-id")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        GetApplicationEnvironmentResponse.builder()
+                                .stagingEnvironmentVariable(
+                                        "GEM_CACHE", "http://gem-cache.example.org")
+                                .runningEnvironmentVariable(
+                                        "HTTP_PROXY", "http://proxy.example.org")
+                                .environmentVariable("RAILS_ENV", "production")
+                                .systemEnvironmentVariable(
+                                        "VCAP_SERVICES",
+                                        FluentMap.builder()
+                                                .entry(
+                                                        "mysql",
+                                                        Collections.singletonList(
+                                                                FluentMap.builder()
+                                                                        .entry(
+                                                                                "name",
+                                                                                "db-for-my-app")
+                                                                        .entry("label", "mysql")
+                                                                        .entry(
+                                                                                "tags",
+                                                                                Arrays.asList(
+                                                                                        "relational",
+                                                                                        "sql"))
+                                                                        .entry("plan", "xlarge")
+                                                                        .entry(
+                                                                                "credentials",
+                                                                                FluentMap.builder()
+                                                                                        .entry(
+                                                                                                "username",
+                                                                                                "user")
+                                                                                        .entry(
+                                                                                                "password",
+                                                                                                "top-secret")
+                                                                                        .build())
+                                                                        .entry(
+                                                                                "syslog_drain_url",
+                                                                                "https://syslog.example.org/drain")
+                                                                        .entry("provider", null)
+                                                                        .build()))
+                                                .build())
+                                .applicationEnvironmentVariable(
+                                        "VCAP_APPLICATION",
+                                        FluentMap.builder()
+                                                .entry(
+                                                        "limits",
+                                                        FluentMap.builder()
+                                                                .entry("fds", 16384)
+                                                                .build())
+                                                .entry("application_name", "my_app")
+                                                .entry(
+                                                        "application_uris",
+                                                        Collections.singletonList(
+                                                                "my_app.example.org"))
+                                                .entry("name", "my_app")
+                                                .entry("space_name", "my_space")
+                                                .entry(
+                                                        "space_id",
+                                                        "2f35885d-0c9d-4423-83ad-fd05066f8576")
+                                                .entry(
+                                                        "uris",
+                                                        Collections.singletonList(
+                                                                "my_app.example.org"))
+                                                .entry("users", null)
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
     public void getEnvironmentVariables() {
-        mockRequest(InteractionContext.builder()
-            .request(TestRequest.builder()
-                .method(GET).path("/apps/test-application-id/environment_variables")
-                .build())
-            .response(TestResponse.builder()
-                .status(OK)
-                .payload("fixtures/client/v3/apps/GET_{id}_environment_variables_response.json")
-                .build())
-            .build());
+        mockRequest(
+                InteractionContext.builder()
+                        .request(
+                                TestRequest.builder()
+                                        .method(GET)
+                                        .path("/apps/test-application-id/environment_variables")
+                                        .build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(OK)
+                                        .payload(
+                                                "fixtures/client/v3/apps/GET_{id}_environment_variables_response.json")
+                                        .build())
+                        .build());
 
         this.applications
-            .getEnvironmentVariables(GetApplicationEnvironmentVariablesRequest.builder()
-                .applicationId("test-application-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(GetApplicationEnvironmentVariablesResponse.builder()
-                .var("RAILS_ENV", "production")
-                .link("self", Link.builder()
-                    .href("https://api.example.org/v3/apps/[guid]/environment_variables")
-                    .build())
-                .link("app", Link.builder()
-                    .href("https://api.example.org/v3/apps/[guid]")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .getEnvironmentVariables(
+                        GetApplicationEnvironmentVariablesRequest.builder()
+                                .applicationId("test-application-id")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        GetApplicationEnvironmentVariablesResponse.builder()
+                                .var("RAILS_ENV", "production")
+                                .link(
+                                        "self",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/[guid]/environment_variables")
+                                                .build())
+                                .link(
+                                        "app",
+                                        Link.builder()
+                                                .href("https://api.example.org/v3/apps/[guid]")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
     public void getFeature() {
-        mockRequest(InteractionContext.builder()
-            .request(TestRequest.builder()
-                .method(GET).path("/apps/test-application-id/features/test-feature-name")
-                .build())
-            .response(TestResponse.builder()
-                .status(OK)
-                .payload("fixtures/client/v3/apps/GET_{id}_features_{name}_response.json")
-                .build())
-            .build());
+        mockRequest(
+                InteractionContext.builder()
+                        .request(
+                                TestRequest.builder()
+                                        .method(GET)
+                                        .path(
+                                                "/apps/test-application-id/features/test-feature-name")
+                                        .build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(OK)
+                                        .payload(
+                                                "fixtures/client/v3/apps/GET_{id}_features_{name}_response.json")
+                                        .build())
+                        .build());
 
         this.applications
-            .getFeature(GetApplicationFeatureRequest.builder()
-                .applicationId("test-application-id")
-                .featureName("test-feature-name")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(GetApplicationFeatureResponse.builder()
-                .description("Enable SSHing into the app.")
-                .enabled(true)
-                .name("ssh")
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .getFeature(
+                        GetApplicationFeatureRequest.builder()
+                                .applicationId("test-application-id")
+                                .featureName("test-feature-name")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        GetApplicationFeatureResponse.builder()
+                                .description("Enable SSHing into the app.")
+                                .enabled(true)
+                                .name("ssh")
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
     public void getPermissions() {
-        mockRequest(InteractionContext.builder()
-            .request(TestRequest.builder()
-                .method(GET).path("/apps/test-application-id/permissions")
-                .build())
-            .response(TestResponse.builder()
-                .status(OK)
-                .payload("fixtures/client/v3/apps/GET_{id}_permissions_response.json")
-                .build())
-            .build());
+        mockRequest(
+                InteractionContext.builder()
+                        .request(
+                                TestRequest.builder()
+                                        .method(GET)
+                                        .path("/apps/test-application-id/permissions")
+                                        .build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(OK)
+                                        .payload(
+                                                "fixtures/client/v3/apps/GET_{id}_permissions_response.json")
+                                        .build())
+                        .build());
 
         this.applications
-            .getPermissions(GetApplicationPermissionsRequest.builder()
-                .applicationId("test-application-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(GetApplicationPermissionsResponse.builder()
-                .readBasicData(true)
-                .readSensitiveData(false)
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .getPermissions(
+                        GetApplicationPermissionsRequest.builder()
+                                .applicationId("test-application-id")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        GetApplicationPermissionsResponse.builder()
+                                .readBasicData(true)
+                                .readSensitiveData(false)
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
     public void getProcess() {
-        mockRequest(InteractionContext.builder()
-            .request(TestRequest.builder()
-                .method(GET).path("/apps/test-application-id/processes/test-type")
-                .build())
-            .response(TestResponse.builder()
-                .status(OK)
-                .payload("fixtures/client/v3/apps/GET_{id}_processes_{type}_response.json")
-                .build())
-            .build());
+        mockRequest(
+                InteractionContext.builder()
+                        .request(
+                                TestRequest.builder()
+                                        .method(GET)
+                                        .path("/apps/test-application-id/processes/test-type")
+                                        .build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(OK)
+                                        .payload(
+                                                "fixtures/client/v3/apps/GET_{id}_processes_{type}_response.json")
+                                        .build())
+                        .build());
 
         this.applications
-            .getProcess(GetApplicationProcessRequest.builder()
-                .applicationId("test-application-id")
-                .type("test-type")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(GetApplicationProcessResponse.builder()
-                .id("6a901b7c-9417-4dc1-8189-d3234aa0ab82")
-                .type("web")
-                .command("rackup")
-                .instances(5)
-                .memoryInMb(256)
-                .diskInMb(1_024)
-                .healthCheck(HealthCheck.builder()
-                    .type(HealthCheckType.PORT)
-                    .data(Data.builder()
-                        .timeout(null)
-                        .endpoint(null)
-                        .build())
-                    .build())
-                .metadata(Metadata.builder()
-                    .annotations(Collections.emptyMap())
-                    .labels(Collections.emptyMap())
-                    .build())
-                .relationships(ProcessRelationships.builder()
-                    .build())
-                .createdAt("2016-03-23T18:48:22Z")
-                .updatedAt("2016-03-23T18:48:42Z")
-                .link("self", Link.builder()
-                    .href("https://api.example.org/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82")
-                    .build())
-                .link("scale", Link.builder()
-                    .href("https://api.example.org/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82/actions/scale")
-                    .method("POST")
-                    .build())
-                .link("app", Link.builder()
-                    .href("https://api.example.org/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5")
-                    .build())
-                .link("space", Link.builder()
-                    .href("https://api.example.org/v3/spaces/2f35885d-0c9d-4423-83ad-fd05066f8576")
-                    .build())
-                .link("stats", Link.builder()
-                    .href("https://api.example.org/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82/stats")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .getProcess(
+                        GetApplicationProcessRequest.builder()
+                                .applicationId("test-application-id")
+                                .type("test-type")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        GetApplicationProcessResponse.builder()
+                                .id("6a901b7c-9417-4dc1-8189-d3234aa0ab82")
+                                .type("web")
+                                .command("rackup")
+                                .instances(5)
+                                .memoryInMb(256)
+                                .diskInMb(1_024)
+                                .healthCheck(
+                                        HealthCheck.builder()
+                                                .type(HealthCheckType.PORT)
+                                                .data(
+                                                        Data.builder()
+                                                                .timeout(null)
+                                                                .endpoint(null)
+                                                                .build())
+                                                .build())
+                                .metadata(
+                                        Metadata.builder()
+                                                .annotations(Collections.emptyMap())
+                                                .labels(Collections.emptyMap())
+                                                .build())
+                                .relationships(ProcessRelationships.builder().build())
+                                .createdAt("2016-03-23T18:48:22Z")
+                                .updatedAt("2016-03-23T18:48:42Z")
+                                .link(
+                                        "self",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82")
+                                                .build())
+                                .link(
+                                        "scale",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82/actions/scale")
+                                                .method("POST")
+                                                .build())
+                                .link(
+                                        "app",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5")
+                                                .build())
+                                .link(
+                                        "space",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/spaces/2f35885d-0c9d-4423-83ad-fd05066f8576")
+                                                .build())
+                                .link(
+                                        "stats",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82/stats")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
     public void getProcessStatistics() {
-        mockRequest(InteractionContext.builder()
-            .request(TestRequest.builder()
-                .method(GET).path("/apps/test-id/processes/test-type/stats")
-                .build())
-            .response(TestResponse.builder()
-                .status(OK)
-                .payload("fixtures/client/v3/apps/GET_{id}_processes_{type}_stats_response.json")
-                .build())
-            .build());
+        mockRequest(
+                InteractionContext.builder()
+                        .request(
+                                TestRequest.builder()
+                                        .method(GET)
+                                        .path("/apps/test-id/processes/test-type/stats")
+                                        .build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(OK)
+                                        .payload(
+                                                "fixtures/client/v3/apps/GET_{id}_processes_{type}_stats_response.json")
+                                        .build())
+                        .build());
 
         this.applications
-            .getProcessStatistics(GetApplicationProcessStatisticsRequest.builder()
-                .applicationId("test-id")
-                .type("test-type")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(GetApplicationProcessStatisticsResponse.builder()
-                .resource(ProcessStatisticsResource.builder()
-                    .type("web")
-                    .index(0)
-                    .state(ProcessState.RUNNING)
-                    .usage(ProcessUsage.builder()
-                        .time("2016-03-23T23:17:30.476314154Z")
-                        .cpu(0.00038711029163348665)
-                        .memory(19177472L)
-                        .disk(69705728L)
-                        .build())
-                    .host("10.244.16.10")
-                    .instancePort(PortMapping.builder()
-                        .external(64546)
-                        .externalTlsProxyPort(1234)
-                        .internal(8080)
-                        .internalTlsProxyPort(5678)
-                        .build())
-                    .uptime(9042L)
-                    .memoryQuota(268435456L)
-                    .diskQuota(1073741824L)
-                    .fileDescriptorQuota(16384L)
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .getProcessStatistics(
+                        GetApplicationProcessStatisticsRequest.builder()
+                                .applicationId("test-id")
+                                .type("test-type")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        GetApplicationProcessStatisticsResponse.builder()
+                                .resource(
+                                        ProcessStatisticsResource.builder()
+                                                .type("web")
+                                                .index(0)
+                                                .state(ProcessState.RUNNING)
+                                                .usage(
+                                                        ProcessUsage.builder()
+                                                                .time(
+                                                                        "2016-03-23T23:17:30.476314154Z")
+                                                                .cpu(0.00038711029163348665)
+                                                                .memory(19177472L)
+                                                                .disk(69705728L)
+                                                                .build())
+                                                .host("10.244.16.10")
+                                                .instancePort(
+                                                        PortMapping.builder()
+                                                                .external(64546)
+                                                                .externalTlsProxyPort(1234)
+                                                                .internal(8080)
+                                                                .internalTlsProxyPort(5678)
+                                                                .build())
+                                                .uptime(9042L)
+                                                .memoryQuota(268435456L)
+                                                .diskQuota(1073741824L)
+                                                .fileDescriptorQuota(16384L)
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
     public void getSshEnabled() {
-        mockRequest(InteractionContext.builder()
-            .request(TestRequest.builder()
-                .method(GET).path("/apps/test-application-id/ssh_enabled")
-                .build())
-            .response(TestResponse.builder()
-                .status(OK)
-                .payload("fixtures/client/v3/apps/GET_{id}_ssh_enabled_response.json")
-                .build())
-            .build());
+        mockRequest(
+                InteractionContext.builder()
+                        .request(
+                                TestRequest.builder()
+                                        .method(GET)
+                                        .path("/apps/test-application-id/ssh_enabled")
+                                        .build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(OK)
+                                        .payload(
+                                                "fixtures/client/v3/apps/GET_{id}_ssh_enabled_response.json")
+                                        .build())
+                        .build());
 
         this.applications
-            .getSshEnabled(GetApplicationSshEnabledRequest.builder()
-                .applicationId("test-application-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(GetApplicationSshEnabledResponse.builder()
-                .enabled(false)
-                .reason("Disabled globally")
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .getSshEnabled(
+                        GetApplicationSshEnabledRequest.builder()
+                                .applicationId("test-application-id")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        GetApplicationSshEnabledResponse.builder()
+                                .enabled(false)
+                                .reason("Disabled globally")
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
     public void list() {
-        mockRequest(InteractionContext.builder()
-            .request(TestRequest.builder()
-                .method(GET).path("/apps")
-                .build())
-            .response(TestResponse.builder()
-                .status(OK)
-                .payload("fixtures/client/v3/apps/GET_response.json")
-                .build())
-            .build());
+        mockRequest(
+                InteractionContext.builder()
+                        .request(TestRequest.builder().method(GET).path("/apps").build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(OK)
+                                        .payload("fixtures/client/v3/apps/GET_response.json")
+                                        .build())
+                        .build());
 
         this.applications
-            .list(ListApplicationsRequest.builder()
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(ListApplicationsResponse.builder()
-                .pagination(Pagination.builder()
-                    .totalResults(3)
-                    .totalPages(2)
-                    .first(Link.builder()
-                        .href("https://api.example.org/v3/apps?page=1&per_page=2")
-                        .build())
-                    .last(Link.builder()
-                        .href("https://api.example.org/v3/apps?page=2&per_page=2")
-                        .build())
-                    .next(Link.builder()
-                        .href("https://api.example.org/v3/apps?page=2&per_page=2")
-                        .build())
-                    .build())
-                .resource(ApplicationResource.builder()
-                    .id("1cb006ee-fb05-47e1-b541-c34179ddc446")
-                    .name("my_app")
-                    .state(ApplicationState.STARTED)
-                    .createdAt("2016-03-17T21:41:30Z")
-                    .updatedAt("2016-03-18T11:32:30Z")
-                    .lifecycle(Lifecycle.builder()
-                        .type(LifecycleType.BUILDPACK)
-                        .data(BuildpackData.builder()
-                            .buildpack("java_buildpack")
-                            .stack("cflinuxfs2")
-                            .build())
-                        .build())
-                    .relationships(ApplicationRelationships.builder()
-                        .space(ToOneRelationship.builder()
-                            .data(Relationship.builder()
-                                .id("2f35885d-0c9d-4423-83ad-fd05066f8576")
+                .list(ListApplicationsRequest.builder().build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        ListApplicationsResponse.builder()
+                                .pagination(
+                                        Pagination.builder()
+                                                .totalResults(3)
+                                                .totalPages(2)
+                                                .first(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps?page=1&per_page=2")
+                                                                .build())
+                                                .last(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps?page=2&per_page=2")
+                                                                .build())
+                                                .next(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps?page=2&per_page=2")
+                                                                .build())
+                                                .build())
+                                .resource(
+                                        ApplicationResource.builder()
+                                                .id("1cb006ee-fb05-47e1-b541-c34179ddc446")
+                                                .name("my_app")
+                                                .state(ApplicationState.STARTED)
+                                                .createdAt("2016-03-17T21:41:30Z")
+                                                .updatedAt("2016-03-18T11:32:30Z")
+                                                .lifecycle(
+                                                        Lifecycle.builder()
+                                                                .type(LifecycleType.BUILDPACK)
+                                                                .data(
+                                                                        BuildpackData.builder()
+                                                                                .buildpack(
+                                                                                        "java_buildpack")
+                                                                                .stack("cflinuxfs2")
+                                                                                .build())
+                                                                .build())
+                                                .relationships(
+                                                        ApplicationRelationships.builder()
+                                                                .space(
+                                                                        ToOneRelationship.builder()
+                                                                                .data(
+                                                                                        Relationship
+                                                                                                .builder()
+                                                                                                .id(
+                                                                                                        "2f35885d-0c9d-4423-83ad-fd05066f8576")
+                                                                                                .build())
+                                                                                .build())
+                                                                .build())
+                                                .metadata(
+                                                        Metadata.builder()
+                                                                .annotation("version", "1.2.3")
+                                                                .label("isLive", "true")
+                                                                .build())
+                                                .link(
+                                                        "self",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446")
+                                                                .build())
+                                                .link(
+                                                        "space",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/spaces/2f35885d-0c9d-4423-83ad-fd05066f8576")
+                                                                .build())
+                                                .link(
+                                                        "processes",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/processes")
+                                                                .build())
+                                                .link(
+                                                        "route_mappings",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/route_mappings")
+                                                                .build())
+                                                .link(
+                                                        "packages",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/packages")
+                                                                .build())
+                                                .link(
+                                                        "environment_variables",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/environment_variables")
+                                                                .build())
+                                                .link(
+                                                        "current_droplet",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/droplets/current")
+                                                                .build())
+                                                .link(
+                                                        "droplets",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/droplets")
+                                                                .build())
+                                                .link(
+                                                        "tasks",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/tasks")
+                                                                .build())
+                                                .link(
+                                                        "start",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/actions/start")
+                                                                .method("POST")
+                                                                .build())
+                                                .link(
+                                                        "stop",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/actions/stop")
+                                                                .method("POST")
+                                                                .build())
+                                                .build())
+                                .resource(
+                                        ApplicationResource.builder()
+                                                .id("02b4ec9b-94c7-4468-9c23-4e906191a0f8")
+                                                .name("my_app2")
+                                                .state(ApplicationState.STOPPED)
+                                                .createdAt("1970-01-01T00:00:02Z")
+                                                .updatedAt("2016-06-08T16:41:26Z")
+                                                .lifecycle(
+                                                        Lifecycle.builder()
+                                                                .type(LifecycleType.BUILDPACK)
+                                                                .data(
+                                                                        BuildpackData.builder()
+                                                                                .buildpack(
+                                                                                        "ruby_buildpack")
+                                                                                .stack("cflinuxfs2")
+                                                                                .build())
+                                                                .build())
+                                                .relationships(
+                                                        ApplicationRelationships.builder()
+                                                                .space(
+                                                                        ToOneRelationship.builder()
+                                                                                .data(
+                                                                                        Relationship
+                                                                                                .builder()
+                                                                                                .id(
+                                                                                                        "2f35885d-0c9d-4423-83ad-fd05066f8576")
+                                                                                                .build())
+                                                                                .build())
+                                                                .build())
+                                                .link(
+                                                        "self",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/02b4ec9b-94c7-4468-9c23-4e906191a0f8")
+                                                                .build())
+                                                .link(
+                                                        "space",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/spaces/2f35885d-0c9d-4423-83ad-fd05066f8576")
+                                                                .build())
+                                                .link(
+                                                        "processes",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/02b4ec9b-94c7-4468-9c23-4e906191a0f8/processes")
+                                                                .build())
+                                                .link(
+                                                        "route_mappings",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/02b4ec9b-94c7-4468-9c23-4e906191a0f8/route_mappings")
+                                                                .build())
+                                                .link(
+                                                        "packages",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/02b4ec9b-94c7-4468-9c23-4e906191a0f8/packages")
+                                                                .build())
+                                                .link(
+                                                        "environment_variables",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/02b4ec9b-94c7-4468-9c23-4e906191a0f8/environment_variables")
+                                                                .build())
+                                                .link(
+                                                        "current_droplet",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/02b4ec9b-94c7-4468-9c23-4e906191a0f8/droplets/current")
+                                                                .build())
+                                                .link(
+                                                        "droplets",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/02b4ec9b-94c7-4468-9c23-4e906191a0f8/droplets")
+                                                                .build())
+                                                .link(
+                                                        "tasks",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/02b4ec9b-94c7-4468-9c23-4e906191a0f8/tasks")
+                                                                .build())
+                                                .link(
+                                                        "start",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/02b4ec9b-94c7-4468-9c23-4e906191a0f8/actions/start")
+                                                                .method("POST")
+                                                                .build())
+                                                .link(
+                                                        "stop",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/02b4ec9b-94c7-4468-9c23-4e906191a0f8/actions/stop")
+                                                                .method("POST")
+                                                                .build())
+                                                .build())
                                 .build())
-                            .build())
-                        .build())
-                    .metadata(Metadata.builder()
-                        .annotation("version", "1.2.3")
-                        .label("isLive", "true")
-                        .build())
-                    .link("self", Link.builder()
-                        .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446")
-                        .build())
-                    .link("space", Link.builder()
-                        .href("https://api.example.org/v3/spaces/2f35885d-0c9d-4423-83ad-fd05066f8576")
-                        .build())
-                    .link("processes", Link.builder()
-                        .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/processes")
-                        .build())
-                    .link("route_mappings", Link.builder()
-                        .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/route_mappings")
-                        .build())
-                    .link("packages", Link.builder()
-                        .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/packages")
-                        .build())
-                    .link("environment_variables", Link.builder()
-                        .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/environment_variables")
-                        .build())
-                    .link("current_droplet", Link.builder()
-                        .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/droplets/current")
-                        .build())
-                    .link("droplets", Link.builder()
-                        .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/droplets")
-                        .build())
-                    .link("tasks", Link.builder()
-                        .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/tasks")
-                        .build())
-                    .link("start", Link.builder()
-                        .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/actions/start")
-                        .method("POST")
-                        .build())
-                    .link("stop", Link.builder()
-                        .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/actions/stop")
-                        .method("POST")
-                        .build())
-                    .build())
-                .resource(ApplicationResource.builder()
-                    .id("02b4ec9b-94c7-4468-9c23-4e906191a0f8")
-                    .name("my_app2")
-                    .state(ApplicationState.STOPPED)
-                    .createdAt("1970-01-01T00:00:02Z")
-                    .updatedAt("2016-06-08T16:41:26Z")
-                    .lifecycle(Lifecycle.builder()
-                        .type(LifecycleType.BUILDPACK)
-                        .data(BuildpackData.builder()
-                            .buildpack("ruby_buildpack")
-                            .stack("cflinuxfs2")
-                            .build())
-                        .build())
-                    .relationships(ApplicationRelationships.builder()
-                        .space(ToOneRelationship.builder()
-                            .data(Relationship.builder()
-                                .id("2f35885d-0c9d-4423-83ad-fd05066f8576")
-                                .build())
-                            .build())
-                        .build())
-                    .link("self", Link.builder()
-                        .href("https://api.example.org/v3/apps/02b4ec9b-94c7-4468-9c23-4e906191a0f8")
-                        .build())
-                    .link("space", Link.builder()
-                        .href("https://api.example.org/v3/spaces/2f35885d-0c9d-4423-83ad-fd05066f8576")
-                        .build())
-                    .link("processes", Link.builder()
-                        .href("https://api.example.org/v3/apps/02b4ec9b-94c7-4468-9c23-4e906191a0f8/processes")
-                        .build())
-                    .link("route_mappings", Link.builder()
-                        .href("https://api.example.org/v3/apps/02b4ec9b-94c7-4468-9c23-4e906191a0f8/route_mappings")
-                        .build())
-                    .link("packages", Link.builder()
-                        .href("https://api.example.org/v3/apps/02b4ec9b-94c7-4468-9c23-4e906191a0f8/packages")
-                        .build())
-                    .link("environment_variables", Link.builder()
-                        .href("https://api.example.org/v3/apps/02b4ec9b-94c7-4468-9c23-4e906191a0f8/environment_variables")
-                        .build())
-                    .link("current_droplet", Link.builder()
-                        .href("https://api.example.org/v3/apps/02b4ec9b-94c7-4468-9c23-4e906191a0f8/droplets/current")
-                        .build())
-                    .link("droplets", Link.builder()
-                        .href("https://api.example.org/v3/apps/02b4ec9b-94c7-4468-9c23-4e906191a0f8/droplets")
-                        .build())
-                    .link("tasks", Link.builder()
-                        .href("https://api.example.org/v3/apps/02b4ec9b-94c7-4468-9c23-4e906191a0f8/tasks")
-                        .build())
-                    .link("start", Link.builder()
-                        .href("https://api.example.org/v3/apps/02b4ec9b-94c7-4468-9c23-4e906191a0f8/actions/start")
-                        .method("POST")
-                        .build())
-                    .link("stop", Link.builder()
-                        .href("https://api.example.org/v3/apps/02b4ec9b-94c7-4468-9c23-4e906191a0f8/actions/stop")
-                        .method("POST")
-                        .build())
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
     public void listBuilds() {
-        mockRequest(InteractionContext.builder()
-            .request(TestRequest.builder()
-                .method(GET).path("/apps/test-application-id/builds")
-                .build())
-            .response(TestResponse.builder()
-                .status(OK)
-                .payload("fixtures/client/v3/apps/GET_{id}_builds_response.json")
-                .build())
-            .build());
+        mockRequest(
+                InteractionContext.builder()
+                        .request(
+                                TestRequest.builder()
+                                        .method(GET)
+                                        .path("/apps/test-application-id/builds")
+                                        .build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(OK)
+                                        .payload(
+                                                "fixtures/client/v3/apps/GET_{id}_builds_response.json")
+                                        .build())
+                        .build());
 
         this.applications
-            .listBuilds(ListApplicationBuildsRequest.builder()
-                .applicationId("test-application-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(ListApplicationBuildsResponse.builder()
-                .pagination(Pagination.builder()
-                    .totalResults(1)
-                    .totalPages(1)
-                    .first(Link.builder()
-                        .href("https://api.example.org/v3/apps/test-application-id/builds?states=STAGING&page=1&per_page=2")
-                        .build())
-                    .last(Link.builder()
-                        .href("https://api.example.org/v3/apps/test-application-id/builds?states=STAGING&page=1&per_page=2")
-                        .build())
-                    .build())
-                .resource(BuildResource.builder()
-                    .id("585bc3c1-3743-497d-88b0-403ad6b56d16")
-                    .createdAt("2016-03-28T23:39:34Z")
-                    .updatedAt("2016-06-08T16:41:26Z")
-                    .createdBy(CreatedBy.builder()
-                        .id("3cb4e243-bed4-49d5-8739-f8b45abdec1c")
-                        .name("bill")
-                        .email("bill@example.com")
-                        .build())
-                    .state(BuildState.STAGING)
-                    .error(null)
-                    .lifecycle(Lifecycle.builder()
-                        .type(LifecycleType.BUILDPACK)
-                        .data(BuildpackData.builder()
-                            .buildpack("ruby_buildpack")
-                            .stack("cflinuxfs2")
-                            .build())
-                        .build())
-                    .inputPackage(Relationship.builder()
-                        .id("8e4da443-f255-499c-8b47-b3729b5b7432")
-                        .build())
-                    .link("self", Link.builder()
-                        .href("https://api.example.org/v3/builds/585bc3c1-3743-497d-88b0-403ad6b56d16")
-                        .build())
-                    .link("app", Link.builder()
-                        .href("https://api.example.org/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058396")
-                        .build())
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .listBuilds(
+                        ListApplicationBuildsRequest.builder()
+                                .applicationId("test-application-id")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        ListApplicationBuildsResponse.builder()
+                                .pagination(
+                                        Pagination.builder()
+                                                .totalResults(1)
+                                                .totalPages(1)
+                                                .first(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/test-application-id/builds?states=STAGING&page=1&per_page=2")
+                                                                .build())
+                                                .last(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/test-application-id/builds?states=STAGING&page=1&per_page=2")
+                                                                .build())
+                                                .build())
+                                .resource(
+                                        BuildResource.builder()
+                                                .id("585bc3c1-3743-497d-88b0-403ad6b56d16")
+                                                .createdAt("2016-03-28T23:39:34Z")
+                                                .updatedAt("2016-06-08T16:41:26Z")
+                                                .createdBy(
+                                                        CreatedBy.builder()
+                                                                .id(
+                                                                        "3cb4e243-bed4-49d5-8739-f8b45abdec1c")
+                                                                .name("bill")
+                                                                .email("bill@example.com")
+                                                                .build())
+                                                .state(BuildState.STAGING)
+                                                .error(null)
+                                                .lifecycle(
+                                                        Lifecycle.builder()
+                                                                .type(LifecycleType.BUILDPACK)
+                                                                .data(
+                                                                        BuildpackData.builder()
+                                                                                .buildpack(
+                                                                                        "ruby_buildpack")
+                                                                                .stack("cflinuxfs2")
+                                                                                .build())
+                                                                .build())
+                                                .inputPackage(
+                                                        Relationship.builder()
+                                                                .id(
+                                                                        "8e4da443-f255-499c-8b47-b3729b5b7432")
+                                                                .build())
+                                                .link(
+                                                        "self",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/builds/585bc3c1-3743-497d-88b0-403ad6b56d16")
+                                                                .build())
+                                                .link(
+                                                        "app",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058396")
+                                                                .build())
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
     public void listDroplets() {
-        mockRequest(InteractionContext.builder()
-            .request(TestRequest.builder()
-                .method(GET).path("/apps/test-application-id/droplets")
-                .build())
-            .response(TestResponse.builder()
-                .status(OK)
-                .payload("fixtures/client/v3/apps/GET_{id}_droplets_response.json")
-                .build())
-            .build());
+        mockRequest(
+                InteractionContext.builder()
+                        .request(
+                                TestRequest.builder()
+                                        .method(GET)
+                                        .path("/apps/test-application-id/droplets")
+                                        .build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(OK)
+                                        .payload(
+                                                "fixtures/client/v3/apps/GET_{id}_droplets_response.json")
+                                        .build())
+                        .build());
 
         this.applications
-            .listDroplets(ListApplicationDropletsRequest.builder()
-                .applicationId("test-application-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(ListApplicationDropletsResponse.builder()
-                .pagination(Pagination.builder()
-                    .totalResults(2)
-                    .totalPages(1)
-                    .first(Link.builder()
-                        .href("https://api.example.org/v3/app/7b34f1cf-7e73-428a-bb5a-8a17a8058396/droplets?page=1&per_page=50")
-                        .build())
-                    .last(Link.builder()
-                        .href("https://api.example.org/v3/app/7b34f1cf-7e73-428a-bb5a-8a17a8058396/droplets?page=1&per_page=50")
-                        .build())
-                    .build())
-                .resource(DropletResource.builder()
-                    .id("585bc3c1-3743-497d-88b0-403ad6b56d16")
-                    .state(DropletState.STAGED)
-                    .error(null)
-                    .lifecycle(Lifecycle.builder()
-                        .type(LifecycleType.BUILDPACK)
-                        .data(BuildpackData.builder()
-                            .build())
-                        .build())
-                    .image(null)
-                    .executionMetadata("PRIVATE DATA HIDDEN")
-                    .processType("redacted_message", "[PRIVATE DATA HIDDEN IN LISTS]")
-                    .checksum(Checksum.builder()
-                        .type(ChecksumType.SHA256)
-                        .value("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855")
-                        .build())
-                    .buildpack(Buildpack.builder()
-                        .name("ruby_buildpack")
-                        .detectOutput("ruby 1.6.14")
-                        .build())
-                    .stack("cflinuxfs2")
-                    .createdAt("2016-03-28T23:39:34Z")
-                    .updatedAt("2016-03-28T23:39:47Z")
-                    .link("self", Link.builder()
-                        .href("https://api.example.org/v3/droplets/585bc3c1-3743-497d-88b0-403ad6b56d16")
-                        .build())
-                    .link("package", Link.builder()
-                        .href("https://api.example.org/v3/packages/8222f76a-9e09-4360-b3aa-1ed329945e92")
-                        .build())
-                    .link("app", Link.builder()
-                        .href("https://api.example.org/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058396")
-                        .build())
-                    .link("assign_current_droplet", Link.builder()
-                        .href("https://api.example.org/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058396/relationships/current_droplet")
-                        .method("PATCH")
-                        .build())
-                    .build())
-                .resource(DropletResource.builder()
-                    .id("fdf3851c-def8-4de1-87f1-6d4543189e22")
-                    .state(DropletState.STAGED)
-                    .error(null)
-                    .lifecycle(Lifecycle.builder()
-                        .type(LifecycleType.DOCKER)
-                        .data(DockerData.builder()
-                            .build())
-                        .build())
-                    .executionMetadata("[PRIVATE DATA HIDDEN IN LISTS]")
-                    .processType("redacted_message", "[PRIVATE DATA HIDDEN IN LISTS]")
-                    .image("cloudfoundry/diego-docker-app-custom:latest")
-                    .checksum(null)
-                    .stack(null)
-                    .createdAt("2016-03-17T00:00:01Z")
-                    .updatedAt("2016-03-17T21:41:32Z")
-                    .link("self", Link.builder()
-                        .href("https://api.example.org/v3/droplets/fdf3851c-def8-4de1-87f1-6d4543189e22")
-                        .build())
-                    .link("package", Link.builder()
-                        .href("https://api.example.org/v3/packages/c5725684-a02f-4e59-bc67-8f36ae944688")
-                        .build())
-                    .link("app", Link.builder()
-                        .href("https://api.example.org/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058396")
-                        .build())
-                    .link("assign_current_droplet", Link.builder()
-                        .href("https://api.example.org/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058396/relationships/current_droplet")
-                        .method("PATCH")
-                        .build())
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .listDroplets(
+                        ListApplicationDropletsRequest.builder()
+                                .applicationId("test-application-id")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        ListApplicationDropletsResponse.builder()
+                                .pagination(
+                                        Pagination.builder()
+                                                .totalResults(2)
+                                                .totalPages(1)
+                                                .first(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/app/7b34f1cf-7e73-428a-bb5a-8a17a8058396/droplets?page=1&per_page=50")
+                                                                .build())
+                                                .last(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/app/7b34f1cf-7e73-428a-bb5a-8a17a8058396/droplets?page=1&per_page=50")
+                                                                .build())
+                                                .build())
+                                .resource(
+                                        DropletResource.builder()
+                                                .id("585bc3c1-3743-497d-88b0-403ad6b56d16")
+                                                .state(DropletState.STAGED)
+                                                .error(null)
+                                                .lifecycle(
+                                                        Lifecycle.builder()
+                                                                .type(LifecycleType.BUILDPACK)
+                                                                .data(
+                                                                        BuildpackData.builder()
+                                                                                .build())
+                                                                .build())
+                                                .image(null)
+                                                .executionMetadata("PRIVATE DATA HIDDEN")
+                                                .processType(
+                                                        "redacted_message",
+                                                        "[PRIVATE DATA HIDDEN IN LISTS]")
+                                                .checksum(
+                                                        Checksum.builder()
+                                                                .type(ChecksumType.SHA256)
+                                                                .value(
+                                                                        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855")
+                                                                .build())
+                                                .buildpack(
+                                                        Buildpack.builder()
+                                                                .name("ruby_buildpack")
+                                                                .detectOutput("ruby 1.6.14")
+                                                                .build())
+                                                .stack("cflinuxfs2")
+                                                .createdAt("2016-03-28T23:39:34Z")
+                                                .updatedAt("2016-03-28T23:39:47Z")
+                                                .link(
+                                                        "self",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/droplets/585bc3c1-3743-497d-88b0-403ad6b56d16")
+                                                                .build())
+                                                .link(
+                                                        "package",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/packages/8222f76a-9e09-4360-b3aa-1ed329945e92")
+                                                                .build())
+                                                .link(
+                                                        "app",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058396")
+                                                                .build())
+                                                .link(
+                                                        "assign_current_droplet",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058396/relationships/current_droplet")
+                                                                .method("PATCH")
+                                                                .build())
+                                                .build())
+                                .resource(
+                                        DropletResource.builder()
+                                                .id("fdf3851c-def8-4de1-87f1-6d4543189e22")
+                                                .state(DropletState.STAGED)
+                                                .error(null)
+                                                .lifecycle(
+                                                        Lifecycle.builder()
+                                                                .type(LifecycleType.DOCKER)
+                                                                .data(DockerData.builder().build())
+                                                                .build())
+                                                .executionMetadata("[PRIVATE DATA HIDDEN IN LISTS]")
+                                                .processType(
+                                                        "redacted_message",
+                                                        "[PRIVATE DATA HIDDEN IN LISTS]")
+                                                .image(
+                                                        "cloudfoundry/diego-docker-app-custom:latest")
+                                                .checksum(null)
+                                                .stack(null)
+                                                .createdAt("2016-03-17T00:00:01Z")
+                                                .updatedAt("2016-03-17T21:41:32Z")
+                                                .link(
+                                                        "self",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/droplets/fdf3851c-def8-4de1-87f1-6d4543189e22")
+                                                                .build())
+                                                .link(
+                                                        "package",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/packages/c5725684-a02f-4e59-bc67-8f36ae944688")
+                                                                .build())
+                                                .link(
+                                                        "app",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058396")
+                                                                .build())
+                                                .link(
+                                                        "assign_current_droplet",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058396/relationships/current_droplet")
+                                                                .method("PATCH")
+                                                                .build())
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
     public void listFeatures() {
-        mockRequest(InteractionContext.builder()
-            .request(TestRequest.builder()
-                .method(GET).path("/apps/test-application-id/features")
-                .build())
-            .response(TestResponse.builder()
-                .status(OK)
-                .payload("fixtures/client/v3/apps/GET_{id}_features_response.json")
-                .build())
-            .build());
+        mockRequest(
+                InteractionContext.builder()
+                        .request(
+                                TestRequest.builder()
+                                        .method(GET)
+                                        .path("/apps/test-application-id/features")
+                                        .build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(OK)
+                                        .payload(
+                                                "fixtures/client/v3/apps/GET_{id}_features_response.json")
+                                        .build())
+                        .build());
 
         this.applications
-            .listFeatures(ListApplicationFeaturesRequest.builder()
-                .applicationId("test-application-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(ListApplicationFeaturesResponse.builder()
-                .pagination(Pagination.builder()
-                    .totalResults(1)
-                    .totalPages(1)
-                    .first(Link.builder()
-                        .href("/v3/apps/05d39de4-2c9e-4c76-8fd6-10417da07e42/features")
-                        .build())
-                    .last(Link.builder()
-                        .href("/v3/apps/05d39de4-2c9e-4c76-8fd6-10417da07e42/features")
-                        .build())
-                    .build())
-                .resource(ApplicationFeatureResource.builder()
-                    .name("ssh")
-                    .description("Enable SSHing into the app.")
-                    .enabled(true)
-                    .build())
-                .resource(ApplicationFeatureResource.builder()
-                    .name("revisions")
-                    .description("Enable versioning of an application")
-                    .enabled(false)
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .listFeatures(
+                        ListApplicationFeaturesRequest.builder()
+                                .applicationId("test-application-id")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        ListApplicationFeaturesResponse.builder()
+                                .pagination(
+                                        Pagination.builder()
+                                                .totalResults(1)
+                                                .totalPages(1)
+                                                .first(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "/v3/apps/05d39de4-2c9e-4c76-8fd6-10417da07e42/features")
+                                                                .build())
+                                                .last(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "/v3/apps/05d39de4-2c9e-4c76-8fd6-10417da07e42/features")
+                                                                .build())
+                                                .build())
+                                .resource(
+                                        ApplicationFeatureResource.builder()
+                                                .name("ssh")
+                                                .description("Enable SSHing into the app.")
+                                                .enabled(true)
+                                                .build())
+                                .resource(
+                                        ApplicationFeatureResource.builder()
+                                                .name("revisions")
+                                                .description("Enable versioning of an application")
+                                                .enabled(false)
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
     public void listPackages() {
-        mockRequest(InteractionContext.builder()
-            .request(TestRequest.builder()
-                .method(GET).path("/apps/test-application-id/packages")
-                .build())
-            .response(TestResponse.builder()
-                .status(OK)
-                .payload("fixtures/client/v3/apps/GET_{id}_packages_response.json")
-                .build())
-            .build());
+        mockRequest(
+                InteractionContext.builder()
+                        .request(
+                                TestRequest.builder()
+                                        .method(GET)
+                                        .path("/apps/test-application-id/packages")
+                                        .build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(OK)
+                                        .payload(
+                                                "fixtures/client/v3/apps/GET_{id}_packages_response.json")
+                                        .build())
+                        .build());
 
         this.applications
-            .listPackages(ListApplicationPackagesRequest.builder()
-                .applicationId("test-application-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(ListApplicationPackagesResponse.builder()
-                .pagination(Pagination.builder()
-                    .totalResults(1)
-                    .totalPages(1)
-                    .first(Link.builder()
-                        .href("https://api.example.org/v3/apps/f2efe391-2b5b-4836-8518-ad93fa9ebf69/packages?states=READY&page=1&per_page=50")
-                        .build())
-                    .last(Link.builder()
-                        .href("https://api.example.org/v3/apps/f2efe391-2b5b-4836-8518-ad93fa9ebf69/packages?states=READY&page=1&per_page=50")
-                        .build())
-                    .build())
-                .resource(PackageResource.builder()
-                    .id("752edab0-2147-4f58-9c25-cd72ad8c3561")
-                    .type(PackageType.BITS)
-                    .data(BitsData.builder()
-                        .error(null)
-                        .checksum(Checksum.builder()
-                            .type(ChecksumType.SHA256)
-                            .value(null)
-                            .build())
-                        .build())
-                    .state(PackageState.READY)
-                    .createdAt("2016-03-17T21:41:09Z")
-                    .updatedAt("2016-06-08T16:41:26Z")
-                    .link("self", Link.builder()
-                        .href("https://api.example.org/v3/packages/752edab0-2147-4f58-9c25-cd72ad8c3561")
-                        .build())
-                    .link("upload", Link.builder()
-                        .href("https://api.example.org/v3/packages/752edab0-2147-4f58-9c25-cd72ad8c3561/upload")
-                        .method("POST")
-                        .build())
-                    .link("download", Link.builder()
-                        .href("https://api.example.org/v3/packages/752edab0-2147-4f58-9c25-cd72ad8c3561/download")
-                        .method("GET")
-                        .build())
-                    .link("app", Link.builder()
-                        .href("https://api.example.org/v3/apps/f2efe391-2b5b-4836-8518-ad93fa9ebf69")
-                        .build())
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .listPackages(
+                        ListApplicationPackagesRequest.builder()
+                                .applicationId("test-application-id")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        ListApplicationPackagesResponse.builder()
+                                .pagination(
+                                        Pagination.builder()
+                                                .totalResults(1)
+                                                .totalPages(1)
+                                                .first(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/f2efe391-2b5b-4836-8518-ad93fa9ebf69/packages?states=READY&page=1&per_page=50")
+                                                                .build())
+                                                .last(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/f2efe391-2b5b-4836-8518-ad93fa9ebf69/packages?states=READY&page=1&per_page=50")
+                                                                .build())
+                                                .build())
+                                .resource(
+                                        PackageResource.builder()
+                                                .id("752edab0-2147-4f58-9c25-cd72ad8c3561")
+                                                .type(PackageType.BITS)
+                                                .data(
+                                                        BitsData.builder()
+                                                                .error(null)
+                                                                .checksum(
+                                                                        Checksum.builder()
+                                                                                .type(
+                                                                                        ChecksumType
+                                                                                                .SHA256)
+                                                                                .value(null)
+                                                                                .build())
+                                                                .build())
+                                                .state(PackageState.READY)
+                                                .createdAt("2016-03-17T21:41:09Z")
+                                                .updatedAt("2016-06-08T16:41:26Z")
+                                                .link(
+                                                        "self",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/packages/752edab0-2147-4f58-9c25-cd72ad8c3561")
+                                                                .build())
+                                                .link(
+                                                        "upload",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/packages/752edab0-2147-4f58-9c25-cd72ad8c3561/upload")
+                                                                .method("POST")
+                                                                .build())
+                                                .link(
+                                                        "download",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/packages/752edab0-2147-4f58-9c25-cd72ad8c3561/download")
+                                                                .method("GET")
+                                                                .build())
+                                                .link(
+                                                        "app",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/f2efe391-2b5b-4836-8518-ad93fa9ebf69")
+                                                                .build())
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
     public void listProcesses() {
-        mockRequest(InteractionContext.builder()
-            .request(TestRequest.builder()
-                .method(GET).path("/apps/test-application-id/processes")
-                .build())
-            .response(TestResponse.builder()
-                .status(OK)
-                .payload("fixtures/client/v3/apps/GET_{id}_processes_response.json")
-                .build())
-            .build());
+        mockRequest(
+                InteractionContext.builder()
+                        .request(
+                                TestRequest.builder()
+                                        .method(GET)
+                                        .path("/apps/test-application-id/processes")
+                                        .build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(OK)
+                                        .payload(
+                                                "fixtures/client/v3/apps/GET_{id}_processes_response.json")
+                                        .build())
+                        .build());
 
         this.applications
-            .listProcesses(ListApplicationProcessesRequest.builder()
-                .applicationId("test-application-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(ListApplicationProcessesResponse.builder()
-                .pagination(Pagination.builder()
-                    .totalResults(3)
-                    .totalPages(2)
-                    .first(Link.builder()
-                        .href("https://api.example.org/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5/processes?page=1&per_page=2")
-                        .build())
-                    .last(Link.builder()
-                        .href("https://api.example.org/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5/processes?page=2&per_page=2")
-                        .build())
-                    .next(Link.builder()
-                        .href("https://api.example.org/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5/processes?page=2&per_page=2")
-                        .build())
-                    .build())
-                .resource(ProcessResource.builder()
-                    .id("6a901b7c-9417-4dc1-8189-d3234aa0ab82")
-                    .type("web")
-                    .command("[PRIVATE DATA HIDDEN IN LISTS]")
-                    .instances(5)
-                    .memoryInMb(256)
-                    .diskInMb(1_024)
-                    .healthCheck(HealthCheck.builder()
-                        .type(HealthCheckType.PORT)
-                        .data(Data.builder()
-                            .timeout(null)
-                            .endpoint(null)
-                            .build())
-                        .build())
-                    .metadata(Metadata.builder()
-                        .annotations(Collections.emptyMap())
-                        .labels(Collections.emptyMap())
-                        .build())
-                    .relationships(ProcessRelationships.builder()
-                        .build())
-                    .createdAt("2016-03-23T18:48:22Z")
-                    .updatedAt("2016-03-23T18:48:42Z")
-                    .link("self", Link.builder()
-                        .href("https://api.example.org/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82")
-                        .build())
-                    .link("scale", Link.builder()
-                        .href("https://api.example.org/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82/actions/scale")
-                        .method("POST")
-                        .build())
-                    .link("app", Link.builder()
-                        .href("https://api.example.org/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5")
-                        .build())
-                    .link("space", Link.builder()
-                        .href("https://api.example.org/v3/spaces/2f35885d-0c9d-4423-83ad-fd05066f8576")
-                        .build())
-                    .link("stats", Link.builder()
-                        .href("https://api.example.org/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82/stats")
-                        .build())
-                    .build())
-                .resource(ProcessResource.builder()
-                    .id("3fccacd9-4b02-4b96-8d02-8e865865e9eb")
-                    .type("worker")
-                    .command("[PRIVATE DATA HIDDEN IN LISTS]")
-                    .instances(1)
-                    .memoryInMb(256)
-                    .diskInMb(1_024)
-                    .healthCheck(HealthCheck.builder()
-                        .type(HealthCheckType.PROCESS)
-                        .data(Data.builder()
-                            .timeout(null)
-                            .endpoint(null)
-                            .build())
-                        .build())
-                    .metadata(Metadata.builder()
-                        .annotations(Collections.emptyMap())
-                        .labels(Collections.emptyMap())
-                        .build())
-                    .relationships(ProcessRelationships.builder()
-                        .build())
-                    .createdAt("2016-03-23T18:48:22Z")
-                    .updatedAt("2016-03-23T18:48:42Z")
-                    .link("self", Link.builder()
-                        .href("https://api.example.org/v3/processes/3fccacd9-4b02-4b96-8d02-8e865865e9eb")
-                        .build())
-                    .link("scale", Link.builder()
-                        .href("https://api.example.org/v3/processes/3fccacd9-4b02-4b96-8d02-8e865865e9eb/actions/scale")
-                        .method("POST")
-                        .build())
-                    .link("app", Link.builder()
-                        .href("https://api.example.org/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5")
-                        .build())
-                    .link("space", Link.builder()
-                        .href("https://api.example.org/v3/spaces/2f35885d-0c9d-4423-83ad-fd05066f8576")
-                        .build())
-                    .link("stats", Link.builder()
-                        .href("https://api.example.org/v3/processes/3fccacd9-4b02-4b96-8d02-8e865865e9eb/stats")
-                        .build())
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .listProcesses(
+                        ListApplicationProcessesRequest.builder()
+                                .applicationId("test-application-id")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        ListApplicationProcessesResponse.builder()
+                                .pagination(
+                                        Pagination.builder()
+                                                .totalResults(3)
+                                                .totalPages(2)
+                                                .first(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5/processes?page=1&per_page=2")
+                                                                .build())
+                                                .last(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5/processes?page=2&per_page=2")
+                                                                .build())
+                                                .next(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5/processes?page=2&per_page=2")
+                                                                .build())
+                                                .build())
+                                .resource(
+                                        ProcessResource.builder()
+                                                .id("6a901b7c-9417-4dc1-8189-d3234aa0ab82")
+                                                .type("web")
+                                                .command("[PRIVATE DATA HIDDEN IN LISTS]")
+                                                .instances(5)
+                                                .memoryInMb(256)
+                                                .diskInMb(1_024)
+                                                .healthCheck(
+                                                        HealthCheck.builder()
+                                                                .type(HealthCheckType.PORT)
+                                                                .data(
+                                                                        Data.builder()
+                                                                                .timeout(null)
+                                                                                .endpoint(null)
+                                                                                .build())
+                                                                .build())
+                                                .metadata(
+                                                        Metadata.builder()
+                                                                .annotations(Collections.emptyMap())
+                                                                .labels(Collections.emptyMap())
+                                                                .build())
+                                                .relationships(
+                                                        ProcessRelationships.builder().build())
+                                                .createdAt("2016-03-23T18:48:22Z")
+                                                .updatedAt("2016-03-23T18:48:42Z")
+                                                .link(
+                                                        "self",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82")
+                                                                .build())
+                                                .link(
+                                                        "scale",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82/actions/scale")
+                                                                .method("POST")
+                                                                .build())
+                                                .link(
+                                                        "app",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5")
+                                                                .build())
+                                                .link(
+                                                        "space",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/spaces/2f35885d-0c9d-4423-83ad-fd05066f8576")
+                                                                .build())
+                                                .link(
+                                                        "stats",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82/stats")
+                                                                .build())
+                                                .build())
+                                .resource(
+                                        ProcessResource.builder()
+                                                .id("3fccacd9-4b02-4b96-8d02-8e865865e9eb")
+                                                .type("worker")
+                                                .command("[PRIVATE DATA HIDDEN IN LISTS]")
+                                                .instances(1)
+                                                .memoryInMb(256)
+                                                .diskInMb(1_024)
+                                                .healthCheck(
+                                                        HealthCheck.builder()
+                                                                .type(HealthCheckType.PROCESS)
+                                                                .data(
+                                                                        Data.builder()
+                                                                                .timeout(null)
+                                                                                .endpoint(null)
+                                                                                .build())
+                                                                .build())
+                                                .metadata(
+                                                        Metadata.builder()
+                                                                .annotations(Collections.emptyMap())
+                                                                .labels(Collections.emptyMap())
+                                                                .build())
+                                                .relationships(
+                                                        ProcessRelationships.builder().build())
+                                                .createdAt("2016-03-23T18:48:22Z")
+                                                .updatedAt("2016-03-23T18:48:42Z")
+                                                .link(
+                                                        "self",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/processes/3fccacd9-4b02-4b96-8d02-8e865865e9eb")
+                                                                .build())
+                                                .link(
+                                                        "scale",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/processes/3fccacd9-4b02-4b96-8d02-8e865865e9eb/actions/scale")
+                                                                .method("POST")
+                                                                .build())
+                                                .link(
+                                                        "app",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5")
+                                                                .build())
+                                                .link(
+                                                        "space",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/spaces/2f35885d-0c9d-4423-83ad-fd05066f8576")
+                                                                .build())
+                                                .link(
+                                                        "stats",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/processes/3fccacd9-4b02-4b96-8d02-8e865865e9eb/stats")
+                                                                .build())
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
     public void listRoutes() {
-        mockRequest(InteractionContext.builder()
-            .request(TestRequest.builder()
-                .method(GET).path("/apps/test-application-id/routes")
-                .build())
-            .response(TestResponse.builder()
-                .status(OK)
-                .payload("fixtures/client/v3/apps/GET_{id}_routes_response.json")
-                .build())
-            .build());
+        mockRequest(
+                InteractionContext.builder()
+                        .request(
+                                TestRequest.builder()
+                                        .method(GET)
+                                        .path("/apps/test-application-id/routes")
+                                        .build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(OK)
+                                        .payload(
+                                                "fixtures/client/v3/apps/GET_{id}_routes_response.json")
+                                        .build())
+                        .build());
         this.applications
-            .listRoutes(ListApplicationRoutesRequest.builder()
-                .applicationId("test-application-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(ListApplicationRoutesResponse.builder()
-                .pagination(Pagination.builder()
-                    .totalResults(3)
-                    .totalPages(2)
-                    .first(Link.builder()
-                        .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/routes?page=1&per_page=2")
-                        .build())
-                    .last(Link.builder()
-                        .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/routes?page=2&per_page=2")
-                        .build())
-                    .next(Link.builder()
-                        .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/routes?page=2&per_page=2")
-                        .build())
-                    .build())
-                .resource(RouteResource.builder().host("test-hostname")
-                    .id("cbad697f-cac1-48f4-9017-ac08f39dfb31")
-                    .protocol(HTTP)
-                    .path("/some_path")
-                    .createdAt("2019-05-10T17:17:48Z")
-                    .updatedAt("2019-05-10T17:17:48Z")
-                    .host("a-hostname")
-                    .url("a-hostname.a-domain.com/some_path")
-                    .destinations(Destination.builder()
-                        .destinationId("385bf117-17f5-4689-8c5c-08c6cc821fed")
-                        .application(Application.builder()
-                            .applicationId("0a6636b5-7fc4-44d8-8752-0db3e40b35a5")
-                            .process(Process.builder()
-                                .type("web")
+                .listRoutes(
+                        ListApplicationRoutesRequest.builder()
+                                .applicationId("test-application-id")
                                 .build())
-                            .build())
-                        .port(8080)
-                        .build())
-                    .destinations(Destination.builder()
-                        .destinationId("27e96a3b-5bcf-49ed-8048-351e0be23e6f")
-                        .application(Application.builder()
-                            .applicationId("f61e59fa-2121-4217-8c7b-15bfd75baf25")
-                            .process(Process.builder()
-                                .type("web")
+                .as(StepVerifier::create)
+                .expectNext(
+                        ListApplicationRoutesResponse.builder()
+                                .pagination(
+                                        Pagination.builder()
+                                                .totalResults(3)
+                                                .totalPages(2)
+                                                .first(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/routes?page=1&per_page=2")
+                                                                .build())
+                                                .last(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/routes?page=2&per_page=2")
+                                                                .build())
+                                                .next(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/routes?page=2&per_page=2")
+                                                                .build())
+                                                .build())
+                                .resource(
+                                        RouteResource.builder()
+                                                .host("test-hostname")
+                                                .id("cbad697f-cac1-48f4-9017-ac08f39dfb31")
+                                                .protocol(HTTP)
+                                                .path("/some_path")
+                                                .createdAt("2019-05-10T17:17:48Z")
+                                                .updatedAt("2019-05-10T17:17:48Z")
+                                                .host("a-hostname")
+                                                .url("a-hostname.a-domain.com/some_path")
+                                                .destinations(
+                                                        Destination.builder()
+                                                                .destinationId(
+                                                                        "385bf117-17f5-4689-8c5c-08c6cc821fed")
+                                                                .application(
+                                                                        Application.builder()
+                                                                                .applicationId(
+                                                                                        "0a6636b5-7fc4-44d8-8752-0db3e40b35a5")
+                                                                                .process(
+                                                                                        Process
+                                                                                                .builder()
+                                                                                                .type(
+                                                                                                        "web")
+                                                                                                .build())
+                                                                                .build())
+                                                                .port(8080)
+                                                                .build())
+                                                .destinations(
+                                                        Destination.builder()
+                                                                .destinationId(
+                                                                        "27e96a3b-5bcf-49ed-8048-351e0be23e6f")
+                                                                .application(
+                                                                        Application.builder()
+                                                                                .applicationId(
+                                                                                        "f61e59fa-2121-4217-8c7b-15bfd75baf25")
+                                                                                .process(
+                                                                                        Process
+                                                                                                .builder()
+                                                                                                .type(
+                                                                                                        "web")
+                                                                                                .build())
+                                                                                .build())
+                                                                .port(8080)
+                                                                .build())
+                                                .metadata(
+                                                        Metadata.builder()
+                                                                .annotations(Collections.emptyMap())
+                                                                .labels(Collections.emptyMap())
+                                                                .build())
+                                                .relationships(
+                                                        RouteRelationships.builder()
+                                                                .space(
+                                                                        ToOneRelationship.builder()
+                                                                                .data(
+                                                                                        Relationship
+                                                                                                .builder()
+                                                                                                .id(
+                                                                                                        "885a8cb3-c07b-4856-b448-eeb10bf36236")
+                                                                                                .build())
+                                                                                .build())
+                                                                .domain(
+                                                                        ToOneRelationship.builder()
+                                                                                .data(
+                                                                                        Relationship
+                                                                                                .builder()
+                                                                                                .id(
+                                                                                                        "0b5f3633-194c-42d2-9408-972366617e0e")
+                                                                                                .build())
+                                                                                .build())
+                                                                .build())
+                                                .link(
+                                                        "self",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/routes/cbad697f-cac1-48f4-9017-ac08f39dfb31")
+                                                                .build())
+                                                .link(
+                                                        "space",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/spaces/885a8cb3-c07b-4856-b448-eeb10bf36236")
+                                                                .build())
+                                                .link(
+                                                        "domain",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/domains/0b5f3633-194c-42d2-9408-972366617e0e")
+                                                                .build())
+                                                .link(
+                                                        "destinations",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/routes/cbad697f-cac1-48f4-9017-ac08f39dfb31/destinations")
+                                                                .build())
+                                                .build())
                                 .build())
-                            .build())
-                        .port(8080)
-                        .build())
-                    .metadata(Metadata.builder()
-                        .annotations(Collections.emptyMap())
-                        .labels(Collections.emptyMap())
-                        .build())
-                    .relationships(RouteRelationships.builder()
-                        .space(ToOneRelationship.builder()
-                            .data(Relationship.builder()
-                                .id("885a8cb3-c07b-4856-b448-eeb10bf36236")
-                                .build())
-                            .build())
-                        .domain(ToOneRelationship.builder()
-                            .data(Relationship.builder()
-                                .id("0b5f3633-194c-42d2-9408-972366617e0e")
-                                .build())
-                            .build())
-                        .build())
-                    .link("self", Link.builder()
-                        .href("https://api.example.org/v3/routes/cbad697f-cac1-48f4-9017-ac08f39dfb31")
-                        .build())
-                    .link("space", Link.builder()
-                        .href("https://api.example.org/v3/spaces/885a8cb3-c07b-4856-b448-eeb10bf36236")
-                        .build())
-                    .link("domain", Link.builder()
-                        .href("https://api.example.org/v3/domains/0b5f3633-194c-42d2-9408-972366617e0e")
-                        .build())
-                    .link("destinations", Link.builder()
-                        .href("https://api.example.org/v3/routes/cbad697f-cac1-48f4-9017-ac08f39dfb31/destinations")
-                        .build())
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
     public void listTasks() {
-        mockRequest(InteractionContext.builder()
-            .request(TestRequest.builder()
-                .method(GET).path("/apps/test-application-id/tasks")
-                .build())
-            .response(TestResponse.builder()
-                .status(OK)
-                .payload("fixtures/client/v3/apps/GET_{id}_tasks_response.json")
-                .build())
-            .build());
+        mockRequest(
+                InteractionContext.builder()
+                        .request(
+                                TestRequest.builder()
+                                        .method(GET)
+                                        .path("/apps/test-application-id/tasks")
+                                        .build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(OK)
+                                        .payload(
+                                                "fixtures/client/v3/apps/GET_{id}_tasks_response.json")
+                                        .build())
+                        .build());
 
         this.applications
-            .listTasks(ListApplicationTasksRequest.builder()
-                .applicationId("test-application-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(ListApplicationTasksResponse.builder()
-                .pagination(Pagination.builder()
-                    .totalResults(3)
-                    .totalPages(2)
-                    .first(Link.builder()
-                        .href("https://api.example.org/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5/tasks?page=1&per_page=2")
-                        .build())
-                    .last(Link.builder()
-                        .href("https://api.example.org/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5/tasks?page=2&per_page=2")
-                        .build())
-                    .next(Link.builder()
-                        .href("https://api.example.org/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5/tasks?page=2&per_page=2")
-                        .build())
-                    .build())
-                .resource(TaskResource.builder()
-                    .id("d5cc22ec-99a3-4e6a-af91-a44b4ab7b6fa")
-                    .sequenceId(1)
-                    .name("hello")
-                    .state(TaskState.SUCCEEDED)
-                    .memoryInMb(512)
-                    .diskInMb(1024)
-                    .result(Result.builder()
-                        .build())
-                    .dropletId("740ebd2b-162b-469a-bd72-3edb96fabd9a")
-                    .createdAt("2016-05-04T17:00:41Z")
-                    .updatedAt("2016-05-04T17:00:42Z")
-                    .link("self", Link.builder()
-                        .href("https://api.example.org/v3/tasks/d5cc22ec-99a3-4e6a-af91-a44b4ab7b6fa")
-                        .build())
-                    .link("app", Link.builder()
-                        .href("https://api.example.org/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5")
-                        .build())
-                    .link("cancel", Link.builder()
-                        .href("https://api.example.org/v3/tasks/d5cc22ec-99a3-4e6a-af91-a44b4ab7b6fa/actions/cancel")
-                        .method("POST")
-                        .build())
-                    .link("droplet", Link.builder()
-                        .href("https://api.example.org/v3/droplets/740ebd2b-162b-469a-bd72-3edb96fabd9a")
-                        .build())
-                    .build())
-                .resource(TaskResource.builder()
-                    .id("63b4cd89-fd8b-4bf1-a311-7174fcc907d6")
-                    .sequenceId(2)
-                    .name("migrate")
-                    .state(TaskState.FAILED)
-                    .memoryInMb(512)
-                    .diskInMb(1024)
-                    .result(Result.builder()
-                        .failureReason("Exited with status 1")
-                        .build())
-                    .dropletId("740ebd2b-162b-469a-bd72-3edb96fabd9a")
-                    .createdAt("2016-05-04T17:00:41Z")
-                    .updatedAt("2016-05-04T17:00:42Z")
-                    .link("self", Link.builder()
-                        .href("https://api.example.org/v3/tasks/63b4cd89-fd8b-4bf1-a311-7174fcc907d6")
-                        .build())
-                    .link("app", Link.builder()
-                        .href("https://api.example.org/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5")
-                        .build())
-                    .link("cancel", Link.builder()
-                        .href("https://api.example.org/v3/tasks/63b4cd89-fd8b-4bf1-a311-7174fcc907d6/actions/cancel")
-                        .method("POST")
-                        .build())
-                    .link("droplet", Link.builder()
-                        .href("https://api.example.org/v3/droplets/740ebd2b-162b-469a-bd72-3edb96fabd9a")
-                        .build())
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .listTasks(
+                        ListApplicationTasksRequest.builder()
+                                .applicationId("test-application-id")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        ListApplicationTasksResponse.builder()
+                                .pagination(
+                                        Pagination.builder()
+                                                .totalResults(3)
+                                                .totalPages(2)
+                                                .first(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5/tasks?page=1&per_page=2")
+                                                                .build())
+                                                .last(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5/tasks?page=2&per_page=2")
+                                                                .build())
+                                                .next(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5/tasks?page=2&per_page=2")
+                                                                .build())
+                                                .build())
+                                .resource(
+                                        TaskResource.builder()
+                                                .id("d5cc22ec-99a3-4e6a-af91-a44b4ab7b6fa")
+                                                .sequenceId(1)
+                                                .name("hello")
+                                                .state(TaskState.SUCCEEDED)
+                                                .memoryInMb(512)
+                                                .diskInMb(1024)
+                                                .result(Result.builder().build())
+                                                .dropletId("740ebd2b-162b-469a-bd72-3edb96fabd9a")
+                                                .createdAt("2016-05-04T17:00:41Z")
+                                                .updatedAt("2016-05-04T17:00:42Z")
+                                                .link(
+                                                        "self",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/tasks/d5cc22ec-99a3-4e6a-af91-a44b4ab7b6fa")
+                                                                .build())
+                                                .link(
+                                                        "app",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5")
+                                                                .build())
+                                                .link(
+                                                        "cancel",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/tasks/d5cc22ec-99a3-4e6a-af91-a44b4ab7b6fa/actions/cancel")
+                                                                .method("POST")
+                                                                .build())
+                                                .link(
+                                                        "droplet",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/droplets/740ebd2b-162b-469a-bd72-3edb96fabd9a")
+                                                                .build())
+                                                .build())
+                                .resource(
+                                        TaskResource.builder()
+                                                .id("63b4cd89-fd8b-4bf1-a311-7174fcc907d6")
+                                                .sequenceId(2)
+                                                .name("migrate")
+                                                .state(TaskState.FAILED)
+                                                .memoryInMb(512)
+                                                .diskInMb(1024)
+                                                .result(
+                                                        Result.builder()
+                                                                .failureReason(
+                                                                        "Exited with status 1")
+                                                                .build())
+                                                .dropletId("740ebd2b-162b-469a-bd72-3edb96fabd9a")
+                                                .createdAt("2016-05-04T17:00:41Z")
+                                                .updatedAt("2016-05-04T17:00:42Z")
+                                                .link(
+                                                        "self",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/tasks/63b4cd89-fd8b-4bf1-a311-7174fcc907d6")
+                                                                .build())
+                                                .link(
+                                                        "app",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5")
+                                                                .build())
+                                                .link(
+                                                        "cancel",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/tasks/63b4cd89-fd8b-4bf1-a311-7174fcc907d6/actions/cancel")
+                                                                .method("POST")
+                                                                .build())
+                                                .link(
+                                                        "droplet",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/droplets/740ebd2b-162b-469a-bd72-3edb96fabd9a")
+                                                                .build())
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
     public void scale() {
-        mockRequest(InteractionContext.builder()
-            .request(TestRequest.builder()
-                .method(POST).path("/apps/test-application-id/processes/test-type/actions/scale")
-                .payload("fixtures/client/v3/apps/PUT_{id}_processes_{type}_actions_scale_request.json")
-                .build())
-            .response(TestResponse.builder()
-                .status(OK)
-                .payload("fixtures/client/v3/apps/PUT_{id}_processes_{type}_actions_scale_response.json")
-                .build())
-            .build());
+        mockRequest(
+                InteractionContext.builder()
+                        .request(
+                                TestRequest.builder()
+                                        .method(POST)
+                                        .path(
+                                                "/apps/test-application-id/processes/test-type/actions/scale")
+                                        .payload(
+                                                "fixtures/client/v3/apps/PUT_{id}_processes_{type}_actions_scale_request.json")
+                                        .build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(OK)
+                                        .payload(
+                                                "fixtures/client/v3/apps/PUT_{id}_processes_{type}_actions_scale_response.json")
+                                        .build())
+                        .build());
 
         this.applications
-            .scale(ScaleApplicationRequest.builder()
-                .applicationId("test-application-id")
-                .type("test-type")
-                .instances(5)
-                .memoryInMb(256)
-                .diskInMb(1_024)
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(ScaleApplicationResponse.builder()
-                .id("6a901b7c-9417-4dc1-8189-d3234aa0ab82")
-                .type("web")
-                .command("rackup")
-                .instances(5)
-                .memoryInMb(256)
-                .diskInMb(1_024)
-                .healthCheck(HealthCheck.builder()
-                    .type(HealthCheckType.PORT)
-                    .data(Data.builder()
-                        .timeout(null)
-                        .endpoint(null)
-                        .build())
-                    .build())
-                .metadata(Metadata.builder()
-                    .annotations(Collections.emptyMap())
-                    .labels(Collections.emptyMap())
-                    .build())
-                .relationships(ProcessRelationships.builder()
-                    .build())
-                .createdAt("2016-03-23T18:48:22Z")
-                .updatedAt("2016-03-23T18:48:42Z")
-                .link("self", Link.builder()
-                    .href("https://api.example.org/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82")
-                    .build())
-                .link("scale", Link.builder()
-                    .href("https://api.example.org/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82/actions/scale")
-                    .method("POST")
-                    .build())
-                .link("app", Link.builder()
-                    .href("https://api.example.org/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5")
-                    .build())
-                .link("space", Link.builder()
-                    .href("https://api.example.org/v3/spaces/2f35885d-0c9d-4423-83ad-fd05066f8576")
-                    .build())
-                .link("stats", Link.builder()
-                    .href("https://api.example.org/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82/stats")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .scale(
+                        ScaleApplicationRequest.builder()
+                                .applicationId("test-application-id")
+                                .type("test-type")
+                                .instances(5)
+                                .memoryInMb(256)
+                                .diskInMb(1_024)
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        ScaleApplicationResponse.builder()
+                                .id("6a901b7c-9417-4dc1-8189-d3234aa0ab82")
+                                .type("web")
+                                .command("rackup")
+                                .instances(5)
+                                .memoryInMb(256)
+                                .diskInMb(1_024)
+                                .healthCheck(
+                                        HealthCheck.builder()
+                                                .type(HealthCheckType.PORT)
+                                                .data(
+                                                        Data.builder()
+                                                                .timeout(null)
+                                                                .endpoint(null)
+                                                                .build())
+                                                .build())
+                                .metadata(
+                                        Metadata.builder()
+                                                .annotations(Collections.emptyMap())
+                                                .labels(Collections.emptyMap())
+                                                .build())
+                                .relationships(ProcessRelationships.builder().build())
+                                .createdAt("2016-03-23T18:48:22Z")
+                                .updatedAt("2016-03-23T18:48:42Z")
+                                .link(
+                                        "self",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82")
+                                                .build())
+                                .link(
+                                        "scale",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82/actions/scale")
+                                                .method("POST")
+                                                .build())
+                                .link(
+                                        "app",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5")
+                                                .build())
+                                .link(
+                                        "space",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/spaces/2f35885d-0c9d-4423-83ad-fd05066f8576")
+                                                .build())
+                                .link(
+                                        "stats",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82/stats")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
     public void setCurrentDroplet() {
-        mockRequest(InteractionContext.builder()
-            .request(TestRequest.builder()
-                .method(PATCH).path("/apps/test-application-id/relationships/current_droplet")
-                .payload("fixtures/client/v3/apps/PATCH_{id}_relationships_current_droplet_request.json")
-                .build())
-            .response(TestResponse.builder()
-                .status(OK)
-                .payload("fixtures/client/v3/apps/PATCH_{id}_relationships_current_droplet_response.json")
-                .build())
-            .build());
+        mockRequest(
+                InteractionContext.builder()
+                        .request(
+                                TestRequest.builder()
+                                        .method(PATCH)
+                                        .path(
+                                                "/apps/test-application-id/relationships/current_droplet")
+                                        .payload(
+                                                "fixtures/client/v3/apps/PATCH_{id}_relationships_current_droplet_request.json")
+                                        .build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(OK)
+                                        .payload(
+                                                "fixtures/client/v3/apps/PATCH_{id}_relationships_current_droplet_response.json")
+                                        .build())
+                        .build());
 
         this.applications
-            .setCurrentDroplet(SetApplicationCurrentDropletRequest.builder()
-                .data(Relationship.builder()
-                    .id("[droplet_guid]")
-                    .build())
-                .applicationId("test-application-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(SetApplicationCurrentDropletResponse.builder()
-                .data(Relationship.builder()
-                    .id("9d8e007c-ce52-4ea7-8a57-f2825d2c6b39")
-                    .build())
-                .link("self", Link.builder()
-                    .href("https://api.example.org/v3/apps/d4c91047-7b29-4fda-b7f9-04033e5c9c9f/relationships/current_droplet")
-                    .build())
-                .link("related", Link.builder()
-                    .href("https://api.example.org/v3/apps/d4c91047-7b29-4fda-b7f9-04033e5c9c9f/droplets/current")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .setCurrentDroplet(
+                        SetApplicationCurrentDropletRequest.builder()
+                                .data(Relationship.builder().id("[droplet_guid]").build())
+                                .applicationId("test-application-id")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        SetApplicationCurrentDropletResponse.builder()
+                                .data(
+                                        Relationship.builder()
+                                                .id("9d8e007c-ce52-4ea7-8a57-f2825d2c6b39")
+                                                .build())
+                                .link(
+                                        "self",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/d4c91047-7b29-4fda-b7f9-04033e5c9c9f/relationships/current_droplet")
+                                                .build())
+                                .link(
+                                        "related",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/d4c91047-7b29-4fda-b7f9-04033e5c9c9f/droplets/current")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
     public void start() {
-        mockRequest(InteractionContext.builder()
-            .request(TestRequest.builder()
-                .method(POST).path("/apps/test-application-id/actions/start")
-                .build())
-            .response(TestResponse.builder()
-                .status(OK)
-                .payload("fixtures/client/v3/apps/POST_{id}_actions_start_response.json")
-                .build())
-            .build());
+        mockRequest(
+                InteractionContext.builder()
+                        .request(
+                                TestRequest.builder()
+                                        .method(POST)
+                                        .path("/apps/test-application-id/actions/start")
+                                        .build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(OK)
+                                        .payload(
+                                                "fixtures/client/v3/apps/POST_{id}_actions_start_response.json")
+                                        .build())
+                        .build());
 
         this.applications
-            .start(StartApplicationRequest.builder()
-                .applicationId("test-application-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(StartApplicationResponse.builder()
-                .id("1cb006ee-fb05-47e1-b541-c34179ddc446")
-                .name("my_app")
-                .state(ApplicationState.STARTED)
-                .createdAt("2016-03-17T21:41:30Z")
-                .updatedAt("2016-03-18T11:32:30Z")
-                .lifecycle(Lifecycle.builder()
-                    .type(LifecycleType.BUILDPACK)
-                    .data(BuildpackData.builder()
-                        .buildpack("java_buildpack")
-                        .stack("cflinuxfs2")
-                        .build())
-                    .build())
-                .relationships(ApplicationRelationships.builder()
-                    .space(ToOneRelationship.builder()
-                        .data(Relationship.builder()
-                            .id("2f35885d-0c9d-4423-83ad-fd05066f8576")
-                            .build())
-                        .build())
-                    .build())
-                .link("self", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446")
-                    .build())
-                .link("space", Link.builder()
-                    .href("https://api.example.org/v3/spaces/2f35885d-0c9d-4423-83ad-fd05066f8576")
-                    .build())
-                .link("processes", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/processes")
-                    .build())
-                .link("route_mappings", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/route_mappings")
-                    .build())
-                .link("packages", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/packages")
-                    .build())
-                .link("environment_variables", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/environment_variables")
-                    .build())
-                .link("current_droplet", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/droplets/current")
-                    .build())
-                .link("droplets", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/droplets")
-                    .build())
-                .link("tasks", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/tasks")
-                    .build())
-                .link("start", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/actions/start")
-                    .method("POST")
-                    .build())
-                .link("stop", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/actions/stop")
-                    .method("POST")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .start(
+                        StartApplicationRequest.builder()
+                                .applicationId("test-application-id")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        StartApplicationResponse.builder()
+                                .id("1cb006ee-fb05-47e1-b541-c34179ddc446")
+                                .name("my_app")
+                                .state(ApplicationState.STARTED)
+                                .createdAt("2016-03-17T21:41:30Z")
+                                .updatedAt("2016-03-18T11:32:30Z")
+                                .lifecycle(
+                                        Lifecycle.builder()
+                                                .type(LifecycleType.BUILDPACK)
+                                                .data(
+                                                        BuildpackData.builder()
+                                                                .buildpack("java_buildpack")
+                                                                .stack("cflinuxfs2")
+                                                                .build())
+                                                .build())
+                                .relationships(
+                                        ApplicationRelationships.builder()
+                                                .space(
+                                                        ToOneRelationship.builder()
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id(
+                                                                                        "2f35885d-0c9d-4423-83ad-fd05066f8576")
+                                                                                .build())
+                                                                .build())
+                                                .build())
+                                .link(
+                                        "self",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446")
+                                                .build())
+                                .link(
+                                        "space",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/spaces/2f35885d-0c9d-4423-83ad-fd05066f8576")
+                                                .build())
+                                .link(
+                                        "processes",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/processes")
+                                                .build())
+                                .link(
+                                        "route_mappings",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/route_mappings")
+                                                .build())
+                                .link(
+                                        "packages",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/packages")
+                                                .build())
+                                .link(
+                                        "environment_variables",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/environment_variables")
+                                                .build())
+                                .link(
+                                        "current_droplet",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/droplets/current")
+                                                .build())
+                                .link(
+                                        "droplets",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/droplets")
+                                                .build())
+                                .link(
+                                        "tasks",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/tasks")
+                                                .build())
+                                .link(
+                                        "start",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/actions/start")
+                                                .method("POST")
+                                                .build())
+                                .link(
+                                        "stop",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/actions/stop")
+                                                .method("POST")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
     public void stop() {
-        mockRequest(InteractionContext.builder()
-            .request(TestRequest.builder()
-                .method(POST).path("/apps/test-application-id/actions/stop")
-                .build())
-            .response(TestResponse.builder()
-                .status(OK)
-                .payload("fixtures/client/v3/apps/POST_{id}_actions_stop_response.json")
-                .build())
-            .build());
+        mockRequest(
+                InteractionContext.builder()
+                        .request(
+                                TestRequest.builder()
+                                        .method(POST)
+                                        .path("/apps/test-application-id/actions/stop")
+                                        .build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(OK)
+                                        .payload(
+                                                "fixtures/client/v3/apps/POST_{id}_actions_stop_response.json")
+                                        .build())
+                        .build());
 
         this.applications
-            .stop(StopApplicationRequest.builder()
-                .applicationId("test-application-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(StopApplicationResponse.builder()
-                .id("1cb006ee-fb05-47e1-b541-c34179ddc446")
-                .name("my_app")
-                .state(ApplicationState.STOPPED)
-                .createdAt("2016-03-17T21:41:30Z")
-                .updatedAt("2016-03-18T11:32:30Z")
-                .lifecycle(Lifecycle.builder()
-                    .type(LifecycleType.BUILDPACK)
-                    .data(BuildpackData.builder()
-                        .buildpack("java_buildpack")
-                        .stack("cflinuxfs2")
-                        .build())
-                    .build())
-                .relationships(ApplicationRelationships.builder()
-                    .space(ToOneRelationship.builder()
-                        .data(Relationship.builder()
-                            .id("2f35885d-0c9d-4423-83ad-fd05066f8576")
-                            .build())
-                        .build())
-                    .build())
-                .link("self", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446")
-                    .build())
-                .link("space", Link.builder()
-                    .href("https://api.example.org/v3/spaces/2f35885d-0c9d-4423-83ad-fd05066f8576")
-                    .build())
-                .link("processes", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/processes")
-                    .build())
-                .link("route_mappings", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/route_mappings")
-                    .build())
-                .link("packages", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/packages")
-                    .build())
-                .link("environment_variables", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/environment_variables")
-                    .build())
-                .link("current_droplet", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/droplets/current")
-                    .build())
-                .link("droplets", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/droplets")
-                    .build())
-                .link("tasks", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/tasks")
-                    .build())
-                .link("start", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/actions/start")
-                    .method("POST")
-                    .build())
-                .link("stop", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/actions/stop")
-                    .method("POST")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .stop(StopApplicationRequest.builder().applicationId("test-application-id").build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        StopApplicationResponse.builder()
+                                .id("1cb006ee-fb05-47e1-b541-c34179ddc446")
+                                .name("my_app")
+                                .state(ApplicationState.STOPPED)
+                                .createdAt("2016-03-17T21:41:30Z")
+                                .updatedAt("2016-03-18T11:32:30Z")
+                                .lifecycle(
+                                        Lifecycle.builder()
+                                                .type(LifecycleType.BUILDPACK)
+                                                .data(
+                                                        BuildpackData.builder()
+                                                                .buildpack("java_buildpack")
+                                                                .stack("cflinuxfs2")
+                                                                .build())
+                                                .build())
+                                .relationships(
+                                        ApplicationRelationships.builder()
+                                                .space(
+                                                        ToOneRelationship.builder()
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id(
+                                                                                        "2f35885d-0c9d-4423-83ad-fd05066f8576")
+                                                                                .build())
+                                                                .build())
+                                                .build())
+                                .link(
+                                        "self",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446")
+                                                .build())
+                                .link(
+                                        "space",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/spaces/2f35885d-0c9d-4423-83ad-fd05066f8576")
+                                                .build())
+                                .link(
+                                        "processes",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/processes")
+                                                .build())
+                                .link(
+                                        "route_mappings",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/route_mappings")
+                                                .build())
+                                .link(
+                                        "packages",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/packages")
+                                                .build())
+                                .link(
+                                        "environment_variables",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/environment_variables")
+                                                .build())
+                                .link(
+                                        "current_droplet",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/droplets/current")
+                                                .build())
+                                .link(
+                                        "droplets",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/droplets")
+                                                .build())
+                                .link(
+                                        "tasks",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/tasks")
+                                                .build())
+                                .link(
+                                        "start",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/actions/start")
+                                                .method("POST")
+                                                .build())
+                                .link(
+                                        "stop",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/actions/stop")
+                                                .method("POST")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
     public void terminateInstance() {
-        mockRequest(InteractionContext.builder()
-            .request(TestRequest.builder()
-                .method(DELETE).path("/apps/test-application-id/processes/test-type/instances/test-index")
-                .build())
-            .response(TestResponse.builder()
-                .status(NO_CONTENT)
-                .build())
-            .build());
+        mockRequest(
+                InteractionContext.builder()
+                        .request(
+                                TestRequest.builder()
+                                        .method(DELETE)
+                                        .path(
+                                                "/apps/test-application-id/processes/test-type/instances/test-index")
+                                        .build())
+                        .response(TestResponse.builder().status(NO_CONTENT).build())
+                        .build());
 
         this.applications
-            .terminateInstance(TerminateApplicationInstanceRequest.builder()
-                .applicationId("test-application-id")
-                .index("test-index")
-                .type("test-type")
-                .build())
-            .as(StepVerifier::create)
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .terminateInstance(
+                        TerminateApplicationInstanceRequest.builder()
+                                .applicationId("test-application-id")
+                                .index("test-index")
+                                .type("test-type")
+                                .build())
+                .as(StepVerifier::create)
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
     public void update() {
-        mockRequest(InteractionContext.builder()
-            .request(TestRequest.builder()
-                .method(PATCH).path("/apps/test-application-id")
-                .payload("fixtures/client/v3/apps/PATCH_{id}_request.json")
-                .build())
-            .response(TestResponse.builder()
-                .status(OK)
-                .payload("fixtures/client/v3/apps/PATCH_{id}_response.json")
-                .build())
-            .build());
+        mockRequest(
+                InteractionContext.builder()
+                        .request(
+                                TestRequest.builder()
+                                        .method(PATCH)
+                                        .path("/apps/test-application-id")
+                                        .payload("fixtures/client/v3/apps/PATCH_{id}_request.json")
+                                        .build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(OK)
+                                        .payload("fixtures/client/v3/apps/PATCH_{id}_response.json")
+                                        .build())
+                        .build());
 
         this.applications
-            .update(UpdateApplicationRequest.builder()
-                .applicationId("test-application-id")
-                .name("my_app")
-                .lifecycle(Lifecycle.builder()
-                    .type(LifecycleType.BUILDPACK)
-                    .data(BuildpackData.builder()
-                        .buildpack("java_buildpack")
-                        .build())
-                    .build())
-                .metadata(Metadata.builder()
-                    .annotation("version", "1.2.4")
-                    .label("isLive", "false")
-                    .label("maintenance", "true")
-                    .build())
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(UpdateApplicationResponse.builder()
-                .id("1cb006ee-fb05-47e1-b541-c34179ddc446")
-                .name("my_app")
-                .state(ApplicationState.STARTED)
-                .createdAt("2016-03-17T21:41:30Z")
-                .updatedAt("2016-03-18T11:32:30Z")
-                .lifecycle(Lifecycle.builder()
-                    .type(LifecycleType.BUILDPACK)
-                    .data(BuildpackData.builder()
-                        .buildpack("java_buildpack")
-                        .stack("cflinuxfs2")
-                        .build())
-                    .build())
-                .relationships(ApplicationRelationships.builder()
-                    .space(ToOneRelationship.builder()
-                        .data(Relationship.builder()
-                            .id("2f35885d-0c9d-4423-83ad-fd05066f8576")
-                            .build())
-                        .build())
-                    .build())
-                .metadata(Metadata.builder()
-                    .annotation("version", "1.2.4")
-                    .label("isLive", "false")
-                    .label("maintenance", "true")
-                    .build())
-                .link("self", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446")
-                    .build())
-                .link("space", Link.builder()
-                    .href("https://api.example.org/v3/spaces/2f35885d-0c9d-4423-83ad-fd05066f8576")
-                    .build())
-                .link("processes", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/processes")
-                    .build())
-                .link("route_mappings", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/route_mappings")
-                    .build())
-                .link("packages", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/packages")
-                    .build())
-                .link("environment_variables", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/environment_variables")
-                    .build())
-                .link("current_droplet", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/droplets/current")
-                    .build())
-                .link("droplets", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/droplets")
-                    .build())
-                .link("tasks", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/tasks")
-                    .build())
-                .link("start", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/actions/start")
-                    .method("POST")
-                    .build())
-                .link("stop", Link.builder()
-                    .href("https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/actions/stop")
-                    .method("POST")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .update(
+                        UpdateApplicationRequest.builder()
+                                .applicationId("test-application-id")
+                                .name("my_app")
+                                .lifecycle(
+                                        Lifecycle.builder()
+                                                .type(LifecycleType.BUILDPACK)
+                                                .data(
+                                                        BuildpackData.builder()
+                                                                .buildpack("java_buildpack")
+                                                                .build())
+                                                .build())
+                                .metadata(
+                                        Metadata.builder()
+                                                .annotation("version", "1.2.4")
+                                                .label("isLive", "false")
+                                                .label("maintenance", "true")
+                                                .build())
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        UpdateApplicationResponse.builder()
+                                .id("1cb006ee-fb05-47e1-b541-c34179ddc446")
+                                .name("my_app")
+                                .state(ApplicationState.STARTED)
+                                .createdAt("2016-03-17T21:41:30Z")
+                                .updatedAt("2016-03-18T11:32:30Z")
+                                .lifecycle(
+                                        Lifecycle.builder()
+                                                .type(LifecycleType.BUILDPACK)
+                                                .data(
+                                                        BuildpackData.builder()
+                                                                .buildpack("java_buildpack")
+                                                                .stack("cflinuxfs2")
+                                                                .build())
+                                                .build())
+                                .relationships(
+                                        ApplicationRelationships.builder()
+                                                .space(
+                                                        ToOneRelationship.builder()
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id(
+                                                                                        "2f35885d-0c9d-4423-83ad-fd05066f8576")
+                                                                                .build())
+                                                                .build())
+                                                .build())
+                                .metadata(
+                                        Metadata.builder()
+                                                .annotation("version", "1.2.4")
+                                                .label("isLive", "false")
+                                                .label("maintenance", "true")
+                                                .build())
+                                .link(
+                                        "self",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446")
+                                                .build())
+                                .link(
+                                        "space",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/spaces/2f35885d-0c9d-4423-83ad-fd05066f8576")
+                                                .build())
+                                .link(
+                                        "processes",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/processes")
+                                                .build())
+                                .link(
+                                        "route_mappings",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/route_mappings")
+                                                .build())
+                                .link(
+                                        "packages",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/packages")
+                                                .build())
+                                .link(
+                                        "environment_variables",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/environment_variables")
+                                                .build())
+                                .link(
+                                        "current_droplet",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/droplets/current")
+                                                .build())
+                                .link(
+                                        "droplets",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/droplets")
+                                                .build())
+                                .link(
+                                        "tasks",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/tasks")
+                                                .build())
+                                .link(
+                                        "start",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/actions/start")
+                                                .method("POST")
+                                                .build())
+                                .link(
+                                        "stop",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/1cb006ee-fb05-47e1-b541-c34179ddc446/actions/stop")
+                                                .method("POST")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
     public void updateEnvironmentVariables() {
-        mockRequest(InteractionContext.builder()
-            .request(TestRequest.builder()
-                .method(PATCH).path("/apps/test-application-id/environment_variables")
-                .payload("fixtures/client/v3/apps/PATCH_{id}_environment_variables_request.json")
-                .build())
-            .response(TestResponse.builder()
-                .status(OK)
-                .payload("fixtures/client/v3/apps/PATCH_{id}_environment_variables_response.json")
-                .build())
-            .build());
+        mockRequest(
+                InteractionContext.builder()
+                        .request(
+                                TestRequest.builder()
+                                        .method(PATCH)
+                                        .path("/apps/test-application-id/environment_variables")
+                                        .payload(
+                                                "fixtures/client/v3/apps/PATCH_{id}_environment_variables_request.json")
+                                        .build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(OK)
+                                        .payload(
+                                                "fixtures/client/v3/apps/PATCH_{id}_environment_variables_response.json")
+                                        .build())
+                        .build());
 
         this.applications
-            .updateEnvironmentVariables(UpdateApplicationEnvironmentVariablesRequest.builder()
-                .applicationId("test-application-id")
-                .var("DEBUG", "false")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(UpdateApplicationEnvironmentVariablesResponse.builder()
-                .var("RAILS_ENV", "production")
-                .var("DEBUG", "false")
-                .link("self", Link.builder()
-                    .href("https://api.example.org/v3/apps/[guid]/environment_variables")
-                    .build())
-                .link("app", Link.builder()
-                    .href("https://api.example.org/v3/apps/[guid]")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .updateEnvironmentVariables(
+                        UpdateApplicationEnvironmentVariablesRequest.builder()
+                                .applicationId("test-application-id")
+                                .var("DEBUG", "false")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        UpdateApplicationEnvironmentVariablesResponse.builder()
+                                .var("RAILS_ENV", "production")
+                                .var("DEBUG", "false")
+                                .link(
+                                        "self",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/[guid]/environment_variables")
+                                                .build())
+                                .link(
+                                        "app",
+                                        Link.builder()
+                                                .href("https://api.example.org/v3/apps/[guid]")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
     public void updateFeature() {
-        mockRequest(InteractionContext.builder()
-            .request(TestRequest.builder()
-                .method(PATCH).path("/apps/test-application-id/features/ssh")
-                .payload("fixtures/client/v3/apps/PATCH_{id}_features_{name}_request.json")
-                .build())
-            .response(TestResponse.builder()
-                .status(OK)
-                .payload("fixtures/client/v3/apps/PATCH_{id}_features_{name}_response.json")
-                .build())
-            .build());
+        mockRequest(
+                InteractionContext.builder()
+                        .request(
+                                TestRequest.builder()
+                                        .method(PATCH)
+                                        .path("/apps/test-application-id/features/ssh")
+                                        .payload(
+                                                "fixtures/client/v3/apps/PATCH_{id}_features_{name}_request.json")
+                                        .build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(OK)
+                                        .payload(
+                                                "fixtures/client/v3/apps/PATCH_{id}_features_{name}_response.json")
+                                        .build())
+                        .build());
 
         this.applications
-            .updateFeature(UpdateApplicationFeatureRequest.builder()
-                .applicationId("test-application-id")
-                .enabled(false)
-                .featureName("ssh")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(UpdateApplicationFeatureResponse.builder()
-                .description("Enable SSHing into the app.")
-                .enabled(true)
-                .name("ssh")
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .updateFeature(
+                        UpdateApplicationFeatureRequest.builder()
+                                .applicationId("test-application-id")
+                                .enabled(false)
+                                .featureName("ssh")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        UpdateApplicationFeatureResponse.builder()
+                                .description("Enable SSHing into the app.")
+                                .enabled(true)
+                                .name("ssh")
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
-
 }

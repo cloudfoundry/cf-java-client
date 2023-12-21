@@ -22,24 +22,19 @@ public final class MapExternalGroupRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noExternalGroup() {
-        MapExternalGroupRequest.builder()
-            .groupId("test-group-id")
-            .build();
+        MapExternalGroupRequest.builder().groupId("test-group-id").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noGroupId() {
-        MapExternalGroupRequest.builder()
-            .externalGroup("test-external-group")
-            .build();
+        MapExternalGroupRequest.builder().externalGroup("test-external-group").build();
     }
 
     @Test
     public void valid() {
         MapExternalGroupRequest.builder()
-            .groupId("test-group-id")
-            .externalGroup("test-external-group")
-            .build();
+                .groupId("test-group-id")
+                .externalGroup("test-external-group")
+                .build();
     }
-
 }

@@ -23,34 +23,33 @@ public final class GetTokenByClientCredentialsRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noClientId() {
         GetTokenByClientCredentialsRequest.builder()
-            .clientSecret("test-client-secret")
-            .tokenFormat(TokenFormat.OPAQUE)
-            .build();
+                .clientSecret("test-client-secret")
+                .tokenFormat(TokenFormat.OPAQUE)
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noClientSecret() {
         GetTokenByClientCredentialsRequest.builder()
-            .clientId("test-client-id")
-            .tokenFormat(TokenFormat.OPAQUE)
-            .build();
+                .clientId("test-client-id")
+                .tokenFormat(TokenFormat.OPAQUE)
+                .build();
     }
 
     @Test
     public void validMax() {
         GetTokenByClientCredentialsRequest.builder()
-            .clientId("test-client-id")
-            .clientSecret("test-client-secret")
-            .tokenFormat(TokenFormat.OPAQUE)
-            .build();
+                .clientId("test-client-id")
+                .clientSecret("test-client-secret")
+                .tokenFormat(TokenFormat.OPAQUE)
+                .build();
     }
 
     @Test
     public void validMin() {
         GetTokenByClientCredentialsRequest.builder()
-            .clientId("test-client-id")
-            .clientSecret("test-client-secret")
-            .build();
+                .clientId("test-client-id")
+                .clientSecret("test-client-secret")
+                .build();
     }
-
 }

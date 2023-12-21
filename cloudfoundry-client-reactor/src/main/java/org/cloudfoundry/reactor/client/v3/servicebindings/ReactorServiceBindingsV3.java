@@ -16,6 +16,8 @@
 
 package org.cloudfoundry.reactor.client.v3.servicebindings;
 
+import java.util.Map;
+import java.util.Optional;
 import org.cloudfoundry.client.v3.servicebindings.CreateServiceBindingRequest;
 import org.cloudfoundry.client.v3.servicebindings.CreateServiceBindingResponse;
 import org.cloudfoundry.client.v3.servicebindings.DeleteServiceBindingRequest;
@@ -36,13 +38,11 @@ import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
 import reactor.core.publisher.Mono;
 
-import java.util.Map;
-import java.util.Optional;
-
 /**
  * The Reactor-based implementation of {@link ServiceBindingsV3}
  */
-public final class ReactorServiceBindingsV3 extends AbstractClientV3Operations implements ServiceBindingsV3 {
+public final class ReactorServiceBindingsV3 extends AbstractClientV3Operations
+        implements ServiceBindingsV3 {
 
     /**
      * Creates an instance
@@ -52,54 +52,100 @@ public final class ReactorServiceBindingsV3 extends AbstractClientV3Operations i
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorServiceBindingsV3(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
+    public ReactorServiceBindingsV3(
+            ConnectionContext connectionContext,
+            Mono<String> root,
+            TokenProvider tokenProvider,
+            Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<CreateServiceBindingResponse> create(CreateServiceBindingRequest request) {
-        return postWithResponse(request, ServiceBindingResource.class, builder -> builder.pathSegment("service_credential_bindings"))
-            .map(responseTuple -> CreateServiceBindingResponse.builder()
-                .serviceBinding(responseTuple.getBody())
-                .jobId(Optional.ofNullable(extractJobId(responseTuple.getResponse())))
-                .build())
-            .checkpoint();
+        return postWithResponse(
+                        request,
+                        ServiceBindingResource.class,
+                        builder -> builder.pathSegment("service_credential_bindings"))
+                .map(
+                        responseTuple ->
+                                CreateServiceBindingResponse.builder()
+                                        .serviceBinding(responseTuple.getBody())
+                                        .jobId(
+                                                Optional.ofNullable(
+                                                        extractJobId(responseTuple.getResponse())))
+                                        .build())
+                .checkpoint();
     }
 
     @Override
     public Mono<String> delete(DeleteServiceBindingRequest request) {
-        return delete(request, builder -> builder.pathSegment("service_credential_bindings", request.getServiceBindingId()))
-            .checkpoint();
+        return delete(
+                        request,
+                        builder ->
+                                builder.pathSegment(
+                                        "service_credential_bindings",
+                                        request.getServiceBindingId()))
+                .checkpoint();
     }
 
     @Override
     public Mono<GetServiceBindingResponse> get(GetServiceBindingRequest request) {
-        return get(request, GetServiceBindingResponse.class, builder -> builder.pathSegment("service_credential_bindings", request.getServiceBindingId()))
-            .checkpoint();
+        return get(
+                        request,
+                        GetServiceBindingResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "service_credential_bindings",
+                                        request.getServiceBindingId()))
+                .checkpoint();
     }
 
     @Override
-    public Mono<GetServiceBindingDetailsResponse> getDetails(GetServiceBindingDetailsRequest request) {
-        return get(request, GetServiceBindingDetailsResponse.class, builder -> builder.pathSegment("service_credential_bindings", request.getServiceBindingId(), "details"))
-            .checkpoint();
+    public Mono<GetServiceBindingDetailsResponse> getDetails(
+            GetServiceBindingDetailsRequest request) {
+        return get(
+                        request,
+                        GetServiceBindingDetailsResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "service_credential_bindings",
+                                        request.getServiceBindingId(),
+                                        "details"))
+                .checkpoint();
     }
 
     @Override
-    public Mono<GetServiceBindingParametersResponse> getParameters(GetServiceBindingParametersRequest request) {
-        return get(request, GetServiceBindingParametersResponse.class, builder -> builder.pathSegment("service_credential_bindings", request.getServiceBindingId(), "parameters"))
-            .checkpoint();
+    public Mono<GetServiceBindingParametersResponse> getParameters(
+            GetServiceBindingParametersRequest request) {
+        return get(
+                        request,
+                        GetServiceBindingParametersResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "service_credential_bindings",
+                                        request.getServiceBindingId(),
+                                        "parameters"))
+                .checkpoint();
     }
 
     @Override
     public Mono<ListServiceBindingsResponse> list(ListServiceBindingsRequest request) {
-        return get(request, ListServiceBindingsResponse.class, builder -> builder.pathSegment("service_credential_bindings"))
-            .checkpoint();
+        return get(
+                        request,
+                        ListServiceBindingsResponse.class,
+                        builder -> builder.pathSegment("service_credential_bindings"))
+                .checkpoint();
     }
 
     @Override
     public Mono<UpdateServiceBindingResponse> update(UpdateServiceBindingRequest request) {
-        return patch(request, UpdateServiceBindingResponse.class, builder -> builder.pathSegment("service_credential_bindings", request.getServiceBindingId()))
-            .checkpoint();
+        return patch(
+                        request,
+                        UpdateServiceBindingResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "service_credential_bindings",
+                                        request.getServiceBindingId()))
+                .checkpoint();
     }
-
 }

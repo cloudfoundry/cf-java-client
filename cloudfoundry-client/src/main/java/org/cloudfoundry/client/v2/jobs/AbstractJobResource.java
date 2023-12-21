@@ -21,6 +21,5 @@ import org.cloudfoundry.client.v2.Resource;
 /**
  * The base class for Job resources
  */
-public abstract class AbstractJobResource extends Resource<org.cloudfoundry.client.v2.jobs.JobEntity> {
-
-}
+public abstract class AbstractJobResource
+        extends Resource<org.cloudfoundry.client.v2.jobs.JobEntity> {}

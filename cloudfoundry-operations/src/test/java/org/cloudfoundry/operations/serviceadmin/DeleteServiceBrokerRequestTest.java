@@ -22,15 +22,11 @@ public class DeleteServiceBrokerRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noName() {
-        DeleteServiceBrokerRequest.builder()
-            .build();
+        DeleteServiceBrokerRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        DeleteServiceBrokerRequest.builder()
-            .name("test-service-broker")
-            .build();
+        DeleteServiceBrokerRequest.builder().name("test-service-broker").build();
     }
-
 }

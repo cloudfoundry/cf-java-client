@@ -22,24 +22,19 @@ public final class RemoveSpaceAuditorRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noAuditorId() {
-        RemoveSpaceAuditorRequest.builder()
-            .spaceId("test-space-id")
-            .build();
+        RemoveSpaceAuditorRequest.builder().spaceId("test-space-id").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noSpaceId() {
-        RemoveSpaceAuditorRequest.builder()
-            .auditorId("test-auditor-id")
-            .build();
+        RemoveSpaceAuditorRequest.builder().auditorId("test-auditor-id").build();
     }
 
     @Test
     public void valid() {
         RemoveSpaceAuditorRequest.builder()
-            .auditorId("test-auditor-id")
-            .spaceId("test-space-id")
-            .build();
+                .auditorId("test-auditor-id")
+                .spaceId("test-space-id")
+                .build();
     }
-
 }

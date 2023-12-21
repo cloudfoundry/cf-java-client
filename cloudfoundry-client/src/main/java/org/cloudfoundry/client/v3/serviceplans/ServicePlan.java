@@ -17,12 +17,11 @@
 package org.cloudfoundry.client.v3.serviceplans;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
 import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.Resource;
-
-import java.util.List;
 
 /**
  * Base class for responses that are Service Plans
@@ -97,5 +96,4 @@ public abstract class ServicePlan extends Resource {
      */
     @JsonProperty("visibility_type")
     public abstract Visibility getVisibilityType();
-
 }

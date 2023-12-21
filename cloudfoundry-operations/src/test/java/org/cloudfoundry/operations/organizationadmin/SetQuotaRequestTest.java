@@ -22,24 +22,19 @@ public final class SetQuotaRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noOrganizationName() {
-        SetQuotaRequest.builder()
-            .quotaName("test-quota")
-            .build();
+        SetQuotaRequest.builder().quotaName("test-quota").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noQuotaName() {
-        SetQuotaRequest.builder()
-            .organizationName("test-organization")
-            .build();
+        SetQuotaRequest.builder().organizationName("test-organization").build();
     }
 
     @Test
     public void valid() {
         SetQuotaRequest.builder()
-            .organizationName("test-organization")
-            .quotaName("test-quota")
-            .build();
+                .organizationName("test-organization")
+                .quotaName("test-quota")
+                .build();
     }
-
 }

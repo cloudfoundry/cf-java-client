@@ -16,10 +16,9 @@
 
 package org.cloudfoundry.client.v3.buildpacks;
 
-import org.junit.Test;
-
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import org.junit.Test;
 
 public final class UploadBuildpackRequestTest {
 
@@ -27,24 +26,19 @@ public final class UploadBuildpackRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noBits() {
-        UploadBuildpackRequest.builder()
-            .buildpackId("test-buildpack-id")
-            .build();
+        UploadBuildpackRequest.builder().buildpackId("test-buildpack-id").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noBuildpackId() {
-        UploadBuildpackRequest.builder()
-            .bits(TEST_BUILDPACK)
-            .build();
+        UploadBuildpackRequest.builder().bits(TEST_BUILDPACK).build();
     }
 
     @Test
     public void valid() {
         UploadBuildpackRequest.builder()
-            .bits(TEST_BUILDPACK)
-            .buildpackId("test-buildpack-id")
-            .build();
+                .bits(TEST_BUILDPACK)
+                .buildpackId("test-buildpack-id")
+                .build();
     }
-
 }

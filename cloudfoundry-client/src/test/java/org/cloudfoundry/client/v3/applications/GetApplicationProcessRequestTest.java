@@ -22,24 +22,19 @@ public final class GetApplicationProcessRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noApplicationId() {
-        GetApplicationProcessRequest.builder()
-            .type("test-type")
-            .build();
+        GetApplicationProcessRequest.builder().type("test-type").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noType() {
-        GetApplicationProcessRequest.builder()
-            .applicationId("test-application-id")
-            .build();
+        GetApplicationProcessRequest.builder().applicationId("test-application-id").build();
     }
 
     @Test
     public void valid() {
         GetApplicationProcessRequest.builder()
-            .applicationId("test-application-id")
-            .type("test-type")
-            .build();
+                .applicationId("test-application-id")
+                .type("test-type")
+                .build();
     }
-
 }

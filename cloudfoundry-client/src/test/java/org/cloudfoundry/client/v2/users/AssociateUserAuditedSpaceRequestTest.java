@@ -22,24 +22,19 @@ public final class AssociateUserAuditedSpaceRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noAuditedSpaceId() {
-        AssociateUserAuditedSpaceRequest.builder()
-            .userId("test-user-id")
-            .build();
+        AssociateUserAuditedSpaceRequest.builder().userId("test-user-id").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noUserId() {
-        AssociateUserAuditedSpaceRequest.builder()
-            .auditedSpaceId("test-managed-space-id")
-            .build();
+        AssociateUserAuditedSpaceRequest.builder().auditedSpaceId("test-managed-space-id").build();
     }
 
     @Test
     public void valid() {
         AssociateUserAuditedSpaceRequest.builder()
-            .auditedSpaceId("test-managed-space-id")
-            .userId("test-user-id")
-            .build();
+                .auditedSpaceId("test-managed-space-id")
+                .userId("test-user-id")
+                .build();
     }
-
 }

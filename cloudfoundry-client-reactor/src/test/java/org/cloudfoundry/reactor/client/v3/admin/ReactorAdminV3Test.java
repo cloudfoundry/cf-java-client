@@ -16,6 +16,11 @@
 
 package org.cloudfoundry.reactor.client.v3.admin;
 
+import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
+
+import java.time.Duration;
+import java.util.Collections;
 import org.cloudfoundry.client.v3.admin.ClearBuildpackCacheRequest;
 import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
@@ -24,35 +29,35 @@ import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import org.junit.Test;
 import reactor.test.StepVerifier;
 
-import java.time.Duration;
-import java.util.Collections;
-
-import static io.netty.handler.codec.http.HttpMethod.POST;
-import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
-
 public final class ReactorAdminV3Test extends AbstractClientApiTest {
 
-    private final ReactorAdminV3 admin = new ReactorAdminV3(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
+    private final ReactorAdminV3 admin =
+            new ReactorAdminV3(
+                    CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void clearBuildpackCache() {
-        mockRequest(InteractionContext.builder()
-            .request(TestRequest.builder()
-                .method(POST).path("/admin/actions/clear_buildpack_cache")
-                .build())
-            .response(TestResponse.builder()
-                .status(ACCEPTED)
-                .header("Location", "https://api.example.org/v3/jobs/[guid]")
-                .build())
-            .build());
+        mockRequest(
+                InteractionContext.builder()
+                        .request(
+                                TestRequest.builder()
+                                        .method(POST)
+                                        .path("/admin/actions/clear_buildpack_cache")
+                                        .build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(ACCEPTED)
+                                        .header(
+                                                "Location",
+                                                "https://api.example.org/v3/jobs/[guid]")
+                                        .build())
+                        .build());
 
         this.admin
-            .clearBuildpackCache(ClearBuildpackCacheRequest.builder()
-                .build())
-            .as(StepVerifier::create)
-            .expectNext("[guid]")
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .clearBuildpackCache(ClearBuildpackCacheRequest.builder().build())
+                .as(StepVerifier::create)
+                .expectNext("[guid]")
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
-
 }

@@ -22,15 +22,11 @@ public final class ListUserBillingManagedOrganizationsRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noUserId() {
-        ListUserBillingManagedOrganizationsRequest.builder()
-            .build();
+        ListUserBillingManagedOrganizationsRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        ListUserBillingManagedOrganizationsRequest.builder()
-            .userId("test-user-id")
-            .build();
+        ListUserBillingManagedOrganizationsRequest.builder().userId("test-user-id").build();
     }
-
 }

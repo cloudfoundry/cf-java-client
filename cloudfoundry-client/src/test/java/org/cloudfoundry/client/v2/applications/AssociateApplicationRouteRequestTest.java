@@ -22,24 +22,19 @@ public final class AssociateApplicationRouteRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noApplicationId() {
-        AssociateApplicationRouteRequest.builder()
-            .routeId("test-route-id")
-            .build();
+        AssociateApplicationRouteRequest.builder().routeId("test-route-id").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noRouteId() {
-        AssociateApplicationRouteRequest.builder()
-            .applicationId("test-application-id")
-            .build();
+        AssociateApplicationRouteRequest.builder().applicationId("test-application-id").build();
     }
 
     @Test
     public void valid() {
         AssociateApplicationRouteRequest.builder()
-            .applicationId("test-application-id")
-            .routeId("test-route-id")
-            .build();
+                .applicationId("test-application-id")
+                .routeId("test-route-id")
+                .build();
     }
-
 }

@@ -22,24 +22,19 @@ public final class GetServiceKeyRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noServiceInstanceName() {
-        GetServiceKeyRequest.builder()
-            .serviceKeyName("test-service-key-name")
-            .build();
+        GetServiceKeyRequest.builder().serviceKeyName("test-service-key-name").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noServiceKeyName() {
-        GetServiceKeyRequest.builder()
-            .serviceInstanceName("test-service-instance-name")
-            .build();
+        GetServiceKeyRequest.builder().serviceInstanceName("test-service-instance-name").build();
     }
 
     @Test
     public void valid() {
         GetServiceKeyRequest.builder()
-            .serviceKeyName("test-service-key-name")
-            .serviceInstanceName("test-service-instance-name")
-            .build();
+                .serviceKeyName("test-service-key-name")
+                .serviceInstanceName("test-service-instance-name")
+                .build();
     }
-
 }

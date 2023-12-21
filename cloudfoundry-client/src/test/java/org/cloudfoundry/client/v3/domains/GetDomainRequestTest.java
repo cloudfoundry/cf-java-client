@@ -22,15 +22,11 @@ public final class GetDomainRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noDomainId() {
-        GetDomainRequest.builder()
-            .build();
+        GetDomainRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        GetDomainRequest.builder()
-            .domainId("test-domain-id")
-            .build();
+        GetDomainRequest.builder().domainId("test-domain-id").build();
     }
-
 }

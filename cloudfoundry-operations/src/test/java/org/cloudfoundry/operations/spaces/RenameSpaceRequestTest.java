@@ -22,24 +22,16 @@ public final class RenameSpaceRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noName() {
-        RenameSpaceRequest.builder()
-            .newName("new-name")
-            .build();
+        RenameSpaceRequest.builder().newName("new-name").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noNewName() {
-        RenameSpaceRequest.builder()
-            .name("name")
-            .build();
+        RenameSpaceRequest.builder().name("name").build();
     }
 
     @Test
     public void valid() {
-        RenameSpaceRequest.builder()
-            .name("test-name")
-            .newName("test-new-name")
-            .build();
+        RenameSpaceRequest.builder().name("test-name").newName("test-new-name").build();
     }
-
 }

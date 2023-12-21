@@ -22,8 +22,6 @@ public final class ListApplicationUsageEventsRequestTest {
 
     @Test
     public void valid() {
-        ListApplicationUsageEventsRequest.builder()
-            .build();
+        ListApplicationUsageEventsRequest.builder().build();
     }
-
 }

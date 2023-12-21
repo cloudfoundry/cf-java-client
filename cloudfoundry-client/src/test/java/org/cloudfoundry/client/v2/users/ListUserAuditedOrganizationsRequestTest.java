@@ -22,15 +22,11 @@ public final class ListUserAuditedOrganizationsRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noUserId() {
-        ListUserAuditedOrganizationsRequest.builder()
-            .build();
+        ListUserAuditedOrganizationsRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        ListUserAuditedOrganizationsRequest.builder()
-            .userId("test-user-id")
-            .build();
+        ListUserAuditedOrganizationsRequest.builder().userId("test-user-id").build();
     }
-
 }

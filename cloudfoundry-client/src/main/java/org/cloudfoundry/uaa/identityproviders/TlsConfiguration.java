@@ -23,7 +23,6 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * The file to be used for group integration.
  */
 public enum TlsConfiguration {
-
     NONE("none"),
 
     SIMPLE("simple"),
@@ -46,7 +45,8 @@ public enum TlsConfiguration {
             case "external":
                 return EXTERNAL;
             default:
-                throw new IllegalArgumentException(String.format("Unknown TLS Configuration type: %s", s));
+                throw new IllegalArgumentException(
+                        String.format("Unknown TLS Configuration type: %s", s));
         }
     }
 
@@ -59,5 +59,4 @@ public enum TlsConfiguration {
     public String toString() {
         return getValue();
     }
-
 }

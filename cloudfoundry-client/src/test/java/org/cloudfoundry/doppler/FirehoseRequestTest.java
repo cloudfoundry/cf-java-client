@@ -22,15 +22,11 @@ public final class FirehoseRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noSubscriptionId() {
-        FirehoseRequest.builder()
-            .build();
+        FirehoseRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        FirehoseRequest.builder()
-            .subscriptionId("test-subscription-id")
-            .build();
+        FirehoseRequest.builder().subscriptionId("test-subscription-id").build();
     }
-
 }

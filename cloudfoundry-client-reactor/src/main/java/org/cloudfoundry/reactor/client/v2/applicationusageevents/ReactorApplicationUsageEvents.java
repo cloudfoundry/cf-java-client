@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v2.applicationusageevents;
 
+import java.util.Map;
 import org.cloudfoundry.client.v2.applicationusageevents.ApplicationUsageEvents;
 import org.cloudfoundry.client.v2.applicationusageevents.GetApplicationUsageEventRequest;
 import org.cloudfoundry.client.v2.applicationusageevents.GetApplicationUsageEventResponse;
@@ -27,12 +28,11 @@ import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v2.AbstractClientV2Operations;
 import reactor.core.publisher.Mono;
 
-import java.util.Map;
-
 /**
  * The Reactor-based implementation of {@link ApplicationUsageEvents}
  */
-public final class ReactorApplicationUsageEvents extends AbstractClientV2Operations implements ApplicationUsageEvents {
+public final class ReactorApplicationUsageEvents extends AbstractClientV2Operations
+        implements ApplicationUsageEvents {
 
     /**
      * Creates an instance
@@ -42,26 +42,44 @@ public final class ReactorApplicationUsageEvents extends AbstractClientV2Operati
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorApplicationUsageEvents(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
+    public ReactorApplicationUsageEvents(
+            ConnectionContext connectionContext,
+            Mono<String> root,
+            TokenProvider tokenProvider,
+            Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<GetApplicationUsageEventResponse> get(GetApplicationUsageEventRequest request) {
-        return get(request, GetApplicationUsageEventResponse.class, builder -> builder.pathSegment("app_usage_events", request.getApplicationUsageEventId()))
-            .checkpoint();
+        return get(
+                        request,
+                        GetApplicationUsageEventResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "app_usage_events", request.getApplicationUsageEventId()))
+                .checkpoint();
     }
 
     @Override
-    public Mono<ListApplicationUsageEventsResponse> list(ListApplicationUsageEventsRequest request) {
-        return get(request, ListApplicationUsageEventsResponse.class, builder -> builder.pathSegment("app_usage_events"))
-            .checkpoint();
+    public Mono<ListApplicationUsageEventsResponse> list(
+            ListApplicationUsageEventsRequest request) {
+        return get(
+                        request,
+                        ListApplicationUsageEventsResponse.class,
+                        builder -> builder.pathSegment("app_usage_events"))
+                .checkpoint();
     }
 
     @Override
     public Mono<Void> purgeAndReseed(PurgeAndReseedApplicationUsageEventsRequest request) {
-        return post(request, Void.class, builder -> builder.pathSegment("app_usage_events", "destructively_purge_all_and_reseed_started_apps"))
-            .checkpoint();
+        return post(
+                        request,
+                        Void.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "app_usage_events",
+                                        "destructively_purge_all_and_reseed_started_apps"))
+                .checkpoint();
     }
-
 }

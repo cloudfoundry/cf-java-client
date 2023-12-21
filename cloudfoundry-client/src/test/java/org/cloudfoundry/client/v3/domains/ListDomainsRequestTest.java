@@ -22,8 +22,6 @@ public final class ListDomainsRequestTest {
 
     @Test
     public void valid() {
-        ListDomainsRequest.builder()
-            .build();
+        ListDomainsRequest.builder().build();
     }
-
 }

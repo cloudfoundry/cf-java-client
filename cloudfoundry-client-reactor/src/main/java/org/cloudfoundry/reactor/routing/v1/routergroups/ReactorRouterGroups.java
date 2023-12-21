@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.routing.v1.routergroups;
 
+import java.util.Map;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.routing.v1.AbstractRoutingV1Operations;
@@ -25,8 +26,6 @@ import org.cloudfoundry.routing.v1.routergroups.RouterGroups;
 import org.cloudfoundry.routing.v1.routergroups.UpdateRouterGroupRequest;
 import org.cloudfoundry.routing.v1.routergroups.UpdateRouterGroupResponse;
 import reactor.core.publisher.Mono;
-
-import java.util.Map;
 
 /**
  * The Reactor-based implementation of {@link RouterGroups}
@@ -41,20 +40,30 @@ public class ReactorRouterGroups extends AbstractRoutingV1Operations implements 
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorRouterGroups(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
+    public ReactorRouterGroups(
+            ConnectionContext connectionContext,
+            Mono<String> root,
+            TokenProvider tokenProvider,
+            Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<ListRouterGroupsResponse> list(ListRouterGroupsRequest request) {
-        return get(ListRouterGroupsResponse.class, builder -> builder.pathSegment("v1", "router_groups"))
-            .checkpoint();
+        return get(
+                        ListRouterGroupsResponse.class,
+                        builder -> builder.pathSegment("v1", "router_groups"))
+                .checkpoint();
     }
 
     @Override
     public Mono<UpdateRouterGroupResponse> update(UpdateRouterGroupRequest request) {
-        return put(request, UpdateRouterGroupResponse.class, builder -> builder.pathSegment("v1", "router_groups", request.getRouterGroupId()))
-            .checkpoint();
+        return put(
+                        request,
+                        UpdateRouterGroupResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "v1", "router_groups", request.getRouterGroupId()))
+                .checkpoint();
     }
-
 }

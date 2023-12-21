@@ -23,23 +23,20 @@ public final class UnbindServiceInstanceRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noApplicationName() {
         UnbindServiceInstanceRequest.builder()
-            .serviceInstanceName("test-service-instance-name")
-            .build();
+                .serviceInstanceName("test-service-instance-name")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noServiceInstanceName() {
-        UnbindServiceInstanceRequest.builder()
-            .applicationName("test-application-name")
-            .build();
+        UnbindServiceInstanceRequest.builder().applicationName("test-application-name").build();
     }
 
     @Test
     public void valid() {
         UnbindServiceInstanceRequest.builder()
-            .applicationName("test-application-name")
-            .serviceInstanceName("test-service-instance-name")
-            .build();
+                .applicationName("test-application-name")
+                .serviceInstanceName("test-service-instance-name")
+                .build();
     }
-
 }

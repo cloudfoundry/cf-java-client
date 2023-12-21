@@ -22,15 +22,11 @@ public final class GetApplicationHealthCheckRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noName() {
-        GetApplicationHealthCheckRequest.builder()
-            .build();
+        GetApplicationHealthCheckRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        GetApplicationHealthCheckRequest.builder()
-            .name("test-name")
-            .build();
+        GetApplicationHealthCheckRequest.builder().name("test-name").build();
     }
-
 }

@@ -22,24 +22,19 @@ public final class UnshareDomainRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noDomain() {
-        UnshareDomainRequest.builder()
-            .organization("test-organization")
-            .build();
+        UnshareDomainRequest.builder().organization("test-organization").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noOrganization() {
-        UnshareDomainRequest.builder()
-            .domain("test-domain")
-            .build();
+        UnshareDomainRequest.builder().domain("test-domain").build();
     }
 
     @Test
     public void valid() {
         UnshareDomainRequest.builder()
-            .domain("test-domain")
-            .organization("test-organization")
-            .build();
+                .domain("test-domain")
+                .organization("test-organization")
+                .build();
     }
-
 }

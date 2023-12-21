@@ -17,10 +17,9 @@
 package org.cloudfoundry.client.v3;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.Map;
 import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
-
-import java.util.Map;
 
 /**
  * A base class for all response types that are relationships
@@ -40,5 +39,4 @@ public abstract class RelationshipResponse {
     @AllowNulls
     @JsonProperty("links")
     public abstract Map<String, Link> getLinks();
-
 }

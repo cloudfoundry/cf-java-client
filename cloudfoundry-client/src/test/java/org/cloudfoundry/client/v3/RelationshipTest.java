@@ -22,15 +22,11 @@ public final class RelationshipTest {
 
     @Test(expected = IllegalStateException.class)
     public void noId() {
-        Relationship.builder()
-            .build();
+        Relationship.builder().build();
     }
 
     @Test
     public void valid() {
-        Relationship.builder()
-            .id("test-id")
-            .build();
+        Relationship.builder().id("test-id").build();
     }
-
 }

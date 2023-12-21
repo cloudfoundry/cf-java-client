@@ -23,55 +23,54 @@ public class UpdateIdentityZoneRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noIdentityZoneId() {
         UpdateIdentityZoneRequest.builder()
-            .configuration(IdentityZoneConfiguration.builder().build())
-            .description("test-new-description")
-            .name("test-name")
-            .subdomain("test-sub-domain")
-            .version(1)
-            .build();
+                .configuration(IdentityZoneConfiguration.builder().build())
+                .description("test-new-description")
+                .name("test-name")
+                .subdomain("test-sub-domain")
+                .version(1)
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noName() {
         UpdateIdentityZoneRequest.builder()
-            .configuration(IdentityZoneConfiguration.builder().build())
-            .description("test-new-description")
-            .identityZoneId("test-id")
-            .subdomain("test-sub-domain")
-            .version(1)
-            .build();
+                .configuration(IdentityZoneConfiguration.builder().build())
+                .description("test-new-description")
+                .identityZoneId("test-id")
+                .subdomain("test-sub-domain")
+                .version(1)
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noSubdomain() {
         UpdateIdentityZoneRequest.builder()
-            .configuration(IdentityZoneConfiguration.builder().build())
-            .description("test-new-description")
-            .identityZoneId("test-id")
-            .name("test-name")
-            .version(1)
-            .build();
+                .configuration(IdentityZoneConfiguration.builder().build())
+                .description("test-new-description")
+                .identityZoneId("test-id")
+                .name("test-name")
+                .version(1)
+                .build();
     }
 
     @Test
     public void validMax() {
         UpdateIdentityZoneRequest.builder()
-            .configuration(IdentityZoneConfiguration.builder().build())
-            .description("test-new-description")
-            .identityZoneId("test-id")
-            .name("test-name")
-            .subdomain("test-sub-domain")
-            .version(1)
-            .build();
+                .configuration(IdentityZoneConfiguration.builder().build())
+                .description("test-new-description")
+                .identityZoneId("test-id")
+                .name("test-name")
+                .subdomain("test-sub-domain")
+                .version(1)
+                .build();
     }
 
     @Test
     public void validMin() {
         UpdateIdentityZoneRequest.builder()
-            .identityZoneId("test-id")
-            .name("test-name")
-            .subdomain("test-sub-domain")
-            .build();
+                .identityZoneId("test-id")
+                .name("test-name")
+                .subdomain("test-sub-domain")
+                .build();
     }
-
 }

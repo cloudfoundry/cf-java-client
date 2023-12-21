@@ -22,15 +22,11 @@ public final class RestageApplicationRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noApplicationId() {
-        RestageApplicationRequest.builder()
-            .build();
+        RestageApplicationRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        RestageApplicationRequest.builder()
-            .applicationId("test-application-id")
-            .build();
+        RestageApplicationRequest.builder().applicationId("test-application-id").build();
     }
-
 }

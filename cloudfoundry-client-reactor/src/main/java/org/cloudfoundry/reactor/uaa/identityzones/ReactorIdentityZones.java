@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.uaa.identityzones;
 
+import java.util.Map;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.uaa.AbstractUaaOperations;
@@ -32,8 +33,6 @@ import org.cloudfoundry.uaa.identityzones.UpdateIdentityZoneRequest;
 import org.cloudfoundry.uaa.identityzones.UpdateIdentityZoneResponse;
 import reactor.core.publisher.Mono;
 
-import java.util.Map;
-
 /**
  * The Reactor-based implementation of {@link IdentityZones}
  */
@@ -47,38 +46,59 @@ public final class ReactorIdentityZones extends AbstractUaaOperations implements
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorIdentityZones(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
+    public ReactorIdentityZones(
+            ConnectionContext connectionContext,
+            Mono<String> root,
+            TokenProvider tokenProvider,
+            Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<CreateIdentityZoneResponse> create(CreateIdentityZoneRequest request) {
-        return post(request, CreateIdentityZoneResponse.class, builder -> builder.pathSegment("identity-zones"))
-            .checkpoint();
+        return post(
+                        request,
+                        CreateIdentityZoneResponse.class,
+                        builder -> builder.pathSegment("identity-zones"))
+                .checkpoint();
     }
 
     @Override
     public Mono<DeleteIdentityZoneResponse> delete(DeleteIdentityZoneRequest request) {
-        return delete(request, DeleteIdentityZoneResponse.class, builder -> builder.pathSegment("identity-zones", request.getIdentityZoneId()))
-            .checkpoint();
+        return delete(
+                        request,
+                        DeleteIdentityZoneResponse.class,
+                        builder ->
+                                builder.pathSegment("identity-zones", request.getIdentityZoneId()))
+                .checkpoint();
     }
 
     @Override
     public Mono<GetIdentityZoneResponse> get(GetIdentityZoneRequest request) {
-        return get(request, GetIdentityZoneResponse.class, builder -> builder.pathSegment("identity-zones", request.getIdentityZoneId()))
-            .checkpoint();
+        return get(
+                        request,
+                        GetIdentityZoneResponse.class,
+                        builder ->
+                                builder.pathSegment("identity-zones", request.getIdentityZoneId()))
+                .checkpoint();
     }
 
     @Override
     public Mono<ListIdentityZonesResponse> list(ListIdentityZonesRequest request) {
-        return get(request, ListIdentityZonesResponse.class, builder -> builder.pathSegment("identity-zones"))
-            .checkpoint();
+        return get(
+                        request,
+                        ListIdentityZonesResponse.class,
+                        builder -> builder.pathSegment("identity-zones"))
+                .checkpoint();
     }
 
     @Override
     public Mono<UpdateIdentityZoneResponse> update(UpdateIdentityZoneRequest request) {
-        return put(request, UpdateIdentityZoneResponse.class, builder -> builder.pathSegment("identity-zones", request.getIdentityZoneId()))
-            .checkpoint();
+        return put(
+                        request,
+                        UpdateIdentityZoneResponse.class,
+                        builder ->
+                                builder.pathSegment("identity-zones", request.getIdentityZoneId()))
+                .checkpoint();
     }
-
 }

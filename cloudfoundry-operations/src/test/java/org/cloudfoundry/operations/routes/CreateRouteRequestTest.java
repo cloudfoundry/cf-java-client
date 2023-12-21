@@ -22,45 +22,36 @@ public final class CreateRouteRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noDomain() {
-        CreateRouteRequest.builder()
-            .space("test-space")
-            .build();
+        CreateRouteRequest.builder().space("test-space").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noSpace() {
-        CreateRouteRequest.builder()
-            .domain("test-domain")
-            .host("test-hostname")
-            .build();
+        CreateRouteRequest.builder().domain("test-domain").host("test-hostname").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void portConflict() {
         CreateRouteRequest.builder()
-            .domain("test-domain")
-            .port(123)
-            .randomPort(true)
-            .space("test-space")
-            .build();
+                .domain("test-domain")
+                .port(123)
+                .randomPort(true)
+                .space("test-space")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void setupConflict() {
         CreateRouteRequest.builder()
-            .domain("test-domain")
-            .host("test-hostname")
-            .port(123)
-            .space("test-space")
-            .build();
+                .domain("test-domain")
+                .host("test-hostname")
+                .port(123)
+                .space("test-space")
+                .build();
     }
 
     @Test
     public void valid() {
-        CreateRouteRequest.builder()
-            .domain("test-domain")
-            .space("test-space")
-            .build();
+        CreateRouteRequest.builder().domain("test-domain").space("test-space").build();
     }
-
 }

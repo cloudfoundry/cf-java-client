@@ -22,24 +22,16 @@ public final class ScaleApplicationRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noApplicationId() {
-        ScaleApplicationRequest.builder()
-            .type("web")
-            .build();
+        ScaleApplicationRequest.builder().type("web").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noType() {
-        ScaleApplicationRequest.builder()
-            .applicationId("test-application-id")
-            .build();
+        ScaleApplicationRequest.builder().applicationId("test-application-id").build();
     }
 
     @Test
     public void valid() {
-        ScaleApplicationRequest.builder()
-            .applicationId("test-application-id")
-            .type("web")
-            .build();
+        ScaleApplicationRequest.builder().applicationId("test-application-id").type("web").build();
     }
-
 }

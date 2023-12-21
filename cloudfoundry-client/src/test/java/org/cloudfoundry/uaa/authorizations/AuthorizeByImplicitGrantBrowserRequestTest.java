@@ -23,25 +23,22 @@ public final class AuthorizeByImplicitGrantBrowserRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noClientId() {
         AuthorizeByImplicitGrantBrowserRequest.builder()
-            .redirectUri("http://redirect.to/app")
-            .scope("test-scope")
-            .build();
+                .redirectUri("http://redirect.to/app")
+                .scope("test-scope")
+                .build();
     }
 
     @Test
     public void validMax() {
         AuthorizeByImplicitGrantBrowserRequest.builder()
-            .clientId("test-client-id")
-            .redirectUri("http://redirect.to/app")
-            .scope("test-scope")
-            .build();
+                .clientId("test-client-id")
+                .redirectUri("http://redirect.to/app")
+                .scope("test-scope")
+                .build();
     }
 
     @Test
     public void validMin() {
-        AuthorizeByImplicitGrantBrowserRequest.builder()
-            .clientId("test-client-id")
-            .build();
+        AuthorizeByImplicitGrantBrowserRequest.builder().clientId("test-client-id").build();
     }
-
 }

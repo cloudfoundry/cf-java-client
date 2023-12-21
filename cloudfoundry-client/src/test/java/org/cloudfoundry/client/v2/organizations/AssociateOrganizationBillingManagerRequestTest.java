@@ -23,23 +23,22 @@ public final class AssociateOrganizationBillingManagerRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noBillingManagerId() {
         AssociateOrganizationBillingManagerRequest.builder()
-            .organizationId("test-organization-id")
-            .build();
+                .organizationId("test-organization-id")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noOrganizationId() {
         AssociateOrganizationBillingManagerRequest.builder()
-            .billingManagerId("test-billing-manager-id")
-            .build();
+                .billingManagerId("test-billing-manager-id")
+                .build();
     }
 
     @Test
     public void valid() {
         AssociateOrganizationBillingManagerRequest.builder()
-            .billingManagerId("test-billing-manager-id")
-            .organizationId("test-organization-id")
-            .build();
+                .billingManagerId("test-billing-manager-id")
+                .organizationId("test-organization-id")
+                .build();
     }
-
 }

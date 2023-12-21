@@ -46,5 +46,4 @@ public final class SizeUtils {
             return String.format("%d B", size);
         }
     }
-
 }

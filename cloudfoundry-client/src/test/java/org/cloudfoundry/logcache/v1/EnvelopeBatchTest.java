@@ -24,5 +24,4 @@ public class EnvelopeBatchTest {
     public void valid() {
         EnvelopeBatch.builder().build();
     }
-
 }

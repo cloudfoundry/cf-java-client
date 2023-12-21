@@ -1,11 +1,10 @@
 package org.cloudfoundry.client.v3.routes;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.cloudfoundry.AllowNulls;
-import org.cloudfoundry.client.v3.Link;
-
 import java.util.List;
 import java.util.Map;
+import org.cloudfoundry.AllowNulls;
+import org.cloudfoundry.client.v3.Link;
 
 /**
  * The Route Destinations
@@ -24,5 +23,4 @@ public abstract class RouteDestinations {
      */
     @JsonProperty("destinations")
     abstract List<Destination> getDestinations();
-
 }

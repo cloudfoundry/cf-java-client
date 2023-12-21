@@ -16,20 +16,21 @@
 
 package org.cloudfoundry.reactor.util;
 
-import org.springframework.web.util.UriComponentsBuilder;
-
 import java.util.stream.Stream;
+import org.springframework.web.util.UriComponentsBuilder;
 
 public class UriQueryParameters {
 
-    public static void set(UriComponentsBuilder builder, Stream<UriQueryParameter> uriQueryParameters) {
+    public static void set(
+            UriComponentsBuilder builder, Stream<UriQueryParameter> uriQueryParameters) {
         // Replace all literal values with URI variables to apply more strict encoding:
         UriVariablesRegistry uriVariablesRegistry = new UriVariablesRegistry();
-        uriQueryParameters.forEach(uriQueryParameter -> {
-            UriVariable uriVariable = uriVariablesRegistry.register(uriQueryParameter.getValue());
-            builder.queryParam(uriQueryParameter.getKey(), uriVariable.getPlaceholder());
-        });
+        uriQueryParameters.forEach(
+                uriQueryParameter -> {
+                    UriVariable uriVariable =
+                            uriVariablesRegistry.register(uriQueryParameter.getValue());
+                    builder.queryParam(uriQueryParameter.getKey(), uriVariable.getPlaceholder());
+                });
         builder.uriVariables(uriVariablesRegistry.getUriVariablesMap());
     }
-
 }

@@ -23,74 +23,79 @@ public class CreateTcpRoutesRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noBackendIp() {
         CreateTcpRoutesRequest.builder()
-            .tcpRoute(TcpRouteConfiguration.builder()
-                .backendPort(9999)
-                .port(999)
-                .routerGroupId("test-router-group-id")
-                .ttl(99)
-                .build())
-            .build();
+                .tcpRoute(
+                        TcpRouteConfiguration.builder()
+                                .backendPort(9999)
+                                .port(999)
+                                .routerGroupId("test-router-group-id")
+                                .ttl(99)
+                                .build())
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noBackendPort() {
         CreateTcpRoutesRequest.builder()
-            .tcpRoute(TcpRouteConfiguration.builder()
-                .backendIp("test-backend-ip")
-                .port(999)
-                .routerGroupId("test-router-group-id")
-                .ttl(99)
-                .build())
-            .build();
+                .tcpRoute(
+                        TcpRouteConfiguration.builder()
+                                .backendIp("test-backend-ip")
+                                .port(999)
+                                .routerGroupId("test-router-group-id")
+                                .ttl(99)
+                                .build())
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noPort() {
         CreateTcpRoutesRequest.builder()
-            .tcpRoute(TcpRouteConfiguration.builder()
-                .backendIp("test-backend-ip")
-                .backendPort(9999)
-                .routerGroupId("test-router-group-id")
-                .ttl(99)
-                .build())
-            .build();
+                .tcpRoute(
+                        TcpRouteConfiguration.builder()
+                                .backendIp("test-backend-ip")
+                                .backendPort(9999)
+                                .routerGroupId("test-router-group-id")
+                                .ttl(99)
+                                .build())
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noRouterGroupId() {
         CreateTcpRoutesRequest.builder()
-            .tcpRoute(TcpRouteConfiguration.builder()
-                .backendIp("test-backend-ip")
-                .backendPort(9999)
-                .port(999)
-                .ttl(99)
-                .build())
-            .build();
+                .tcpRoute(
+                        TcpRouteConfiguration.builder()
+                                .backendIp("test-backend-ip")
+                                .backendPort(9999)
+                                .port(999)
+                                .ttl(99)
+                                .build())
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noTtl() {
         CreateTcpRoutesRequest.builder()
-            .tcpRoute(TcpRouteConfiguration.builder()
-                .backendIp("test-backend-ip")
-                .backendPort(9999)
-                .port(999)
-                .routerGroupId("test-router-group-id")
-                .build())
-            .build();
+                .tcpRoute(
+                        TcpRouteConfiguration.builder()
+                                .backendIp("test-backend-ip")
+                                .backendPort(9999)
+                                .port(999)
+                                .routerGroupId("test-router-group-id")
+                                .build())
+                .build();
     }
 
     @Test
     public void valid() {
         CreateTcpRoutesRequest.builder()
-            .tcpRoute(TcpRouteConfiguration.builder()
-                .backendIp("test-backend-ip")
-                .backendPort(9999)
-                .port(999)
-                .routerGroupId("test-router-group-id")
-                .ttl(99)
-                .build())
-            .build();
+                .tcpRoute(
+                        TcpRouteConfiguration.builder()
+                                .backendIp("test-backend-ip")
+                                .backendPort(9999)
+                                .port(999)
+                                .routerGroupId("test-router-group-id")
+                                .ttl(99)
+                                .build())
+                .build();
     }
-
 }

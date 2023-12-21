@@ -16,27 +16,24 @@
 
 package org.cloudfoundry.operations.buildpacks;
 
-import org.junit.Test;
-
 import java.nio.file.Paths;
+import org.junit.Test;
 
 public class UpdateBuildpackRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noName() {
-        UpdateBuildpackRequest.builder()
-            .build();
+        UpdateBuildpackRequest.builder().build();
     }
 
     @Test
     public void valid() {
         UpdateBuildpackRequest.builder()
-            .buildpack(Paths.get("test-buildpack"))
-            .enable(false)
-            .lock(true)
-            .name("test-name")
-            .position(0)
-            .build();
+                .buildpack(Paths.get("test-buildpack"))
+                .enable(false)
+                .lock(true)
+                .name("test-name")
+                .position(0)
+                .build();
     }
-
 }

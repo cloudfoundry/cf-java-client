@@ -22,24 +22,19 @@ public final class CreateTaskRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noApplicationId() {
-        CreateTaskRequest.builder()
-            .command("test-command")
-            .build();
+        CreateTaskRequest.builder().command("test-command").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noCommand() {
-        CreateTaskRequest.builder()
-            .applicationId("test-application-id")
-            .build();
+        CreateTaskRequest.builder().applicationId("test-application-id").build();
     }
 
     @Test
     public void valid() {
         CreateTaskRequest.builder()
-            .applicationId("test-application-id")
-            .command("test-command")
-            .build();
+                .applicationId("test-application-id")
+                .command("test-command")
+                .build();
     }
-
 }

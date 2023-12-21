@@ -22,16 +22,11 @@ public final class DeleteUserRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noUserId() {
-        DeleteUserRequest.builder()
-            .async(true)
-            .build();
+        DeleteUserRequest.builder().async(true).build();
     }
 
     @Test
     public void valid() {
-        DeleteUserRequest.builder()
-            .userId("test-user-id")
-            .build();
+        DeleteUserRequest.builder().userId("test-user-id").build();
     }
-
 }

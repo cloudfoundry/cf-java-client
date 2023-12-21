@@ -21,6 +21,6 @@ import org.cloudfoundry.client.v2.Resource;
 /**
  * The base class for Space Quota Definition resources
  */
-public abstract class AbstractSpaceQuotaDefinitionResource extends Resource<org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionEntity> {
-
-}
+public abstract class AbstractSpaceQuotaDefinitionResource
+        extends Resource<
+                org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionEntity> {}

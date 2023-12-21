@@ -22,8 +22,6 @@ public class ListTcpRoutesRequestTest {
 
     @Test
     public void valid() {
-        ListTcpRoutesRequest.builder()
-            .build();
+        ListTcpRoutesRequest.builder().build();
     }
-
 }

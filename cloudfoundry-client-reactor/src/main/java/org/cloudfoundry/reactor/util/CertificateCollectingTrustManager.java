@@ -16,10 +16,10 @@
 
 package org.cloudfoundry.reactor.util;
 
-import javax.net.ssl.X509TrustManager;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import javax.net.ssl.X509TrustManager;
 
 final class CertificateCollectingTrustManager implements X509TrustManager {
 
@@ -80,7 +80,6 @@ final class CertificateCollectingTrustManager implements X509TrustManager {
         synchronized (this.monitor) {
             if (this.collected == null) {
                 return null;
-
             }
             return Arrays.copyOf(this.collected, this.collected.length);
         }
@@ -91,5 +90,4 @@ final class CertificateCollectingTrustManager implements X509TrustManager {
             return this.trusted;
         }
     }
-
 }

@@ -134,5 +134,4 @@ public interface Clients {
      * @return the response to the Update Metadata request
      */
     Mono<UpdateMetadataResponse> updateMetadata(UpdateMetadataRequest request);
-
 }

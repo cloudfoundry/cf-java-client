@@ -21,6 +21,6 @@ import org.cloudfoundry.client.v2.Resource;
 /**
  * The base class for Service Plan Visibility resources
  */
-public abstract class AbstractServicePlanVisibilityResource extends Resource<org.cloudfoundry.client.v2.serviceplanvisibilities.ServicePlanVisibilityEntity> {
-
-}
+public abstract class AbstractServicePlanVisibilityResource
+        extends Resource<
+                org.cloudfoundry.client.v2.serviceplanvisibilities.ServicePlanVisibilityEntity> {}

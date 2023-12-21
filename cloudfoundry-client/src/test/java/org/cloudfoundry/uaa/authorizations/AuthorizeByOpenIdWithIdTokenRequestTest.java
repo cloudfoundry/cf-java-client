@@ -23,25 +23,22 @@ public final class AuthorizeByOpenIdWithIdTokenRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noClientId() {
         AuthorizeByOpenIdWithIdTokenRequest.builder()
-            .redirectUri("http://redirect.to/app")
-            .scope("test-scope")
-            .build();
+                .redirectUri("http://redirect.to/app")
+                .scope("test-scope")
+                .build();
     }
 
     @Test
     public void validMax() {
         AuthorizeByOpenIdWithIdTokenRequest.builder()
-            .clientId("test-client-id")
-            .redirectUri("http://redirect.to/app")
-            .scope("test-scope")
-            .build();
+                .clientId("test-client-id")
+                .redirectUri("http://redirect.to/app")
+                .scope("test-scope")
+                .build();
     }
 
     @Test
     public void validMin() {
-        AuthorizeByOpenIdWithIdTokenRequest.builder()
-            .clientId("test-client-id")
-            .build();
+        AuthorizeByOpenIdWithIdTokenRequest.builder().clientId("test-client-id").build();
     }
-
 }

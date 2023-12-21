@@ -23,23 +23,20 @@ public final class AssociateSpaceQuotaDefinitionRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noSpaceId() {
         AssociateSpaceQuotaDefinitionRequest.builder()
-            .spaceQuotaDefinitionId("test-space-quota-definition-id")
-            .build();
+                .spaceQuotaDefinitionId("test-space-quota-definition-id")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noSpaceQuotaDefinitionId() {
-        AssociateSpaceQuotaDefinitionRequest.builder()
-            .spaceId("test-space-id")
-            .build();
+        AssociateSpaceQuotaDefinitionRequest.builder().spaceId("test-space-id").build();
     }
 
     @Test
     public void valid() {
         AssociateSpaceQuotaDefinitionRequest.builder()
-            .spaceId("test-space-id")
-            .spaceQuotaDefinitionId("test-space-quota-definition-id")
-            .build();
+                .spaceId("test-space-id")
+                .spaceQuotaDefinitionId("test-space-quota-definition-id")
+                .build();
     }
-
 }

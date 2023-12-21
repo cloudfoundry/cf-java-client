@@ -22,15 +22,13 @@ public final class ListServiceInstanceServiceKeysRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noServiceInstanceId() {
-        ListServiceInstanceServiceBindingsRequest.builder()
-            .build();
+        ListServiceInstanceServiceBindingsRequest.builder().build();
     }
 
     @Test
     public void valid() {
         ListServiceInstanceServiceKeysRequest.builder()
-            .serviceInstanceId("test-service-instance-id")
-            .build();
+                .serviceInstanceId("test-service-instance-id")
+                .build();
     }
-
 }

@@ -22,24 +22,19 @@ public final class RemoveOrganizationUserRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noOrganizationId() {
-        RemoveOrganizationUserRequest.builder()
-            .userId("test-user-id")
-            .build();
+        RemoveOrganizationUserRequest.builder().userId("test-user-id").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noUserId() {
-        RemoveOrganizationUserRequest.builder()
-            .organizationId("test-organization-id")
-            .build();
+        RemoveOrganizationUserRequest.builder().organizationId("test-organization-id").build();
     }
 
     @Test
     public void valid() {
         RemoveOrganizationUserRequest.builder()
-            .organizationId("test-organization-id")
-            .userId("test-user-id")
-            .build();
+                .organizationId("test-organization-id")
+                .userId("test-user-id")
+                .build();
     }
-
 }

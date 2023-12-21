@@ -75,5 +75,4 @@ public enum Visibility {
     public String toString() {
         return getValue();
     }
-
 }

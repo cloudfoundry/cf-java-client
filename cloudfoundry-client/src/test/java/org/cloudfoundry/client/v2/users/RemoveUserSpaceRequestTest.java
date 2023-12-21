@@ -22,24 +22,16 @@ public final class RemoveUserSpaceRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noSpaceId() {
-        RemoveUserSpaceRequest.builder()
-            .userId("test-user-id")
-            .build();
+        RemoveUserSpaceRequest.builder().userId("test-user-id").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noUserId() {
-        RemoveUserSpaceRequest.builder()
-            .spaceId("test-space-id")
-            .build();
+        RemoveUserSpaceRequest.builder().spaceId("test-space-id").build();
     }
 
     @Test
     public void valid() {
-        RemoveUserSpaceRequest.builder()
-            .spaceId("test-space-id")
-            .userId("test-user-id")
-            .build();
+        RemoveUserSpaceRequest.builder().spaceId("test-space-id").userId("test-user-id").build();
     }
-
 }

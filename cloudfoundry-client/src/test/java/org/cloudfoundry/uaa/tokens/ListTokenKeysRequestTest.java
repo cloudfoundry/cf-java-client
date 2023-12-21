@@ -22,8 +22,6 @@ public final class ListTokenKeysRequestTest {
 
     @Test
     public void valid() {
-        ListTokenKeysRequest.builder()
-            .build();
+        ListTokenKeysRequest.builder().build();
     }
-
 }

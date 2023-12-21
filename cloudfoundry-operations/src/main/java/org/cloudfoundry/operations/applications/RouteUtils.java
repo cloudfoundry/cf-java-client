@@ -16,20 +16,19 @@
 
 package org.cloudfoundry.operations.applications;
 
-import reactor.core.publisher.Mono;
-
 import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import reactor.core.publisher.Mono;
 
 final class RouteUtils {
 
-    private RouteUtils() {
-    }
+    private RouteUtils() {}
 
-    static Mono<DecomposedRoute> decomposeRoute(List<DomainSummary> availableDomains, String route, String routePath) {
+    static Mono<DecomposedRoute> decomposeRoute(
+            List<DomainSummary> availableDomains, String route, String routePath) {
         String domain = null;
         String host = null;
         String path = null;
@@ -37,12 +36,17 @@ final class RouteUtils {
         String routeWithoutSuffix = route;
 
         if (availableDomains.size() == 0) {
-            throw new IllegalArgumentException(String.format("The route %s did not match any existing domains", route));
+            throw new IllegalArgumentException(
+                    String.format("The route %s did not match any existing domains", route));
         }
 
-        List<DomainSummary> sortedDomains = availableDomains.stream()
-            .sorted(Comparator.<DomainSummary>comparingInt(domainSummary -> domainSummary.getName().length()).reversed())
-            .collect(Collectors.toList());
+        List<DomainSummary> sortedDomains =
+                availableDomains.stream()
+                        .sorted(
+                                Comparator.<DomainSummary>comparingInt(
+                                                domainSummary -> domainSummary.getName().length())
+                                        .reversed())
+                        .collect(Collectors.toList());
 
         if (route.contains("/")) {
             int index = route.indexOf("/");
@@ -57,26 +61,27 @@ final class RouteUtils {
             if (isDomainMatch(routeWithoutSuffix, item.getName())) {
                 domain = item.getName();
                 if (domain.length() < routeWithoutSuffix.length()) {
-                    host = routeWithoutSuffix.substring(0, routeWithoutSuffix.lastIndexOf(domain) - 1);
+                    host =
+                            routeWithoutSuffix.substring(
+                                    0, routeWithoutSuffix.lastIndexOf(domain) - 1);
                 }
                 break;
             }
         }
 
         if (domain == null) {
-            throw new IllegalArgumentException(String.format("The route %s did not match any existing domains", route));
+            throw new IllegalArgumentException(
+                    String.format("The route %s did not match any existing domains", route));
         }
 
         if ((host != null || path != null) && port != null) {
-            throw new IllegalArgumentException(String.format("The route %s is invalid: Host/path cannot be set with port", route));
+            throw new IllegalArgumentException(
+                    String.format(
+                            "The route %s is invalid: Host/path cannot be set with port", route));
         }
 
-        return Mono.just(DecomposedRoute.builder()
-            .domain(domain)
-            .host(host)
-            .path(path)
-            .port(port)
-            .build());
+        return Mono.just(
+                DecomposedRoute.builder().domain(domain).host(host).path(path).port(port).build());
     }
 
     private static Integer getPort(String route) {
@@ -95,7 +100,8 @@ final class RouteUtils {
     }
 
     private static boolean isDomainMatch(String route, String domain) {
-        return route.equals(domain) || route.endsWith(domain) && route.charAt(route.length() - domain.length() - 1) == '.';
+        return route.equals(domain)
+                || route.endsWith(domain)
+                        && route.charAt(route.length() - domain.length() - 1) == '.';
     }
-
 }

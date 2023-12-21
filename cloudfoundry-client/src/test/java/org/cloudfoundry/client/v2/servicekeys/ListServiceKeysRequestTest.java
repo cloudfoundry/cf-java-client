@@ -22,8 +22,6 @@ public final class ListServiceKeysRequestTest {
 
     @Test
     public void valid() {
-        ListServiceKeysRequest.builder()
-            .build();
+        ListServiceKeysRequest.builder().build();
     }
-
 }

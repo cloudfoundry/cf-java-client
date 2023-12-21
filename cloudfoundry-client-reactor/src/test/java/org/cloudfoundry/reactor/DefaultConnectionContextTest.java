@@ -16,29 +16,29 @@
 
 package org.cloudfoundry.reactor;
 
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import io.netty.handler.logging.ByteBufFormat;
 import io.netty.handler.logging.LogLevel;
+import java.net.InetSocketAddress;
+import java.time.Duration;
+import java.util.Optional;
 import org.junit.After;
 import org.junit.Test;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.transport.ProxyProvider;
 import reactor.test.StepVerifier;
 
-import java.net.InetSocketAddress;
-import java.time.Duration;
-import java.util.Optional;
-
-import static io.netty.handler.codec.http.HttpMethod.GET;
-import static io.netty.handler.codec.http.HttpResponseStatus.OK;
-import static org.assertj.core.api.Assertions.assertThat;
-
 public final class DefaultConnectionContextTest extends AbstractRestTest {
 
-    private final DefaultConnectionContext connectionContext = DefaultConnectionContext.builder()
-        .apiHost(this.mockWebServer.getHostName())
-        .port(this.mockWebServer.getPort())
-        .secure(false)
-        .build();
+    private final DefaultConnectionContext connectionContext =
+            DefaultConnectionContext.builder()
+                    .apiHost(this.mockWebServer.getHostName())
+                    .port(this.mockWebServer.getPort())
+                    .secure(false)
+                    .build();
 
     @After
     public void dispose() {
@@ -47,43 +47,42 @@ public final class DefaultConnectionContextTest extends AbstractRestTest {
 
     @Test
     public void getInfo() {
-        mockRequest(InteractionContext.builder()
-            .request(TestRequest.builder()
-                .method(GET).path("/")
-                .build())
-            .response(TestResponse.builder()
-                .status(OK)
-                .payload("fixtures/GET_response.json")
-                .build())
-            .build());
+        mockRequest(
+                InteractionContext.builder()
+                        .request(TestRequest.builder().method(GET).path("/").build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(OK)
+                                        .payload("fixtures/GET_response.json")
+                                        .build())
+                        .build());
 
-        mockRequest(InteractionContext.builder()
-            .request(TestRequest.builder()
-                .method(GET).path("/v2/info")
-                .build())
-            .response(TestResponse.builder()
-                .status(OK)
-                .payload("fixtures/client/v2/info/GET_response.json")
-                .build())
-            .build());
+        mockRequest(
+                InteractionContext.builder()
+                        .request(TestRequest.builder().method(GET).path("/v2/info").build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(OK)
+                                        .payload("fixtures/client/v2/info/GET_response.json")
+                                        .build())
+                        .build());
 
-        this.connectionContext.getRootProvider()
-            .getRoot("token_endpoint", this.connectionContext)
-            .as(StepVerifier::create)
-            .expectNext("http://localhost:8080/uaa")
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+        this.connectionContext
+                .getRootProvider()
+                .getRoot("token_endpoint", this.connectionContext)
+                .as(StepVerifier::create)
+                .expectNext("http://localhost:8080/uaa")
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
     public void multipleInstances() {
-        DefaultConnectionContext first = DefaultConnectionContext.builder()
-            .apiHost("test-host")
-            .build();
+        DefaultConnectionContext first =
+                DefaultConnectionContext.builder().apiHost("test-host").build();
 
-        DefaultConnectionContext second = DefaultConnectionContext.builder()
-            .apiHost("test-host")
-            .build();
+        DefaultConnectionContext second =
+                DefaultConnectionContext.builder().apiHost("test-host").build();
 
         first.monitorByteBufAllocator();
         second.monitorByteBufAllocator();
@@ -94,19 +93,20 @@ public final class DefaultConnectionContextTest extends AbstractRestTest {
 
     @Test
     public void configurationAlwaysApplied() {
-        DefaultConnectionContext ctx = DefaultConnectionContext.builder()
-            .connectionPoolSize(24)
-            .apiHost("api.example.com")
-            .keepAlive(true)
-            .proxyConfiguration(
-                ProxyConfiguration.builder()
-                    .host("proxy.example.com")
-                    .port(8080)
-                    .username("foo")
-                    .password("bar")
-                    .build())
-            .skipSslValidation(true)
-            .build();
+        DefaultConnectionContext ctx =
+                DefaultConnectionContext.builder()
+                        .connectionPoolSize(24)
+                        .apiHost("api.example.com")
+                        .keepAlive(true)
+                        .proxyConfiguration(
+                                ProxyConfiguration.builder()
+                                        .host("proxy.example.com")
+                                        .port(8080)
+                                        .username("foo")
+                                        .password("bar")
+                                        .build())
+                        .skipSslValidation(true)
+                        .build();
 
         assertThat(ctx.getConnectionPoolSize()).isEqualTo(24);
         assertThat(ctx.getApiHost()).isEqualTo("api.example.com");
@@ -118,10 +118,11 @@ public final class DefaultConnectionContextTest extends AbstractRestTest {
         InetSocketAddress addr = client.configuration().proxyProvider().getAddress().get();
         assertThat(addr.getHostName()).isEqualTo("proxy.example.com");
         assertThat(addr.getPort()).isEqualTo(8080);
-        assertThat(client.configuration().proxyProvider().getType()).isEqualTo(ProxyProvider.Proxy.HTTP);
+        assertThat(client.configuration().proxyProvider().getType())
+                .isEqualTo(ProxyProvider.Proxy.HTTP);
 
         assertThat(client.configuration().loggingHandler().level()).isEqualTo(LogLevel.TRACE);
-        assertThat(client.configuration().loggingHandler().byteBufFormat()).isEqualTo(ByteBufFormat.HEX_DUMP);
+        assertThat(client.configuration().loggingHandler().byteBufFormat())
+                .isEqualTo(ByteBufFormat.HEX_DUMP);
     }
-
 }

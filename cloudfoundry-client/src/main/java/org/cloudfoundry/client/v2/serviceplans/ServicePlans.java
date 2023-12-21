@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.client.v2.serviceplans;
 
-
 import reactor.core.publisher.Mono;
 
 public interface ServicePlans {
@@ -52,7 +51,8 @@ public interface ServicePlans {
      * @param request the List Service Instances request
      * @return the response from the List Service Instances request
      */
-    Mono<ListServicePlanServiceInstancesResponse> listServiceInstances(ListServicePlanServiceInstancesRequest request);
+    Mono<ListServicePlanServiceInstancesResponse> listServiceInstances(
+            ListServicePlanServiceInstancesRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/service_plans/updating_a_service_plan.html">Updating a Service Plan</a> request
@@ -61,5 +61,4 @@ public interface ServicePlans {
      * @return the response from the Update Service Plan request
      */
     Mono<UpdateServicePlanResponse> update(UpdateServicePlanRequest request);
-
 }

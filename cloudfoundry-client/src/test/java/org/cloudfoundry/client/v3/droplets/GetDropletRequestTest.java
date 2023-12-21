@@ -22,15 +22,11 @@ public final class GetDropletRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noDropletId() {
-        GetDropletRequest.builder()
-            .build();
+        GetDropletRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        GetDropletRequest.builder()
-            .dropletId("test-droplet-id")
-            .build();
+        GetDropletRequest.builder().dropletId("test-droplet-id").build();
     }
-
 }

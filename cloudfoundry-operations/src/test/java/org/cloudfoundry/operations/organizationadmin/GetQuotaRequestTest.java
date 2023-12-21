@@ -22,15 +22,11 @@ public final class GetQuotaRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noName() {
-        GetQuotaRequest.builder()
-            .build();
+        GetQuotaRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        GetQuotaRequest.builder()
-            .name("test-name")
-            .build();
+        GetQuotaRequest.builder().name("test-name").build();
     }
-
 }

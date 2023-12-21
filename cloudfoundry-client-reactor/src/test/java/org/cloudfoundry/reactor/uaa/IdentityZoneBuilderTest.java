@@ -16,13 +16,13 @@
 
 package org.cloudfoundry.reactor.uaa;
 
-import io.netty.handler.codec.http.HttpHeaders;
-import org.cloudfoundry.uaa.IdentityZoned;
-import org.junit.Test;
-
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+
+import io.netty.handler.codec.http.HttpHeaders;
+import org.cloudfoundry.uaa.IdentityZoned;
+import org.junit.Test;
 
 public final class IdentityZoneBuilderTest {
 
@@ -55,5 +55,4 @@ public final class IdentityZoneBuilderTest {
             return "test-identity-zone-subdomain";
         }
     }
-
 }

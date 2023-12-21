@@ -26,7 +26,8 @@ public interface SecurityGroups {
      * @param request the associate security group space request
      * @return the response from the associate security group space request
      */
-    Mono<AssociateSecurityGroupSpaceResponse> associateSpace(AssociateSecurityGroupSpaceRequest request);
+    Mono<AssociateSecurityGroupSpaceResponse> associateSpace(
+            AssociateSecurityGroupSpaceRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/security_groups/creating_a_security_group.html">Creating a Security Group</a> request.
@@ -67,7 +68,8 @@ public interface SecurityGroups {
      * @param request the list running security groups request
      * @return the response from the list running security groups request
      */
-    Mono<ListSecurityGroupRunningDefaultsResponse> listRunningDefaults(ListSecurityGroupRunningDefaultsRequest request);
+    Mono<ListSecurityGroupRunningDefaultsResponse> listRunningDefaults(
+            ListSecurityGroupRunningDefaultsRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/security_groups/list_all_spaces_for_the_security_group.html">List all Spaces for the Security Group</a> request.
@@ -83,7 +85,8 @@ public interface SecurityGroups {
      * @param request the list staging security groups request
      * @return the response from the list staging security groups request
      */
-    Mono<ListSecurityGroupStagingDefaultsResponse> listStagingDefaults(ListSecurityGroupStagingDefaultsRequest request);
+    Mono<ListSecurityGroupStagingDefaultsResponse> listStagingDefaults(
+            ListSecurityGroupStagingDefaultsRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/security_group_running_defaults/removing_a_security_group_as_a_default_for_running_apps.html">
@@ -118,7 +121,8 @@ public interface SecurityGroups {
      * @param request the list running security groups request
      * @return the response from the list running security groups request
      */
-    Mono<SetSecurityGroupRunningDefaultResponse> setRunningDefault(SetSecurityGroupRunningDefaultRequest request);
+    Mono<SetSecurityGroupRunningDefaultResponse> setRunningDefault(
+            SetSecurityGroupRunningDefaultRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/security_group_staging_defaults/set_a_security_group_as_a_default_for_staging.html">Set a Security Group as a default for
@@ -127,7 +131,8 @@ public interface SecurityGroups {
      * @param request the list staging security groups request
      * @return the response from the list staging security groups request
      */
-    Mono<SetSecurityGroupStagingDefaultResponse> setStagingDefault(SetSecurityGroupStagingDefaultRequest request);
+    Mono<SetSecurityGroupStagingDefaultResponse> setStagingDefault(
+            SetSecurityGroupStagingDefaultRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/security_groups/updating_a_security_group.html">Updating a Security Group</a> request.
@@ -136,5 +141,4 @@ public interface SecurityGroups {
      * @return the response from the update security group request
      */
     Mono<UpdateSecurityGroupResponse> update(UpdateSecurityGroupRequest request);
-
 }

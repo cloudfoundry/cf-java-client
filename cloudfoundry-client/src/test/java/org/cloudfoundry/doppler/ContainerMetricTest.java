@@ -22,74 +22,74 @@ public final class ContainerMetricTest {
 
     @Test
     public void dropsonde() {
-        ContainerMetric.from(new org.cloudfoundry.dropsonde.events.ContainerMetric.Builder()
-            .applicationId("test-application-id")
-            .cpuPercentage(0.0)
-            .diskBytes(0L)
-            .instanceIndex(0)
-            .memoryBytes(0L)
-            .build());
+        ContainerMetric.from(
+                new org.cloudfoundry.dropsonde.events.ContainerMetric.Builder()
+                        .applicationId("test-application-id")
+                        .cpuPercentage(0.0)
+                        .diskBytes(0L)
+                        .instanceIndex(0)
+                        .memoryBytes(0L)
+                        .build());
     }
 
     @Test(expected = IllegalStateException.class)
     public void noApplicationId() {
         ContainerMetric.builder()
-            .cpuPercentage(0.0)
-            .diskBytes(0L)
-            .instanceIndex(0)
-            .memoryBytes(0L)
-            .build();
+                .cpuPercentage(0.0)
+                .diskBytes(0L)
+                .instanceIndex(0)
+                .memoryBytes(0L)
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noCpuPercentage() {
         ContainerMetric.builder()
-            .applicationId("test-application-id")
-            .diskBytes(0L)
-            .instanceIndex(0)
-            .memoryBytes(0L)
-            .build();
+                .applicationId("test-application-id")
+                .diskBytes(0L)
+                .instanceIndex(0)
+                .memoryBytes(0L)
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noDiskBytes() {
         ContainerMetric.builder()
-            .applicationId("test-application-id")
-            .cpuPercentage(0.0)
-            .instanceIndex(0)
-            .memoryBytes(0L)
-            .build();
+                .applicationId("test-application-id")
+                .cpuPercentage(0.0)
+                .instanceIndex(0)
+                .memoryBytes(0L)
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noInstanceIndex() {
         ContainerMetric.builder()
-            .applicationId("test-application-id")
-            .cpuPercentage(0.0)
-            .diskBytes(0L)
-            .memoryBytes(0L)
-            .build();
+                .applicationId("test-application-id")
+                .cpuPercentage(0.0)
+                .diskBytes(0L)
+                .memoryBytes(0L)
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noMemoryBytes() {
         ContainerMetric.builder()
-            .applicationId("test-application-id")
-            .cpuPercentage(0.0)
-            .diskBytes(0L)
-            .instanceIndex(0)
-            .build();
+                .applicationId("test-application-id")
+                .cpuPercentage(0.0)
+                .diskBytes(0L)
+                .instanceIndex(0)
+                .build();
     }
 
     @Test
     public void valid() {
         ContainerMetric.builder()
-            .applicationId("test-application-id")
-            .cpuPercentage(0.0)
-            .diskBytes(0L)
-            .instanceIndex(0)
-            .memoryBytes(0L)
-            .build();
+                .applicationId("test-application-id")
+                .cpuPercentage(0.0)
+                .diskBytes(0L)
+                .instanceIndex(0)
+                .memoryBytes(0L)
+                .build();
     }
-
 }

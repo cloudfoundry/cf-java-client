@@ -21,13 +21,11 @@ import java.util.UUID;
 
 final class UuidUtils {
 
-    private UuidUtils() {
-    }
+    private UuidUtils() {}
 
     static UUID from(org.cloudfoundry.dropsonde.events.UUID dropsonde) {
         return Optional.ofNullable(dropsonde)
-            .map(d -> new UUID(Long.reverseBytes(d.low), Long.reverseBytes(d.high)))
-            .orElse(null);
+                .map(d -> new UUID(Long.reverseBytes(d.low), Long.reverseBytes(d.high)))
+                .orElse(null);
     }
-
 }

@@ -107,5 +107,4 @@ public abstract class AbstractUserEntity {
     @JsonProperty("username")
     @Nullable
     public abstract String getUsername();
-
 }

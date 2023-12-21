@@ -16,6 +16,12 @@
 
 package org.cloudfoundry.util;
 
+import static org.cloudfoundry.util.DelayUtils.exponentialBackOff;
+
+import java.time.Duration;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Set;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.ClientV2Exception;
 import org.cloudfoundry.client.v2.Resource;
@@ -29,24 +35,17 @@ import org.cloudfoundry.client.v3.jobs.Job;
 import org.cloudfoundry.client.v3.jobs.JobState;
 import reactor.core.publisher.Mono;
 
-import java.time.Duration;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
-
-import static org.cloudfoundry.util.DelayUtils.exponentialBackOff;
-
 /**
  * Utilities for Jobs
  */
 public final class JobUtils {
 
-    private static final Set<JobState> FINAL_STATES = EnumSet.of(JobState.COMPLETE, JobState.FAILED);
+    private static final Set<JobState> FINAL_STATES =
+            EnumSet.of(JobState.COMPLETE, JobState.FAILED);
 
     private static final Integer STATUS_OK = 200;
 
-    private JobUtils() {
-    }
+    private JobUtils() {}
 
     /**
      * Waits for a job to complete
@@ -57,8 +56,10 @@ public final class JobUtils {
      * @param <R>                the Job resource type
      * @return {@code onComplete} once job has completed
      */
-    public static <R extends Resource<JobEntity>> Mono<Void> waitForCompletion(CloudFoundryClient cloudFoundryClient, Duration completionTimeout, R resource) {
-        return waitForCompletion(cloudFoundryClient, completionTimeout, ResourceUtils.getEntity(resource));
+    public static <R extends Resource<JobEntity>> Mono<Void> waitForCompletion(
+            CloudFoundryClient cloudFoundryClient, Duration completionTimeout, R resource) {
+        return waitForCompletion(
+                cloudFoundryClient, completionTimeout, ResourceUtils.getEntity(resource));
     }
 
     /**
@@ -69,21 +70,28 @@ public final class JobUtils {
      * @param jobEntity          the entity representing the job
      * @return {@code onComplete} once job has completed
      */
-    public static Mono<Void> waitForCompletion(CloudFoundryClient cloudFoundryClient, Duration completionTimeout, JobEntity jobEntity) {
+    public static Mono<Void> waitForCompletion(
+            CloudFoundryClient cloudFoundryClient,
+            Duration completionTimeout,
+            JobEntity jobEntity) {
         Mono<JobEntity> job;
 
         if (JobUtils.isComplete(jobEntity)) {
             job = Mono.just(jobEntity);
         } else {
-            job = requestJobV2(cloudFoundryClient, jobEntity.getId())
-                .map(GetJobResponse::getEntity)
-                .filter(JobUtils::isComplete)
-                .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), completionTimeout));
+            job =
+                    requestJobV2(cloudFoundryClient, jobEntity.getId())
+                            .map(GetJobResponse::getEntity)
+                            .filter(JobUtils::isComplete)
+                            .repeatWhenEmpty(
+                                    exponentialBackOff(
+                                            Duration.ofSeconds(1),
+                                            Duration.ofSeconds(15),
+                                            completionTimeout));
         }
 
-        return job
-            .filter(entity -> "failed".equals(entity.getStatus()))
-            .flatMap(JobUtils::getError);
+        return job.filter(entity -> "failed".equals(entity.getStatus()))
+                .flatMap(JobUtils::getError);
     }
 
     /**
@@ -94,17 +102,25 @@ public final class JobUtils {
      * @param jobId              the id of the job
      * @return {@code onComplete} once job has completed
      */
-    public static Mono<Void> waitForCompletion(CloudFoundryClient cloudFoundryClient, Duration completionTimeout, String jobId) {
+    public static Mono<Void> waitForCompletion(
+            CloudFoundryClient cloudFoundryClient, Duration completionTimeout, String jobId) {
         return requestJobV3(cloudFoundryClient, jobId)
-            .filter(job -> FINAL_STATES.contains(job.getState()))
-            .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), completionTimeout))
-            .filter(job -> JobState.FAILED == job.getState())
-            .flatMap(JobUtils::getError);
+                .filter(job -> FINAL_STATES.contains(job.getState()))
+                .repeatWhenEmpty(
+                        exponentialBackOff(
+                                Duration.ofSeconds(1), Duration.ofSeconds(15), completionTimeout))
+                .filter(job -> JobState.FAILED == job.getState())
+                .flatMap(JobUtils::getError);
     }
 
     private static Mono<Void> getError(JobEntity entity) {
         ErrorDetails errorDetails = entity.getErrorDetails();
-        return Mono.error(new ClientV2Exception(null, errorDetails.getCode(), errorDetails.getDescription(), errorDetails.getErrorCode()));
+        return Mono.error(
+                new ClientV2Exception(
+                        null,
+                        errorDetails.getCode(),
+                        errorDetails.getDescription(),
+                        errorDetails.getErrorCode()));
     }
 
     private static Mono<Void> getError(Job job) {
@@ -117,18 +133,15 @@ public final class JobUtils {
         return "finished".equals(status) || "failed".equals(status);
     }
 
-    private static Mono<GetJobResponse> requestJobV2(CloudFoundryClient cloudFoundryClient, String jobId) {
-        return cloudFoundryClient.jobs()
-            .get(GetJobRequest.builder()
-                .jobId(jobId)
-                .build());
+    private static Mono<GetJobResponse> requestJobV2(
+            CloudFoundryClient cloudFoundryClient, String jobId) {
+        return cloudFoundryClient.jobs().get(GetJobRequest.builder().jobId(jobId).build());
     }
 
-    private static Mono<org.cloudfoundry.client.v3.jobs.GetJobResponse> requestJobV3(CloudFoundryClient cloudFoundryClient, String jobId) {
-        return cloudFoundryClient.jobsV3()
-            .get(org.cloudfoundry.client.v3.jobs.GetJobRequest.builder()
-                .jobId(jobId)
-                .build());
+    private static Mono<org.cloudfoundry.client.v3.jobs.GetJobResponse> requestJobV3(
+            CloudFoundryClient cloudFoundryClient, String jobId) {
+        return cloudFoundryClient
+                .jobsV3()
+                .get(org.cloudfoundry.client.v3.jobs.GetJobRequest.builder().jobId(jobId).build());
     }
-
 }

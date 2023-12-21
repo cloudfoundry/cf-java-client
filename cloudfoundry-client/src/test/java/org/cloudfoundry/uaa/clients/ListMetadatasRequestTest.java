@@ -22,8 +22,6 @@ public final class ListMetadatasRequestTest {
 
     @Test
     public void valid() {
-        ListMetadatasRequest.builder()
-            .build();
+        ListMetadatasRequest.builder().build();
     }
-
 }

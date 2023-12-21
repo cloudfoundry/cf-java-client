@@ -29,8 +29,7 @@ public final class TimeUtils {
 
     private static final double HOUR = 60 * MINUTE;
 
-    private TimeUtils() {
-    }
+    private TimeUtils() {}
 
     /**
      * Renders a time period in human readable form
@@ -49,5 +48,4 @@ public final class TimeUtils {
             return String.format("%d ms", time);
         }
     }
-
 }

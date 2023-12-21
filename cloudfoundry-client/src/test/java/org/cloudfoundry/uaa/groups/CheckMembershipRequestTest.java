@@ -22,25 +22,19 @@ public final class CheckMembershipRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noGroupId() {
-        CheckMembershipRequest.builder()
-            .memberId("test-member-id")
-            .build();
+        CheckMembershipRequest.builder().memberId("test-member-id").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noMemberId() {
-        CheckMembershipRequest.builder()
-            .groupId("test-group-id")
-            .build();
+        CheckMembershipRequest.builder().groupId("test-group-id").build();
     }
 
     @Test
     public void valid() {
         CheckMembershipRequest.builder()
-            .groupId("test-group-id")
-            .memberId("test-member-id")
-            .build();
+                .groupId("test-group-id")
+                .memberId("test-member-id")
+                .build();
     }
-
-
 }

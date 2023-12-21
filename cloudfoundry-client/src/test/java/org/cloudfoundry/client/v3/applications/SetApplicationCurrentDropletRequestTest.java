@@ -24,28 +24,20 @@ public final class SetApplicationCurrentDropletRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noApplicationId() {
         SetApplicationCurrentDropletRequest.builder()
-            .data(Relationship.builder()
-                .id("test-droplet-id")
-                .build())
-
-            .build();
+                .data(Relationship.builder().id("test-droplet-id").build())
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noDropletId() {
-        SetApplicationCurrentDropletRequest.builder()
-            .applicationId("test-application-id")
-            .build();
+        SetApplicationCurrentDropletRequest.builder().applicationId("test-application-id").build();
     }
 
     @Test
     public void valid() {
         SetApplicationCurrentDropletRequest.builder()
-            .applicationId("test-application-id")
-            .data(Relationship.builder()
-                .id("test-droplet-id")
-                .build())
-            .build();
+                .applicationId("test-application-id")
+                .data(Relationship.builder().id("test-droplet-id").build())
+                .build();
     }
-
 }

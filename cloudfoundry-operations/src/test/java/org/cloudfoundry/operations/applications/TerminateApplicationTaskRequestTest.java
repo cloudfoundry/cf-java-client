@@ -22,24 +22,19 @@ public final class TerminateApplicationTaskRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noApplicationName() {
-        TerminateApplicationTaskRequest.builder()
-            .sequenceId(1)
-            .build();
+        TerminateApplicationTaskRequest.builder().sequenceId(1).build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noSequenceId() {
-        TerminateApplicationTaskRequest.builder()
-            .applicationName("test-application-name")
-            .build();
+        TerminateApplicationTaskRequest.builder().applicationName("test-application-name").build();
     }
 
     @Test
     public void valid() {
         TerminateApplicationTaskRequest.builder()
-            .applicationName("test-application-name")
-            .sequenceId(1)
-            .build();
+                .applicationName("test-application-name")
+                .sequenceId(1)
+                .build();
     }
-
 }

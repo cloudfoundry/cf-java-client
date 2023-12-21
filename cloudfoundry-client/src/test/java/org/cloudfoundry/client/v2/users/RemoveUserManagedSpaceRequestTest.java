@@ -22,24 +22,19 @@ public final class RemoveUserManagedSpaceRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noManagedSpaceId() {
-        RemoveUserManagedSpaceRequest.builder()
-            .userId("test-user-id")
-            .build();
+        RemoveUserManagedSpaceRequest.builder().userId("test-user-id").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noUserId() {
-        RemoveUserManagedSpaceRequest.builder()
-            .managedSpaceId("test-space-id")
-            .build();
+        RemoveUserManagedSpaceRequest.builder().managedSpaceId("test-space-id").build();
     }
 
     @Test
     public void valid() {
         RemoveUserManagedSpaceRequest.builder()
-            .managedSpaceId("test-space-id")
-            .userId("test-user-id")
-            .build();
+                .managedSpaceId("test-space-id")
+                .userId("test-user-id")
+                .build();
     }
-
 }

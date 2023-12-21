@@ -22,24 +22,19 @@ public final class CreateSpaceRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noName() {
-        CreateSpaceRequest.builder()
-            .organizationId("test-organization-id")
-            .build();
+        CreateSpaceRequest.builder().organizationId("test-organization-id").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noOrganizationId() {
-        CreateSpaceRequest.builder()
-            .name("test-name")
-            .build();
+        CreateSpaceRequest.builder().name("test-name").build();
     }
 
     @Test
     public void valid() {
         CreateSpaceRequest.builder()
-            .name("test-name")
-            .organizationId("test-organization-id")
-            .build();
+                .name("test-name")
+                .organizationId("test-organization-id")
+                .build();
     }
-
 }

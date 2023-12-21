@@ -45,7 +45,5 @@ public final class FluentMap {
             this.entries.put(key, value);
             return this;
         }
-
     }
-
 }

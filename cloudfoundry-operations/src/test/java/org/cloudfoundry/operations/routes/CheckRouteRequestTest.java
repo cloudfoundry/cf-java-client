@@ -22,15 +22,11 @@ public final class CheckRouteRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noDomain() {
-        CheckRouteRequest.builder()
-            .build();
+        CheckRouteRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        CheckRouteRequest.builder()
-            .domain("test-domain")
-            .build();
+        CheckRouteRequest.builder().domain("test-domain").build();
     }
-
 }

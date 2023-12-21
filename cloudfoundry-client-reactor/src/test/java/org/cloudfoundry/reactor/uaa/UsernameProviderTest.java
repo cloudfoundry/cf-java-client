@@ -16,18 +16,17 @@
 
 package org.cloudfoundry.reactor.uaa;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwsHeader;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.SigningKeyResolver;
 import io.jsonwebtoken.impl.DefaultJwsHeader;
-import org.cloudfoundry.reactor.ConnectionContext;
-import org.cloudfoundry.reactor.TokenProvider;
-import org.junit.Test;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
-
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -36,11 +35,11 @@ import java.sql.Date;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import org.cloudfoundry.reactor.ConnectionContext;
+import org.cloudfoundry.reactor.TokenProvider;
+import org.junit.Test;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 public final class UsernameProviderTest {
 
@@ -50,24 +49,34 @@ public final class UsernameProviderTest {
 
     private final TokenProvider tokenProvider = mock(TokenProvider.class);
 
-    private final UsernameProvider usernameProvider = new UsernameProvider(this.connectionContext, this.signingKeyResolver, this.tokenProvider);
+    private final UsernameProvider usernameProvider =
+            new UsernameProvider(
+                    this.connectionContext, this.signingKeyResolver, this.tokenProvider);
 
     @SuppressWarnings("unchecked")
     @Test
     public void getInvalidToken() throws NoSuchAlgorithmException {
         KeyPair keyPair = getKeyPair();
-        when(this.signingKeyResolver.resolveSigningKey(any(JwsHeader.class), any(Claims.class))).thenReturn(keyPair.getPublic());
+        when(this.signingKeyResolver.resolveSigningKey(any(JwsHeader.class), any(Claims.class)))
+                .thenReturn(keyPair.getPublic());
 
-        String invalidToken = String.format("bearer %s", getToken(keyPair.getPrivate(), Instant.now().minus(Duration.ofHours(1))));
-        String validToken = String.format("bearer %s", getToken(keyPair.getPrivate(), Instant.now().plus(Duration.ofHours(1))));
-        when(this.tokenProvider.getToken(this.connectionContext)).thenReturn(Mono.just(invalidToken), Mono.just(validToken));
+        String invalidToken =
+                String.format(
+                        "bearer %s",
+                        getToken(keyPair.getPrivate(), Instant.now().minus(Duration.ofHours(1))));
+        String validToken =
+                String.format(
+                        "bearer %s",
+                        getToken(keyPair.getPrivate(), Instant.now().plus(Duration.ofHours(1))));
+        when(this.tokenProvider.getToken(this.connectionContext))
+                .thenReturn(Mono.just(invalidToken), Mono.just(validToken));
 
         this.usernameProvider
-            .get()
-            .as(StepVerifier::create)
-            .expectNext("test-username")
-            .expectComplete()
-            .verify(Duration.ofSeconds(1));
+                .get()
+                .as(StepVerifier::create)
+                .expectNext("test-username")
+                .expectComplete()
+                .verify(Duration.ofSeconds(1));
 
         verify(this.tokenProvider).invalidate(this.connectionContext);
     }
@@ -75,27 +84,31 @@ public final class UsernameProviderTest {
     @Test
     public void getValidToken() throws NoSuchAlgorithmException {
         KeyPair keyPair = getKeyPair();
-        when(this.signingKeyResolver.resolveSigningKey(any(JwsHeader.class), any(Claims.class))).thenReturn(keyPair.getPublic());
+        when(this.signingKeyResolver.resolveSigningKey(any(JwsHeader.class), any(Claims.class)))
+                .thenReturn(keyPair.getPublic());
 
-        String token = String.format("bearer %s", getToken(keyPair.getPrivate(), Instant.now().plus(Duration.ofHours(1))));
+        String token =
+                String.format(
+                        "bearer %s",
+                        getToken(keyPair.getPrivate(), Instant.now().plus(Duration.ofHours(1))));
         when(this.tokenProvider.getToken(this.connectionContext)).thenReturn(Mono.just(token));
 
         this.usernameProvider
-            .get()
-            .as(StepVerifier::create)
-            .expectNext("test-username")
-            .expectComplete()
-            .verify(Duration.ofSeconds(1));
+                .get()
+                .as(StepVerifier::create)
+                .expectNext("test-username")
+                .expectComplete()
+                .verify(Duration.ofSeconds(1));
     }
 
     @SuppressWarnings("unchecked")
     private static String getToken(PrivateKey privateKey, Instant expiration) {
         return Jwts.builder()
-            .setHeader((Map<String, Object>) new DefaultJwsHeader().setKeyId("test-key"))
-            .signWith(privateKey, SignatureAlgorithm.RS256)
-            .claim("user_name", "test-username")
-            .setExpiration(Date.from(expiration))
-            .compact();
+                .setHeader((Map<String, Object>) new DefaultJwsHeader().setKeyId("test-key"))
+                .signWith(privateKey, SignatureAlgorithm.RS256)
+                .claim("user_name", "test-username")
+                .setExpiration(Date.from(expiration))
+                .compact();
     }
 
     private KeyPair getKeyPair() throws NoSuchAlgorithmException {
@@ -103,5 +116,4 @@ public final class UsernameProviderTest {
         keyPairGenerator.initialize(2048);
         return keyPairGenerator.generateKeyPair();
     }
-
 }

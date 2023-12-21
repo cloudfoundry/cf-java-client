@@ -48,7 +48,8 @@ public enum OrganizationStatus {
             case "suspended":
                 return SUSPENDED;
             default:
-                throw new IllegalArgumentException(String.format("Unknown organization status: %s", s));
+                throw new IllegalArgumentException(
+                        String.format("Unknown organization status: %s", s));
         }
     }
 
@@ -61,5 +62,4 @@ public enum OrganizationStatus {
     public String toString() {
         return getValue();
     }
-
 }

@@ -17,11 +17,10 @@
 package org.cloudfoundry.uaa.clients;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.uaa.tokens.GrantType;
 import org.immutables.value.Value;
-
-import java.util.List;
 
 /**
  * Client in Create request
@@ -31,7 +30,9 @@ abstract class AbstractCreateClient {
     @Value.Check
     void checkAuthorizedGrantTypes() {
         if (this.getAuthorizedGrantTypes() == null) {
-            throw new IllegalStateException("Cannot build CreateClientRequest, required attribute authorizedGrantTypes is not set");
+            throw new IllegalStateException(
+                    "Cannot build CreateClientRequest, required attribute authorizedGrantTypes is"
+                            + " not set");
         }
     }
 
@@ -138,5 +139,4 @@ abstract class AbstractCreateClient {
     @JsonProperty("token_salt")
     @Nullable
     abstract String getTokenSalt();
-
 }

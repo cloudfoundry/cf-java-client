@@ -22,24 +22,19 @@ public class UpdateRouterGroupRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noId() {
-        UpdateRouterGroupRequest.builder()
-            .reservablePorts("999-9999")
-            .build();
+        UpdateRouterGroupRequest.builder().reservablePorts("999-9999").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noReservablePorts() {
-        UpdateRouterGroupRequest.builder()
-            .routerGroupId("test-router-group-id")
-            .build();
+        UpdateRouterGroupRequest.builder().routerGroupId("test-router-group-id").build();
     }
 
     @Test
     public void valid() {
         UpdateRouterGroupRequest.builder()
-            .reservablePorts("999-9999")
-            .routerGroupId("test-router-group-id")
-            .build();
+                .reservablePorts("999-9999")
+                .routerGroupId("test-router-group-id")
+                .build();
     }
-
 }

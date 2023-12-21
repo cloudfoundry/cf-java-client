@@ -16,10 +16,9 @@
 
 package org.cloudfoundry.uaa.authorizations;
 
+import java.util.List;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.QueryParameter;
-
-import java.util.List;
 
 /**
  * The request payload for OpenID requests
@@ -45,5 +44,4 @@ abstract class AbstractAuthorizationRequest {
     @Nullable
     @QueryParameter(value = "scope", delimiter = " ")
     abstract List<String> getScopes();
-
 }

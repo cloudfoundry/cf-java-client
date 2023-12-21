@@ -22,24 +22,19 @@ public class RenameBuildpackRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noName() {
-        RenameBuildpackRequest.builder()
-            .newName("test-buildpack-new-name")
-            .build();
+        RenameBuildpackRequest.builder().newName("test-buildpack-new-name").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noNewName() {
-        RenameBuildpackRequest.builder()
-            .name("test-buildpack-name")
-            .build();
+        RenameBuildpackRequest.builder().name("test-buildpack-name").build();
     }
 
     @Test
     public void valid() {
         RenameBuildpackRequest.builder()
-            .name("test-buildpack-name")
-            .newName("test-buildpack-new-name")
-            .build();
+                .name("test-buildpack-name")
+                .newName("test-buildpack-new-name")
+                .build();
     }
-
 }

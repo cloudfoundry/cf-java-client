@@ -16,10 +16,9 @@
 
 package org.cloudfoundry.operations.services;
 
+import java.util.List;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v2.MaintenanceInfo;
-
-import java.util.List;
 
 /**
  * A service instance summary base class
@@ -75,5 +74,4 @@ public abstract class AbstractServiceInstanceSummary {
      * The type of the service instance
      */
     abstract ServiceInstanceType getType();
-
 }

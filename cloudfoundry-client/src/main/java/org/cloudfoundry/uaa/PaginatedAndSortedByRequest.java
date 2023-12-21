@@ -30,5 +30,4 @@ public abstract class PaginatedAndSortedByRequest extends PaginatedAndSortedRequ
     @Nullable
     @QueryParameter("sortBy")
     public abstract String getSortBy();
-
 }

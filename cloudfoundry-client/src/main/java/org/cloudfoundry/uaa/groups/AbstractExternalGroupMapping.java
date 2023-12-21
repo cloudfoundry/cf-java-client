@@ -17,9 +17,8 @@
 package org.cloudfoundry.uaa.groups;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.cloudfoundry.uaa.Metadata;
-
 import java.util.List;
+import org.cloudfoundry.uaa.Metadata;
 
 /**
  * The entity response payload for External Group
@@ -37,5 +36,4 @@ abstract class AbstractExternalGroupMapping extends AbstractExternalGroupResourc
      */
     @JsonProperty("schemas")
     abstract List<String> getSchemas();
-
 }

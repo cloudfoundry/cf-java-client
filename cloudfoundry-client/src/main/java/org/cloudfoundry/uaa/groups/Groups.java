@@ -77,7 +77,8 @@ public interface Groups {
      * @param request the List External Group Mappings request
      * @return the response from the List External Group Mappings request
      */
-    Mono<ListExternalGroupMappingsResponse> listExternalGroupMappings(ListExternalGroupMappingsRequest request);
+    Mono<ListExternalGroupMappingsResponse> listExternalGroupMappings(
+            ListExternalGroupMappingsRequest request);
 
     /**
      * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#list-members">List Members</a> request
@@ -109,7 +110,8 @@ public interface Groups {
      * @param request the Unmap External Group By Group Display Name request
      * @return the response from the Unmap External Group By Group Display Name request
      */
-    Mono<UnmapExternalGroupByGroupDisplayNameResponse> unmapExternalGroupByGroupDisplayName(UnmapExternalGroupByGroupDisplayNameRequest request);
+    Mono<UnmapExternalGroupByGroupDisplayNameResponse> unmapExternalGroupByGroupDisplayName(
+            UnmapExternalGroupByGroupDisplayNameRequest request);
 
     /**
      * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#by-group-id">Unmap External Group By Group Id</a> request
@@ -117,7 +119,8 @@ public interface Groups {
      * @param request the Unmap External Group By Group Id request
      * @return the response from the Unmap External Group By Group Id request
      */
-    Mono<UnmapExternalGroupByGroupIdResponse> unmapExternalGroupByGroupId(UnmapExternalGroupByGroupIdRequest request);
+    Mono<UnmapExternalGroupByGroupIdResponse> unmapExternalGroupByGroupId(
+            UnmapExternalGroupByGroupIdRequest request);
 
     /**
      * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#update79">Update Group</a> request
@@ -126,5 +129,4 @@ public interface Groups {
      * @return the response from the Update Group request
      */
     Mono<UpdateGroupResponse> update(UpdateGroupRequest request);
-
 }

@@ -22,15 +22,11 @@ public final class GetJobRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noJobId() {
-        GetJobRequest.builder()
-            .build();
+        GetJobRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        GetJobRequest.builder()
-            .jobId("test-job-id")
-            .build();
+        GetJobRequest.builder().jobId("test-job-id").build();
     }
-
 }

@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum RefreshTokenFormat {
-
     JWT("jwt"),
 
     OPAQUE("opaque");
@@ -39,7 +38,8 @@ public enum RefreshTokenFormat {
             case "opaque":
                 return OPAQUE;
             default:
-                throw new IllegalArgumentException(String.format("Unknown refresh token format: %s", s));
+                throw new IllegalArgumentException(
+                        String.format("Unknown refresh token format: %s", s));
         }
     }
 

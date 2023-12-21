@@ -22,15 +22,11 @@ public final class DeleteApplicationRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noApplicationId() {
-        DeleteApplicationRequest.builder()
-            .build();
+        DeleteApplicationRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        DeleteApplicationRequest.builder()
-            .applicationId("test-application-id")
-            .build();
+        DeleteApplicationRequest.builder().applicationId("test-application-id").build();
     }
-
 }

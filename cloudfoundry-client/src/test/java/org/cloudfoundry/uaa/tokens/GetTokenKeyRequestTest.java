@@ -22,8 +22,6 @@ public final class GetTokenKeyRequestTest {
 
     @Test
     public void valid() {
-        GetTokenKeyRequest.builder()
-            .build();
+        GetTokenKeyRequest.builder().build();
     }
-
 }

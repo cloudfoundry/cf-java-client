@@ -22,8 +22,6 @@ public final class ListSecurityGroupsRequestTest {
 
     @Test
     public void valid() {
-        ListSecurityGroupsRequest.builder()
-            .build();
+        ListSecurityGroupsRequest.builder().build();
     }
-
 }

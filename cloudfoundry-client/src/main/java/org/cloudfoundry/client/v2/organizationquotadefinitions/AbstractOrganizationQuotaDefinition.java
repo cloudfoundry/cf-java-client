@@ -21,6 +21,7 @@ import org.cloudfoundry.client.v2.Resource;
 /**
  * Organization Quota in responses
  */
-public abstract class AbstractOrganizationQuotaDefinition extends Resource<org.cloudfoundry.client.v2.organizationquotadefinitions.OrganizationQuotaDefinitionEntity> {
-
-}
+public abstract class AbstractOrganizationQuotaDefinition
+        extends Resource<
+                org.cloudfoundry.client.v2.organizationquotadefinitions
+                        .OrganizationQuotaDefinitionEntity> {}

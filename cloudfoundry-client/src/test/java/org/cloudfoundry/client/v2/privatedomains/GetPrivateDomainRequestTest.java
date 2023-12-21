@@ -22,15 +22,11 @@ public final class GetPrivateDomainRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noPrivateDomainId() {
-        GetPrivateDomainRequest.builder()
-            .build();
+        GetPrivateDomainRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        GetPrivateDomainRequest.builder()
-            .privateDomainId("test-private-domain-id")
-            .build();
+        GetPrivateDomainRequest.builder().privateDomainId("test-private-domain-id").build();
     }
-
 }

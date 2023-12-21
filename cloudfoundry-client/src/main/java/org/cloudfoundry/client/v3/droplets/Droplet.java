@@ -17,14 +17,13 @@
 package org.cloudfoundry.client.v3.droplets;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
+import java.util.Map;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.Checksum;
 import org.cloudfoundry.client.v3.Lifecycle;
 import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.Resource;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * Base class for responses that are droplets
@@ -104,5 +103,4 @@ public abstract class Droplet extends Resource {
      */
     @JsonProperty("state")
     public abstract DropletState getState();
-
 }

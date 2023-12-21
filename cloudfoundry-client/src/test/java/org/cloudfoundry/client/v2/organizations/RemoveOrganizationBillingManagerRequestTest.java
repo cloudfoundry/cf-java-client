@@ -23,23 +23,22 @@ public final class RemoveOrganizationBillingManagerRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noBillingManagerId() {
         RemoveOrganizationBillingManagerRequest.builder()
-            .organizationId("test-organization-id")
-            .build();
+                .organizationId("test-organization-id")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noOrganizationId() {
         RemoveOrganizationBillingManagerRequest.builder()
-            .billingManagerId("test-billing-manager-id")
-            .build();
+                .billingManagerId("test-billing-manager-id")
+                .build();
     }
 
     @Test
     public void valid() {
         RemoveOrganizationBillingManagerRequest.builder()
-            .billingManagerId("test-billing-manager-id")
-            .organizationId("test-organization-id")
-            .build();
+                .billingManagerId("test-billing-manager-id")
+                .organizationId("test-organization-id")
+                .build();
     }
-
 }

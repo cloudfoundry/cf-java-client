@@ -22,8 +22,6 @@ public final class ListFeatureFlagsRequestTest {
 
     @Test
     public void valid() {
-        ListFeatureFlagsRequest.builder()
-            .build();
+        ListFeatureFlagsRequest.builder().build();
     }
-
 }

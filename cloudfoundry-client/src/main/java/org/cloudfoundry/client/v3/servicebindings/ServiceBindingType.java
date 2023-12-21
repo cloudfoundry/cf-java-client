@@ -48,5 +48,4 @@ public enum ServiceBindingType {
     public String toString() {
         return getValue();
     }
-
 }

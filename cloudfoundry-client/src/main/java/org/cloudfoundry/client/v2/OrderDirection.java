@@ -48,5 +48,4 @@ public enum OrderDirection {
     public String toString() {
         return getValue();
     }
-
 }

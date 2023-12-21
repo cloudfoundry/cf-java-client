@@ -16,7 +16,8 @@
 
 package org.cloudfoundry.reactor.client.v3.serviceinstances;
 
-
+import java.util.Map;
+import java.util.Optional;
 import org.cloudfoundry.client.v3.serviceinstances.CreateServiceInstanceRequest;
 import org.cloudfoundry.client.v3.serviceinstances.CreateServiceInstanceResponse;
 import org.cloudfoundry.client.v3.serviceinstances.DeleteServiceInstanceRequest;
@@ -43,13 +44,11 @@ import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
 import reactor.core.publisher.Mono;
 
-import java.util.Map;
-import java.util.Optional;
-
 /**
  * The Reactor-based implementation of {@link ServiceInstancesV3}
  */
-public final class ReactorServiceInstancesV3 extends AbstractClientV3Operations implements ServiceInstancesV3 {
+public final class ReactorServiceInstancesV3 extends AbstractClientV3Operations
+        implements ServiceInstancesV3 {
 
     /**
      * Creates an instance
@@ -59,18 +58,27 @@ public final class ReactorServiceInstancesV3 extends AbstractClientV3Operations 
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorServiceInstancesV3(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
+    public ReactorServiceInstancesV3(
+            ConnectionContext connectionContext,
+            Mono<String> root,
+            TokenProvider tokenProvider,
+            Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<CreateServiceInstanceResponse> create(CreateServiceInstanceRequest request) {
-        return postWithResponse(request, ServiceInstanceResource.class, builder -> builder.pathSegment("service_instances"))
-            .map(responseTuple -> CreateServiceInstanceResponse.builder()
-                .jobId(getJobId(responseTuple))
-                .serviceInstance(responseTuple.getBody())
-                .build())
-            .checkpoint();
+        return postWithResponse(
+                        request,
+                        ServiceInstanceResource.class,
+                        builder -> builder.pathSegment("service_instances"))
+                .map(
+                        responseTuple ->
+                                CreateServiceInstanceResponse.builder()
+                                        .jobId(getJobId(responseTuple))
+                                        .serviceInstance(responseTuple.getBody())
+                                        .build())
+                .checkpoint();
     }
 
     private <T> Optional<String> getJobId(HttpClientResponseWithParsedBody<T> responseTuple) {
@@ -79,60 +87,122 @@ public final class ReactorServiceInstancesV3 extends AbstractClientV3Operations 
 
     @Override
     public Mono<GetServiceInstanceResponse> get(GetServiceInstanceRequest request) {
-        return get(request, GetServiceInstanceResponse.class, builder -> builder.pathSegment("service_instances", request.getServiceInstanceId()))
-            .checkpoint();
+        return get(
+                        request,
+                        GetServiceInstanceResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "service_instances", request.getServiceInstanceId()))
+                .checkpoint();
     }
 
     @Override
     public Mono<Optional<String>> delete(DeleteServiceInstanceRequest request) {
-        return deleteWithResponse(request, String.class, builder -> builder.pathSegment("service_instances", request.getServiceInstanceId()))
-            .map(this::getJobId)
-            .checkpoint();
+        return deleteWithResponse(
+                        request,
+                        String.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "service_instances", request.getServiceInstanceId()))
+                .map(this::getJobId)
+                .checkpoint();
     }
 
     @Override
-    public Mono<GetManagedServiceParametersResponse> getManagedServiceParameters(GetManagedServiceParametersRequest request) {
-        return get(request, GetManagedServiceParametersResponse.class, builder -> builder.pathSegment("service_instances", request.getServiceInstanceId(), "parameters"))
-            .checkpoint();
+    public Mono<GetManagedServiceParametersResponse> getManagedServiceParameters(
+            GetManagedServiceParametersRequest request) {
+        return get(
+                        request,
+                        GetManagedServiceParametersResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "service_instances",
+                                        request.getServiceInstanceId(),
+                                        "parameters"))
+                .checkpoint();
     }
 
     @Override
-    public Mono<GetUserProvidedCredentialsResponse> getUserProvidedCredentials(GetUserProvidedCredentialsRequest request) {
-        return get(request, GetUserProvidedCredentialsResponse.class, builder -> builder.pathSegment("service_instances", request.getServiceInstanceId(), "credentials"))
-            .checkpoint();
+    public Mono<GetUserProvidedCredentialsResponse> getUserProvidedCredentials(
+            GetUserProvidedCredentialsRequest request) {
+        return get(
+                        request,
+                        GetUserProvidedCredentialsResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "service_instances",
+                                        request.getServiceInstanceId(),
+                                        "credentials"))
+                .checkpoint();
     }
 
     @Override
     public Mono<ListServiceInstancesResponse> list(ListServiceInstancesRequest request) {
-        return get(request, ListServiceInstancesResponse.class, builder -> builder.pathSegment("service_instances"))
-            .checkpoint();
+        return get(
+                        request,
+                        ListServiceInstancesResponse.class,
+                        builder -> builder.pathSegment("service_instances"))
+                .checkpoint();
     }
 
     @Override
-    public Mono<ListSharedSpacesRelationshipResponse> listSharedSpacesRelationship(ListSharedSpacesRelationshipRequest request) {
-        return get(request, ListSharedSpacesRelationshipResponse.class, builder -> builder.pathSegment("service_instances", request.getServiceInstanceId(), "relationships", "shared_spaces"))
-            .checkpoint();
+    public Mono<ListSharedSpacesRelationshipResponse> listSharedSpacesRelationship(
+            ListSharedSpacesRelationshipRequest request) {
+        return get(
+                        request,
+                        ListSharedSpacesRelationshipResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "service_instances",
+                                        request.getServiceInstanceId(),
+                                        "relationships",
+                                        "shared_spaces"))
+                .checkpoint();
     }
 
     @Override
     public Mono<ShareServiceInstanceResponse> share(ShareServiceInstanceRequest request) {
-        return post(request, ShareServiceInstanceResponse.class, builder -> builder.pathSegment("service_instances", request.getServiceInstanceId(), "relationships", "shared_spaces"))
-            .checkpoint();
+        return post(
+                        request,
+                        ShareServiceInstanceResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "service_instances",
+                                        request.getServiceInstanceId(),
+                                        "relationships",
+                                        "shared_spaces"))
+                .checkpoint();
     }
 
     @Override
     public Mono<Void> unshare(UnshareServiceInstanceRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("service_instances", request.getServiceInstanceId(), "relationships", "shared_spaces", request.getSpaceId()))
-            .checkpoint();
+        return delete(
+                        request,
+                        Void.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "service_instances",
+                                        request.getServiceInstanceId(),
+                                        "relationships",
+                                        "shared_spaces",
+                                        request.getSpaceId()))
+                .checkpoint();
     }
 
     @Override
     public Mono<UpdateServiceInstanceResponse> update(UpdateServiceInstanceRequest request) {
-        return patchWithResponse(request, ServiceInstanceResource.class, builder -> builder.pathSegment("service_instances", request.getServiceInstanceId()))
-            .map(responseTuple -> UpdateServiceInstanceResponse.builder()
-                .jobId(getJobId(responseTuple))
-                .serviceInstance(responseTuple.getBody())
-                .build())
-            .checkpoint();
+        return patchWithResponse(
+                        request,
+                        ServiceInstanceResource.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "service_instances", request.getServiceInstanceId()))
+                .map(
+                        responseTuple ->
+                                UpdateServiceInstanceResponse.builder()
+                                        .jobId(getJobId(responseTuple))
+                                        .serviceInstance(responseTuple.getBody())
+                                        .build())
+                .checkpoint();
     }
 }

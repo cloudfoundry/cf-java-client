@@ -16,6 +16,11 @@
 
 package org.cloudfoundry.reactor.client.v2;
 
+import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Stream;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.QueryBuilder;
@@ -34,15 +39,13 @@ import reactor.netty.ByteBufFlux;
 import reactor.netty.http.client.HttpClientForm;
 import reactor.netty.http.client.HttpClientRequest;
 
-import java.util.Map;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.stream.Stream;
-
 public abstract class AbstractClientV2Operations extends AbstractReactorOperations {
 
-    protected AbstractClientV2Operations(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
+    protected AbstractClientV2Operations(
+            ConnectionContext connectionContext,
+            Mono<String> root,
+            TokenProvider tokenProvider,
+            Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
@@ -51,86 +54,139 @@ public abstract class AbstractClientV2Operations extends AbstractReactorOperatio
         return super.createOperator().map(this::attachErrorPayloadMapper);
     }
 
-    protected final <T> Mono<T> delete(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+    protected final <T> Mono<T> delete(
+            Object requestPayload,
+            Class<T> responseType,
+            Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return createOperator()
-            .flatMap(operator -> operator.delete()
-                .uri(queryTransformer(requestPayload).andThen(uriTransformer))
-                .send(requestPayload)
-                .response()
-                .parseBody(responseType));
+                .flatMap(
+                        operator ->
+                                operator.delete()
+                                        .uri(
+                                                queryTransformer(requestPayload)
+                                                        .andThen(uriTransformer))
+                                        .send(requestPayload)
+                                        .response()
+                                        .parseBody(responseType));
     }
 
-    protected final <T> Flux<T> get(Object requestPayload, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer, Function<ByteBufFlux, Flux<T>> bodyTransformer) {
+    protected final <T> Flux<T> get(
+            Object requestPayload,
+            Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
+            Function<ByteBufFlux, Flux<T>> bodyTransformer) {
         return createOperator()
-            .flatMapMany(operator -> operator.followRedirects()
-                .get()
-                .uri(queryTransformer(requestPayload).andThen(uriTransformer))
-                .response()
-                .parseBodyToFlux(responseWithBody -> bodyTransformer.apply(responseWithBody.getBody())));
+                .flatMapMany(
+                        operator ->
+                                operator.followRedirects()
+                                        .get()
+                                        .uri(
+                                                queryTransformer(requestPayload)
+                                                        .andThen(uriTransformer))
+                                        .response()
+                                        .parseBodyToFlux(
+                                                responseWithBody ->
+                                                        bodyTransformer.apply(
+                                                                responseWithBody.getBody())));
     }
 
-    protected final <T> Mono<T> get(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+    protected final <T> Mono<T> get(
+            Object requestPayload,
+            Class<T> responseType,
+            Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return createOperator()
-            .flatMap(operator -> operator.get()
-                .uri(queryTransformer(requestPayload).andThen(uriTransformer))
-                .response()
-                .parseBody(responseType));
+                .flatMap(
+                        operator ->
+                                operator.get()
+                                        .uri(
+                                                queryTransformer(requestPayload)
+                                                        .andThen(uriTransformer))
+                                        .response()
+                                        .parseBody(responseType));
     }
 
-    protected final <T> Mono<T> post(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+    protected final <T> Mono<T> post(
+            Object requestPayload,
+            Class<T> responseType,
+            Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return createOperator()
-            .flatMap(operator -> operator.post()
-                .uri(queryTransformer(requestPayload).andThen(uriTransformer))
-                .send(requestPayload)
-                .response()
-                .parseBody(responseType));
+                .flatMap(
+                        operator ->
+                                operator.post()
+                                        .uri(
+                                                queryTransformer(requestPayload)
+                                                        .andThen(uriTransformer))
+                                        .send(requestPayload)
+                                        .response()
+                                        .parseBody(responseType));
     }
 
-    protected final <T> Mono<T> put(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
-                                    Consumer<MultipartHttpClientRequest> requestTransformer, Runnable onTerminate) {
+    protected final <T> Mono<T> put(
+            Object requestPayload,
+            Class<T> responseType,
+            Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
+            Consumer<MultipartHttpClientRequest> requestTransformer,
+            Runnable onTerminate) {
         return createOperator()
-            .flatMap(operator -> operator.put()
-                .uri(queryTransformer(requestPayload).andThen(uriTransformer))
-                .sendForm(multipartRequest(requestTransformer))
-                .response()
-                .parseBody(responseType))
-            .doFinally(signalType -> onTerminate.run());
+                .flatMap(
+                        operator ->
+                                operator.put()
+                                        .uri(
+                                                queryTransformer(requestPayload)
+                                                        .andThen(uriTransformer))
+                                        .sendForm(multipartRequest(requestTransformer))
+                                        .response()
+                                        .parseBody(responseType))
+                .doFinally(signalType -> onTerminate.run());
     }
 
-    protected final <T> Mono<T> put(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+    protected final <T> Mono<T> put(
+            Object requestPayload,
+            Class<T> responseType,
+            Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return createOperator()
-            .flatMap(operator -> operator.put()
-                .uri(queryTransformer(requestPayload).andThen(uriTransformer))
-                .send(requestPayload)
-                .response()
-                .parseBody(responseType));
+                .flatMap(
+                        operator ->
+                                operator.put()
+                                        .uri(
+                                                queryTransformer(requestPayload)
+                                                        .andThen(uriTransformer))
+                                        .send(requestPayload)
+                                        .response()
+                                        .parseBody(responseType));
     }
 
     private Operator attachErrorPayloadMapper(Operator operator) {
-        return operator.withErrorPayloadMapper(ErrorPayloadMappers.clientV2(this.connectionContext.getObjectMapper()));
+        return operator.withErrorPayloadMapper(
+                ErrorPayloadMappers.clientV2(this.connectionContext.getObjectMapper()));
     }
 
-    private MultipartHttpClientRequest createMultipartRequest(HttpClientRequest request, HttpClientForm form) {
-        return new MultipartHttpClientRequest(this.connectionContext.getObjectMapper(), request, form);
+    private MultipartHttpClientRequest createMultipartRequest(
+            HttpClientRequest request, HttpClientForm form) {
+        return new MultipartHttpClientRequest(
+                this.connectionContext.getObjectMapper(), request, form);
     }
 
     private UriQueryParameterBuilder getUriQueryParameterBuilder() {
-        return DelegatingUriQueryParameterBuilder.builder().builders(new FilterBuilder(), new QueryBuilder()).build();
+        return DelegatingUriQueryParameterBuilder.builder()
+                .builders(new FilterBuilder(), new QueryBuilder())
+                .build();
     }
 
-    private BiConsumer<HttpClientRequest, HttpClientForm> multipartRequest(Consumer<MultipartHttpClientRequest> requestTransformer) {
+    private BiConsumer<HttpClientRequest, HttpClientForm> multipartRequest(
+            Consumer<MultipartHttpClientRequest> requestTransformer) {
         return (request, form) -> {
             MultipartHttpClientRequest multipartRequest = createMultipartRequest(request, form);
             requestTransformer.accept(multipartRequest);
         };
     }
 
-    private Function<UriComponentsBuilder, UriComponentsBuilder> queryTransformer(Object requestPayload) {
+    private Function<UriComponentsBuilder, UriComponentsBuilder> queryTransformer(
+            Object requestPayload) {
         return builder -> {
-            Stream<UriQueryParameter> parameters = getUriQueryParameterBuilder().build(requestPayload);
+            Stream<UriQueryParameter> parameters =
+                    getUriQueryParameterBuilder().build(requestPayload);
             UriQueryParameters.set(builder, parameters);
             return builder;
         };
     }
-
 }

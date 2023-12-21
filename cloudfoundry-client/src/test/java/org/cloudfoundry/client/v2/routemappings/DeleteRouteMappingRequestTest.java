@@ -22,15 +22,11 @@ public final class DeleteRouteMappingRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noRouteMappingId() {
-        DeleteRouteMappingRequest.builder()
-            .build();
+        DeleteRouteMappingRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        DeleteRouteMappingRequest.builder()
-            .routeMappingId("route-mapping-id")
-            .build();
+        DeleteRouteMappingRequest.builder().routeMappingId("route-mapping-id").build();
     }
-
 }

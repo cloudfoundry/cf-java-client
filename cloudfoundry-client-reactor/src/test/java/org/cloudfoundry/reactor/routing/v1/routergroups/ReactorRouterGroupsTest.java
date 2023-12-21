@@ -16,6 +16,12 @@
 
 package org.cloudfoundry.reactor.routing.v1.routergroups;
 
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.PUT;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+
+import java.time.Duration;
+import java.util.Collections;
 import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
@@ -28,72 +34,77 @@ import org.cloudfoundry.routing.v1.routergroups.UpdateRouterGroupResponse;
 import org.junit.Test;
 import reactor.test.StepVerifier;
 
-import java.time.Duration;
-import java.util.Collections;
-
-import static io.netty.handler.codec.http.HttpMethod.GET;
-import static io.netty.handler.codec.http.HttpMethod.PUT;
-import static io.netty.handler.codec.http.HttpResponseStatus.OK;
-
 public final class ReactorRouterGroupsTest extends AbstractRoutingApiTest {
 
-    private final ReactorRouterGroups routerGroups = new ReactorRouterGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
+    private final ReactorRouterGroups routerGroups =
+            new ReactorRouterGroups(
+                    CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void list() {
-        mockRequest(InteractionContext.builder()
-            .request(TestRequest.builder()
-                .method(GET).path("/v1/router_groups")
-                .build())
-            .response(TestResponse.builder()
-                .status(OK)
-                .payload("fixtures/routing/v1/routergroups/GET_response.json")
-                .build())
-            .build());
+        mockRequest(
+                InteractionContext.builder()
+                        .request(
+                                TestRequest.builder().method(GET).path("/v1/router_groups").build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(OK)
+                                        .payload(
+                                                "fixtures/routing/v1/routergroups/GET_response.json")
+                                        .build())
+                        .build());
 
         this.routerGroups
-            .list(ListRouterGroupsRequest.builder()
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(ListRouterGroupsResponse.builder()
-                .routerGroup(RouterGroup.builder()
-                    .name("default-tcp")
-                    .reservablePorts("1024-65535")
-                    .routerGroupId("abc123")
-                    .type("tcp")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .list(ListRouterGroupsRequest.builder().build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        ListRouterGroupsResponse.builder()
+                                .routerGroup(
+                                        RouterGroup.builder()
+                                                .name("default-tcp")
+                                                .reservablePorts("1024-65535")
+                                                .routerGroupId("abc123")
+                                                .type("tcp")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
     public void update() {
-        mockRequest(InteractionContext.builder()
-            .request(TestRequest.builder()
-                .method(PUT).path("/v1/router_groups/abc123")
-                .payload("fixtures/routing/v1/routergroups/PUT_{id}_request.json")
-                .build())
-            .response(TestResponse.builder()
-                .status(OK)
-                .payload("fixtures/routing/v1/routergroups/PUT_{id}_response.json")
-                .build())
-            .build());
+        mockRequest(
+                InteractionContext.builder()
+                        .request(
+                                TestRequest.builder()
+                                        .method(PUT)
+                                        .path("/v1/router_groups/abc123")
+                                        .payload(
+                                                "fixtures/routing/v1/routergroups/PUT_{id}_request.json")
+                                        .build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(OK)
+                                        .payload(
+                                                "fixtures/routing/v1/routergroups/PUT_{id}_response.json")
+                                        .build())
+                        .build());
 
         this.routerGroups
-            .update(UpdateRouterGroupRequest.builder()
-                .reservablePorts("1024-65535")
-                .routerGroupId("abc123")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(UpdateRouterGroupResponse.builder()
-                .name("default-tcp")
-                .reservablePorts("1024-65535")
-                .routerGroupId("abc123")
-                .type("tcp")
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .update(
+                        UpdateRouterGroupRequest.builder()
+                                .reservablePorts("1024-65535")
+                                .routerGroupId("abc123")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        UpdateRouterGroupResponse.builder()
+                                .name("default-tcp")
+                                .reservablePorts("1024-65535")
+                                .routerGroupId("abc123")
+                                .type("tcp")
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
-
 }

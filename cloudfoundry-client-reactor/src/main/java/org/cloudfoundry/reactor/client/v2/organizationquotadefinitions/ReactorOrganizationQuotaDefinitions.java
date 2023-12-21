@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v2.organizationquotadefinitions;
 
+import java.util.Map;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.CreateOrganizationQuotaDefinitionRequest;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.CreateOrganizationQuotaDefinitionResponse;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.DeleteOrganizationQuotaDefinitionRequest;
@@ -32,12 +33,11 @@ import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v2.AbstractClientV2Operations;
 import reactor.core.publisher.Mono;
 
-import java.util.Map;
-
 /**
  * The Reactor-based implementation of {@link OrganizationQuotaDefinitions}
  */
-public final class ReactorOrganizationQuotaDefinitions extends AbstractClientV2Operations implements OrganizationQuotaDefinitions {
+public final class ReactorOrganizationQuotaDefinitions extends AbstractClientV2Operations
+        implements OrganizationQuotaDefinitions {
 
     /**
      * Creates an instance
@@ -47,38 +47,70 @@ public final class ReactorOrganizationQuotaDefinitions extends AbstractClientV2O
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorOrganizationQuotaDefinitions(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
+    public ReactorOrganizationQuotaDefinitions(
+            ConnectionContext connectionContext,
+            Mono<String> root,
+            TokenProvider tokenProvider,
+            Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
-    public Mono<CreateOrganizationQuotaDefinitionResponse> create(CreateOrganizationQuotaDefinitionRequest request) {
-        return post(request, CreateOrganizationQuotaDefinitionResponse.class, builder -> builder.pathSegment("quota_definitions"))
-            .checkpoint();
+    public Mono<CreateOrganizationQuotaDefinitionResponse> create(
+            CreateOrganizationQuotaDefinitionRequest request) {
+        return post(
+                        request,
+                        CreateOrganizationQuotaDefinitionResponse.class,
+                        builder -> builder.pathSegment("quota_definitions"))
+                .checkpoint();
     }
 
     @Override
-    public Mono<DeleteOrganizationQuotaDefinitionResponse> delete(DeleteOrganizationQuotaDefinitionRequest request) {
-        return delete(request, DeleteOrganizationQuotaDefinitionResponse.class, builder -> builder.pathSegment("quota_definitions", request.getOrganizationQuotaDefinitionId()))
-            .checkpoint();
+    public Mono<DeleteOrganizationQuotaDefinitionResponse> delete(
+            DeleteOrganizationQuotaDefinitionRequest request) {
+        return delete(
+                        request,
+                        DeleteOrganizationQuotaDefinitionResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "quota_definitions",
+                                        request.getOrganizationQuotaDefinitionId()))
+                .checkpoint();
     }
 
     @Override
-    public Mono<GetOrganizationQuotaDefinitionResponse> get(GetOrganizationQuotaDefinitionRequest request) {
-        return get(request, GetOrganizationQuotaDefinitionResponse.class, builder -> builder.pathSegment("quota_definitions", request.getOrganizationQuotaDefinitionId()))
-            .checkpoint();
+    public Mono<GetOrganizationQuotaDefinitionResponse> get(
+            GetOrganizationQuotaDefinitionRequest request) {
+        return get(
+                        request,
+                        GetOrganizationQuotaDefinitionResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "quota_definitions",
+                                        request.getOrganizationQuotaDefinitionId()))
+                .checkpoint();
     }
 
     @Override
-    public Mono<ListOrganizationQuotaDefinitionsResponse> list(ListOrganizationQuotaDefinitionsRequest request) {
-        return get(request, ListOrganizationQuotaDefinitionsResponse.class, builder -> builder.pathSegment("quota_definitions"))
-            .checkpoint();
+    public Mono<ListOrganizationQuotaDefinitionsResponse> list(
+            ListOrganizationQuotaDefinitionsRequest request) {
+        return get(
+                        request,
+                        ListOrganizationQuotaDefinitionsResponse.class,
+                        builder -> builder.pathSegment("quota_definitions"))
+                .checkpoint();
     }
 
     @Override
-    public Mono<UpdateOrganizationQuotaDefinitionResponse> update(UpdateOrganizationQuotaDefinitionRequest request) {
-        return put(request, UpdateOrganizationQuotaDefinitionResponse.class, builder -> builder.pathSegment("quota_definitions", request.getOrganizationQuotaDefinitionId()))
-            .checkpoint();
+    public Mono<UpdateOrganizationQuotaDefinitionResponse> update(
+            UpdateOrganizationQuotaDefinitionRequest request) {
+        return put(
+                        request,
+                        UpdateOrganizationQuotaDefinitionResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "quota_definitions",
+                                        request.getOrganizationQuotaDefinitionId()))
+                .checkpoint();
     }
-
 }

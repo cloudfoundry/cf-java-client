@@ -22,17 +22,11 @@ public final class UpdateUserRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noUaaId() {
-        UpdateUserRequest.builder()
-            .defaultSpaceId("test-space-id")
-            .build();
+        UpdateUserRequest.builder().defaultSpaceId("test-space-id").build();
     }
 
     @Test
     public void valid() {
-        UpdateUserRequest.builder()
-            .defaultSpaceId("test-space-id")
-            .userId("test-uaa-id")
-            .build();
+        UpdateUserRequest.builder().defaultSpaceId("test-space-id").userId("test-uaa-id").build();
     }
-
 }

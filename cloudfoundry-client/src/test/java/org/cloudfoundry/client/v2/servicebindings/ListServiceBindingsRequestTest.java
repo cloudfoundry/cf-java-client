@@ -16,15 +16,12 @@
 
 package org.cloudfoundry.client.v2.servicebindings;
 
-
 import org.junit.Test;
 
 public final class ListServiceBindingsRequestTest {
 
     @Test
     public void valid() {
-        ListServiceBindingsRequest.builder()
-            .build();
+        ListServiceBindingsRequest.builder().build();
     }
-
 }

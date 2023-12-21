@@ -22,8 +22,6 @@ public class ListRouterGroupsRequestTest {
 
     @Test
     public void valid() {
-        ListRouterGroupsRequest.builder()
-            .build();
+        ListRouterGroupsRequest.builder().build();
     }
-
 }

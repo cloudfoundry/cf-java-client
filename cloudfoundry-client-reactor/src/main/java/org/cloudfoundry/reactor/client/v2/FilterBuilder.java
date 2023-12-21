@@ -16,17 +16,16 @@
 
 package org.cloudfoundry.reactor.client.v2;
 
-import org.cloudfoundry.client.v2.FilterParameter;
-import org.cloudfoundry.reactor.util.AnnotationUtils;
-import org.cloudfoundry.reactor.util.AnnotationUtils.AnnotatedValue;
-import org.cloudfoundry.reactor.util.UriQueryParameter;
-import org.cloudfoundry.reactor.util.UriQueryParameterBuilder;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.cloudfoundry.client.v2.FilterParameter;
+import org.cloudfoundry.reactor.util.AnnotationUtils;
+import org.cloudfoundry.reactor.util.AnnotationUtils.AnnotatedValue;
+import org.cloudfoundry.reactor.util.UriQueryParameter;
+import org.cloudfoundry.reactor.util.UriQueryParameterBuilder;
 
 /**
  * A builder for Cloud Foundry V2 filters
@@ -35,20 +34,25 @@ final class FilterBuilder implements UriQueryParameterBuilder {
 
     public Stream<UriQueryParameter> build(Object instance) {
         return AnnotationUtils.streamAnnotatedValues(instance, FilterParameter.class)
-            .map(FilterBuilder::processValue)
-            .filter(Objects::nonNull);
+                .map(FilterBuilder::processValue)
+                .filter(Objects::nonNull);
     }
 
-    private static UriQueryParameter processCollection(FilterParameter filterParameter, Object value) {
-        List<String> collection = ((Collection<?>) value).stream()
-            .map(Object::toString)
-            .map(String::trim)
-            .collect(Collectors.toList());
+    private static UriQueryParameter processCollection(
+            FilterParameter filterParameter, Object value) {
+        List<String> collection =
+                ((Collection<?>) value)
+                        .stream()
+                                .map(Object::toString)
+                                .map(String::trim)
+                                .collect(Collectors.toList());
 
         if (collection.size() == 1) {
-            return processValue(filterParameter.value(), filterParameter.operation(), collection.get(0));
+            return processValue(
+                    filterParameter.value(), filterParameter.operation(), collection.get(0));
         } else if (collection.size() > 1) {
-            return processValue(filterParameter.value(), filterParameter.collectionOperation(), collection);
+            return processValue(
+                    filterParameter.value(), filterParameter.collectionOperation(), collection);
         } else {
             return null;
         }
@@ -60,12 +64,13 @@ final class FilterBuilder implements UriQueryParameterBuilder {
         if (value instanceof Collection) {
             return processCollection(filterParameter, value);
         } else {
-            return processValue(filterParameter.value(), filterParameter.operation(), value.toString()
-                .trim());
+            return processValue(
+                    filterParameter.value(), filterParameter.operation(), value.toString().trim());
         }
     }
 
-    private static UriQueryParameter processValue(String name, FilterParameter.Operation operation, Collection<String> collection) {
+    private static UriQueryParameter processValue(
+            String name, FilterParameter.Operation operation, Collection<String> collection) {
         String value = String.join(",", collection);
         if (!value.isEmpty()) {
             return processValue(name, operation, value);
@@ -73,8 +78,8 @@ final class FilterBuilder implements UriQueryParameterBuilder {
         return null;
     }
 
-    private static UriQueryParameter processValue(String name, FilterParameter.Operation operation, String value) {
+    private static UriQueryParameter processValue(
+            String name, FilterParameter.Operation operation, String value) {
         return UriQueryParameter.of("q", String.format("%s%s%s", name, operation, value));
     }
-
 }

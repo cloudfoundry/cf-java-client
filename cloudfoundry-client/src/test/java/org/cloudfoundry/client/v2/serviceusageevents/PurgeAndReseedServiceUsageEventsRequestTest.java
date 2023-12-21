@@ -22,8 +22,6 @@ public final class PurgeAndReseedServiceUsageEventsRequestTest {
 
     @Test
     public void valid() {
-        PurgeAndReseedServiceUsageEventsRequest.builder()
-            .build();
+        PurgeAndReseedServiceUsageEventsRequest.builder().build();
     }
-
 }

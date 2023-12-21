@@ -22,15 +22,11 @@ public final class GetSpaceRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noName() {
-        GetSpaceRequest.builder()
-            .build();
+        GetSpaceRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        GetSpaceRequest.builder()
-            .name("test-name")
-            .build();
+        GetSpaceRequest.builder().name("test-name").build();
     }
-
 }

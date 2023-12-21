@@ -23,34 +23,33 @@ public final class UnmapExternalGroupByGroupIdRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noExternalGroup() {
         UnmapExternalGroupByGroupIdRequest.builder()
-            .groupId("test-group-id")
-            .origin("test-origin")
-            .build();
+                .groupId("test-group-id")
+                .origin("test-origin")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noGroupId() {
         UnmapExternalGroupByGroupIdRequest.builder()
-            .externalGroup("test-external-group")
-            .origin("test-origin")
-            .build();
+                .externalGroup("test-external-group")
+                .origin("test-origin")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noOrigin() {
         UnmapExternalGroupByGroupIdRequest.builder()
-            .groupId("test-group-id")
-            .externalGroup("test-external-group")
-            .build();
+                .groupId("test-group-id")
+                .externalGroup("test-external-group")
+                .build();
     }
 
     @Test
     public void valid() {
         UnmapExternalGroupByGroupIdRequest.builder()
-            .groupId("test-group-id")
-            .externalGroup("test-external-group")
-            .origin("test-origin")
-            .build();
+                .groupId("test-group-id")
+                .externalGroup("test-external-group")
+                .origin("test-origin")
+                .build();
     }
-
 }

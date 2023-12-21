@@ -25,8 +25,7 @@ final class EventStreamCodec {
 
     private static final int MAX_PAYLOAD_SIZE = 1024 * 1024;
 
-    private EventStreamCodec() {
-    }
+    private EventStreamCodec() {}
 
     static LineBasedFrameDecoder createDecoder(HttpClientResponse response) {
         return new LineBasedFrameDecoder(MAX_PAYLOAD_SIZE);
@@ -34,11 +33,18 @@ final class EventStreamCodec {
 
     static Flux<ServerSentEvent> decode(ByteBufFlux body) {
         return body.asString()
-            .windowWhile(s -> !s.isEmpty())
-            .concatMap(window -> window
-                .reduce(ServerSentEvent.builder(), EventStreamCodec::parseLine))
-            .map(ServerSentEvent.Builder::build)
-            .filter(sse -> sse.getData() != null || sse.getEventType() != null || sse.getId() != null || sse.getRetry() != null);
+                .windowWhile(s -> !s.isEmpty())
+                .concatMap(
+                        window ->
+                                window.reduce(
+                                        ServerSentEvent.builder(), EventStreamCodec::parseLine))
+                .map(ServerSentEvent.Builder::build)
+                .filter(
+                        sse ->
+                                sse.getData() != null
+                                        || sse.getEventType() != null
+                                        || sse.getId() != null
+                                        || sse.getRetry() != null);
     }
 
     private static Field parseField(String line) {
@@ -84,7 +90,5 @@ final class EventStreamCodec {
         private String getValue() {
             return this.value;
         }
-
     }
-
 }

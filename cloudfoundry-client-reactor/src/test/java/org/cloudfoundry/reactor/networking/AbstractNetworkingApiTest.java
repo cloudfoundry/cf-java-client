@@ -18,6 +18,4 @@ package org.cloudfoundry.reactor.networking;
 
 import org.cloudfoundry.reactor.AbstractRestTest;
 
-public abstract class AbstractNetworkingApiTest extends AbstractRestTest {
-
-}
+public abstract class AbstractNetworkingApiTest extends AbstractRestTest {}

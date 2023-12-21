@@ -72,5 +72,4 @@ public abstract class Process extends Resource {
      */
     @JsonProperty("type")
     public abstract String getType();
-
 }

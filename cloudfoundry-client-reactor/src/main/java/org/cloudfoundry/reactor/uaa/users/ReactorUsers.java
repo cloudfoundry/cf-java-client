@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.uaa.users;
 
+import java.util.Map;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.uaa.AbstractUaaOperations;
@@ -44,8 +45,6 @@ import org.cloudfoundry.uaa.users.VerifyUserRequest;
 import org.cloudfoundry.uaa.users.VerifyUserResponse;
 import reactor.core.publisher.Mono;
 
-import java.util.Map;
-
 /**
  * The Reactor-based implementation of {@link Users}
  */
@@ -59,74 +58,102 @@ public final class ReactorUsers extends AbstractUaaOperations implements Users {
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorUsers(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
+    public ReactorUsers(
+            ConnectionContext connectionContext,
+            Mono<String> root,
+            TokenProvider tokenProvider,
+            Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<ChangeUserPasswordResponse> changePassword(ChangeUserPasswordRequest request) {
-        return put(request, ChangeUserPasswordResponse.class, builder -> builder.pathSegment("Users", request.getUserId(), "password"))
-            .checkpoint();
+        return put(
+                        request,
+                        ChangeUserPasswordResponse.class,
+                        builder -> builder.pathSegment("Users", request.getUserId(), "password"))
+                .checkpoint();
     }
 
     @Override
     public Mono<CreateUserResponse> create(CreateUserRequest request) {
         return post(request, CreateUserResponse.class, builder -> builder.pathSegment("Users"))
-            .checkpoint();
+                .checkpoint();
     }
 
     @Override
     public Mono<DeleteUserResponse> delete(DeleteUserRequest request) {
-        return delete(request, DeleteUserResponse.class, builder -> builder.pathSegment("Users", request.getUserId()))
-            .checkpoint();
+        return delete(
+                        request,
+                        DeleteUserResponse.class,
+                        builder -> builder.pathSegment("Users", request.getUserId()))
+                .checkpoint();
     }
 
     @Override
     public Mono<ExpirePasswordResponse> expirePassword(ExpirePasswordRequest request) {
-        return patch(request, ExpirePasswordResponse.class, builder -> builder.pathSegment("Users", request.getUserId(), "status"))
-            .checkpoint();
+        return patch(
+                        request,
+                        ExpirePasswordResponse.class,
+                        builder -> builder.pathSegment("Users", request.getUserId(), "status"))
+                .checkpoint();
     }
 
     @Override
-    public Mono<GetUserVerificationLinkResponse> getVerificationLink(GetUserVerificationLinkRequest request) {
-        return get(request, GetUserVerificationLinkResponse.class, builder -> builder.pathSegment("Users", request.getUserId(), "verify-link"))
-            .checkpoint();
+    public Mono<GetUserVerificationLinkResponse> getVerificationLink(
+            GetUserVerificationLinkRequest request) {
+        return get(
+                        request,
+                        GetUserVerificationLinkResponse.class,
+                        builder -> builder.pathSegment("Users", request.getUserId(), "verify-link"))
+                .checkpoint();
     }
 
     @Override
     public Mono<InviteUsersResponse> invite(InviteUsersRequest request) {
-        return post(request, InviteUsersResponse.class, builder -> builder.pathSegment("invite_users"))
-            .checkpoint();
+        return post(
+                        request,
+                        InviteUsersResponse.class,
+                        builder -> builder.pathSegment("invite_users"))
+                .checkpoint();
     }
 
     @Override
     public Mono<ListUsersResponse> list(ListUsersRequest request) {
         return get(request, ListUsersResponse.class, builder -> builder.pathSegment("Users"))
-            .checkpoint();
+                .checkpoint();
     }
 
     @Override
     public Mono<LookupUserIdsResponse> lookup(LookupUserIdsRequest request) {
-        return get(request, LookupUserIdsResponse.class, builder -> builder.pathSegment("ids", "Users"))
-            .checkpoint();
+        return get(
+                        request,
+                        LookupUserIdsResponse.class,
+                        builder -> builder.pathSegment("ids", "Users"))
+                .checkpoint();
     }
 
     @Override
     public Mono<UpdateUserResponse> update(UpdateUserRequest request) {
-        return put(request, UpdateUserResponse.class, builder -> builder.pathSegment("Users", request.getId()))
-            .checkpoint();
+        return put(
+                        request,
+                        UpdateUserResponse.class,
+                        builder -> builder.pathSegment("Users", request.getId()))
+                .checkpoint();
     }
 
     @Override
     public Mono<UserInfoResponse> userInfo(UserInfoRequest request) {
         return get(request, UserInfoResponse.class, builder -> builder.pathSegment("userinfo"))
-            .checkpoint();
+                .checkpoint();
     }
 
     @Override
     public Mono<VerifyUserResponse> verify(VerifyUserRequest request) {
-        return get(request, VerifyUserResponse.class, builder -> builder.pathSegment("Users", request.getUserId(), "verify"))
-            .checkpoint();
+        return get(
+                        request,
+                        VerifyUserResponse.class,
+                        builder -> builder.pathSegment("Users", request.getUserId(), "verify"))
+                .checkpoint();
     }
-
 }

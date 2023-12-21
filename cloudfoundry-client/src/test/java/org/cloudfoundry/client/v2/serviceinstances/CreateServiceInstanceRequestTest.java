@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.client.v2.serviceinstances;
 
-
 import org.junit.Test;
 
 public final class CreateServiceInstanceRequestTest {
@@ -24,34 +23,30 @@ public final class CreateServiceInstanceRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noName() {
         CreateServiceInstanceRequest.builder()
-            .servicePlanId("service-plan-id")
-            .spaceId("space-id")
-            .build();
+                .servicePlanId("service-plan-id")
+                .spaceId("space-id")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noServicePlanId() {
-        CreateServiceInstanceRequest.builder()
-            .name("name")
-            .spaceId("space-id")
-            .build();
+        CreateServiceInstanceRequest.builder().name("name").spaceId("space-id").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noSpaceId() {
         CreateServiceInstanceRequest.builder()
-            .name("name")
-            .servicePlanId("service-plan-id")
-            .build();
+                .name("name")
+                .servicePlanId("service-plan-id")
+                .build();
     }
 
     @Test
     public void valid() {
         CreateServiceInstanceRequest.builder()
-            .name("name")
-            .servicePlanId("service-plan-id")
-            .spaceId("space-id")
-            .build();
+                .name("name")
+                .servicePlanId("service-plan-id")
+                .spaceId("space-id")
+                .build();
     }
-
 }

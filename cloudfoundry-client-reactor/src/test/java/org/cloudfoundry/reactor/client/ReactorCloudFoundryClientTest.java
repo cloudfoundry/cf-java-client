@@ -16,19 +16,20 @@
 
 package org.cloudfoundry.reactor.client;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.cloudfoundry.reactor.AbstractRestTest;
 import org.junit.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 public final class ReactorCloudFoundryClientTest extends AbstractRestTest {
 
-    private final ReactorCloudFoundryClient client = ReactorCloudFoundryClient.builder()
-        .connectionContext(CONNECTION_CONTEXT)
-        .rootV2(this.root)
-        .rootV3(this.root)
-        .tokenProvider(TOKEN_PROVIDER)
-        .build();
+    private final ReactorCloudFoundryClient client =
+            ReactorCloudFoundryClient.builder()
+                    .connectionContext(CONNECTION_CONTEXT)
+                    .rootV2(this.root)
+                    .rootV3(this.root)
+                    .tokenProvider(TOKEN_PROVIDER)
+                    .build();
 
     @Test
     public void applicationUsageEvents() {
@@ -244,5 +245,4 @@ public final class ReactorCloudFoundryClientTest extends AbstractRestTest {
     public void users() {
         assertThat(this.client.users()).isNotNull();
     }
-
 }

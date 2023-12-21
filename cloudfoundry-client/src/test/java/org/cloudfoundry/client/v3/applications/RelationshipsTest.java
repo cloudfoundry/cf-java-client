@@ -24,19 +24,16 @@ public final class RelationshipsTest {
 
     @Test(expected = IllegalStateException.class)
     public void noSpace() {
-        ApplicationRelationships.builder()
-            .build();
+        ApplicationRelationships.builder().build();
     }
 
     @Test
     public void valid() {
         ApplicationRelationships.builder()
-            .space(ToOneRelationship.builder()
-                .data(Relationship.builder()
-                    .id("test-id")
-                    .build())
-                .build())
-            .build();
+                .space(
+                        ToOneRelationship.builder()
+                                .data(Relationship.builder().id("test-id").build())
+                                .build())
+                .build();
     }
-
 }

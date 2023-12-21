@@ -22,15 +22,11 @@ public final class GetApplicationPermissionRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noApplicationId() {
-        GetApplicationPermissionsRequest.builder()
-            .build();
+        GetApplicationPermissionsRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        GetApplicationPermissionsRequest.builder()
-            .applicationId("test-application-id")
-            .build();
+        GetApplicationPermissionsRequest.builder().applicationId("test-application-id").build();
     }
-
 }

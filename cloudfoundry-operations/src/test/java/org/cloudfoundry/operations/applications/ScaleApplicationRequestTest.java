@@ -22,15 +22,11 @@ public final class ScaleApplicationRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noName() {
-        ScaleApplicationRequest.builder()
-            .build();
+        ScaleApplicationRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        ScaleApplicationRequest.builder()
-            .name("test-name")
-            .build();
+        ScaleApplicationRequest.builder().name("test-name").build();
     }
-
 }

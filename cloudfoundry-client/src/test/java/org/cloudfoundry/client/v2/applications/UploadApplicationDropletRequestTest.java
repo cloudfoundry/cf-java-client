@@ -16,10 +16,9 @@
 
 package org.cloudfoundry.client.v2.applications;
 
-import org.junit.Test;
-
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import org.junit.Test;
 
 public final class UploadApplicationDropletRequestTest {
 
@@ -27,24 +26,19 @@ public final class UploadApplicationDropletRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noApplication() {
-        UploadApplicationDropletRequest.builder()
-            .applicationId("test-application-id")
-            .build();
+        UploadApplicationDropletRequest.builder().applicationId("test-application-id").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noApplicationId() {
-        UploadApplicationDropletRequest.builder()
-            .droplet(TEST_DROPLET)
-            .build();
+        UploadApplicationDropletRequest.builder().droplet(TEST_DROPLET).build();
     }
 
     @Test
     public void valid() {
         UploadApplicationDropletRequest.builder()
-            .droplet(TEST_DROPLET)
-            .applicationId("test-application-id")
-            .build();
+                .droplet(TEST_DROPLET)
+                .applicationId("test-application-id")
+                .build();
     }
-
 }

@@ -86,5 +86,4 @@ public interface Spaces {
      * @return Boolean is ssh allowed on the space
      */
     Mono<Boolean> sshAllowed(SpaceSshAllowedRequest request);
-
 }

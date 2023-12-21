@@ -24,17 +24,14 @@ public final class AddIsolationSegmentOrganizationEntitlementRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noIsolationSegmentId() {
         AddIsolationSegmentOrganizationEntitlementRequest.builder()
-            .data(Relationship.builder()
-                .id("test-organization-id")
-                .build())
-            .build();
+                .data(Relationship.builder().id("test-organization-id").build())
+                .build();
     }
 
     @Test
     public void valid() {
         AddIsolationSegmentOrganizationEntitlementRequest.builder()
-            .isolationSegmentId("test-isolation-segment-id")
-            .build();
+                .isolationSegmentId("test-isolation-segment-id")
+                .build();
     }
-
 }

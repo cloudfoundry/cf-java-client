@@ -18,7 +18,8 @@ package org.cloudfoundry.reactor.util;
 
 import io.netty.buffer.ByteBufAllocatorMetricProvider;
 
-public final class ByteBufAllocatorMetricProviderWrapper implements ByteBufAllocatorMetricProviderMXBean {
+public final class ByteBufAllocatorMetricProviderWrapper
+        implements ByteBufAllocatorMetricProviderMXBean {
 
     private final ByteBufAllocatorMetricProvider delegate;
 
@@ -35,5 +36,4 @@ public final class ByteBufAllocatorMetricProviderWrapper implements ByteBufAlloc
     public long getUsedHeapMemory() {
         return this.delegate.metric().usedHeapMemory();
     }
-
 }

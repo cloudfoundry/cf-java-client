@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v3.jobs;
 
+import java.util.Map;
 import org.cloudfoundry.client.v3.jobs.GetJobRequest;
 import org.cloudfoundry.client.v3.jobs.GetJobResponse;
 import org.cloudfoundry.client.v3.jobs.JobsV3;
@@ -23,8 +24,6 @@ import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
 import reactor.core.publisher.Mono;
-
-import java.util.Map;
 
 /**
  * The Reactor-based implementation of {@link JobsV3}
@@ -39,14 +38,20 @@ public final class ReactorJobsV3 extends AbstractClientV3Operations implements J
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorJobsV3(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
+    public ReactorJobsV3(
+            ConnectionContext connectionContext,
+            Mono<String> root,
+            TokenProvider tokenProvider,
+            Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<GetJobResponse> get(GetJobRequest request) {
-        return get(request, GetJobResponse.class, builder -> builder.pathSegment("jobs", request.getJobId()))
-            .checkpoint();
+        return get(
+                        request,
+                        GetJobResponse.class,
+                        builder -> builder.pathSegment("jobs", request.getJobId()))
+                .checkpoint();
     }
-
 }

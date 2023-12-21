@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.networking.v1.tags;
 
+import java.util.Map;
 import org.cloudfoundry.networking.v1.tags.ListTagsRequest;
 import org.cloudfoundry.networking.v1.tags.ListTagsResponse;
 import org.cloudfoundry.networking.v1.tags.Tags;
@@ -23,8 +24,6 @@ import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.networking.AbstractNetworkingOperations;
 import reactor.core.publisher.Mono;
-
-import java.util.Map;
 
 /**
  * The Reactor-based implementation of {@link Tags}
@@ -39,13 +38,16 @@ public class ReactorTags extends AbstractNetworkingOperations implements Tags {
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorTags(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
+    public ReactorTags(
+            ConnectionContext connectionContext,
+            Mono<String> root,
+            TokenProvider tokenProvider,
+            Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<ListTagsResponse> list(ListTagsRequest request) {
-        return get(ListTagsResponse.class, builder -> builder.pathSegment("tags"))
-            .checkpoint();
+        return get(ListTagsResponse.class, builder -> builder.pathSegment("tags")).checkpoint();
     }
 }

@@ -23,23 +23,20 @@ public final class AssociateOrganizationManagerRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noManagerId() {
         AssociateOrganizationManagerRequest.builder()
-            .organizationId("test-organization-id")
-            .build();
+                .organizationId("test-organization-id")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noOrganizationId() {
-        AssociateOrganizationManagerRequest.builder()
-            .managerId("test-manager-id")
-            .build();
+        AssociateOrganizationManagerRequest.builder().managerId("test-manager-id").build();
     }
 
     @Test
     public void valid() {
         AssociateOrganizationManagerRequest.builder()
-            .organizationId("test-organization-id")
-            .managerId("test-manager-id")
-            .build();
+                .organizationId("test-organization-id")
+                .managerId("test-manager-id")
+                .build();
     }
-
 }

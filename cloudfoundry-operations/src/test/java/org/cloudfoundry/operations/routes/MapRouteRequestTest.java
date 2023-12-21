@@ -22,57 +22,43 @@ public final class MapRouteRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noApplicationName() {
-        MapRouteRequest.builder()
-            .domain("test-domain")
-            .host("test-host")
-            .path("test-path")
-            .build();
+        MapRouteRequest.builder().domain("test-domain").host("test-host").path("test-path").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noDomain() {
         MapRouteRequest.builder()
-            .applicationName("test-applicationName")
-            .host("test-host")
-            .path("test-path")
-            .build();
+                .applicationName("test-applicationName")
+                .host("test-host")
+                .path("test-path")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void portConflict() {
-        MapRouteRequest.builder()
-            .domain("test-domain")
-            .port(123)
-            .randomPort(true)
-            .build();
+        MapRouteRequest.builder().domain("test-domain").port(123).randomPort(true).build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void setupConflict() {
-        MapRouteRequest.builder()
-            .domain("test-domain")
-            .host("test-hostname")
-            .port(123)
-            .build();
+        MapRouteRequest.builder().domain("test-domain").host("test-hostname").port(123).build();
     }
 
     @Test
     public void validMax() {
         MapRouteRequest.builder()
-            .applicationName("test-applicationName")
-            .domain("test-domain")
-            .host("test-host")
-            .path("test-path")
-            .build();
+                .applicationName("test-applicationName")
+                .domain("test-domain")
+                .host("test-host")
+                .path("test-path")
+                .build();
     }
 
     @Test
     public void validMin() {
         MapRouteRequest.builder()
-            .applicationName("test-applicationName")
-            .domain("test-domain")
-            .build();
+                .applicationName("test-applicationName")
+                .domain("test-domain")
+                .build();
     }
-
-
 }

@@ -16,6 +16,10 @@
 
 package org.cloudfoundry.reactor.client.v3.builpacks;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Map;
 import org.cloudfoundry.client.v3.buildpacks.BuildpacksV3;
 import org.cloudfoundry.client.v3.buildpacks.CreateBuildpackRequest;
 import org.cloudfoundry.client.v3.buildpacks.CreateBuildpackResponse;
@@ -36,11 +40,6 @@ import org.cloudfoundry.util.FileUtils;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Map;
-
 /**
  * The Reactor-based implementation of {@link BuildpacksV3}
  */
@@ -54,38 +53,56 @@ public final class ReactorBuildpacksV3 extends AbstractClientV3Operations implem
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorBuildpacksV3(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
+    public ReactorBuildpacksV3(
+            ConnectionContext connectionContext,
+            Mono<String> root,
+            TokenProvider tokenProvider,
+            Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<CreateBuildpackResponse> create(CreateBuildpackRequest request) {
-        return post(request, CreateBuildpackResponse.class, builder -> builder.pathSegment("buildpacks"))
-            .checkpoint();
+        return post(
+                        request,
+                        CreateBuildpackResponse.class,
+                        builder -> builder.pathSegment("buildpacks"))
+                .checkpoint();
     }
 
     @Override
     public Mono<String> delete(DeleteBuildpackRequest request) {
-        return delete(request, builder -> builder.pathSegment("buildpacks", request.getBuildpackId()))
-            .checkpoint();
+        return delete(
+                        request,
+                        builder -> builder.pathSegment("buildpacks", request.getBuildpackId()))
+                .checkpoint();
     }
 
     @Override
     public Mono<GetBuildpackResponse> get(GetBuildpackRequest request) {
-        return get(request, GetBuildpackResponse.class, builder -> builder.pathSegment("buildpacks", request.getBuildpackId()))
-            .checkpoint();
+        return get(
+                        request,
+                        GetBuildpackResponse.class,
+                        builder -> builder.pathSegment("buildpacks", request.getBuildpackId()))
+                .checkpoint();
     }
 
     @Override
     public Mono<ListBuildpacksResponse> list(ListBuildpacksRequest request) {
-        return get(request, ListBuildpacksResponse.class, builder -> builder.pathSegment("buildpacks"))
-            .checkpoint();
+        return get(
+                        request,
+                        ListBuildpacksResponse.class,
+                        builder -> builder.pathSegment("buildpacks"))
+                .checkpoint();
     }
 
     @Override
     public Mono<UpdateBuildpackResponse> update(UpdateBuildpackRequest request) {
-        return patch(request, UpdateBuildpackResponse.class, builder -> builder.pathSegment("buildpacks", request.getBuildpackId()))
-            .checkpoint();
+        return patch(
+                        request,
+                        UpdateBuildpackResponse.class,
+                        builder -> builder.pathSegment("buildpacks", request.getBuildpackId()))
+                .checkpoint();
     }
 
     @Override
@@ -94,34 +111,44 @@ public final class ReactorBuildpacksV3 extends AbstractClientV3Operations implem
 
         if (bits.toFile().isDirectory()) {
             return FileUtils.compress(bits)
-                .map(temporaryFile -> UploadBuildpackRequest.builder()
-                    .from(request)
-                    .bits(temporaryFile)
-                    .build())
-                .flatMap(requestWithTemporaryFile -> upload(requestWithTemporaryFile, () -> {
-                    try {
-                        Files.delete(requestWithTemporaryFile.getBits());
-                    } catch (IOException e) {
-                        throw Exceptions.propagate(e);
-                    }
-                }));
+                    .map(
+                            temporaryFile ->
+                                    UploadBuildpackRequest.builder()
+                                            .from(request)
+                                            .bits(temporaryFile)
+                                            .build())
+                    .flatMap(
+                            requestWithTemporaryFile ->
+                                    upload(
+                                            requestWithTemporaryFile,
+                                            () -> {
+                                                try {
+                                                    Files.delete(
+                                                            requestWithTemporaryFile.getBits());
+                                                } catch (IOException e) {
+                                                    throw Exceptions.propagate(e);
+                                                }
+                                            }));
         } else {
-            return upload(request, () -> {
-            });
+            return upload(request, () -> {});
         }
     }
 
-    private Mono<UploadBuildpackResponse> upload(UploadBuildpackRequest request, Runnable onTerminate) {
-        return post(request, UploadBuildpackResponse.class, builder -> builder.pathSegment("buildpacks", request.getBuildpackId(), "upload"), outbound ->
-            upload(request.getBits(), outbound), onTerminate)
-            .checkpoint();
+    private Mono<UploadBuildpackResponse> upload(
+            UploadBuildpackRequest request, Runnable onTerminate) {
+        return post(
+                        request,
+                        UploadBuildpackResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "buildpacks", request.getBuildpackId(), "upload"),
+                        outbound -> upload(request.getBits(), outbound),
+                        onTerminate)
+                .checkpoint();
     }
 
     private void upload(Path bits, MultipartHttpClientRequest r) {
-        r.addPart(part -> part.setName("bits")
-            .setContentType(APPLICATION_ZIP)
-            .sendFile(bits))
-            .done();
+        r.addPart(part -> part.setName("bits").setContentType(APPLICATION_ZIP).sendFile(bits))
+                .done();
     }
-
 }

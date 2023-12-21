@@ -21,7 +21,5 @@ import org.cloudfoundry.client.v2.Resource;
 /**
  * The core resource in Service Plan responses
  */
-public abstract class AbstractServicePlanResource extends Resource<org.cloudfoundry.client.v2.serviceplans.ServicePlanEntity> {
-
-}
-
+public abstract class AbstractServicePlanResource
+        extends Resource<org.cloudfoundry.client.v2.serviceplans.ServicePlanEntity> {}

@@ -52,5 +52,4 @@ public abstract class AbstractToken {
      */
     @JsonProperty("token_type")
     public abstract String getTokenType();
-
 }

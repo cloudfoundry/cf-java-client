@@ -16,19 +16,20 @@
 
 package org.cloudfoundry.operations;
 
-import org.junit.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.Test;
 
 public final class DefaultCloudFoundryOperationsTest extends AbstractOperationsTest {
 
-    private final DefaultCloudFoundryOperations operations = DefaultCloudFoundryOperations.builder()
-        .cloudFoundryClient(this.cloudFoundryClient)
-        .dopplerClient(this.dopplerClient)
-        .organization(TEST_ORGANIZATION_NAME)
-        .space(TEST_SPACE_NAME)
-        .uaaClient(this.uaaClient)
-        .build();
+    private final DefaultCloudFoundryOperations operations =
+            DefaultCloudFoundryOperations.builder()
+                    .cloudFoundryClient(this.cloudFoundryClient)
+                    .dopplerClient(this.dopplerClient)
+                    .organization(TEST_ORGANIZATION_NAME)
+                    .space(TEST_SPACE_NAME)
+                    .uaaClient(this.uaaClient)
+                    .build();
 
     @Test
     public void advanced() {
@@ -99,5 +100,4 @@ public final class DefaultCloudFoundryOperationsTest extends AbstractOperationsT
     public void userAdmin() {
         assertThat(this.operations.userAdmin()).isNotNull();
     }
-
 }

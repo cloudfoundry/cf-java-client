@@ -22,8 +22,6 @@ public final class ListSpaceQuotaDefinitionsRequestTest {
 
     @Test
     public void valid() {
-        ListSpaceQuotaDefinitionsRequest.builder()
-            .build();
+        ListSpaceQuotaDefinitionsRequest.builder().build();
     }
-
 }

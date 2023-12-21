@@ -30,7 +30,8 @@ public interface SpaceQuotaDefinitions {
      * @param request the Associate a Space with a Space Quota Definition request
      * @return the response from the Associate a Space with a Space Quota Definition request
      */
-    Mono<AssociateSpaceQuotaDefinitionResponse> associateSpace(AssociateSpaceQuotaDefinitionRequest request);
+    Mono<AssociateSpaceQuotaDefinitionResponse> associateSpace(
+            AssociateSpaceQuotaDefinitionRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/space_quota_definitions/creating_a_space_quota_definition.html">Creating a Space Quota Definition</a> request
@@ -72,7 +73,8 @@ public interface SpaceQuotaDefinitions {
      * @param request the List all Spaces for the Space Quota Definition request
      * @return the response from the List all Spaces for the Space Quota Definition request
      */
-    Mono<ListSpaceQuotaDefinitionSpacesResponse> listSpaces(ListSpaceQuotaDefinitionSpacesRequest request);
+    Mono<ListSpaceQuotaDefinitionSpacesResponse> listSpaces(
+            ListSpaceQuotaDefinitionSpacesRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/space_quota_definitions/remove_space_from_the_space_quota_definition.html">Remove a Space from a Space Quota Definition</a>
@@ -90,5 +92,4 @@ public interface SpaceQuotaDefinitions {
      * @return the response from the Update Space Quota Definitions request
      */
     Mono<UpdateSpaceQuotaDefinitionResponse> update(UpdateSpaceQuotaDefinitionRequest request);
-
 }

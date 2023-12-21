@@ -63,5 +63,4 @@ public interface ServicePlanVisibilities {
      * @return the response from the Update Service Plan Visibility request
      */
     Mono<UpdateServicePlanVisibilityResponse> update(UpdateServicePlanVisibilityRequest request);
-
 }

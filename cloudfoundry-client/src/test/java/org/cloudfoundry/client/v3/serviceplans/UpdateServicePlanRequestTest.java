@@ -22,15 +22,11 @@ public final class UpdateServicePlanRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noServicePlanId() {
-        UpdateServicePlanRequest.builder()
-            .build();
+        UpdateServicePlanRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        UpdateServicePlanRequest.builder()
-            .servicePlanId("test-service-plan-id")
-            .build();
+        UpdateServicePlanRequest.builder().servicePlanId("test-service-plan-id").build();
     }
-
 }
