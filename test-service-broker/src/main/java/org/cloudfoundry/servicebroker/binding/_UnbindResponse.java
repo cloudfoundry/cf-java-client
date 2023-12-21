@@ -16,8 +16,6 @@
 
 package org.cloudfoundry.servicebroker.binding;
 
-import org.immutables.value.Value;
-
 @Value.Immutable
 abstract class _UnbindResponse {
 

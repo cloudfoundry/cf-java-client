@@ -16,9 +16,7 @@
 
 package org.cloudfoundry.routing.v1.tcproutes;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.routing.v1.ModificationTag;
 import org.immutables.value.Value;
 
 /**

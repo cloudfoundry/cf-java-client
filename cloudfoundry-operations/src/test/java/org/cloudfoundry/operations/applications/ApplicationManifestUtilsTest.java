@@ -33,8 +33,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.cloudfoundry.operations.applications.ApplicationHealthCheck.NONE;
 import static org.cloudfoundry.operations.applications.ApplicationHealthCheck.PORT;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
 import static org.junit.Assume.assumeTrue;
 
 public final class ApplicationManifestUtilsTest {

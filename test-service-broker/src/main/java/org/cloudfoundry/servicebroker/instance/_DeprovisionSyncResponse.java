@@ -16,8 +16,6 @@
 
 package org.cloudfoundry.servicebroker.instance;
 
-import org.immutables.value.Value;
-
 @Value.Immutable
 abstract class _DeprovisionSyncResponse {
 

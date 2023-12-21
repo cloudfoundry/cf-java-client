@@ -28,5 +28,3 @@
     typeImmutable = "*"
 )
 package org.cloudfoundry.servicebroker;
-
-import org.immutables.value.Value;

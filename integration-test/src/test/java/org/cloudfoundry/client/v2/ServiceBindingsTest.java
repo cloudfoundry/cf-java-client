@@ -44,7 +44,6 @@ import reactor.util.function.Tuple3;
 
 import java.time.Duration;
 import java.util.Optional;
-import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;

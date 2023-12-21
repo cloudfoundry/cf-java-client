@@ -29,7 +29,6 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
-import java.util.concurrent.TimeoutException;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.predicate;
 
