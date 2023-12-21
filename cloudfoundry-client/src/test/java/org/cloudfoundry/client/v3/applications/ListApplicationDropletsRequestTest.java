@@ -22,15 +22,11 @@ public final class ListApplicationDropletsRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noApplicationId() {
-        ListApplicationDropletsRequest.builder()
-            .build();
+        ListApplicationDropletsRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        ListApplicationDropletsRequest.builder()
-            .applicationId("test-application-id")
-            .build();
+        ListApplicationDropletsRequest.builder().applicationId("test-application-id").build();
     }
-
 }

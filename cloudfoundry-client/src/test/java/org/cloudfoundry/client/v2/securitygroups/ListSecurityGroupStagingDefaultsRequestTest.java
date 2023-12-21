@@ -22,8 +22,6 @@ public final class ListSecurityGroupStagingDefaultsRequestTest {
 
     @Test
     public void valid() {
-        ListSecurityGroupStagingDefaultsRequest.builder()
-            .build();
+        ListSecurityGroupStagingDefaultsRequest.builder().build();
     }
-
 }

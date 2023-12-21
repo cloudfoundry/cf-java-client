@@ -24,5 +24,4 @@ public final class InternalConfigurationTest {
     public void valid() {
         InternalConfiguration.builder().build();
     }
-
 }

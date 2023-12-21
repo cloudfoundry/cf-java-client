@@ -22,15 +22,11 @@ public final class GetProcessStatisticsRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noProcessId() {
-        GetProcessStatisticsRequest.builder()
-            .build();
+        GetProcessStatisticsRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        GetProcessStatisticsRequest.builder()
-            .processId("test-id")
-            .build();
+        GetProcessStatisticsRequest.builder().processId("test-id").build();
     }
-
 }

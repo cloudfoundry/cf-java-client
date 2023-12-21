@@ -22,24 +22,19 @@ public final class ChangeUserPasswordRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noPassword() {
-        ChangeUserPasswordRequest.builder()
-            .userId("test-user-id")
-            .build();
+        ChangeUserPasswordRequest.builder().userId("test-user-id").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noUserId() {
-        ChangeUserPasswordRequest.builder()
-            .password("test-password")
-            .build();
+        ChangeUserPasswordRequest.builder().password("test-password").build();
     }
 
     @Test
     public void valid() {
         ChangeUserPasswordRequest.builder()
-            .password("test-password")
-            .userId("test-user-id")
-            .build();
+                .password("test-password")
+                .userId("test-user-id")
+                .build();
     }
-
 }

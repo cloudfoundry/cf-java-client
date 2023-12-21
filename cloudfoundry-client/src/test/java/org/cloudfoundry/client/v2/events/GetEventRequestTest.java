@@ -22,15 +22,11 @@ public final class GetEventRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noEventId() {
-        GetEventRequest.builder()
-            .build();
+        GetEventRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        GetEventRequest.builder()
-            .eventId("test-event-id")
-            .build();
+        GetEventRequest.builder().eventId("test-event-id").build();
     }
-
 }

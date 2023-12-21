@@ -22,32 +22,25 @@ public final class CounterEventTest {
 
     @Test
     public void dropsonde() {
-        CounterEvent.from(new org.cloudfoundry.dropsonde.events.CounterEvent.Builder()
-            .delta(0L)
-            .name("test-name")
-            .build());
+        CounterEvent.from(
+                new org.cloudfoundry.dropsonde.events.CounterEvent.Builder()
+                        .delta(0L)
+                        .name("test-name")
+                        .build());
     }
 
     @Test(expected = IllegalStateException.class)
     public void noDelta() {
-        CounterEvent.builder()
-            .name("test-name")
-            .build();
+        CounterEvent.builder().name("test-name").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noName() {
-        CounterEvent.builder()
-            .delta(0L)
-            .build();
+        CounterEvent.builder().delta(0L).build();
     }
 
     @Test
     public void valid() {
-        CounterEvent.builder()
-            .delta(0L)
-            .name("test-name")
-            .build();
+        CounterEvent.builder().delta(0L).name("test-name").build();
     }
-
 }

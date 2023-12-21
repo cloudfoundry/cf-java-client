@@ -54,5 +54,4 @@ public interface DopplerClient {
      * @return the events from the stream
      */
     Flux<Envelope> stream(StreamRequest request);
-
 }

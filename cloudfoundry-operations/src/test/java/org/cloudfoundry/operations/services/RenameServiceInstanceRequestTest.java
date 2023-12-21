@@ -22,24 +22,19 @@ public final class RenameServiceInstanceRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noName() {
-        RenameServiceInstanceRequest.builder()
-            .newName("test-service-new-name")
-            .build();
+        RenameServiceInstanceRequest.builder().newName("test-service-new-name").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noNewName() {
-        RenameServiceInstanceRequest.builder()
-            .name("test-service-name")
-            .build();
+        RenameServiceInstanceRequest.builder().name("test-service-name").build();
     }
 
     @Test
     public void valid() {
         RenameServiceInstanceRequest.builder()
-            .name("test-service-name")
-            .newName("test-service-new-name")
-            .build();
+                .name("test-service-name")
+                .newName("test-service-new-name")
+                .build();
     }
-
 }

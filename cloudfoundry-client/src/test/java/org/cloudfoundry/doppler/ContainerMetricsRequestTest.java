@@ -22,15 +22,11 @@ public final class ContainerMetricsRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noApplicationId() {
-        ContainerMetricsRequest.builder()
-            .build();
+        ContainerMetricsRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        ContainerMetricsRequest.builder()
-            .applicationId("test-application-id")
-            .build();
+        ContainerMetricsRequest.builder().applicationId("test-application-id").build();
     }
-
 }

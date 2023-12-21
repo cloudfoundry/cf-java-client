@@ -22,8 +22,6 @@ public final class ListClientsRequestTest {
 
     @Test
     public void valid() {
-        ListClientsRequest.builder()
-            .build();
+        ListClientsRequest.builder().build();
     }
-
 }

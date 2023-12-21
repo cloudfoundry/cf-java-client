@@ -30,5 +30,4 @@ final class JsonParsingException extends RuntimeException {
     public String getPayload() {
         return this.payload;
     }
-
 }

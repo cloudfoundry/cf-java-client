@@ -22,24 +22,16 @@ public final class RestartApplicationInstanceRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noInstanceIndex() {
-        RestartApplicationInstanceRequest.builder()
-            .name("test-name")
-            .build();
+        RestartApplicationInstanceRequest.builder().name("test-name").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noName() {
-        RestartApplicationInstanceRequest.builder()
-            .instanceIndex(0)
-            .build();
+        RestartApplicationInstanceRequest.builder().instanceIndex(0).build();
     }
 
     @Test
     public void valid() {
-        RestartApplicationInstanceRequest.builder()
-            .instanceIndex(0)
-            .name("test-name")
-            .build();
+        RestartApplicationInstanceRequest.builder().instanceIndex(0).name("test-name").build();
     }
-
 }

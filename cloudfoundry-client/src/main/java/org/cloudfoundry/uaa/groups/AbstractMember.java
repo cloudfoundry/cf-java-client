@@ -18,7 +18,6 @@ package org.cloudfoundry.uaa.groups;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.Optional;
 
 /**
@@ -44,5 +43,4 @@ abstract class AbstractMember {
      */
     @JsonProperty("type")
     abstract Optional<MemberType> getType();
-
 }

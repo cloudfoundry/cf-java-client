@@ -22,15 +22,11 @@ public final class DeleteSharedDomainRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noId() {
-        DeleteSharedDomainRequest.builder()
-            .build();
+        DeleteSharedDomainRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        DeleteSharedDomainRequest.builder()
-            .sharedDomainId("test-shared-domain-id")
-            .build();
+        DeleteSharedDomainRequest.builder().sharedDomainId("test-shared-domain-id").build();
     }
-
 }

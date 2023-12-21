@@ -62,7 +62,8 @@ public enum ApplicationHealthCheck {
             case "process":
                 return PROCESS;
             default:
-                throw new IllegalArgumentException(String.format("Unknown application health check: %s", s));
+                throw new IllegalArgumentException(
+                        String.format("Unknown application health check: %s", s));
         }
     }
 
@@ -75,5 +76,4 @@ public enum ApplicationHealthCheck {
     public String toString() {
         return getValue();
     }
-
 }

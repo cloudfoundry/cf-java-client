@@ -40,5 +40,4 @@ public abstract class AbstractUserId {
      */
     @JsonProperty("userName")
     public abstract String getUserName();
-
 }

@@ -19,6 +19,4 @@ package org.cloudfoundry.client.v3.packages;
 /**
  * Marker interface for Package Data
  */
-public interface PackageData {
-
-}
+public interface PackageData {}

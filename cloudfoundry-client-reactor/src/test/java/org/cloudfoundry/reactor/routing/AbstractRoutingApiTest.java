@@ -18,6 +18,4 @@ package org.cloudfoundry.reactor.routing;
 
 import org.cloudfoundry.reactor.AbstractRestTest;
 
-public abstract class AbstractRoutingApiTest extends AbstractRestTest {
-
-}
+public abstract class AbstractRoutingApiTest extends AbstractRestTest {}

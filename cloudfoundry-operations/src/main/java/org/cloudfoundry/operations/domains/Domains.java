@@ -69,5 +69,4 @@ public interface Domains {
      * @return a completion indicator
      */
     Mono<Void> unshare(UnshareDomainRequest request);
-
 }

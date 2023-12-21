@@ -22,8 +22,6 @@ public final class ToOneRelationshipTest {
 
     @Test
     public void valid() {
-        ToOneRelationship.builder()
-            .build();
+        ToOneRelationship.builder().build();
     }
-
 }

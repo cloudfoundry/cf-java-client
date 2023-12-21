@@ -22,15 +22,11 @@ public final class GetApplicationCurrentDropletRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noApplicationId() {
-        GetApplicationCurrentDropletRequest.builder()
-            .build();
+        GetApplicationCurrentDropletRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        GetApplicationCurrentDropletRequest.builder()
-            .applicationId("test-application-id")
-            .build();
+        GetApplicationCurrentDropletRequest.builder().applicationId("test-application-id").build();
     }
-
 }

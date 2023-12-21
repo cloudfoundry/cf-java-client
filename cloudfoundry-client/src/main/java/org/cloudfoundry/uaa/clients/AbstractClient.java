@@ -17,10 +17,9 @@
 package org.cloudfoundry.uaa.clients;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.uaa.tokens.GrantType;
-
-import java.util.List;
 
 /**
  * The payload for Client responses
@@ -139,5 +138,4 @@ abstract class AbstractClient {
     @JsonProperty("token_salt")
     @Nullable
     abstract String getTokenSalt();
-
 }

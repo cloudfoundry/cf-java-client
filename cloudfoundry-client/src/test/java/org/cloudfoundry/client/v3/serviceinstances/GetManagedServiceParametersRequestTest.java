@@ -7,8 +7,7 @@ public class GetManagedServiceParametersRequestTest {
     @Test
     public void valid() {
         GetManagedServiceParametersRequest.builder()
-            .serviceInstanceId("test-service-instance-id")
-            .build();
+                .serviceInstanceId("test-service-instance-id")
+                .build();
     }
-
 }

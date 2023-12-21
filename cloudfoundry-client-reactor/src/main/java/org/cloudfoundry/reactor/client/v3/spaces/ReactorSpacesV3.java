@@ -16,6 +16,8 @@
 
 package org.cloudfoundry.reactor.client.v3.spaces;
 
+import java.util.Map;
+import java.util.Optional;
 import org.cloudfoundry.client.v3.spaces.ApplyManifestRequest;
 import org.cloudfoundry.client.v3.spaces.ApplyManifestResponse;
 import org.cloudfoundry.client.v3.spaces.AssignSpaceIsolationSegmentRequest;
@@ -38,9 +40,6 @@ import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
 import reactor.core.publisher.Mono;
 
-import java.util.Map;
-import java.util.Optional;
-
 /**
  * The Reactor-based implementation of {@link SpacesV3}
  */
@@ -54,65 +53,108 @@ public final class ReactorSpacesV3 extends AbstractClientV3Operations implements
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorSpacesV3(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
+    public ReactorSpacesV3(
+            ConnectionContext connectionContext,
+            Mono<String> root,
+            TokenProvider tokenProvider,
+            Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<ApplyManifestResponse> applyManifest(ApplyManifestRequest request) {
-        return postRawWithResponse(request.getManifest(), "application/x-yaml", ApplyManifestResponse.class, builder -> builder.pathSegment("spaces", request.getSpaceId(), "actions",
-            "apply_manifest"))
-            .map(responseTuple -> ApplyManifestResponse.builder()
-                .jobId(Optional.ofNullable(
-                    extractJobId(responseTuple.getResponse())))
-                .build());
+        return postRawWithResponse(
+                        request.getManifest(),
+                        "application/x-yaml",
+                        ApplyManifestResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "spaces",
+                                        request.getSpaceId(),
+                                        "actions",
+                                        "apply_manifest"))
+                .map(
+                        responseTuple ->
+                                ApplyManifestResponse.builder()
+                                        .jobId(
+                                                Optional.ofNullable(
+                                                        extractJobId(responseTuple.getResponse())))
+                                        .build());
     }
 
     @Override
-    public Mono<AssignSpaceIsolationSegmentResponse> assignIsolationSegment(AssignSpaceIsolationSegmentRequest request) {
-        return patch(request, AssignSpaceIsolationSegmentResponse.class, builder -> builder.pathSegment("spaces", request.getSpaceId(), "relationships", "isolation_segment"))
-            .checkpoint();
+    public Mono<AssignSpaceIsolationSegmentResponse> assignIsolationSegment(
+            AssignSpaceIsolationSegmentRequest request) {
+        return patch(
+                        request,
+                        AssignSpaceIsolationSegmentResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "spaces",
+                                        request.getSpaceId(),
+                                        "relationships",
+                                        "isolation_segment"))
+                .checkpoint();
     }
 
     @Override
     public Mono<CreateSpaceResponse> create(CreateSpaceRequest request) {
         return post(request, CreateSpaceResponse.class, builder -> builder.pathSegment("spaces"))
-            .checkpoint();
+                .checkpoint();
     }
 
     @Override
     public Mono<String> delete(DeleteSpaceRequest request) {
         return delete(request, builder -> builder.pathSegment("spaces", request.getSpaceId()))
-            .checkpoint();
+                .checkpoint();
     }
 
     @Override
     public Mono<String> deleteUnmappedRoutes(DeleteUnmappedRoutesRequest request) {
-        return delete(request, builder -> builder.pathSegment("spaces", request.getSpaceId(), "routes").query("unmapped=true"))
-            .checkpoint();
+        return delete(
+                        request,
+                        builder ->
+                                builder.pathSegment("spaces", request.getSpaceId(), "routes")
+                                        .query("unmapped=true"))
+                .checkpoint();
     }
 
     @Override
     public Mono<GetSpaceResponse> get(GetSpaceRequest request) {
-        return get(request, GetSpaceResponse.class, builder -> builder.pathSegment("spaces", request.getSpaceId()))
-            .checkpoint();
+        return get(
+                        request,
+                        GetSpaceResponse.class,
+                        builder -> builder.pathSegment("spaces", request.getSpaceId()))
+                .checkpoint();
     }
 
     @Override
-    public Mono<GetSpaceIsolationSegmentResponse> getIsolationSegment(GetSpaceIsolationSegmentRequest request) {
-        return get(request, GetSpaceIsolationSegmentResponse.class, builder -> builder.pathSegment("spaces", request.getSpaceId(), "relationships", "isolation_segment"))
-            .checkpoint();
+    public Mono<GetSpaceIsolationSegmentResponse> getIsolationSegment(
+            GetSpaceIsolationSegmentRequest request) {
+        return get(
+                        request,
+                        GetSpaceIsolationSegmentResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "spaces",
+                                        request.getSpaceId(),
+                                        "relationships",
+                                        "isolation_segment"))
+                .checkpoint();
     }
 
     @Override
     public Mono<ListSpacesResponse> list(ListSpacesRequest request) {
         return get(request, ListSpacesResponse.class, builder -> builder.pathSegment("spaces"))
-            .checkpoint();
+                .checkpoint();
     }
 
     @Override
     public Mono<UpdateSpaceResponse> update(UpdateSpaceRequest request) {
-        return patch(request, UpdateSpaceResponse.class, builder -> builder.pathSegment("spaces", request.getSpaceId()))
-            .checkpoint();
+        return patch(
+                        request,
+                        UpdateSpaceResponse.class,
+                        builder -> builder.pathSegment("spaces", request.getSpaceId()))
+                .checkpoint();
     }
 }

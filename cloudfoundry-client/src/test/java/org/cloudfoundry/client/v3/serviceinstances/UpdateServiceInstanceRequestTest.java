@@ -26,39 +26,40 @@ public class UpdateServiceInstanceRequestTest {
     @Test
     public void testServiceInstanceIdOnly() {
         UpdateServiceInstanceRequest.builder()
-            .serviceInstanceId("test-service-instance-id")
-            .build();
+                .serviceInstanceId("test-service-instance-id")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noServiceInstanceId() {
-        UpdateServiceInstanceRequest.builder()
-            .metadata(Metadata.builder().build())
-            .build();
+        UpdateServiceInstanceRequest.builder().metadata(Metadata.builder().build()).build();
     }
 
     @Test
     public void validManagedServiceInstance() {
         UpdateServiceInstanceRequest.builder()
-            .metadata(Metadata.builder().build())
-            .serviceInstanceId("test-service-instance-id")
-            .name("test-service-instance-name")
-            .relationships(ServiceInstanceRelationships.builder()
-                .servicePlan(ToOneRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("test-service-plan-id")
-                        .build())
-                    .build())
-                .space(ToOneRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("test-space-id")
-                        .build())
-                    .build())
-                .build())
-            .tags("foo", "bar")
-            .parameter("key", "value")
-            .build();
+                .metadata(Metadata.builder().build())
+                .serviceInstanceId("test-service-instance-id")
+                .name("test-service-instance-name")
+                .relationships(
+                        ServiceInstanceRelationships.builder()
+                                .servicePlan(
+                                        ToOneRelationship.builder()
+                                                .data(
+                                                        Relationship.builder()
+                                                                .id("test-service-plan-id")
+                                                                .build())
+                                                .build())
+                                .space(
+                                        ToOneRelationship.builder()
+                                                .data(
+                                                        Relationship.builder()
+                                                                .id("test-space-id")
+                                                                .build())
+                                                .build())
+                                .build())
+                .tags("foo", "bar")
+                .parameter("key", "value")
+                .build();
     }
-
-
 }

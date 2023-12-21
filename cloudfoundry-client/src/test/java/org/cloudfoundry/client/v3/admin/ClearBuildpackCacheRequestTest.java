@@ -22,8 +22,6 @@ public class ClearBuildpackCacheRequestTest {
 
     @Test
     public void valid() {
-        ClearBuildpackCacheRequest.builder()
-            .build();
+        ClearBuildpackCacheRequest.builder().build();
     }
-
 }

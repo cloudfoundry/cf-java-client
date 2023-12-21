@@ -22,33 +22,24 @@ public final class UnmapRouteRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noApplicationName() {
-        UnmapRouteRequest.builder()
-            .domain("test-domain")
-            .build();
+        UnmapRouteRequest.builder().domain("test-domain").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noDomain() {
-        UnmapRouteRequest.builder()
-            .applicationName("test-applicationName")
-            .build();
+        UnmapRouteRequest.builder().applicationName("test-applicationName").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void setupConflict() {
-        UnmapRouteRequest.builder()
-            .domain("test-domain")
-            .host("test-hostname")
-            .port(123)
-            .build();
+        UnmapRouteRequest.builder().domain("test-domain").host("test-hostname").port(123).build();
     }
 
     @Test
     public void valid() {
         UnmapRouteRequest.builder()
-            .applicationName("test-applicationName")
-            .domain("test-domain")
-            .build();
+                .applicationName("test-applicationName")
+                .domain("test-domain")
+                .build();
     }
-
 }

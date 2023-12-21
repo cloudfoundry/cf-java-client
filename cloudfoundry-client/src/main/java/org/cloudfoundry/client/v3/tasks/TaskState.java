@@ -82,5 +82,4 @@ public enum TaskState {
     public String toString() {
         return getValue();
     }
-
 }

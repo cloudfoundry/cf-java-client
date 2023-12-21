@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v2.privatedomains;
 
+import java.util.Map;
 import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainRequest;
 import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainResponse;
 import org.cloudfoundry.client.v2.privatedomains.DeletePrivateDomainRequest;
@@ -32,12 +33,11 @@ import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v2.AbstractClientV2Operations;
 import reactor.core.publisher.Mono;
 
-import java.util.Map;
-
 /**
  * The Reactor-based implementation of {@link PrivateDomains}
  */
-public final class ReactorPrivateDomains extends AbstractClientV2Operations implements PrivateDomains {
+public final class ReactorPrivateDomains extends AbstractClientV2Operations
+        implements PrivateDomains {
 
     /**
      * Creates an instance
@@ -47,38 +47,65 @@ public final class ReactorPrivateDomains extends AbstractClientV2Operations impl
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorPrivateDomains(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
+    public ReactorPrivateDomains(
+            ConnectionContext connectionContext,
+            Mono<String> root,
+            TokenProvider tokenProvider,
+            Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<CreatePrivateDomainResponse> create(CreatePrivateDomainRequest request) {
-        return post(request, CreatePrivateDomainResponse.class, builder -> builder.pathSegment("private_domains"))
-            .checkpoint();
+        return post(
+                        request,
+                        CreatePrivateDomainResponse.class,
+                        builder -> builder.pathSegment("private_domains"))
+                .checkpoint();
     }
 
     @Override
     public Mono<DeletePrivateDomainResponse> delete(DeletePrivateDomainRequest request) {
-        return delete(request, DeletePrivateDomainResponse.class, builder -> builder.pathSegment("private_domains", request.getPrivateDomainId()))
-            .checkpoint();
+        return delete(
+                        request,
+                        DeletePrivateDomainResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "private_domains", request.getPrivateDomainId()))
+                .checkpoint();
     }
 
     @Override
     public Mono<GetPrivateDomainResponse> get(GetPrivateDomainRequest request) {
-        return get(request, GetPrivateDomainResponse.class, builder -> builder.pathSegment("private_domains", request.getPrivateDomainId()))
-            .checkpoint();
+        return get(
+                        request,
+                        GetPrivateDomainResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "private_domains", request.getPrivateDomainId()))
+                .checkpoint();
     }
 
     @Override
     public Mono<ListPrivateDomainsResponse> list(ListPrivateDomainsRequest request) {
-        return get(request, ListPrivateDomainsResponse.class, builder -> builder.pathSegment("private_domains"))
-            .checkpoint();
+        return get(
+                        request,
+                        ListPrivateDomainsResponse.class,
+                        builder -> builder.pathSegment("private_domains"))
+                .checkpoint();
     }
 
     @Override
-    public Mono<ListPrivateDomainSharedOrganizationsResponse> listSharedOrganizations(ListPrivateDomainSharedOrganizationsRequest request) {
-        return get(request, ListPrivateDomainSharedOrganizationsResponse.class, builder -> builder.pathSegment("private_domains", request.getPrivateDomainId(), "shared_organizations"))
-            .checkpoint();
+    public Mono<ListPrivateDomainSharedOrganizationsResponse> listSharedOrganizations(
+            ListPrivateDomainSharedOrganizationsRequest request) {
+        return get(
+                        request,
+                        ListPrivateDomainSharedOrganizationsResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "private_domains",
+                                        request.getPrivateDomainId(),
+                                        "shared_organizations"))
+                .checkpoint();
     }
-
 }

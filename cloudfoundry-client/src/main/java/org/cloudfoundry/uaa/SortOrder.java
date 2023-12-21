@@ -48,5 +48,4 @@ public enum SortOrder {
     public String toString() {
         return getValue();
     }
-
 }

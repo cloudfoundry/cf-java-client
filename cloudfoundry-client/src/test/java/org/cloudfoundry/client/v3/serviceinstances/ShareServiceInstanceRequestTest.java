@@ -24,20 +24,15 @@ public class ShareServiceInstanceRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noServiceInstanceId() {
         ShareServiceInstanceRequest.builder()
-            .data(Relationship.builder()
-                .id("test-space-id")
-                .build())
-            .build();
+                .data(Relationship.builder().id("test-space-id").build())
+                .build();
     }
 
     @Test
     public void valid() {
         ShareServiceInstanceRequest.builder()
-            .serviceInstanceId("test-service-instance-id")
-            .data(Relationship.builder()
-                .id("test-space-id")
-                .build())
-            .build();
+                .serviceInstanceId("test-service-instance-id")
+                .data(Relationship.builder().id("test-space-id").build())
+                .build();
     }
-
 }

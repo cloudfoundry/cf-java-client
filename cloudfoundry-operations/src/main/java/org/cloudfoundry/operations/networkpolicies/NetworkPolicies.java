@@ -39,5 +39,4 @@ public interface NetworkPolicies {
      * Remove a network policy
      */
     Flux<Void> remove(RemoveNetworkPolicyRequest request);
-
 }

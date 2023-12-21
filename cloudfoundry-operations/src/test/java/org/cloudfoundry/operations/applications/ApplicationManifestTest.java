@@ -16,83 +16,70 @@
 
 package org.cloudfoundry.operations.applications;
 
-import org.junit.Test;
-
 import java.nio.file.Paths;
+import org.junit.Test;
 
 public final class ApplicationManifestTest {
 
     @Test(expected = IllegalStateException.class)
     public void dockerAndBuildpack() {
         ApplicationManifest.builder()
-            .name("test-name")
-            .buildpack("test-buildpack")
-            .docker(Docker.builder()
-                .image("test-docker-image")
-                .build())
-            .build();
+                .name("test-name")
+                .buildpack("test-buildpack")
+                .docker(Docker.builder().image("test-docker-image").build())
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void dockerAndPath() {
         ApplicationManifest.builder()
-            .name("test-name")
-            .docker(Docker.builder()
-                .image("test-docker-image")
-                .build())
-            .path(Paths.get("test-application"))
-            .build();
+                .name("test-name")
+                .docker(Docker.builder().image("test-docker-image").build())
+                .path(Paths.get("test-application"))
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void dockerCredentialsNoImage() {
         ApplicationManifest.builder()
-            .name("test-name")
-            .docker(Docker.builder()
-                .password("test-password")
-                .username("test-username")
-                .build())
-            .build();
+                .name("test-name")
+                .docker(
+                        Docker.builder()
+                                .password("test-password")
+                                .username("test-username")
+                                .build())
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void routesAndDomains() {
         ApplicationManifest.builder()
-            .name("test-name")
-            .route(Route.builder()
-                .route("test-route")
-                .build())
-            .domain("test-domain")
-            .build();
+                .name("test-name")
+                .route(Route.builder().route("test-route").build())
+                .domain("test-domain")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void routesAndHosts() {
         ApplicationManifest.builder()
-            .name("test-name")
-            .route(Route.builder()
-                .route("test-route")
-                .build())
-            .host("test-host")
-            .build();
+                .name("test-name")
+                .route(Route.builder().route("test-route").build())
+                .host("test-host")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void routesAndNoHostName() {
         ApplicationManifest.builder()
-            .name("test-name")
-            .route(Route.builder()
-                .route("test-route")
-                .build())
-            .noHostname(true)
-            .build();
+                .name("test-name")
+                .route(Route.builder().route("test-route").build())
+                .noHostname(true)
+                .build();
     }
 
     @Test
     public void valid() {
-        ApplicationManifest.builder()
-            .name("test-name")
-            .build();
+        ApplicationManifest.builder().name("test-name").build();
     }
-
 }

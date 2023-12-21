@@ -23,46 +23,46 @@ public class UpdateServiceBrokerRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noName() {
         UpdateServiceBrokerRequest.builder()
-            .url("test-broker-url")
-            .username("test-username")
-            .password("test-password")
-            .build();
+                .url("test-broker-url")
+                .username("test-username")
+                .password("test-password")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noPassword() {
         UpdateServiceBrokerRequest.builder()
-            .name("test-broker")
-            .url("test-broker-url")
-            .username("test-username")
-            .build();
+                .name("test-broker")
+                .url("test-broker-url")
+                .username("test-username")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noUrl() {
         UpdateServiceBrokerRequest.builder()
-            .name("test-broker")
-            .username("test-username")
-            .password("test-password")
-            .build();
+                .name("test-broker")
+                .username("test-username")
+                .password("test-password")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noUsername() {
         UpdateServiceBrokerRequest.builder()
-            .name("test-broker")
-            .url("test-broker-url")
-            .password("test-password")
-            .build();
+                .name("test-broker")
+                .url("test-broker-url")
+                .password("test-password")
+                .build();
     }
 
     @Test
     public void valid() {
         UpdateServiceBrokerRequest.builder()
-            .name("test-broker")
-            .url("test-broker-url")
-            .username("test-username")
-            .password("test-password")
-            .build();
+                .name("test-broker")
+                .url("test-broker-url")
+                .username("test-username")
+                .password("test-password")
+                .build();
     }
 }

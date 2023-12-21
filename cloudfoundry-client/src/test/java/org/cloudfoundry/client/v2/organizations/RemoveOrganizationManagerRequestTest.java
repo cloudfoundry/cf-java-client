@@ -22,24 +22,19 @@ public final class RemoveOrganizationManagerRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noManagerId() {
-        RemoveOrganizationManagerRequest.builder()
-            .organizationId("test-organization-id")
-            .build();
+        RemoveOrganizationManagerRequest.builder().organizationId("test-organization-id").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noOrganizationId() {
-        RemoveOrganizationManagerRequest.builder()
-            .managerId("test-manager-id")
-            .build();
+        RemoveOrganizationManagerRequest.builder().managerId("test-manager-id").build();
     }
 
     @Test
     public void valid() {
         RemoveOrganizationManagerRequest.builder()
-            .managerId("test-manager-id")
-            .organizationId("test-organization-id")
-            .build();
+                .managerId("test-manager-id")
+                .organizationId("test-organization-id")
+                .build();
     }
-
 }

@@ -23,7 +23,6 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * The type of a service instance
  */
 public enum ServiceInstanceType {
-
     MANAGED("managed_service_instance"),
 
     USER_PROVIDED("user_provided_service_instance");
@@ -42,9 +41,9 @@ public enum ServiceInstanceType {
             case "user_provided_service_instance":
                 return USER_PROVIDED;
             default:
-                throw new IllegalArgumentException(String.format("Unknown service instance type: %s", s));
+                throw new IllegalArgumentException(
+                        String.format("Unknown service instance type: %s", s));
         }
-
     }
 
     @JsonValue
@@ -56,5 +55,4 @@ public enum ServiceInstanceType {
     public String toString() {
         return this.getValue();
     }
-
 }

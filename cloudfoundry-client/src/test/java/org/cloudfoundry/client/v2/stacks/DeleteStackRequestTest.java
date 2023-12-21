@@ -22,16 +22,11 @@ public final class DeleteStackRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noStackId() {
-        DeleteStackRequest.builder()
-            .build();
+        DeleteStackRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        DeleteStackRequest.builder()
-            .async(true)
-            .stackId("test-stack-id")
-            .build();
+        DeleteStackRequest.builder().async(true).stackId("test-stack-id").build();
     }
-
 }

@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v2.resourcematch;
 
+import java.util.Map;
 import org.cloudfoundry.client.v2.resourcematch.ListMatchingResourcesRequest;
 import org.cloudfoundry.client.v2.resourcematch.ListMatchingResourcesResponse;
 import org.cloudfoundry.client.v2.resourcematch.ResourceMatch;
@@ -24,12 +25,11 @@ import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v2.AbstractClientV2Operations;
 import reactor.core.publisher.Mono;
 
-import java.util.Map;
-
 /**
  * The Reactor-based implementation of {@link ResourceMatch}
  */
-public final class ReactorResourceMatch extends AbstractClientV2Operations implements ResourceMatch {
+public final class ReactorResourceMatch extends AbstractClientV2Operations
+        implements ResourceMatch {
 
     /**
      * Creates an instance
@@ -39,14 +39,20 @@ public final class ReactorResourceMatch extends AbstractClientV2Operations imple
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorResourceMatch(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
+    public ReactorResourceMatch(
+            ConnectionContext connectionContext,
+            Mono<String> root,
+            TokenProvider tokenProvider,
+            Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<ListMatchingResourcesResponse> list(ListMatchingResourcesRequest request) {
-        return put(request, ListMatchingResourcesResponse.class, builder -> builder.pathSegment("resource_match"))
-            .checkpoint();
+        return put(
+                        request,
+                        ListMatchingResourcesResponse.class,
+                        builder -> builder.pathSegment("resource_match"))
+                .checkpoint();
     }
-
 }

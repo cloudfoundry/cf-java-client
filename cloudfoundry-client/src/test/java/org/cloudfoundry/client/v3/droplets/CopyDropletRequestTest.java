@@ -24,36 +24,33 @@ public final class CopyDropletRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noRelationships() {
-        CopyDropletRequest.builder()
-            .sourceDropletId("test-source-id")
-            .build();
+        CopyDropletRequest.builder().sourceDropletId("test-source-id").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noSourceDropletId() {
         CopyDropletRequest.builder()
-            .relationships(DropletRelationships.builder()
-                .application(ToOneRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("test-id")
-                        .build())
-                    .build())
-                .build())
-            .build();
+                .relationships(
+                        DropletRelationships.builder()
+                                .application(
+                                        ToOneRelationship.builder()
+                                                .data(Relationship.builder().id("test-id").build())
+                                                .build())
+                                .build())
+                .build();
     }
 
     @Test
     public void valid() {
         CopyDropletRequest.builder()
-            .relationships(DropletRelationships.builder()
-                .application(ToOneRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("test-id")
-                        .build())
-                    .build())
-                .build())
-            .sourceDropletId("test-source-id")
-            .build();
+                .relationships(
+                        DropletRelationships.builder()
+                                .application(
+                                        ToOneRelationship.builder()
+                                                .data(Relationship.builder().id("test-id").build())
+                                                .build())
+                                .build())
+                .sourceDropletId("test-source-id")
+                .build();
     }
-
 }

@@ -22,24 +22,19 @@ public final class CopyApplicationRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noApplicationId() {
-        CopyApplicationRequest.builder()
-            .sourceApplicationId("test-source-application-id")
-            .build();
+        CopyApplicationRequest.builder().sourceApplicationId("test-source-application-id").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noSourceApplicationId() {
-        CopyApplicationRequest.builder()
-            .applicationId("test-application id")
-            .build();
+        CopyApplicationRequest.builder().applicationId("test-application id").build();
     }
 
     @Test
     public void valid() {
         CopyApplicationRequest.builder()
-            .applicationId("test-application-id")
-            .sourceApplicationId("test-source-application-id")
-            .build();
+                .applicationId("test-application-id")
+                .sourceApplicationId("test-source-application-id")
+                .build();
     }
-
 }

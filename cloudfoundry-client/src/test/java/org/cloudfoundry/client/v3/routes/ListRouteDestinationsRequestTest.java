@@ -22,15 +22,11 @@ public class ListRouteDestinationsRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noRouteId() {
-        ListRouteDestinationsRequest.builder()
-            .build();
+        ListRouteDestinationsRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        ListRouteDestinationsRequest.builder()
-            .routeId("test-route-destination-id")
-            .build();
+        ListRouteDestinationsRequest.builder().routeId("test-route-destination-id").build();
     }
-
 }

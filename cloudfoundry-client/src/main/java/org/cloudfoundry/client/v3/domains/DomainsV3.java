@@ -86,5 +86,4 @@ public interface DomainsV3 {
      * @return the response from the Update a Domain request
      */
     Mono<UpdateDomainResponse> update(UpdateDomainRequest request);
-
 }

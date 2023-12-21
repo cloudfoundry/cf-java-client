@@ -26,7 +26,8 @@ class UriVariablesRegistry {
     private final List<UriVariable> uriVariables = new ArrayList<>();
 
     Map<String, Object> getUriVariablesMap() {
-        return this.uriVariables.stream().collect(Collectors.toMap(UriVariable::getKey, UriVariable::getValue));
+        return this.uriVariables.stream()
+                .collect(Collectors.toMap(UriVariable::getKey, UriVariable::getValue));
     }
 
     UriVariable register(Object value) {
@@ -39,5 +40,4 @@ class UriVariablesRegistry {
     private String getNextUriVariableKey() {
         return Integer.toString(this.uriVariables.size());
     }
-
 }

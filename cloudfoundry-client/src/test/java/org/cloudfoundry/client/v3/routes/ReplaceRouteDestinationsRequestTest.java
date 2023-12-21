@@ -23,24 +23,22 @@ public class ReplaceRouteDestinationsRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noRouteId() {
         ReplaceRouteDestinationsRequest.builder()
-            .destination(Destination.builder()
-                .application(Application.builder()
-                    .applicationId("test-application-id")
-                    .process(Process.builder()
-                        .type("test-type")
-                        .build())
-                    .build())
-                .destinationId("test-destination-id")
-                .port(999)
-                .build())
-            .build();
+                .destination(
+                        Destination.builder()
+                                .application(
+                                        Application.builder()
+                                                .applicationId("test-application-id")
+                                                .process(
+                                                        Process.builder().type("test-type").build())
+                                                .build())
+                                .destinationId("test-destination-id")
+                                .port(999)
+                                .build())
+                .build();
     }
 
     @Test
     public void valid() {
-        ReplaceRouteDestinationsRequest.builder()
-            .routeId("test-route-destination-id")
-            .build();
+        ReplaceRouteDestinationsRequest.builder().routeId("test-route-destination-id").build();
     }
-
 }

@@ -22,16 +22,14 @@ public final class CreateStackRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noName() {
-        CreateStackRequest.builder()
-            .build();
+        CreateStackRequest.builder().build();
     }
 
     @Test
     public void valid() {
         CreateStackRequest.builder()
-            .description("test-stack-description")
-            .name("test-stack-name")
-            .build();
+                .description("test-stack-description")
+                .name("test-stack-name")
+                .build();
     }
-
 }

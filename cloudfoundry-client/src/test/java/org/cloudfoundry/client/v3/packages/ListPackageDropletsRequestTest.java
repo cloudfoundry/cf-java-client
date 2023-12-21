@@ -22,15 +22,11 @@ public final class ListPackageDropletsRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noPackageId() {
-        ListPackageDropletsRequest.builder()
-            .build();
+        ListPackageDropletsRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        ListPackageDropletsRequest.builder()
-            .packageId("test-package-id")
-            .build();
+        ListPackageDropletsRequest.builder().packageId("test-package-id").build();
     }
-
 }

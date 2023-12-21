@@ -22,8 +22,6 @@ public final class ListDeploymentsRequestTest {
 
     @Test
     public void valid() {
-        ListDeploymentsRequest.builder()
-            .build();
+        ListDeploymentsRequest.builder().build();
     }
-
 }

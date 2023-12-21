@@ -16,6 +16,9 @@
 
 package org.cloudfoundry.operations.util;
 
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import org.cloudfoundry.util.TimeUtils;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscription;
@@ -25,16 +28,11 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.SignalType;
 
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Consumer;
-import java.util.function.Function;
-
 public final class OperationsLogging {
 
     private static final Logger LOGGER = LoggerFactory.getLogger("cloudfoundry-client.operations");
 
-    private OperationsLogging() {
-    }
+    private OperationsLogging() {}
 
     @SuppressWarnings("unchecked")
     public static <T extends Publisher<U>, U> Function<T, T> log(String message) {
@@ -44,30 +42,28 @@ public final class OperationsLogging {
 
         AtomicLong startTimeHolder = new AtomicLong();
 
-        Consumer<Subscription> start = subscription -> {
-            startTimeHolder.set(System.currentTimeMillis());
-            LOGGER.debug("START  {}", message);
-        };
+        Consumer<Subscription> start =
+                subscription -> {
+                    startTimeHolder.set(System.currentTimeMillis());
+                    LOGGER.debug("START  {}", message);
+                };
 
-        Consumer<SignalType> finish = signalType -> {
-            String elapsed = TimeUtils.asTime(System.currentTimeMillis() - startTimeHolder.get());
-            LOGGER.debug("FINISH {} ({}/{})", message, signalType, elapsed);
-        };
+        Consumer<SignalType> finish =
+                signalType -> {
+                    String elapsed =
+                            TimeUtils.asTime(System.currentTimeMillis() - startTimeHolder.get());
+                    LOGGER.debug("FINISH {} ({}/{})", message, signalType, elapsed);
+                };
 
         return f -> {
             if (f instanceof Mono) {
-                return (T) ((Mono<U>) f)
-                    .doOnSubscribe(start)
-                    .doFinally(finish);
+                return (T) ((Mono<U>) f).doOnSubscribe(start).doFinally(finish);
             }
             if (f instanceof Flux) {
-                return (T) ((Flux<U>) f)
-                    .doOnSubscribe(start)
-                    .doFinally(finish);
+                return (T) ((Flux<U>) f).doOnSubscribe(start).doFinally(finish);
             } else {
                 return f;
             }
         };
     }
-
 }

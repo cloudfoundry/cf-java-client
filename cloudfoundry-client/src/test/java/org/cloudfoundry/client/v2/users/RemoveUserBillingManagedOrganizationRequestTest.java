@@ -22,24 +22,21 @@ public final class RemoveUserBillingManagedOrganizationRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noBillingManagedOrganizationId() {
-        RemoveUserBillingManagedOrganizationRequest.builder()
-            .userId("test-user-id")
-            .build();
+        RemoveUserBillingManagedOrganizationRequest.builder().userId("test-user-id").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noUserId() {
         RemoveUserBillingManagedOrganizationRequest.builder()
-            .billingManagedOrganizationId("test-space-id")
-            .build();
+                .billingManagedOrganizationId("test-space-id")
+                .build();
     }
 
     @Test
     public void valid() {
         RemoveUserBillingManagedOrganizationRequest.builder()
-            .billingManagedOrganizationId("test-space-id")
-            .userId("test-user-id")
-            .build();
+                .billingManagedOrganizationId("test-space-id")
+                .userId("test-user-id")
+                .build();
     }
-
 }

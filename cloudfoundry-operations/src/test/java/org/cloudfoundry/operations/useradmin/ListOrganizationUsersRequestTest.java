@@ -22,15 +22,11 @@ public final class ListOrganizationUsersRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noOrganizationName() {
-        ListOrganizationUsersRequest.builder()
-            .build();
+        ListOrganizationUsersRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        ListOrganizationUsersRequest.builder()
-            .organizationName("test-organization")
-            .build();
+        ListOrganizationUsersRequest.builder().organizationName("test-organization").build();
     }
-
 }

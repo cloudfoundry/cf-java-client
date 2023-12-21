@@ -23,23 +23,22 @@ public final class RemoveApplicationServiceBindingRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noApplicationId() {
         RemoveApplicationServiceBindingRequest.builder()
-            .serviceBindingId("test-service-binding-id")
-            .build();
+                .serviceBindingId("test-service-binding-id")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noServiceBindingId() {
         RemoveApplicationServiceBindingRequest.builder()
-            .applicationId("test-application-id")
-            .build();
+                .applicationId("test-application-id")
+                .build();
     }
 
     @Test
     public void valid() {
         RemoveApplicationServiceBindingRequest.builder()
-            .applicationId("test-application-id")
-            .serviceBindingId("test-service-binding-id")
-            .build();
+                .applicationId("test-application-id")
+                .serviceBindingId("test-service-binding-id")
+                .build();
     }
-
 }

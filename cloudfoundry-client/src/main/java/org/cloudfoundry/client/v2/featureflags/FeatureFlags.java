@@ -46,5 +46,4 @@ public interface FeatureFlags {
      * @return the response from the set feature flag request
      */
     Mono<SetFeatureFlagResponse> set(SetFeatureFlagRequest request);
-
 }

@@ -62,5 +62,4 @@ public interface IdentityProviders {
      * @return the response from the Update Identity Provider request
      */
     Mono<UpdateIdentityProviderResponse> update(UpdateIdentityProviderRequest request);
-
 }

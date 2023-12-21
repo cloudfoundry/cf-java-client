@@ -32,5 +32,4 @@ public interface Consumer2<T1, T2> {
      * @param t2 the second input argument
      */
     void accept(T1 t1, T2 t2);
-
 }

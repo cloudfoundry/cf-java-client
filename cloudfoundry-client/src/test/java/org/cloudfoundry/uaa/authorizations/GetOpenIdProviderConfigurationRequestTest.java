@@ -22,8 +22,6 @@ public final class GetOpenIdProviderConfigurationRequestTest {
 
     @Test
     public void valid() {
-        GetOpenIdProviderConfigurationRequest.builder()
-            .build();
+        GetOpenIdProviderConfigurationRequest.builder().build();
     }
-
 }

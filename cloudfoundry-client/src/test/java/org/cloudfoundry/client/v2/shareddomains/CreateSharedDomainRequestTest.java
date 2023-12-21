@@ -22,15 +22,11 @@ public final class CreateSharedDomainRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noName() {
-        CreateSharedDomainRequest.builder()
-            .build();
+        CreateSharedDomainRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        CreateSharedDomainRequest.builder()
-            .name("test-test-name")
-            .build();
+        CreateSharedDomainRequest.builder().name("test-test-name").build();
     }
-
 }

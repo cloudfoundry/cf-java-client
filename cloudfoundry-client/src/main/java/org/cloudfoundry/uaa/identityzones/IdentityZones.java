@@ -62,5 +62,4 @@ public interface IdentityZones {
      * @return the response from the Update Identity Zone request
      */
     Mono<UpdateIdentityZoneResponse> update(UpdateIdentityZoneRequest request);
-
 }

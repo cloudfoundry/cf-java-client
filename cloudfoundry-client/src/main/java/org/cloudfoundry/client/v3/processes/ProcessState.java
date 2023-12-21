@@ -75,5 +75,4 @@ public enum ProcessState {
     public String toString() {
         return getValue();
     }
-
 }

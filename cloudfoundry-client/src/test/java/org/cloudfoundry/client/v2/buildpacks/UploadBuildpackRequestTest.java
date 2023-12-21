@@ -16,10 +16,9 @@
 
 package org.cloudfoundry.client.v2.buildpacks;
 
-import org.junit.Test;
-
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import org.junit.Test;
 
 public final class UploadBuildpackRequestTest {
 
@@ -28,34 +27,33 @@ public final class UploadBuildpackRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noBuildpack() {
         UploadBuildpackRequest.builder()
-            .buildpackId("test-buildpack-id")
-            .filename("test-filename")
-            .build();
+                .buildpackId("test-buildpack-id")
+                .filename("test-filename")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noBuildpackId() {
         UploadBuildpackRequest.builder()
-            .buildpack(TEST_BUILDPACK)
-            .filename("test-filename")
-            .build();
+                .buildpack(TEST_BUILDPACK)
+                .filename("test-filename")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noFilename() {
         UploadBuildpackRequest.builder()
-            .buildpack(TEST_BUILDPACK)
-            .buildpackId("test-buildpack-id")
-            .build();
+                .buildpack(TEST_BUILDPACK)
+                .buildpackId("test-buildpack-id")
+                .build();
     }
 
     @Test
     public void valid() {
         UploadBuildpackRequest.builder()
-            .buildpack(TEST_BUILDPACK)
-            .buildpackId("test-buildpack-id")
-            .filename("test-filename")
-            .build();
+                .buildpack(TEST_BUILDPACK)
+                .buildpackId("test-buildpack-id")
+                .filename("test-filename")
+                .build();
     }
-
 }

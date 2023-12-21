@@ -22,23 +22,19 @@ public final class ApplyManifestRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noSpaceId() {
-        ApplyManifestRequest.builder()
-            .manifest("test-manifest".getBytes())
-            .build();
+        ApplyManifestRequest.builder().manifest("test-manifest".getBytes()).build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noManifest() {
-        ApplyManifestRequest.builder()
-            .spaceId("test-space-id")
-            .build();
+        ApplyManifestRequest.builder().spaceId("test-space-id").build();
     }
 
     @Test
     public void valid() {
         ApplyManifestRequest.builder()
-            .spaceId("test-space-id")
-            .manifest("test-manifest".getBytes())
-            .build();
+                .spaceId("test-space-id")
+                .manifest("test-manifest".getBytes())
+                .build();
     }
 }

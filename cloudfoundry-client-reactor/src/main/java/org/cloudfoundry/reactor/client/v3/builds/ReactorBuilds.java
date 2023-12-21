@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v3.builds;
 
+import java.util.Map;
 import org.cloudfoundry.client.v3.builds.Builds;
 import org.cloudfoundry.client.v3.builds.CreateBuildRequest;
 import org.cloudfoundry.client.v3.builds.CreateBuildResponse;
@@ -27,9 +28,6 @@ import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
 import reactor.core.publisher.Mono;
-
-import java.util.Map;
-
 
 /**
  * The Reactor-based implementation of {@link Builds}
@@ -44,26 +42,32 @@ public final class ReactorBuilds extends AbstractClientV3Operations implements B
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorBuilds(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
+    public ReactorBuilds(
+            ConnectionContext connectionContext,
+            Mono<String> root,
+            TokenProvider tokenProvider,
+            Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<CreateBuildResponse> create(CreateBuildRequest request) {
         return post(request, CreateBuildResponse.class, builder -> builder.pathSegment("builds"))
-            .checkpoint();
+                .checkpoint();
     }
 
     @Override
     public Mono<GetBuildResponse> get(GetBuildRequest request) {
-        return get(request, GetBuildResponse.class, builder -> builder.pathSegment("builds", request.getBuildId()))
-            .checkpoint();
+        return get(
+                        request,
+                        GetBuildResponse.class,
+                        builder -> builder.pathSegment("builds", request.getBuildId()))
+                .checkpoint();
     }
 
     @Override
     public Mono<ListBuildsResponse> list(ListBuildsRequest request) {
         return get(request, ListBuildsResponse.class, builder -> builder.pathSegment("builds"))
-            .checkpoint();
+                .checkpoint();
     }
-
 }

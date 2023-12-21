@@ -22,15 +22,11 @@ public class GetRoleRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noRoleId() {
-        GetRoleRequest.builder()
-            .build();
+        GetRoleRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        GetRoleRequest.builder()
-            .roleId("test-role-id")
-            .build();
+        GetRoleRequest.builder().roleId("test-role-id").build();
     }
-
 }

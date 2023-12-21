@@ -22,8 +22,6 @@ public final class ListIdentityZonesRequestTest {
 
     @Test
     public void valid() {
-        ListIdentityZonesRequest.builder()
-            .build();
+        ListIdentityZonesRequest.builder().build();
     }
-
 }

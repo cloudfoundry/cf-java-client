@@ -16,70 +16,69 @@
 
 package org.cloudfoundry.reactor;
 
-import org.junit.Test;
-import reactor.test.StepVerifier;
-
-import java.time.Duration;
-
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
+import java.time.Duration;
+import org.junit.Test;
+import reactor.test.StepVerifier;
+
 public final class InfoPayloadRootProviderTest extends AbstractRestTest {
 
-    private final InfoPayloadRootProvider rootProvider = InfoPayloadRootProvider.builder()
-        .apiHost("localhost")
-        .port(this.mockWebServer.getPort())
-        .secure(false)
-        .objectMapper(CONNECTION_CONTEXT.getObjectMapper())
-        .build();
+    private final InfoPayloadRootProvider rootProvider =
+            InfoPayloadRootProvider.builder()
+                    .apiHost("localhost")
+                    .port(this.mockWebServer.getPort())
+                    .secure(false)
+                    .objectMapper(CONNECTION_CONTEXT.getObjectMapper())
+                    .build();
 
     @Test
     public void getRoot() {
         this.rootProvider
-            .getRoot(CONNECTION_CONTEXT)
-            .as(StepVerifier::create)
-            .expectNext(String.format("http://localhost:%d", this.mockWebServer.getPort()))
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .getRoot(CONNECTION_CONTEXT)
+                .as(StepVerifier::create)
+                .expectNext(String.format("http://localhost:%d", this.mockWebServer.getPort()))
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
     public void getRootKey() {
-        mockRequest(InteractionContext.builder()
-            .request(TestRequest.builder()
-                .method(GET).path("/v2/info")
-                .build())
-            .response(TestResponse.builder()
-                .status(OK)
-                .payload("fixtures/client/v2/info/GET_response.json")
-                .build())
-            .build());
+        mockRequest(
+                InteractionContext.builder()
+                        .request(TestRequest.builder().method(GET).path("/v2/info").build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(OK)
+                                        .payload("fixtures/client/v2/info/GET_response.json")
+                                        .build())
+                        .build());
 
         this.rootProvider
-            .getRoot("authorization_endpoint", CONNECTION_CONTEXT)
-            .as(StepVerifier::create)
-            .expectNext("http://localhost:8080/uaa")
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .getRoot("authorization_endpoint", CONNECTION_CONTEXT)
+                .as(StepVerifier::create)
+                .expectNext("http://localhost:8080/uaa")
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
     public void getRootKeyNoKey() {
-        mockRequest(InteractionContext.builder()
-            .request(TestRequest.builder()
-                .method(GET).path("/v2/info")
-                .build())
-            .response(TestResponse.builder()
-                .status(OK)
-                .payload("fixtures/client/v2/info/GET_response.json")
-                .build())
-            .build());
+        mockRequest(
+                InteractionContext.builder()
+                        .request(TestRequest.builder().method(GET).path("/v2/info").build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(OK)
+                                        .payload("fixtures/client/v2/info/GET_response.json")
+                                        .build())
+                        .build());
 
         this.rootProvider
-            .getRoot("invalid-key", CONNECTION_CONTEXT)
-            .as(StepVerifier::create)
-            .expectError(IllegalArgumentException.class)
-            .verify(Duration.ofSeconds(5));
+                .getRoot("invalid-key", CONNECTION_CONTEXT)
+                .as(StepVerifier::create)
+                .expectError(IllegalArgumentException.class)
+                .verify(Duration.ofSeconds(5));
     }
-
 }

@@ -22,8 +22,6 @@ public final class ListOrganizationQuotaDefinitionsRequestTest {
 
     @Test
     public void valid() {
-        ListOrganizationQuotaDefinitionsRequest.builder()
-            .build();
+        ListOrganizationQuotaDefinitionsRequest.builder().build();
     }
-
 }

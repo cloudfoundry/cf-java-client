@@ -31,7 +31,10 @@ public abstract class Package extends Resource {
     /**
      * The data for the package
      */
-    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "type")
+    @JsonTypeInfo(
+            use = JsonTypeInfo.Id.NAME,
+            include = JsonTypeInfo.As.EXTERNAL_PROPERTY,
+            property = "type")
     @JsonSubTypes({
         @JsonSubTypes.Type(name = "bits", value = BitsData.class),
         @JsonSubTypes.Type(name = "docker", value = DockerData.class)
@@ -64,5 +67,4 @@ public abstract class Package extends Resource {
     @JsonProperty("relationships")
     @Nullable
     abstract PackageRelationships getRelationships();
-
 }

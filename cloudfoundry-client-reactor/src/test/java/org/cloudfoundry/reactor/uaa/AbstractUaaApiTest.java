@@ -18,6 +18,4 @@ package org.cloudfoundry.reactor.uaa;
 
 import org.cloudfoundry.reactor.AbstractRestTest;
 
-public abstract class AbstractUaaApiTest extends AbstractRestTest {
-
-}
+public abstract class AbstractUaaApiTest extends AbstractRestTest {}

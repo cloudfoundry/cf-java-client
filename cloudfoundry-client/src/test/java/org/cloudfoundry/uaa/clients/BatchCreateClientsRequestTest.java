@@ -16,34 +16,30 @@
 
 package org.cloudfoundry.uaa.clients;
 
-import org.junit.Test;
-
 import static org.cloudfoundry.uaa.tokens.GrantType.CLIENT_CREDENTIALS;
+
+import org.junit.Test;
 
 public final class BatchCreateClientsRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void emptyClient() {
-        BatchCreateClientsRequest.builder()
-            .clients()
-            .build();
+        BatchCreateClientsRequest.builder().clients().build();
     }
-
 
     @Test(expected = IllegalStateException.class)
     public void noClient() {
-        BatchCreateClientsRequest.builder()
-            .build();
+        BatchCreateClientsRequest.builder().build();
     }
 
     @Test
     public void valid() {
         BatchCreateClientsRequest.builder()
-            .client(CreateClient.builder()
-                .clientId("test-client-id")
-                .authorizedGrantType(CLIENT_CREDENTIALS)
-                .build())
-            .build();
+                .client(
+                        CreateClient.builder()
+                                .clientId("test-client-id")
+                                .authorizedGrantType(CLIENT_CREDENTIALS)
+                                .build())
+                .build();
     }
-
 }

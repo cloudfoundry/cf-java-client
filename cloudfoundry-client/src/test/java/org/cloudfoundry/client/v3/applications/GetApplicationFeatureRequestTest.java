@@ -22,24 +22,19 @@ public final class GetApplicationFeatureRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noApplicationId() {
-        GetApplicationFeatureRequest.builder()
-            .applicationId("test-application-id")
-            .build();
+        GetApplicationFeatureRequest.builder().applicationId("test-application-id").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noFeatureName() {
-        GetApplicationFeatureRequest.builder()
-            .featureName("test-feature-name")
-            .build();
+        GetApplicationFeatureRequest.builder().featureName("test-feature-name").build();
     }
 
     @Test
     public void valid() {
         GetApplicationFeatureRequest.builder()
-            .applicationId("test-application-id")
-            .featureName("test-feature-name")
-            .build();
+                .applicationId("test-application-id")
+                .featureName("test-feature-name")
+                .build();
     }
-
 }

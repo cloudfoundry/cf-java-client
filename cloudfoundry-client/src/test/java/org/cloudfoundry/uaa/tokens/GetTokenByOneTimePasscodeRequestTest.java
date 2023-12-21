@@ -23,47 +23,46 @@ public final class GetTokenByOneTimePasscodeRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noClientId() {
         GetTokenByOneTimePasscodeRequest.builder()
-            .clientSecret("test-client-secret")
-            .passcode("test-passcode")
-            .tokenFormat(TokenFormat.OPAQUE)
-            .build();
+                .clientSecret("test-client-secret")
+                .passcode("test-passcode")
+                .tokenFormat(TokenFormat.OPAQUE)
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noClientSecret() {
         GetTokenByOneTimePasscodeRequest.builder()
-            .clientId("test-client-id")
-            .passcode("test-passcode")
-            .tokenFormat(TokenFormat.OPAQUE)
-            .build();
+                .clientId("test-client-id")
+                .passcode("test-passcode")
+                .tokenFormat(TokenFormat.OPAQUE)
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noPasscode() {
         GetTokenByOneTimePasscodeRequest.builder()
-            .clientId("test-client-id")
-            .clientSecret("test-client-secret")
-            .tokenFormat(TokenFormat.OPAQUE)
-            .build();
+                .clientId("test-client-id")
+                .clientSecret("test-client-secret")
+                .tokenFormat(TokenFormat.OPAQUE)
+                .build();
     }
 
     @Test
     public void validMax() {
         GetTokenByOneTimePasscodeRequest.builder()
-            .clientId("test-client-id")
-            .clientSecret("test-client-secret")
-            .passcode("test-passcode")
-            .tokenFormat(TokenFormat.OPAQUE)
-            .build();
+                .clientId("test-client-id")
+                .clientSecret("test-client-secret")
+                .passcode("test-passcode")
+                .tokenFormat(TokenFormat.OPAQUE)
+                .build();
     }
 
     @Test
     public void validMin() {
         GetTokenByOneTimePasscodeRequest.builder()
-            .clientId("test-client-id")
-            .clientSecret("test-client-secret")
-            .passcode("test-passcode")
-            .build();
+                .clientId("test-client-id")
+                .clientSecret("test-client-secret")
+                .passcode("test-passcode")
+                .build();
     }
-
 }

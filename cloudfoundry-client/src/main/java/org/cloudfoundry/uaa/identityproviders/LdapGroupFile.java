@@ -23,7 +23,6 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * The file to be used for group integration.
  */
 public enum LdapGroupFile {
-
     GROUPS_AS_SCOPES("ldap/ldap-groups-as-scopes.xml"),
 
     GROUPS_MAP_TO_SCOPES("ldap/ldap-groups-map-to-scopes.xml"),
@@ -59,5 +58,4 @@ public enum LdapGroupFile {
     public String toString() {
         return getValue();
     }
-
 }

@@ -23,23 +23,20 @@ public final class UnsetEnvironmentVariableApplicationRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noName() {
         UnsetEnvironmentVariableApplicationRequest.builder()
-            .variableName("test-variable-name")
-            .build();
+                .variableName("test-variable-name")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noVariableName() {
-        UnsetEnvironmentVariableApplicationRequest.builder()
-            .name("test-name")
-            .build();
+        UnsetEnvironmentVariableApplicationRequest.builder().name("test-name").build();
     }
 
     @Test
     public void valid() {
         UnsetEnvironmentVariableApplicationRequest.builder()
-            .name("test-name")
-            .variableName("test-variable-name")
-            .build();
+                .name("test-name")
+                .variableName("test-variable-name")
+                .build();
     }
-
 }

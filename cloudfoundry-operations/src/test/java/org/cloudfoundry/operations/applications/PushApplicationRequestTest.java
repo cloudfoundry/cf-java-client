@@ -16,49 +16,40 @@
 
 package org.cloudfoundry.operations.applications;
 
-import org.junit.Test;
-
 import java.nio.file.Paths;
+import org.junit.Test;
 
 public final class PushApplicationRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void applicationAndDocker() {
         PushApplicationRequest.builder()
-            .path(Paths.get("test-application"))
-            .dockerImage("test-docker")
-            .name("test-name")
-            .build();
+                .path(Paths.get("test-application"))
+                .dockerImage("test-docker")
+                .name("test-name")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noApplicationOrDocker() {
-        PushApplicationRequest.builder()
-            .name("test-name")
-            .build();
+        PushApplicationRequest.builder().name("test-name").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noName() {
-        PushApplicationRequest.builder()
-            .path(Paths.get("test-application"))
-            .build();
+        PushApplicationRequest.builder().path(Paths.get("test-application")).build();
     }
 
     @Test
     public void validApplication() {
         PushApplicationRequest.builder()
-            .path(Paths.get("test-application"))
-            .name("test-name")
-            .build();
+                .path(Paths.get("test-application"))
+                .name("test-name")
+                .build();
     }
 
     @Test
     public void validDocker() {
-        PushApplicationRequest.builder()
-            .dockerImage("test-docker")
-            .name("test-name")
-            .build();
+        PushApplicationRequest.builder().dockerImage("test-docker").name("test-name").build();
     }
-
 }

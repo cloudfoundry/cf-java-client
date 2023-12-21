@@ -22,24 +22,21 @@ public final class AssociateSpaceSecurityGroupRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noSecurityGroupId() {
-        AssociateSpaceSecurityGroupRequest.builder()
-            .spaceId("test-space-id")
-            .build();
+        AssociateSpaceSecurityGroupRequest.builder().spaceId("test-space-id").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noSpaceId() {
         AssociateSpaceSecurityGroupRequest.builder()
-            .securityGroupId("test-security-group-id")
-            .build();
+                .securityGroupId("test-security-group-id")
+                .build();
     }
 
     @Test
     public void valid() {
         AssociateSpaceSecurityGroupRequest.builder()
-            .securityGroupId("test-security-group-id")
-            .spaceId("test-space-id")
-            .build();
+                .securityGroupId("test-security-group-id")
+                .spaceId("test-space-id")
+                .build();
     }
-
 }

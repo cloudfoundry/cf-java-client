@@ -23,26 +23,22 @@ public final class InviteUsersRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noEmails() {
         InviteUsersRequest.builder()
-            .clientId("test-client-id")
-            .redirectUri("test-redirect-uri")
-            .build();
+                .clientId("test-client-id")
+                .redirectUri("test-redirect-uri")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noRedirectId() {
-        InviteUsersRequest.builder()
-            .clientId("test-client-id")
-            .email("test-email")
-            .build();
+        InviteUsersRequest.builder().clientId("test-client-id").email("test-email").build();
     }
 
     @Test
     public void valid() {
         InviteUsersRequest.builder()
-            .clientId("test-client-id")
-            .email("test-email")
-            .redirectUri("test-redirect-uri")
-            .build();
+                .clientId("test-client-id")
+                .email("test-email")
+                .redirectUri("test-redirect-uri")
+                .build();
     }
-
 }

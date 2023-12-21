@@ -22,24 +22,19 @@ public final class CreateServiceBindingRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noApplicationId() {
-        CreateServiceBindingRequest.builder()
-            .serviceInstanceId("test-service-instance-id")
-            .build();
+        CreateServiceBindingRequest.builder().serviceInstanceId("test-service-instance-id").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noServiceInstanceId() {
-        CreateServiceBindingRequest.builder()
-            .applicationId("app-id")
-            .build();
+        CreateServiceBindingRequest.builder().applicationId("app-id").build();
     }
 
     @Test
     public void valid() {
         CreateServiceBindingRequest.builder()
-            .applicationId("app-id")
-            .serviceInstanceId("test-service-instance-id")
-            .build();
+                .applicationId("app-id")
+                .serviceInstanceId("test-service-instance-id")
+                .build();
     }
-
 }

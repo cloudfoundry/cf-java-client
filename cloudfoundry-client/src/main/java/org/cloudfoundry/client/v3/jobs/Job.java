@@ -17,9 +17,8 @@
 package org.cloudfoundry.client.v3.jobs;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.cloudfoundry.client.v3.Resource;
-
 import java.util.List;
+import org.cloudfoundry.client.v3.Resource;
 
 /**
  * Base class for responses that are jobs
@@ -49,5 +48,4 @@ public abstract class Job extends Resource {
      */
     @JsonProperty("warnings")
     public abstract List<Warning> getWarnings();
-
 }

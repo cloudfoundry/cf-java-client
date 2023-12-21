@@ -62,7 +62,8 @@ public enum DeploymentStatusValue {
             case "finalized":
                 return FINALIZED;
             default:
-                throw new IllegalArgumentException(String.format("Unknown deployment status value: %s", s));
+                throw new IllegalArgumentException(
+                        String.format("Unknown deployment status value: %s", s));
         }
     }
 
@@ -75,5 +76,4 @@ public enum DeploymentStatusValue {
     public String toString() {
         return getValue();
     }
-
 }

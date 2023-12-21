@@ -22,15 +22,11 @@ public final class GetServiceRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noServiceId() {
-        GetServiceRequest.builder()
-            .build();
+        GetServiceRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        GetServiceRequest.builder()
-            .serviceId("test-service-id")
-            .build();
+        GetServiceRequest.builder().serviceId("test-service-id").build();
     }
-
 }

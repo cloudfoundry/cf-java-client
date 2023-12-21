@@ -23,47 +23,46 @@ public final class GetAutoLoginAuthenticationCodeRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noClientId() {
         GetAutoLoginAuthenticationCodeRequest.builder()
-            .clientSecret("test-client-secret")
-            .password("test-password")
-            .username("test-username")
-            .build();
+                .clientSecret("test-client-secret")
+                .password("test-password")
+                .username("test-username")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noClientSecret() {
         GetAutoLoginAuthenticationCodeRequest.builder()
-            .clientId("test-client-id")
-            .password("test-password")
-            .username("test-username")
-            .build();
+                .clientId("test-client-id")
+                .password("test-password")
+                .username("test-username")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noPassword() {
         GetAutoLoginAuthenticationCodeRequest.builder()
-            .clientId("test-client-id")
-            .clientSecret("test-client-secret")
-            .username("test-username")
-            .build();
+                .clientId("test-client-id")
+                .clientSecret("test-client-secret")
+                .username("test-username")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noUsername() {
         GetAutoLoginAuthenticationCodeRequest.builder()
-            .clientId("test-client-id")
-            .clientSecret("test-client-secret")
-            .password("test-password")
-            .build();
+                .clientId("test-client-id")
+                .clientSecret("test-client-secret")
+                .password("test-password")
+                .build();
     }
 
     @Test
     public void valid() {
         GetAutoLoginAuthenticationCodeRequest.builder()
-            .clientId("test-client-id")
-            .clientSecret("test-client-secret")
-            .password("test-password")
-            .username("test-username")
-            .build();
+                .clientId("test-client-id")
+                .clientSecret("test-client-secret")
+                .password("test-password")
+                .username("test-username")
+                .build();
     }
-
 }

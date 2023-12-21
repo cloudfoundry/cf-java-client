@@ -16,11 +16,10 @@
 
 package org.cloudfoundry.reactor.util;
 
+import java.util.function.Function;
 import org.cloudfoundry.reactor.HttpClientResponseWithConnection;
 import reactor.core.publisher.Flux;
 
-import java.util.function.Function;
-
-public interface ErrorPayloadMapper extends Function<Flux<HttpClientResponseWithConnection>, Flux<HttpClientResponseWithConnection>> {
-
-}
+public interface ErrorPayloadMapper
+        extends Function<
+                Flux<HttpClientResponseWithConnection>, Flux<HttpClientResponseWithConnection>> {}

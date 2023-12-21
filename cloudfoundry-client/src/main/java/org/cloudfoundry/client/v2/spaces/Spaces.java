@@ -37,7 +37,8 @@ public interface Spaces {
      * @param request the Associate Auditor with the Space by Username request
      * @return the response from the Associate Auditor with the Space by Username request
      */
-    Mono<AssociateSpaceAuditorByUsernameResponse> associateAuditorByUsername(AssociateSpaceAuditorByUsernameRequest request);
+    Mono<AssociateSpaceAuditorByUsernameResponse> associateAuditorByUsername(
+            AssociateSpaceAuditorByUsernameRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/spaces/associate_developer_with_the_space.html">Associate Developer with the Space</a> request
@@ -45,7 +46,8 @@ public interface Spaces {
      * @param request the Associate Developer request
      * @return the response from the Associate Developer request
      */
-    Mono<AssociateSpaceDeveloperResponse> associateDeveloper(AssociateSpaceDeveloperRequest request);
+    Mono<AssociateSpaceDeveloperResponse> associateDeveloper(
+            AssociateSpaceDeveloperRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/spaces/associate_developer_with_the_space_by_username.html">Associate Developer with the Space by Username</a> request
@@ -53,7 +55,8 @@ public interface Spaces {
      * @param request the Associate Developer with the Space by Username request
      * @return the response from the Associate Developer with the Space by Username request
      */
-    Mono<AssociateSpaceDeveloperByUsernameResponse> associateDeveloperByUsername(AssociateSpaceDeveloperByUsernameRequest request);
+    Mono<AssociateSpaceDeveloperByUsernameResponse> associateDeveloperByUsername(
+            AssociateSpaceDeveloperByUsernameRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/spaces/associate_manager_with_the_space.html">Associate Manager with the Space</a> request
@@ -69,7 +72,8 @@ public interface Spaces {
      * @param request the Associate Manager with the Space by Username request
      * @return the response from the Associate Manager with the Space by Username request
      */
-    Mono<AssociateSpaceManagerByUsernameResponse> associateManagerByUsername(AssociateSpaceManagerByUsernameRequest request);
+    Mono<AssociateSpaceManagerByUsernameResponse> associateManagerByUsername(
+            AssociateSpaceManagerByUsernameRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/spaces/associate_security_group_with_the_space.html">Associate Security Group with the Space</a> request
@@ -77,7 +81,8 @@ public interface Spaces {
      * @param request the Associate Security Group request
      * @return the response from the Associate Security Group request
      */
-    Mono<AssociateSpaceSecurityGroupResponse> associateSecurityGroup(AssociateSpaceSecurityGroupRequest request);
+    Mono<AssociateSpaceSecurityGroupResponse> associateSecurityGroup(
+            AssociateSpaceSecurityGroupRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/spaces/creating_a_space.html">Create Space</a> request
@@ -182,7 +187,8 @@ public interface Spaces {
      * @param request the List all Security Groups for the Space request
      * @return the response from the List all Security Groups for the Space request
      */
-    Mono<ListSpaceSecurityGroupsResponse> listSecurityGroups(ListSpaceSecurityGroupsRequest request);
+    Mono<ListSpaceSecurityGroupsResponse> listSecurityGroups(
+            ListSpaceSecurityGroupsRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/spaces/list_all_service_instances_for_the_space.html">List all Service Instances for the Space</a> request
@@ -190,7 +196,8 @@ public interface Spaces {
      * @param request the List all Service Instances for the Space request
      * @return the response from the List all Service Instances for the Space request
      */
-    Mono<ListSpaceServiceInstancesResponse> listServiceInstances(ListSpaceServiceInstancesRequest request);
+    Mono<ListSpaceServiceInstancesResponse> listServiceInstances(
+            ListSpaceServiceInstancesRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/spaces/list_all_services_for_the_space.html">List all Services for the Space</a> request
@@ -222,7 +229,8 @@ public interface Spaces {
      * @param request the Disassociate Auditor with the Space by Username request
      * @return the response from the Disassociate Auditor with the Space by Username request
      */
-    Mono<RemoveSpaceAuditorByUsernameResponse> removeAuditorByUsername(RemoveSpaceAuditorByUsernameRequest request);
+    Mono<RemoveSpaceAuditorByUsernameResponse> removeAuditorByUsername(
+            RemoveSpaceAuditorByUsernameRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/spaces/remove_developer_from_the_space.html">Remove Developer from the Space</a> request
@@ -238,7 +246,8 @@ public interface Spaces {
      * @param request the Disassociate Developer with the Space by Username request
      * @return the response from the Disassociate Developer with the Space by Username request
      */
-    Mono<RemoveSpaceDeveloperByUsernameResponse> removeDeveloperByUsername(RemoveSpaceDeveloperByUsernameRequest request);
+    Mono<RemoveSpaceDeveloperByUsernameResponse> removeDeveloperByUsername(
+            RemoveSpaceDeveloperByUsernameRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/spaces/remove_manager_from_the_space.html">Remove Manager from the Space</a> request
@@ -254,7 +263,8 @@ public interface Spaces {
      * @param request the Disassociate Manager with the Space by Username request
      * @return the response from the Disassociate Manager with the Space by Username request
      */
-    Mono<RemoveSpaceManagerByUsernameResponse> removeManagerByUsername(RemoveSpaceManagerByUsernameRequest request);
+    Mono<RemoveSpaceManagerByUsernameResponse> removeManagerByUsername(
+            RemoveSpaceManagerByUsernameRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/spaces/remove_security_group_from_the_space.html">Remove Security Group from the Space</a> request
@@ -271,5 +281,4 @@ public interface Spaces {
      * @return the response from the Update a Space request
      */
     Mono<UpdateSpaceResponse> update(UpdateSpaceRequest request);
-
 }

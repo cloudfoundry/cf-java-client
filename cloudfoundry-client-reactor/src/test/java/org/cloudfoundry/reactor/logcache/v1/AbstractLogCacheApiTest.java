@@ -18,6 +18,4 @@ package org.cloudfoundry.reactor.logcache.v1;
 
 import org.cloudfoundry.reactor.AbstractRestTest;
 
-class AbstractLogCacheApiTest extends AbstractRestTest {
-
-}
+class AbstractLogCacheApiTest extends AbstractRestTest {}

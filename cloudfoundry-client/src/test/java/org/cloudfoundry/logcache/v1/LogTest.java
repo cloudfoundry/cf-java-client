@@ -16,12 +16,11 @@
 
 package org.cloudfoundry.logcache.v1;
 
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.Test;
 
 public class LogTest {
 
@@ -33,13 +32,10 @@ public class LogTest {
     @Test
     public void getPayloadAsText() {
         final String payload = "This is a test.";
-        final String encodedPayload = Base64.getEncoder().encodeToString(payload.getBytes(StandardCharsets.UTF_8));
+        final String encodedPayload =
+                Base64.getEncoder().encodeToString(payload.getBytes(StandardCharsets.UTF_8));
 
-        assertThat(Log.builder()
-            .payload(encodedPayload)
-            .build()
-            .getPayloadAsText())
-            .isEqualTo(payload);
+        assertThat(Log.builder().payload(encodedPayload).build().getPayloadAsText())
+                .isEqualTo(payload);
     }
-
 }

@@ -48,7 +48,8 @@ public enum ServiceInstanceType {
             case "user-provided":
                 return USER_PROVIDED;
             default:
-                throw new IllegalArgumentException(String.format("Unknown service instance type: %s", s));
+                throw new IllegalArgumentException(
+                        String.format("Unknown service instance type: %s", s));
         }
     }
 
@@ -61,5 +62,4 @@ public enum ServiceInstanceType {
     public String toString() {
         return getValue();
     }
-
 }

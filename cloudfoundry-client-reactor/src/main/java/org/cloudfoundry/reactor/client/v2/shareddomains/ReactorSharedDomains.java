@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v2.shareddomains;
 
+import java.util.Map;
 import org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainRequest;
 import org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainResponse;
 import org.cloudfoundry.client.v2.shareddomains.DeleteSharedDomainRequest;
@@ -30,12 +31,11 @@ import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v2.AbstractClientV2Operations;
 import reactor.core.publisher.Mono;
 
-import java.util.Map;
-
 /**
  * The Reactor-based implementation of {@link SharedDomains}
  */
-public final class ReactorSharedDomains extends AbstractClientV2Operations implements SharedDomains {
+public final class ReactorSharedDomains extends AbstractClientV2Operations
+        implements SharedDomains {
 
     /**
      * Creates an instance
@@ -45,33 +45,49 @@ public final class ReactorSharedDomains extends AbstractClientV2Operations imple
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorSharedDomains(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
+    public ReactorSharedDomains(
+            ConnectionContext connectionContext,
+            Mono<String> root,
+            TokenProvider tokenProvider,
+            Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<CreateSharedDomainResponse> create(CreateSharedDomainRequest request) {
-        return post(request, CreateSharedDomainResponse.class, builder -> builder.pathSegment("shared_domains"))
-            .checkpoint();
+        return post(
+                        request,
+                        CreateSharedDomainResponse.class,
+                        builder -> builder.pathSegment("shared_domains"))
+                .checkpoint();
     }
 
     @Override
     public Mono<DeleteSharedDomainResponse> delete(DeleteSharedDomainRequest request) {
-        return delete(request, DeleteSharedDomainResponse.class, builder -> builder.pathSegment("shared_domains", request.getSharedDomainId()))
-            .checkpoint();
+        return delete(
+                        request,
+                        DeleteSharedDomainResponse.class,
+                        builder ->
+                                builder.pathSegment("shared_domains", request.getSharedDomainId()))
+                .checkpoint();
     }
 
     @Override
     public Mono<GetSharedDomainResponse> get(GetSharedDomainRequest request) {
-        return get(request, GetSharedDomainResponse.class, builder -> builder.pathSegment("shared_domains", request.getSharedDomainId()))
-            .checkpoint();
-
+        return get(
+                        request,
+                        GetSharedDomainResponse.class,
+                        builder ->
+                                builder.pathSegment("shared_domains", request.getSharedDomainId()))
+                .checkpoint();
     }
 
     @Override
     public Mono<ListSharedDomainsResponse> list(ListSharedDomainsRequest request) {
-        return get(request, ListSharedDomainsResponse.class, builder -> builder.pathSegment("shared_domains"))
-            .checkpoint();
+        return get(
+                        request,
+                        ListSharedDomainsResponse.class,
+                        builder -> builder.pathSegment("shared_domains"))
+                .checkpoint();
     }
-
 }

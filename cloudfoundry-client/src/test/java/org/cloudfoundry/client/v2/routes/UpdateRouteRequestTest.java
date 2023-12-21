@@ -22,15 +22,11 @@ public final class UpdateRouteRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noRouteId() {
-        UpdateRouteRequest.builder()
-            .build();
+        UpdateRouteRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        UpdateRouteRequest.builder()
-            .routeId("test-route-id")
-            .build();
+        UpdateRouteRequest.builder().routeId("test-route-id").build();
     }
-
 }

@@ -22,15 +22,11 @@ public final class DeleteClientRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noId() {
-        DeleteClientRequest.builder()
-            .build();
+        DeleteClientRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        DeleteClientRequest.builder()
-            .clientId("test-client-id")
-            .build();
+        DeleteClientRequest.builder().clientId("test-client-id").build();
     }
-
 }

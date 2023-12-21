@@ -66,5 +66,4 @@ public abstract class AbstractTokenKey {
      */
     @JsonProperty("value")
     public abstract String getValue();
-
 }

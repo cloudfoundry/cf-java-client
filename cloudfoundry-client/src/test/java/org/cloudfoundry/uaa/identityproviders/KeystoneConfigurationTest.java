@@ -22,8 +22,6 @@ public final class KeystoneConfigurationTest {
 
     @Test
     public void valid() {
-        KeystoneConfiguration.builder()
-            .build();
+        KeystoneConfiguration.builder().build();
     }
-
 }

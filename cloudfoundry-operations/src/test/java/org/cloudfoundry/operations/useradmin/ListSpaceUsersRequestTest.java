@@ -22,24 +22,19 @@ public final class ListSpaceUsersRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noOrganizationName() {
-        ListSpaceUsersRequest.builder()
-            .spaceName("test-space")
-            .build();
+        ListSpaceUsersRequest.builder().spaceName("test-space").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noSpaceName() {
-        ListSpaceUsersRequest.builder()
-            .organizationName("test-organization")
-            .build();
+        ListSpaceUsersRequest.builder().organizationName("test-organization").build();
     }
 
     @Test
     public void valid() {
         ListSpaceUsersRequest.builder()
-            .organizationName("test-organization")
-            .spaceName("test-space")
-            .build();
+                .organizationName("test-organization")
+                .spaceName("test-space")
+                .build();
     }
-
 }

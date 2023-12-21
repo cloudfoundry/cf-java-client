@@ -58,5 +58,4 @@ public enum LogType {
     public String toString() {
         return getValue();
     }
-
 }

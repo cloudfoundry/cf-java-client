@@ -22,15 +22,13 @@ public final class GetOrganizationInstanceUsageRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noOrganizationId() {
-        GetOrganizationInstanceUsageRequest.builder()
-            .build();
+        GetOrganizationInstanceUsageRequest.builder().build();
     }
 
     @Test
     public void valid() {
         GetOrganizationInstanceUsageRequest.builder()
-            .organizationId("test-organization-id")
-            .build();
+                .organizationId("test-organization-id")
+                .build();
     }
-
 }

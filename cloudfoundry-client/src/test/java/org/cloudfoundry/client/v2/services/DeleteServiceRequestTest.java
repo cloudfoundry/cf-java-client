@@ -22,15 +22,11 @@ public final class DeleteServiceRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noServiceId() {
-        DeleteServiceRequest.builder()
-            .build();
+        DeleteServiceRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        DeleteServiceRequest.builder()
-            .serviceId("test-service-id")
-            .build();
+        DeleteServiceRequest.builder().serviceId("test-service-id").build();
     }
-
 }

@@ -22,15 +22,13 @@ public final class ListIsolationSegmentEntitledOrganizationsRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noId() {
-        ListIsolationSegmentEntitledOrganizationsRequest.builder()
-            .build();
+        ListIsolationSegmentEntitledOrganizationsRequest.builder().build();
     }
 
     @Test
     public void valid() {
         ListIsolationSegmentEntitledOrganizationsRequest.builder()
-            .isolationSegmentId("test-isolation-segment-id")
-            .build();
+                .isolationSegmentId("test-isolation-segment-id")
+                .build();
     }
-
 }

@@ -16,10 +16,9 @@
 
 package org.cloudfoundry.client.v3;
 
-import org.cloudfoundry.AbstractCloudFoundryException;
-
 import java.util.List;
 import java.util.stream.Collectors;
+import org.cloudfoundry.AbstractCloudFoundryException;
 
 /**
  * An exception encapsulating an error returned from Cloud Foundry V3 APIs
@@ -37,7 +36,11 @@ public final class ClientV3Exception extends AbstractCloudFoundryException {
      * @param errors     the errors
      */
     public ClientV3Exception(Integer statusCode, List<Error> errors) {
-        super(statusCode, errors.stream().map(ClientV3Exception::toErrorString).collect(Collectors.joining(", ")));
+        super(
+                statusCode,
+                errors.stream()
+                        .map(ClientV3Exception::toErrorString)
+                        .collect(Collectors.joining(", ")));
         this.errors = errors;
     }
 
@@ -51,5 +54,4 @@ public final class ClientV3Exception extends AbstractCloudFoundryException {
     private static String toErrorString(Error error) {
         return String.format("%s(%d): %s", error.getTitle(), error.getCode(), error.getDetail());
     }
-
 }

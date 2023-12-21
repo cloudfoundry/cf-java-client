@@ -23,32 +23,24 @@ public final class CreateUserRequestTest {
     @Test(expected = IllegalStateException.class)
     public void bothOriginAndPassword() {
         CreateUserRequest.builder()
-            .origin("test-origin")
-            .password("test-password")
-            .username("test-username")
-            .build();
+                .origin("test-origin")
+                .password("test-password")
+                .username("test-username")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noOriginOrPassword() {
-        CreateUserRequest.builder()
-            .username("test-username")
-            .build();
+        CreateUserRequest.builder().username("test-username").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noUsername() {
-        CreateUserRequest.builder()
-            .password("test-password")
-            .build();
+        CreateUserRequest.builder().password("test-password").build();
     }
 
     @Test
     public void valid() {
-        CreateUserRequest.builder()
-            .password("test-password")
-            .username("test-username")
-            .build();
+        CreateUserRequest.builder().password("test-password").username("test-username").build();
     }
-
 }

@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.networking.v1.policies;
 
+import java.util.Map;
 import org.cloudfoundry.networking.v1.policies.CreatePoliciesRequest;
 import org.cloudfoundry.networking.v1.policies.DeletePoliciesRequest;
 import org.cloudfoundry.networking.v1.policies.ListPoliciesRequest;
@@ -25,8 +26,6 @@ import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.networking.AbstractNetworkingOperations;
 import reactor.core.publisher.Mono;
-
-import java.util.Map;
 
 /**
  * The Reactor-based implementation of {@link Policies}
@@ -41,28 +40,31 @@ public class ReactorPolicies extends AbstractNetworkingOperations implements Pol
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorPolicies(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
+    public ReactorPolicies(
+            ConnectionContext connectionContext,
+            Mono<String> root,
+            TokenProvider tokenProvider,
+            Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<Void> create(CreatePoliciesRequest request) {
         return post(request, Object.class, builder -> builder.pathSegment("policies"))
-            .then()
-            .checkpoint();
+                .then()
+                .checkpoint();
     }
 
     @Override
     public Mono<Void> delete(DeletePoliciesRequest request) {
         return post(request, Object.class, builder -> builder.pathSegment("policies", "delete"))
-            .then()
-            .checkpoint();
+                .then()
+                .checkpoint();
     }
 
     @Override
     public Mono<ListPoliciesResponse> list(ListPoliciesRequest request) {
         return get(request, ListPoliciesResponse.class, builder -> builder.pathSegment("policies"))
-            .checkpoint();
+                .checkpoint();
     }
-
 }

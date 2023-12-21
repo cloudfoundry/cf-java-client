@@ -16,18 +16,19 @@
 
 package org.cloudfoundry.reactor.uaa;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.cloudfoundry.reactor.AbstractRestTest;
 import org.junit.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 public final class ReactorUaaClientTest extends AbstractRestTest {
 
-    private final ReactorUaaClient client = ReactorUaaClient.builder()
-        .connectionContext(CONNECTION_CONTEXT)
-        .root(this.root)
-        .tokenProvider(TOKEN_PROVIDER)
-        .build();
+    private final ReactorUaaClient client =
+            ReactorUaaClient.builder()
+                    .connectionContext(CONNECTION_CONTEXT)
+                    .root(this.root)
+                    .tokenProvider(TOKEN_PROVIDER)
+                    .build();
 
     @Test
     public void authorizations() {
@@ -63,5 +64,4 @@ public final class ReactorUaaClientTest extends AbstractRestTest {
     public void users() {
         assertThat(this.client.users()).isNotNull();
     }
-
 }

@@ -20,12 +20,11 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum LifecycleType {
-
     BUILDPACK("buildpack"),
 
     DOCKER("docker"),
 
-    KPACK( "kpack");
+    KPACK("kpack");
 
     private final String value;
 
@@ -56,5 +55,4 @@ public enum LifecycleType {
     public String toString() {
         return getValue();
     }
-
 }

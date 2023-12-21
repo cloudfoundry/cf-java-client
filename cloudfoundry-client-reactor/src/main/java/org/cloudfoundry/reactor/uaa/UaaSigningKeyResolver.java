@@ -19,12 +19,6 @@ package org.cloudfoundry.reactor.uaa;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwsHeader;
 import io.jsonwebtoken.SigningKeyResolver;
-import org.cloudfoundry.uaa.tokens.ListTokenKeysRequest;
-import org.cloudfoundry.uaa.tokens.ListTokenKeysResponse;
-import org.cloudfoundry.uaa.tokens.TokenKey;
-import org.cloudfoundry.uaa.tokens.Tokens;
-import reactor.core.Exceptions;
-
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -34,6 +28,11 @@ import java.time.Duration;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
+import org.cloudfoundry.uaa.tokens.ListTokenKeysRequest;
+import org.cloudfoundry.uaa.tokens.ListTokenKeysResponse;
+import org.cloudfoundry.uaa.tokens.TokenKey;
+import org.cloudfoundry.uaa.tokens.Tokens;
+import reactor.core.Exceptions;
 
 final class UaaSigningKeyResolver implements SigningKeyResolver {
 
@@ -64,14 +63,14 @@ final class UaaSigningKeyResolver implements SigningKeyResolver {
     }
 
     private static byte[] decode(TokenKey tokenKey) {
-        return Base64.getMimeDecoder().decode(tokenKey.getValue().replace(BEGIN, "").replace(END, "").trim());
+        return Base64.getMimeDecoder()
+                .decode(tokenKey.getValue().replace(BEGIN, "").replace(END, "").trim());
     }
 
     private static Key generateKey(TokenKey tokenKey) {
         try {
-            return KeyFactory
-                .getInstance(tokenKey.getKeyType().toString())
-                .generatePublic(new X509EncodedKeySpec(decode(tokenKey)));
+            return KeyFactory.getInstance(tokenKey.getKeyType().toString())
+                    .generatePublic(new X509EncodedKeySpec(decode(tokenKey)));
         } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
             throw Exceptions.propagate(e);
         }
@@ -91,18 +90,18 @@ final class UaaSigningKeyResolver implements SigningKeyResolver {
                 return key;
             }
 
-            throw new IllegalStateException(String.format("Unable to retrieve signing key %s", keyId));
+            throw new IllegalStateException(
+                    String.format("Unable to retrieve signing key %s", keyId));
         }
     }
 
     private void refreshKeys() {
         this.signingKeys.clear();
-        this.signingKeys.putAll(this.tokens
-            .listKeys(ListTokenKeysRequest.builder()
-                .build())
-            .flatMapIterable(ListTokenKeysResponse::getKeys)
-            .collectMap(TokenKey::getId, UaaSigningKeyResolver::generateKey)
-            .block(Duration.ofMinutes(5)));
+        this.signingKeys.putAll(
+                this.tokens
+                        .listKeys(ListTokenKeysRequest.builder().build())
+                        .flatMapIterable(ListTokenKeysResponse::getKeys)
+                        .collectMap(TokenKey::getId, UaaSigningKeyResolver::generateKey)
+                        .block(Duration.ofMinutes(5)));
     }
-
 }

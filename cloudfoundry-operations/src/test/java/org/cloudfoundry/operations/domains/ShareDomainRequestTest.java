@@ -22,24 +22,19 @@ public final class ShareDomainRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noDomain() {
-        ShareDomainRequest.builder()
-            .organization("test-organization")
-            .build();
+        ShareDomainRequest.builder().organization("test-organization").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noOrganization() {
-        ShareDomainRequest.builder()
-            .domain("test-domain")
-            .build();
+        ShareDomainRequest.builder().domain("test-domain").build();
     }
 
     @Test
     public void valid() {
         ShareDomainRequest.builder()
-            .domain("test-domain")
-            .organization("test-organization")
-            .build();
+                .domain("test-domain")
+                .organization("test-organization")
+                .build();
     }
-
 }

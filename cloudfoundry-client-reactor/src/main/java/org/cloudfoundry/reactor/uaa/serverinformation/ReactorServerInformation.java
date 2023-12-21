@@ -16,7 +16,11 @@
 
 package org.cloudfoundry.reactor.uaa.serverinformation;
 
+import static io.netty.handler.codec.http.HttpHeaderNames.AUTHORIZATION;
+
 import io.netty.util.AsciiString;
+import java.util.Base64;
+import java.util.Map;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.uaa.AbstractUaaOperations;
@@ -29,15 +33,11 @@ import org.cloudfoundry.uaa.serverinformation.GetInfoResponse;
 import org.cloudfoundry.uaa.serverinformation.ServerInformation;
 import reactor.core.publisher.Mono;
 
-import java.util.Base64;
-import java.util.Map;
-
-import static io.netty.handler.codec.http.HttpHeaderNames.AUTHORIZATION;
-
 /**
  * The Reactor-based implementation of {@link IdentityZones}
  */
-public final class ReactorServerInformation extends AbstractUaaOperations implements ServerInformation {
+public final class ReactorServerInformation extends AbstractUaaOperations
+        implements ServerInformation {
 
     private static final AsciiString BASIC_PREAMBLE = new AsciiString("Basic ");
 
@@ -49,33 +49,45 @@ public final class ReactorServerInformation extends AbstractUaaOperations implem
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorServerInformation(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
+    public ReactorServerInformation(
+            ConnectionContext connectionContext,
+            Mono<String> root,
+            TokenProvider tokenProvider,
+            Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<Void> autoLogin(AutoLoginRequest request) {
-        return get(request, Void.class, builder -> builder.pathSegment("autologin"))
-            .checkpoint();
+        return get(request, Void.class, builder -> builder.pathSegment("autologin")).checkpoint();
     }
 
     @Override
-    public Mono<GetAutoLoginAuthenticationCodeResponse> getAuthenticationCode(GetAutoLoginAuthenticationCodeRequest request) {
-        return post(request, GetAutoLoginAuthenticationCodeResponse.class, builder -> builder.pathSegment("autologin"),
-            outbound -> {
-            },
-            outbound -> {
-                String encoded = Base64.getEncoder().encodeToString(new AsciiString(request.getClientId()).concat(":").concat(request.getClientSecret()).toByteArray());
-                outbound.set(AUTHORIZATION, BASIC_PREAMBLE + encoded);
+    public Mono<GetAutoLoginAuthenticationCodeResponse> getAuthenticationCode(
+            GetAutoLoginAuthenticationCodeRequest request) {
+        return post(
+                        request,
+                        GetAutoLoginAuthenticationCodeResponse.class,
+                        builder -> builder.pathSegment("autologin"),
+                        outbound -> {},
+                        outbound -> {
+                            String encoded =
+                                    Base64.getEncoder()
+                                            .encodeToString(
+                                                    new AsciiString(request.getClientId())
+                                                            .concat(":")
+                                                            .concat(request.getClientSecret())
+                                                            .toByteArray());
+                            outbound.set(AUTHORIZATION, BASIC_PREAMBLE + encoded);
 
-                return Mono.just(outbound);
-            })
-            .checkpoint();
+                            return Mono.just(outbound);
+                        })
+                .checkpoint();
     }
 
     @Override
     public Mono<GetInfoResponse> getInfo(GetInfoRequest request) {
         return get(request, GetInfoResponse.class, builder -> builder.pathSegment("info"))
-            .checkpoint();
+                .checkpoint();
     }
 }

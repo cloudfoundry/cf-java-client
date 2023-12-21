@@ -19,6 +19,4 @@ package org.cloudfoundry.uaa.identityproviders;
 /**
  * Configuration for an {@link AbstractIdentityProvider}
  */
-public interface IdentityProviderConfiguration {
-
-}
+public interface IdentityProviderConfiguration {}

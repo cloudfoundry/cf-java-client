@@ -22,15 +22,11 @@ public final class GetClientRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noId() {
-        GetClientRequest.builder()
-            .build();
+        GetClientRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        GetClientRequest.builder()
-            .clientId("test-client-id")
-            .build();
+        GetClientRequest.builder().clientId("test-client-id").build();
     }
-
 }

@@ -30,5 +30,4 @@ public interface AdminV3 {
      * @return the response from the Clear BuildPack Cache request
      */
     Mono<String> clearBuildpackCache(ClearBuildpackCacheRequest request);
-
 }

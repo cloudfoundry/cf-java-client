@@ -22,8 +22,6 @@ public final class DeleteBlobstoreBuildpackCachesRequestTest {
 
     @Test
     public void valid() {
-        DeleteBlobstoreBuildpackCachesRequest.builder()
-            .build();
+        DeleteBlobstoreBuildpackCachesRequest.builder().build();
     }
-
 }

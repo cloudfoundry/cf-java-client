@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v3.serviceplans;
 
+import java.util.Map;
 import org.cloudfoundry.client.v3.serviceplans.DeleteServicePlanRequest;
 import org.cloudfoundry.client.v3.serviceplans.GetServicePlanRequest;
 import org.cloudfoundry.client.v3.serviceplans.GetServicePlanResponse;
@@ -31,12 +32,11 @@ import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
 import reactor.core.publisher.Mono;
 
-import java.util.Map;
-
 /**
  * The Reactor-based implementation of {@link ServicePlansV3}
  */
-public final class ReactorServicePlansV3 extends AbstractClientV3Operations implements ServicePlansV3 {
+public final class ReactorServicePlansV3 extends AbstractClientV3Operations
+        implements ServicePlansV3 {
 
     /**
      * Creates an instance
@@ -46,37 +46,59 @@ public final class ReactorServicePlansV3 extends AbstractClientV3Operations impl
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorServicePlansV3(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
+    public ReactorServicePlansV3(
+            ConnectionContext connectionContext,
+            Mono<String> root,
+            TokenProvider tokenProvider,
+            Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<Void> delete(DeleteServicePlanRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("service_plans", request.getServicePlanId()))
-            .checkpoint();
+        return delete(
+                        request,
+                        Void.class,
+                        builder -> builder.pathSegment("service_plans", request.getServicePlanId()))
+                .checkpoint();
     }
 
     @Override
     public Mono<GetServicePlanResponse> get(GetServicePlanRequest request) {
-        return get(request, GetServicePlanResponse.class, builder -> builder.pathSegment("service_plans", request.getServicePlanId()))
-            .checkpoint();
+        return get(
+                        request,
+                        GetServicePlanResponse.class,
+                        builder -> builder.pathSegment("service_plans", request.getServicePlanId()))
+                .checkpoint();
     }
 
     @Override
     public Mono<ListServicePlansResponse> list(ListServicePlansRequest request) {
-        return get(request, ListServicePlansResponse.class, builder -> builder.pathSegment("service_plans"))
-            .checkpoint();
+        return get(
+                        request,
+                        ListServicePlansResponse.class,
+                        builder -> builder.pathSegment("service_plans"))
+                .checkpoint();
     }
 
     @Override
     public Mono<UpdateServicePlanResponse> update(UpdateServicePlanRequest request) {
-        return patch(request, UpdateServicePlanResponse.class, builder -> builder.pathSegment("service_plans", request.getServicePlanId()))
-            .checkpoint();
+        return patch(
+                        request,
+                        UpdateServicePlanResponse.class,
+                        builder -> builder.pathSegment("service_plans", request.getServicePlanId()))
+                .checkpoint();
     }
 
     @Override
-    public Mono<UpdateServicePlanVisibilityResponse> updateVisibility(UpdateServicePlanVisibilityRequest request) {
-        return post(request, UpdateServicePlanVisibilityResponse.class, builder -> builder.pathSegment("service_plans", request.getServicePlanId(), "visibility"))
-            .checkpoint();
+    public Mono<UpdateServicePlanVisibilityResponse> updateVisibility(
+            UpdateServicePlanVisibilityRequest request) {
+        return post(
+                        request,
+                        UpdateServicePlanVisibilityResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "service_plans", request.getServicePlanId(), "visibility"))
+                .checkpoint();
     }
 }

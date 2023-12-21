@@ -22,24 +22,19 @@ public final class AddNetworkPolicyRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noDestination() {
-        AddNetworkPolicyRequest.builder()
-            .source("test-source")
-            .build();
+        AddNetworkPolicyRequest.builder().source("test-source").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noSource() {
-        AddNetworkPolicyRequest.builder()
-            .destination("test-destination")
-            .build();
+        AddNetworkPolicyRequest.builder().destination("test-destination").build();
     }
 
     @Test
     public void valid() {
         AddNetworkPolicyRequest.builder()
-            .destination("test-destination")
-            .source("test-source")
-            .build();
+                .destination("test-destination")
+                .source("test-source")
+                .build();
     }
-
 }

@@ -22,10 +22,6 @@ public final class ListIdentityProvidersRequestTest {
 
     @Test
     public void valid() {
-        ListIdentityProvidersRequest.builder()
-            .identityZoneId("text-identity-zone-id")
-            .build();
+        ListIdentityProvidersRequest.builder().identityZoneId("text-identity-zone-id").build();
     }
-
-
 }

@@ -16,6 +16,10 @@
 
 package org.cloudfoundry.operations.stacks;
 
+import static org.cloudfoundry.operations.TestObjects.fill;
+import static org.mockito.Mockito.when;
+
+import java.time.Duration;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
 import org.cloudfoundry.client.v2.stacks.ListStacksResponse;
@@ -24,11 +28,6 @@ import org.cloudfoundry.operations.AbstractOperationsTest;
 import org.junit.Test;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-
-import java.time.Duration;
-
-import static org.cloudfoundry.operations.TestObjects.fill;
-import static org.mockito.Mockito.when;
 
 public final class DefaultStacksTest extends AbstractOperationsTest {
 
@@ -39,51 +38,42 @@ public final class DefaultStacksTest extends AbstractOperationsTest {
         requestStacks(this.cloudFoundryClient, "test-stack-name");
 
         this.stacks
-            .get(GetStackRequest.builder()
-                .name("test-stack-name")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(fill(Stack.builder(), "stack-")
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .get(GetStackRequest.builder().name("test-stack-name").build())
+                .as(StepVerifier::create)
+                .expectNext(fill(Stack.builder(), "stack-").build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
     public void listStacks() {
         requestStacks(this.cloudFoundryClient);
 
-        this.stacks.list()
-            .as(StepVerifier::create)
-            .expectNext(fill(Stack.builder(), "stack-")
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+        this.stacks
+                .list()
+                .as(StepVerifier::create)
+                .expectNext(fill(Stack.builder(), "stack-").build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     private static void requestStacks(CloudFoundryClient cloudFoundryClient) {
-        when(cloudFoundryClient.stacks()
-            .list(ListStacksRequest.builder()
-                .page(1)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(ListStacksResponse.builder())
-                    .resource(fill(StackResource.builder(), "stack-")
-                        .build())
-                    .build()));
+        when(cloudFoundryClient.stacks().list(ListStacksRequest.builder().page(1).build()))
+                .thenReturn(
+                        Mono.just(
+                                fill(ListStacksResponse.builder())
+                                        .resource(fill(StackResource.builder(), "stack-").build())
+                                        .build()));
     }
 
     private static void requestStacks(CloudFoundryClient cloudFoundryClient, String name) {
-        when(cloudFoundryClient.stacks()
-            .list(ListStacksRequest.builder()
-                .name(name)
-                .page(1)
-                .build()))
-            .thenReturn(Mono
-                .just(fill(ListStacksResponse.builder())
-                    .resource(fill(StackResource.builder(), "stack-")
-                        .build())
-                    .build()));
+        when(cloudFoundryClient
+                        .stacks()
+                        .list(ListStacksRequest.builder().name(name).page(1).build()))
+                .thenReturn(
+                        Mono.just(
+                                fill(ListStacksResponse.builder())
+                                        .resource(fill(StackResource.builder(), "stack-").build())
+                                        .build()));
     }
-
 }

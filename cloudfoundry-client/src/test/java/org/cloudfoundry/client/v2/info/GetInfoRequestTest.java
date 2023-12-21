@@ -22,8 +22,6 @@ public final class GetInfoRequestTest {
 
     @Test
     public void valid() {
-        GetInfoRequest.builder()
-            .build();
+        GetInfoRequest.builder().build();
     }
-
 }

@@ -22,15 +22,11 @@ public final class GetOrganizationMemoryUsageRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noOrganizationId() {
-        GetOrganizationMemoryUsageRequest.builder()
-            .build();
+        GetOrganizationMemoryUsageRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        GetOrganizationMemoryUsageRequest.builder()
-            .organizationId("test-organization-id")
-            .build();
+        GetOrganizationMemoryUsageRequest.builder().organizationId("test-organization-id").build();
     }
-
 }

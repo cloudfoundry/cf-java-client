@@ -16,10 +16,9 @@
 
 package org.cloudfoundry.client.v2.applications;
 
-import org.junit.Test;
-
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import org.junit.Test;
 
 public final class UploadApplicationRequestTest {
 
@@ -27,24 +26,19 @@ public final class UploadApplicationRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noApplication() {
-        UploadApplicationRequest.builder()
-            .applicationId("test-application-id")
-            .build();
+        UploadApplicationRequest.builder().applicationId("test-application-id").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noApplicationId() {
-        UploadApplicationRequest.builder()
-            .application(TEST_APPLICATION)
-            .build();
+        UploadApplicationRequest.builder().application(TEST_APPLICATION).build();
     }
 
     @Test
     public void valid() {
         UploadApplicationRequest.builder()
-            .application(TEST_APPLICATION)
-            .applicationId("test-application-id")
-            .build();
+                .application(TEST_APPLICATION)
+                .applicationId("test-application-id")
+                .build();
     }
-
 }

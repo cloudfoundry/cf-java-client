@@ -23,17 +23,13 @@ public final class CreateBuildRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noPackage() {
-        CreateBuildRequest.builder()
-            .build();
+        CreateBuildRequest.builder().build();
     }
 
     @Test
     public void valid() {
         CreateBuildRequest.builder()
-            .getPackage(Relationship.builder()
-                .id("test-id")
-                .build())
-            .build();
+                .getPackage(Relationship.builder().id("test-id").build())
+                .build();
     }
-
 }

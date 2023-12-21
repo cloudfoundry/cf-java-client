@@ -22,15 +22,11 @@ public final class ListServiceAccessSettingsRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noServiceName() {
-        DisableServiceAccessRequest.builder()
-            .build();
+        DisableServiceAccessRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        DisableServiceAccessRequest.builder()
-            .serviceName("test-service-name")
-            .build();
+        DisableServiceAccessRequest.builder().serviceName("test-service-name").build();
     }
-
 }

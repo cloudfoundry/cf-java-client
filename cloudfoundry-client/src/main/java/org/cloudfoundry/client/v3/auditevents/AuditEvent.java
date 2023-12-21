@@ -17,12 +17,11 @@
 package org.cloudfoundry.client.v3.auditevents;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.Map;
 import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.Resource;
-
-import java.util.Map;
 
 /**
  * Base class for responses that are audit events
@@ -71,5 +70,4 @@ public abstract class AuditEvent extends Resource {
     @JsonProperty("type")
     @Nullable
     public abstract String getType();
-
 }

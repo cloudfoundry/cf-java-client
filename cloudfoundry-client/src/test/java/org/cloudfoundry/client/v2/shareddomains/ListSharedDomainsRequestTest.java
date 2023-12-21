@@ -22,9 +22,6 @@ public final class ListSharedDomainsRequestTest {
 
     @Test
     public void valid() {
-        ListSharedDomainsRequest.builder()
-            .name("test-name")
-            .build();
+        ListSharedDomainsRequest.builder().name("test-name").build();
     }
-
 }

@@ -22,15 +22,13 @@ public final class GetServiceBindingParametersRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noServiceInstanceId() {
-        GetServiceBindingParametersRequest.builder()
-            .build();
+        GetServiceBindingParametersRequest.builder().build();
     }
 
     @Test
     public void valid() {
         GetServiceBindingParametersRequest.builder()
-            .serviceBindingId("test-service-instance-id")
-            .build();
+                .serviceBindingId("test-service-instance-id")
+                .build();
     }
-
 }

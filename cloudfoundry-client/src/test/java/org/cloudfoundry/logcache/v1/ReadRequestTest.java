@@ -22,16 +22,11 @@ public class ReadRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noSourceId() {
-        ReadRequest.builder()
-            .build();
+        ReadRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        ReadRequest.builder()
-            .sourceId("test")
-            .build();
+        ReadRequest.builder().sourceId("test").build();
     }
-
-
 }

@@ -23,80 +23,73 @@ public final class UpdateIdentityProviderRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noIdentityProviderId() {
         UpdateIdentityProviderRequest.builder()
-            .configuration(InternalConfiguration.builder()
-                .build())
-            .identityZoneId("test-identity-zone-id")
-            .name("test-name")
-            .originKey("test-origin-key")
-            .type(Type.INTERNAL)
-            .version(0)
-            .build();
+                .configuration(InternalConfiguration.builder().build())
+                .identityZoneId("test-identity-zone-id")
+                .name("test-name")
+                .originKey("test-origin-key")
+                .type(Type.INTERNAL)
+                .version(0)
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noName() {
         UpdateIdentityProviderRequest.builder()
-            .configuration(InternalConfiguration.builder()
-                .build())
-            .identityZoneId("test-identity-zone-id")
-            .identityProviderId("test-identity-provider-id")
-            .originKey("test-origin-key")
-            .type(Type.INTERNAL)
-            .version(0)
-            .build();
+                .configuration(InternalConfiguration.builder().build())
+                .identityZoneId("test-identity-zone-id")
+                .identityProviderId("test-identity-provider-id")
+                .originKey("test-origin-key")
+                .type(Type.INTERNAL)
+                .version(0)
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noOriginKey() {
         UpdateIdentityProviderRequest.builder()
-            .configuration(InternalConfiguration.builder()
-                .build())
-            .identityZoneId("test-identity-zone-id")
-            .identityProviderId("test-identity-provider-id")
-            .name("test-name")
-            .type(Type.INTERNAL)
-            .version(0)
-            .build();
+                .configuration(InternalConfiguration.builder().build())
+                .identityZoneId("test-identity-zone-id")
+                .identityProviderId("test-identity-provider-id")
+                .name("test-name")
+                .type(Type.INTERNAL)
+                .version(0)
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noType() {
         UpdateIdentityProviderRequest.builder()
-            .configuration(InternalConfiguration.builder()
-                .build())
-            .identityZoneId("test-identity-zone-id")
-            .identityProviderId("test-identity-provider-id")
-            .name("test-name")
-            .originKey("test-origin-key")
-            .version(0)
-            .build();
+                .configuration(InternalConfiguration.builder().build())
+                .identityZoneId("test-identity-zone-id")
+                .identityProviderId("test-identity-provider-id")
+                .name("test-name")
+                .originKey("test-origin-key")
+                .version(0)
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noVersion() {
         UpdateIdentityProviderRequest.builder()
-            .configuration(InternalConfiguration.builder()
-                .build())
-            .identityZoneId("test-identity-zone-id")
-            .identityProviderId("test-identity-provider-id")
-            .name("test-name")
-            .originKey("test-origin-key")
-            .type(Type.INTERNAL)
-            .build();
+                .configuration(InternalConfiguration.builder().build())
+                .identityZoneId("test-identity-zone-id")
+                .identityProviderId("test-identity-provider-id")
+                .name("test-name")
+                .originKey("test-origin-key")
+                .type(Type.INTERNAL)
+                .build();
     }
 
     @Test
     public void valid() {
         UpdateIdentityProviderRequest.builder()
-            .configuration(InternalConfiguration.builder()
-                .build())
-            .identityZoneId("test-identity-zone-id")
-            .identityProviderId("test-identity-provider-id")
-            .name("test-name")
-            .originKey("test-origin-key")
-            .type(Type.INTERNAL)
-            .version(0)
-            .build();
+                .configuration(InternalConfiguration.builder().build())
+                .identityZoneId("test-identity-zone-id")
+                .identityProviderId("test-identity-provider-id")
+                .name("test-name")
+                .originKey("test-origin-key")
+                .type(Type.INTERNAL)
+                .version(0)
+                .build();
     }
-
 }

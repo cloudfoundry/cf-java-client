@@ -22,24 +22,16 @@ public final class CreateRouteRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noDomainId() {
-        CreateRouteRequest.builder()
-            .spaceId("test-space-id")
-            .build();
+        CreateRouteRequest.builder().spaceId("test-space-id").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noSpaceId() {
-        CreateRouteRequest.builder()
-            .domainId("test-domain-id")
-            .build();
+        CreateRouteRequest.builder().domainId("test-domain-id").build();
     }
 
     @Test
     public void valid() {
-        CreateRouteRequest.builder()
-            .domainId("test-domain-id")
-            .spaceId("test-space-id")
-            .build();
+        CreateRouteRequest.builder().domainId("test-domain-id").spaceId("test-space-id").build();
     }
-
 }

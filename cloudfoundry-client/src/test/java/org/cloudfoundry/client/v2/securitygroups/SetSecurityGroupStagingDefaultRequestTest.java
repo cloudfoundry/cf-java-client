@@ -22,15 +22,13 @@ public final class SetSecurityGroupStagingDefaultRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noSecurityGroupStagingDefaultId() {
-        SetSecurityGroupStagingDefaultRequest.builder()
-            .build();
+        SetSecurityGroupStagingDefaultRequest.builder().build();
     }
 
     @Test
     public void valid() {
         SetSecurityGroupStagingDefaultRequest.builder()
-            .securityGroupId("test-security-group-default-id")
-            .build();
+                .securityGroupId("test-security-group-default-id")
+                .build();
     }
-
 }

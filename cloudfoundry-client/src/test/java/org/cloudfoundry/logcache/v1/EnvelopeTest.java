@@ -24,5 +24,4 @@ public class EnvelopeTest {
     public void valid() {
         Envelope.builder().build();
     }
-
 }

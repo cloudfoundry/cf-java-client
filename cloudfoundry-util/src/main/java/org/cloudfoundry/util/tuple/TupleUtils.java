@@ -16,6 +16,9 @@
 
 package org.cloudfoundry.util.tuple;
 
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuple3;
 import reactor.util.function.Tuple4;
@@ -24,14 +27,9 @@ import reactor.util.function.Tuple6;
 import reactor.util.function.Tuple7;
 import reactor.util.function.Tuple8;
 
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
-
 public final class TupleUtils {
 
-    private TupleUtils() {
-    }
+    private TupleUtils() {}
 
     /**
      * Returns a {@link Consumer} of {@link Tuple2} that wraps a consumer of the component values of the tuple
@@ -54,7 +52,8 @@ public final class TupleUtils {
      * @param <T3>     the type of the third value
      * @return the wrapper consumer
      */
-    public static <T1, T2, T3> Consumer<Tuple3<T1, T2, T3>> consumer(Consumer3<T1, T2, T3> consumer) {
+    public static <T1, T2, T3> Consumer<Tuple3<T1, T2, T3>> consumer(
+            Consumer3<T1, T2, T3> consumer) {
         return tuple -> consumer.accept(tuple.getT1(), tuple.getT2(), tuple.getT3());
     }
 
@@ -68,7 +67,8 @@ public final class TupleUtils {
      * @param <T4>     the type of the fourth value
      * @return the wrapper consumer
      */
-    public static <T1, T2, T3, T4> Consumer<Tuple4<T1, T2, T3, T4>> consumer(Consumer4<T1, T2, T3, T4> consumer) {
+    public static <T1, T2, T3, T4> Consumer<Tuple4<T1, T2, T3, T4>> consumer(
+            Consumer4<T1, T2, T3, T4> consumer) {
         return tuple -> consumer.accept(tuple.getT1(), tuple.getT2(), tuple.getT3(), tuple.getT4());
     }
 
@@ -83,8 +83,11 @@ public final class TupleUtils {
      * @param <T5>     the type of the fifth value
      * @return the wrapper consumer
      */
-    public static <T1, T2, T3, T4, T5> Consumer<Tuple5<T1, T2, T3, T4, T5>> consumer(Consumer5<T1, T2, T3, T4, T5> consumer) {
-        return tuple -> consumer.accept(tuple.getT1(), tuple.getT2(), tuple.getT3(), tuple.getT4(), tuple.getT5());
+    public static <T1, T2, T3, T4, T5> Consumer<Tuple5<T1, T2, T3, T4, T5>> consumer(
+            Consumer5<T1, T2, T3, T4, T5> consumer) {
+        return tuple ->
+                consumer.accept(
+                        tuple.getT1(), tuple.getT2(), tuple.getT3(), tuple.getT4(), tuple.getT5());
     }
 
     /**
@@ -99,8 +102,16 @@ public final class TupleUtils {
      * @param <T6>     the type of the sixth value
      * @return the wrapper consumer
      */
-    public static <T1, T2, T3, T4, T5, T6> Consumer<Tuple6<T1, T2, T3, T4, T5, T6>> consumer(Consumer6<T1, T2, T3, T4, T5, T6> consumer) {
-        return tuple -> consumer.accept(tuple.getT1(), tuple.getT2(), tuple.getT3(), tuple.getT4(), tuple.getT5(), tuple.getT6());
+    public static <T1, T2, T3, T4, T5, T6> Consumer<Tuple6<T1, T2, T3, T4, T5, T6>> consumer(
+            Consumer6<T1, T2, T3, T4, T5, T6> consumer) {
+        return tuple ->
+                consumer.accept(
+                        tuple.getT1(),
+                        tuple.getT2(),
+                        tuple.getT3(),
+                        tuple.getT4(),
+                        tuple.getT5(),
+                        tuple.getT6());
     }
 
     /**
@@ -116,8 +127,18 @@ public final class TupleUtils {
      * @param <T7>     the type of the seventh value
      * @return the wrapper consumer
      */
-    public static <T1, T2, T3, T4, T5, T6, T7> Consumer<Tuple7<T1, T2, T3, T4, T5, T6, T7>> consumer(Consumer7<T1, T2, T3, T4, T5, T6, T7> consumer) {
-        return tuple -> consumer.accept(tuple.getT1(), tuple.getT2(), tuple.getT3(), tuple.getT4(), tuple.getT5(), tuple.getT6(), tuple.getT7());
+    public static <T1, T2, T3, T4, T5, T6, T7>
+            Consumer<Tuple7<T1, T2, T3, T4, T5, T6, T7>> consumer(
+                    Consumer7<T1, T2, T3, T4, T5, T6, T7> consumer) {
+        return tuple ->
+                consumer.accept(
+                        tuple.getT1(),
+                        tuple.getT2(),
+                        tuple.getT3(),
+                        tuple.getT4(),
+                        tuple.getT5(),
+                        tuple.getT6(),
+                        tuple.getT7());
     }
 
     /**
@@ -134,8 +155,19 @@ public final class TupleUtils {
      * @param <T8>     the type of the eighth value
      * @return the wrapper consumer
      */
-    public static <T1, T2, T3, T4, T5, T6, T7, T8> Consumer<Tuple8<T1, T2, T3, T4, T5, T6, T7, T8>> consumer(Consumer8<T1, T2, T3, T4, T5, T6, T7, T8> consumer) {
-        return tuple -> consumer.accept(tuple.getT1(), tuple.getT2(), tuple.getT3(), tuple.getT4(), tuple.getT5(), tuple.getT6(), tuple.getT7(), tuple.getT8());
+    public static <T1, T2, T3, T4, T5, T6, T7, T8>
+            Consumer<Tuple8<T1, T2, T3, T4, T5, T6, T7, T8>> consumer(
+                    Consumer8<T1, T2, T3, T4, T5, T6, T7, T8> consumer) {
+        return tuple ->
+                consumer.accept(
+                        tuple.getT1(),
+                        tuple.getT2(),
+                        tuple.getT3(),
+                        tuple.getT4(),
+                        tuple.getT5(),
+                        tuple.getT6(),
+                        tuple.getT7(),
+                        tuple.getT8());
     }
 
     /**
@@ -161,7 +193,8 @@ public final class TupleUtils {
      * @param <R>      the type of the result of the function
      * @return the wrapper function
      */
-    public static <T1, T2, T3, R> Function<Tuple3<T1, T2, T3>, R> function(Function3<T1, T2, T3, R> function) {
+    public static <T1, T2, T3, R> Function<Tuple3<T1, T2, T3>, R> function(
+            Function3<T1, T2, T3, R> function) {
         return tuple -> function.apply(tuple.getT1(), tuple.getT2(), tuple.getT3());
     }
 
@@ -176,7 +209,8 @@ public final class TupleUtils {
      * @param <R>      the type of the result of the function
      * @return the wrapper function
      */
-    public static <T1, T2, T3, T4, R> Function<Tuple4<T1, T2, T3, T4>, R> function(Function4<T1, T2, T3, T4, R> function) {
+    public static <T1, T2, T3, T4, R> Function<Tuple4<T1, T2, T3, T4>, R> function(
+            Function4<T1, T2, T3, T4, R> function) {
         return tuple -> function.apply(tuple.getT1(), tuple.getT2(), tuple.getT3(), tuple.getT4());
     }
 
@@ -192,8 +226,11 @@ public final class TupleUtils {
      * @param <R>      the type of the result of the function
      * @return the wrapper function
      */
-    public static <T1, T2, T3, T4, T5, R> Function<Tuple5<T1, T2, T3, T4, T5>, R> function(Function5<T1, T2, T3, T4, T5, R> function) {
-        return tuple -> function.apply(tuple.getT1(), tuple.getT2(), tuple.getT3(), tuple.getT4(), tuple.getT5());
+    public static <T1, T2, T3, T4, T5, R> Function<Tuple5<T1, T2, T3, T4, T5>, R> function(
+            Function5<T1, T2, T3, T4, T5, R> function) {
+        return tuple ->
+                function.apply(
+                        tuple.getT1(), tuple.getT2(), tuple.getT3(), tuple.getT4(), tuple.getT5());
     }
 
     /**
@@ -209,8 +246,16 @@ public final class TupleUtils {
      * @param <R>      the type of the result of the function
      * @return the wrapper function
      */
-    public static <T1, T2, T3, T4, T5, T6, R> Function<Tuple6<T1, T2, T3, T4, T5, T6>, R> function(Function6<T1, T2, T3, T4, T5, T6, R> function) {
-        return tuple -> function.apply(tuple.getT1(), tuple.getT2(), tuple.getT3(), tuple.getT4(), tuple.getT5(), tuple.getT6());
+    public static <T1, T2, T3, T4, T5, T6, R> Function<Tuple6<T1, T2, T3, T4, T5, T6>, R> function(
+            Function6<T1, T2, T3, T4, T5, T6, R> function) {
+        return tuple ->
+                function.apply(
+                        tuple.getT1(),
+                        tuple.getT2(),
+                        tuple.getT3(),
+                        tuple.getT4(),
+                        tuple.getT5(),
+                        tuple.getT6());
     }
 
     /**
@@ -227,8 +272,18 @@ public final class TupleUtils {
      * @param <R>      the type of the result of the function
      * @return the wrapper function
      */
-    public static <T1, T2, T3, T4, T5, T6, T7, R> Function<Tuple7<T1, T2, T3, T4, T5, T6, T7>, R> function(Function7<T1, T2, T3, T4, T5, T6, T7, R> function) {
-        return tuple -> function.apply(tuple.getT1(), tuple.getT2(), tuple.getT3(), tuple.getT4(), tuple.getT5(), tuple.getT6(), tuple.getT7());
+    public static <T1, T2, T3, T4, T5, T6, T7, R>
+            Function<Tuple7<T1, T2, T3, T4, T5, T6, T7>, R> function(
+                    Function7<T1, T2, T3, T4, T5, T6, T7, R> function) {
+        return tuple ->
+                function.apply(
+                        tuple.getT1(),
+                        tuple.getT2(),
+                        tuple.getT3(),
+                        tuple.getT4(),
+                        tuple.getT5(),
+                        tuple.getT6(),
+                        tuple.getT7());
     }
 
     /**
@@ -246,8 +301,19 @@ public final class TupleUtils {
      * @param <R>      the type of the result of the function
      * @return the wrapper function
      */
-    public static <T1, T2, T3, T4, T5, T6, T7, T8, R> Function<Tuple8<T1, T2, T3, T4, T5, T6, T7, T8>, R> function(Function8<T1, T2, T3, T4, T5, T6, T7, T8, R> function) {
-        return tuple -> function.apply(tuple.getT1(), tuple.getT2(), tuple.getT3(), tuple.getT4(), tuple.getT5(), tuple.getT6(), tuple.getT7(), tuple.getT8());
+    public static <T1, T2, T3, T4, T5, T6, T7, T8, R>
+            Function<Tuple8<T1, T2, T3, T4, T5, T6, T7, T8>, R> function(
+                    Function8<T1, T2, T3, T4, T5, T6, T7, T8, R> function) {
+        return tuple ->
+                function.apply(
+                        tuple.getT1(),
+                        tuple.getT2(),
+                        tuple.getT3(),
+                        tuple.getT4(),
+                        tuple.getT5(),
+                        tuple.getT6(),
+                        tuple.getT7(),
+                        tuple.getT8());
     }
 
     /**
@@ -271,7 +337,8 @@ public final class TupleUtils {
      * @param <T3>      the type of the third value
      * @return the wrapper predicate
      */
-    public static <T1, T2, T3> Predicate<Tuple3<T1, T2, T3>> predicate(Predicate3<T1, T2, T3> predicate) {
+    public static <T1, T2, T3> Predicate<Tuple3<T1, T2, T3>> predicate(
+            Predicate3<T1, T2, T3> predicate) {
         return tuple -> predicate.test(tuple.getT1(), tuple.getT2(), tuple.getT3());
     }
 
@@ -285,7 +352,8 @@ public final class TupleUtils {
      * @param <T4>      the type of the fourth value
      * @return the wrapper predicate
      */
-    public static <T1, T2, T3, T4> Predicate<Tuple4<T1, T2, T3, T4>> predicate(Predicate4<T1, T2, T3, T4> predicate) {
+    public static <T1, T2, T3, T4> Predicate<Tuple4<T1, T2, T3, T4>> predicate(
+            Predicate4<T1, T2, T3, T4> predicate) {
         return tuple -> predicate.test(tuple.getT1(), tuple.getT2(), tuple.getT3(), tuple.getT4());
     }
 
@@ -300,8 +368,11 @@ public final class TupleUtils {
      * @param <T5>      the type of the fifth value
      * @return the wrapper predicate
      */
-    public static <T1, T2, T3, T4, T5> Predicate<Tuple5<T1, T2, T3, T4, T5>> predicate(Predicate5<T1, T2, T3, T4, T5> predicate) {
-        return tuple -> predicate.test(tuple.getT1(), tuple.getT2(), tuple.getT3(), tuple.getT4(), tuple.getT5());
+    public static <T1, T2, T3, T4, T5> Predicate<Tuple5<T1, T2, T3, T4, T5>> predicate(
+            Predicate5<T1, T2, T3, T4, T5> predicate) {
+        return tuple ->
+                predicate.test(
+                        tuple.getT1(), tuple.getT2(), tuple.getT3(), tuple.getT4(), tuple.getT5());
     }
 
     /**
@@ -316,8 +387,16 @@ public final class TupleUtils {
      * @param <T6>      the type of the sixth value
      * @return the wrapper predicate
      */
-    public static <T1, T2, T3, T4, T5, T6> Predicate<Tuple6<T1, T2, T3, T4, T5, T6>> predicate(Predicate6<T1, T2, T3, T4, T5, T6> predicate) {
-        return tuple -> predicate.test(tuple.getT1(), tuple.getT2(), tuple.getT3(), tuple.getT4(), tuple.getT5(), tuple.getT6());
+    public static <T1, T2, T3, T4, T5, T6> Predicate<Tuple6<T1, T2, T3, T4, T5, T6>> predicate(
+            Predicate6<T1, T2, T3, T4, T5, T6> predicate) {
+        return tuple ->
+                predicate.test(
+                        tuple.getT1(),
+                        tuple.getT2(),
+                        tuple.getT3(),
+                        tuple.getT4(),
+                        tuple.getT5(),
+                        tuple.getT6());
     }
 
     /**
@@ -333,8 +412,18 @@ public final class TupleUtils {
      * @param <T7>      the type of the seventh value
      * @return the wrapper predicate
      */
-    public static <T1, T2, T3, T4, T5, T6, T7> Predicate<Tuple7<T1, T2, T3, T4, T5, T6, T7>> predicate(Predicate7<T1, T2, T3, T4, T5, T6, T7> predicate) {
-        return tuple -> predicate.test(tuple.getT1(), tuple.getT2(), tuple.getT3(), tuple.getT4(), tuple.getT5(), tuple.getT6(), tuple.getT7());
+    public static <T1, T2, T3, T4, T5, T6, T7>
+            Predicate<Tuple7<T1, T2, T3, T4, T5, T6, T7>> predicate(
+                    Predicate7<T1, T2, T3, T4, T5, T6, T7> predicate) {
+        return tuple ->
+                predicate.test(
+                        tuple.getT1(),
+                        tuple.getT2(),
+                        tuple.getT3(),
+                        tuple.getT4(),
+                        tuple.getT5(),
+                        tuple.getT6(),
+                        tuple.getT7());
     }
 
     /**
@@ -351,8 +440,18 @@ public final class TupleUtils {
      * @param <T8>      the type of the eighth value
      * @return the wrapper predicate
      */
-    public static <T1, T2, T3, T4, T5, T6, T7, T8> Predicate<Tuple8<T1, T2, T3, T4, T5, T6, T7, T8>> predicate(Predicate8<T1, T2, T3, T4, T5, T6, T7, T8> predicate) {
-        return tuple -> predicate.test(tuple.getT1(), tuple.getT2(), tuple.getT3(), tuple.getT4(), tuple.getT5(), tuple.getT6(), tuple.getT7(), tuple.getT8());
+    public static <T1, T2, T3, T4, T5, T6, T7, T8>
+            Predicate<Tuple8<T1, T2, T3, T4, T5, T6, T7, T8>> predicate(
+                    Predicate8<T1, T2, T3, T4, T5, T6, T7, T8> predicate) {
+        return tuple ->
+                predicate.test(
+                        tuple.getT1(),
+                        tuple.getT2(),
+                        tuple.getT3(),
+                        tuple.getT4(),
+                        tuple.getT5(),
+                        tuple.getT6(),
+                        tuple.getT7(),
+                        tuple.getT8());
     }
-
 }

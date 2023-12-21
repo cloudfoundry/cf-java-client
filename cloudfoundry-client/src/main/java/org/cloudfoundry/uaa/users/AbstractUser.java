@@ -17,9 +17,8 @@
 package org.cloudfoundry.uaa.users;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.cloudfoundry.Nullable;
-
 import java.util.List;
+import org.cloudfoundry.Nullable;
 
 /**
  * The entity response payload for User
@@ -44,5 +43,4 @@ public abstract class AbstractUser extends AbstractUserSummary {
      */
     @JsonProperty("groups")
     public abstract List<org.cloudfoundry.uaa.users.Group> getGroups();
-
 }

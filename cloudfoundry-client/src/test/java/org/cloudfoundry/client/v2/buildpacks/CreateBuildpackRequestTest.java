@@ -22,15 +22,11 @@ public final class CreateBuildpackRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noName() {
-        CreateBuildpackRequest.builder()
-            .build();
+        CreateBuildpackRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        CreateBuildpackRequest.builder()
-            .name("test-buildpack-name")
-            .build();
+        CreateBuildpackRequest.builder().name("test-buildpack-name").build();
     }
-
 }

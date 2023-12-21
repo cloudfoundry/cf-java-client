@@ -22,24 +22,19 @@ public final class RemoveSpaceDeveloperRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noDeveloperId() {
-        RemoveSpaceDeveloperRequest.builder()
-            .spaceId("test-space-id")
-            .build();
+        RemoveSpaceDeveloperRequest.builder().spaceId("test-space-id").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noSpaceId() {
-        RemoveSpaceDeveloperRequest.builder()
-            .developerId("test-developer-id")
-            .build();
+        RemoveSpaceDeveloperRequest.builder().developerId("test-developer-id").build();
     }
 
     @Test
     public void valid() {
         RemoveSpaceDeveloperRequest.builder()
-            .developerId("test-developer-id")
-            .spaceId("test-space-id")
-            .build();
+                .developerId("test-developer-id")
+                .spaceId("test-space-id")
+                .build();
     }
-
 }

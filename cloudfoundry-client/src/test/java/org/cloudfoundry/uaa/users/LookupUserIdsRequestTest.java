@@ -22,8 +22,6 @@ public final class LookupUserIdsRequestTest {
 
     @Test
     public void valid() {
-        LookupUserIdsRequest.builder()
-            .build();
+        LookupUserIdsRequest.builder().build();
     }
-
 }

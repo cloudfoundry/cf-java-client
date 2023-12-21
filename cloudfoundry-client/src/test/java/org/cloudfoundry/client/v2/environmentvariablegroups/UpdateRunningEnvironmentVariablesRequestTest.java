@@ -22,8 +22,6 @@ public final class UpdateRunningEnvironmentVariablesRequestTest {
 
     @Test
     public void valid() {
-        UpdateRunningEnvironmentVariablesRequest.builder()
-            .build();
+        UpdateRunningEnvironmentVariablesRequest.builder().build();
     }
-
 }

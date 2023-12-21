@@ -22,15 +22,13 @@ public final class GetOrganizationDefaultIsolationSegmentRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noOrganizationId() {
-        GetOrganizationDefaultIsolationSegmentRequest.builder()
-            .build();
+        GetOrganizationDefaultIsolationSegmentRequest.builder().build();
     }
 
     @Test
     public void valid() {
         GetOrganizationDefaultIsolationSegmentRequest.builder()
-            .organizationId("test-organization-id")
-            .build();
+                .organizationId("test-organization-id")
+                .build();
     }
-
 }

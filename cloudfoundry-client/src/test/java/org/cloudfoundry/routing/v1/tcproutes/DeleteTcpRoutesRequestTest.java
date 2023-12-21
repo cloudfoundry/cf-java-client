@@ -23,57 +23,61 @@ public class DeleteTcpRoutesRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noBackendIp() {
         DeleteTcpRoutesRequest.builder()
-            .tcpRoute(TcpRouteDeletion.builder()
-                .backendPort(9999)
-                .port(999)
-                .routerGroupId("test-router-group-id")
-                .build())
-            .build();
+                .tcpRoute(
+                        TcpRouteDeletion.builder()
+                                .backendPort(9999)
+                                .port(999)
+                                .routerGroupId("test-router-group-id")
+                                .build())
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noBackendPort() {
         DeleteTcpRoutesRequest.builder()
-            .tcpRoute(TcpRouteDeletion.builder()
-                .backendIp("test-backend-ip")
-                .port(999)
-                .routerGroupId("test-router-group-id")
-                .build())
-            .build();
+                .tcpRoute(
+                        TcpRouteDeletion.builder()
+                                .backendIp("test-backend-ip")
+                                .port(999)
+                                .routerGroupId("test-router-group-id")
+                                .build())
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noPort() {
         DeleteTcpRoutesRequest.builder()
-            .tcpRoute(TcpRouteDeletion.builder()
-                .backendIp("test-backend-ip")
-                .backendPort(9999)
-                .routerGroupId("test-router-group-id")
-                .build())
-            .build();
+                .tcpRoute(
+                        TcpRouteDeletion.builder()
+                                .backendIp("test-backend-ip")
+                                .backendPort(9999)
+                                .routerGroupId("test-router-group-id")
+                                .build())
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noRouterGroupId() {
         DeleteTcpRoutesRequest.builder()
-            .tcpRoute(TcpRouteDeletion.builder()
-                .backendIp("test-backend-ip")
-                .backendPort(9999)
-                .port(999)
-                .build())
-            .build();
+                .tcpRoute(
+                        TcpRouteDeletion.builder()
+                                .backendIp("test-backend-ip")
+                                .backendPort(9999)
+                                .port(999)
+                                .build())
+                .build();
     }
 
     @Test
     public void valid() {
         DeleteTcpRoutesRequest.builder()
-            .tcpRoute(TcpRouteDeletion.builder()
-                .backendIp("test-backend-ip")
-                .backendPort(9999)
-                .port(999)
-                .routerGroupId("test-router-group-id")
-                .build())
-            .build();
+                .tcpRoute(
+                        TcpRouteDeletion.builder()
+                                .backendIp("test-backend-ip")
+                                .backendPort(9999)
+                                .port(999)
+                                .routerGroupId("test-router-group-id")
+                                .build())
+                .build();
     }
-
 }

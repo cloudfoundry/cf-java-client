@@ -16,18 +16,18 @@
 
 package org.cloudfoundry.uaa;
 
-import org.junit.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.Test;
 
 public final class UaaExceptionTest {
 
     @Test
     public void test() {
         assertThat(new UaaException(-1, "test-error", "test-error-description"))
-            .hasNoCause()
-            .hasMessage("test-error: test-error-description")
-            .extracting("statusCode", "error", "errorDescription").containsExactly(-1, "test-error", "test-error-description");
+                .hasNoCause()
+                .hasMessage("test-error: test-error-description")
+                .extracting("statusCode", "error", "errorDescription")
+                .containsExactly(-1, "test-error", "test-error-description");
     }
-
 }

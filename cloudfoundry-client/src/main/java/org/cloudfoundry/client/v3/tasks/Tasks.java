@@ -54,5 +54,4 @@ public interface Tasks {
      * @return the response from the List Tasks request
      */
     Mono<ListTasksResponse> list(ListTasksRequest request);
-
 }

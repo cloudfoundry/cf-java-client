@@ -39,11 +39,13 @@ public final class ByteArrayPool {
 
     private static final AtomicLong EVICTOR_COUNTER = new AtomicLong();
 
-    private static final ThreadFactory EVICTOR_FACTORY = r -> {
-        Thread t = new Thread(r, "byte-buffer-evictor-" + EVICTOR_COUNTER.incrementAndGet());
-        t.setDaemon(true);
-        return t;
-    };
+    private static final ThreadFactory EVICTOR_FACTORY =
+            r -> {
+                Thread t =
+                        new Thread(r, "byte-buffer-evictor-" + EVICTOR_COUNTER.incrementAndGet());
+                t.setDaemon(true);
+                return t;
+            };
 
     private static final int MIBIBYTE = 1_024 * 1_024;
 
@@ -60,7 +62,8 @@ public final class ByteArrayPool {
         this.ttl = ttl;
 
         Executors.newScheduledThreadPool(1, EVICTOR_FACTORY)
-            .scheduleAtFixedRate(this::evict, ttl.toMillis(), ttl.toMillis(), TimeUnit.MILLISECONDS);
+                .scheduleAtFixedRate(
+                        this::evict, ttl.toMillis(), ttl.toMillis(), TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -73,9 +76,10 @@ public final class ByteArrayPool {
     }
 
     private void doWithByteArray(Consumer<byte[]> consumer) {
-        byte[] byteArray = Optional.ofNullable(this.cache.poll())
-            .map(ByteArrayExpiry::getByteArray)
-            .orElseGet(() -> new byte[this.capacity]);
+        byte[] byteArray =
+                Optional.ofNullable(this.cache.poll())
+                        .map(ByteArrayExpiry::getByteArray)
+                        .orElseGet(() -> new byte[this.capacity]);
 
         try {
             consumer.accept(byteArray);
@@ -87,9 +91,10 @@ public final class ByteArrayPool {
     private void evict() {
         Instant now = Instant.now();
 
-        new ArrayList<>(this.cache).stream()
-            .filter(expiry -> expiry.getExpiration().isBefore(now))
-            .forEach(this.cache::remove);
+        new ArrayList<>(this.cache)
+                .stream()
+                        .filter(expiry -> expiry.getExpiration().isBefore(now))
+                        .forEach(this.cache::remove);
     }
 
     private static class ByteArrayExpiry {
@@ -110,8 +115,5 @@ public final class ByteArrayPool {
         private Instant getExpiration() {
             return this.expiration;
         }
-
     }
-
-
 }

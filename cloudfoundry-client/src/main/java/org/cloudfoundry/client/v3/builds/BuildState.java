@@ -68,5 +68,4 @@ public enum BuildState {
     public String toString() {
         return getValue();
     }
-
 }

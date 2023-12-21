@@ -16,9 +16,9 @@
 
 package org.cloudfoundry.logcache.v1;
 
-import org.junit.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.Test;
 
 public class ReadResponseTest {
 
@@ -31,5 +31,4 @@ public class ReadResponseTest {
     public void valid() {
         ReadResponse.builder().envelopes(EnvelopeBatch.builder().build()).build();
     }
-
 }

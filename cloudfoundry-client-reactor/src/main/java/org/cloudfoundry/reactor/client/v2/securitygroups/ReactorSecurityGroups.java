@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v2.securitygroups;
 
+import java.util.Map;
 import org.cloudfoundry.client.v2.securitygroups.AssociateSecurityGroupSpaceRequest;
 import org.cloudfoundry.client.v2.securitygroups.AssociateSecurityGroupSpaceResponse;
 import org.cloudfoundry.client.v2.securitygroups.CreateSecurityGroupRequest;
@@ -47,8 +48,6 @@ import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v2.AbstractClientV2Operations;
 import reactor.core.publisher.Mono;
 
-import java.util.Map;
-
 /**
  * The Reactor-based implementation of {@link SecurityGroups}
  */
@@ -62,92 +61,177 @@ public class ReactorSecurityGroups extends AbstractClientV2Operations implements
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorSecurityGroups(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
+    public ReactorSecurityGroups(
+            ConnectionContext connectionContext,
+            Mono<String> root,
+            TokenProvider tokenProvider,
+            Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
-    public Mono<AssociateSecurityGroupSpaceResponse> associateSpace(AssociateSecurityGroupSpaceRequest request) {
-        return put(request, AssociateSecurityGroupSpaceResponse.class, builder -> builder.pathSegment("security_groups", request.getSecurityGroupId(), "spaces", request.getSpaceId()))
-            .checkpoint();
+    public Mono<AssociateSecurityGroupSpaceResponse> associateSpace(
+            AssociateSecurityGroupSpaceRequest request) {
+        return put(
+                        request,
+                        AssociateSecurityGroupSpaceResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "security_groups",
+                                        request.getSecurityGroupId(),
+                                        "spaces",
+                                        request.getSpaceId()))
+                .checkpoint();
     }
 
     @Override
     public Mono<CreateSecurityGroupResponse> create(CreateSecurityGroupRequest request) {
-        return post(request, CreateSecurityGroupResponse.class, builder -> builder.pathSegment("security_groups"))
-            .checkpoint();
+        return post(
+                        request,
+                        CreateSecurityGroupResponse.class,
+                        builder -> builder.pathSegment("security_groups"))
+                .checkpoint();
     }
 
     @Override
     public Mono<DeleteSecurityGroupResponse> delete(DeleteSecurityGroupRequest request) {
-        return delete(request, DeleteSecurityGroupResponse.class, builder -> builder.pathSegment("security_groups", request.getSecurityGroupId()))
-            .checkpoint();
+        return delete(
+                        request,
+                        DeleteSecurityGroupResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "security_groups", request.getSecurityGroupId()))
+                .checkpoint();
     }
 
     @Override
     public Mono<GetSecurityGroupResponse> get(GetSecurityGroupRequest request) {
-        return get(request, GetSecurityGroupResponse.class, builder -> builder.pathSegment("security_groups", request.getSecurityGroupId()))
-            .checkpoint();
+        return get(
+                        request,
+                        GetSecurityGroupResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "security_groups", request.getSecurityGroupId()))
+                .checkpoint();
     }
 
     @Override
     public Mono<ListSecurityGroupsResponse> list(ListSecurityGroupsRequest request) {
-        return get(request, ListSecurityGroupsResponse.class, builder -> builder.pathSegment("security_groups"))
-            .checkpoint();
+        return get(
+                        request,
+                        ListSecurityGroupsResponse.class,
+                        builder -> builder.pathSegment("security_groups"))
+                .checkpoint();
     }
 
     @Override
-    public Mono<ListSecurityGroupRunningDefaultsResponse> listRunningDefaults(ListSecurityGroupRunningDefaultsRequest request) {
-        return get(request, ListSecurityGroupRunningDefaultsResponse.class, builder -> builder.pathSegment("config", "running_security_groups"))
-            .checkpoint();
+    public Mono<ListSecurityGroupRunningDefaultsResponse> listRunningDefaults(
+            ListSecurityGroupRunningDefaultsRequest request) {
+        return get(
+                        request,
+                        ListSecurityGroupRunningDefaultsResponse.class,
+                        builder -> builder.pathSegment("config", "running_security_groups"))
+                .checkpoint();
     }
 
     @Override
-    public Mono<ListSecurityGroupSpacesResponse> listSpaces(ListSecurityGroupSpacesRequest request) {
-        return get(request, ListSecurityGroupSpacesResponse.class, builder -> builder.pathSegment("security_groups", request.getSecurityGroupId(), "spaces"))
-            .checkpoint();
+    public Mono<ListSecurityGroupSpacesResponse> listSpaces(
+            ListSecurityGroupSpacesRequest request) {
+        return get(
+                        request,
+                        ListSecurityGroupSpacesResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "security_groups", request.getSecurityGroupId(), "spaces"))
+                .checkpoint();
     }
 
     @Override
-    public Mono<ListSecurityGroupStagingDefaultsResponse> listStagingDefaults(ListSecurityGroupStagingDefaultsRequest request) {
-        return get(request, ListSecurityGroupStagingDefaultsResponse.class, builder -> builder.pathSegment("config", "staging_security_groups"))
-            .checkpoint();
+    public Mono<ListSecurityGroupStagingDefaultsResponse> listStagingDefaults(
+            ListSecurityGroupStagingDefaultsRequest request) {
+        return get(
+                        request,
+                        ListSecurityGroupStagingDefaultsResponse.class,
+                        builder -> builder.pathSegment("config", "staging_security_groups"))
+                .checkpoint();
     }
 
     @Override
     public Mono<Void> removeRunningDefault(RemoveSecurityGroupRunningDefaultRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("config", "running_security_groups", request.getSecurityGroupId()))
-            .checkpoint();
+        return delete(
+                        request,
+                        Void.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "config",
+                                        "running_security_groups",
+                                        request.getSecurityGroupId()))
+                .checkpoint();
     }
 
     @Override
     public Mono<Void> removeSpace(RemoveSecurityGroupSpaceRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("security_groups", request.getSecurityGroupId(), "spaces", request.getSpaceId()))
-            .checkpoint();
+        return delete(
+                        request,
+                        Void.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "security_groups",
+                                        request.getSecurityGroupId(),
+                                        "spaces",
+                                        request.getSpaceId()))
+                .checkpoint();
     }
 
     @Override
     public Mono<Void> removeStagingDefault(RemoveSecurityGroupStagingDefaultRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("config", "staging_security_groups", request.getSecurityGroupId()))
-            .checkpoint();
+        return delete(
+                        request,
+                        Void.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "config",
+                                        "staging_security_groups",
+                                        request.getSecurityGroupId()))
+                .checkpoint();
     }
 
     @Override
-    public Mono<SetSecurityGroupRunningDefaultResponse> setRunningDefault(SetSecurityGroupRunningDefaultRequest request) {
-        return put(request, SetSecurityGroupRunningDefaultResponse.class, builder -> builder.pathSegment("config", "running_security_groups", request.getSecurityGroupId()))
-            .checkpoint();
+    public Mono<SetSecurityGroupRunningDefaultResponse> setRunningDefault(
+            SetSecurityGroupRunningDefaultRequest request) {
+        return put(
+                        request,
+                        SetSecurityGroupRunningDefaultResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "config",
+                                        "running_security_groups",
+                                        request.getSecurityGroupId()))
+                .checkpoint();
     }
 
     @Override
-    public Mono<SetSecurityGroupStagingDefaultResponse> setStagingDefault(SetSecurityGroupStagingDefaultRequest request) {
-        return put(request, SetSecurityGroupStagingDefaultResponse.class, builder -> builder.pathSegment("config", "staging_security_groups", request.getSecurityGroupId()))
-            .checkpoint();
+    public Mono<SetSecurityGroupStagingDefaultResponse> setStagingDefault(
+            SetSecurityGroupStagingDefaultRequest request) {
+        return put(
+                        request,
+                        SetSecurityGroupStagingDefaultResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "config",
+                                        "staging_security_groups",
+                                        request.getSecurityGroupId()))
+                .checkpoint();
     }
 
     @Override
     public Mono<UpdateSecurityGroupResponse> update(UpdateSecurityGroupRequest request) {
-        return put(request, UpdateSecurityGroupResponse.class, builder -> builder.pathSegment("security_groups", request.getSecurityGroupId()))
-            .checkpoint();
+        return put(
+                        request,
+                        UpdateSecurityGroupResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "security_groups", request.getSecurityGroupId()))
+                .checkpoint();
     }
-
 }

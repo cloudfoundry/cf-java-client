@@ -16,37 +16,38 @@
 
 package org.cloudfoundry.client.v3;
 
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.Test;
 
 public final class ClientV3ExceptionTest {
 
     @Test
     public void test() {
-        ClientV3Exception exception = new ClientV3Exception(-1,
-            Arrays.asList(
-                Error.builder()
-                    .code(-2)
-                    .detail("test-detail-1")
-                    .title("test-title-1")
-                    .build(),
-                Error.builder()
-                    .code(-3)
-                    .detail("test-detail-2")
-                    .title("test-title-2")
-                    .build()));
+        ClientV3Exception exception =
+                new ClientV3Exception(
+                        -1,
+                        Arrays.asList(
+                                Error.builder()
+                                        .code(-2)
+                                        .detail("test-detail-1")
+                                        .title("test-title-1")
+                                        .build(),
+                                Error.builder()
+                                        .code(-3)
+                                        .detail("test-detail-2")
+                                        .title("test-title-2")
+                                        .build()));
 
         assertThat(exception)
-            .hasNoCause()
-            .hasMessage("test-title-1(-2): test-detail-1, test-title-2(-3): test-detail-2")
-            .extracting("statusCode").isEqualTo(-1);
+                .hasNoCause()
+                .hasMessage("test-title-1(-2): test-detail-1, test-title-2(-3): test-detail-2")
+                .extracting("statusCode")
+                .isEqualTo(-1);
 
         assertThat(exception.getErrors())
-            .flatExtracting(Error::getCode, Error::getDetail, Error::getTitle)
-            .contains(-2, "test-detail-1", "test-title-1", -3, "test-detail-2", "test-title-2");
+                .flatExtracting(Error::getCode, Error::getDetail, Error::getTitle)
+                .contains(-2, "test-detail-1", "test-title-1", -3, "test-detail-2", "test-title-2");
     }
-
 }

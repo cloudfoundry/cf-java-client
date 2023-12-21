@@ -22,24 +22,19 @@ public final class GetUserVerificationLinkRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noRedirectUri() {
-        GetUserVerificationLinkRequest.builder()
-            .userId("test-user-id")
-            .build();
+        GetUserVerificationLinkRequest.builder().userId("test-user-id").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noUserId() {
-        GetUserVerificationLinkRequest.builder()
-            .redirectUri("test-redirect-uri")
-            .build();
+        GetUserVerificationLinkRequest.builder().redirectUri("test-redirect-uri").build();
     }
 
     @Test
     public void valid() {
         GetUserVerificationLinkRequest.builder()
-            .userId("test-user-id")
-            .redirectUri("test-redirect-uri")
-            .build();
+                .userId("test-user-id")
+                .redirectUri("test-redirect-uri")
+                .build();
     }
-
 }

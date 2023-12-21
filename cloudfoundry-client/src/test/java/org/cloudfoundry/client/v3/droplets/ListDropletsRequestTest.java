@@ -22,8 +22,6 @@ public final class ListDropletsRequestTest {
 
     @Test
     public void valid() {
-        ListDropletsRequest.builder()
-            .build();
+        ListDropletsRequest.builder().build();
     }
-
 }

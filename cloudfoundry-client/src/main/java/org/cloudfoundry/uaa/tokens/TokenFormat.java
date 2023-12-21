@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * The format of tokens requested.
  */
 public enum TokenFormat {
-
     OPAQUE("opaque");
 
     private final String value;
@@ -40,5 +39,4 @@ public enum TokenFormat {
     public String toString() {
         return getValue();
     }
-
 }

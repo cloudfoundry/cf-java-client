@@ -22,8 +22,6 @@ public final class UserInfoRequestTest {
 
     @Test
     public void valid() {
-        UserInfoRequest.builder()
-            .build();
+        UserInfoRequest.builder().build();
     }
-
 }

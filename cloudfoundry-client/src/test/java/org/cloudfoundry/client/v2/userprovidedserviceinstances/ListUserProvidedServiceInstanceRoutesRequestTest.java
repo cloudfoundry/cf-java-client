@@ -16,22 +16,19 @@
 
 package org.cloudfoundry.client.v2.userprovidedserviceinstances;
 
-
 import org.junit.Test;
 
 public final class ListUserProvidedServiceInstanceRoutesRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noUserProvidedServiceInstanceId() {
-        ListUserProvidedServiceInstanceRoutesRequest.builder()
-            .build();
+        ListUserProvidedServiceInstanceRoutesRequest.builder().build();
     }
 
     @Test
     public void valid() {
         ListUserProvidedServiceInstanceRoutesRequest.builder()
-            .userProvidedServiceInstanceId("test-user-provided-service-instance-id")
-            .build();
+                .userProvidedServiceInstanceId("test-user-provided-service-instance-id")
+                .build();
     }
-
 }

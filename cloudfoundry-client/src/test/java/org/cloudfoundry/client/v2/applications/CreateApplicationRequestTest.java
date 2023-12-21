@@ -22,24 +22,16 @@ public final class CreateApplicationRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noName() {
-        CreateApplicationRequest.builder()
-            .spaceId("test-space-id")
-            .build();
+        CreateApplicationRequest.builder().spaceId("test-space-id").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noSpaceId() {
-        CreateApplicationRequest.builder()
-            .name("test-name")
-            .build();
+        CreateApplicationRequest.builder().name("test-name").build();
     }
 
     @Test
     public void valid() {
-        CreateApplicationRequest.builder()
-            .name("test-name")
-            .spaceId("test-space-id")
-            .build();
+        CreateApplicationRequest.builder().name("test-name").spaceId("test-space-id").build();
     }
-
 }

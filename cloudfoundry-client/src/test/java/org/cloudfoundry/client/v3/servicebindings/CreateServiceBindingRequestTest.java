@@ -24,46 +24,41 @@ public final class CreateServiceBindingRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noRelationships() {
-        CreateServiceBindingRequest.builder()
-            .type(ServiceBindingType.APPLICATION)
-            .build();
+        CreateServiceBindingRequest.builder().type(ServiceBindingType.APPLICATION).build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noType() {
         CreateServiceBindingRequest.builder()
-            .relationships(ServiceBindingRelationships.builder()
-                .application(ToOneRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("test-id")
-                        .build())
-                    .build())
-                .serviceInstance(ToOneRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("test-id")
-                        .build())
-                    .build())
-                .build())
-            .build();
+                .relationships(
+                        ServiceBindingRelationships.builder()
+                                .application(
+                                        ToOneRelationship.builder()
+                                                .data(Relationship.builder().id("test-id").build())
+                                                .build())
+                                .serviceInstance(
+                                        ToOneRelationship.builder()
+                                                .data(Relationship.builder().id("test-id").build())
+                                                .build())
+                                .build())
+                .build();
     }
 
     @Test
     public void valid() {
         CreateServiceBindingRequest.builder()
-            .relationships(ServiceBindingRelationships.builder()
-                .application(ToOneRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("test-id")
-                        .build())
-                    .build())
-                .serviceInstance(ToOneRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("test-id")
-                        .build())
-                    .build())
-                .build())
-            .type(ServiceBindingType.APPLICATION)
-            .build();
+                .relationships(
+                        ServiceBindingRelationships.builder()
+                                .application(
+                                        ToOneRelationship.builder()
+                                                .data(Relationship.builder().id("test-id").build())
+                                                .build())
+                                .serviceInstance(
+                                        ToOneRelationship.builder()
+                                                .data(Relationship.builder().id("test-id").build())
+                                                .build())
+                                .build())
+                .type(ServiceBindingType.APPLICATION)
+                .build();
     }
-
 }

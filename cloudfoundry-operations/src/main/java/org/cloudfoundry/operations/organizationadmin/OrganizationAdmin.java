@@ -70,5 +70,4 @@ public interface OrganizationAdmin {
      * @return the organization quota
      */
     Mono<OrganizationQuota> updateQuota(UpdateQuotaRequest request);
-
 }

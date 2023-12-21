@@ -23,24 +23,21 @@ public final class AssociateUserProvidedServiceInstanceRouteRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noRouteId() {
         AssociateUserProvidedServiceInstanceRouteRequest.builder()
-            .userProvidedServiceInstanceId("test-user-provided-service-instance-id")
-            .build();
+                .userProvidedServiceInstanceId("test-user-provided-service-instance-id")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noUserProvidedServiceInstanceId() {
-        AssociateUserProvidedServiceInstanceRouteRequest.builder()
-            .routeId("test-route-id")
-            .build();
+        AssociateUserProvidedServiceInstanceRouteRequest.builder().routeId("test-route-id").build();
     }
 
     @Test
     public void valid() {
         AssociateUserProvidedServiceInstanceRouteRequest.builder()
-            .parameter("test-key", "test-value")
-            .routeId("test-route-id")
-            .userProvidedServiceInstanceId("test-user-provided-service-instance-id")
-            .build();
+                .parameter("test-key", "test-value")
+                .routeId("test-route-id")
+                .userProvidedServiceInstanceId("test-user-provided-service-instance-id")
+                .build();
     }
-
 }

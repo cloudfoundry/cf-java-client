@@ -16,6 +16,15 @@
 
 package org.cloudfoundry.reactor.client.v3.servicebindings;
 
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
+import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+
+import java.time.Duration;
+import java.util.Collections;
 import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.Pagination;
 import org.cloudfoundry.client.v3.Relationship;
@@ -37,211 +46,298 @@ import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import org.junit.Test;
 import reactor.test.StepVerifier;
 
-import java.time.Duration;
-import java.util.Collections;
-
-import static io.netty.handler.codec.http.HttpMethod.DELETE;
-import static io.netty.handler.codec.http.HttpMethod.GET;
-import static io.netty.handler.codec.http.HttpMethod.POST;
-import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
-import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
-import static io.netty.handler.codec.http.HttpResponseStatus.OK;
-
 public final class ReactorServiceBindingsV3Test extends AbstractClientApiTest {
 
-    private final ReactorServiceBindingsV3 serviceBindings = new ReactorServiceBindingsV3(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
+    private final ReactorServiceBindingsV3 serviceBindings =
+            new ReactorServiceBindingsV3(
+                    CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     public void create() {
-        mockRequest(InteractionContext.builder()
-            .request(TestRequest.builder()
-                .method(POST).path("/service_credential_bindings")
-                .payload("fixtures/client/v3/servicebindings/POST_request.json")
-                .build())
-            .response(TestResponse.builder()
-                .status(ACCEPTED)
-                .header("Location", "https://api.example.org/v3/jobs/af5c57f6-8769-41fa-a499-2c84ed896788")
-                .build())
-            .build());
+        mockRequest(
+                InteractionContext.builder()
+                        .request(
+                                TestRequest.builder()
+                                        .method(POST)
+                                        .path("/service_credential_bindings")
+                                        .payload(
+                                                "fixtures/client/v3/servicebindings/POST_request.json")
+                                        .build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(ACCEPTED)
+                                        .header(
+                                                "Location",
+                                                "https://api.example.org/v3/jobs/af5c57f6-8769-41fa-a499-2c84ed896788")
+                                        .build())
+                        .build());
 
         this.serviceBindings
-            .create(CreateServiceBindingRequest.builder()
-                .relationships(ServiceBindingRelationships.builder()
-                    .application(ToOneRelationship.builder()
-                        .data(Relationship.builder()
-                            .id("74f7c078-0934-470f-9883-4fddss5b8f13")
-                            .build())
-                        .build())
-                    .serviceInstance(ToOneRelationship.builder()
-                        .data(Relationship.builder()
-                            .id("8bfe4c1b-9e18-45b1-83be-124163f31f9e")
-                            .build())
-                        .build())
-                    .build())
-                .type(ServiceBindingType.APPLICATION)
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(CreateServiceBindingResponse.builder()
-                .jobId("af5c57f6-8769-41fa-a499-2c84ed896788")
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .create(
+                        CreateServiceBindingRequest.builder()
+                                .relationships(
+                                        ServiceBindingRelationships.builder()
+                                                .application(
+                                                        ToOneRelationship.builder()
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id(
+                                                                                        "74f7c078-0934-470f-9883-4fddss5b8f13")
+                                                                                .build())
+                                                                .build())
+                                                .serviceInstance(
+                                                        ToOneRelationship.builder()
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id(
+                                                                                        "8bfe4c1b-9e18-45b1-83be-124163f31f9e")
+                                                                                .build())
+                                                                .build())
+                                                .build())
+                                .type(ServiceBindingType.APPLICATION)
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        CreateServiceBindingResponse.builder()
+                                .jobId("af5c57f6-8769-41fa-a499-2c84ed896788")
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
     public void delete() {
-        mockRequest(InteractionContext.builder()
-            .request(TestRequest.builder()
-                .method(DELETE).path("/service_credential_bindings/test-service-binding-id")
-                .build())
-            .response(TestResponse.builder()
-                .status(NO_CONTENT)
-                .build())
-            .build());
+        mockRequest(
+                InteractionContext.builder()
+                        .request(
+                                TestRequest.builder()
+                                        .method(DELETE)
+                                        .path(
+                                                "/service_credential_bindings/test-service-binding-id")
+                                        .build())
+                        .response(TestResponse.builder().status(NO_CONTENT).build())
+                        .build());
 
         this.serviceBindings
-            .delete(DeleteServiceBindingRequest.builder()
-                .serviceBindingId("test-service-binding-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .delete(
+                        DeleteServiceBindingRequest.builder()
+                                .serviceBindingId("test-service-binding-id")
+                                .build())
+                .as(StepVerifier::create)
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
     public void get() {
-        mockRequest(InteractionContext.builder()
-            .request(TestRequest.builder()
-                .method(GET).path("/service_credential_bindings/test-service-binding-id")
-                .build())
-            .response(TestResponse.builder()
-                .status(OK)
-                .payload("fixtures/client/v3/servicebindings/GET_{id}_response.json")
-                .build())
-            .build());
+        mockRequest(
+                InteractionContext.builder()
+                        .request(
+                                TestRequest.builder()
+                                        .method(GET)
+                                        .path(
+                                                "/service_credential_bindings/test-service-binding-id")
+                                        .build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(OK)
+                                        .payload(
+                                                "fixtures/client/v3/servicebindings/GET_{id}_response.json")
+                                        .build())
+                        .build());
 
         this.serviceBindings
-            .get(GetServiceBindingRequest.builder()
-                .serviceBindingId("test-service-binding-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(GetServiceBindingResponse.builder()
-                .id("dde5ad2a-d8f4-44dc-a56f-0452d744f1c3")
-                .type(ServiceBindingType.APPLICATION)
-                .relationships(ServiceBindingRelationships.builder()
-                    .application(ToOneRelationship.builder()
-                        .data(Relationship.builder()
-                            .id("74f7c078-0934-470f-9883-4fddss5b8f13")
-                            .build())
-                        .build())
-                    .serviceInstance(ToOneRelationship.builder()
-                        .data(Relationship.builder()
-                            .id("8bfe4c1b-9e18-45b1-83be-124163f31f9e")
-                            .build())
-                        .build())
-                    .build())
-                .createdAt("2015-11-13T17:02:56Z")
-                .link("self", Link.builder()
-                    .href("/v3/service_credential_bindings/dde5ad2a-d8f4-44dc-a56f-0452d744f1c3")
-                    .build())
-                .link("service_instance", Link.builder()
-                    .href("/v3/service_instances/8bfe4c1b-9e18-45b1-83be-124163f31f9e")
-                    .build())
-                .link("app", Link.builder()
-                    .href("/v3/apps/74f7c078-0934-470f-9883-4fddss5b8f13")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .get(
+                        GetServiceBindingRequest.builder()
+                                .serviceBindingId("test-service-binding-id")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        GetServiceBindingResponse.builder()
+                                .id("dde5ad2a-d8f4-44dc-a56f-0452d744f1c3")
+                                .type(ServiceBindingType.APPLICATION)
+                                .relationships(
+                                        ServiceBindingRelationships.builder()
+                                                .application(
+                                                        ToOneRelationship.builder()
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id(
+                                                                                        "74f7c078-0934-470f-9883-4fddss5b8f13")
+                                                                                .build())
+                                                                .build())
+                                                .serviceInstance(
+                                                        ToOneRelationship.builder()
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id(
+                                                                                        "8bfe4c1b-9e18-45b1-83be-124163f31f9e")
+                                                                                .build())
+                                                                .build())
+                                                .build())
+                                .createdAt("2015-11-13T17:02:56Z")
+                                .link(
+                                        "self",
+                                        Link.builder()
+                                                .href(
+                                                        "/v3/service_credential_bindings/dde5ad2a-d8f4-44dc-a56f-0452d744f1c3")
+                                                .build())
+                                .link(
+                                        "service_instance",
+                                        Link.builder()
+                                                .href(
+                                                        "/v3/service_instances/8bfe4c1b-9e18-45b1-83be-124163f31f9e")
+                                                .build())
+                                .link(
+                                        "app",
+                                        Link.builder()
+                                                .href(
+                                                        "/v3/apps/74f7c078-0934-470f-9883-4fddss5b8f13")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
     public void list() {
-        mockRequest(InteractionContext.builder()
-            .request(TestRequest.builder()
-                .method(GET).path("/service_credential_bindings?app_guids=test-application-id&order_by=%2Bcreated_at&page=1")
-                .build())
-            .response(TestResponse.builder()
-                .status(OK)
-                .payload("fixtures/client/v3/servicebindings/GET_response.json")
-                .build())
-            .build());
+        mockRequest(
+                InteractionContext.builder()
+                        .request(
+                                TestRequest.builder()
+                                        .method(GET)
+                                        .path(
+                                                "/service_credential_bindings?app_guids=test-application-id&order_by=%2Bcreated_at&page=1")
+                                        .build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(OK)
+                                        .payload(
+                                                "fixtures/client/v3/servicebindings/GET_response.json")
+                                        .build())
+                        .build());
 
         this.serviceBindings
-            .list(ListServiceBindingsRequest.builder()
-                .page(1)
-                .orderBy("+created_at")
-                .applicationId("test-application-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(ListServiceBindingsResponse.builder()
-                .pagination(Pagination.builder()
-                    .totalResults(3)
-                    .first(Link.builder()
-                        .href("/v3/service_credential_bindings?page=1&per_page=2")
-                        .build())
-                    .last(Link.builder()
-                        .href("/v3/service_credential_bindings?page=2&per_page=2")
-                        .build())
-                    .next(Link.builder()
-                        .href("/v3/service_credential_bindings?page=2&per_page=2")
-                        .build())
-                    .build())
-                .resource(ServiceBindingResource.builder()
-                    .id("dde5ad2a-d8f4-44dc-a56f-0452d744f1c3")
-                    .type(ServiceBindingType.APPLICATION)
-                    .relationships(ServiceBindingRelationships.builder()
-                        .application(ToOneRelationship.builder()
-                            .data(Relationship.builder()
-                                .id("74f7c078-0934-470f-9883-4fddss5b8f13")
+                .list(
+                        ListServiceBindingsRequest.builder()
+                                .page(1)
+                                .orderBy("+created_at")
+                                .applicationId("test-application-id")
                                 .build())
-                            .build())
-                        .serviceInstance(ToOneRelationship.builder()
-                            .data(Relationship.builder()
-                                .id("8bfe4c1b-9e18-45b1-83be-124163f31f9e")
+                .as(StepVerifier::create)
+                .expectNext(
+                        ListServiceBindingsResponse.builder()
+                                .pagination(
+                                        Pagination.builder()
+                                                .totalResults(3)
+                                                .first(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "/v3/service_credential_bindings?page=1&per_page=2")
+                                                                .build())
+                                                .last(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "/v3/service_credential_bindings?page=2&per_page=2")
+                                                                .build())
+                                                .next(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "/v3/service_credential_bindings?page=2&per_page=2")
+                                                                .build())
+                                                .build())
+                                .resource(
+                                        ServiceBindingResource.builder()
+                                                .id("dde5ad2a-d8f4-44dc-a56f-0452d744f1c3")
+                                                .type(ServiceBindingType.APPLICATION)
+                                                .relationships(
+                                                        ServiceBindingRelationships.builder()
+                                                                .application(
+                                                                        ToOneRelationship.builder()
+                                                                                .data(
+                                                                                        Relationship
+                                                                                                .builder()
+                                                                                                .id(
+                                                                                                        "74f7c078-0934-470f-9883-4fddss5b8f13")
+                                                                                                .build())
+                                                                                .build())
+                                                                .serviceInstance(
+                                                                        ToOneRelationship.builder()
+                                                                                .data(
+                                                                                        Relationship
+                                                                                                .builder()
+                                                                                                .id(
+                                                                                                        "8bfe4c1b-9e18-45b1-83be-124163f31f9e")
+                                                                                                .build())
+                                                                                .build())
+                                                                .build())
+                                                .createdAt("2015-11-13T17:02:56Z")
+                                                .link(
+                                                        "self",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "/v3/service_credential_bindings/dde5ad2a-d8f4-44dc-a56f-0452d744f1c3")
+                                                                .build())
+                                                .link(
+                                                        "service_instance",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "/v3/service_instances/8bfe4c1b-9e18-45b1-83be-124163f31f9e")
+                                                                .build())
+                                                .link(
+                                                        "app",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "/v3/apps/74f7c078-0934-470f-9883-4fddss5b8f13")
+                                                                .build())
+                                                .build())
+                                .resource(
+                                        ServiceBindingResource.builder()
+                                                .id("7aa37bad-6ccb-4ef9-ba48-9ce3a91b2b62")
+                                                .type(ServiceBindingType.APPLICATION)
+                                                .relationships(
+                                                        ServiceBindingRelationships.builder()
+                                                                .application(
+                                                                        ToOneRelationship.builder()
+                                                                                .data(
+                                                                                        Relationship
+                                                                                                .builder()
+                                                                                                .id(
+                                                                                                        "74f7c078-0934-470f-9883-4fddss5b8f13")
+                                                                                                .build())
+                                                                                .build())
+                                                                .serviceInstance(
+                                                                        ToOneRelationship.builder()
+                                                                                .data(
+                                                                                        Relationship
+                                                                                                .builder()
+                                                                                                .id(
+                                                                                                        "8bf356j3-9e18-45b1-3333-124163f31f9e")
+                                                                                                .build())
+                                                                                .build())
+                                                                .build())
+                                                .createdAt("2015-11-13T17:02:56Z")
+                                                .link(
+                                                        "self",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "/v3/service_credential_bindings/7aa37bad-6ccb-4ef9-ba48-9ce3a91b2b62")
+                                                                .build())
+                                                .link(
+                                                        "service_instance",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "/v3/service_instances/8bf356j3-9e18-45b1-3333-124163f31f9e")
+                                                                .build())
+                                                .link(
+                                                        "app",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "/v3/apps/74f7c078-0934-470f-9883-4fddss5b8f13")
+                                                                .build())
+                                                .build())
                                 .build())
-                            .build())
-                        .build())
-                    .createdAt("2015-11-13T17:02:56Z")
-                    .link("self", Link.builder()
-                        .href("/v3/service_credential_bindings/dde5ad2a-d8f4-44dc-a56f-0452d744f1c3")
-                        .build())
-                    .link("service_instance", Link.builder()
-                        .href("/v3/service_instances/8bfe4c1b-9e18-45b1-83be-124163f31f9e")
-                        .build())
-                    .link("app", Link.builder()
-                        .href("/v3/apps/74f7c078-0934-470f-9883-4fddss5b8f13")
-                        .build())
-                    .build())
-                .resource(ServiceBindingResource.builder()
-                    .id("7aa37bad-6ccb-4ef9-ba48-9ce3a91b2b62")
-                    .type(ServiceBindingType.APPLICATION)
-                    .relationships(ServiceBindingRelationships.builder()
-                        .application(ToOneRelationship.builder()
-                            .data(Relationship.builder()
-                                .id("74f7c078-0934-470f-9883-4fddss5b8f13")
-                                .build())
-                            .build())
-                        .serviceInstance(ToOneRelationship.builder()
-                            .data(Relationship.builder()
-                                .id("8bf356j3-9e18-45b1-3333-124163f31f9e")
-                                .build())
-                            .build())
-                        .build())
-                    .createdAt("2015-11-13T17:02:56Z")
-                    .link("self", Link.builder()
-                        .href("/v3/service_credential_bindings/7aa37bad-6ccb-4ef9-ba48-9ce3a91b2b62")
-                        .build())
-                    .link("service_instance", Link.builder()
-                        .href("/v3/service_instances/8bf356j3-9e18-45b1-3333-124163f31f9e")
-                        .build())
-                    .link("app", Link.builder()
-                        .href("/v3/apps/74f7c078-0934-470f-9883-4fddss5b8f13")
-                        .build())
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
-
 }

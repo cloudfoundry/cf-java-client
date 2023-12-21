@@ -22,24 +22,19 @@ public final class RemoveSpaceManagerByUsernameRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noSpaceId() {
-        RemoveSpaceManagerByUsernameRequest.builder()
-            .username("test-username")
-            .build();
+        RemoveSpaceManagerByUsernameRequest.builder().username("test-username").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noUsername() {
-        RemoveSpaceManagerByUsernameRequest.builder()
-            .spaceId("test-space-id")
-            .build();
+        RemoveSpaceManagerByUsernameRequest.builder().spaceId("test-space-id").build();
     }
 
     @Test
     public void valid() {
         RemoveSpaceManagerByUsernameRequest.builder()
-            .spaceId("test-space-id")
-            .username("test-username")
-            .build();
+                .spaceId("test-space-id")
+                .username("test-username")
+                .build();
     }
-
 }

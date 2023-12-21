@@ -22,15 +22,11 @@ public final class CreateUserProvidedServiceInstanceRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noName() {
-        CreateUserProvidedServiceInstanceRequest.builder()
-            .build();
+        CreateUserProvidedServiceInstanceRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        CreateUserProvidedServiceInstanceRequest.builder()
-            .name("test-name")
-            .build();
+        CreateUserProvidedServiceInstanceRequest.builder().name("test-name").build();
     }
-
 }

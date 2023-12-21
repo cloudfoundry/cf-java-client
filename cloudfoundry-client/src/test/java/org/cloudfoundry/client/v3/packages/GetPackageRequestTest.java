@@ -22,15 +22,11 @@ public final class GetPackageRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noPackageId() {
-        GetPackageRequest.builder()
-            .build();
+        GetPackageRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        GetPackageRequest.builder()
-            .packageId("test-package-id")
-            .build();
+        GetPackageRequest.builder().packageId("test-package-id").build();
     }
-
 }

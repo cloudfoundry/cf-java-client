@@ -22,15 +22,11 @@ public final class DeleteDropletRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noDropletId() {
-        DeleteDropletRequest.builder()
-            .build();
+        DeleteDropletRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        DeleteDropletRequest.builder()
-            .dropletId("test-droplet-id")
-            .build();
+        DeleteDropletRequest.builder().dropletId("test-droplet-id").build();
     }
-
 }

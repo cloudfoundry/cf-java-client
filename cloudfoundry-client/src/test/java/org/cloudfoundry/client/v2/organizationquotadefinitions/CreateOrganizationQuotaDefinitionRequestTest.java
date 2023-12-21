@@ -23,78 +23,77 @@ public final class CreateOrganizationQuotaDefinitionRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noInstanceMemoryLimit() {
         CreateOrganizationQuotaDefinitionRequest.builder()
-            .memoryLimit(1024)
-            .name("test-quota-definition-name")
-            .nonBasicServicesAllowed(false)
-            .totalRoutes(-1)
-            .totalServices(-1)
-            .build();
+                .memoryLimit(1024)
+                .name("test-quota-definition-name")
+                .nonBasicServicesAllowed(false)
+                .totalRoutes(-1)
+                .totalServices(-1)
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noMemoryLimit() {
         CreateOrganizationQuotaDefinitionRequest.builder()
-            .instanceMemoryLimit(1024)
-            .name("test-quota-definition-name")
-            .nonBasicServicesAllowed(false)
-            .totalRoutes(-1)
-            .totalServices(-1)
-            .build();
+                .instanceMemoryLimit(1024)
+                .name("test-quota-definition-name")
+                .nonBasicServicesAllowed(false)
+                .totalRoutes(-1)
+                .totalServices(-1)
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noName() {
         CreateOrganizationQuotaDefinitionRequest.builder()
-            .instanceMemoryLimit(1024)
-            .memoryLimit(1024)
-            .nonBasicServicesAllowed(false)
-            .totalRoutes(-1)
-            .totalServices(-1)
-            .build();
+                .instanceMemoryLimit(1024)
+                .memoryLimit(1024)
+                .nonBasicServicesAllowed(false)
+                .totalRoutes(-1)
+                .totalServices(-1)
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noNonBasicServicesAllowed() {
         CreateOrganizationQuotaDefinitionRequest.builder()
-            .instanceMemoryLimit(1024)
-            .memoryLimit(1024)
-            .name("test-quota-definition-name")
-            .totalRoutes(-1)
-            .totalServices(-1)
-            .build();
+                .instanceMemoryLimit(1024)
+                .memoryLimit(1024)
+                .name("test-quota-definition-name")
+                .totalRoutes(-1)
+                .totalServices(-1)
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noTotalRoutes() {
         CreateOrganizationQuotaDefinitionRequest.builder()
-            .instanceMemoryLimit(1024)
-            .memoryLimit(1024)
-            .name("test-quota-definition-name")
-            .totalServices(-1)
-            .build();
+                .instanceMemoryLimit(1024)
+                .memoryLimit(1024)
+                .name("test-quota-definition-name")
+                .totalServices(-1)
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noTotalServices() {
         CreateOrganizationQuotaDefinitionRequest.builder()
-            .instanceMemoryLimit(1024)
-            .memoryLimit(1024)
-            .name("test-quota-definition-name")
-            .nonBasicServicesAllowed(false)
-            .totalRoutes(-1)
-            .build();
+                .instanceMemoryLimit(1024)
+                .memoryLimit(1024)
+                .name("test-quota-definition-name")
+                .nonBasicServicesAllowed(false)
+                .totalRoutes(-1)
+                .build();
     }
 
     @Test
     public void valid() {
         CreateOrganizationQuotaDefinitionRequest.builder()
-            .instanceMemoryLimit(1024)
-            .memoryLimit(1024)
-            .name("test-quota-definition-name")
-            .nonBasicServicesAllowed(false)
-            .totalRoutes(-1)
-            .totalServices(-1)
-            .build();
+                .instanceMemoryLimit(1024)
+                .memoryLimit(1024)
+                .name("test-quota-definition-name")
+                .nonBasicServicesAllowed(false)
+                .totalRoutes(-1)
+                .totalServices(-1)
+                .build();
     }
-
 }

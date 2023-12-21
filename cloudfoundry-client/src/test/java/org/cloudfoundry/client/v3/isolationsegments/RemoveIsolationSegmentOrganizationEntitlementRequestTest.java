@@ -23,23 +23,22 @@ public final class RemoveIsolationSegmentOrganizationEntitlementRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noIsolationSegmentId() {
         RemoveIsolationSegmentOrganizationEntitlementRequest.builder()
-            .organizationId("test-organization-id")
-            .build();
+                .organizationId("test-organization-id")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noOrganizationId() {
         RemoveIsolationSegmentOrganizationEntitlementRequest.builder()
-            .isolationSegmentId("test-isolation-segment-id")
-            .build();
+                .isolationSegmentId("test-isolation-segment-id")
+                .build();
     }
 
     @Test
     public void valid() {
         RemoveIsolationSegmentOrganizationEntitlementRequest.builder()
-            .isolationSegmentId("test-isolation-segment-id")
-            .organizationId("test-organization-id")
-            .build();
+                .isolationSegmentId("test-isolation-segment-id")
+                .organizationId("test-organization-id")
+                .build();
     }
-
 }

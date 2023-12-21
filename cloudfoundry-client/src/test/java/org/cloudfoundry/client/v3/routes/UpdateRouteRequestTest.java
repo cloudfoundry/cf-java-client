@@ -23,18 +23,14 @@ public class UpdateRouteRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noRouteId() {
-        UpdateRouteRequest.builder()
-            .build();
+        UpdateRouteRequest.builder().build();
     }
 
     @Test
     public void valid() {
         UpdateRouteRequest.builder()
-            .metadata(Metadata.builder()
-                .label("test-key", "test-value")
-                .build())
-            .routeId("test-route-id")
-            .build();
+                .metadata(Metadata.builder().label("test-key", "test-value").build())
+                .routeId("test-route-id")
+                .build();
     }
-
 }

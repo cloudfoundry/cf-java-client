@@ -63,7 +63,8 @@ public interface ServiceInstances {
      * @param request the Get Parameters request
      * @return the response from the Get Parameters request
      */
-    Mono<GetServiceInstanceParametersResponse> getParameters(GetServiceInstanceParametersRequest request);
+    Mono<GetServiceInstanceParametersResponse> getParameters(
+            GetServiceInstanceParametersRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/service_instances/retrieving_permissions_on_a_service_instance.html">Retrieving permissions on a Service Instance</a> request
@@ -71,7 +72,8 @@ public interface ServiceInstances {
      * @param request the Get Permissions request
      * @return the response from the Get Permissions request
      */
-    Mono<GetServiceInstancePermissionsResponse> getPermissions(GetServiceInstancePermissionsRequest request);
+    Mono<GetServiceInstancePermissionsResponse> getPermissions(
+            GetServiceInstancePermissionsRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/service_instances/list_all_service_instances.html">List Service Instances</a> request
@@ -96,7 +98,8 @@ public interface ServiceInstances {
      * @param request the List Service Bindings request
      * @return the response from the List Service Bindings request
      */
-    Mono<ListServiceInstanceServiceBindingsResponse> listServiceBindings(ListServiceInstanceServiceBindingsRequest request);
+    Mono<ListServiceInstanceServiceBindingsResponse> listServiceBindings(
+            ListServiceInstanceServiceBindingsRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/service_instances/retrieving_service_keys_associated_with_a_service_instance.html">List all Service keys for the Service
@@ -105,7 +108,8 @@ public interface ServiceInstances {
      * @param request the List Service Keys request
      * @return the response from the List Service Keys request
      */
-    Mono<ListServiceInstanceServiceKeysResponse> listServiceKeys(ListServiceInstanceServiceKeysRequest request);
+    Mono<ListServiceInstanceServiceKeysResponse> listServiceKeys(
+            ListServiceInstanceServiceKeysRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/service_instances/unbinding_a_service_instance_from_a_route.html">Unbinding a Service Instance from a Route</a> request
@@ -122,5 +126,4 @@ public interface ServiceInstances {
      * @return the response from the Update Service Instance request
      */
     Mono<UpdateServiceInstanceResponse> update(UpdateServiceInstanceRequest request);
-
 }

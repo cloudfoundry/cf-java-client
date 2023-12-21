@@ -22,15 +22,11 @@ public final class RouteExistsRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noDomainId() {
-        RouteExistsRequest.builder()
-            .build();
+        RouteExistsRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        RouteExistsRequest.builder()
-            .domainId("test-domain-id")
-            .build();
+        RouteExistsRequest.builder().domainId("test-domain-id").build();
     }
-
 }

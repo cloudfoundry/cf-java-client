@@ -18,7 +18,6 @@ package org.cloudfoundry.client.v3;
 
 import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -39,5 +38,4 @@ public @interface FilterParameter {
      * @return the name of the parameter
      */
     String value();
-
 }

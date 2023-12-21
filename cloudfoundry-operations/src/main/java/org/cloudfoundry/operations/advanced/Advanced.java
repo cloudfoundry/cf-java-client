@@ -24,5 +24,4 @@ import reactor.core.publisher.Mono;
 public interface Advanced {
 
     Mono<String> sshCode();
-
 }

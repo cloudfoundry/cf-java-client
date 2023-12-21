@@ -21,14 +21,11 @@ import org.junit.Test;
 public class ManifestV3ServiceTest {
     @Test(expected = IllegalStateException.class)
     public void noName() {
-        ManifestV3Service.builder()
-            .build();
+        ManifestV3Service.builder().build();
     }
 
     @Test
     public void valid() {
-        ManifestV3Service.builder()
-            .name("test-service-name")
-            .build();
+        ManifestV3Service.builder().name("test-service-name").build();
     }
 }

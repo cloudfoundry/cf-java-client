@@ -33,5 +33,4 @@ public interface RoutingClient {
      * Main entry point to the TCP Routing API
      */
     TcpRoutes tcpRoutes();
-
 }

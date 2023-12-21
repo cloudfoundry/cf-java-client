@@ -23,23 +23,20 @@ public final class BindServiceInstanceRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noApplicationName() {
         BindServiceInstanceRequest.builder()
-            .serviceInstanceName("test-service-instance-name")
-            .build();
+                .serviceInstanceName("test-service-instance-name")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noServiceInstanceName() {
-        BindServiceInstanceRequest.builder()
-            .applicationName("test-application-name")
-            .build();
+        BindServiceInstanceRequest.builder().applicationName("test-application-name").build();
     }
 
     @Test
     public void valid() {
         BindServiceInstanceRequest.builder()
-            .applicationName("test-application-name")
-            .serviceInstanceName("test-service-instance-name")
-            .build();
+                .applicationName("test-application-name")
+                .serviceInstanceName("test-service-instance-name")
+                .build();
     }
-
 }

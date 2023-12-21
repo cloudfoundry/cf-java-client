@@ -23,34 +23,33 @@ public final class GetTokenByAuthorizationCodeRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noAuthorizationCode() {
         GetTokenByAuthorizationCodeRequest.builder()
-            .clientId("test-client-id")
-            .clientSecret("test-client-secret")
-            .build();
+                .clientId("test-client-id")
+                .clientSecret("test-client-secret")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noClientId() {
         GetTokenByAuthorizationCodeRequest.builder()
-            .authorizationCode("test-authorization-code")
-            .clientSecret("test-client-secret")
-            .build();
+                .authorizationCode("test-authorization-code")
+                .clientSecret("test-client-secret")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noClientSecret() {
         GetTokenByAuthorizationCodeRequest.builder()
-            .authorizationCode("test-authorization-code")
-            .clientId("test-client-id")
-            .build();
+                .authorizationCode("test-authorization-code")
+                .clientId("test-client-id")
+                .build();
     }
 
     @Test
     public void valid() {
         GetTokenByAuthorizationCodeRequest.builder()
-            .authorizationCode("test-authorization-code")
-            .clientId("test-client-id")
-            .clientSecret("test-client-secret")
-            .build();
+                .authorizationCode("test-authorization-code")
+                .clientId("test-client-id")
+                .clientSecret("test-client-secret")
+                .build();
     }
-
 }

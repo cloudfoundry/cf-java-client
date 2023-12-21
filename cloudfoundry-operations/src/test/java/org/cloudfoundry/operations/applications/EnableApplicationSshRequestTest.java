@@ -22,15 +22,11 @@ public final class EnableApplicationSshRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noName() {
-        EnableApplicationSshRequest.builder()
-            .build();
+        EnableApplicationSshRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        EnableApplicationSshRequest.builder()
-            .name("test-name")
-            .build();
+        EnableApplicationSshRequest.builder().name("test-name").build();
     }
-
 }

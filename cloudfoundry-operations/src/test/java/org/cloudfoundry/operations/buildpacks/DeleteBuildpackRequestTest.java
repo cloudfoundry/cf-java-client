@@ -16,24 +16,21 @@
 
 package org.cloudfoundry.operations.buildpacks;
 
-import org.junit.Test;
-
 import java.time.Duration;
+import org.junit.Test;
 
 public class DeleteBuildpackRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noName() {
-        DeleteBuildpackRequest.builder()
-            .build();
+        DeleteBuildpackRequest.builder().build();
     }
 
     @Test
     public void valid() {
         DeleteBuildpackRequest.builder()
-            .name("test-buildpack-name")
-            .completionTimeout(Duration.ofSeconds(5))
-            .build();
+                .name("test-buildpack-name")
+                .completionTimeout(Duration.ofSeconds(5))
+                .build();
     }
-
 }

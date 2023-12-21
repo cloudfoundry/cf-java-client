@@ -21,6 +21,5 @@ import org.cloudfoundry.client.v2.Resource;
 /**
  * The resource response payload for any type of Service Instance
  */
-public abstract class AbstractUnionServiceInstanceResource extends Resource<org.cloudfoundry.client.v2.serviceinstances.UnionServiceInstanceEntity> {
-
-}
+public abstract class AbstractUnionServiceInstanceResource
+        extends Resource<org.cloudfoundry.client.v2.serviceinstances.UnionServiceInstanceEntity> {}

@@ -22,15 +22,13 @@ public final class ListApplicationServiceBindingsRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noApplicationId() {
-        ListApplicationServiceBindingsRequest.builder()
-            .build();
+        ListApplicationServiceBindingsRequest.builder().build();
     }
 
     @Test
     public void valid() {
         ListApplicationServiceBindingsRequest.builder()
-            .applicationId("test-application-id")
-            .build();
+                .applicationId("test-application-id")
+                .build();
     }
-
 }

@@ -22,24 +22,16 @@ public final class RenameOrganizationRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noName() {
-        RenameOrganizationRequest.builder()
-            .newName("new-name")
-            .build();
+        RenameOrganizationRequest.builder().newName("new-name").build();
     }
 
     @Test
     public void valid() {
-        RenameOrganizationRequest.builder()
-            .name("test-name")
-            .newName("test-new-name")
-            .build();
+        RenameOrganizationRequest.builder().name("test-name").newName("test-new-name").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void validNoNewName() {
-        RenameOrganizationRequest.builder()
-            .name("name")
-            .build();
+        RenameOrganizationRequest.builder().name("name").build();
     }
-
 }

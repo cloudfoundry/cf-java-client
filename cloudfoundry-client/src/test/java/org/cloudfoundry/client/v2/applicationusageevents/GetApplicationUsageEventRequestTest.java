@@ -22,15 +22,13 @@ public final class GetApplicationUsageEventRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noApplicationUsageEventId() {
-        GetApplicationUsageEventRequest.builder()
-            .build();
+        GetApplicationUsageEventRequest.builder().build();
     }
 
     @Test
     public void valid() {
         GetApplicationUsageEventRequest.builder()
-            .applicationUsageEventId("test-application-usage-event-id")
-            .build();
+                .applicationUsageEventId("test-application-usage-event-id")
+                .build();
     }
-
 }

@@ -23,43 +23,39 @@ public final class CreateIdentityZoneRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noName() {
         CreateIdentityZoneRequest.builder()
-            .configuration(IdentityZoneConfiguration.builder().build())
-            .description("test-description")
-            .identityZoneId("test-identity-zone-id")
-            .subdomain("test-sub-domain")
-            .version(1)
-            .build();
+                .configuration(IdentityZoneConfiguration.builder().build())
+                .description("test-description")
+                .identityZoneId("test-identity-zone-id")
+                .subdomain("test-sub-domain")
+                .version(1)
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noSubdomain() {
         CreateIdentityZoneRequest.builder()
-            .configuration(IdentityZoneConfiguration.builder().build())
-            .description("test-description")
-            .identityZoneId("test-identity-zone-id")
-            .name("test-name")
-            .version(1)
-            .build();
+                .configuration(IdentityZoneConfiguration.builder().build())
+                .description("test-description")
+                .identityZoneId("test-identity-zone-id")
+                .name("test-name")
+                .version(1)
+                .build();
     }
 
     @Test
     public void validMax() {
         CreateIdentityZoneRequest.builder()
-            .configuration(IdentityZoneConfiguration.builder().build())
-            .description("test-description")
-            .identityZoneId("test-identity-zone-id")
-            .name("test-name")
-            .subdomain("test-sub-domain")
-            .version(1)
-            .build();
+                .configuration(IdentityZoneConfiguration.builder().build())
+                .description("test-description")
+                .identityZoneId("test-identity-zone-id")
+                .name("test-name")
+                .subdomain("test-sub-domain")
+                .version(1)
+                .build();
     }
 
     @Test
     public void validMin() {
-        CreateIdentityZoneRequest.builder()
-            .name("test-name")
-            .subdomain("test-sub-domain")
-            .build();
+        CreateIdentityZoneRequest.builder().name("test-name").subdomain("test-sub-domain").build();
     }
-
 }

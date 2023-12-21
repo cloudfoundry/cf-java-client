@@ -16,36 +16,31 @@
 
 package org.cloudfoundry.uaa.clients;
 
-import org.junit.Test;
-
 import static org.cloudfoundry.uaa.tokens.GrantType.IMPLICIT;
+
+import org.junit.Test;
 
 public final class MixedActionsRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void emptyAction() {
-        MixedActionsRequest.builder()
-            .actions()
-            .build();
+        MixedActionsRequest.builder().actions().build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noAction() {
-        MixedActionsRequest.builder()
-            .build();
+        MixedActionsRequest.builder().build();
     }
 
     @Test
     public void valid() {
         MixedActionsRequest.builder()
-            .action(CreateClientAction.builder()
-                .authorizedGrantType(IMPLICIT)
-                .clientId("test-client-id")
-                .build())
-            .action(DeleteClientAction.builder()
-                .clientId("test-client-id")
-                .build())
-            .build();
+                .action(
+                        CreateClientAction.builder()
+                                .authorizedGrantType(IMPLICIT)
+                                .clientId("test-client-id")
+                                .build())
+                .action(DeleteClientAction.builder().clientId("test-client-id").build())
+                .build();
     }
-
 }

@@ -22,24 +22,16 @@ public final class RemoveMemberRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noGroupId() {
-        RemoveMemberRequest.builder()
-            .memberId("test-member-id")
-            .build();
+        RemoveMemberRequest.builder().memberId("test-member-id").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noMemberId() {
-        RemoveMemberRequest.builder()
-            .groupId("test-group-id")
-            .build();
+        RemoveMemberRequest.builder().groupId("test-group-id").build();
     }
 
     @Test
     public void valid() {
-        RemoveMemberRequest.builder()
-            .groupId("test-group-id")
-            .memberId("test-member-id")
-            .build();
+        RemoveMemberRequest.builder().groupId("test-group-id").memberId("test-member-id").build();
     }
-
 }

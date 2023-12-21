@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v2.domains;
 
+import java.util.Map;
 import org.cloudfoundry.client.v2.domains.CreateDomainRequest;
 import org.cloudfoundry.client.v2.domains.CreateDomainResponse;
 import org.cloudfoundry.client.v2.domains.DeleteDomainRequest;
@@ -32,8 +33,6 @@ import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v2.AbstractClientV2Operations;
 import reactor.core.publisher.Mono;
 
-import java.util.Map;
-
 /**
  * The Reactor-based implementation of {@link Domains}
  */
@@ -47,7 +46,11 @@ public final class ReactorDomains extends AbstractClientV2Operations implements 
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorDomains(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
+    public ReactorDomains(
+            ConnectionContext connectionContext,
+            Mono<String> root,
+            TokenProvider tokenProvider,
+            Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
@@ -55,35 +58,43 @@ public final class ReactorDomains extends AbstractClientV2Operations implements 
     @SuppressWarnings("deprecation")
     public Mono<CreateDomainResponse> create(CreateDomainRequest request) {
         return post(request, CreateDomainResponse.class, builder -> builder.pathSegment("domains"))
-            .checkpoint();
+                .checkpoint();
     }
 
     @Override
     @SuppressWarnings("deprecation")
     public Mono<DeleteDomainResponse> delete(DeleteDomainRequest request) {
-        return delete(request, DeleteDomainResponse.class, builder -> builder.pathSegment("domains", request.getDomainId()))
-            .checkpoint();
+        return delete(
+                        request,
+                        DeleteDomainResponse.class,
+                        builder -> builder.pathSegment("domains", request.getDomainId()))
+                .checkpoint();
     }
 
     @Override
     @SuppressWarnings("deprecation")
     public Mono<GetDomainResponse> get(GetDomainRequest request) {
-        return get(request, GetDomainResponse.class, builder -> builder.pathSegment("domains", request.getDomainId()))
-            .checkpoint();
+        return get(
+                        request,
+                        GetDomainResponse.class,
+                        builder -> builder.pathSegment("domains", request.getDomainId()))
+                .checkpoint();
     }
 
     @Override
     @SuppressWarnings("deprecation")
     public Mono<ListDomainsResponse> list(ListDomainsRequest request) {
         return get(request, ListDomainsResponse.class, builder -> builder.pathSegment("domains"))
-            .checkpoint();
+                .checkpoint();
     }
 
     @Override
     @SuppressWarnings("deprecation")
     public Mono<ListDomainSpacesResponse> listSpaces(ListDomainSpacesRequest request) {
-        return get(request, ListDomainSpacesResponse.class, builder -> builder.pathSegment("domains", request.getDomainId(), "spaces"))
-            .checkpoint();
+        return get(
+                        request,
+                        ListDomainSpacesResponse.class,
+                        builder -> builder.pathSegment("domains", request.getDomainId(), "spaces"))
+                .checkpoint();
     }
-
 }

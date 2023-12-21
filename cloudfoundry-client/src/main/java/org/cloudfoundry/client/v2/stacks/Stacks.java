@@ -51,5 +51,4 @@ public interface Stacks {
      * @return the response from the List Stacks request
      */
     Mono<ListStacksResponse> list(ListStacksRequest request);
-
 }

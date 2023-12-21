@@ -25,48 +25,59 @@ public final class CreateRouteRequestTest {
     @Test(expected = IllegalStateException.class)
     public void invalidWithMissingDomainRelationship() {
         CreateRouteRequest.builder()
-            .relationships(RouteRelationships.builder()
-                .space(ToOneRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("test-space-id")
-                        .build()).build())
-                .build())
-            .build();
+                .relationships(
+                        RouteRelationships.builder()
+                                .space(
+                                        ToOneRelationship.builder()
+                                                .data(
+                                                        Relationship.builder()
+                                                                .id("test-space-id")
+                                                                .build())
+                                                .build())
+                                .build())
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void invalidWithMissingRelationship() {
-        CreateRouteRequest.builder()
-            .build();
+        CreateRouteRequest.builder().build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void invalidWithMissingSpaceRelationship() {
         CreateRouteRequest.builder()
-            .relationships(RouteRelationships.builder()
-                .domain(ToOneRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("test-domain-id")
-                        .build()).build())
-                .build())
-            .build();
+                .relationships(
+                        RouteRelationships.builder()
+                                .domain(
+                                        ToOneRelationship.builder()
+                                                .data(
+                                                        Relationship.builder()
+                                                                .id("test-domain-id")
+                                                                .build())
+                                                .build())
+                                .build())
+                .build();
     }
 
     @Test
     public void valid() {
         CreateRouteRequest.builder()
-            .relationships(RouteRelationships.builder()
-                .domain(ToOneRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("test-domain-id")
-                        .build())
-                    .build())
-                .space(ToOneRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("test-space-id")
-                        .build())
-                    .build())
-                .build());
+                .relationships(
+                        RouteRelationships.builder()
+                                .domain(
+                                        ToOneRelationship.builder()
+                                                .data(
+                                                        Relationship.builder()
+                                                                .id("test-domain-id")
+                                                                .build())
+                                                .build())
+                                .space(
+                                        ToOneRelationship.builder()
+                                                .data(
+                                                        Relationship.builder()
+                                                                .id("test-space-id")
+                                                                .build())
+                                                .build())
+                                .build());
     }
-
 }

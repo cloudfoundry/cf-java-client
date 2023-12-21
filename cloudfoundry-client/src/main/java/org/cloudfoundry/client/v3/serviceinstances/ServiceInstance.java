@@ -17,13 +17,12 @@
 package org.cloudfoundry.client.v3.serviceinstances;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.LastOperation;
 import org.cloudfoundry.client.v3.MaintenanceInfo;
 import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.Resource;
-
-import java.util.List;
 
 /**
  * Base class for responses that are service instances
@@ -105,5 +104,4 @@ public abstract class ServiceInstance extends Resource {
     @JsonProperty("upgrade_available")
     @Nullable
     public abstract Boolean getUpdateAvailable();
-
 }

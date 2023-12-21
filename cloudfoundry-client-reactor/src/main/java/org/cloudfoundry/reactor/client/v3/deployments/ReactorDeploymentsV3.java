@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v3.deployments;
 
+import java.util.Map;
 import org.cloudfoundry.client.v3.deployments.CancelDeploymentRequest;
 import org.cloudfoundry.client.v3.deployments.CancelDeploymentResponse;
 import org.cloudfoundry.client.v3.deployments.CreateDeploymentRequest;
@@ -30,12 +31,11 @@ import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
 import reactor.core.publisher.Mono;
 
-import java.util.Map;
-
 /**
  * The Reactor-based implementation of {@link DeploymentsV3}
  */
-public final class ReactorDeploymentsV3 extends AbstractClientV3Operations implements DeploymentsV3 {
+public final class ReactorDeploymentsV3 extends AbstractClientV3Operations
+        implements DeploymentsV3 {
 
     /**
      * Creates an instance
@@ -45,32 +45,52 @@ public final class ReactorDeploymentsV3 extends AbstractClientV3Operations imple
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorDeploymentsV3(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
+    public ReactorDeploymentsV3(
+            ConnectionContext connectionContext,
+            Mono<String> root,
+            TokenProvider tokenProvider,
+            Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<CancelDeploymentResponse> cancel(CancelDeploymentRequest request) {
-        return post(request, CancelDeploymentResponse.class, builder -> builder.pathSegment("deployments", request.getDeploymentId(), "actions", "cancel"))
-            .checkpoint();
+        return post(
+                        request,
+                        CancelDeploymentResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "deployments",
+                                        request.getDeploymentId(),
+                                        "actions",
+                                        "cancel"))
+                .checkpoint();
     }
 
     @Override
     public Mono<CreateDeploymentResponse> create(CreateDeploymentRequest request) {
-        return post(request, CreateDeploymentResponse.class, builder -> builder.pathSegment("deployments"))
-            .checkpoint();
+        return post(
+                        request,
+                        CreateDeploymentResponse.class,
+                        builder -> builder.pathSegment("deployments"))
+                .checkpoint();
     }
 
     @Override
     public Mono<GetDeploymentResponse> get(GetDeploymentRequest request) {
-        return get(request, GetDeploymentResponse.class, builder -> builder.pathSegment("deployments", request.getDeploymentId()))
-            .checkpoint();
+        return get(
+                        request,
+                        GetDeploymentResponse.class,
+                        builder -> builder.pathSegment("deployments", request.getDeploymentId()))
+                .checkpoint();
     }
 
     @Override
     public Mono<ListDeploymentsResponse> list(ListDeploymentsRequest request) {
-        return get(request, ListDeploymentsResponse.class, builder -> builder.pathSegment("deployments"))
-            .checkpoint();
+        return get(
+                        request,
+                        ListDeploymentsResponse.class,
+                        builder -> builder.pathSegment("deployments"))
+                .checkpoint();
     }
-
 }

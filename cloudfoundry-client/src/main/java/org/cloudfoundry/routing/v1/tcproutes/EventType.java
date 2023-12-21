@@ -61,5 +61,4 @@ public enum EventType {
     public String toString() {
         return getValue();
     }
-
 }

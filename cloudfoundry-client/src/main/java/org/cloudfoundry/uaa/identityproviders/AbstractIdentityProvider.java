@@ -36,7 +36,10 @@ abstract class AbstractIdentityProvider {
      * The configuration of this identity provider
      */
     @JsonProperty("config")
-    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "type")
+    @JsonTypeInfo(
+            use = JsonTypeInfo.Id.NAME,
+            include = JsonTypeInfo.As.EXTERNAL_PROPERTY,
+            property = "type")
     @JsonSubTypes({
         @JsonSubTypes.Type(name = "keystone", value = KeystoneConfiguration.class),
         @JsonSubTypes.Type(name = "ldap", value = LdapConfiguration.class),
@@ -95,5 +98,4 @@ abstract class AbstractIdentityProvider {
      */
     @JsonProperty("version")
     abstract Integer getVersion();
-
 }

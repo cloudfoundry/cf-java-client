@@ -22,15 +22,13 @@ public final class GetServiceUsageEventRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noServiceUsageEventId() {
-        GetServiceUsageEventRequest.builder()
-            .build();
+        GetServiceUsageEventRequest.builder().build();
     }
 
     @Test
     public void valid() {
         GetServiceUsageEventRequest.builder()
-            .serviceUsageEventId("test-service-usage-event-id")
-            .build();
+                .serviceUsageEventId("test-service-usage-event-id")
+                .build();
     }
-
 }

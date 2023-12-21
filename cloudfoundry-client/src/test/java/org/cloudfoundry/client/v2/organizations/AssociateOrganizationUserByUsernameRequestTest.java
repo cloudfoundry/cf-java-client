@@ -22,24 +22,21 @@ public final class AssociateOrganizationUserByUsernameRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noOrganizationId() {
-        AssociateOrganizationUserByUsernameRequest.builder()
-            .username("test-username")
-            .build();
+        AssociateOrganizationUserByUsernameRequest.builder().username("test-username").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noUsername() {
         AssociateOrganizationUserByUsernameRequest.builder()
-            .organizationId("test-organization-id")
-            .build();
+                .organizationId("test-organization-id")
+                .build();
     }
 
     @Test
     public void valid() {
         AssociateOrganizationUserByUsernameRequest.builder()
-            .organizationId("test-organization-id")
-            .username("test-username")
-            .build();
+                .organizationId("test-organization-id")
+                .username("test-username")
+                .build();
     }
-
 }

@@ -22,8 +22,6 @@ public class ListRolesRequestTest {
 
     @Test
     public void valid() {
-        ListRolesRequest.builder()
-            .build();
+        ListRolesRequest.builder().build();
     }
-
 }

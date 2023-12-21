@@ -23,25 +23,22 @@ public final class AuthorizeByAuthorizationCodeGrantHybridRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noClientId() {
         AuthorizeByAuthorizationCodeGrantHybridRequest.builder()
-            .redirectUri("http://redirect.to/app")
-            .scope("test-scope")
-            .build();
+                .redirectUri("http://redirect.to/app")
+                .scope("test-scope")
+                .build();
     }
 
     @Test
     public void validMax() {
         AuthorizeByAuthorizationCodeGrantHybridRequest.builder()
-            .clientId("test-client-id")
-            .redirectUri("http://redirect.to/app")
-            .scope("test-scope")
-            .build();
+                .clientId("test-client-id")
+                .redirectUri("http://redirect.to/app")
+                .scope("test-scope")
+                .build();
     }
 
     @Test
     public void validMin() {
-        AuthorizeByAuthorizationCodeGrantHybridRequest.builder()
-            .clientId("test-client-id")
-            .build();
+        AuthorizeByAuthorizationCodeGrantHybridRequest.builder().clientId("test-client-id").build();
     }
-
 }

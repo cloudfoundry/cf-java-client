@@ -16,10 +16,8 @@
 
 package org.cloudfoundry.operations.applications;
 
-import org.cloudfoundry.client.v3.processes.HealthCheckType;
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.Yaml;
-import reactor.core.Exceptions;
+import static java.util.Collections.emptyMap;
+import static java.util.stream.Collectors.toMap;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -34,9 +32,10 @@ import java.util.Optional;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-
-import static java.util.Collections.emptyMap;
-import static java.util.stream.Collectors.toMap;
+import org.cloudfoundry.client.v3.processes.HealthCheckType;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.Yaml;
+import reactor.core.Exceptions;
 
 /**
  * Utilities for dealing with {@link ManifestV3}s.  Includes the functionality to transform to and from standard CLI YAML files.
@@ -52,10 +51,10 @@ public final class ApplicationManifestUtilsV3 extends ApplicationManifestUtilsCo
         YAML = new Yaml(dumperOptions);
     }
 
-    private static final Pattern FIND_VARIABLE_REGEX = Pattern.compile("\\(\\(([a-zA-Z]\\w+)\\)\\)");
+    private static final Pattern FIND_VARIABLE_REGEX =
+            Pattern.compile("\\(\\(([a-zA-Z]\\w+)\\)\\)");
 
-    private ApplicationManifestUtilsV3() {
-    }
+    private ApplicationManifestUtilsV3() {}
 
     /**
      * Reads a YAML manifest file (defined by the <a href="https://v3-apidocs.cloudfoundry.org/version/3.124.0/index.html#manifests">CC API</a>) from a {@link Path} and converts it into a {@link
@@ -77,10 +76,9 @@ public final class ApplicationManifestUtilsV3 extends ApplicationManifestUtilsCo
      * @return the resolved manifest
      */
     public static ManifestV3 read(Path path, Path variablesPath) {
-        Map<String, String> variables = deserialize(variablesPath.toAbsolutePath())
-            .entrySet()
-            .stream()
-            .collect(toMap(Map.Entry::getKey,e -> String.valueOf(e.getValue())));
+        Map<String, String> variables =
+                deserialize(variablesPath.toAbsolutePath()).entrySet().stream()
+                        .collect(toMap(Map.Entry::getKey, e -> String.valueOf(e.getValue())));
 
         return doRead(path.toAbsolutePath(), variables);
     }
@@ -92,7 +90,8 @@ public final class ApplicationManifestUtilsV3 extends ApplicationManifestUtilsCo
      * @param manifest the manifest to write
      */
     public static void write(Path path, ManifestV3 manifest) {
-        try (OutputStream out = Files.newOutputStream(path, StandardOpenOption.CREATE, StandardOpenOption.WRITE)) {
+        try (OutputStream out =
+                Files.newOutputStream(path, StandardOpenOption.CREATE, StandardOpenOption.WRITE)) {
             write(out, manifest);
         } catch (IOException e) {
             throw Exceptions.propagate(e);
@@ -122,31 +121,56 @@ public final class ApplicationManifestUtilsV3 extends ApplicationManifestUtilsCo
 
         ManifestV3Application template = getTemplate(path, root, variables);
         Optional.ofNullable(root.get("applications"))
-            .map(value -> ((List<Map<String, Object>>) value).stream())
-            .orElseGet(Stream::empty)
-            .map(application -> {
-                String name = getName(application);
-                return toApplicationManifest(application, variables, ManifestV3Application.builder().from(template), path)
-                    .name(name)
-                    .build();
-            })
-            .forEach(builder::application);
+                .map(value -> ((List<Map<String, Object>>) value).stream())
+                .orElseGet(Stream::empty)
+                .map(
+                        application -> {
+                            String name = getName(application);
+                            return toApplicationManifest(
+                                            application,
+                                            variables,
+                                            ManifestV3Application.builder().from(template),
+                                            path)
+                                    .name(name)
+                                    .build();
+                        })
+                .forEach(builder::application);
         return builder.build();
     }
 
-    private static ManifestV3Application getTemplate(Path path, Map<String, Object> root, Map<String, String> variables) {
+    private static ManifestV3Application getTemplate(
+            Path path, Map<String, Object> root, Map<String, String> variables) {
         return toApplicationManifest(root, variables, ManifestV3Application.builder(), path)
-            .name("template")
-            .build();
+                .name("template")
+                .build();
     }
 
     @SuppressWarnings("unchecked")
-    private static ManifestV3Application.Builder toApplicationManifest(Map<String, Object> application, Map<String, String> variables, ManifestV3Application.Builder builder, Path root) {
+    private static ManifestV3Application.Builder toApplicationManifest(
+            Map<String, Object> application,
+            Map<String, String> variables,
+            ManifestV3Application.Builder builder,
+            Path root) {
         toApplicationManifestCommon(application, variables, builder, root);
 
-        asList(application, "processes", variables, raw -> getProcess((Map<String, Object>) raw, variables), builder::processe);
-        asList(application, "services", variables, raw -> getService(raw, variables), builder::service);
-        asList(application, "sidecars", variables, raw -> getSidecar((Map<String, Object>) raw, variables), builder::sidecar);
+        asList(
+                application,
+                "processes",
+                variables,
+                raw -> getProcess((Map<String, Object>) raw, variables),
+                builder::processe);
+        asList(
+                application,
+                "services",
+                variables,
+                raw -> getService(raw, variables),
+                builder::service);
+        asList(
+                application,
+                "sidecars",
+                variables,
+                raw -> getSidecar((Map<String, Object>) raw, variables),
+                builder::sidecar);
         as(application, "labels", variables, Map.class::cast, builder::labels);
         as(application, "annotations", variables, Map.class::cast, builder::annotations);
         asBoolean(application, "default-route", variables, builder::defaultRoute);
@@ -154,7 +178,8 @@ public final class ApplicationManifestUtilsV3 extends ApplicationManifestUtilsCo
         return builder;
     }
 
-    private static ManifestV3Sidecar getSidecar(Map<String, Object> raw, Map<String, String> variables) {
+    private static ManifestV3Sidecar getSidecar(
+            Map<String, Object> raw, Map<String, String> variables) {
         ManifestV3Sidecar.Builder builder = ManifestV3Sidecar.builder();
 
         asString(raw, "name", variables, builder::name);
@@ -165,15 +190,25 @@ public final class ApplicationManifestUtilsV3 extends ApplicationManifestUtilsCo
         return builder.build();
     }
 
-    private static ManifestV3Process getProcess(Map<String, Object> raw, Map<String, String> variables) {
+    private static ManifestV3Process getProcess(
+            Map<String, Object> raw, Map<String, String> variables) {
         ManifestV3Process.Builder builder = ManifestV3Process.builder();
 
         asString(raw, "type", variables, builder::type);
         asString(raw, "command", variables, builder::command);
         asString(raw, "disk", variables, builder::disk);
         asString(raw, "health-check-http-endpoint", variables, builder::healthCheckHttpEndpoint);
-        asInteger(raw, "health-check-invocation-timeout", variables, builder::healthCheckInvocationTimeout);
-        as(raw, "health-check-type", variables, s -> HealthCheckType.from((String) s), builder::healthCheckType);
+        asInteger(
+                raw,
+                "health-check-invocation-timeout",
+                variables,
+                builder::healthCheckInvocationTimeout);
+        as(
+                raw,
+                "health-check-type",
+                variables,
+                s -> HealthCheckType.from((String) s),
+                builder::healthCheckType);
         asInteger(raw, "instances", variables, builder::instances);
         asString(raw, "memory", variables, builder::memory);
         asInteger(raw, "timeout", variables, builder::timeout);
@@ -199,17 +234,32 @@ public final class ApplicationManifestUtilsV3 extends ApplicationManifestUtilsCo
     private static Map<String, Object> toYaml(ManifestV3 manifest) {
         Map<String, Object> yaml = new TreeMap<>();
         yaml.put("version", manifest.getVersion());
-        yaml.put("applications", convertCollection(manifest.getApplications(), ApplicationManifestUtilsV3::toApplicationYaml));
+        yaml.put(
+                "applications",
+                convertCollection(
+                        manifest.getApplications(), ApplicationManifestUtilsV3::toApplicationYaml));
         return yaml;
     }
 
     private static Map<String, Object> toApplicationYaml(ManifestV3Application application) {
         Map<String, Object> yaml = ApplicationManifestUtilsCommon.toApplicationYaml(application);
 
-        putIfPresent(yaml, "processes", convertCollection(application.getProcesses(), ApplicationManifestUtilsV3::toProcessYaml));
+        putIfPresent(
+                yaml,
+                "processes",
+                convertCollection(
+                        application.getProcesses(), ApplicationManifestUtilsV3::toProcessYaml));
         putIfPresent(yaml, "default-route", application.getDefaultRoute());
-        putIfPresent(yaml, "services", convertCollection(application.getServices(), ApplicationManifestUtilsV3::toServiceYaml));
-        putIfPresent(yaml, "sidecars", convertCollection(application.getSidecars(), ApplicationManifestUtilsV3::toSidecarsYaml));
+        putIfPresent(
+                yaml,
+                "services",
+                convertCollection(
+                        application.getServices(), ApplicationManifestUtilsV3::toServiceYaml));
+        putIfPresent(
+                yaml,
+                "sidecars",
+                convertCollection(
+                        application.getSidecars(), ApplicationManifestUtilsV3::toSidecarsYaml));
         putIfPresent(yaml, "labels", application.getLabels());
         putIfPresent(yaml, "annotations", application.getAnnotations());
         return yaml;
@@ -241,7 +291,8 @@ public final class ApplicationManifestUtilsV3 extends ApplicationManifestUtilsCo
         putIfPresent(yaml, "command", process.getCommand());
         putIfPresent(yaml, "disk_quota", process.getDisk());
         putIfPresent(yaml, "health-check-http-endpoint", process.getHealthCheckHttpEndpoint());
-        putIfPresent(yaml, "health-check-invocation-timeout", process.getHealthCheckInvocationTimeout());
+        putIfPresent(
+                yaml, "health-check-invocation-timeout", process.getHealthCheckInvocationTimeout());
         putIfPresent(yaml, "health-check-type", process.getHealthCheckType());
         putIfPresent(yaml, "instances", process.getInstances());
         putIfPresent(yaml, "memory", process.getMemory());

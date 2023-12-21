@@ -23,77 +23,81 @@ public class InsertRouteDestinationsRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noApplication() {
         InsertRouteDestinationsRequest.builder()
-            .destination(Destination.builder()
-                .destinationId("test-destination-id")
-                .port(999)
-                .build())
-            .routeId("test-route-id")
-            .build();
+                .destination(
+                        Destination.builder()
+                                .destinationId("test-destination-id")
+                                .port(999)
+                                .build())
+                .routeId("test-route-id")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noApplicationId() {
         InsertRouteDestinationsRequest.builder()
-            .destination(Destination.builder()
-                .application(Application.builder()
-                    .process(Process.builder()
-                        .type("test-type")
-                        .build())
-                    .build())
-                .destinationId("test-destination-id")
-                .port(999)
-                .build())
-            .routeId("test-route-id")
-            .build();
+                .destination(
+                        Destination.builder()
+                                .application(
+                                        Application.builder()
+                                                .process(
+                                                        Process.builder().type("test-type").build())
+                                                .build())
+                                .destinationId("test-destination-id")
+                                .port(999)
+                                .build())
+                .routeId("test-route-id")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noRouteId() {
         InsertRouteDestinationsRequest.builder()
-            .destination(Destination.builder()
-                .application(Application.builder()
-                    .applicationId("test-application-id")
-                    .process(Process.builder()
-                        .type("test-type")
-                        .build())
-                    .build())
-                .destinationId("test-destination-id")
-                .port(999)
-                .build())
-            .build();
+                .destination(
+                        Destination.builder()
+                                .application(
+                                        Application.builder()
+                                                .applicationId("test-application-id")
+                                                .process(
+                                                        Process.builder().type("test-type").build())
+                                                .build())
+                                .destinationId("test-destination-id")
+                                .port(999)
+                                .build())
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noType() {
         InsertRouteDestinationsRequest.builder()
-            .destination(Destination.builder()
-                .application(Application.builder()
-                    .applicationId("test-application-id")
-                    .process(Process.builder()
-                        .build())
-                    .build())
-                .destinationId("test-destination-id")
-                .port(999)
-                .build())
-            .routeId("test-route-id")
-            .build();
+                .destination(
+                        Destination.builder()
+                                .application(
+                                        Application.builder()
+                                                .applicationId("test-application-id")
+                                                .process(Process.builder().build())
+                                                .build())
+                                .destinationId("test-destination-id")
+                                .port(999)
+                                .build())
+                .routeId("test-route-id")
+                .build();
     }
 
     @Test
     public void valid() {
         InsertRouteDestinationsRequest.builder()
-            .destination(Destination.builder()
-                .application(Application.builder()
-                    .applicationId("test-application-id")
-                    .process(Process.builder()
-                        .type("test-type")
-                        .build())
-                    .build())
-                .destinationId("test-destination-id")
-                .port(999)
-                .build())
-            .routeId("test-route-id")
-            .build();
+                .destination(
+                        Destination.builder()
+                                .application(
+                                        Application.builder()
+                                                .applicationId("test-application-id")
+                                                .process(
+                                                        Process.builder().type("test-type").build())
+                                                .build())
+                                .destinationId("test-destination-id")
+                                .port(999)
+                                .build())
+                .routeId("test-route-id")
+                .build();
     }
-
 }

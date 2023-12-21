@@ -55,5 +55,4 @@ abstract class AbstractMetadata {
      */
     @JsonProperty("showOnHomePage")
     abstract Boolean getShowOnHomePage();
-
 }

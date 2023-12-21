@@ -16,43 +16,35 @@
 
 package org.cloudfoundry.operations.buildpacks;
 
-import org.junit.Test;
-
 import java.nio.file.Paths;
+import org.junit.Test;
 
 public class CreateBuildpackRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noBuildpack() {
-        CreateBuildpackRequest.builder()
-            .name("test-name")
-            .position(0)
-            .build();
+        CreateBuildpackRequest.builder().name("test-name").position(0).build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noName() {
-        CreateBuildpackRequest.builder()
-            .buildpack(Paths.get("test-buildpack"))
-            .position(0)
-            .build();
+        CreateBuildpackRequest.builder().buildpack(Paths.get("test-buildpack")).position(0).build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noPosition() {
         CreateBuildpackRequest.builder()
-            .buildpack(Paths.get("test-buildpack"))
-            .name("test-name")
-            .build();
+                .buildpack(Paths.get("test-buildpack"))
+                .name("test-name")
+                .build();
     }
 
     @Test
     public void valid() {
         CreateBuildpackRequest.builder()
-            .buildpack(Paths.get("test-buildpack"))
-            .name("test-name")
-            .position(0)
-            .build();
+                .buildpack(Paths.get("test-buildpack"))
+                .name("test-name")
+                .position(0)
+                .build();
     }
-
 }

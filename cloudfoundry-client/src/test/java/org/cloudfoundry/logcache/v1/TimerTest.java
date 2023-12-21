@@ -24,5 +24,4 @@ public class TimerTest {
     public void valid() {
         Timer.builder().build();
     }
-
 }

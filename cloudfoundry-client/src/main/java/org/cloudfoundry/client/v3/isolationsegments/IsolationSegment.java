@@ -38,5 +38,4 @@ public abstract class IsolationSegment extends Resource {
      */
     @JsonProperty("name")
     public abstract String getName();
-
 }

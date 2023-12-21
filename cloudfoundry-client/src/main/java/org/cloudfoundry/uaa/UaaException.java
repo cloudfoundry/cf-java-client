@@ -55,5 +55,4 @@ public final class UaaException extends AbstractCloudFoundryException {
     public String getErrorDescription() {
         return this.errorDescription;
     }
-
 }

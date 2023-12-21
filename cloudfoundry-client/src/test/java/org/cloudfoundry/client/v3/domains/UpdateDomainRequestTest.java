@@ -23,18 +23,14 @@ public final class UpdateDomainRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noDomainId() {
-        UpdateDomainRequest.builder()
-            .build();
+        UpdateDomainRequest.builder().build();
     }
 
     @Test
     public void valid() {
         UpdateDomainRequest.builder()
-            .domainId("test-domain-id")
-            .metadata(Metadata.builder()
-                .label("test-label-key", "test-label-value")
-                .build())
-            .build();
+                .domainId("test-domain-id")
+                .metadata(Metadata.builder().label("test-label-key", "test-label-value").build())
+                .build();
     }
-
 }

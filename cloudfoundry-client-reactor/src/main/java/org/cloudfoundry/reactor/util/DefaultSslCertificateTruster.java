@@ -17,21 +17,6 @@
 package org.cloudfoundry.reactor.util;
 
 import io.netty.handler.ssl.SslContextBuilder;
-import org.cloudfoundry.reactor.ProxyConfiguration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import reactor.core.Exceptions;
-import reactor.core.publisher.Mono;
-import reactor.netty.resources.LoopResources;
-import reactor.netty.tcp.SslProvider.SslContextSpec;
-import reactor.netty.tcp.TcpClient;
-import reactor.util.function.Tuple2;
-import reactor.util.function.Tuples;
-
-import javax.net.ssl.SSLException;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -44,6 +29,20 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
+import javax.net.ssl.SSLException;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
+import org.cloudfoundry.reactor.ProxyConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import reactor.core.Exceptions;
+import reactor.core.publisher.Mono;
+import reactor.netty.resources.LoopResources;
+import reactor.netty.tcp.SslProvider.SslContextSpec;
+import reactor.netty.tcp.TcpClient;
+import reactor.util.function.Tuple2;
+import reactor.util.function.Tuples;
 
 public final class DefaultSslCertificateTruster implements SslCertificateTruster {
 
@@ -57,7 +56,8 @@ public final class DefaultSslCertificateTruster implements SslCertificateTruster
 
     private final Set<Tuple2<String, Integer>> trustedHostsAndPorts;
 
-    public DefaultSslCertificateTruster(Optional<ProxyConfiguration> proxyConfiguration, LoopResources threadPool) {
+    public DefaultSslCertificateTruster(
+            Optional<ProxyConfiguration> proxyConfiguration, LoopResources threadPool) {
         this.proxyConfiguration = proxyConfiguration;
         this.threadPool = threadPool;
         this.delegate = new AtomicReference<>(getTrustManager(getTrustManagerFactory(null)));
@@ -65,12 +65,14 @@ public final class DefaultSslCertificateTruster implements SslCertificateTruster
     }
 
     @Override
-    public void checkClientTrusted(X509Certificate[] x509Certificates, String authType) throws CertificateException {
+    public void checkClientTrusted(X509Certificate[] x509Certificates, String authType)
+            throws CertificateException {
         this.delegate.get().checkClientTrusted(x509Certificates, authType);
     }
 
     @Override
-    public void checkServerTrusted(X509Certificate[] x509Certificates, String authType) throws CertificateException {
+    public void checkServerTrusted(X509Certificate[] x509Certificates, String authType)
+            throws CertificateException {
         this.delegate.get().checkServerTrusted(x509Certificates, authType);
     }
 
@@ -90,19 +92,29 @@ public final class DefaultSslCertificateTruster implements SslCertificateTruster
 
         X509TrustManager trustManager = this.delegate.get();
 
-        return getUntrustedCertificates(duration, host, port, this.proxyConfiguration, this.threadPool, trustManager)
-            .doOnNext(untrustedCertificates -> {
-                KeyStore trustStore = addToTrustStore(untrustedCertificates, trustManager);
-                this.delegate.set(getTrustManager(getTrustManagerFactory(trustStore)));
-            })
-            .doOnSuccess(untrustedCertificates -> {
-                this.trustedHostsAndPorts.add(hostAndPort);
-                this.logger.debug("Trusted SSL Certificate for {}:{}", host, port);
-            })
-            .then();
+        return getUntrustedCertificates(
+                        duration,
+                        host,
+                        port,
+                        this.proxyConfiguration,
+                        this.threadPool,
+                        trustManager)
+                .doOnNext(
+                        untrustedCertificates -> {
+                            KeyStore trustStore =
+                                    addToTrustStore(untrustedCertificates, trustManager);
+                            this.delegate.set(getTrustManager(getTrustManagerFactory(trustStore)));
+                        })
+                .doOnSuccess(
+                        untrustedCertificates -> {
+                            this.trustedHostsAndPorts.add(hostAndPort);
+                            this.logger.debug("Trusted SSL Certificate for {}:{}", host, port);
+                        })
+                .then();
     }
 
-    private static KeyStore addToTrustStore(X509Certificate[] untrustedCertificates, X509TrustManager trustManager) {
+    private static KeyStore addToTrustStore(
+            X509Certificate[] untrustedCertificates, X509TrustManager trustManager) {
         try {
             KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
             trustStore.load(null);
@@ -116,28 +128,42 @@ public final class DefaultSslCertificateTruster implements SslCertificateTruster
             }
 
             return trustStore;
-        } catch (CertificateException | NoSuchAlgorithmException | IOException | KeyStoreException e) {
+        } catch (CertificateException
+                | NoSuchAlgorithmException
+                | IOException
+                | KeyStoreException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private static void configureSsl(SslContextSpec sslContextSpec, CertificateCollectingTrustManager collector) {
+    private static void configureSsl(
+            SslContextSpec sslContextSpec, CertificateCollectingTrustManager collector) {
         try {
-           sslContextSpec.sslContext(SslContextBuilder.forClient().trustManager(new StaticTrustManagerFactory(collector)).build());
+            sslContextSpec.sslContext(
+                    SslContextBuilder.forClient()
+                            .trustManager(new StaticTrustManagerFactory(collector))
+                            .build());
         } catch (SSLException e) {
             throw Exceptions.propagate(e);
         }
     }
 
-    private static TcpClient getTcpClient(Optional<ProxyConfiguration> proxyConfiguration, LoopResources threadPool, CertificateCollectingTrustManager collector, String host, int port) {
-        TcpClient tcpClient = TcpClient.create()
-            .runOn(threadPool)
-            .host(host)
-            .port(port)
-            .secure(spec -> configureSsl(spec, collector));
+    private static TcpClient getTcpClient(
+            Optional<ProxyConfiguration> proxyConfiguration,
+            LoopResources threadPool,
+            CertificateCollectingTrustManager collector,
+            String host,
+            int port) {
+        TcpClient tcpClient =
+                TcpClient.create()
+                        .runOn(threadPool)
+                        .host(host)
+                        .port(port)
+                        .secure(spec -> configureSsl(spec, collector));
 
-        return proxyConfiguration.map(configuration -> configuration.configure(tcpClient))
-            .orElse(tcpClient);
+        return proxyConfiguration
+                .map(configuration -> configuration.configure(tcpClient))
+                .orElse(tcpClient);
     }
 
     private static X509TrustManager getTrustManager(TrustManagerFactory trustManagerFactory) {
@@ -152,7 +178,8 @@ public final class DefaultSslCertificateTruster implements SslCertificateTruster
 
     private static TrustManagerFactory getTrustManagerFactory(KeyStore trustStore) {
         try {
-            TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            TrustManagerFactory trustManagerFactory =
+                    TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
             trustManagerFactory.init(trustStore);
 
             return trustManagerFactory;
@@ -161,31 +188,38 @@ public final class DefaultSslCertificateTruster implements SslCertificateTruster
         }
     }
 
-    private static Mono<X509Certificate[]> getUntrustedCertificates(Duration duration, String host, int port,
-                                                                    Optional<ProxyConfiguration> proxyConfiguration,
-                                                                    LoopResources threadPool, X509TrustManager delegate) {
+    private static Mono<X509Certificate[]> getUntrustedCertificates(
+            Duration duration,
+            String host,
+            int port,
+            Optional<ProxyConfiguration> proxyConfiguration,
+            LoopResources threadPool,
+            X509TrustManager delegate) {
 
-        CertificateCollectingTrustManager collector = new CertificateCollectingTrustManager(delegate);
+        CertificateCollectingTrustManager collector =
+                new CertificateCollectingTrustManager(delegate);
         TcpClient tcpClient = getTcpClient(proxyConfiguration, threadPool, collector, host, port);
-        return tcpClient.handle((inbound, outbound) -> inbound.receive()
-            .then())
-            .connect()
-            .timeout(duration)
-            .handle((connection, sink) -> {
-                X509Certificate[] chain = collector.getCollectedCertificateChain();
+        return tcpClient
+                .handle((inbound, outbound) -> inbound.receive().then())
+                .connect()
+                .timeout(duration)
+                .handle(
+                        (connection, sink) -> {
+                            X509Certificate[] chain = collector.getCollectedCertificateChain();
 
-                if (chain == null) {
-                    sink.error(new IllegalStateException("Could not obtain server certificate chain"));
-                }
+                            if (chain == null) {
+                                sink.error(
+                                        new IllegalStateException(
+                                                "Could not obtain server certificate chain"));
+                            }
 
-                if (collector.isTrusted()) {
-                    sink.complete();
-                } else {
-                    sink.next(chain);
-                }
+                            if (collector.isTrusted()) {
+                                sink.complete();
+                            } else {
+                                sink.next(chain);
+                            }
 
-                connection.dispose();
-            });
+                            connection.dispose();
+                        });
     }
-
 }

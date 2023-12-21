@@ -22,15 +22,11 @@ public final class DownloadPackageRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noPackageId() {
-        DownloadPackageRequest.builder()
-            .build();
+        DownloadPackageRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        DownloadPackageRequest.builder()
-            .packageId("test-package-id")
-            .build();
+        DownloadPackageRequest.builder().packageId("test-package-id").build();
     }
-
 }

@@ -40,8 +40,8 @@ public enum MessageType {
             case OUT:
                 return OUT;
             default:
-                throw new IllegalArgumentException(String.format("Unknown message type: %s", dropsonde));
+                throw new IllegalArgumentException(
+                        String.format("Unknown message type: %s", dropsonde));
         }
     }
-
 }

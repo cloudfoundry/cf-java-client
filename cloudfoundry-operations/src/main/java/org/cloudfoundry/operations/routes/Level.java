@@ -30,5 +30,4 @@ public enum Level {
      * List routes for the current space in the current organisation
      */
     SPACE
-
 }

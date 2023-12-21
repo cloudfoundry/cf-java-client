@@ -22,8 +22,6 @@ public final class UpdateStagingEnvironmentVariablesRequestTest {
 
     @Test
     public void valid() {
-        UpdateStagingEnvironmentVariablesRequest.builder()
-            .build();
+        UpdateStagingEnvironmentVariablesRequest.builder().build();
     }
-
 }

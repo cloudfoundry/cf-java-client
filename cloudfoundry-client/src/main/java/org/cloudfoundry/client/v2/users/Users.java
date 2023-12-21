@@ -26,7 +26,8 @@ public interface Users {
      * @param request the Associate Audited Organization with the User request
      * @return the response from the Associate Audited Organization with the User request
      */
-    Mono<AssociateUserAuditedOrganizationResponse> associateAuditedOrganization(AssociateUserAuditedOrganizationRequest request);
+    Mono<AssociateUserAuditedOrganizationResponse> associateAuditedOrganization(
+            AssociateUserAuditedOrganizationRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/users/associate_audited_space_with_the_user.html">Associate Audited Space with the User</a> request
@@ -34,7 +35,8 @@ public interface Users {
      * @param request the Associate Audited Space with the User request
      * @return the response from the Associate Audited Space with the User request
      */
-    Mono<AssociateUserAuditedSpaceResponse> associateAuditedSpace(AssociateUserAuditedSpaceRequest request);
+    Mono<AssociateUserAuditedSpaceResponse> associateAuditedSpace(
+            AssociateUserAuditedSpaceRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/users/associate_billing_managed_organization_with_the_user.html">Associate Billing Managed Organization with the User</a>
@@ -43,7 +45,8 @@ public interface Users {
      * @param request the Associate Billing Managed Organization with the User request
      * @return the response from the Associate Billing Managed Organization with the User request
      */
-    Mono<AssociateUserBillingManagedOrganizationResponse> associateBillingManagedOrganization(AssociateUserBillingManagedOrganizationRequest request);
+    Mono<AssociateUserBillingManagedOrganizationResponse> associateBillingManagedOrganization(
+            AssociateUserBillingManagedOrganizationRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/users/associate_managed_organization_with_the_user.html">Associate Managed Organization with the User</a> request
@@ -51,7 +54,8 @@ public interface Users {
      * @param request the Associate Managed Organization with the User request
      * @return the response from the Associate Managed Organization with the User request
      */
-    Mono<AssociateUserManagedOrganizationResponse> associateManagedOrganization(AssociateUserManagedOrganizationRequest request);
+    Mono<AssociateUserManagedOrganizationResponse> associateManagedOrganization(
+            AssociateUserManagedOrganizationRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/users/associate_managed_space_with_the_user.html">Associate Managed Space with the User</a> request
@@ -59,7 +63,8 @@ public interface Users {
      * @param request the Associate Managed Space with the User request
      * @return the response from the Associate Managed Space with the User request
      */
-    Mono<AssociateUserManagedSpaceResponse> associateManagedSpace(AssociateUserManagedSpaceRequest request);
+    Mono<AssociateUserManagedSpaceResponse> associateManagedSpace(
+            AssociateUserManagedSpaceRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/users/associate_organization_with_the_user.html">Associate Organization with the User</a> request
@@ -67,7 +72,8 @@ public interface Users {
      * @param request the Associate Organization with the User request
      * @return the response from the Associate Organization with the User request
      */
-    Mono<AssociateUserOrganizationResponse> associateOrganization(AssociateUserOrganizationRequest request);
+    Mono<AssociateUserOrganizationResponse> associateOrganization(
+            AssociateUserOrganizationRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/users/associate_space_with_the_user.html">Associate Space with the User</a> request
@@ -115,7 +121,8 @@ public interface Users {
      * @param request the List all Audited Organizations for the User request
      * @return the response from the List all Audited Organizations for the User request
      */
-    Mono<ListUserAuditedOrganizationsResponse> listAuditedOrganizations(ListUserAuditedOrganizationsRequest request);
+    Mono<ListUserAuditedOrganizationsResponse> listAuditedOrganizations(
+            ListUserAuditedOrganizationsRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/users/list_all_audited_spaces_for_the_user.html">List all Audited Spaces for the User</a> request
@@ -131,7 +138,8 @@ public interface Users {
      * @param request the List all Billing Managed Organizations for the User request
      * @return the response from the List all Billing Managed Organizations for the User request
      */
-    Mono<ListUserBillingManagedOrganizationsResponse> listBillingManagedOrganizations(ListUserBillingManagedOrganizationsRequest request);
+    Mono<ListUserBillingManagedOrganizationsResponse> listBillingManagedOrganizations(
+            ListUserBillingManagedOrganizationsRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/users/list_all_managed_organizations_for_the_user.html">List all Managed Organizations for the User</a> request
@@ -139,7 +147,8 @@ public interface Users {
      * @param request the List all Managed Organizations for the User request
      * @return the response from the List all Managed Organizations for the User request
      */
-    Mono<ListUserManagedOrganizationsResponse> listManagedOrganizations(ListUserManagedOrganizationsRequest request);
+    Mono<ListUserManagedOrganizationsResponse> listManagedOrganizations(
+            ListUserManagedOrganizationsRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/users/list_all_managed_spaces_for_the_user.html">List all Managed Spaces for the User</a> request
@@ -187,7 +196,8 @@ public interface Users {
      * @param request the Remove Billing Managed Organization from the User request
      * @return the response from the Remove Billing Managed Organization from the User request
      */
-    Mono<Void> removeBillingManagedOrganization(RemoveUserBillingManagedOrganizationRequest request);
+    Mono<Void> removeBillingManagedOrganization(
+            RemoveUserBillingManagedOrganizationRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/users/remove_managed_organization_from_the_user.html">Remove Managed Organization from the User</a> request
@@ -236,5 +246,4 @@ public interface Users {
      * @return the response from the Updating a User request
      */
     Mono<UpdateUserResponse> update(UpdateUserRequest request);
-
 }

@@ -16,6 +16,9 @@
 
 package org.cloudfoundry.reactor.logcache.v1;
 
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Stream;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.QueryBuilder;
@@ -25,35 +28,40 @@ import org.cloudfoundry.reactor.util.UriQueryParameters;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Stream;
-
 public class AbstractLogCacheOperations extends AbstractReactorOperations {
 
-    protected AbstractLogCacheOperations(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
+    protected AbstractLogCacheOperations(
+            ConnectionContext connectionContext,
+            Mono<String> root,
+            TokenProvider tokenProvider,
+            Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
-    protected final <T> Mono<T> get(Object requestPayload, Class<T> responseType, String... pathSegments) {
+    protected final <T> Mono<T> get(
+            Object requestPayload, Class<T> responseType, String... pathSegments) {
         return createOperator()
-            .flatMap(operator -> operator.get()
-                .uri(buildPathSegments(pathSegments).andThen(queryTransformer(requestPayload)))
-                .response()
-                .parseBody(responseType));
+                .flatMap(
+                        operator ->
+                                operator.get()
+                                        .uri(
+                                                buildPathSegments(pathSegments)
+                                                        .andThen(queryTransformer(requestPayload)))
+                                        .response()
+                                        .parseBody(responseType));
     }
 
-    private Function<UriComponentsBuilder, UriComponentsBuilder> buildPathSegments(String[] pathSegments) {
+    private Function<UriComponentsBuilder, UriComponentsBuilder> buildPathSegments(
+            String[] pathSegments) {
         return builder -> builder.pathSegment("api", "v1").pathSegment(pathSegments);
     }
 
-    private Function<UriComponentsBuilder, UriComponentsBuilder> queryTransformer(Object requestPayload) {
+    private Function<UriComponentsBuilder, UriComponentsBuilder> queryTransformer(
+            Object requestPayload) {
         return builder -> {
             Stream<UriQueryParameter> parameters = new QueryBuilder().build(requestPayload);
             UriQueryParameters.set(builder, parameters);
             return builder;
         };
     }
-
-
 }

@@ -25,39 +25,34 @@ public final class RelationshipsTest {
     @Test
     public void noApplication() {
         ServiceBindingRelationships.builder()
-            .serviceInstance(ToOneRelationship.builder()
-                .data(Relationship.builder()
-                    .id("test-id")
-                    .build())
-                .build())
-            .build();
+                .serviceInstance(
+                        ToOneRelationship.builder()
+                                .data(Relationship.builder().id("test-id").build())
+                                .build())
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noServiceInstance() {
         ServiceBindingRelationships.builder()
-            .application(ToOneRelationship.builder()
-                .data(Relationship.builder()
-                    .id("test-id")
-                    .build())
-                .build())
-            .build();
+                .application(
+                        ToOneRelationship.builder()
+                                .data(Relationship.builder().id("test-id").build())
+                                .build())
+                .build();
     }
 
     @Test
     public void valid() {
         ServiceBindingRelationships.builder()
-            .application(ToOneRelationship.builder()
-                .data(Relationship.builder()
-                    .id("test-id")
-                    .build())
-                .build())
-            .serviceInstance(ToOneRelationship.builder()
-                .data(Relationship.builder()
-                    .id("test-id")
-                    .build())
-                .build())
-            .build();
+                .application(
+                        ToOneRelationship.builder()
+                                .data(Relationship.builder().id("test-id").build())
+                                .build())
+                .serviceInstance(
+                        ToOneRelationship.builder()
+                                .data(Relationship.builder().id("test-id").build())
+                                .build())
+                .build();
     }
-
 }

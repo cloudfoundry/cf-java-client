@@ -16,17 +16,16 @@
 
 package org.cloudfoundry.reactor.util;
 
-import org.junit.Test;
-
-import javax.net.ssl.X509TrustManager;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.RETURNS_SMART_NULLS;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import javax.net.ssl.X509TrustManager;
+import org.junit.Test;
 
 public final class CertificateCollectingTrustManagerTest {
 
@@ -34,7 +33,8 @@ public final class CertificateCollectingTrustManagerTest {
 
     private final X509TrustManager delegate = mock(X509TrustManager.class, RETURNS_SMART_NULLS);
 
-    private final CertificateCollectingTrustManager trustManager = new CertificateCollectingTrustManager(this.delegate);
+    private final CertificateCollectingTrustManager trustManager =
+            new CertificateCollectingTrustManager(this.delegate);
 
     @Test(expected = IllegalStateException.class)
     public void checkClientTrustedAlreadyCollected() {
@@ -44,7 +44,9 @@ public final class CertificateCollectingTrustManagerTest {
 
     @Test
     public void checkClientTrustedNotTrusted() throws CertificateException {
-        doThrow(new CertificateException()).when(this.delegate).checkClientTrusted(this.chain, null);
+        doThrow(new CertificateException())
+                .when(this.delegate)
+                .checkClientTrusted(this.chain, null);
 
         this.trustManager.checkClientTrusted(this.chain, null);
 
@@ -66,7 +68,9 @@ public final class CertificateCollectingTrustManagerTest {
 
     @Test
     public void checkServerTrustedNotTrusted() throws CertificateException {
-        doThrow(new CertificateException()).when(this.delegate).checkServerTrusted(this.chain, null);
+        doThrow(new CertificateException())
+                .when(this.delegate)
+                .checkServerTrusted(this.chain, null);
 
         this.trustManager.checkServerTrusted(this.chain, null);
 
@@ -91,7 +95,8 @@ public final class CertificateCollectingTrustManagerTest {
     public void getCollectedCertificateChain() {
         this.trustManager.checkServerTrusted(this.chain, null);
 
-        X509Certificate[] collectedCertificateChain = this.trustManager.getCollectedCertificateChain();
+        X509Certificate[] collectedCertificateChain =
+                this.trustManager.getCollectedCertificateChain();
         assertThat(collectedCertificateChain).isNotNull();
         assertThat(collectedCertificateChain).hasSize(0);
         assertThat(collectedCertificateChain).isNotSameAs(this.chain);

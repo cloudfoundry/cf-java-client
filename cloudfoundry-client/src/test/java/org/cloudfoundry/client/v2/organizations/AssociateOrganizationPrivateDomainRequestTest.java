@@ -23,23 +23,22 @@ public final class AssociateOrganizationPrivateDomainRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noOrganizationId() {
         AssociateOrganizationPrivateDomainRequest.builder()
-            .privateDomainId("test-private-domain-id")
-            .build();
+                .privateDomainId("test-private-domain-id")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noPrivateDomainId() {
         AssociateOrganizationPrivateDomainRequest.builder()
-            .organizationId("test-organization-id")
-            .build();
+                .organizationId("test-organization-id")
+                .build();
     }
 
     @Test
     public void valid() {
         AssociateOrganizationPrivateDomainRequest.builder()
-            .organizationId("test-organization-id")
-            .privateDomainId("test-private-domain-id")
-            .build();
+                .organizationId("test-organization-id")
+                .privateDomainId("test-private-domain-id")
+                .build();
     }
-
 }

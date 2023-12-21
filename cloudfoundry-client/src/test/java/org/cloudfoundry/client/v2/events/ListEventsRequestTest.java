@@ -22,8 +22,6 @@ public final class ListEventsRequestTest {
 
     @Test
     public void valid() {
-        ListEventsRequest.builder()
-            .build();
+        ListEventsRequest.builder().build();
     }
-
 }

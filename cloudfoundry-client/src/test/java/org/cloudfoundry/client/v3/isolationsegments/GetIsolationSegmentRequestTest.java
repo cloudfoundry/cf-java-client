@@ -22,15 +22,11 @@ public final class GetIsolationSegmentRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noId() {
-        GetIsolationSegmentRequest.builder()
-            .build();
+        GetIsolationSegmentRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        GetIsolationSegmentRequest.builder()
-            .isolationSegmentId("test-id")
-            .build();
+        GetIsolationSegmentRequest.builder().isolationSegmentId("test-id").build();
     }
-
 }

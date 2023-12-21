@@ -18,20 +18,15 @@ package org.cloudfoundry.client.v2.servicebrokers;
 
 import org.junit.Test;
 
-
 public final class GetServiceBrokerRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noServiceBrokerId() {
-        GetServiceBrokerRequest.builder()
-            .build();
+        GetServiceBrokerRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        GetServiceBrokerRequest.builder()
-            .serviceBrokerId("test-service-broker-id")
-            .build();
+        GetServiceBrokerRequest.builder().serviceBrokerId("test-service-broker-id").build();
     }
-
 }

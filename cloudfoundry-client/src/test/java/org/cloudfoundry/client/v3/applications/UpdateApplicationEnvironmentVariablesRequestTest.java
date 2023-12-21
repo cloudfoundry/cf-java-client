@@ -22,15 +22,13 @@ public final class UpdateApplicationEnvironmentVariablesRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noApplicationId() {
-        UpdateApplicationEnvironmentVariablesRequest.builder()
-            .build();
+        UpdateApplicationEnvironmentVariablesRequest.builder().build();
     }
 
     @Test
     public void valid() {
         UpdateApplicationEnvironmentVariablesRequest.builder()
-            .applicationId("test-application-id")
-            .build();
+                .applicationId("test-application-id")
+                .build();
     }
-
 }

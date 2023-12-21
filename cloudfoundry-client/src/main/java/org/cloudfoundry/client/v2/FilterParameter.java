@@ -16,16 +16,15 @@
 
 package org.cloudfoundry.client.v2;
 
+import static org.cloudfoundry.client.v2.FilterParameter.Operation.IN;
+import static org.cloudfoundry.client.v2.FilterParameter.Operation.IS;
+
 import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-
-import static org.cloudfoundry.client.v2.FilterParameter.Operation.IN;
-import static org.cloudfoundry.client.v2.FilterParameter.Operation.IS;
 
 /**
  * An annotation indicating that a method represents a Cloud Foundry V2 filter parameter
@@ -102,7 +101,5 @@ public @interface FilterParameter {
         public String toString() {
             return this.value;
         }
-
     }
-
 }

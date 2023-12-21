@@ -17,11 +17,10 @@
 package org.cloudfoundry.reactor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import reactor.core.publisher.Mono;
-import reactor.netty.http.client.HttpClient;
-
 import java.time.Duration;
 import java.util.Optional;
+import reactor.core.publisher.Mono;
+import reactor.netty.http.client.HttpClient;
 
 /**
  * Common, reusable, connection context
@@ -60,5 +59,4 @@ public interface ConnectionContext {
      * @param port the port of the endpoint to trust
      */
     Mono<Void> trust(String host, int port);
-
 }

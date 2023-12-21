@@ -40,8 +40,8 @@ public enum PeerType {
             case Server:
                 return SERVER;
             default:
-                throw new IllegalArgumentException(String.format("Unknown peer type: %s", dropsonde));
+                throw new IllegalArgumentException(
+                        String.format("Unknown peer type: %s", dropsonde));
         }
     }
-
 }

@@ -23,32 +23,23 @@ public final class ResourceTest {
 
     @Test(expected = IllegalStateException.class)
     public void noCreatedAt() {
-        StubResource.builder()
-            .id("test-id")
-            .updatedAt("test-updated-at")
-            .build();
+        StubResource.builder().id("test-id").updatedAt("test-updated-at").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noId() {
-        StubResource.builder()
-            .createdAt("test-created-at")
-            .updatedAt("test-updated-at")
-            .build();
+        StubResource.builder().createdAt("test-created-at").updatedAt("test-updated-at").build();
     }
 
     @Test
     public void valid() {
         StubResource.builder()
-            .createdAt("test-created-at")
-            .id("test-id")
-            .updatedAt("test-updated-at")
-            .build();
+                .createdAt("test-created-at")
+                .id("test-id")
+                .updatedAt("test-updated-at")
+                .build();
     }
 
     @Value.Immutable
-    static abstract class _StubResource extends Resource {
-
-    }
-
+    abstract static class _StubResource extends Resource {}
 }

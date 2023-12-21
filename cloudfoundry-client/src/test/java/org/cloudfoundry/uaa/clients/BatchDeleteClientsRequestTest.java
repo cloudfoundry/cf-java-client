@@ -22,22 +22,16 @@ public final class BatchDeleteClientsRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void emptyClientIds() {
-        BatchDeleteClientsRequest.builder()
-            .clientIds()
-            .build();
+        BatchDeleteClientsRequest.builder().clientIds().build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noClientIds() {
-        BatchDeleteClientsRequest.builder()
-            .build();
+        BatchDeleteClientsRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        BatchDeleteClientsRequest.builder()
-            .clientId("test-client-id")
-            .build();
+        BatchDeleteClientsRequest.builder().clientId("test-client-id").build();
     }
-
 }

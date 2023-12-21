@@ -17,6 +17,9 @@
 package org.cloudfoundry.reactor.doppler;
 
 import io.netty.channel.ChannelHandler;
+import java.io.InputStream;
+import java.util.Map;
+import java.util.function.Function;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.util.AbstractReactorOperations;
@@ -26,29 +29,36 @@ import reactor.core.publisher.Mono;
 import reactor.netty.ByteBufFlux;
 import reactor.netty.http.client.HttpClientResponse;
 
-import java.io.InputStream;
-import java.util.Map;
-import java.util.function.Function;
-
 abstract class AbstractDopplerOperations extends AbstractReactorOperations {
 
-    AbstractDopplerOperations(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
+    AbstractDopplerOperations(
+            ConnectionContext connectionContext,
+            Mono<String> root,
+            TokenProvider tokenProvider,
+            Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
-    final <T> Flux<T> get(Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer, Function<HttpClientResponse, ChannelHandler> channelHandlerBuilder,
-                          Function<ByteBufFlux, Flux<T>> bodyTransformer) {
-        return createOperator().flatMapMany(operator -> operator.get()
-            .uri(uriTransformer)
-            .response()
-            .addChannelHandler(channelHandlerBuilder)
-            .parseBodyToFlux(responseWithBody -> bodyTransformer.apply(responseWithBody.getBody())));
+    final <T> Flux<T> get(
+            Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
+            Function<HttpClientResponse, ChannelHandler> channelHandlerBuilder,
+            Function<ByteBufFlux, Flux<T>> bodyTransformer) {
+        return createOperator()
+                .flatMapMany(
+                        operator ->
+                                operator.get()
+                                        .uri(uriTransformer)
+                                        .response()
+                                        .addChannelHandler(channelHandlerBuilder)
+                                        .parseBodyToFlux(
+                                                responseWithBody ->
+                                                        bodyTransformer.apply(
+                                                                responseWithBody.getBody())));
     }
 
-    final Flux<InputStream> ws(Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
-        return createOperator().flatMapMany(operator -> operator.websocket()
-            .uri(uriTransformer)
-            .get());
+    final Flux<InputStream> ws(
+            Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+        return createOperator()
+                .flatMapMany(operator -> operator.websocket().uri(uriTransformer).get());
     }
-
 }

@@ -22,15 +22,11 @@ public final class ScaleProcessRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noProcessId() {
-        ScaleProcessRequest.builder()
-            .build();
+        ScaleProcessRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        ScaleProcessRequest.builder()
-            .processId("test-process-id")
-            .build();
+        ScaleProcessRequest.builder().processId("test-process-id").build();
     }
-
 }

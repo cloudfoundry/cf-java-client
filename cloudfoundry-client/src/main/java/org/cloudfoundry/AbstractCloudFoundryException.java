@@ -41,5 +41,4 @@ public abstract class AbstractCloudFoundryException extends RuntimeException {
     public int getStatusCode() {
         return this.statusCode;
     }
-
 }
