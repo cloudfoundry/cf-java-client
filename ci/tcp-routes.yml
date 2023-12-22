@@ -18,3 +18,7 @@
 - type: replace
   path: /resource-config/tcp_router/instances
   value: automatic
+- type: replace
+  path: /product-properties/.cloud_controller.default_quota_memory_limit_mb
+  value:
+    value: 20480
