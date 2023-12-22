@@ -34,7 +34,8 @@ public interface RoutesV3 {
      * @param request the Insert Route Destinations request
      * @return the response from the Insert Route Destinations request
      */
-    Mono<InsertRouteDestinationsResponse> insertDestinations(InsertRouteDestinationsRequest request);
+    Mono<InsertRouteDestinationsResponse> insertDestinations(
+            InsertRouteDestinationsRequest request);
 
     /**
      * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.77.0/index.html#list-routes">List Routes</a> request
@@ -66,7 +67,8 @@ public interface RoutesV3 {
      * @param request the Replace Route Destinations request
      * @return the response from the Replace Route Destinations request
      */
-    Mono<ReplaceRouteDestinationsResponse> replaceDestinations(ReplaceRouteDestinationsRequest request);
+    Mono<ReplaceRouteDestinationsResponse> replaceDestinations(
+            ReplaceRouteDestinationsRequest request);
 
     /**
      * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.77.0/index.html#list-routes">List Routes</a> request
@@ -75,5 +77,4 @@ public interface RoutesV3 {
      * @return the response from the List Route request
      */
     Mono<UpdateRouteResponse> update(UpdateRouteRequest request);
-
 }

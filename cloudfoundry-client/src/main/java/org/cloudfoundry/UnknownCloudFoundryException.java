@@ -51,5 +51,4 @@ public final class UnknownCloudFoundryException extends AbstractCloudFoundryExce
     public String getPayload() {
         return this.payload;
     }
-
 }

@@ -54,7 +54,8 @@ public interface ServiceBindingsV2 {
      * @param request the Get Parameters request
      * @return the response from the Get Parameters request
      */
-    Mono<GetServiceBindingParametersResponse> getParameters(GetServiceBindingParametersRequest request);
+    Mono<GetServiceBindingParametersResponse> getParameters(
+            GetServiceBindingParametersRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/service_bindings/list_all_service_bindings.html">List all Service Bindings</a> request
@@ -63,5 +64,4 @@ public interface ServiceBindingsV2 {
      * @return the response from the List Service Bindings request
      */
     Mono<ListServiceBindingsResponse> list(ListServiceBindingsRequest request);
-
 }

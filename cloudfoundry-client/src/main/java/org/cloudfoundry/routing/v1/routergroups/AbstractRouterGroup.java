@@ -46,5 +46,4 @@ abstract class AbstractRouterGroup {
      */
     @JsonProperty("type")
     abstract String getType();
-
 }

@@ -25,8 +25,7 @@ import reactor.core.publisher.Flux;
  */
 public final class ResourceUtils {
 
-    private ResourceUtils() {
-    }
+    private ResourceUtils() {}
 
     /**
      * Return the entity of a resource
@@ -58,8 +57,8 @@ public final class ResourceUtils {
      * @param <U>      the response type
      * @return a stream of resources from the response
      */
-    public static <R extends Resource<?>, U extends PaginatedResponse<R>> Flux<R> getResources(U response) {
+    public static <R extends Resource<?>, U extends PaginatedResponse<R>> Flux<R> getResources(
+            U response) {
         return Flux.fromIterable(response.getResources());
     }
-
 }

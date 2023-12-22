@@ -22,15 +22,11 @@ public final class ListMembersRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noId() {
-        ListMembersRequest.builder()
-            .build();
+        ListMembersRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        ListMembersRequest.builder()
-            .groupId("test-group-id")
-            .build();
+        ListMembersRequest.builder().groupId("test-group-id").build();
     }
-
 }

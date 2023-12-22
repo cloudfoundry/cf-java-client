@@ -81,5 +81,4 @@ public abstract class AbstractIdentityZone {
     @JsonProperty("version")
     @Nullable
     abstract Integer getVersion();
-
 }

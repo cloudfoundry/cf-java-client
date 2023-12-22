@@ -38,5 +38,4 @@ public interface Stacks {
      * @return a list of {@link Stack}s
      */
     Flux<Stack> list();
-
 }

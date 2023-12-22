@@ -76,5 +76,4 @@ public abstract class Buildpack extends Resource {
      */
     @JsonProperty("state")
     public abstract BuildpackState getState();
-
 }

@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v3.stacks;
 
+import java.util.Map;
 import org.cloudfoundry.client.v3.stacks.CreateStackRequest;
 import org.cloudfoundry.client.v3.stacks.CreateStackResponse;
 import org.cloudfoundry.client.v3.stacks.DeleteStackRequest;
@@ -31,8 +32,6 @@ import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
 import reactor.core.publisher.Mono;
 
-import java.util.Map;
-
 /**
  * The Reactor-based implementation of {@link StacksV3}
  */
@@ -46,37 +45,59 @@ public class ReactorStacksV3 extends AbstractClientV3Operations implements Stack
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorStacksV3(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
+    public ReactorStacksV3(
+            ConnectionContext connectionContext,
+            Mono<String> root,
+            TokenProvider tokenProvider,
+            Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<CreateStackResponse> create(CreateStackRequest request) {
-        return post(request, CreateStackResponse.class, uriComponentsBuilder -> uriComponentsBuilder.pathSegment("stacks"))
-            .checkpoint();
+        return post(
+                        request,
+                        CreateStackResponse.class,
+                        uriComponentsBuilder -> uriComponentsBuilder.pathSegment("stacks"))
+                .checkpoint();
     }
 
     @Override
     public Mono<Void> delete(DeleteStackRequest request) {
-        return delete(request, Void.class, uriComponentsBuilder -> uriComponentsBuilder.pathSegment("stacks", request.getStackId()))
-            .checkpoint();
+        return delete(
+                        request,
+                        Void.class,
+                        uriComponentsBuilder ->
+                                uriComponentsBuilder.pathSegment("stacks", request.getStackId()))
+                .checkpoint();
     }
 
     @Override
     public Mono<GetStackResponse> get(GetStackRequest request) {
-        return get(request, GetStackResponse.class, uriComponentsBuilder -> uriComponentsBuilder.pathSegment("stacks", request.getStackId()))
-            .checkpoint();
+        return get(
+                        request,
+                        GetStackResponse.class,
+                        uriComponentsBuilder ->
+                                uriComponentsBuilder.pathSegment("stacks", request.getStackId()))
+                .checkpoint();
     }
 
     @Override
     public Mono<ListStacksResponse> list(ListStacksRequest request) {
-        return get(request, ListStacksResponse.class, uriComponentsBuilder -> uriComponentsBuilder.pathSegment("stacks"))
-            .checkpoint();
+        return get(
+                        request,
+                        ListStacksResponse.class,
+                        uriComponentsBuilder -> uriComponentsBuilder.pathSegment("stacks"))
+                .checkpoint();
     }
 
     @Override
     public Mono<UpdateStackResponse> update(UpdateStackRequest request) {
-        return patch(request, UpdateStackResponse.class, uriComponentsBuilder -> uriComponentsBuilder.pathSegment("stacks", request.getStackId()))
-            .checkpoint();
+        return patch(
+                        request,
+                        UpdateStackResponse.class,
+                        uriComponentsBuilder ->
+                                uriComponentsBuilder.pathSegment("stacks", request.getStackId()))
+                .checkpoint();
     }
 }

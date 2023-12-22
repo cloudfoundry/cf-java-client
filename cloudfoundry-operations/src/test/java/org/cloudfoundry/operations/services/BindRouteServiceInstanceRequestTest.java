@@ -23,23 +23,20 @@ public final class BindRouteServiceInstanceRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noDomainName() {
         BindRouteServiceInstanceRequest.builder()
-            .serviceInstanceName("test-service-instance-name")
-            .build();
+                .serviceInstanceName("test-service-instance-name")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noServiceInstanceName() {
-        BindRouteServiceInstanceRequest.builder()
-            .domainName("test-domain-name")
-            .build();
+        BindRouteServiceInstanceRequest.builder().domainName("test-domain-name").build();
     }
 
     @Test
     public void valid() {
         BindRouteServiceInstanceRequest.builder()
-            .domainName("test-domain-name")
-            .serviceInstanceName("test-service-instance-name")
-            .build();
+                .domainName("test-domain-name")
+                .serviceInstanceName("test-service-instance-name")
+                .build();
     }
-
 }

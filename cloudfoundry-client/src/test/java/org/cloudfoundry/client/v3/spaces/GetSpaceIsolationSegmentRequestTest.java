@@ -22,15 +22,11 @@ public final class GetSpaceIsolationSegmentRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noOrganizationId() {
-        GetSpaceIsolationSegmentRequest.builder()
-            .build();
+        GetSpaceIsolationSegmentRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        GetSpaceIsolationSegmentRequest.builder()
-            .spaceId("test-space-id")
-            .build();
+        GetSpaceIsolationSegmentRequest.builder().spaceId("test-space-id").build();
     }
-
 }

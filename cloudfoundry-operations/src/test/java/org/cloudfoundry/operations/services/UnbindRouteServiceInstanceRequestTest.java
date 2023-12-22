@@ -23,23 +23,20 @@ public final class UnbindRouteServiceInstanceRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noDomainName() {
         UnbindRouteServiceInstanceRequest.builder()
-            .serviceInstanceName("test-service-instance-name")
-            .build();
+                .serviceInstanceName("test-service-instance-name")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noServiceInstanceName() {
-        UnbindRouteServiceInstanceRequest.builder()
-            .domainName("test-domain-name")
-            .build();
+        UnbindRouteServiceInstanceRequest.builder().domainName("test-domain-name").build();
     }
 
     @Test
     public void valid() {
         UnbindRouteServiceInstanceRequest.builder()
-            .domainName("test-domain-name")
-            .serviceInstanceName("test-service-instance-name")
-            .build();
+                .domainName("test-domain-name")
+                .serviceInstanceName("test-service-instance-name")
+                .build();
     }
-
 }

@@ -22,8 +22,6 @@ public final class ListBuildpacksRequestTest {
 
     @Test
     public void valid() {
-        ListBuildpacksRequest.builder()
-            .build();
+        ListBuildpacksRequest.builder().build();
     }
-
 }

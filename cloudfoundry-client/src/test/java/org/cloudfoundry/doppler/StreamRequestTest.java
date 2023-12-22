@@ -22,15 +22,11 @@ public final class StreamRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noApplicationId() {
-        StreamRequest.builder()
-            .build();
+        StreamRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        StreamRequest.builder()
-            .applicationId("test-application-id")
-            .build();
+        StreamRequest.builder().applicationId("test-application-id").build();
     }
-
 }

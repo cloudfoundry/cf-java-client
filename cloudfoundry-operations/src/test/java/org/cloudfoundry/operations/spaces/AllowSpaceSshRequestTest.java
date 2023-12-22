@@ -22,15 +22,11 @@ public final class AllowSpaceSshRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noName() {
-        AllowSpaceSshRequest.builder()
-            .build();
+        AllowSpaceSshRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        AllowSpaceSshRequest.builder()
-            .name("test-name")
-            .build();
+        AllowSpaceSshRequest.builder().name("test-name").build();
     }
-
 }

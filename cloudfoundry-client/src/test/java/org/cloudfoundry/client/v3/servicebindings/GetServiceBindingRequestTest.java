@@ -16,22 +16,17 @@
 
 package org.cloudfoundry.client.v3.servicebindings;
 
-
 import org.junit.Test;
 
 public final class GetServiceBindingRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noServiceBindingId() {
-        GetServiceBindingRequest.builder()
-            .build();
+        GetServiceBindingRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        GetServiceBindingRequest.builder()
-            .serviceBindingId("test-service-binding-id")
-            .build();
+        GetServiceBindingRequest.builder().serviceBindingId("test-service-binding-id").build();
     }
-
 }

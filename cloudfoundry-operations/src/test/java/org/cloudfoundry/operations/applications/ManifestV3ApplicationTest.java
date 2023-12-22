@@ -16,82 +16,70 @@
 
 package org.cloudfoundry.operations.applications;
 
-import org.junit.Test;
-
 import java.nio.file.Paths;
+import org.junit.Test;
 
 public class ManifestV3ApplicationTest {
 
     @Test(expected = IllegalStateException.class)
     public void dockerAndBuildpack() {
         ManifestV3Application.builder()
-            .name("test-name")
-            .buildpack("test-buildpack")
-            .docker(Docker.builder()
-                .image("test-docker-image")
-                .build())
-            .build();
+                .name("test-name")
+                .buildpack("test-buildpack")
+                .docker(Docker.builder().image("test-docker-image").build())
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void dockerAndPath() {
         ManifestV3Application.builder()
-            .name("test-name")
-            .docker(Docker.builder()
-                .image("test-docker-image")
-                .build())
-            .path(Paths.get("test-application"))
-            .build();
+                .name("test-name")
+                .docker(Docker.builder().image("test-docker-image").build())
+                .path(Paths.get("test-application"))
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void dockerCredentialsNoImage() {
         ManifestV3Application.builder()
-            .name("test-name")
-            .docker(Docker.builder()
-                .password("test-password")
-                .username("test-username")
-                .build())
-            .build();
+                .name("test-name")
+                .docker(
+                        Docker.builder()
+                                .password("test-password")
+                                .username("test-username")
+                                .build())
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void routesAndDomains() {
         ManifestV3Application.builder()
-            .name("test-name")
-            .route(Route.builder()
-                .route("test-route")
-                .build())
-            .domain("test-domain")
-            .build();
+                .name("test-name")
+                .route(Route.builder().route("test-route").build())
+                .domain("test-domain")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void routesAndHosts() {
         ManifestV3Application.builder()
-            .name("test-name")
-            .route(Route.builder()
-                .route("test-route")
-                .build())
-            .host("test-host")
-            .build();
+                .name("test-name")
+                .route(Route.builder().route("test-route").build())
+                .host("test-host")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void routesAndNoHostName() {
         ManifestV3Application.builder()
-            .name("test-name")
-            .route(Route.builder()
-                .route("test-route")
-                .build())
-            .noHostname(true)
-            .build();
+                .name("test-name")
+                .route(Route.builder().route("test-route").build())
+                .noHostname(true)
+                .build();
     }
 
     @Test
     public void valid() {
-        ManifestV3Application.builder()
-            .name("test-name")
-            .build();
+        ManifestV3Application.builder().name("test-name").build();
     }
 }

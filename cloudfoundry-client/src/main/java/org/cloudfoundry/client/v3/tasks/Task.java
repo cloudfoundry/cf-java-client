@@ -89,5 +89,4 @@ public abstract class Task extends Resource {
     @JsonProperty("relationships")
     @Nullable
     public abstract TaskRelationships getTaskRelationships();
-
 }

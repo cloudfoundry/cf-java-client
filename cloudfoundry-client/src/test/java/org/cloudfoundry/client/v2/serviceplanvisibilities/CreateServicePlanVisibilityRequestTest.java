@@ -18,29 +18,23 @@ package org.cloudfoundry.client.v2.serviceplanvisibilities;
 
 import org.junit.Test;
 
-
 public final class CreateServicePlanVisibilityRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noOrganizationId() {
-        CreateServicePlanVisibilityRequest.builder()
-            .servicePlanId("service-plan-id")
-            .build();
+        CreateServicePlanVisibilityRequest.builder().servicePlanId("service-plan-id").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noServicePlanId() {
-        CreateServicePlanVisibilityRequest.builder()
-            .organizationId("organization-id")
-            .build();
+        CreateServicePlanVisibilityRequest.builder().organizationId("organization-id").build();
     }
 
     @Test
     public void valid() {
         CreateServicePlanVisibilityRequest.builder()
-            .organizationId("organization-id")
-            .servicePlanId("service-plan-id")
-            .build();
+                .organizationId("organization-id")
+                .servicePlanId("service-plan-id")
+                .build();
     }
-
 }

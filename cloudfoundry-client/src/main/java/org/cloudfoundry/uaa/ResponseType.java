@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * The response types
  */
 public enum ResponseType {
-
     CODE("code"),
 
     ID_TOKEN("id_token"),

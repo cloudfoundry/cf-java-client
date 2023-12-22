@@ -37,7 +37,5 @@ public interface TokenProvider {
      *
      * @param connectionContext A {@link ConnectionContext} to be used to identity which connection the tokens should be invalidated for
      */
-    default void invalidate(ConnectionContext connectionContext) {
-    }
-
+    default void invalidate(ConnectionContext connectionContext) {}
 }

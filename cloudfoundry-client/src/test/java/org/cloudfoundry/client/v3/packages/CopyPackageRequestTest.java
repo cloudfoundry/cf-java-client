@@ -24,36 +24,33 @@ public final class CopyPackageRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noRelationships() {
-        CopyPackageRequest.builder()
-            .sourcePackageId("test-source-package-id")
-            .build();
+        CopyPackageRequest.builder().sourcePackageId("test-source-package-id").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noSourcePackageId() {
         CopyPackageRequest.builder()
-            .relationships(PackageRelationships.builder()
-                .application(ToOneRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("test-id")
-                        .build())
-                    .build())
-                .build())
-            .build();
+                .relationships(
+                        PackageRelationships.builder()
+                                .application(
+                                        ToOneRelationship.builder()
+                                                .data(Relationship.builder().id("test-id").build())
+                                                .build())
+                                .build())
+                .build();
     }
 
     @Test
     public void valid() {
         CopyPackageRequest.builder()
-            .relationships(PackageRelationships.builder()
-                .application(ToOneRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("test-id")
-                        .build())
-                    .build())
-                .build())
-            .sourcePackageId("test-source-package-id")
-            .build();
+                .relationships(
+                        PackageRelationships.builder()
+                                .application(
+                                        ToOneRelationship.builder()
+                                                .data(Relationship.builder().id("test-id").build())
+                                                .build())
+                                .build())
+                .sourcePackageId("test-source-package-id")
+                .build();
     }
-
 }

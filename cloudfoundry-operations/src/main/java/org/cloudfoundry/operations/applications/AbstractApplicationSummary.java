@@ -62,5 +62,4 @@ public abstract class AbstractApplicationSummary {
      * The list of bound urls
      */
     public abstract List<String> getUrls();
-
 }

@@ -16,14 +16,13 @@
 
 package org.cloudfoundry.reactor.uaa;
 
-import io.netty.handler.codec.http.HttpHeaders;
-import org.cloudfoundry.uaa.Versioned;
-import org.junit.Test;
-
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
+import io.netty.handler.codec.http.HttpHeaders;
+import org.cloudfoundry.uaa.Versioned;
+import org.junit.Test;
 
 public final class VersionBuilderTest {
 
@@ -59,7 +58,5 @@ public final class VersionBuilderTest {
         public String getVersion() {
             return this.version;
         }
-
     }
-
 }

@@ -30,5 +30,4 @@ public interface Versioned {
     @JsonIgnore
     @Nullable
     String getVersion();
-
 }

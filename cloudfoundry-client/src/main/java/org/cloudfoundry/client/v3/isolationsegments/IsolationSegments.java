@@ -30,7 +30,8 @@ public interface IsolationSegments {
      * @param request the Add an Isolation Segment Organization Entitlement request
      * @return the response from the Add an Isolation Segment Organization Entitlement request
      */
-    Mono<AddIsolationSegmentOrganizationEntitlementResponse> addOrganizationEntitlement(AddIsolationSegmentOrganizationEntitlementRequest request);
+    Mono<AddIsolationSegmentOrganizationEntitlementResponse> addOrganizationEntitlement(
+            AddIsolationSegmentOrganizationEntitlementRequest request);
 
     /**
      * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#create-an-isolation-segment">Create an Isolation Segment</a> request
@@ -70,7 +71,8 @@ public interface IsolationSegments {
      * @param request the List Organizations for Isolation Segment request
      * @return the response from the List Organizations for Isolation Segment request
      */
-    Mono<ListIsolationSegmentEntitledOrganizationsResponse> listEntitledOrganizations(ListIsolationSegmentEntitledOrganizationsRequest request);
+    Mono<ListIsolationSegmentEntitledOrganizationsResponse> listEntitledOrganizations(
+            ListIsolationSegmentEntitledOrganizationsRequest request);
 
     /**
      * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#list-organizations-relationship">List Organizations Relationship</a> request
@@ -78,7 +80,8 @@ public interface IsolationSegments {
      * @param request the List Organizations Relationship request
      * @return the response from the List Organizations Relationship request
      */
-    Mono<ListIsolationSegmentOrganizationsRelationshipResponse> listOrganizationsRelationship(ListIsolationSegmentOrganizationsRelationshipRequest request);
+    Mono<ListIsolationSegmentOrganizationsRelationshipResponse> listOrganizationsRelationship(
+            ListIsolationSegmentOrganizationsRelationshipRequest request);
 
     /**
      * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#list-spaces-relationship">List Spaces Relationship</a> request
@@ -86,7 +89,8 @@ public interface IsolationSegments {
      * @param request the List Spaces Relationship request
      * @return the response from the List Spaces Relationship request
      */
-    Mono<ListIsolationSegmentSpacesRelationshipResponse> listSpacesRelationship(ListIsolationSegmentSpacesRelationshipRequest request);
+    Mono<ListIsolationSegmentSpacesRelationshipResponse> listSpacesRelationship(
+            ListIsolationSegmentSpacesRelationshipRequest request);
 
     /**
      * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#revoke-entitlement-to-isolation-segment-for-an-organization">
@@ -95,7 +99,8 @@ public interface IsolationSegments {
      * @param request the Remove an Isolation Segment Organization Entitlement request
      * @return the response from the Remove an Isolation Segment Organization Entitlement request
      */
-    Mono<Void> removeOrganizationEntitlement(RemoveIsolationSegmentOrganizationEntitlementRequest request);
+    Mono<Void> removeOrganizationEntitlement(
+            RemoveIsolationSegmentOrganizationEntitlementRequest request);
 
     /**
      * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#update-an-isolation-segment">Update an Isolation Segment</a> request
@@ -104,5 +109,4 @@ public interface IsolationSegments {
      * @return the response from the Update Isolation Segment request
      */
     Mono<UpdateIsolationSegmentResponse> update(UpdateIsolationSegmentRequest request);
-
 }

@@ -22,15 +22,11 @@ public final class ListApplicationRoutesRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noApplicationId() {
-        ListApplicationRoutesRequest.builder()
-            .build();
+        ListApplicationRoutesRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        ListApplicationRoutesRequest.builder()
-            .applicationId("test-application-id")
-            .build();
+        ListApplicationRoutesRequest.builder().applicationId("test-application-id").build();
     }
-
 }

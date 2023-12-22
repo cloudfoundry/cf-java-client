@@ -61,5 +61,4 @@ public enum BuildpackState {
     public String toString() {
         return getValue();
     }
-
 }

@@ -23,34 +23,33 @@ public final class UpdateApplicationFeatureRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noApplicationId() {
         UpdateApplicationFeatureRequest.builder()
-            .applicationId("test-application-id")
-            .enabled(true)
-            .build();
+                .applicationId("test-application-id")
+                .enabled(true)
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noEnabled() {
         UpdateApplicationFeatureRequest.builder()
-            .applicationId("test-application-id")
-            .featureName("test-feature-name")
-            .build();
+                .applicationId("test-application-id")
+                .featureName("test-feature-name")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noFeatureName() {
         UpdateApplicationFeatureRequest.builder()
-            .enabled(true)
-            .featureName("test-feature-name")
-            .build();
+                .enabled(true)
+                .featureName("test-feature-name")
+                .build();
     }
 
     @Test
     public void valid() {
         UpdateApplicationFeatureRequest.builder()
-            .applicationId("test-application-id")
-            .enabled(true)
-            .featureName("test-feature-name")
-            .build();
+                .applicationId("test-application-id")
+                .enabled(true)
+                .featureName("test-feature-name")
+                .build();
     }
-
 }

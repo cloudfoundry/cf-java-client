@@ -20,28 +20,21 @@ import org.junit.Test;
 
 public class ManifestV3Test {
 
-    private final ManifestV3Application testApplication = ManifestV3Application.builder()
-        .name("test-application-name")
-        .build();
+    private final ManifestV3Application testApplication =
+            ManifestV3Application.builder().name("test-application-name").build();
 
     @Test(expected = IllegalStateException.class)
     public void illegalVersion() {
-        ManifestV3.builder()
-            .version(2)
-            .application(testApplication)
-            .build();
+        ManifestV3.builder().version(2).application(testApplication).build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noApplications() {
-        ManifestV3.builder()
-            .build();
+        ManifestV3.builder().build();
     }
 
     @Test
     public void valid() {
-        ManifestV3.builder()
-            .application(testApplication)
-            .build();
+        ManifestV3.builder().application(testApplication).build();
     }
 }

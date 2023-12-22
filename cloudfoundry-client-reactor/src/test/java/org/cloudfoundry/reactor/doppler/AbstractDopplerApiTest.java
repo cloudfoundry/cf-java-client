@@ -18,6 +18,4 @@ package org.cloudfoundry.reactor.doppler;
 
 import org.cloudfoundry.reactor.AbstractRestTest;
 
-abstract class AbstractDopplerApiTest extends AbstractRestTest {
-
-}
+abstract class AbstractDopplerApiTest extends AbstractRestTest {}

@@ -38,5 +38,4 @@ public interface AuditEventsV3 {
      * @return the response from the List Audit Events request
      */
     Mono<ListAuditEventsResponse> list(ListAuditEventsRequest request);
-
 }

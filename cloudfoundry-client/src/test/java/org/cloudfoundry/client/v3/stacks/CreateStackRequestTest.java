@@ -16,86 +16,61 @@
 
 package org.cloudfoundry.client.v3.stacks;
 
-import org.cloudfoundry.client.v3.Metadata;
-import org.junit.Test;
-
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.cloudfoundry.client.v3.Metadata;
+import org.junit.Test;
 
 public class CreateStackRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void invalidNameLengthTest() {
-        String invalidName = Stream.generate(() -> "aaa")
-            .limit(251)
-            .collect(Collectors.joining());
+        String invalidName = Stream.generate(() -> "aaa").limit(251).collect(Collectors.joining());
 
-        CreateStackRequest.builder()
-            .name(invalidName)
-            .build();
+        CreateStackRequest.builder().name(invalidName).build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void invalidDescriptionLengthTest() {
-        String invalidDescription = Stream.generate(() -> "aaa")
-            .limit(251)
-            .collect(Collectors.joining());
+        String invalidDescription =
+                Stream.generate(() -> "aaa").limit(251).collect(Collectors.joining());
 
-        CreateStackRequest.builder()
-            .name("valid name")
-            .description(invalidDescription)
-            .build();
+        CreateStackRequest.builder().name("valid name").description(invalidDescription).build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void invalidNameAndDescriptionLengthTest() {
-        String invalidName = Stream.generate(() -> "aaa")
-            .limit(251)
-            .collect(Collectors.joining());
-        String invalidDescription = Stream.generate(() -> "aaa")
-            .limit(251)
-            .collect(Collectors.joining());
+        String invalidName = Stream.generate(() -> "aaa").limit(251).collect(Collectors.joining());
+        String invalidDescription =
+                Stream.generate(() -> "aaa").limit(251).collect(Collectors.joining());
 
-        CreateStackRequest.builder()
-            .name(invalidName)
-            .description(invalidDescription)
-            .build();
+        CreateStackRequest.builder().name(invalidName).description(invalidDescription).build();
     }
 
     @Test
     public void validRequestTest() {
-        CreateStackRequest.builder()
-            .name("valid name")
-            .build();
+        CreateStackRequest.builder().name("valid name").build();
     }
 
     @Test
     public void validRequestWithDescriptionTest() {
-        CreateStackRequest.builder()
-            .name("valid name")
-            .description("valid description")
-            .build();
+        CreateStackRequest.builder().name("valid name").description("valid description").build();
     }
 
     @Test
     public void validRequestWithMetadataTest() {
         CreateStackRequest.builder()
-            .name("valid name")
-            .metadata(Metadata.builder()
-                .label("label-key", "label-value")
-                .build())
-            .build();
+                .name("valid name")
+                .metadata(Metadata.builder().label("label-key", "label-value").build())
+                .build();
     }
 
     @Test
     public void validRequestWithAllFieldsTest() {
         CreateStackRequest.builder()
-            .name("valid name")
-            .description("valid description")
-            .metadata(Metadata.builder()
-                .label("label-key", "label-value")
-                .build())
-            .build();
+                .name("valid name")
+                .description("valid description")
+                .metadata(Metadata.builder().label("label-key", "label-value").build())
+                .build();
     }
-
 }

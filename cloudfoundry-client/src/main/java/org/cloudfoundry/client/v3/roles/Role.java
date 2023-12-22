@@ -35,5 +35,4 @@ public abstract class Role extends Resource {
      */
     @JsonProperty("type")
     public abstract RoleType getType();
-
 }

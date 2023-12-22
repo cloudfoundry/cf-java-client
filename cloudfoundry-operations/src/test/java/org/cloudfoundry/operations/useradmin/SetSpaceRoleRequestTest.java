@@ -23,48 +23,46 @@ public final class SetSpaceRoleRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noOrganizationName() {
         SetSpaceRoleRequest.builder()
-            .spaceName("test-space")
-            .spaceRole(SpaceRole.AUDITOR)
-            .username("test-username")
-            .build();
+                .spaceName("test-space")
+                .spaceRole(SpaceRole.AUDITOR)
+                .username("test-username")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noSpaceName() {
         SetSpaceRoleRequest.builder()
-            .organizationName("test-organization")
-            .spaceRole(SpaceRole.MANAGER)
-            .username("test-username")
-            .build();
+                .organizationName("test-organization")
+                .spaceRole(SpaceRole.MANAGER)
+                .username("test-username")
+                .build();
     }
-
 
     @Test(expected = IllegalStateException.class)
     public void noSpaceRole() {
         SetSpaceRoleRequest.builder()
-            .organizationName("test-organization")
-            .spaceName("test-space")
-            .username("test-username")
-            .build();
+                .organizationName("test-organization")
+                .spaceName("test-space")
+                .username("test-username")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noUsername() {
         SetSpaceRoleRequest.builder()
-            .organizationName("test-organization")
-            .spaceName("test-space")
-            .spaceRole(SpaceRole.DEVELOPER)
-            .build();
+                .organizationName("test-organization")
+                .spaceName("test-space")
+                .spaceRole(SpaceRole.DEVELOPER)
+                .build();
     }
 
     @Test
     public void valid() {
         SetSpaceRoleRequest.builder()
-            .organizationName("test-organization")
-            .spaceName("test-space")
-            .spaceRole(SpaceRole.AUDITOR)
-            .username("test-username")
-            .build();
+                .organizationName("test-organization")
+                .spaceName("test-space")
+                .spaceRole(SpaceRole.AUDITOR)
+                .username("test-username")
+                .build();
     }
-
 }

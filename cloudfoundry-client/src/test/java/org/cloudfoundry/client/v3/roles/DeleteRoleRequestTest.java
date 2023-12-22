@@ -22,15 +22,11 @@ public class DeleteRoleRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noRoleId() {
-        DeleteRoleRequest.builder()
-            .build();
+        DeleteRoleRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        DeleteRoleRequest.builder()
-            .roleId("test-role-id")
-            .build();
+        DeleteRoleRequest.builder().roleId("test-role-id").build();
     }
-
 }

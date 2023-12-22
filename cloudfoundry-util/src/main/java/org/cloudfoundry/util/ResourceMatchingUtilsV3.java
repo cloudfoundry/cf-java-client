@@ -16,6 +16,14 @@
 
 package org.cloudfoundry.util;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.List;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.cloudfoundry.client.CloudFoundryClient;
@@ -31,55 +39,58 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.List;
-
 /**
  * Utilities for matching resources with objects for v3 API
  */
 public final class ResourceMatchingUtilsV3 {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger("cloudfoundry-client.resource-matching-v3");
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger("cloudfoundry-client.resource-matching-v3");
 
-    private ResourceMatchingUtilsV3() {
-    }
+    private ResourceMatchingUtilsV3() {}
 
-    public static Mono<List<MatchedResource>> getMatchedResources(CloudFoundryClient cloudFoundryClient, Path application) {
-        return (Files.isDirectory(application) ? getArtifactMetadataFromDirectory(application) : getArtifactMetadataFromZip(application))
-            .collectList()
-            .flatMap((List<ArtifactMetadata> artifactMetadatas) -> requestListMatchingResources(cloudFoundryClient, artifactMetadatas))
-            .map(ListMatchingResourcesResponse::getResources)
-            .doOnNext(matched -> LOGGER.debug("{} resources matched totaling {}", matched.size(), SizeUtils.asIbi(matched.stream()
-                .mapToInt(MatchedResource::getSize)
-                .sum())))
-            .subscribeOn(Schedulers.boundedElastic());
+    public static Mono<List<MatchedResource>> getMatchedResources(
+            CloudFoundryClient cloudFoundryClient, Path application) {
+        return (Files.isDirectory(application)
+                        ? getArtifactMetadataFromDirectory(application)
+                        : getArtifactMetadataFromZip(application))
+                .collectList()
+                .flatMap(
+                        (List<ArtifactMetadata> artifactMetadatas) ->
+                                requestListMatchingResources(cloudFoundryClient, artifactMetadatas))
+                .map(ListMatchingResourcesResponse::getResources)
+                .doOnNext(
+                        matched ->
+                                LOGGER.debug(
+                                        "{} resources matched totaling {}",
+                                        matched.size(),
+                                        SizeUtils.asIbi(
+                                                matched.stream()
+                                                        .mapToInt(MatchedResource::getSize)
+                                                        .sum())))
+                .subscribeOn(Schedulers.boundedElastic());
     }
 
     private static Flux<ArtifactMetadata> getArtifactMetadataFromDirectory(Path application) {
-        return Flux
-            .defer(() -> {
-                try {
-                    return Flux.fromStream(Files.walk(application));
-                } catch (IOException e) {
-                    throw Exceptions.propagate(e);
-                }
-            })
-            .filter(path -> !Files.isDirectory(path))
-            .map(path -> new ArtifactMetadata(
-                Checksum.builder()
-                    .type(ChecksumType.SHA1)
-                    .value(FileUtils.hash(path))
-                    .build(),
-                FileUtils.getRelativePathName(application, path),
-                FileUtils.permissions(path),
-                FileUtils.size(path))
-            );
+        return Flux.defer(
+                        () -> {
+                            try {
+                                return Flux.fromStream(Files.walk(application));
+                            } catch (IOException e) {
+                                throw Exceptions.propagate(e);
+                            }
+                        })
+                .filter(path -> !Files.isDirectory(path))
+                .map(
+                        path ->
+                                new ArtifactMetadata(
+                                        Checksum.builder()
+                                                .type(ChecksumType.SHA1)
+                                                .value(FileUtils.hash(path))
+                                                .build(),
+                                        FileUtils.getRelativePathName(application, path),
+                                        FileUtils.permissions(path),
+                                        FileUtils.size(path)));
     }
 
     private static Flux<ArtifactMetadata> getArtifactMetadataFromZip(Path application) {
@@ -93,17 +104,18 @@ public final class ResourceMatchingUtilsV3 {
 
                 if (!entry.isDirectory()) {
                     try (InputStream in = zipFile.getInputStream(entry)) {
-                        Checksum checksum = Checksum.builder()
-                            .type(ChecksumType.SHA1)
-                            .value(FileUtils.hash(in))
-                            .build();
+                        Checksum checksum =
+                                Checksum.builder()
+                                        .type(ChecksumType.SHA1)
+                                        .value(FileUtils.hash(in))
+                                        .build();
                         String path = entry.getName();
                         String permissions = FileUtils.permissions(entry.getUnixMode());
                         int size = (int) entry.getSize();
 
-                        artifactMetadatas.add(new ArtifactMetadata(checksum, path, permissions, size));
+                        artifactMetadatas.add(
+                                new ArtifactMetadata(checksum, path, permissions, size));
                     }
-
                 }
             }
         } catch (IOException e) {
@@ -113,18 +125,24 @@ public final class ResourceMatchingUtilsV3 {
         return Flux.fromIterable(artifactMetadatas);
     }
 
-    private static Mono<ListMatchingResourcesResponse> requestListMatchingResources(CloudFoundryClient cloudFoundryClient, Collection<ArtifactMetadata> artifactMetadatas) {
-        ListMatchingResourcesRequest request = artifactMetadatas.stream()
-            .reduce(ListMatchingResourcesRequest.builder(), (builder, artifactMetadata) -> builder.resource(MatchedResource.builder()
-                .checksum(artifactMetadata.getChecksum())
-                .mode(artifactMetadata.getPermissions())
-                .size(artifactMetadata.getSize())
-                .path(artifactMetadata.getPath())
-                .build()), (a, b) -> a.addAllResources(b.build().getResources()))
-            .build();
+    private static Mono<ListMatchingResourcesResponse> requestListMatchingResources(
+            CloudFoundryClient cloudFoundryClient, Collection<ArtifactMetadata> artifactMetadatas) {
+        ListMatchingResourcesRequest request =
+                artifactMetadatas.stream()
+                        .reduce(
+                                ListMatchingResourcesRequest.builder(),
+                                (builder, artifactMetadata) ->
+                                        builder.resource(
+                                                MatchedResource.builder()
+                                                        .checksum(artifactMetadata.getChecksum())
+                                                        .mode(artifactMetadata.getPermissions())
+                                                        .size(artifactMetadata.getSize())
+                                                        .path(artifactMetadata.getPath())
+                                                        .build()),
+                                (a, b) -> a.addAllResources(b.build().getResources()))
+                        .build();
 
-        return cloudFoundryClient.resourceMatchV3()
-            .list(request);
+        return cloudFoundryClient.resourceMatchV3().list(request);
     }
 
     /**
@@ -182,7 +200,6 @@ public final class ResourceMatchingUtilsV3 {
             return this.permissions;
         }
 
-
         /**
          * Returns the size of the artifact in bytes
          *
@@ -191,6 +208,5 @@ public final class ResourceMatchingUtilsV3 {
         public int getSize() {
             return this.size;
         }
-
     }
 }

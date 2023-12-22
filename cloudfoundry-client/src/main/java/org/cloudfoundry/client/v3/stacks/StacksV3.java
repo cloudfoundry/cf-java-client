@@ -62,5 +62,4 @@ public interface StacksV3 {
      * @return the response from the Update Stack request
      */
     Mono<UpdateStackResponse> update(UpdateStackRequest request);
-
 }

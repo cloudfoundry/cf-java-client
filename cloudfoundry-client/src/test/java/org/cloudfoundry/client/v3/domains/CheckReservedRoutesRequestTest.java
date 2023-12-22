@@ -22,15 +22,11 @@ public final class CheckReservedRoutesRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noDomainId() {
-        CheckReservedRoutesRequest.builder()
-            .build();
+        CheckReservedRoutesRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        CheckReservedRoutesRequest.builder()
-            .domainId("test-domain-id")
-            .build();
+        CheckReservedRoutesRequest.builder().domainId("test-domain-id").build();
     }
-
 }

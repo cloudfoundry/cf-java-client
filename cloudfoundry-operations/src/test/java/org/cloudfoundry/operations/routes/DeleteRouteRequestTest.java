@@ -22,24 +22,16 @@ public final class DeleteRouteRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noDomain() {
-        DeleteRouteRequest.builder()
-            .build();
+        DeleteRouteRequest.builder().build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void setupConflict() {
-        DeleteRouteRequest.builder()
-            .domain("test-domain")
-            .host("test-hostname")
-            .port(123)
-            .build();
+        DeleteRouteRequest.builder().domain("test-domain").host("test-hostname").port(123).build();
     }
 
     @Test
     public void valid() {
-        DeleteRouteRequest.builder()
-            .domain("test-domain")
-            .build();
+        DeleteRouteRequest.builder().domain("test-domain").build();
     }
-
 }

@@ -17,14 +17,14 @@
 package org.cloudfoundry.uaa.identityproviders;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.cloudfoundry.Nullable;
-
 import java.util.List;
+import org.cloudfoundry.Nullable;
 
 /**
  * The payload for the oauth/oidc identity provider configuration
  */
-abstract class AbstractAuthenticationConfiguration extends AbstractExternalIdentityProviderConfiguration {
+abstract class AbstractAuthenticationConfiguration
+        extends AbstractExternalIdentityProviderConfiguration {
 
     /**
      * Determines whether or not shadow users must be created before login by an administrator.
@@ -100,5 +100,4 @@ abstract class AbstractAuthenticationConfiguration extends AbstractExternalIdent
      */
     @JsonProperty("tokenUrl")
     abstract String getTokenUrl();
-
 }

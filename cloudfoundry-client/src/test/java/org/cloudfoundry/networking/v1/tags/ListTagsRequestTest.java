@@ -22,8 +22,6 @@ public class ListTagsRequestTest {
 
     @Test
     public void valid() {
-        ListTagsRequest.builder()
-            .build();
+        ListTagsRequest.builder().build();
     }
-
 }

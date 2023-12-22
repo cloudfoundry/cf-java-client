@@ -25,73 +25,73 @@ public final class GetApplicationProcessStatisticsRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noApplicationId() {
-        GetApplicationProcessStatisticsRequest.builder()
-            .type("test-type")
-            .build();
+        GetApplicationProcessStatisticsRequest.builder().type("test-type").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noType() {
-        GetApplicationProcessStatisticsRequest.builder()
-            .applicationId("test-id")
-            .build();
+        GetApplicationProcessStatisticsRequest.builder().applicationId("test-id").build();
     }
 
     @Test
     public void valid() {
         GetApplicationProcessStatisticsRequest.builder()
-            .applicationId("test-id")
-            .type("test-type")
-            .build();
+                .applicationId("test-id")
+                .type("test-type")
+                .build();
     }
 
     @Test
     public void validDownResource() {
-        ProcessStatisticsResource processStatisticsResource = ProcessStatisticsResource.builder()
-            .type("web")
-            .index(0)
-            .state(ProcessState.DOWN)
-            .uptime(0L)
-            .build();
+        ProcessStatisticsResource processStatisticsResource =
+                ProcessStatisticsResource.builder()
+                        .type("web")
+                        .index(0)
+                        .state(ProcessState.DOWN)
+                        .uptime(0L)
+                        .build();
         GetApplicationProcessStatisticsResponse.builder()
-            .resource(processStatisticsResource)
-            .build();
+                .resource(processStatisticsResource)
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void invalidRunningResource() {
-        ProcessStatisticsResource processStatisticsResource = ProcessStatisticsResource.builder()
-            .type("web")
-            .index(0)
-            .state(ProcessState.RUNNING)
-            .uptime(0L)
-            .build();
+        ProcessStatisticsResource processStatisticsResource =
+                ProcessStatisticsResource.builder()
+                        .type("web")
+                        .index(0)
+                        .state(ProcessState.RUNNING)
+                        .uptime(0L)
+                        .build();
         GetApplicationProcessStatisticsResponse.builder()
-            .resource(processStatisticsResource)
-            .build();
+                .resource(processStatisticsResource)
+                .build();
     }
 
     @Test
     public void validRunningResponse() {
-        ProcessUsage processUsage = ProcessUsage.builder()
-            .time("")
-            .cpu(Double.valueOf("0.00038711029163348665"))
-            .memory(19177472L)
-            .disk(69705728L)
-            .build();
-        ProcessStatisticsResource processStatisticsResource = ProcessStatisticsResource.builder()
-            .type("web")
-            .index(0)
-            .state(ProcessState.RUNNING)
-            .host("10.244.16.10")
-            .usage(processUsage)
-            .uptime(9042L)
-            .memoryQuota(268435456L)
-            .diskQuota(1073741824L)
-            .fileDescriptorQuota(16384L)
-            .build();
+        ProcessUsage processUsage =
+                ProcessUsage.builder()
+                        .time("")
+                        .cpu(Double.valueOf("0.00038711029163348665"))
+                        .memory(19177472L)
+                        .disk(69705728L)
+                        .build();
+        ProcessStatisticsResource processStatisticsResource =
+                ProcessStatisticsResource.builder()
+                        .type("web")
+                        .index(0)
+                        .state(ProcessState.RUNNING)
+                        .host("10.244.16.10")
+                        .usage(processUsage)
+                        .uptime(9042L)
+                        .memoryQuota(268435456L)
+                        .diskQuota(1073741824L)
+                        .fileDescriptorQuota(16384L)
+                        .build();
         GetApplicationProcessStatisticsResponse.builder()
-            .resource(processStatisticsResource)
-            .build();
+                .resource(processStatisticsResource)
+                .build();
     }
 }

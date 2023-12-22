@@ -61,7 +61,8 @@ public interface ServiceBindingsV3 {
      * @param request the Get Service Binding Parameters request
      * @return the response from the Get Service Binding Parameters request
      */
-    Mono<GetServiceBindingParametersResponse> getParameters(GetServiceBindingParametersRequest request);
+    Mono<GetServiceBindingParametersResponse> getParameters(
+            GetServiceBindingParametersRequest request);
 
     /**
      * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#list-service-credential-bindings">List service credential bindings</a> request
@@ -78,5 +79,4 @@ public interface ServiceBindingsV3 {
      * @return the response from the Update Service Bindings request
      */
     Mono<UpdateServiceBindingResponse> update(UpdateServiceBindingRequest request);
-
 }

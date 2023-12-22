@@ -62,5 +62,4 @@ public interface Organizations {
      * @return completion indicator
      */
     Mono<Void> rename(RenameOrganizationRequest request);
-
 }

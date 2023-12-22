@@ -23,43 +23,29 @@ public final class CreateUserRequestTest {
     @Test(expected = IllegalStateException.class)
     public void incompleteName() {
         CreateUserRequest.builder()
-            .email(Email.builder()
-                .primary(true)
-                .value("test-email")
-                .build())
-            .name(Name.builder()
-                .familyName("test-family-name")
-                .build())
-            .userName("test-userName")
-            .build();
+                .email(Email.builder().primary(true).value("test-email").build())
+                .name(Name.builder().familyName("test-family-name").build())
+                .userName("test-userName")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noEmail() {
-        CreateUserRequest.builder()
-            .userName("test-userName")
-            .build();
+        CreateUserRequest.builder().userName("test-userName").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noUserName() {
         CreateUserRequest.builder()
-            .email(Email.builder()
-                .primary(true)
-                .value("test-email")
-                .build())
-            .build();
+                .email(Email.builder().primary(true).value("test-email").build())
+                .build();
     }
 
     @Test
     public void valid() {
         CreateUserRequest.builder()
-            .email(Email.builder()
-                .primary(true)
-                .value("test-email")
-                .build())
-            .userName("test-userName")
-            .build();
+                .email(Email.builder().primary(true).value("test-email").build())
+                .userName("test-userName")
+                .build();
     }
-
 }

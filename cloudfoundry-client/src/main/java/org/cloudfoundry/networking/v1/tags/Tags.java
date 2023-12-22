@@ -30,5 +30,4 @@ public interface Tags {
      * @return the response to the List Tags request
      */
     Mono<ListTagsResponse> list(ListTagsRequest request);
-
 }

@@ -22,15 +22,11 @@ public final class GetOrganizationUserRolesRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noOrganizationId() {
-        GetOrganizationUserRolesRequest.builder()
-            .build();
+        GetOrganizationUserRolesRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        GetOrganizationUserRolesRequest.builder()
-            .organizationId("test-organization-id")
-            .build();
+        GetOrganizationUserRolesRequest.builder().organizationId("test-organization-id").build();
     }
-
 }

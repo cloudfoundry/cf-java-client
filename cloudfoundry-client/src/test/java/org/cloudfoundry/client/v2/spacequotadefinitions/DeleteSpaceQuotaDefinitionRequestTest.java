@@ -22,15 +22,13 @@ public final class DeleteSpaceQuotaDefinitionRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noSpaceQuotaDefinitionId() {
-        DeleteSpaceQuotaDefinitionRequest.builder()
-            .build();
+        DeleteSpaceQuotaDefinitionRequest.builder().build();
     }
 
     @Test
     public void valid() {
         DeleteSpaceQuotaDefinitionRequest.builder()
-            .spaceQuotaDefinitionId("test-space-quota-definition-id")
-            .build();
+                .spaceQuotaDefinitionId("test-space-quota-definition-id")
+                .build();
     }
-
 }

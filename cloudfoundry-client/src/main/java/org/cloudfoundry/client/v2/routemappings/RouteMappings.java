@@ -54,5 +54,4 @@ public interface RouteMappings {
      * @return the response from the List Route Mappings request
      */
     Mono<ListRouteMappingsResponse> list(ListRouteMappingsRequest request);
-
 }

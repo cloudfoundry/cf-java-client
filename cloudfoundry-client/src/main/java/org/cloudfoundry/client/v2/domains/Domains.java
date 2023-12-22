@@ -70,5 +70,4 @@ public interface Domains {
      */
     @Deprecated
     Mono<ListDomainSpacesResponse> listSpaces(ListDomainSpacesRequest request);
-
 }

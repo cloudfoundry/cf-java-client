@@ -16,12 +16,10 @@
 
 package org.cloudfoundry.reactor.client;
 
-import org.junit.Test;
-
-import java.lang.reflect.Method;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.lang.reflect.Method;
+import org.junit.Test;
 
 public final class MethodNameComparatorTest {
 
@@ -44,5 +42,4 @@ public final class MethodNameComparatorTest {
     private void bravo() {
         // text fixture
     }
-
 }

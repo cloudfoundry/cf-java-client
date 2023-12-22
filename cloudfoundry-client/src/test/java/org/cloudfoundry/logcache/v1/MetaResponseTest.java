@@ -24,5 +24,4 @@ public class MetaResponseTest {
     public void valid() {
         MetaResponse.builder().build();
     }
-
 }

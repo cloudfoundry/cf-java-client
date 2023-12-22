@@ -21,14 +21,11 @@ import org.junit.Test;
 public class ManifestV3ProcessTest {
     @Test(expected = IllegalStateException.class)
     public void noType() {
-        ManifestV3Process.builder()
-            .build();
+        ManifestV3Process.builder().build();
     }
 
     @Test
     public void valid() {
-        ManifestV3Process.builder()
-            .type("test-type")
-            .build();
+        ManifestV3Process.builder().type("test-type").build();
     }
 }

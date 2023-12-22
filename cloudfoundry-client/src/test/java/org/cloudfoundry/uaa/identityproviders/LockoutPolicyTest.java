@@ -16,42 +16,31 @@
 
 package org.cloudfoundry.uaa.identityproviders;
 
-
 import org.junit.Test;
 
 public final class LockoutPolicyTest {
 
     @Test(expected = IllegalStateException.class)
     public void noLockAccountPeriodInSecond() {
-        LockoutPolicy.builder()
-            .lockoutPeriodInSecond(0)
-            .numberOfAllowedFailures(0)
-            .build();
+        LockoutPolicy.builder().lockoutPeriodInSecond(0).numberOfAllowedFailures(0).build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noLockoutPeriodInSecond() {
-        LockoutPolicy.builder()
-            .lockAccountPeriodInSecond(0)
-            .numberOfAllowedFailures(0)
-            .build();
+        LockoutPolicy.builder().lockAccountPeriodInSecond(0).numberOfAllowedFailures(0).build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noNumberOfAllowedFailures() {
-        LockoutPolicy.builder()
-            .lockAccountPeriodInSecond(0)
-            .lockoutPeriodInSecond(0)
-            .build();
+        LockoutPolicy.builder().lockAccountPeriodInSecond(0).lockoutPeriodInSecond(0).build();
     }
 
     @Test
     public void valid() {
         LockoutPolicy.builder()
-            .lockAccountPeriodInSecond(0)
-            .lockoutPeriodInSecond(0)
-            .numberOfAllowedFailures(0)
-            .build();
+                .lockAccountPeriodInSecond(0)
+                .lockoutPeriodInSecond(0)
+                .numberOfAllowedFailures(0)
+                .build();
     }
-
 }

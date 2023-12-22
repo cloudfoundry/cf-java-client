@@ -86,5 +86,4 @@ public interface UserAdmin {
      * @return completion indicator
      */
     Mono<Void> unsetSpaceRole(UnsetSpaceRoleRequest request);
-
 }

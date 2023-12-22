@@ -52,5 +52,4 @@ public enum DeploymentStrategy {
     public String toString() {
         return getValue();
     }
-
 }

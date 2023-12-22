@@ -16,22 +16,19 @@
 
 package org.cloudfoundry.client.v2.userprovidedserviceinstances;
 
-
 import org.junit.Test;
 
 public final class ListUserProvidedServiceInstanceServiceBindingsRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noUserProvidedServiceInstanceId() {
-        ListUserProvidedServiceInstanceServiceBindingsRequest.builder()
-            .build();
+        ListUserProvidedServiceInstanceServiceBindingsRequest.builder().build();
     }
 
     @Test
     public void valid() {
         ListUserProvidedServiceInstanceServiceBindingsRequest.builder()
-            .userProvidedServiceInstanceId("test-user-provided-service-instance-id")
-            .build();
+                .userProvidedServiceInstanceId("test-user-provided-service-instance-id")
+                .build();
     }
-
 }

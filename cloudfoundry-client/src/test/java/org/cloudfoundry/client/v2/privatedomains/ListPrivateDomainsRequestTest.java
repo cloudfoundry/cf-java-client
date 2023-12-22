@@ -22,8 +22,6 @@ public final class ListPrivateDomainsRequestTest {
 
     @Test
     public void valid() {
-        ListPrivateDomainsRequest.builder()
-            .build();
+        ListPrivateDomainsRequest.builder().build();
     }
-
 }

@@ -61,7 +61,8 @@ public interface Users {
      * @param request the Get User Verification Link request
      * @return the response from the Get User Verification Link request
      */
-    Mono<GetUserVerificationLinkResponse> getVerificationLink(GetUserVerificationLinkRequest request);
+    Mono<GetUserVerificationLinkResponse> getVerificationLink(
+            GetUserVerificationLinkRequest request);
 
     /**
      * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#invite-users">Invite Users</a> request
@@ -110,5 +111,4 @@ public interface Users {
      * @return the response from the Verify User request
      */
     Mono<VerifyUserResponse> verify(VerifyUserRequest request);
-
 }

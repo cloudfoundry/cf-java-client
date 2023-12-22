@@ -23,43 +23,29 @@ public final class PaginatedRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void excessivePerPage() {
-        StubPaginatedRequest.builder()
-            .perPage(10_000)
-            .build();
+        StubPaginatedRequest.builder().perPage(10_000).build();
     }
 
     @Test
     public void validNoValues() {
-        StubPaginatedRequest.builder()
-            .build();
+        StubPaginatedRequest.builder().build();
     }
 
     @Test
     public void validValues() {
-        StubPaginatedRequest.builder()
-            .page(10)
-            .perPage(10)
-            .orderBy("name")
-            .build();
+        StubPaginatedRequest.builder().page(10).perPage(10).orderBy("name").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void zeroPage() {
-        StubPaginatedRequest.builder()
-            .page(0)
-            .build();
+        StubPaginatedRequest.builder().page(0).build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void zeroPerPage() {
-        StubPaginatedRequest.builder()
-            .perPage(0)
-            .build();
+        StubPaginatedRequest.builder().perPage(0).build();
     }
 
     @Value.Immutable
-    static abstract class _StubPaginatedRequest extends PaginatedRequest {
-
-    }
-
+    abstract static class _StubPaginatedRequest extends PaginatedRequest {}
 }

@@ -22,24 +22,16 @@ public final class AutoLoginRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noClientId() {
-        AutoLoginRequest.builder()
-            .code("test-code")
-            .build();
+        AutoLoginRequest.builder().code("test-code").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noCode() {
-        AutoLoginRequest.builder()
-            .clientId("test-client-id")
-            .build();
+        AutoLoginRequest.builder().clientId("test-client-id").build();
     }
 
     @Test
     public void valid() {
-        AutoLoginRequest.builder()
-            .clientId("test-client-id")
-            .code("test-code")
-            .build();
+        AutoLoginRequest.builder().clientId("test-client-id").code("test-code").build();
     }
-
 }

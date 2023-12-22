@@ -22,24 +22,19 @@ public final class CreateDomainRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noDomain() {
-        CreateDomainRequest.builder()
-            .organization("test-organization")
-            .build();
+        CreateDomainRequest.builder().organization("test-organization").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noOrganization() {
-        CreateDomainRequest.builder()
-            .domain("test-domain")
-            .build();
+        CreateDomainRequest.builder().domain("test-domain").build();
     }
 
     @Test
     public void valid() {
         CreateDomainRequest.builder()
-            .domain("test-domain")
-            .organization("test-organization")
-            .build();
+                .domain("test-domain")
+                .organization("test-organization")
+                .build();
     }
-
 }

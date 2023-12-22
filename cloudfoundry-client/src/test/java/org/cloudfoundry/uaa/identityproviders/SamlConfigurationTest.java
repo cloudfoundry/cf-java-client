@@ -22,15 +22,11 @@ public final class SamlConfigurationTest {
 
     @Test(expected = IllegalStateException.class)
     public void noMetadataLocation() {
-        SamlConfiguration.builder()
-            .build();
+        SamlConfiguration.builder().build();
     }
 
     @Test
     public void valid() {
-        SamlConfiguration.builder()
-            .metaDataLocation("test-metadata-location")
-            .build();
+        SamlConfiguration.builder().metaDataLocation("test-metadata-location").build();
     }
-
 }

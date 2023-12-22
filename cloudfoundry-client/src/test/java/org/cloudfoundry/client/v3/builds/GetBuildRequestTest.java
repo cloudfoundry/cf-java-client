@@ -22,15 +22,11 @@ public final class GetBuildRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noBuildId() {
-        GetBuildRequest.builder()
-            .build();
+        GetBuildRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        GetBuildRequest.builder()
-            .buildId("test-build-id")
-            .build();
+        GetBuildRequest.builder().buildId("test-build-id").build();
     }
-
 }

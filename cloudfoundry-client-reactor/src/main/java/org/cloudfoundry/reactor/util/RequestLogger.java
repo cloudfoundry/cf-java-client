@@ -16,13 +16,12 @@
 
 package org.cloudfoundry.reactor.util;
 
+import java.util.List;
 import org.cloudfoundry.util.TimeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.netty.http.client.HttpClientRequest;
 import reactor.netty.http.client.HttpClientResponse;
-
-import java.util.List;
 
 public class RequestLogger {
 
@@ -48,17 +47,32 @@ public class RequestLogger {
 
         if (warnings.isEmpty()) {
             if (RESPONSE_LOGGER.isTraceEnabled()) {
-                RESPONSE_LOGGER.debug("{}    {} ({}, {})", response.status().code(), response.uri(), elapsed, response.responseHeaders().get("X-Vcap-Request-Id"));
+                RESPONSE_LOGGER.debug(
+                        "{}    {} ({}, {})",
+                        response.status().code(),
+                        response.uri(),
+                        elapsed,
+                        response.responseHeaders().get("X-Vcap-Request-Id"));
             } else {
-                RESPONSE_LOGGER.debug("{}    {} ({})", response.status().code(), response.uri(), elapsed);
+                RESPONSE_LOGGER.debug(
+                        "{}    {} ({})", response.status().code(), response.uri(), elapsed);
             }
         } else {
             if (RESPONSE_LOGGER.isTraceEnabled()) {
-                RESPONSE_LOGGER.warn("{}    {} ({}, {}) [{}]", response.status().code(), response.uri(), elapsed, response.responseHeaders().get("X-Vcap-Request-Id"),
-                    String.join(", ", warnings));
+                RESPONSE_LOGGER.warn(
+                        "{}    {} ({}, {}) [{}]",
+                        response.status().code(),
+                        response.uri(),
+                        elapsed,
+                        response.responseHeaders().get("X-Vcap-Request-Id"),
+                        String.join(", ", warnings));
             } else {
-                RESPONSE_LOGGER.warn("{}    {} ({}) [{}]", response.status().code(), response.uri(), elapsed, String.join(", ", warnings));
-
+                RESPONSE_LOGGER.warn(
+                        "{}    {} ({}) [{}]",
+                        response.status().code(),
+                        response.uri(),
+                        elapsed,
+                        String.join(", ", warnings));
             }
         }
     }
@@ -71,5 +85,4 @@ public class RequestLogger {
         REQUEST_LOGGER.debug(message, uri);
         this.requestSentTime = System.currentTimeMillis();
     }
-
 }

@@ -23,23 +23,20 @@ public final class RemoveRouteWithUserProvidedServiceInstanceRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noRouteId() {
         RemoveUserProvidedServiceInstanceRouteRequest.builder()
-            .userProvidedServiceInstanceId("test-user-provided-service-instance-id")
-            .build();
+                .userProvidedServiceInstanceId("test-user-provided-service-instance-id")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noUserProvidedServiceInstanceId() {
-        RemoveUserProvidedServiceInstanceRouteRequest.builder()
-            .routeId("test-route-id")
-            .build();
+        RemoveUserProvidedServiceInstanceRouteRequest.builder().routeId("test-route-id").build();
     }
 
     @Test
     public void valid() {
         RemoveUserProvidedServiceInstanceRouteRequest.builder()
-            .routeId("test-route-id")
-            .userProvidedServiceInstanceId("test-user-provided-service-instance-id")
-            .build();
+                .routeId("test-route-id")
+                .userProvidedServiceInstanceId("test-user-provided-service-instance-id")
+                .build();
     }
-
 }

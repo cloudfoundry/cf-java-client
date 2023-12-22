@@ -22,27 +22,22 @@ public final class RunApplicationTaskRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noApplicationName() {
-        RunApplicationTaskRequest.builder()
-            .command("test-command")
-            .build();
+        RunApplicationTaskRequest.builder().command("test-command").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noCommand() {
-        RunApplicationTaskRequest.builder()
-            .applicationName("test-application-name")
-            .build();
+        RunApplicationTaskRequest.builder().applicationName("test-application-name").build();
     }
 
     @Test
     public void valid() {
         RunApplicationTaskRequest.builder()
-            .applicationName("test-application-name")
-            .command("test-command")
-            .disk(1)
-            .memory(1)
-            .taskName("test-task-name")
-            .build();
+                .applicationName("test-application-name")
+                .command("test-command")
+                .disk(1)
+                .memory(1)
+                .taskName("test-task-name")
+                .build();
     }
-
 }

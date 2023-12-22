@@ -22,15 +22,11 @@ public final class GetDeploymentTest {
 
     @Test(expected = IllegalStateException.class)
     public void noDeploymentId() {
-        GetDeploymentRequest.builder()
-            .build();
+        GetDeploymentRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        GetDeploymentRequest.builder()
-            .deploymentId("deployment-id")
-            .build();
+        GetDeploymentRequest.builder().deploymentId("deployment-id").build();
     }
-
 }

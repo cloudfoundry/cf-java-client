@@ -63,6 +63,6 @@ public interface PrivateDomains {
      * @param request the List Private Domain Shared Organizations request
      * @return the response from the List Private Domains Shared Organizations request
      */
-    Mono<ListPrivateDomainSharedOrganizationsResponse> listSharedOrganizations(ListPrivateDomainSharedOrganizationsRequest request);
-
+    Mono<ListPrivateDomainSharedOrganizationsResponse> listSharedOrganizations(
+            ListPrivateDomainSharedOrganizationsRequest request);
 }

@@ -61,5 +61,4 @@ public enum PackageType {
     public String toString() {
         return getValue();
     }
-
 }

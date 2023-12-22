@@ -22,8 +22,6 @@ public final class ListRouteMappingsRequestTest {
 
     @Test
     public void valid() {
-        ListRouteMappingsRequest.builder()
-            .build();
+        ListRouteMappingsRequest.builder().build();
     }
-
 }

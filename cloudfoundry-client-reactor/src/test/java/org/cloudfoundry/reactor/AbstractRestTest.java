@@ -16,10 +16,18 @@
 
 package org.cloudfoundry.reactor;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -29,24 +37,18 @@ import org.junit.ComparisonFailure;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import reactor.core.publisher.Mono;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
-
 public abstract class AbstractRestTest {
 
-    protected static final ConnectionContext CONNECTION_CONTEXT = DefaultConnectionContext.builder()
-        .apiHost("localhost")
-        .secure(false)
-        .problemHandler(new FailingDeserializationProblemHandler())  // Test-only problem handler
-        .build();
+    protected static final ConnectionContext CONNECTION_CONTEXT =
+            DefaultConnectionContext.builder()
+                    .apiHost("localhost")
+                    .secure(false)
+                    .problemHandler(
+                            new FailingDeserializationProblemHandler()) // Test-only problem handler
+                    .build();
 
-    protected static final TokenProvider TOKEN_PROVIDER = connectionContext -> Mono.just("test-authorization");
+    protected static final TokenProvider TOKEN_PROVIDER =
+            connectionContext -> Mono.just("test-authorization");
 
     static {
         SLF4JBridgeHandler.removeHandlersForRootLogger();
@@ -80,14 +82,22 @@ public abstract class AbstractRestTest {
         this.multipleRequestDispatcher.add(interactionContext);
     }
 
-    private static final class FailingDeserializationProblemHandler extends DeserializationProblemHandler {
+    private static final class FailingDeserializationProblemHandler
+            extends DeserializationProblemHandler {
 
         @Override
-        public boolean handleUnknownProperty(DeserializationContext ctxt, JsonParser jp, JsonDeserializer<?> deserializer, Object beanOrClass, String propertyName) {
-            fail(String.format("Found unexpected property %s in payload for %s", propertyName, beanOrClass.getClass().getName()));
+        public boolean handleUnknownProperty(
+                DeserializationContext ctxt,
+                JsonParser jp,
+                JsonDeserializer<?> deserializer,
+                Object beanOrClass,
+                String propertyName) {
+            fail(
+                    String.format(
+                            "Found unexpected property %s in payload for %s",
+                            propertyName, beanOrClass.getClass().getName()));
             return false;
         }
-
     }
 
     private static final class MultipleRequestDispatcher extends Dispatcher {
@@ -101,7 +111,10 @@ public abstract class AbstractRestTest {
             InteractionContext interactionContext = this.responses.poll();
 
             if (interactionContext == null) {
-                throw new IllegalStateException(String.format("Unexpected request for %s %s received", request.getMethod(), request.getPath()));
+                throw new IllegalStateException(
+                        String.format(
+                                "Unexpected request for %s %s received",
+                                request.getMethod(), request.getPath()));
             }
 
             interactionContext.setDone(true);
@@ -125,11 +138,11 @@ public abstract class AbstractRestTest {
                 TestRequest request = interactionContext.getRequest();
 
                 assertThat(interactionContext.isDone())
-                    .as("Expected request to %s %s not received", request.getMethod(), request.getPath())
-                    .isTrue();
+                        .as(
+                                "Expected request to %s %s not received",
+                                request.getMethod(), request.getPath())
+                        .isTrue();
             }
         }
-
     }
-
 }

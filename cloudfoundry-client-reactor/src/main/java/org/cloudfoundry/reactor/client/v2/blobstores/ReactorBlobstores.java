@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v2.blobstores;
 
+import java.util.Map;
 import org.cloudfoundry.client.v2.blobstores.Blobstores;
 import org.cloudfoundry.client.v2.blobstores.DeleteBlobstoreBuildpackCachesRequest;
 import org.cloudfoundry.client.v2.blobstores.DeleteBlobstoreBuildpackCachesResponse;
@@ -23,8 +24,6 @@ import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v2.AbstractClientV2Operations;
 import reactor.core.publisher.Mono;
-
-import java.util.Map;
 
 /**
  * The Reactor-based implementation of {@link Blobstores}
@@ -39,14 +38,21 @@ public final class ReactorBlobstores extends AbstractClientV2Operations implemen
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorBlobstores(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
+    public ReactorBlobstores(
+            ConnectionContext connectionContext,
+            Mono<String> root,
+            TokenProvider tokenProvider,
+            Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
-    public Mono<DeleteBlobstoreBuildpackCachesResponse> deleteBuildpackCaches(DeleteBlobstoreBuildpackCachesRequest request) {
-        return delete(request, DeleteBlobstoreBuildpackCachesResponse.class, builder -> builder.pathSegment("blobstores", "buildpack_cache"))
-            .checkpoint();
+    public Mono<DeleteBlobstoreBuildpackCachesResponse> deleteBuildpackCaches(
+            DeleteBlobstoreBuildpackCachesRequest request) {
+        return delete(
+                        request,
+                        DeleteBlobstoreBuildpackCachesResponse.class,
+                        builder -> builder.pathSegment("blobstores", "buildpack_cache"))
+                .checkpoint();
     }
-
 }

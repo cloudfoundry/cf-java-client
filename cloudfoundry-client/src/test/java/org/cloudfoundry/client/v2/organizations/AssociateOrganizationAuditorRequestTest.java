@@ -23,23 +23,20 @@ public final class AssociateOrganizationAuditorRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noAuditorId() {
         AssociateOrganizationAuditorRequest.builder()
-            .organizationId("test-organization-id")
-            .build();
+                .organizationId("test-organization-id")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noOrganizationId() {
-        AssociateOrganizationAuditorRequest.builder()
-            .auditorId("test-auditor-id")
-            .build();
+        AssociateOrganizationAuditorRequest.builder().auditorId("test-auditor-id").build();
     }
 
     @Test
     public void valid() {
         AssociateOrganizationAuditorRequest.builder()
-            .auditorId("test-auditor-id")
-            .organizationId("test-organization-id")
-            .build();
+                .auditorId("test-auditor-id")
+                .organizationId("test-organization-id")
+                .build();
     }
-
 }

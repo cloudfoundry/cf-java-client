@@ -51,5 +51,4 @@ public abstract class AbstractFeatureFlag {
     @JsonProperty("url")
     @Nullable
     abstract String getUrl();
-
 }

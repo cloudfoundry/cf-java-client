@@ -18,13 +18,10 @@ package org.cloudfoundry.client.v2.servicebrokers;
 
 import org.junit.Test;
 
-
 public final class ListServiceBrokersRequestTest {
 
     @Test
     public void valid() {
-        ListServiceBrokersRequest.builder()
-            .build();
+        ListServiceBrokersRequest.builder().build();
     }
-
 }

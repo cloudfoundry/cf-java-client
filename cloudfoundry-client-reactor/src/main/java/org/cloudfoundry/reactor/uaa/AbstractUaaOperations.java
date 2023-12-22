@@ -17,6 +17,10 @@
 package org.cloudfoundry.reactor.uaa;
 
 import io.netty.handler.codec.http.HttpHeaders;
+import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Stream;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.QueryBuilder;
@@ -29,14 +33,13 @@ import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClientResponse;
 
-import java.util.Map;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.stream.Stream;
-
 public abstract class AbstractUaaOperations extends AbstractReactorOperations {
 
-    protected AbstractUaaOperations(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
+    protected AbstractUaaOperations(
+            ConnectionContext connectionContext,
+            Mono<String> root,
+            TokenProvider tokenProvider,
+            Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
@@ -45,114 +48,223 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
         return super.createOperator().map(this::attachErrorPayloadMapper);
     }
 
-    protected final <T> Mono<T> delete(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+    protected final <T> Mono<T> delete(
+            Object requestPayload,
+            Class<T> responseType,
+            Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return createOperator()
-            .flatMap(operator -> operator.headers(headers -> addHeaders(headers, requestPayload))
-                .delete()
-                .uri(queryTransformer(requestPayload).andThen(uriTransformer))
-                .send(requestPayload)
-                .response()
-                .parseBody(responseType));
+                .flatMap(
+                        operator ->
+                                operator.headers(headers -> addHeaders(headers, requestPayload))
+                                        .delete()
+                                        .uri(
+                                                queryTransformer(requestPayload)
+                                                        .andThen(uriTransformer))
+                                        .send(requestPayload)
+                                        .response()
+                                        .parseBody(responseType));
     }
 
-    protected final Mono<HttpClientResponse> get(Object requestPayload, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+    protected final Mono<HttpClientResponse> get(
+            Object requestPayload,
+            Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return createOperator()
-            .flatMap(operator -> operator.headers(headers -> addHeaders(headers, requestPayload))
-                .get()
-                .uri(queryTransformer(requestPayload).andThen(uriTransformer))
-                .response()
-                .get());
+                .flatMap(
+                        operator ->
+                                operator.headers(headers -> addHeaders(headers, requestPayload))
+                                        .get()
+                                        .uri(
+                                                queryTransformer(requestPayload)
+                                                        .andThen(uriTransformer))
+                                        .response()
+                                        .get());
     }
 
-    protected final Mono<HttpClientResponse> get(Object requestPayload, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer, Consumer<HttpHeaders> headersTransformer) {
+    protected final Mono<HttpClientResponse> get(
+            Object requestPayload,
+            Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
+            Consumer<HttpHeaders> headersTransformer) {
         return createOperator()
-            .flatMap(operator -> operator.headers(headers -> addHeaders(headers, requestPayload, headersTransformer))
-                .get()
-                .uri(queryTransformer(requestPayload).andThen(uriTransformer))
-                .response()
-                .get());
+                .flatMap(
+                        operator ->
+                                operator.headers(
+                                                headers ->
+                                                        addHeaders(
+                                                                headers,
+                                                                requestPayload,
+                                                                headersTransformer))
+                                        .get()
+                                        .uri(
+                                                queryTransformer(requestPayload)
+                                                        .andThen(uriTransformer))
+                                        .response()
+                                        .get());
     }
 
-    protected final Mono<HttpClientResponse> get(Object requestPayload, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer, Consumer<HttpHeaders> headersTransformer,
-                                                 Function<HttpHeaders, Mono<? extends HttpHeaders>> headersWhenTransformer) {
+    protected final Mono<HttpClientResponse> get(
+            Object requestPayload,
+            Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
+            Consumer<HttpHeaders> headersTransformer,
+            Function<HttpHeaders, Mono<? extends HttpHeaders>> headersWhenTransformer) {
         return createOperator()
-            .flatMap(operator -> operator.headers(headers -> addHeaders(headers, requestPayload, headersTransformer)).headersWhen(headersWhenTransformer)
-                .get()
-                .uri(queryTransformer(requestPayload).andThen(uriTransformer))
-                .response()
-                .get());
+                .flatMap(
+                        operator ->
+                                operator.headers(
+                                                headers ->
+                                                        addHeaders(
+                                                                headers,
+                                                                requestPayload,
+                                                                headersTransformer))
+                                        .headersWhen(headersWhenTransformer)
+                                        .get()
+                                        .uri(
+                                                queryTransformer(requestPayload)
+                                                        .andThen(uriTransformer))
+                                        .response()
+                                        .get());
     }
 
-    protected final <T> Mono<T> get(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+    protected final <T> Mono<T> get(
+            Object requestPayload,
+            Class<T> responseType,
+            Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return createOperator()
-            .flatMap(operator -> operator.headers(headers -> addHeaders(headers, requestPayload))
-                .get()
-                .uri(queryTransformer(requestPayload).andThen(uriTransformer))
-                .response()
-                .parseBody(responseType));
+                .flatMap(
+                        operator ->
+                                operator.headers(headers -> addHeaders(headers, requestPayload))
+                                        .get()
+                                        .uri(
+                                                queryTransformer(requestPayload)
+                                                        .andThen(uriTransformer))
+                                        .response()
+                                        .parseBody(responseType));
     }
 
-    protected final <T> Mono<T> get(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer, Consumer<HttpHeaders> headersTransformer) {
+    protected final <T> Mono<T> get(
+            Object requestPayload,
+            Class<T> responseType,
+            Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
+            Consumer<HttpHeaders> headersTransformer) {
         return createOperator()
-            .flatMap(operator -> operator.headers(headers -> addHeaders(headers, requestPayload, headersTransformer))
-                .get()
-                .uri(queryTransformer(requestPayload).andThen(uriTransformer))
-                .response()
-                .parseBody(responseType));
+                .flatMap(
+                        operator ->
+                                operator.headers(
+                                                headers ->
+                                                        addHeaders(
+                                                                headers,
+                                                                requestPayload,
+                                                                headersTransformer))
+                                        .get()
+                                        .uri(
+                                                queryTransformer(requestPayload)
+                                                        .andThen(uriTransformer))
+                                        .response()
+                                        .parseBody(responseType));
     }
 
-    protected final <T> Mono<T> patch(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+    protected final <T> Mono<T> patch(
+            Object requestPayload,
+            Class<T> responseType,
+            Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return createOperator()
-            .flatMap(operator -> operator.headers(headers -> addHeaders(headers, requestPayload))
-                .patch()
-                .uri(queryTransformer(requestPayload).andThen(uriTransformer))
-                .send(requestPayload)
-                .response()
-                .parseBody(responseType));
+                .flatMap(
+                        operator ->
+                                operator.headers(headers -> addHeaders(headers, requestPayload))
+                                        .patch()
+                                        .uri(
+                                                queryTransformer(requestPayload)
+                                                        .andThen(uriTransformer))
+                                        .send(requestPayload)
+                                        .response()
+                                        .parseBody(responseType));
     }
 
-    protected final <T> Mono<T> post(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer, Consumer<HttpHeaders> headersTransformer) {
+    protected final <T> Mono<T> post(
+            Object requestPayload,
+            Class<T> responseType,
+            Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
+            Consumer<HttpHeaders> headersTransformer) {
         return createOperator()
-            .flatMap(operator -> operator.headers(headers -> addHeaders(headers, requestPayload, headersTransformer))
-                .post()
-                .uri(queryTransformer(requestPayload).andThen(uriTransformer))
-                .send(requestPayload)
-                .response()
-                .parseBody(responseType));
+                .flatMap(
+                        operator ->
+                                operator.headers(
+                                                headers ->
+                                                        addHeaders(
+                                                                headers,
+                                                                requestPayload,
+                                                                headersTransformer))
+                                        .post()
+                                        .uri(
+                                                queryTransformer(requestPayload)
+                                                        .andThen(uriTransformer))
+                                        .send(requestPayload)
+                                        .response()
+                                        .parseBody(responseType));
     }
 
-    protected final <T> Mono<T> post(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer, Consumer<HttpHeaders> headersTransformer,
-                                     Function<HttpHeaders, Mono<? extends HttpHeaders>> headersWhenTransformer) {
+    protected final <T> Mono<T> post(
+            Object requestPayload,
+            Class<T> responseType,
+            Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer,
+            Consumer<HttpHeaders> headersTransformer,
+            Function<HttpHeaders, Mono<? extends HttpHeaders>> headersWhenTransformer) {
         return createOperator()
-            .flatMap(operator -> operator.headers(headers -> addHeaders(headers, requestPayload, headersTransformer)).headersWhen(headersWhenTransformer)
-                .post()
-                .uri(queryTransformer(requestPayload).andThen(uriTransformer))
-                .send(requestPayload)
-                .response()
-                .parseBody(responseType));
+                .flatMap(
+                        operator ->
+                                operator.headers(
+                                                headers ->
+                                                        addHeaders(
+                                                                headers,
+                                                                requestPayload,
+                                                                headersTransformer))
+                                        .headersWhen(headersWhenTransformer)
+                                        .post()
+                                        .uri(
+                                                queryTransformer(requestPayload)
+                                                        .andThen(uriTransformer))
+                                        .send(requestPayload)
+                                        .response()
+                                        .parseBody(responseType));
     }
 
-    protected final <T> Mono<T> post(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+    protected final <T> Mono<T> post(
+            Object requestPayload,
+            Class<T> responseType,
+            Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return createOperator()
-            .flatMap(operator -> operator.headers(headers -> addHeaders(headers, requestPayload))
-                .post()
-                .uri(queryTransformer(requestPayload).andThen(uriTransformer))
-                .send(requestPayload)
-                .response()
-                .parseBody(responseType));
+                .flatMap(
+                        operator ->
+                                operator.headers(headers -> addHeaders(headers, requestPayload))
+                                        .post()
+                                        .uri(
+                                                queryTransformer(requestPayload)
+                                                        .andThen(uriTransformer))
+                                        .send(requestPayload)
+                                        .response()
+                                        .parseBody(responseType));
     }
 
-    protected final <T> Mono<T> put(Object requestPayload, Class<T> responseType, Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
+    protected final <T> Mono<T> put(
+            Object requestPayload,
+            Class<T> responseType,
+            Function<UriComponentsBuilder, UriComponentsBuilder> uriTransformer) {
         return createOperator()
-            .flatMap(operator -> operator.headers(headers -> addHeaders(headers, requestPayload))
-                .put()
-                .uri(queryTransformer(requestPayload).andThen(uriTransformer))
-                .send(requestPayload)
-                .response()
-                .parseBody(responseType));
+                .flatMap(
+                        operator ->
+                                operator.headers(headers -> addHeaders(headers, requestPayload))
+                                        .put()
+                                        .uri(
+                                                queryTransformer(requestPayload)
+                                                        .andThen(uriTransformer))
+                                        .send(requestPayload)
+                                        .response()
+                                        .parseBody(responseType));
     }
 
-    private static void addHeaders(HttpHeaders httpHeaders, Object requestPayload, Consumer<HttpHeaders> headersTransformer) {
+    private static void addHeaders(
+            HttpHeaders httpHeaders,
+            Object requestPayload,
+            Consumer<HttpHeaders> headersTransformer) {
         addHeaders(httpHeaders, requestPayload);
         headersTransformer.accept(httpHeaders);
     }
@@ -163,15 +275,16 @@ public abstract class AbstractUaaOperations extends AbstractReactorOperations {
     }
 
     private Operator attachErrorPayloadMapper(Operator operator) {
-        return operator.withErrorPayloadMapper(ErrorPayloadMappers.uaa(this.connectionContext.getObjectMapper()));
+        return operator.withErrorPayloadMapper(
+                ErrorPayloadMappers.uaa(this.connectionContext.getObjectMapper()));
     }
 
-    private Function<UriComponentsBuilder, UriComponentsBuilder> queryTransformer(Object requestPayload) {
+    private Function<UriComponentsBuilder, UriComponentsBuilder> queryTransformer(
+            Object requestPayload) {
         return builder -> {
             Stream<UriQueryParameter> parameters = new QueryBuilder().build(requestPayload);
             UriQueryParameters.set(builder, parameters);
             return builder;
         };
     }
-
 }

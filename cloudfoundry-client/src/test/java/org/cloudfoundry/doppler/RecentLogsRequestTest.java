@@ -22,15 +22,11 @@ public final class RecentLogsRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noApplicationId() {
-        RecentLogsRequest.builder()
-            .build();
+        RecentLogsRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        RecentLogsRequest.builder()
-            .applicationId("test-application-id")
-            .build();
+        RecentLogsRequest.builder().applicationId("test-application-id").build();
     }
-
 }

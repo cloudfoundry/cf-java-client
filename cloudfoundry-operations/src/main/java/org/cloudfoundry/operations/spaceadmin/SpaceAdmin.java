@@ -38,5 +38,4 @@ public interface SpaceAdmin {
      * @return the space quotas
      */
     Flux<SpaceQuota> listQuotas();
-
 }

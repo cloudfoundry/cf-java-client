@@ -56,5 +56,4 @@ public abstract class PaginatedRequest {
             throw new IllegalStateException("perPage much be between 1 and 5000 inclusive");
         }
     }
-
 }

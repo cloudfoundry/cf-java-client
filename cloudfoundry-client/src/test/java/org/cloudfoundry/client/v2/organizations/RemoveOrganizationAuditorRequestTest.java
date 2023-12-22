@@ -22,24 +22,19 @@ public final class RemoveOrganizationAuditorRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noAuditorId() {
-        RemoveOrganizationAuditorRequest.builder()
-            .organizationId("test-organization-id")
-            .build();
+        RemoveOrganizationAuditorRequest.builder().organizationId("test-organization-id").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noOrganizationId() {
-        RemoveOrganizationAuditorRequest.builder()
-            .auditorId("test-auditor-id")
-            .build();
+        RemoveOrganizationAuditorRequest.builder().auditorId("test-auditor-id").build();
     }
 
     @Test
     public void valid() {
         RemoveOrganizationAuditorRequest.builder()
-            .auditorId("test-auditor-id")
-            .organizationId("test-organization-id")
-            .build();
+                .auditorId("test-auditor-id")
+                .organizationId("test-organization-id")
+                .build();
     }
-
 }

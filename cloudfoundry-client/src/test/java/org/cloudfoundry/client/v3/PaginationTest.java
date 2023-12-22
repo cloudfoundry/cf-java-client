@@ -22,8 +22,6 @@ public final class PaginationTest {
 
     @Test
     public void valid() {
-        Pagination.builder()
-            .build();
+        Pagination.builder().build();
     }
-
 }

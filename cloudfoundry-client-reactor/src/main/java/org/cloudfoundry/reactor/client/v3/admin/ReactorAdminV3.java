@@ -16,14 +16,13 @@
 
 package org.cloudfoundry.reactor.client.v3.admin;
 
+import java.util.Map;
 import org.cloudfoundry.client.v3.admin.AdminV3;
 import org.cloudfoundry.client.v3.admin.ClearBuildpackCacheRequest;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
 import reactor.core.publisher.Mono;
-
-import java.util.Map;
 
 /**
  * The Reactor-based implementation of {@link AdminV3}
@@ -38,14 +37,19 @@ public final class ReactorAdminV3 extends AbstractClientV3Operations implements 
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorAdminV3(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
+    public ReactorAdminV3(
+            ConnectionContext connectionContext,
+            Mono<String> root,
+            TokenProvider tokenProvider,
+            Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<String> clearBuildpackCache(ClearBuildpackCacheRequest request) {
-        return post(request, builder -> builder.pathSegment("admin", "actions", "clear_buildpack_cache"))
-            .checkpoint();
+        return post(
+                        request,
+                        builder -> builder.pathSegment("admin", "actions", "clear_buildpack_cache"))
+                .checkpoint();
     }
-
 }

@@ -54,5 +54,4 @@ public interface ServiceOfferingsV3 {
      * @return the response from the Update a Service Offering request
      */
     Mono<UpdateServiceOfferingResponse> update(UpdateServiceOfferingRequest request);
-
 }

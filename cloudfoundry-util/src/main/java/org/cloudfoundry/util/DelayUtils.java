@@ -16,6 +16,10 @@
 
 package org.cloudfoundry.util;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import org.atteo.evo.inflector.English;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscription;
@@ -24,11 +28,6 @@ import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.util.function.Consumer;
-import java.util.function.Function;
-
 /**
  * Utilities for delaying progress
  */
@@ -36,8 +35,7 @@ public final class DelayUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger("cloudfoundry-client.delay");
 
-    private DelayUtils() {
-    }
+    private DelayUtils() {}
 
     /**
      * Implements an exponential backoff delay for use with {@link Mono#repeatWhenEmpty(Function)}
@@ -47,7 +45,8 @@ public final class DelayUtils {
      * @param timeout the maximum amount of time to delay for
      * @return a delayed {@link Publisher}
      */
-    public static Function<Flux<Long>, Publisher<?>> exponentialBackOff(Duration minimum, Duration maximum, Duration timeout) {
+    public static Function<Flux<Long>, Publisher<?>> exponentialBackOff(
+            Duration minimum, Duration maximum, Duration timeout) {
         Instant finish = Instant.now().plus(timeout);
         return iterations -> getDelay(minimum, maximum, finish, iterations);
     }
@@ -59,10 +58,9 @@ public final class DelayUtils {
      * @return a delayed {@link Publisher}
      */
     public static Function<Flux<Long>, Publisher<?>> fixed(Duration duration) {
-        return iterations -> iterations
-            .flatMap(iteration -> Mono
-                .delay(duration)
-                .doOnSubscribe(logDelay(duration)), 1);
+        return iterations ->
+                iterations.flatMap(
+                        iteration -> Mono.delay(duration).doOnSubscribe(logDelay(duration)), 1);
     }
 
     /**
@@ -71,10 +69,9 @@ public final class DelayUtils {
      * @return an instant (no delay) {@link Publisher}
      */
     public static Function<Flux<Long>, Publisher<?>> instant() {
-        return iterations -> iterations
-            .flatMap(iteration -> Mono
-                .just(0L)
-                .doOnSubscribe(logDelay(Duration.ZERO)), 1);
+        return iterations ->
+                iterations.flatMap(
+                        iteration -> Mono.just(0L).doOnSubscribe(logDelay(Duration.ZERO)), 1);
     }
 
     private static Duration calculateDuration(Duration minimum, Duration maximum, Long iteration) {
@@ -82,18 +79,18 @@ public final class DelayUtils {
         return min(candidate, maximum);
     }
 
-    private static Flux<?> getDelay(Duration minimum, Duration maximum, Instant finish, Flux<Long> iterations) {
+    private static Flux<?> getDelay(
+            Duration minimum, Duration maximum, Instant finish, Flux<Long> iterations) {
         return iterations
-            .map(iteration -> calculateDuration(minimum, maximum, iteration))
-            .concatMap(delay -> {
-                if (Instant.now().isAfter(finish)) {
-                    return Mono.error(new DelayTimeoutException());
-                }
+                .map(iteration -> calculateDuration(minimum, maximum, iteration))
+                .concatMap(
+                        delay -> {
+                            if (Instant.now().isAfter(finish)) {
+                                return Mono.error(new DelayTimeoutException());
+                            }
 
-                return Mono
-                    .delay(delay)
-                    .doOnSubscribe(logDelay(delay));
-            });
+                            return Mono.delay(delay).doOnSubscribe(logDelay(delay));
+                        });
     }
 
     private static Consumer<Subscription> logDelay(Duration delay) {
@@ -105,12 +102,12 @@ public final class DelayUtils {
             }
 
             int milliseconds = (int) delay.toMillis();
-            LOGGER.debug("Delaying {} {}", milliseconds, English.plural("millisecond", milliseconds));
+            LOGGER.debug(
+                    "Delaying {} {}", milliseconds, English.plural("millisecond", milliseconds));
         };
     }
 
     private static Duration min(Duration a, Duration b) {
         return (a.compareTo(b) <= 0) ? a : b;
     }
-
 }

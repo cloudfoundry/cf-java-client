@@ -29,7 +29,8 @@ public interface ServerInformation {
      * @param request the Get Auto Login Authentication Code request
      * @return the response from the Get Auto Login Authentication Code request
      */
-    Mono<GetAutoLoginAuthenticationCodeResponse> getAuthenticationCode(GetAutoLoginAuthenticationCodeRequest request);
+    Mono<GetAutoLoginAuthenticationCodeResponse> getAuthenticationCode(
+            GetAutoLoginAuthenticationCodeRequest request);
 
     /**
      * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/version/4.10.0/index.html#server-information-2">Server Information</a> request
@@ -46,5 +47,4 @@ public interface ServerInformation {
      * @return the response from the Perform Auto Login request
      */
     Mono<Void> autoLogin(AutoLoginRequest request);
-
 }

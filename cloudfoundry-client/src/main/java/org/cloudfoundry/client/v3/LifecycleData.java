@@ -19,6 +19,4 @@ package org.cloudfoundry.client.v3;
 /**
  * Marker interface for Lifecycle Data
  */
-public interface LifecycleData {
-
-}
+public interface LifecycleData {}

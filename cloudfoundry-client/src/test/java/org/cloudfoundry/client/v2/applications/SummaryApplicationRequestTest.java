@@ -22,15 +22,11 @@ public final class SummaryApplicationRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noApplicationId() {
-        SummaryApplicationRequest.builder()
-            .build();
+        SummaryApplicationRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        SummaryApplicationRequest.builder()
-            .applicationId("test-application-id")
-            .build();
+        SummaryApplicationRequest.builder().applicationId("test-application-id").build();
     }
-
 }

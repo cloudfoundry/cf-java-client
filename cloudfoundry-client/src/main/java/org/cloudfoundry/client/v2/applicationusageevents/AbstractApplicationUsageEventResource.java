@@ -21,6 +21,6 @@ import org.cloudfoundry.client.v2.Resource;
 /**
  * A base class for Application Usage Event resources
  */
-public abstract class AbstractApplicationUsageEventResource extends Resource<org.cloudfoundry.client.v2.applicationusageevents.ApplicationUsageEventEntity> {
-
-}
+public abstract class AbstractApplicationUsageEventResource
+        extends Resource<
+                org.cloudfoundry.client.v2.applicationusageevents.ApplicationUsageEventEntity> {}

@@ -22,8 +22,6 @@ public class ListPoliciesRequestTest {
 
     @Test
     public void valid() {
-        ListPoliciesRequest.builder()
-            .build();
+        ListPoliciesRequest.builder().build();
     }
-
 }

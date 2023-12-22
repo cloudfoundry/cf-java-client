@@ -38,5 +38,4 @@ public interface Events {
      * @return the response from the List Events request
      */
     Mono<ListEventsResponse> list(ListEventsRequest request);
-
 }

@@ -25,34 +25,34 @@ public final class CreateDeploymentRequestTest {
     @Test
     public void noDropletValid() {
         CreateDeploymentRequest.builder()
-            .relationships(DeploymentRelationships.builder()
-                .app(ToOneRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("app-id")
-                        .build())
-                    .build())
-                .build())
-            .build();
+                .relationships(
+                        DeploymentRelationships.builder()
+                                .app(
+                                        ToOneRelationship.builder()
+                                                .data(Relationship.builder().id("app-id").build())
+                                                .build())
+                                .build())
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noRelationships() {
         CreateDeploymentRequest.builder()
-            .droplet(Relationship.builder().id("droplet-id").build())
-            .build();
+                .droplet(Relationship.builder().id("droplet-id").build())
+                .build();
     }
 
     @Test
     public void valid() {
         CreateDeploymentRequest.builder()
-            .droplet(Relationship.builder().id("droplet-id").build())
-            .relationships(DeploymentRelationships.builder()
-                .app(ToOneRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("app-id")
-                        .build())
-                    .build())
-                .build())
-            .build();
+                .droplet(Relationship.builder().id("droplet-id").build())
+                .relationships(
+                        DeploymentRelationships.builder()
+                                .app(
+                                        ToOneRelationship.builder()
+                                                .data(Relationship.builder().id("app-id").build())
+                                                .build())
+                                .build())
+                .build();
     }
 }

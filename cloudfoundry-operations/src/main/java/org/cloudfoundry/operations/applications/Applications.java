@@ -249,5 +249,4 @@ public interface Applications {
      * @return a completion indicator
      */
     Mono<Void> unsetEnvironmentVariable(UnsetEnvironmentVariableApplicationRequest request);
-
 }

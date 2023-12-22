@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v3.domains;
 
+import java.util.Map;
 import org.cloudfoundry.client.v3.domains.CheckReservedRoutesRequest;
 import org.cloudfoundry.client.v3.domains.CheckReservedRoutesResponse;
 import org.cloudfoundry.client.v3.domains.CreateDomainRequest;
@@ -36,8 +37,6 @@ import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
 import reactor.core.publisher.Mono;
 
-import java.util.Map;
-
 /**
  * The Reactor-based implementation of {@link DomainsV3}
  */
@@ -51,55 +50,88 @@ public final class ReactorDomainsV3 extends AbstractClientV3Operations implement
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorDomainsV3(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
+    public ReactorDomainsV3(
+            ConnectionContext connectionContext,
+            Mono<String> root,
+            TokenProvider tokenProvider,
+            Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
-    public Mono<CheckReservedRoutesResponse> checkReservedRoutes(CheckReservedRoutesRequest request) {
-        return get(request, CheckReservedRoutesResponse.class, builder -> builder.pathSegment("domains", request.getDomainId(), "route_reservations"))
-            .checkpoint();
+    public Mono<CheckReservedRoutesResponse> checkReservedRoutes(
+            CheckReservedRoutesRequest request) {
+        return get(
+                        request,
+                        CheckReservedRoutesResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "domains", request.getDomainId(), "route_reservations"))
+                .checkpoint();
     }
 
     @Override
     public Mono<CreateDomainResponse> create(CreateDomainRequest request) {
         return post(request, CreateDomainResponse.class, builder -> builder.pathSegment("domains"))
-            .checkpoint();
+                .checkpoint();
     }
 
     @Override
     public Mono<String> delete(DeleteDomainRequest request) {
         return delete(request, builder -> builder.pathSegment("domains", request.getDomainId()))
-            .checkpoint();
+                .checkpoint();
     }
 
     @Override
     public Mono<GetDomainResponse> get(GetDomainRequest request) {
-        return get(request, GetDomainResponse.class, builder -> builder.pathSegment("domains", request.getDomainId()))
-            .checkpoint();
+        return get(
+                        request,
+                        GetDomainResponse.class,
+                        builder -> builder.pathSegment("domains", request.getDomainId()))
+                .checkpoint();
     }
 
     @Override
     public Mono<ListDomainsResponse> list(ListDomainsRequest request) {
         return get(request, ListDomainsResponse.class, builder -> builder.pathSegment("domains"))
-            .checkpoint();
+                .checkpoint();
     }
 
     @Override
     public Mono<ShareDomainResponse> share(ShareDomainRequest request) {
-        return post(request, ShareDomainResponse.class, builder -> builder.pathSegment("domains", request.getDomainId(), "relationships", "shared_organizations"))
-            .checkpoint();
+        return post(
+                        request,
+                        ShareDomainResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "domains",
+                                        request.getDomainId(),
+                                        "relationships",
+                                        "shared_organizations"))
+                .checkpoint();
     }
 
     @Override
     public Mono<Void> unshare(UnshareDomainRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("domains", request.getDomainId(), "relationships", "shared_organizations", request.getOrganizationId()))
-            .checkpoint();
+        return delete(
+                        request,
+                        Void.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "domains",
+                                        request.getDomainId(),
+                                        "relationships",
+                                        "shared_organizations",
+                                        request.getOrganizationId()))
+                .checkpoint();
     }
 
     @Override
     public Mono<UpdateDomainResponse> update(UpdateDomainRequest request) {
-        return patch(request, UpdateDomainResponse.class, builder -> builder.pathSegment("domains", request.getDomainId()))
-            .checkpoint();
+        return patch(
+                        request,
+                        UpdateDomainResponse.class,
+                        builder -> builder.pathSegment("domains", request.getDomainId()))
+                .checkpoint();
     }
 }

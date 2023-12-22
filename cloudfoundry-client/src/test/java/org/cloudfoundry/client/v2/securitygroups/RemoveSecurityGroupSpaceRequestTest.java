@@ -22,24 +22,19 @@ public final class RemoveSecurityGroupSpaceRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noSecurityGroupId() {
-        RemoveSecurityGroupSpaceRequest.builder()
-            .spaceId("test-space-id")
-            .build();
+        RemoveSecurityGroupSpaceRequest.builder().spaceId("test-space-id").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noSpaceId() {
-        RemoveSecurityGroupSpaceRequest.builder()
-            .securityGroupId("test-security-group-id")
-            .build();
+        RemoveSecurityGroupSpaceRequest.builder().securityGroupId("test-security-group-id").build();
     }
 
     @Test
     public void valid() {
         RemoveSecurityGroupSpaceRequest.builder()
-            .securityGroupId("test-security-group-id")
-            .spaceId("test-space-id")
-            .build();
+                .securityGroupId("test-security-group-id")
+                .spaceId("test-space-id")
+                .build();
     }
-
 }

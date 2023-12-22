@@ -23,34 +23,33 @@ public final class UpdateServicePlanVisibilityRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noOrganizationId() {
         UpdateServicePlanVisibilityRequest.builder()
-            .servicePlanId("service-plan-id")
-            .servicePlanVisibilityId("test-service-plan-visibility-id")
-            .build();
+                .servicePlanId("service-plan-id")
+                .servicePlanVisibilityId("test-service-plan-visibility-id")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noServicePlanId() {
         UpdateServicePlanVisibilityRequest.builder()
-            .organizationId("organization-id")
-            .servicePlanVisibilityId("test-service-plan-visibility-id")
-            .build();
+                .organizationId("organization-id")
+                .servicePlanVisibilityId("test-service-plan-visibility-id")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noServicePlanVisibilityId() {
         UpdateServicePlanVisibilityRequest.builder()
-            .organizationId("organization-id")
-            .servicePlanId("service-plan-id")
-            .build();
+                .organizationId("organization-id")
+                .servicePlanId("service-plan-id")
+                .build();
     }
 
     @Test
     public void valid() {
         UpdateServicePlanVisibilityRequest.builder()
-            .organizationId("organization-id")
-            .servicePlanId("service-plan-id")
-            .servicePlanVisibilityId("test-service-plan-visibility-id")
-            .build();
+                .organizationId("organization-id")
+                .servicePlanId("service-plan-id")
+                .servicePlanVisibilityId("test-service-plan-visibility-id")
+                .build();
     }
-
 }

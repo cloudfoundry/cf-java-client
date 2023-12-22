@@ -22,15 +22,11 @@ public class GetStackRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noStackId() {
-        GetStackRequest.builder()
-            .build();
+        GetStackRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        GetStackRequest.builder()
-            .stackId("test-stack-id")
-            .build();
+        GetStackRequest.builder().stackId("test-stack-id").build();
     }
-
 }

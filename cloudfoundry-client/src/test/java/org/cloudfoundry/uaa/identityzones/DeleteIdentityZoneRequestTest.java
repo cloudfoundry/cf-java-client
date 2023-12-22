@@ -22,15 +22,11 @@ public final class DeleteIdentityZoneRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noId() {
-        DeleteIdentityZoneRequest.builder()
-            .build();
+        DeleteIdentityZoneRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        DeleteIdentityZoneRequest.builder()
-            .identityZoneId("test-identity-zone-id")
-            .build();
+        DeleteIdentityZoneRequest.builder().identityZoneId("test-identity-zone-id").build();
     }
-
 }

@@ -23,7 +23,6 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * The type of Identity provider in payload
  */
 public enum Type {
-
     INTERNAL("uaa"),
 
     LDAP("ldap"),
@@ -75,5 +74,4 @@ public enum Type {
     public String toString() {
         return getValue();
     }
-
 }

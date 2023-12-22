@@ -35,5 +35,4 @@ public enum OrganizationRole {
      * User is a Manager for the organization
      */
     MANAGER
-
 }

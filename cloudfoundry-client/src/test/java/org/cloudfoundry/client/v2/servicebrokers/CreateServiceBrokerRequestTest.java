@@ -23,47 +23,46 @@ public final class CreateServiceBrokerRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noAuthenticationPassword() {
         CreateServiceBrokerRequest.builder()
-            .name("name")
-            .authenticationUsername("username")
-            .brokerUrl("http://somewhere-over-the-rainbow.org")
-            .build();
+                .name("name")
+                .authenticationUsername("username")
+                .brokerUrl("http://somewhere-over-the-rainbow.org")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noAuthenticationUsername() {
         CreateServiceBrokerRequest.builder()
-            .name("name")
-            .authenticationPassword("password")
-            .brokerUrl("http://somewhere-over-the-rainbow.org")
-            .build();
+                .name("name")
+                .authenticationPassword("password")
+                .brokerUrl("http://somewhere-over-the-rainbow.org")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noBrokerUrl() {
         CreateServiceBrokerRequest.builder()
-            .name("name")
-            .authenticationPassword("password")
-            .authenticationUsername("username")
-            .build();
+                .name("name")
+                .authenticationPassword("password")
+                .authenticationUsername("username")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noName() {
         CreateServiceBrokerRequest.builder()
-            .authenticationPassword("password")
-            .authenticationUsername("username")
-            .brokerUrl("http://somewhere-over-the-rainbow.org")
-            .build();
+                .authenticationPassword("password")
+                .authenticationUsername("username")
+                .brokerUrl("http://somewhere-over-the-rainbow.org")
+                .build();
     }
 
     @Test
     public void valid() {
         CreateServiceBrokerRequest.builder()
-            .name("name")
-            .authenticationPassword("password")
-            .authenticationUsername("username")
-            .brokerUrl("http://somewhere-over-the-rainbow.org")
-            .build();
+                .name("name")
+                .authenticationPassword("password")
+                .authenticationUsername("username")
+                .brokerUrl("http://somewhere-over-the-rainbow.org")
+                .build();
     }
-
 }

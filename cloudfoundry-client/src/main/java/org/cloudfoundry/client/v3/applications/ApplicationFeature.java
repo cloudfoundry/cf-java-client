@@ -44,5 +44,4 @@ public abstract class ApplicationFeature {
     @JsonProperty("name")
     @Nullable
     public abstract String getName();
-
 }

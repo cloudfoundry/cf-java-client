@@ -25,35 +25,32 @@ public final class CreateApplicationRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noName() {
         CreateApplicationRequest.builder()
-            .relationships(ApplicationRelationships.builder()
-                .space(ToOneRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("test-id")
-                        .build())
-                    .build())
-                .build())
-            .build();
+                .relationships(
+                        ApplicationRelationships.builder()
+                                .space(
+                                        ToOneRelationship.builder()
+                                                .data(Relationship.builder().id("test-id").build())
+                                                .build())
+                                .build())
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noRelationships() {
-        CreateApplicationRequest.builder()
-            .name("test-name")
-            .build();
+        CreateApplicationRequest.builder().name("test-name").build();
     }
 
     @Test
     public void valid() {
         CreateApplicationRequest.builder()
-            .name("test-name")
-            .relationships(ApplicationRelationships.builder()
-                .space(ToOneRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("test-id")
-                        .build())
-                    .build())
-                .build())
-            .build();
+                .name("test-name")
+                .relationships(
+                        ApplicationRelationships.builder()
+                                .space(
+                                        ToOneRelationship.builder()
+                                                .data(Relationship.builder().id("test-id").build())
+                                                .build())
+                                .build())
+                .build();
     }
-
 }

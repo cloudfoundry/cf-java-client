@@ -16,11 +16,11 @@
 
 package org.cloudfoundry.uaa;
 
-import org.junit.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.uaa.SortOrder.ASCENDING;
 import static org.cloudfoundry.uaa.SortOrder.DESCENDING;
+
+import org.junit.Test;
 
 public final class SortOrderTest {
 
@@ -29,5 +29,4 @@ public final class SortOrderTest {
         assertThat(ASCENDING.getValue()).isEqualTo("ascending");
         assertThat(DESCENDING.getValue()).isEqualTo("descending");
     }
-
 }

@@ -54,5 +54,4 @@ public interface DeploymentsV3 {
      * @return the response from the List Deployments request
      */
     Mono<ListDeploymentsResponse> list(ListDeploymentsRequest request);
-
 }

@@ -23,25 +23,22 @@ public class CreateSecurityGroupRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noName() {
         CreateSecurityGroupRequest.builder()
-            .rule(RuleEntity.builder().build())
-            .spaceId("test-space-id")
-            .build();
+                .rule(RuleEntity.builder().build())
+                .spaceId("test-space-id")
+                .build();
     }
 
     @Test
     public void validMax() {
         CreateSecurityGroupRequest.builder()
-            .name("test-security-group-name")
-            .rule(RuleEntity.builder().build())
-            .spaceId("test-space-id")
-            .build();
+                .name("test-security-group-name")
+                .rule(RuleEntity.builder().build())
+                .spaceId("test-space-id")
+                .build();
     }
 
     @Test
     public void validMin() {
-        CreateSecurityGroupRequest.builder()
-            .name("test-security-group-name")
-            .build();
+        CreateSecurityGroupRequest.builder().name("test-security-group-name").build();
     }
-
 }

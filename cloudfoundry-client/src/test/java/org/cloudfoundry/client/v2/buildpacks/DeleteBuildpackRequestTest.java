@@ -22,15 +22,11 @@ public class DeleteBuildpackRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noBuildpackId() {
-        DeleteBuildpackRequest.builder()
-            .build();
+        DeleteBuildpackRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        DeleteBuildpackRequest.builder()
-            .buildpackId("test-buildpack-id")
-            .build();
+        DeleteBuildpackRequest.builder().buildpackId("test-buildpack-id").build();
     }
-
 }

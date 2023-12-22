@@ -38,5 +38,4 @@ public interface RouterGroups {
      * @return the response to the Update Router Groups request
      */
     Mono<UpdateRouterGroupResponse> update(UpdateRouterGroupRequest request);
-
 }

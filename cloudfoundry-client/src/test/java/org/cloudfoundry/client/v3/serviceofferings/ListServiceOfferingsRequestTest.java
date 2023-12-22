@@ -22,8 +22,6 @@ public final class ListServiceOfferingsRequestTest {
 
     @Test
     public void valid() {
-        ListServiceOfferingsRequest.builder()
-            .build();
+        ListServiceOfferingsRequest.builder().build();
     }
-
 }

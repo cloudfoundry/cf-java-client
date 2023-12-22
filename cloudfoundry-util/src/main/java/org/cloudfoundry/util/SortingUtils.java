@@ -16,10 +16,7 @@
 
 package org.cloudfoundry.util;
 
-import reactor.core.Disposable;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Sinks;
-import reactor.util.function.Tuple2;
+import static reactor.core.publisher.Sinks.EmitFailureHandler.FAIL_FAST;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -29,16 +26,17 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.function.Function;
-
-import static reactor.core.publisher.Sinks.EmitFailureHandler.FAIL_FAST;
+import reactor.core.Disposable;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Sinks;
+import reactor.util.function.Tuple2;
 
 /**
  * Utilities for sorting
  */
 public final class SortingUtils {
 
-    private SortingUtils() {
-    }
+    private SortingUtils() {}
 
     /**
      * Sorts the elements of a {@link Flux} within a sliding time window.  This sorter should be used when element order may be scrambled, but that scrambling has a certain 'temporal locality' to it.
@@ -49,31 +47,39 @@ public final class SortingUtils {
      * @param <T>        The type of the elements to be sorted
      * @return a {@link Flux} providing the sorted elements
      */
-    public static <T> Function<Flux<T>, Flux<T>> timespan(Comparator<T> comparator, Duration timespan) {
+    public static <T> Function<Flux<T>, Flux<T>> timespan(
+            Comparator<T> comparator, Duration timespan) {
         return source -> {
-            Queue<Tuple2<Long, T>> accumulator = new PriorityQueue<>((o1, o2) -> comparator.compare(o1.getT2(), o2.getT2()));
+            Queue<Tuple2<Long, T>> accumulator =
+                    new PriorityQueue<>((o1, o2) -> comparator.compare(o1.getT2(), o2.getT2()));
 
             Object monitor = new Object();
 
             Sinks.Many<Object> d = Sinks.many().multicast().directBestEffort();
 
-            Disposable disposable = source
-                .timestamp()
-                .subscribe(item -> {
-                    synchronized (monitor) {
-                        accumulator.add(item);
-                    }
-                }, throwable -> d.emitError(throwable, FAIL_FAST), () -> d.emitComplete(FAIL_FAST));
+            Disposable disposable =
+                    source.timestamp()
+                            .subscribe(
+                                    item -> {
+                                        synchronized (monitor) {
+                                            accumulator.add(item);
+                                        }
+                                    },
+                                    throwable -> d.emitError(throwable, FAIL_FAST),
+                                    () -> d.emitComplete(FAIL_FAST));
 
-            return Flux
-                .interval(timespan)
-                .takeUntilOther(d.asFlux())
-                .flatMap(n -> getItems(accumulator, monitor, timespan), null, () -> getItems(accumulator, monitor, Duration.ZERO))
-                .doOnCancel(disposable::dispose);
+            return Flux.interval(timespan)
+                    .takeUntilOther(d.asFlux())
+                    .flatMap(
+                            n -> getItems(accumulator, monitor, timespan),
+                            null,
+                            () -> getItems(accumulator, monitor, Duration.ZERO))
+                    .doOnCancel(disposable::dispose);
         };
     }
 
-    private static <T> Flux<T> getItems(Queue<Tuple2<Long, T>> accumulator, Object monitor, Duration timespan) {
+    private static <T> Flux<T> getItems(
+            Queue<Tuple2<Long, T>> accumulator, Object monitor, Duration timespan) {
         List<T> items = new ArrayList<>();
 
         synchronized (monitor) {
@@ -86,7 +92,9 @@ public final class SortingUtils {
     }
 
     private static <T> boolean isBefore(Tuple2<Long, T> candidate, Duration timespan) {
-        return candidate != null && (Duration.ZERO == timespan || Instant.ofEpochMilli(candidate.getT1()).isBefore(Instant.now().minus(timespan)));
+        return candidate != null
+                && (Duration.ZERO == timespan
+                        || Instant.ofEpochMilli(candidate.getT1())
+                                .isBefore(Instant.now().minus(timespan)));
     }
-
 }

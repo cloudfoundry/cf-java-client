@@ -22,24 +22,21 @@ public class UnshareServiceInstanceRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noServiceInstanceId() {
-        UnshareServiceInstanceRequest.builder()
-            .spaceId("test-space-id")
-            .build();
+        UnshareServiceInstanceRequest.builder().spaceId("test-space-id").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noSpaceId() {
         UnshareServiceInstanceRequest.builder()
-            .serviceInstanceId("test-service-instance-id")
-            .build();
+                .serviceInstanceId("test-service-instance-id")
+                .build();
     }
 
     @Test
     public void valid() {
         UnshareServiceInstanceRequest.builder()
-            .serviceInstanceId("test-service-instance-id")
-            .spaceId("test-space-id")
-            .build();
+                .serviceInstanceId("test-service-instance-id")
+                .spaceId("test-space-id")
+                .build();
     }
-
 }

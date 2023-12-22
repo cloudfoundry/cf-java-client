@@ -23,34 +23,33 @@ public final class SetOrganizationRoleRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noOrganizationName() {
         SetOrganizationRoleRequest.builder()
-            .organizationRole(OrganizationRole.AUDITOR)
-            .username("test-username")
-            .build();
+                .organizationRole(OrganizationRole.AUDITOR)
+                .username("test-username")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noOrganizationRole() {
         SetOrganizationRoleRequest.builder()
-            .organizationName("test-organization")
-            .username("test-username")
-            .build();
+                .organizationName("test-organization")
+                .username("test-username")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noUsername() {
         SetOrganizationRoleRequest.builder()
-            .organizationName("test-organization")
-            .organizationRole(OrganizationRole.BILLING_MANAGER)
-            .build();
+                .organizationName("test-organization")
+                .organizationRole(OrganizationRole.BILLING_MANAGER)
+                .build();
     }
 
     @Test
     public void valid() {
         SetOrganizationRoleRequest.builder()
-            .organizationName("test-organization")
-            .organizationRole(OrganizationRole.MANAGER)
-            .username("test-username")
-            .build();
+                .organizationName("test-organization")
+                .organizationRole(OrganizationRole.MANAGER)
+                .username("test-username")
+                .build();
     }
-
 }

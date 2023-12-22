@@ -16,7 +16,8 @@
 
 package org.cloudfoundry.operations.applications;
 
-import reactor.core.Exceptions;
+import static java.util.Collections.emptyMap;
+import static java.util.stream.Collectors.toMap;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -32,17 +33,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static java.util.Collections.emptyMap;
-import static java.util.stream.Collectors.toMap;
-
+import reactor.core.Exceptions;
 
 /**
  * Utilities for dealing with {@link ApplicationManifest}s.  Includes the functionality to transform to and from standard CLI YAML files.
  */
 public final class ApplicationManifestUtils extends ApplicationManifestUtilsCommon {
-    private ApplicationManifestUtils() {
-    }
+    private ApplicationManifestUtils() {}
 
     /**
      * Reads a YAML manifest file (defined by the <a href="https://docs.cloudfoundry.org/devguide/deploy-apps/manifest.html">CLI</a>) from a {@link Path} and converts it into a collection of {@link
@@ -64,10 +61,9 @@ public final class ApplicationManifestUtils extends ApplicationManifestUtilsComm
      * @return the resolved manifests
      */
     public static List<ApplicationManifest> read(Path path, Path variablesPath) {
-        Map<String, String> variables = deserialize(variablesPath.toAbsolutePath())
-            .entrySet()
-            .stream()
-            .collect(toMap(Map.Entry::getKey,e -> String.valueOf(e.getValue())));
+        Map<String, String> variables =
+                deserialize(variablesPath.toAbsolutePath()).entrySet().stream()
+                        .collect(toMap(Map.Entry::getKey, e -> String.valueOf(e.getValue())));
 
         return doRead(path.toAbsolutePath(), variables);
     }
@@ -89,7 +85,8 @@ public final class ApplicationManifestUtils extends ApplicationManifestUtilsComm
      * @param applicationManifests the manifests to write
      */
     public static void write(Path path, List<ApplicationManifest> applicationManifests) {
-        try (OutputStream out = Files.newOutputStream(path, StandardOpenOption.CREATE, StandardOpenOption.WRITE)) {
+        try (OutputStream out =
+                Files.newOutputStream(path, StandardOpenOption.CREATE, StandardOpenOption.WRITE)) {
             write(out, applicationManifests);
         } catch (IOException e) {
             throw Exceptions.propagate(e);
@@ -114,24 +111,31 @@ public final class ApplicationManifestUtils extends ApplicationManifestUtilsComm
      */
     public static void write(OutputStream out, List<ApplicationManifest> applicationManifests) {
         try (Writer writer = new OutputStreamWriter(out)) {
-            YAML.dump(Collections.singletonMap("applications",
-                applicationManifests.stream()
-                    .map(ApplicationManifestUtils::toYaml)
-                    .collect(Collectors.toList())),
-                writer);
+            YAML.dump(
+                    Collections.singletonMap(
+                            "applications",
+                            applicationManifests.stream()
+                                    .map(ApplicationManifestUtils::toYaml)
+                                    .collect(Collectors.toList())),
+                    writer);
         } catch (IOException e) {
             throw Exceptions.propagate(e);
         }
     }
 
-    private static ApplicationManifest getTemplate(Path path, Map<String, Object> root, Map<String, String> variables) {
+    private static ApplicationManifest getTemplate(
+            Path path, Map<String, Object> root, Map<String, String> variables) {
         return toApplicationManifest(root, variables, ApplicationManifest.builder(), path)
-            .name("template")
-            .build();
+                .name("template")
+                .build();
     }
 
     @SuppressWarnings("unchecked")
-    private static ApplicationManifest.Builder toApplicationManifest(Map<String, Object> application, Map<String, String> variables, ApplicationManifest.Builder builder, Path root) {
+    private static ApplicationManifest.Builder toApplicationManifest(
+            Map<String, Object> application,
+            Map<String, String> variables,
+            ApplicationManifest.Builder builder,
+            Path root) {
         toApplicationManifestCommon(application, variables, builder, root);
         asListOfString(application, "services", variables, builder::service);
 
@@ -139,7 +143,8 @@ public final class ApplicationManifestUtils extends ApplicationManifestUtilsComm
     }
 
     private static Map<String, Object> toYaml(ApplicationManifest applicationManifest) {
-        Map<String, Object> yaml = ApplicationManifestUtilsCommon.toApplicationYaml(applicationManifest);
+        Map<String, Object> yaml =
+                ApplicationManifestUtilsCommon.toApplicationYaml(applicationManifest);
         putIfPresent(yaml, "services", applicationManifest.getServices());
         return yaml;
     }
@@ -151,14 +156,19 @@ public final class ApplicationManifestUtils extends ApplicationManifestUtilsComm
         ApplicationManifest template = getTemplate(path, root, variables);
 
         return Optional.ofNullable(root.get("applications"))
-            .map(value -> ((List<Map<String, Object>>) value).stream())
-            .orElseGet(Stream::empty)
-            .map(application -> {
-                String name = getName(application);
-                return toApplicationManifest(application, variables, ApplicationManifest.builder().from(template), path)
-                    .name(name)
-                    .build();
-            })
-            .collect(Collectors.toList());
+                .map(value -> ((List<Map<String, Object>>) value).stream())
+                .orElseGet(Stream::empty)
+                .map(
+                        application -> {
+                            String name = getName(application);
+                            return toApplicationManifest(
+                                            application,
+                                            variables,
+                                            ApplicationManifest.builder().from(template),
+                                            path)
+                                    .name(name)
+                                    .build();
+                        })
+                .collect(Collectors.toList());
     }
 }

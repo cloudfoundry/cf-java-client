@@ -23,79 +23,78 @@ public final class CreateSpaceQuotaDefinitionRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noMemoryLimit() {
         CreateSpaceQuotaDefinitionRequest.builder()
-            .name("test-space-quota-definition-name")
-            .nonBasicServicesAllowed(true)
-            .organizationId("test-organization-id")
-            .totalRoutes(1)
-            .totalServices(1)
-            .build();
+                .name("test-space-quota-definition-name")
+                .nonBasicServicesAllowed(true)
+                .organizationId("test-organization-id")
+                .totalRoutes(1)
+                .totalServices(1)
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noName() {
         CreateSpaceQuotaDefinitionRequest.builder()
-            .memoryLimit(100)
-            .nonBasicServicesAllowed(true)
-            .organizationId("test-organization-id")
-            .totalRoutes(1)
-            .totalServices(1)
-            .build();
+                .memoryLimit(100)
+                .nonBasicServicesAllowed(true)
+                .organizationId("test-organization-id")
+                .totalRoutes(1)
+                .totalServices(1)
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noNonBasicServicesAllowed() {
         CreateSpaceQuotaDefinitionRequest.builder()
-            .memoryLimit(100)
-            .name("test-space-quota-definition-name")
-            .organizationId("test-organization-id")
-            .totalRoutes(1)
-            .totalServices(1)
-            .build();
+                .memoryLimit(100)
+                .name("test-space-quota-definition-name")
+                .organizationId("test-organization-id")
+                .totalRoutes(1)
+                .totalServices(1)
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noOrganizationId() {
         CreateSpaceQuotaDefinitionRequest.builder()
-            .memoryLimit(100)
-            .name("test-space-quota-definition-name")
-            .nonBasicServicesAllowed(true)
-            .totalRoutes(1)
-            .totalServices(1)
-            .build();
+                .memoryLimit(100)
+                .name("test-space-quota-definition-name")
+                .nonBasicServicesAllowed(true)
+                .totalRoutes(1)
+                .totalServices(1)
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noTotalRoutes() {
         CreateSpaceQuotaDefinitionRequest.builder()
-            .memoryLimit(100)
-            .name("test-space-quota-definition-name")
-            .nonBasicServicesAllowed(true)
-            .organizationId("test-organization-id")
-            .totalServices(1)
-            .build();
+                .memoryLimit(100)
+                .name("test-space-quota-definition-name")
+                .nonBasicServicesAllowed(true)
+                .organizationId("test-organization-id")
+                .totalServices(1)
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noTotalServices() {
         CreateSpaceQuotaDefinitionRequest.builder()
-            .memoryLimit(100)
-            .name("test-space-quota-definition-name")
-            .nonBasicServicesAllowed(true)
-            .organizationId("test-organization-id")
-            .totalRoutes(1)
-            .build();
+                .memoryLimit(100)
+                .name("test-space-quota-definition-name")
+                .nonBasicServicesAllowed(true)
+                .organizationId("test-organization-id")
+                .totalRoutes(1)
+                .build();
     }
 
     @Test
     public void valid() {
         CreateSpaceQuotaDefinitionRequest.builder()
-            .memoryLimit(100)
-            .name("test-space-quota-definition-name")
-            .nonBasicServicesAllowed(true)
-            .organizationId("test-organization-id")
-            .totalRoutes(1)
-            .totalServices(1)
-            .build();
+                .memoryLimit(100)
+                .name("test-space-quota-definition-name")
+                .nonBasicServicesAllowed(true)
+                .organizationId("test-organization-id")
+                .totalRoutes(1)
+                .totalServices(1)
+                .build();
     }
-
 }

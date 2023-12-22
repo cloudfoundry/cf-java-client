@@ -22,24 +22,16 @@ public final class ExpirePasswordRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noPasswordChangeRequired() {
-        ExpirePasswordRequest.builder()
-            .userId("test-user-id")
-            .build();
+        ExpirePasswordRequest.builder().userId("test-user-id").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noUserId() {
-        ExpirePasswordRequest.builder()
-            .passwordChangeRequired(true)
-            .build();
+        ExpirePasswordRequest.builder().passwordChangeRequired(true).build();
     }
 
     @Test
     public void valid() {
-        ExpirePasswordRequest.builder()
-            .passwordChangeRequired(true)
-            .userId("test-user-id")
-            .build();
+        ExpirePasswordRequest.builder().passwordChangeRequired(true).userId("test-user-id").build();
     }
-
 }

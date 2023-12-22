@@ -35,5 +35,4 @@ public enum SpaceRole {
      * User is a Manager for the space
      */
     MANAGER
-
 }

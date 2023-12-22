@@ -22,8 +22,6 @@ public final class ListServiceInstancesRequestTest {
 
     @Test
     public void valid() {
-        ListServiceInstancesRequest.builder()
-            .build();
+        ListServiceInstancesRequest.builder().build();
     }
-
 }

@@ -21,6 +21,5 @@ import org.cloudfoundry.client.v2.Resource;
 /**
  * The base class for User Summary resources
  */
-public abstract class AbstractUserSummaryResource extends Resource<org.cloudfoundry.client.v2.users.UserSummaryEntity> {
-
-}
+public abstract class AbstractUserSummaryResource
+        extends Resource<org.cloudfoundry.client.v2.users.UserSummaryEntity> {}

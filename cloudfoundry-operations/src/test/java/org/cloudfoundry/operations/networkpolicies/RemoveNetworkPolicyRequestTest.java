@@ -23,47 +23,46 @@ public final class RemoveNetworkPolicyRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noDestination() {
         RemoveNetworkPolicyRequest.builder()
-            .protocol("test-protocol")
-            .startPort(1234)
-            .source("test-source")
-            .build();
+                .protocol("test-protocol")
+                .startPort(1234)
+                .source("test-source")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noPort() {
         RemoveNetworkPolicyRequest.builder()
-            .destination("test-destination")
-            .protocol("test-protocol")
-            .source("test-source")
-            .build();
+                .destination("test-destination")
+                .protocol("test-protocol")
+                .source("test-source")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noProtocol() {
         RemoveNetworkPolicyRequest.builder()
-            .destination("test-destination")
-            .startPort(1234)
-            .source("test-source")
-            .build();
+                .destination("test-destination")
+                .startPort(1234)
+                .source("test-source")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noSource() {
         RemoveNetworkPolicyRequest.builder()
-            .destination("test-destination")
-            .protocol("test-protocol")
-            .startPort(1234)
-            .build();
+                .destination("test-destination")
+                .protocol("test-protocol")
+                .startPort(1234)
+                .build();
     }
 
     @Test
     public void valid() {
         RemoveNetworkPolicyRequest.builder()
-            .destination("test-destination")
-            .protocol("test-protocol")
-            .startPort(1234)
-            .source("test-source")
-            .build();
+                .destination("test-destination")
+                .protocol("test-protocol")
+                .startPort(1234)
+                .source("test-source")
+                .build();
     }
-
 }

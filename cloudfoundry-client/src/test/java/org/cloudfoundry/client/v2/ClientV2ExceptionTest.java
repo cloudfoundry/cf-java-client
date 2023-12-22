@@ -16,18 +16,18 @@
 
 package org.cloudfoundry.client.v2;
 
-import org.junit.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.Test;
 
 public final class ClientV2ExceptionTest {
 
     @Test
     public void test() {
         assertThat(new ClientV2Exception(-1, -2, "test-description", "test-error-code"))
-            .hasNoCause()
-            .hasMessage("test-error-code(-2): test-description")
-            .extracting("statusCode", "code", "description", "errorCode").containsExactly(-1, -2, "test-description", "test-error-code");
+                .hasNoCause()
+                .hasMessage("test-error-code(-2): test-description")
+                .extracting("statusCode", "code", "description", "errorCode")
+                .containsExactly(-1, -2, "test-description", "test-error-code");
     }
-
 }

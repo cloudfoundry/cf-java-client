@@ -6,14 +6,11 @@ public final class UpdateServiceBrokerRequestTest {
 
     @Test
     public void valid() {
-	UpdateServiceBrokerRequest.builder()
-		.serviceBrokerId("test-service-broker-id")
-		.build();
+        UpdateServiceBrokerRequest.builder().serviceBrokerId("test-service-broker-id").build();
     }
-    
+
     @Test(expected = IllegalStateException.class)
     public void noServiceBrokerId() {
-	UpdateServiceBrokerRequest.builder().build();
+        UpdateServiceBrokerRequest.builder().build();
     }
-    
 }

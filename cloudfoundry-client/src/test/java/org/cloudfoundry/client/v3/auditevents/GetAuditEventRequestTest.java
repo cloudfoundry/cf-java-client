@@ -22,14 +22,11 @@ public final class GetAuditEventRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void invalid() {
-        GetAuditEventRequest.builder()
-            .build();
+        GetAuditEventRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        GetAuditEventRequest.builder()
-            .eventId("test-event-id")
-            .build();
+        GetAuditEventRequest.builder().eventId("test-event-id").build();
     }
 }

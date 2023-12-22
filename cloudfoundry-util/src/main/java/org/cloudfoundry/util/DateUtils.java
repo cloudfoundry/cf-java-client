@@ -16,23 +16,23 @@
 
 package org.cloudfoundry.util;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
  * Utilities for dealing with {@link Date}s
  */
 public final class DateUtils {
 
-    private static final SimpleDateFormat ISO8601 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
+    private static final SimpleDateFormat ISO8601 =
+            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
 
     private static final Object MONITOR = new Object();
 
-    private DateUtils() {
-    }
+    private DateUtils() {}
 
     /**
      * Formats a {@link Date} into a String in {@code ISO8601} format
@@ -73,5 +73,4 @@ public final class DateUtils {
             return new Date(SECONDS.toMillis(d.longValue()));
         }
     }
-
 }

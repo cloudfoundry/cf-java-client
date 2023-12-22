@@ -22,15 +22,11 @@ public final class DeletePackageRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noPackageId() {
-        DeletePackageRequest.builder()
-            .build();
+        DeletePackageRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        DeletePackageRequest.builder()
-            .packageId("test-package-id")
-            .build();
+        DeletePackageRequest.builder().packageId("test-package-id").build();
     }
-
 }

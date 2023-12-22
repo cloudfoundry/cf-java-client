@@ -23,34 +23,33 @@ public final class CreateServiceInstanceRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noPlan() {
         CreateServiceInstanceRequest.builder()
-            .serviceName("test-service-name")
-            .serviceInstanceName("test-service-instance-name")
-            .build();
+                .serviceName("test-service-name")
+                .serviceInstanceName("test-service-instance-name")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noServiceInstanceName() {
         CreateServiceInstanceRequest.builder()
-            .planName("test-plan-name")
-            .serviceName("test-service-name")
-            .build();
+                .planName("test-plan-name")
+                .serviceName("test-service-name")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noServiceName() {
         CreateServiceInstanceRequest.builder()
-            .planName("test-plan-name")
-            .serviceInstanceName("test-service-instance-name")
-            .build();
+                .planName("test-plan-name")
+                .serviceInstanceName("test-service-instance-name")
+                .build();
     }
 
     @Test
     public void valid() {
         CreateServiceInstanceRequest.builder()
-            .planName("test-plan-name")
-            .serviceName("test-service-name")
-            .serviceInstanceName("test-service-instance-name")
-            .build();
+                .planName("test-plan-name")
+                .serviceName("test-service-name")
+                .serviceInstanceName("test-service-instance-name")
+                .build();
     }
-
 }

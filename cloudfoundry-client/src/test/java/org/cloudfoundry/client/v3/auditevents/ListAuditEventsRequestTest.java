@@ -22,24 +22,21 @@ public class ListAuditEventsRequestTest {
 
     @Test(expected = Exception.class)
     public void invalidWithNullableCollection() {
-        ListAuditEventsRequest.builder()
-            .organizationIds((String[]) null)
-            .build();
+        ListAuditEventsRequest.builder().organizationIds((String[]) null).build();
     }
 
     @Test
     public void valid() {
         ListAuditEventsRequest.builder()
-            .organizationIds("organization-id-1", "organization-id-2")
-            .type("test-type")
-            .orderBy("nothing")
-            .targetId("test-target-id")
-            .build();
+                .organizationIds("organization-id-1", "organization-id-2")
+                .type("test-type")
+                .orderBy("nothing")
+                .targetId("test-target-id")
+                .build();
     }
 
     @Test
     public void validWithEmptyCollections() {
-        ListAuditEventsRequest.builder()
-            .build();
+        ListAuditEventsRequest.builder().build();
     }
 }

@@ -16,6 +16,8 @@
 
 package org.cloudfoundry.reactor.routing.v1.tcproutes;
 
+import java.io.IOException;
+import java.util.Map;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.routing.v1.AbstractRoutingV1Operations;
@@ -32,9 +34,6 @@ import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.io.IOException;
-import java.util.Map;
-
 /**
  * The Reactor-based implementation of {@link TcpRoutes}
  */
@@ -48,42 +47,56 @@ public class ReactorTcpRoutes extends AbstractRoutingV1Operations implements Tcp
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorTcpRoutes(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
+    public ReactorTcpRoutes(
+            ConnectionContext connectionContext,
+            Mono<String> root,
+            TokenProvider tokenProvider,
+            Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<CreateTcpRoutesResponse> create(CreateTcpRoutesRequest request) {
-        return post(request, CreateTcpRoutesResponse.class, builder -> builder.pathSegment("v1", "tcp_routes", "create"))
-            .checkpoint();
+        return post(
+                        request,
+                        CreateTcpRoutesResponse.class,
+                        builder -> builder.pathSegment("v1", "tcp_routes", "create"))
+                .checkpoint();
     }
 
     @Override
     public Mono<Void> delete(DeleteTcpRoutesRequest request) {
-        return post(request, Void.class, builder -> builder.pathSegment("v1", "tcp_routes", "delete"))
-            .checkpoint();
+        return post(
+                        request,
+                        Void.class,
+                        builder -> builder.pathSegment("v1", "tcp_routes", "delete"))
+                .checkpoint();
     }
 
     @Override
     public Flux<TcpRouteEvent> events(EventsRequest request) {
-        return get(EventStreamCodec::createDecoder, builder -> builder.pathSegment("v1", "tcp_routes", "events"), EventStreamCodec::decode)
-            .map(event -> {
-                try {
-                    return this.connectionContext.getObjectMapper()
-                        .readValue(event.getData(), TcpRouteEvent.Builder.class)
-                        .eventType(EventType.from(event.getEventType()))
-                        .build();
-                } catch (IOException e) {
-                    throw Exceptions.propagate(e);
-                }
-            })
-            .checkpoint();
+        return get(
+                        EventStreamCodec::createDecoder,
+                        builder -> builder.pathSegment("v1", "tcp_routes", "events"),
+                        EventStreamCodec::decode)
+                .map(
+                        event -> {
+                            try {
+                                return this.connectionContext
+                                        .getObjectMapper()
+                                        .readValue(event.getData(), TcpRouteEvent.Builder.class)
+                                        .eventType(EventType.from(event.getEventType()))
+                                        .build();
+                            } catch (IOException e) {
+                                throw Exceptions.propagate(e);
+                            }
+                        })
+                .checkpoint();
     }
 
     @Override
     public Mono<ListTcpRoutesResponse> list(ListTcpRoutesRequest request) {
         return get(ListTcpRoutesResponse.class, builder -> builder.pathSegment("v1", "tcp_routes"))
-            .checkpoint();
+                .checkpoint();
     }
-
 }

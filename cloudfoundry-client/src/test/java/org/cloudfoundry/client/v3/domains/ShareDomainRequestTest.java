@@ -24,28 +24,23 @@ public final class ShareDomainRequestTest {
     @Test(expected = IllegalStateException.class)
     public void emptyRelationship() {
         ShareDomainRequest.builder()
-            .domainId("test-domain-id")
-            .data(Relationship.builder().build())
-            .build();
+                .domainId("test-domain-id")
+                .data(Relationship.builder().build())
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noDomainId() {
         ShareDomainRequest.builder()
-            .data(Relationship.builder()
-                .id("shared-organization-id")
-                .build())
-            .build();
+                .data(Relationship.builder().id("shared-organization-id").build())
+                .build();
     }
 
     @Test
     public void valid() {
         ShareDomainRequest.builder()
-            .domainId("test-domain-id")
-            .data(Relationship.builder()
-                .id("shared-organization-id")
-                .build())
-            .build();
+                .domainId("test-domain-id")
+                .data(Relationship.builder().id("shared-organization-id").build())
+                .build();
     }
-
 }

@@ -30,7 +30,8 @@ public interface EnvironmentVariableGroups {
      * @param request the Get Running Environment Variables request
      * @return the response from the Get Running Environment Variables request
      */
-    Mono<GetRunningEnvironmentVariablesResponse> getRunningEnvironmentVariables(GetRunningEnvironmentVariablesRequest request);
+    Mono<GetRunningEnvironmentVariablesResponse> getRunningEnvironmentVariables(
+            GetRunningEnvironmentVariablesRequest request);
 
     /**
      * Makes the <a href="apidocs.cloudfoundry.org/latest-release/environment_variable_groups/getting_the_contents_of_the_staging_environment_variable_group.html">Get the Staging Environment
@@ -39,7 +40,8 @@ public interface EnvironmentVariableGroups {
      * @param request the Get Staging Environment Variables request
      * @return the response from the Get Staging Environment Variables request
      */
-    Mono<GetStagingEnvironmentVariablesResponse> getStagingEnvironmentVariables(GetStagingEnvironmentVariablesRequest request);
+    Mono<GetStagingEnvironmentVariablesResponse> getStagingEnvironmentVariables(
+            GetStagingEnvironmentVariablesRequest request);
 
     /**
      * Makes the <a href="apidocs.cloudfoundry.org/latest-release/environment_variable_groups/updating_the_contents_of_the_running_environment_variable_group.html">Update the Running Environment
@@ -48,7 +50,8 @@ public interface EnvironmentVariableGroups {
      * @param request the Update Running Environment Variables request
      * @return the response from the Update Running Environment Variables request
      */
-    Mono<UpdateRunningEnvironmentVariablesResponse> updateRunningEnvironmentVariables(UpdateRunningEnvironmentVariablesRequest request);
+    Mono<UpdateRunningEnvironmentVariablesResponse> updateRunningEnvironmentVariables(
+            UpdateRunningEnvironmentVariablesRequest request);
 
     /**
      * Makes the <a href="apidocs.cloudfoundry.org/latest-releasehttps://apidocs.cloudfoundry.org/latest-release/environment_variable_groups/updating_the_contents_of_the_staging_environment_variable_group.html">Update
@@ -57,6 +60,6 @@ public interface EnvironmentVariableGroups {
      * @param request the Update Staging Environment Variables request
      * @return the response from the Update Staging Environment Variables request
      */
-    Mono<UpdateStagingEnvironmentVariablesResponse> updateStagingEnvironmentVariables(UpdateStagingEnvironmentVariablesRequest request);
-
+    Mono<UpdateStagingEnvironmentVariablesResponse> updateStagingEnvironmentVariables(
+            UpdateStagingEnvironmentVariablesRequest request);
 }

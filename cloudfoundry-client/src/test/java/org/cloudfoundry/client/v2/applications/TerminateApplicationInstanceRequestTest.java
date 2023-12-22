@@ -22,24 +22,19 @@ public final class TerminateApplicationInstanceRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noApplicationId() {
-        TerminateApplicationInstanceRequest.builder()
-            .index("0")
-            .build();
+        TerminateApplicationInstanceRequest.builder().index("0").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noIndex() {
-        TerminateApplicationInstanceRequest.builder()
-            .applicationId("test-application-id")
-            .build();
+        TerminateApplicationInstanceRequest.builder().applicationId("test-application-id").build();
     }
 
     @Test
     public void valid() {
         TerminateApplicationInstanceRequest.builder()
-            .applicationId("test-application-id")
-            .index("0")
-            .build();
+                .applicationId("test-application-id")
+                .index("0")
+                .build();
     }
-
 }

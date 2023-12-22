@@ -22,15 +22,11 @@ public final class DeleteGroupRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noId() {
-        DeleteGroupRequest.builder()
-            .build();
+        DeleteGroupRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        DeleteGroupRequest.builder()
-            .groupId("test-group-id")
-            .build();
+        DeleteGroupRequest.builder().groupId("test-group-id").build();
     }
-
 }

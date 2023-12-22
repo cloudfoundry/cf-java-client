@@ -22,24 +22,19 @@ public final class AssociateSpaceDeveloperByUsernameRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noSpaceId() {
-        AssociateSpaceDeveloperByUsernameRequest.builder()
-            .username("test-username")
-            .build();
+        AssociateSpaceDeveloperByUsernameRequest.builder().username("test-username").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noUsername() {
-        AssociateSpaceDeveloperByUsernameRequest.builder()
-            .spaceId("test-space-id")
-            .build();
+        AssociateSpaceDeveloperByUsernameRequest.builder().spaceId("test-space-id").build();
     }
 
     @Test
     public void valid() {
         AssociateSpaceDeveloperByUsernameRequest.builder()
-            .spaceId("test-space-id")
-            .username("test-username")
-            .build();
+                .spaceId("test-space-id")
+                .username("test-username")
+                .build();
     }
-
 }

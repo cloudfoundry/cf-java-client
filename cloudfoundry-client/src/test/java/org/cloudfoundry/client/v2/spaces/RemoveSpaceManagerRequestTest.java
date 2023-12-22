@@ -22,24 +22,19 @@ public final class RemoveSpaceManagerRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noManagerId() {
-        RemoveSpaceManagerRequest.builder()
-            .spaceId("test-id")
-            .build();
+        RemoveSpaceManagerRequest.builder().spaceId("test-id").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noSpaceId() {
-        RemoveSpaceManagerRequest.builder()
-            .managerId("test-manager-id")
-            .build();
+        RemoveSpaceManagerRequest.builder().managerId("test-manager-id").build();
     }
 
     @Test
     public void valid() {
         RemoveSpaceManagerRequest.builder()
-            .managerId("test-manager-id")
-            .spaceId("test-space-id")
-            .build();
+                .managerId("test-manager-id")
+                .spaceId("test-space-id")
+                .build();
     }
-
 }

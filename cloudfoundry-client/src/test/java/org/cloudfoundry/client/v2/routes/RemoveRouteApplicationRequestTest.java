@@ -22,24 +22,19 @@ public final class RemoveRouteApplicationRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noApplicationId() {
-        RemoveRouteApplicationRequest.builder()
-            .routeId("test-route-id")
-            .build();
+        RemoveRouteApplicationRequest.builder().routeId("test-route-id").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noRouteId() {
-        RemoveRouteApplicationRequest.builder()
-            .applicationId("test-app-id")
-            .build();
+        RemoveRouteApplicationRequest.builder().applicationId("test-app-id").build();
     }
 
     @Test
     public void valid() {
         RemoveRouteApplicationRequest.builder()
-            .applicationId("test-app-id")
-            .routeId("test-route-id")
-            .build();
+                .applicationId("test-app-id")
+                .routeId("test-route-id")
+                .build();
     }
-
 }

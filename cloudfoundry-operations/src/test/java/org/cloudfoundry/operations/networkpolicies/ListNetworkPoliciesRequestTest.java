@@ -22,8 +22,6 @@ public final class ListNetworkPoliciesRequestTest {
 
     @Test
     public void valid() {
-        ListNetworkPoliciesRequest.builder()
-            .build();
+        ListNetworkPoliciesRequest.builder().build();
     }
-
 }

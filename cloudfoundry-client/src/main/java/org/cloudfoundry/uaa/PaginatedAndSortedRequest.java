@@ -51,5 +51,4 @@ public abstract class PaginatedAndSortedRequest {
     @Nullable
     @QueryParameter("startIndex")
     public abstract Integer getStartIndex();
-
 }

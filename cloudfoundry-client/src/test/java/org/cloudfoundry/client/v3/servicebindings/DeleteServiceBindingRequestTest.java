@@ -16,22 +16,17 @@
 
 package org.cloudfoundry.client.v3.servicebindings;
 
-
 import org.junit.Test;
 
 public final class DeleteServiceBindingRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noServiceBindingId() {
-        DeleteServiceBindingRequest.builder()
-            .build();
+        DeleteServiceBindingRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        DeleteServiceBindingRequest.builder()
-            .serviceBindingId("test-service-binding-id")
-            .build();
+        DeleteServiceBindingRequest.builder().serviceBindingId("test-service-binding-id").build();
     }
-
 }

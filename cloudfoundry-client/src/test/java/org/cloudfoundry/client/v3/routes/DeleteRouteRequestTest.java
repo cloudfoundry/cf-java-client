@@ -22,15 +22,11 @@ public class DeleteRouteRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noRouteId() {
-        DeleteRouteRequest.builder()
-            .build();
+        DeleteRouteRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        DeleteRouteRequest.builder()
-            .routeId("test-route-id")
-            .build();
+        DeleteRouteRequest.builder().routeId("test-route-id").build();
     }
-
 }

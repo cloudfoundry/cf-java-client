@@ -18,29 +18,25 @@ package org.cloudfoundry.client.v2.serviceinstances;
 
 import org.junit.Test;
 
-
 public final class BindServiceInstanceRouteRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noRouteId() {
         BindServiceInstanceRouteRequest.builder()
-            .serviceInstanceId("test-service-instance-id")
-            .build();
+                .serviceInstanceId("test-service-instance-id")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noServiceInstanceId() {
-        BindServiceInstanceRouteRequest.builder()
-            .routeId("test-route-id")
-            .build();
+        BindServiceInstanceRouteRequest.builder().routeId("test-route-id").build();
     }
 
     @Test
     public void valid() {
         BindServiceInstanceRouteRequest.builder()
-            .serviceInstanceId("test-service-instance-id")
-            .routeId("test-route-id")
-            .build();
+                .serviceInstanceId("test-service-instance-id")
+                .routeId("test-route-id")
+                .build();
     }
-
 }

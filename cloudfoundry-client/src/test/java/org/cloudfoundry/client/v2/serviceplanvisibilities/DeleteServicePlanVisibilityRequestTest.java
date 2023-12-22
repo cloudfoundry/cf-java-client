@@ -22,15 +22,13 @@ public final class DeleteServicePlanVisibilityRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noServicePlanVisibilityId() {
-        DeleteServicePlanVisibilityRequest.builder()
-            .build();
+        DeleteServicePlanVisibilityRequest.builder().build();
     }
 
     @Test
     public void valid() {
         DeleteServicePlanVisibilityRequest.builder()
-            .servicePlanVisibilityId("test-service-plan-visibility-id")
-            .build();
+                .servicePlanVisibilityId("test-service-plan-visibility-id")
+                .build();
     }
-
 }

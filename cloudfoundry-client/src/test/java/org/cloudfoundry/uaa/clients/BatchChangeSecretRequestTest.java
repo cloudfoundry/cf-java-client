@@ -22,44 +22,37 @@ public final class BatchChangeSecretRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void emptyChangeSecrets() {
-        BatchChangeSecretRequest.builder()
-            .changeSecrets()
-            .build();
+        BatchChangeSecretRequest.builder().changeSecrets().build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noChangeSecrets() {
-        BatchChangeSecretRequest.builder()
-            .build();
+        BatchChangeSecretRequest.builder().build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noClientId() {
         BatchChangeSecretRequest.builder()
-            .changeSecret(ChangeSecret.builder()
-                .secret("test-secret")
-                .build())
-            .build();
+                .changeSecret(ChangeSecret.builder().secret("test-secret").build())
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noSecret() {
         BatchChangeSecretRequest.builder()
-            .changeSecret(ChangeSecret.builder()
-                .clientId("test-client-id")
-                .build())
-            .build();
+                .changeSecret(ChangeSecret.builder().clientId("test-client-id").build())
+                .build();
     }
 
     @Test
     public void valid() {
         BatchChangeSecretRequest.builder()
-            .changeSecret(ChangeSecret.builder()
-                .clientId("test-client-id")
-                .oldSecret("test-old-secret")
-                .secret("test-secret")
-                .build())
-            .build();
+                .changeSecret(
+                        ChangeSecret.builder()
+                                .clientId("test-client-id")
+                                .oldSecret("test-old-secret")
+                                .secret("test-secret")
+                                .build())
+                .build();
     }
-
 }

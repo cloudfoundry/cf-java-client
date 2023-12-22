@@ -23,6 +23,8 @@ import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.json.JsonObjectDecoder;
+import java.nio.charset.Charset;
+import java.util.function.BiFunction;
 import org.reactivestreams.Publisher;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
@@ -30,22 +32,26 @@ import reactor.netty.ByteBufFlux;
 import reactor.netty.NettyOutbound;
 import reactor.netty.http.client.HttpClientRequest;
 
-import java.nio.charset.Charset;
-import java.util.function.BiFunction;
-
 public final class JsonCodec {
 
     private static final int MAX_PAYLOAD_SIZE = 100 * 1024 * 1024;
 
-    public static <T> Mono<T> decode(ObjectMapper objectMapper, ByteBufFlux responseBody, Class<T> responseType) {
-        return responseBody.aggregate().asByteArray()
-            .map(payload -> {
-                try {
-                    return objectMapper.readValue(payload, responseType);
-                } catch (Throwable t) {
-                    throw new JsonParsingException(t.getMessage(), t, new String(payload, Charset.defaultCharset()));
-                }
-            });
+    public static <T> Mono<T> decode(
+            ObjectMapper objectMapper, ByteBufFlux responseBody, Class<T> responseType) {
+        return responseBody
+                .aggregate()
+                .asByteArray()
+                .map(
+                        payload -> {
+                            try {
+                                return objectMapper.readValue(payload, responseType);
+                            } catch (Throwable t) {
+                                throw new JsonParsingException(
+                                        t.getMessage(),
+                                        t,
+                                        new String(payload, Charset.defaultCharset()));
+                            }
+                        });
     }
 
     public static void setDecodeHeaders(HttpHeaders httpHeaders) {
@@ -56,8 +62,10 @@ public final class JsonCodec {
         return new JsonObjectDecoder(MAX_PAYLOAD_SIZE);
     }
 
-    static BiFunction<HttpClientRequest, NettyOutbound, Publisher<Void>> encode(ObjectMapper objectMapper, Object requestPayload) {
-        if (!AnnotationUtils.findAnnotation(requestPayload.getClass(), JsonSerialize.class).isPresent()) {
+    static BiFunction<HttpClientRequest, NettyOutbound, Publisher<Void>> encode(
+            ObjectMapper objectMapper, Object requestPayload) {
+        if (!AnnotationUtils.findAnnotation(requestPayload.getClass(), JsonSerialize.class)
+                .isPresent()) {
             return (request, outbound) -> Mono.empty();
         }
 
@@ -75,5 +83,4 @@ public final class JsonCodec {
             }
         };
     }
-
 }

@@ -22,24 +22,19 @@ public final class TerminateProcessInstanceRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noIndex() {
-        TerminateProcessInstanceRequest.builder()
-            .processId("test-process-id")
-            .build();
+        TerminateProcessInstanceRequest.builder().processId("test-process-id").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noProcessId() {
-        TerminateProcessInstanceRequest.builder()
-            .index("test-index")
-            .build();
+        TerminateProcessInstanceRequest.builder().index("test-index").build();
     }
 
     @Test
     public void valid() {
         TerminateProcessInstanceRequest.builder()
-            .index("test-index")
-            .processId("test-process-id")
-            .build();
+                .index("test-index")
+                .processId("test-process-id")
+                .build();
     }
-
 }

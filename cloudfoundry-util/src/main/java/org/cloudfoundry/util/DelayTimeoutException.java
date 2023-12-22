@@ -22,5 +22,4 @@ package org.cloudfoundry.util;
 public final class DelayTimeoutException extends RuntimeException {
 
     private static final long serialVersionUID = 5151226191223608759L;
-
 }

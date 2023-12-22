@@ -22,15 +22,11 @@ public final class CancelDeploymentRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noDeploymentId() {
-        CancelDeploymentRequest.builder()
-            .build();
+        CancelDeploymentRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        CancelDeploymentRequest.builder()
-            .deploymentId("test-deployment-id")
-            .build();
+        CancelDeploymentRequest.builder().deploymentId("test-deployment-id").build();
     }
-
 }

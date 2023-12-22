@@ -22,15 +22,11 @@ public final class StartApplicationRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noName() {
-        StartApplicationRequest.builder()
-            .build();
+        StartApplicationRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        StartApplicationRequest.builder()
-            .name("test-name")
-            .build();
+        StartApplicationRequest.builder().name("test-name").build();
     }
-
 }

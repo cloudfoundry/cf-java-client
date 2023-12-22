@@ -17,10 +17,9 @@
 package org.cloudfoundry.client.v3;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.Map;
 import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
-
-import java.util.Map;
 
 public abstract class Resource {
 
@@ -49,5 +48,4 @@ public abstract class Resource {
     @JsonProperty("updated_at")
     @Nullable
     public abstract String getUpdatedAt();
-
 }

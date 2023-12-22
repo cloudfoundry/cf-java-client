@@ -68,5 +68,4 @@ public enum ManifestV3RouteProtocol {
     public String toString() {
         return getValue();
     }
-
 }

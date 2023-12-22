@@ -22,25 +22,19 @@ public final class CreateDomainRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noName() {
-        CreateDomainRequest.builder()
-            .wildcard(true)
-            .build();
+        CreateDomainRequest.builder().wildcard(true).build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noWildcard() {
         CreateDomainRequest.builder()
-            .name("test-name")
-            .owningOrganizationId("test-owning-organization-id")
-            .build();
+                .name("test-name")
+                .owningOrganizationId("test-owning-organization-id")
+                .build();
     }
 
     @Test
     public void valid() {
-        CreateDomainRequest.builder()
-            .name("test-name")
-            .wildcard(true)
-            .build();
+        CreateDomainRequest.builder().name("test-name").wildcard(true).build();
     }
-
 }

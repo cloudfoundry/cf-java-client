@@ -16,33 +16,34 @@
 
 package org.cloudfoundry.reactor.client.v3;
 
+import java.util.Collection;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.cloudfoundry.client.v3.FilterParameter;
 import org.cloudfoundry.reactor.util.AnnotationUtils;
 import org.cloudfoundry.reactor.util.AnnotationUtils.AnnotatedValue;
 import org.cloudfoundry.reactor.util.UriQueryParameter;
 import org.cloudfoundry.reactor.util.UriQueryParameterBuilder;
 
-import java.util.Collection;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 final class FilterBuilder implements UriQueryParameterBuilder {
 
     public Stream<UriQueryParameter> build(Object instance) {
         return AnnotationUtils.streamAnnotatedValues(instance, FilterParameter.class)
-            .map(FilterBuilder::processValue)
-            .filter(Objects::nonNull);
+                .map(FilterBuilder::processValue)
+                .filter(Objects::nonNull);
     }
 
     private static UriQueryParameter processCollection(String name, Collection<?> collection) {
         if (collection.isEmpty()) {
             return null;
         }
-        return processValue(name, collection.stream()
-            .map(Object::toString)
-            .map(String::trim)
-            .collect(Collectors.joining(",")));
+        return processValue(
+                name,
+                collection.stream()
+                        .map(Object::toString)
+                        .map(String::trim)
+                        .collect(Collectors.joining(",")));
     }
 
     private static UriQueryParameter processValue(AnnotatedValue<FilterParameter> annotatedValue) {
@@ -58,5 +59,4 @@ final class FilterBuilder implements UriQueryParameterBuilder {
     private static UriQueryParameter processValue(String name, String value) {
         return UriQueryParameter.of(name, value);
     }
-
 }

@@ -29,7 +29,8 @@ public interface Organizations {
      * @param request the Associate Auditor request
      * @return the response from the Associate Auditor request
      */
-    Mono<AssociateOrganizationAuditorResponse> associateAuditor(AssociateOrganizationAuditorRequest request);
+    Mono<AssociateOrganizationAuditorResponse> associateAuditor(
+            AssociateOrganizationAuditorRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/organizations/associate_auditor_with_the_organization_by_username.html">Associate Auditor with the Organization by Username</a>
@@ -38,7 +39,8 @@ public interface Organizations {
      * @param request the Associate Auditor with an Organization by Username request
      * @return the response from the Associate Auditor with an Organization by Username request
      */
-    Mono<AssociateOrganizationAuditorByUsernameResponse> associateAuditorByUsername(AssociateOrganizationAuditorByUsernameRequest request);
+    Mono<AssociateOrganizationAuditorByUsernameResponse> associateAuditorByUsername(
+            AssociateOrganizationAuditorByUsernameRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/organizations/associate_billing_manager_with_the_organization.html">Associate Billing Manager with the Organization</a>
@@ -47,7 +49,8 @@ public interface Organizations {
      * @param request the Associate Billing Manager with the Organization request
      * @return the response from the Associate Billing Manager with the Organization request
      */
-    Mono<AssociateOrganizationBillingManagerResponse> associateBillingManager(AssociateOrganizationBillingManagerRequest request);
+    Mono<AssociateOrganizationBillingManagerResponse> associateBillingManager(
+            AssociateOrganizationBillingManagerRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/organizations/associate_billing_manager_with_the_organization_by_username.html">Associate Billing Manager with the Organization
@@ -56,7 +59,8 @@ public interface Organizations {
      * @param request the Associate Billing Manager with the Organization by Username request
      * @return the response from the Associate Billing Manager with the Organization by Username request
      */
-    Mono<AssociateOrganizationBillingManagerByUsernameResponse> associateBillingManagerByUsername(AssociateOrganizationBillingManagerByUsernameRequest request);
+    Mono<AssociateOrganizationBillingManagerByUsernameResponse> associateBillingManagerByUsername(
+            AssociateOrganizationBillingManagerByUsernameRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/organizations/associate_manager_with_the_organization.html">Associate Manager with the Organization</a> request
@@ -64,7 +68,8 @@ public interface Organizations {
      * @param request the Associate Manager with the Organization request
      * @return the response from the Associate Manager with the Organization request
      */
-    Mono<AssociateOrganizationManagerResponse> associateManager(AssociateOrganizationManagerRequest request);
+    Mono<AssociateOrganizationManagerResponse> associateManager(
+            AssociateOrganizationManagerRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/organizations/associate_manager_with_the_organization_by_username.html">Associate Manager with the Organization by Username</a>
@@ -73,7 +78,8 @@ public interface Organizations {
      * @param request the Associate Manager with the Organization by Username request
      * @return the response from the Associate Manager with the Organization by Username request
      */
-    Mono<AssociateOrganizationManagerByUsernameResponse> associateManagerByUsername(AssociateOrganizationManagerByUsernameRequest request);
+    Mono<AssociateOrganizationManagerByUsernameResponse> associateManagerByUsername(
+            AssociateOrganizationManagerByUsernameRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/organizations/associate_private_domain_with_the_organization.html">Associate Private Domain with the Organization</a> request
@@ -81,7 +87,8 @@ public interface Organizations {
      * @param request the Associate Private Domain with the Organization request
      * @return the response from the Associate Private Domain with the Organization request
      */
-    Mono<AssociateOrganizationPrivateDomainResponse> associatePrivateDomain(AssociateOrganizationPrivateDomainRequest request);
+    Mono<AssociateOrganizationPrivateDomainResponse> associatePrivateDomain(
+            AssociateOrganizationPrivateDomainRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/organizations/associate_user_with_the_organization.html">Associate User with the Organization</a> request
@@ -98,7 +105,8 @@ public interface Organizations {
      * @param request the Associate User with the Organization by Username request
      * @return the response from the Associate User with the Organization by Username request
      */
-    Mono<AssociateOrganizationUserByUsernameResponse> associateUserByUsername(AssociateOrganizationUserByUsernameRequest request);
+    Mono<AssociateOrganizationUserByUsernameResponse> associateUserByUsername(
+            AssociateOrganizationUserByUsernameRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/organizations/creating_an_organization.html">Creating an Organization</a> request
@@ -130,7 +138,8 @@ public interface Organizations {
      * @param request the Retrieving organization instance usage request
      * @return the response from the Retrieving organization instance usage request
      */
-    Mono<GetOrganizationInstanceUsageResponse> getInstanceUsage(GetOrganizationInstanceUsageRequest request);
+    Mono<GetOrganizationInstanceUsageResponse> getInstanceUsage(
+            GetOrganizationInstanceUsageRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/organizations/retrieving_organization_memory_usage.html">Retrieving organization memory usage</a> request
@@ -138,7 +147,8 @@ public interface Organizations {
      * @param request the Retrieving organization memory usage request
      * @return the response from the Retrieving organization memory usage request
      */
-    Mono<GetOrganizationMemoryUsageResponse> getMemoryUsage(GetOrganizationMemoryUsageRequest request);
+    Mono<GetOrganizationMemoryUsageResponse> getMemoryUsage(
+            GetOrganizationMemoryUsageRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/organizations/retrieving_the_roles_of_all_users_in_the_organization.html">Retrieving the roles of all Users in the
@@ -171,7 +181,8 @@ public interface Organizations {
      * @param request the List all Billing Managers for the Organization request
      * @return the response from the List all Billing Managers for the Organization request
      */
-    Mono<ListOrganizationBillingManagersResponse> listBillingManagers(ListOrganizationBillingManagersRequest request);
+    Mono<ListOrganizationBillingManagersResponse> listBillingManagers(
+            ListOrganizationBillingManagersRequest request);
 
     /**
      * <a href="https://apidocs.cloudfoundry.org/latest-release/organizations/list_all_domains_for_the_organization_%28deprecated%29.html">List all Domains for the Organization</a> request
@@ -196,7 +207,8 @@ public interface Organizations {
      * @param request the List all Private Domains for the Organization request
      * @return the response from the List all Private Domains for the Organization request
      */
-    Mono<ListOrganizationPrivateDomainsResponse> listPrivateDomains(ListOrganizationPrivateDomainsRequest request);
+    Mono<ListOrganizationPrivateDomainsResponse> listPrivateDomains(
+            ListOrganizationPrivateDomainsRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/organizations/list_all_services_for_the_organization.html">List all Services for the Organization</a> request
@@ -213,7 +225,8 @@ public interface Organizations {
      * @param request the List all Space Quota Definitions for the Organization request
      * @return the response from the List all Space Quota Definitions for the Organization request
      */
-    Mono<ListOrganizationSpaceQuotaDefinitionsResponse> listSpaceQuotaDefinitions(ListOrganizationSpaceQuotaDefinitionsRequest request);
+    Mono<ListOrganizationSpaceQuotaDefinitionsResponse> listSpaceQuotaDefinitions(
+            ListOrganizationSpaceQuotaDefinitionsRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/organizations/list_all_spaces_for_the_organization.html">List all Spaces for the Organization</a> request
@@ -263,7 +276,8 @@ public interface Organizations {
      * @param request the Disassociate Billing Manager with the Organization by Username request
      * @return the response from the Disassociate Billing Manager with the Organization by Username request
      */
-    Mono<Void> removeBillingManagerByUsername(RemoveOrganizationBillingManagerByUsernameRequest request);
+    Mono<Void> removeBillingManagerByUsername(
+            RemoveOrganizationBillingManagerByUsernameRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/organizations/remove_manager_from_the_organization.html">Remove Manager from the Organization</a> request
@@ -322,5 +336,4 @@ public interface Organizations {
      * @return the response from the Update an Organization request
      */
     Mono<UpdateOrganizationResponse> update(UpdateOrganizationRequest request);
-
 }

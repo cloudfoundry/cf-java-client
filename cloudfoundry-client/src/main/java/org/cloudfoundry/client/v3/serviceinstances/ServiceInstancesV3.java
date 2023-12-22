@@ -16,9 +16,8 @@
 
 package org.cloudfoundry.client.v3.serviceinstances;
 
-import reactor.core.publisher.Mono;
-
 import java.util.Optional;
+import reactor.core.publisher.Mono;
 
 /**
  * Main entry point to the Cloud Foundry Service Instances V3 Client API
@@ -43,7 +42,6 @@ public interface ServiceInstancesV3 {
      */
     Mono<GetServiceInstanceResponse> get(GetServiceInstanceRequest request);
 
-
     /**
      * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/release-candidate/#delete-a-service-instance">
      * Delete A Service Instance</a> request
@@ -56,20 +54,22 @@ public interface ServiceInstancesV3 {
     /**
      * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/release-candidate/#get-parameters-for-a-managed-service-instance">
      * Get parameters for a managed service instance</a> request
-     * 
+     *
      * @param request the Get Managed Service Parameters request
      * @return the response from Get Managed Service Parameters request
      */
-    Mono<GetManagedServiceParametersResponse> getManagedServiceParameters(GetManagedServiceParametersRequest request);
-    
+    Mono<GetManagedServiceParametersResponse> getManagedServiceParameters(
+            GetManagedServiceParametersRequest request);
+
     /**
      * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/release-candidate/#get-credentials-for-a-user-provided-service-instance">
      * Get credentials for a user-provided service instance</a> request
-     * 
+     *
      * @param request the Get User Provided Credentials request
      * @return the response from Get User provided Credentials request
      */
-    Mono<GetUserProvidedCredentialsResponse> getUserProvidedCredentials(GetUserProvidedCredentialsRequest request);
+    Mono<GetUserProvidedCredentialsResponse> getUserProvidedCredentials(
+            GetUserProvidedCredentialsRequest request);
 
     /**
      * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#list-service-instances">List service instances</a> request
@@ -86,7 +86,8 @@ public interface ServiceInstancesV3 {
      * @param request the List Shared Spaces Relationship request
      * @return the response from the List Shared Spaces Relationship request
      */
-    Mono<ListSharedSpacesRelationshipResponse> listSharedSpacesRelationship(ListSharedSpacesRelationshipRequest request);
+    Mono<ListSharedSpacesRelationshipResponse> listSharedSpacesRelationship(
+            ListSharedSpacesRelationshipRequest request);
 
     /**
      * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/release-candidate/index.html#share-a-service-instance-to-other-spaces">

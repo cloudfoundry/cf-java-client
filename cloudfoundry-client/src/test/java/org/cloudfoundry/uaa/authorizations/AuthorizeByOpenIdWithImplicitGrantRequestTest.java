@@ -23,25 +23,22 @@ public final class AuthorizeByOpenIdWithImplicitGrantRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noClientId() {
         AuthorizeByOpenIdWithImplicitGrantRequest.builder()
-            .redirectUri("http://redirect.to/app")
-            .scope("test-scope")
-            .build();
+                .redirectUri("http://redirect.to/app")
+                .scope("test-scope")
+                .build();
     }
 
     @Test
     public void validMax() {
         AuthorizeByOpenIdWithImplicitGrantRequest.builder()
-            .clientId("test-client-id")
-            .redirectUri("http://redirect.to/app")
-            .scope("test-scope")
-            .build();
+                .clientId("test-client-id")
+                .redirectUri("http://redirect.to/app")
+                .scope("test-scope")
+                .build();
     }
 
     @Test
     public void validMin() {
-        AuthorizeByOpenIdWithImplicitGrantRequest.builder()
-            .clientId("test-client-id")
-            .build();
+        AuthorizeByOpenIdWithImplicitGrantRequest.builder().clientId("test-client-id").build();
     }
-
 }

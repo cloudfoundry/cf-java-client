@@ -22,8 +22,6 @@ public final class ListTasksRequestTest {
 
     @Test
     public void valid() {
-        ListTasksRequest.builder()
-            .build();
+        ListTasksRequest.builder().build();
     }
-
 }

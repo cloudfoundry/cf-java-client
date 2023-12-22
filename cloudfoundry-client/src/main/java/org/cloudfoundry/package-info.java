@@ -15,16 +15,15 @@
  */
 
 @Value.Style(
-    add = "*",
-    defaults = @Value.Immutable(copy = false),
-    depluralize = true,
-    depluralizeDictionary = "status:statuses",
-    jdkOnly = true,
-    put = "*",
-    typeAbstract = "_*",
-    typeImmutable = "*",
-    visibility = ImplementationVisibility.PUBLIC
-)
+        add = "*",
+        defaults = @Value.Immutable(copy = false),
+        depluralize = true,
+        depluralizeDictionary = "status:statuses",
+        jdkOnly = true,
+        put = "*",
+        typeAbstract = "_*",
+        typeImmutable = "*",
+        visibility = ImplementationVisibility.PUBLIC)
 package org.cloudfoundry;
 
 import org.immutables.value.Value;

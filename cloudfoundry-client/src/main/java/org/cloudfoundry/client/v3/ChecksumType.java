@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum ChecksumType {
-
     SHA1("sha1"),
 
     SHA256("sha256");
@@ -52,5 +51,4 @@ public enum ChecksumType {
     public String toString() {
         return getValue();
     }
-
 }

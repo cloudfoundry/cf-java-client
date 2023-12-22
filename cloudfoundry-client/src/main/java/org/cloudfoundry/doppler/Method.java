@@ -22,7 +22,6 @@ import java.util.Objects;
  * HTTP Methods
  */
 public enum Method {
-
     ACL,
 
     BASELINE_CONTROL,
@@ -205,5 +204,4 @@ public enum Method {
                 throw new IllegalArgumentException(String.format("Unknown method: %s", dropsonde));
         }
     }
-
 }

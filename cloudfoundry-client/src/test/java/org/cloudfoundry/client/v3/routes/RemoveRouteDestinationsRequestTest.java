@@ -22,24 +22,19 @@ public class RemoveRouteDestinationsRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noDestinationId() {
-        RemoveRouteDestinationsRequest.builder()
-            .routeId("test-route-id")
-            .build();
+        RemoveRouteDestinationsRequest.builder().routeId("test-route-id").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noRouteId() {
-        RemoveRouteDestinationsRequest.builder()
-            .routeId("test-route-id")
-            .build();
+        RemoveRouteDestinationsRequest.builder().routeId("test-route-id").build();
     }
 
     @Test
     public void valid() {
         RemoveRouteDestinationsRequest.builder()
-            .destinationId("test-destination-id")
-            .routeId("test-route-id")
-            .build();
+                .destinationId("test-destination-id")
+                .routeId("test-route-id")
+                .build();
     }
-
 }

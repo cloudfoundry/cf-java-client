@@ -24,5 +24,4 @@ public class GaugeTest {
     public void valid() {
         Gauge.builder().build();
     }
-
 }

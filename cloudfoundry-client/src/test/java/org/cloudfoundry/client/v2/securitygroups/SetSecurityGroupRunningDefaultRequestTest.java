@@ -22,15 +22,13 @@ public final class SetSecurityGroupRunningDefaultRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noSecurityGroupRunningDefaultId() {
-        SetSecurityGroupRunningDefaultRequest.builder()
-            .build();
+        SetSecurityGroupRunningDefaultRequest.builder().build();
     }
 
     @Test
     public void valid() {
         SetSecurityGroupRunningDefaultRequest.builder()
-            .securityGroupId("test-security-group-default-id")
-            .build();
+                .securityGroupId("test-security-group-default-id")
+                .build();
     }
-
 }

@@ -61,5 +61,4 @@ public enum KeyType {
     public String toString() {
         return getValue();
     }
-
 }

@@ -22,24 +22,19 @@ public final class UpdateIsolationSegmentRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noId() {
-        UpdateIsolationSegmentRequest.builder()
-            .name("test-name")
-            .build();
+        UpdateIsolationSegmentRequest.builder().name("test-name").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noName() {
-        UpdateIsolationSegmentRequest.builder()
-            .isolationSegmentId("test-id")
-            .build();
+        UpdateIsolationSegmentRequest.builder().isolationSegmentId("test-id").build();
     }
 
     @Test
     public void valid() {
         UpdateIsolationSegmentRequest.builder()
-            .isolationSegmentId("test-id")
-            .name("test-name")
-            .build();
+                .isolationSegmentId("test-id")
+                .name("test-name")
+                .build();
     }
-
 }

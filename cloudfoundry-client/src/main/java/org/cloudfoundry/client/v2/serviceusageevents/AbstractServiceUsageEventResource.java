@@ -21,6 +21,5 @@ import org.cloudfoundry.client.v2.Resource;
 /**
  * The base class for Service Usage Event resources
  */
-public abstract class AbstractServiceUsageEventResource extends Resource<org.cloudfoundry.client.v2.serviceusageevents.ServiceUsageEventEntity> {
-
-}
+public abstract class AbstractServiceUsageEventResource
+        extends Resource<org.cloudfoundry.client.v2.serviceusageevents.ServiceUsageEventEntity> {}

@@ -24,5 +24,4 @@ public class InfoResponseTest {
     public void valid() {
         InfoResponse.builder().build();
     }
-
 }

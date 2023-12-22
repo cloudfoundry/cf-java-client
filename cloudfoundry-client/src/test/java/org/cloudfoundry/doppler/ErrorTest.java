@@ -22,44 +22,31 @@ public final class ErrorTest {
 
     @Test
     public void dropsonde() {
-        Error.from(new org.cloudfoundry.dropsonde.events.Error.Builder()
-            .code(0)
-            .message("test-message")
-            .source("test-source")
-            .build());
+        Error.from(
+                new org.cloudfoundry.dropsonde.events.Error.Builder()
+                        .code(0)
+                        .message("test-message")
+                        .source("test-source")
+                        .build());
     }
 
     @Test(expected = IllegalStateException.class)
     public void noCode() {
-        Error.builder()
-            .message("test-message")
-            .source("test-source")
-            .build();
+        Error.builder().message("test-message").source("test-source").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noMessage() {
-        Error.builder()
-            .code(0)
-            .source("test-source")
-            .build();
+        Error.builder().code(0).source("test-source").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noSource() {
-        Error.builder()
-            .code(0)
-            .message("test-message")
-            .build();
+        Error.builder().code(0).message("test-message").build();
     }
 
     @Test
     public void valid() {
-        Error.builder()
-            .code(0)
-            .message("test-message")
-            .source("test-source")
-            .build();
+        Error.builder().code(0).message("test-message").source("test-source").build();
     }
-
 }

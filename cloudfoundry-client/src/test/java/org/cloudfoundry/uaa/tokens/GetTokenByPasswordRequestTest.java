@@ -23,48 +23,47 @@ public final class GetTokenByPasswordRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noClientId() {
         GetTokenByPasswordRequest.builder()
-            .clientSecret("test-client-secret")
-            .password("test-password")
-            .username("test-username")
-            .build();
+                .clientSecret("test-client-secret")
+                .password("test-password")
+                .username("test-username")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noClientSecret() {
         GetTokenByPasswordRequest.builder()
-            .clientId("test-client-id")
-            .password("test-password")
-            .username("test-username")
-            .build();
+                .clientId("test-client-id")
+                .password("test-password")
+                .username("test-username")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noPassword() {
         GetTokenByPasswordRequest.builder()
-            .clientId("test-client-id")
-            .clientSecret("test-client-secret")
-            .username("test-username")
-            .build();
+                .clientId("test-client-id")
+                .clientSecret("test-client-secret")
+                .username("test-username")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noUsername() {
         GetTokenByPasswordRequest.builder()
-            .clientId("test-client-id")
-            .clientSecret("test-client-secret")
-            .password("test-password")
-            .build();
+                .clientId("test-client-id")
+                .clientSecret("test-client-secret")
+                .password("test-password")
+                .build();
     }
 
     @Test
     public void valid() {
         GetTokenByPasswordRequest.builder()
-            .clientId("test-client-id")
-            .clientSecret("test-client-secret")
-            .password("test-password")
-            .tokenFormat(TokenFormat.OPAQUE)
-            .username("test-username")
-            .build();
+                .clientId("test-client-id")
+                .clientSecret("test-client-secret")
+                .password("test-password")
+                .tokenFormat(TokenFormat.OPAQUE)
+                .username("test-username")
+                .build();
     }
-
 }

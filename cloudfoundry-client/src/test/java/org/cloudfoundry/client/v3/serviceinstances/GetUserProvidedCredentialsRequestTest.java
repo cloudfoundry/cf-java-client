@@ -7,7 +7,7 @@ public class GetUserProvidedCredentialsRequestTest {
     @Test
     public void valid() {
         GetUserProvidedCredentialsRequest.builder()
-            .serviceInstanceId("test-service-instance-id")
-            .build();
+                .serviceInstanceId("test-service-instance-id")
+                .build();
     }
 }

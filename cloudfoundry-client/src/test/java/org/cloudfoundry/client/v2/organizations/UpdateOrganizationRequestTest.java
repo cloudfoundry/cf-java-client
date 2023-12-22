@@ -22,15 +22,11 @@ public final class UpdateOrganizationRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noOrganizationId() {
-        UpdateOrganizationRequest.builder()
-            .build();
+        UpdateOrganizationRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        UpdateOrganizationRequest.builder()
-            .organizationId("test-organization-id")
-            .build();
+        UpdateOrganizationRequest.builder().organizationId("test-organization-id").build();
     }
-
 }

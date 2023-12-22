@@ -31,5 +31,4 @@ interface RandomWords {
      * @return a random noun
      */
     String getNoun();
-
 }

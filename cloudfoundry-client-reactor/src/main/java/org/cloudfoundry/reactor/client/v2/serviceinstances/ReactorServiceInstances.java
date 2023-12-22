@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v2.serviceinstances;
 
+import java.util.Map;
 import org.cloudfoundry.client.v2.serviceinstances.BindServiceInstanceRouteRequest;
 import org.cloudfoundry.client.v2.serviceinstances.BindServiceInstanceRouteResponse;
 import org.cloudfoundry.client.v2.serviceinstances.CreateServiceInstanceRequest;
@@ -45,12 +46,11 @@ import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v2.AbstractClientV2Operations;
 import reactor.core.publisher.Mono;
 
-import java.util.Map;
-
 /**
  * The Reactor-based implementation of {@link ServiceInstances}
  */
-public final class ReactorServiceInstances extends AbstractClientV2Operations implements ServiceInstances {
+public final class ReactorServiceInstances extends AbstractClientV2Operations
+        implements ServiceInstances {
 
     /**
      * Creates an instance
@@ -60,80 +60,161 @@ public final class ReactorServiceInstances extends AbstractClientV2Operations im
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorServiceInstances(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
+    public ReactorServiceInstances(
+            ConnectionContext connectionContext,
+            Mono<String> root,
+            TokenProvider tokenProvider,
+            Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
-    public Mono<BindServiceInstanceRouteResponse> bindRoute(BindServiceInstanceRouteRequest request) {
-        return put(request, BindServiceInstanceRouteResponse.class, builder -> builder.pathSegment("service_instances", request.getServiceInstanceId(), "routes", request.getRouteId()))
-            .checkpoint();
+    public Mono<BindServiceInstanceRouteResponse> bindRoute(
+            BindServiceInstanceRouteRequest request) {
+        return put(
+                        request,
+                        BindServiceInstanceRouteResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "service_instances",
+                                        request.getServiceInstanceId(),
+                                        "routes",
+                                        request.getRouteId()))
+                .checkpoint();
     }
 
     @Override
     public Mono<CreateServiceInstanceResponse> create(CreateServiceInstanceRequest request) {
-        return post(request, CreateServiceInstanceResponse.class, builder -> builder.pathSegment("service_instances"))
-            .checkpoint();
+        return post(
+                        request,
+                        CreateServiceInstanceResponse.class,
+                        builder -> builder.pathSegment("service_instances"))
+                .checkpoint();
     }
 
     @Override
     public Mono<DeleteServiceInstanceResponse> delete(DeleteServiceInstanceRequest request) {
-        return delete(request, DeleteServiceInstanceResponse.class, builder -> builder.pathSegment("service_instances", request.getServiceInstanceId()))
-            .checkpoint();
+        return delete(
+                        request,
+                        DeleteServiceInstanceResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "service_instances", request.getServiceInstanceId()))
+                .checkpoint();
     }
 
     @Override
     public Mono<GetServiceInstanceResponse> get(GetServiceInstanceRequest request) {
-        return get(request, GetServiceInstanceResponse.class, builder -> builder.pathSegment("service_instances", request.getServiceInstanceId()))
-            .checkpoint();
+        return get(
+                        request,
+                        GetServiceInstanceResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "service_instances", request.getServiceInstanceId()))
+                .checkpoint();
     }
 
     @Override
-    public Mono<GetServiceInstanceParametersResponse> getParameters(GetServiceInstanceParametersRequest request) {
-        return get(request, GetServiceInstanceParametersResponse.class, builder -> builder.pathSegment("service_instances", request.getServiceInstanceId(), "parameters"))
-            .checkpoint();
+    public Mono<GetServiceInstanceParametersResponse> getParameters(
+            GetServiceInstanceParametersRequest request) {
+        return get(
+                        request,
+                        GetServiceInstanceParametersResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "service_instances",
+                                        request.getServiceInstanceId(),
+                                        "parameters"))
+                .checkpoint();
     }
 
     @Override
-    public Mono<GetServiceInstancePermissionsResponse> getPermissions(GetServiceInstancePermissionsRequest request) {
-        return get(request, GetServiceInstancePermissionsResponse.class, builder -> builder.pathSegment("service_instances", request.getServiceInstanceId(), "permissions"))
-            .checkpoint();
+    public Mono<GetServiceInstancePermissionsResponse> getPermissions(
+            GetServiceInstancePermissionsRequest request) {
+        return get(
+                        request,
+                        GetServiceInstancePermissionsResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "service_instances",
+                                        request.getServiceInstanceId(),
+                                        "permissions"))
+                .checkpoint();
     }
 
     @Override
     public Mono<ListServiceInstancesResponse> list(ListServiceInstancesRequest request) {
-        return get(request, ListServiceInstancesResponse.class, builder -> builder.pathSegment("service_instances"))
-            .checkpoint();
+        return get(
+                        request,
+                        ListServiceInstancesResponse.class,
+                        builder -> builder.pathSegment("service_instances"))
+                .checkpoint();
     }
 
     @Override
-    public Mono<ListServiceInstanceRoutesResponse> listRoutes(ListServiceInstanceRoutesRequest request) {
-        return get(request, ListServiceInstanceRoutesResponse.class, builder -> builder.pathSegment("service_instances", request.getServiceInstanceId(), "routes"))
-            .checkpoint();
+    public Mono<ListServiceInstanceRoutesResponse> listRoutes(
+            ListServiceInstanceRoutesRequest request) {
+        return get(
+                        request,
+                        ListServiceInstanceRoutesResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "service_instances",
+                                        request.getServiceInstanceId(),
+                                        "routes"))
+                .checkpoint();
     }
 
     @Override
-    public Mono<ListServiceInstanceServiceBindingsResponse> listServiceBindings(ListServiceInstanceServiceBindingsRequest request) {
-        return get(request, ListServiceInstanceServiceBindingsResponse.class, builder -> builder.pathSegment("service_instances", request.getServiceInstanceId(), "service_bindings"))
-            .checkpoint();
+    public Mono<ListServiceInstanceServiceBindingsResponse> listServiceBindings(
+            ListServiceInstanceServiceBindingsRequest request) {
+        return get(
+                        request,
+                        ListServiceInstanceServiceBindingsResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "service_instances",
+                                        request.getServiceInstanceId(),
+                                        "service_bindings"))
+                .checkpoint();
     }
 
     @Override
-    public Mono<ListServiceInstanceServiceKeysResponse> listServiceKeys(ListServiceInstanceServiceKeysRequest request) {
-        return get(request, ListServiceInstanceServiceKeysResponse.class, builder -> builder.pathSegment("service_instances", request.getServiceInstanceId(), "service_keys"))
-            .checkpoint();
+    public Mono<ListServiceInstanceServiceKeysResponse> listServiceKeys(
+            ListServiceInstanceServiceKeysRequest request) {
+        return get(
+                        request,
+                        ListServiceInstanceServiceKeysResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "service_instances",
+                                        request.getServiceInstanceId(),
+                                        "service_keys"))
+                .checkpoint();
     }
 
     @Override
     public Mono<Void> unbindRoute(UnbindServiceInstanceRouteRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("service_instances", request.getServiceInstanceId(), "routes", request.getRouteId()))
-            .checkpoint();
+        return delete(
+                        request,
+                        Void.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "service_instances",
+                                        request.getServiceInstanceId(),
+                                        "routes",
+                                        request.getRouteId()))
+                .checkpoint();
     }
 
     @Override
     public Mono<UpdateServiceInstanceResponse> update(UpdateServiceInstanceRequest request) {
-        return put(request, UpdateServiceInstanceResponse.class, builder -> builder.pathSegment("service_instances", request.getServiceInstanceId()))
-            .checkpoint();
+        return put(
+                        request,
+                        UpdateServiceInstanceResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "service_instances", request.getServiceInstanceId()))
+                .checkpoint();
     }
-
 }

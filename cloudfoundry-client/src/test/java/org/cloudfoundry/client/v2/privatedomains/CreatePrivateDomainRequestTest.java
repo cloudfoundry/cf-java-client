@@ -23,23 +23,20 @@ public final class CreatePrivateDomainRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noName() {
         CreatePrivateDomainRequest.builder()
-            .owningOrganizationId("test-owning-organization-id")
-            .build();
+                .owningOrganizationId("test-owning-organization-id")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noOwningOrganizationId() {
-        CreatePrivateDomainRequest.builder()
-            .name("test-name")
-            .build();
+        CreatePrivateDomainRequest.builder().name("test-name").build();
     }
 
     @Test
     public void valid() {
         CreatePrivateDomainRequest.builder()
-            .name("test-name")
-            .owningOrganizationId("test-owning-organization-id")
-            .build();
+                .name("test-name")
+                .owningOrganizationId("test-owning-organization-id")
+                .build();
     }
-
 }

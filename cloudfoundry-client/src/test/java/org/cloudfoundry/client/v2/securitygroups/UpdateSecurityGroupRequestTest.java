@@ -23,20 +23,19 @@ public class UpdateSecurityGroupRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noId() {
         UpdateSecurityGroupRequest.builder()
-            .name("test-security-group-name")
-            .rule(RuleEntity.builder().build())
-            .spaceId("test-space-id")
-            .build();
+                .name("test-security-group-name")
+                .rule(RuleEntity.builder().build())
+                .spaceId("test-space-id")
+                .build();
     }
 
     @Test
     public void valid() {
         UpdateSecurityGroupRequest.builder()
-            .name("test-security-group-name")
-            .rule(RuleEntity.builder().build())
-            .securityGroupId("test-security-group-id")
-            .spaceId("test-space-id")
-            .build();
+                .name("test-security-group-name")
+                .rule(RuleEntity.builder().build())
+                .securityGroupId("test-security-group-id")
+                .spaceId("test-space-id")
+                .build();
     }
-
 }

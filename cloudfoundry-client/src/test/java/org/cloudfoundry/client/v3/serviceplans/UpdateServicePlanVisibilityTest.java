@@ -23,24 +23,25 @@ public class UpdateServicePlanVisibilityTest {
     @Test
     public void valid() {
         UpdateServicePlanVisibilityRequest.builder()
-            .servicePlanId("test-service-plan-id")
-            .type(Visibility.ORGANIZATION)
-            .organization(Organization.builder()
-                .name("test-organization")
-                .guid("test-organization-id")
-                .build())
-            .build();
+                .servicePlanId("test-service-plan-id")
+                .type(Visibility.ORGANIZATION)
+                .organization(
+                        Organization.builder()
+                                .name("test-organization")
+                                .guid("test-organization-id")
+                                .build())
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void invalid() {
         UpdateServicePlanVisibilityRequest.builder()
-            .servicePlanId("test-service-plan-id")
-            .organization(Organization.builder()
-                .name("test-organization")
-                .guid("test-organization-id")
-                .build())
-            .build();
+                .servicePlanId("test-service-plan-id")
+                .organization(
+                        Organization.builder()
+                                .name("test-organization")
+                                .guid("test-organization-id")
+                                .build())
+                .build();
     }
-
 }

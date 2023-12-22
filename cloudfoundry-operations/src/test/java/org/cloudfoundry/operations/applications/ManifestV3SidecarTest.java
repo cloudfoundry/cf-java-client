@@ -22,14 +22,11 @@ public class ManifestV3SidecarTest {
 
     @Test(expected = IllegalStateException.class)
     public void noName() {
-        ManifestV3Sidecar.builder()
-            .build();
+        ManifestV3Sidecar.builder().build();
     }
 
     @Test
     public void valid() {
-        ManifestV3Sidecar.builder()
-            .name("test-service-name")
-            .build();
+        ManifestV3Sidecar.builder().name("test-service-name").build();
     }
 }

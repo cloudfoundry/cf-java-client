@@ -48,7 +48,8 @@ public enum ApplicationState {
             case "stopped":
                 return STOPPED;
             default:
-                throw new IllegalArgumentException(String.format("Unknown application state: %s", s));
+                throw new IllegalArgumentException(
+                        String.format("Unknown application state: %s", s));
         }
     }
 
@@ -61,5 +62,4 @@ public enum ApplicationState {
     public String toString() {
         return getValue();
     }
-
 }

@@ -23,23 +23,20 @@ public final class RemoveSpaceQuotaDefinitionRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noSpaceId() {
         RemoveSpaceQuotaDefinitionRequest.builder()
-            .spaceQuotaDefinitionId("test-space-quota-definition-id")
-            .build();
+                .spaceQuotaDefinitionId("test-space-quota-definition-id")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noSpaceQuotaDefinitionId() {
-        RemoveSpaceQuotaDefinitionRequest.builder()
-            .spaceId("test-space-id")
-            .build();
+        RemoveSpaceQuotaDefinitionRequest.builder().spaceId("test-space-id").build();
     }
 
     @Test
     public void valid() {
         RemoveSpaceQuotaDefinitionRequest.builder()
-            .spaceId("test-space-id")
-            .spaceQuotaDefinitionId("test-space-quota-definition-id")
-            .build();
+                .spaceId("test-space-id")
+                .spaceQuotaDefinitionId("test-space-quota-definition-id")
+                .build();
     }
-
 }

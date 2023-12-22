@@ -22,17 +22,14 @@ public final class DeleteIdentityProviderRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noIdentityProviderId() {
-        DeleteIdentityProviderRequest.builder()
-            .identityZoneId("test-identity-zone-id")
-            .build();
+        DeleteIdentityProviderRequest.builder().identityZoneId("test-identity-zone-id").build();
     }
 
     @Test
     public void valid() {
         DeleteIdentityProviderRequest.builder()
-            .identityProviderId("test-identity-provider-id")
-            .identityZoneId("test-identity-zone-id")
-            .build();
+                .identityProviderId("test-identity-provider-id")
+                .identityZoneId("test-identity-zone-id")
+                .build();
     }
-
 }

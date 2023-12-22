@@ -22,15 +22,13 @@ public class UpdateOrganizationQuotaDefinitionRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noOrganizationQuotaDefinitionId() {
-        UpdateOrganizationQuotaDefinitionRequest.builder()
-            .build();
+        UpdateOrganizationQuotaDefinitionRequest.builder().build();
     }
 
     @Test
     public void valid() {
         UpdateOrganizationQuotaDefinitionRequest.builder()
-            .organizationQuotaDefinitionId("test-organization-quota-definition-id")
-            .build();
+                .organizationQuotaDefinitionId("test-organization-quota-definition-id")
+                .build();
     }
-
 }

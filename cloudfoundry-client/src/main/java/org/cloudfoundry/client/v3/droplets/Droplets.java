@@ -53,5 +53,4 @@ public interface Droplets {
      * @return the response from the List Droplets request
      */
     Mono<ListDropletsResponse> list(ListDropletsRequest request);
-
 }

@@ -63,7 +63,8 @@ public enum HealthCheckType {
             case "process":
                 return PROCESS;
             default:
-                throw new IllegalArgumentException(String.format("Unknown health check type: %s", s));
+                throw new IllegalArgumentException(
+                        String.format("Unknown health check type: %s", s));
         }
     }
 
@@ -76,5 +77,4 @@ public enum HealthCheckType {
     public String toString() {
         return getValue();
     }
-
 }

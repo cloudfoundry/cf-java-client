@@ -62,5 +62,4 @@ public enum EnvelopeType {
     public String toString() {
         return getValue();
     }
-
 }

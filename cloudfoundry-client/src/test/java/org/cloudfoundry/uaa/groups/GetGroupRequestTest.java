@@ -22,15 +22,11 @@ public final class GetGroupRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noId() {
-        GetGroupRequest.builder()
-            .build();
+        GetGroupRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        GetGroupRequest.builder()
-            .groupId("test-group-id")
-            .build();
+        GetGroupRequest.builder().groupId("test-group-id").build();
     }
-
 }

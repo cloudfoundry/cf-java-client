@@ -73,6 +73,7 @@
         <wire.version>3.7.1</wire.version>
         <wire.plugin.version>3.0.2</wire.plugin.version>
         <wire.suffix></wire.suffix>
+        <spotless.version>2.41.1</spotless.version>
     </properties>
 
     <dependencyManagement>
@@ -265,6 +266,25 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>${spotless.version}</version>
+                <configuration>
+                    <java>
+                        <excludes>
+                            <exclude>**/_*.java</exclude>
+                        </excludes>
+                        <googleJavaFormat>
+                            <version>1.19.1</version>
+                            <style>AOSP</style>
+                            <reflowLongStrings>true</reflowLongStrings>
+                            <formatJavadoc>false</formatJavadoc>
+                        </googleJavaFormat>
+                        <removeUnusedImports />
+                    </java>
+                </configuration>
             </plugin>
         </plugins>
     </build>

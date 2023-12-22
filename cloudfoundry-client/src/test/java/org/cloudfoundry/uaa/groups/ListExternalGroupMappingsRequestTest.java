@@ -22,8 +22,6 @@ public final class ListExternalGroupMappingsRequestTest {
 
     @Test
     public void valid() {
-        ListExternalGroupMappingsRequest.builder()
-            .build();
+        ListExternalGroupMappingsRequest.builder().build();
     }
-
 }

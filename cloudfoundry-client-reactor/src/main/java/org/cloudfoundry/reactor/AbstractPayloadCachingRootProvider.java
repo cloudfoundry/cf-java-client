@@ -17,30 +17,33 @@
 package org.cloudfoundry.reactor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
 abstract class AbstractPayloadCachingRootProvider extends AbstractRootProvider {
 
-    private final ConcurrentMap<ConnectionContext, Mono<Map<String, String>>> payloads = new ConcurrentHashMap<>(1);
+    private final ConcurrentMap<ConnectionContext, Mono<Map<String, String>>> payloads =
+            new ConcurrentHashMap<>(1);
 
     protected abstract Mono<Map<String, String>> doGetPayload(ConnectionContext connectionContext);
 
     @Override
     protected final Mono<UriComponents> doGetRoot(String key, ConnectionContext connectionContext) {
-        return this.payloads.computeIfAbsent(connectionContext, this::getPayload)
-            .map(payload -> {
-                if (!payload.containsKey(key)) {
-                    throw new IllegalArgumentException(String.format("Payload does not contain key '%s;", key));
-                }
+        return this.payloads
+                .computeIfAbsent(connectionContext, this::getPayload)
+                .map(
+                        payload -> {
+                            if (!payload.containsKey(key)) {
+                                throw new IllegalArgumentException(
+                                        String.format("Payload does not contain key '%s;", key));
+                            }
 
-                return normalize(UriComponentsBuilder.fromUriString(payload.get(key)));
-            });
+                            return normalize(UriComponentsBuilder.fromUriString(payload.get(key)));
+                        });
     }
 
     abstract ObjectMapper getObjectMapper();
@@ -48,9 +51,6 @@ abstract class AbstractPayloadCachingRootProvider extends AbstractRootProvider {
     private Mono<Map<String, String>> getPayload(ConnectionContext connectionContext) {
         Mono<Map<String, String>> cached = doGetPayload(connectionContext);
 
-        return connectionContext.getCacheDuration()
-            .map(cached::cache)
-            .orElseGet(cached::cache);
+        return connectionContext.getCacheDuration().map(cached::cache).orElseGet(cached::cache);
     }
-
 }

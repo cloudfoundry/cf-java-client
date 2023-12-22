@@ -22,8 +22,6 @@ public final class ListSpacesRequestTest {
 
     @Test
     public void valid() {
-        ListSpacesRequest.builder()
-            .build();
+        ListSpacesRequest.builder().build();
     }
-
 }

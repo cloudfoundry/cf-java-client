@@ -22,24 +22,19 @@ public final class AssociateSpaceManagerRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noManagerId() {
-        AssociateSpaceManagerRequest.builder()
-            .spaceId("test-space-id")
-            .build();
+        AssociateSpaceManagerRequest.builder().spaceId("test-space-id").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noSpaceId() {
-        AssociateSpaceManagerRequest.builder()
-            .managerId("test-manager-id")
-            .build();
+        AssociateSpaceManagerRequest.builder().managerId("test-manager-id").build();
     }
 
     @Test
     public void valid() {
         AssociateSpaceManagerRequest.builder()
-            .managerId("test-manager-id")
-            .spaceId("test-space-id")
-            .build();
+                .managerId("test-manager-id")
+                .spaceId("test-space-id")
+                .build();
     }
-
 }

@@ -16,8 +16,13 @@
 
 package org.cloudfoundry.reactor.util;
 
+import static io.netty.handler.codec.http.HttpStatusClass.CLIENT_ERROR;
+import static io.netty.handler.codec.http.HttpStatusClass.SERVER_ERROR;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.handler.codec.http.HttpStatusClass;
+import java.util.Map;
+import java.util.function.Function;
 import org.cloudfoundry.UnknownCloudFoundryException;
 import org.cloudfoundry.client.v2.ClientV2Exception;
 import org.cloudfoundry.client.v3.ClientV3Exception;
@@ -29,65 +34,75 @@ import reactor.netty.ByteBufFlux;
 import reactor.netty.Connection;
 import reactor.netty.http.client.HttpClientResponse;
 
-import java.util.Map;
-import java.util.function.Function;
-
-import static io.netty.handler.codec.http.HttpStatusClass.CLIENT_ERROR;
-import static io.netty.handler.codec.http.HttpStatusClass.SERVER_ERROR;
-
 public final class ErrorPayloadMappers {
 
     @SuppressWarnings("unchecked")
     public static ErrorPayloadMapper clientV2(ObjectMapper objectMapper) {
-        return inbound -> inbound
-            .flatMap(mapToError((statusCode, payload) -> {
-                Map<String, Object> map = objectMapper.readValue(payload, Map.class);
-                Integer code = (Integer) map.get("code");
-                String description = (String) map.get("description");
-                String errorCode = (String) map.get("error_code");
+        return inbound ->
+                inbound.flatMap(
+                        mapToError(
+                                (statusCode, payload) -> {
+                                    Map<String, Object> map =
+                                            objectMapper.readValue(payload, Map.class);
+                                    Integer code = (Integer) map.get("code");
+                                    String description = (String) map.get("description");
+                                    String errorCode = (String) map.get("error_code");
 
-                return new ClientV2Exception(statusCode, code, description, errorCode);
-            }));
+                                    return new ClientV2Exception(
+                                            statusCode, code, description, errorCode);
+                                }));
     }
 
     public static ErrorPayloadMapper clientV3(ObjectMapper objectMapper) {
-        return inbound -> inbound
-            .flatMap(mapToError((statusCode, payload) -> {
-                Errors errors = objectMapper.readValue(payload, Errors.class);
-                return new ClientV3Exception(statusCode, errors.getErrors());
-            }));
+        return inbound ->
+                inbound.flatMap(
+                        mapToError(
+                                (statusCode, payload) -> {
+                                    Errors errors = objectMapper.readValue(payload, Errors.class);
+                                    return new ClientV3Exception(statusCode, errors.getErrors());
+                                }));
     }
 
     public static ErrorPayloadMapper fallback() {
-        return inbound -> inbound
-            .flatMap(responseWithConnection -> {
-                HttpClientResponse response = responseWithConnection.getResponse();
+        return inbound ->
+                inbound.flatMap(
+                        responseWithConnection -> {
+                            HttpClientResponse response = responseWithConnection.getResponse();
 
-                if (isError(response)) {
-                    Connection connection = responseWithConnection.getConnection();
-                    ByteBufFlux body = ByteBufFlux.fromInbound(connection.inbound().receive());
+                            if (isError(response)) {
+                                Connection connection = responseWithConnection.getConnection();
+                                ByteBufFlux body =
+                                        ByteBufFlux.fromInbound(connection.inbound().receive());
 
-                    return body.aggregate().asString()
-                        .doFinally(signalType -> connection.channel().close())
-                        .flatMap(payload -> {
-                            return Mono.error(new UnknownCloudFoundryException(response.status().code(), payload));
+                                return body.aggregate()
+                                        .asString()
+                                        .doFinally(signalType -> connection.channel().close())
+                                        .flatMap(
+                                                payload -> {
+                                                    return Mono.error(
+                                                            new UnknownCloudFoundryException(
+                                                                    response.status().code(),
+                                                                    payload));
+                                                });
+                            }
+
+                            return Mono.just(responseWithConnection);
                         });
-                }
-
-                return Mono.just(responseWithConnection);
-            });
     }
 
     @SuppressWarnings("unchecked")
     public static ErrorPayloadMapper uaa(ObjectMapper objectMapper) {
-        return inbound -> inbound
-            .flatMap(mapToError((statusCode, payload) -> {
-                Map<String, Object> map = objectMapper.readValue(payload, Map.class);
-                String error = (String) map.get("error");
-                String errorDescription = (String) map.get("error_description");
+        return inbound ->
+                inbound.flatMap(
+                        mapToError(
+                                (statusCode, payload) -> {
+                                    Map<String, Object> map =
+                                            objectMapper.readValue(payload, Map.class);
+                                    String error = (String) map.get("error");
+                                    String errorDescription = (String) map.get("error_description");
 
-                return new UaaException(statusCode, error, errorDescription);
-            }));
+                                    return new UaaException(statusCode, error, errorDescription);
+                                }));
     }
 
     private static boolean isError(HttpClientResponse response) {
@@ -95,25 +110,42 @@ public final class ErrorPayloadMappers {
         return statusClass == CLIENT_ERROR || statusClass == SERVER_ERROR;
     }
 
-    private static Function<HttpClientResponseWithConnection, Mono<HttpClientResponseWithConnection>> mapToError(ExceptionGenerator exceptionGenerator) {
+    private static Function<
+                    HttpClientResponseWithConnection, Mono<HttpClientResponseWithConnection>>
+            mapToError(ExceptionGenerator exceptionGenerator) {
         return response -> {
             if (!isError(response.getResponse())) {
                 return Mono.just(response);
             }
 
             Connection connection = response.getConnection();
-            ByteBufFlux body = ByteBufFlux.fromInbound(connection.inbound().receive()
-                .doFinally(signalType -> connection.dispose()));
+            ByteBufFlux body =
+                    ByteBufFlux.fromInbound(
+                            connection
+                                    .inbound()
+                                    .receive()
+                                    .doFinally(signalType -> connection.dispose()));
 
-            return body.aggregate().asString()
-                .switchIfEmpty(Mono.error(new UnknownCloudFoundryException(response.getResponse().status().code())))
-                .flatMap(payload -> {
-                    try {
-                        return Mono.error(exceptionGenerator.apply(response.getResponse().status().code(), payload));
-                    } catch (Exception e) {
-                        return Mono.error(new UnknownCloudFoundryException(response.getResponse().status().code(), payload));
-                    }
-                });
+            return body.aggregate()
+                    .asString()
+                    .switchIfEmpty(
+                            Mono.error(
+                                    new UnknownCloudFoundryException(
+                                            response.getResponse().status().code())))
+                    .flatMap(
+                            payload -> {
+                                try {
+                                    return Mono.error(
+                                            exceptionGenerator.apply(
+                                                    response.getResponse().status().code(),
+                                                    payload));
+                                } catch (Exception e) {
+                                    return Mono.error(
+                                            new UnknownCloudFoundryException(
+                                                    response.getResponse().status().code(),
+                                                    payload));
+                                }
+                            });
         };
     }
 
@@ -121,7 +153,5 @@ public final class ErrorPayloadMappers {
     private interface ExceptionGenerator {
 
         RuntimeException apply(Integer statusCode, String payload) throws Exception;
-
     }
-
 }

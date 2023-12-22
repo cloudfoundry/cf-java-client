@@ -22,8 +22,6 @@ public final class AttributeMappingsTest {
 
     @Test
     public void valid() {
-        AttributeMappings.builder()
-            .build();
+        AttributeMappings.builder().build();
     }
-
 }

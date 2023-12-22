@@ -22,7 +22,6 @@ import java.util.Objects;
  * Event Types
  */
 public enum EventType {
-
     CONTAINER_METRIC,
 
     COUNTER_EVENT,
@@ -50,8 +49,8 @@ public enum EventType {
             case ValueMetric:
                 return VALUE_METRIC;
             default:
-                throw new IllegalArgumentException(String.format("Unknown event type: %s", dropsonde));
+                throw new IllegalArgumentException(
+                        String.format("Unknown event type: %s", dropsonde));
         }
     }
-
 }

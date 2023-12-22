@@ -17,10 +17,9 @@
 package org.cloudfoundry.client.v2.applications;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.Map;
 import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
-
-import java.util.Map;
 
 /**
  * The core entity response payload for Application resources
@@ -191,5 +190,4 @@ public abstract class AbstractApplicationEntity {
     @JsonProperty("state")
     @Nullable
     public abstract String getState();
-
 }

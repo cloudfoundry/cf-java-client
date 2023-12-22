@@ -22,33 +22,28 @@ public final class CopySourceApplicationRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noName() {
-        CopySourceApplicationRequest.builder()
-            .targetName("test-target-name")
-            .build();
+        CopySourceApplicationRequest.builder().targetName("test-target-name").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noTargetName() {
-        CopySourceApplicationRequest.builder()
-            .name("test-name")
-            .build();
+        CopySourceApplicationRequest.builder().name("test-name").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void organizationNoSpace() {
         CopySourceApplicationRequest.builder()
-            .name("test-name")
-            .targetName("test-target-name")
-            .targetOrganization("test-target-organization")
-            .build();
+                .name("test-name")
+                .targetName("test-target-name")
+                .targetOrganization("test-target-organization")
+                .build();
     }
 
     @Test
     public void valid() {
         CopySourceApplicationRequest.builder()
-            .name("test-name")
-            .targetName("test-target-name")
-            .build();
+                .name("test-name")
+                .targetName("test-target-name")
+                .build();
     }
-
 }

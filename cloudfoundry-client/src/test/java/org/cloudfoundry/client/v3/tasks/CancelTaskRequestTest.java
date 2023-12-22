@@ -22,15 +22,11 @@ public final class CancelTaskRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noTaskId() {
-        CancelTaskRequest.builder()
-            .build();
+        CancelTaskRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        CancelTaskRequest.builder()
-            .taskId("test-task-id")
-            .build();
+        CancelTaskRequest.builder().taskId("test-task-id").build();
     }
-
 }

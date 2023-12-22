@@ -22,24 +22,16 @@ public final class SetFeatureFlagRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noEnabled() {
-        SetFeatureFlagRequest.builder()
-            .name("test-name")
-            .build();
+        SetFeatureFlagRequest.builder().name("test-name").build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noName() {
-        SetFeatureFlagRequest.builder()
-            .enabled(false)
-            .build();
+        SetFeatureFlagRequest.builder().enabled(false).build();
     }
 
     @Test
     public void valid() {
-        SetFeatureFlagRequest.builder()
-            .enabled(false)
-            .name("test-name")
-            .build();
+        SetFeatureFlagRequest.builder().enabled(false).name("test-name").build();
     }
-
 }

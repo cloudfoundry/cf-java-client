@@ -22,15 +22,11 @@ public final class ListApplicationTasksRequestTest {
 
     @Test(expected = IllegalStateException.class)
     public void noApplicationId() {
-        ListApplicationTasksRequest.builder()
-            .build();
+        ListApplicationTasksRequest.builder().build();
     }
 
     @Test
     public void valid() {
-        ListApplicationTasksRequest.builder()
-            .applicationId("test-application-id")
-            .build();
+        ListApplicationTasksRequest.builder().applicationId("test-application-id").build();
     }
-
 }

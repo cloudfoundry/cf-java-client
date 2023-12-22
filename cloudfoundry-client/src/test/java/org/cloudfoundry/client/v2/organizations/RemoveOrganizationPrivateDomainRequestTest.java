@@ -23,23 +23,22 @@ public final class RemoveOrganizationPrivateDomainRequestTest {
     @Test(expected = IllegalStateException.class)
     public void noOrganizationId() {
         RemoveOrganizationPrivateDomainRequest.builder()
-            .privateDomainId("test-private-domain-id")
-            .build();
+                .privateDomainId("test-private-domain-id")
+                .build();
     }
 
     @Test(expected = IllegalStateException.class)
     public void noPrivateDomainId() {
         RemoveOrganizationPrivateDomainRequest.builder()
-            .organizationId("test-organization-id")
-            .build();
+                .organizationId("test-organization-id")
+                .build();
     }
 
     @Test
     public void valid() {
         RemoveOrganizationPrivateDomainRequest.builder()
-            .organizationId("test-organization-id")
-            .privateDomainId("test-private-domain-id")
-            .build();
+                .organizationId("test-organization-id")
+                .privateDomainId("test-private-domain-id")
+                .build();
     }
-
 }

@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v2.info;
 
+import java.util.Map;
 import org.cloudfoundry.client.v2.info.GetInfoRequest;
 import org.cloudfoundry.client.v2.info.GetInfoResponse;
 import org.cloudfoundry.client.v2.info.Info;
@@ -23,8 +24,6 @@ import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v2.AbstractClientV2Operations;
 import reactor.core.publisher.Mono;
-
-import java.util.Map;
 
 /**
  * The Reactor-based implementation of {@link Info}
@@ -39,14 +38,17 @@ public final class ReactorInfo extends AbstractClientV2Operations implements Inf
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorInfo(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
+    public ReactorInfo(
+            ConnectionContext connectionContext,
+            Mono<String> root,
+            TokenProvider tokenProvider,
+            Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<GetInfoResponse> get(GetInfoRequest request) {
         return get(request, GetInfoResponse.class, builder -> builder.pathSegment("info"))
-            .checkpoint();
+                .checkpoint();
     }
-
 }

@@ -16,12 +16,11 @@
 
 package org.cloudfoundry.util;
 
+import java.time.Duration;
+import java.util.function.Supplier;
 import org.cloudfoundry.client.v2.ClientV2Exception;
 import org.cloudfoundry.client.v2.serviceinstances.LastOperation;
 import reactor.core.publisher.Mono;
-
-import java.time.Duration;
-import java.util.function.Supplier;
 
 /**
  * Utilities for {@link LastOperation}s
@@ -30,16 +29,22 @@ public final class LastOperationUtils {
 
     private static final String IN_PROGRESS = "in progress";
 
-    private LastOperationUtils() {
-    }
+    private LastOperationUtils() {}
 
-    public static Mono<Void> waitForCompletion(Duration completionTimeout, Supplier<Mono<LastOperation>> lastOperationSupplier) {
-        return lastOperationSupplier.get()
-            .map(LastOperation::getState)
-            .filter(state -> !IN_PROGRESS.equals(state))
-            .repeatWhenEmpty(DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), completionTimeout))
-            .onErrorResume(t -> t instanceof ClientV2Exception && ((ClientV2Exception) t).getStatusCode() == 404, t -> Mono.empty())
-            .then();
+    public static Mono<Void> waitForCompletion(
+            Duration completionTimeout, Supplier<Mono<LastOperation>> lastOperationSupplier) {
+        return lastOperationSupplier
+                .get()
+                .map(LastOperation::getState)
+                .filter(state -> !IN_PROGRESS.equals(state))
+                .repeatWhenEmpty(
+                        DelayUtils.exponentialBackOff(
+                                Duration.ofSeconds(1), Duration.ofSeconds(15), completionTimeout))
+                .onErrorResume(
+                        t ->
+                                t instanceof ClientV2Exception
+                                        && ((ClientV2Exception) t).getStatusCode() == 404,
+                        t -> Mono.empty())
+                .then();
     }
-
 }
