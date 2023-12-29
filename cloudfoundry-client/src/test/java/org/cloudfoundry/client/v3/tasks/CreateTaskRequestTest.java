@@ -43,9 +43,8 @@ final class CreateTaskRequestTest {
     @Test
     void valid() {
         CreateTaskRequest.builder()
-            .applicationId("test-application-id")
-            .command("test-command")
-            .build();
+                .applicationId("test-application-id")
+                .command("test-command")
+                .build();
     }
-
 }

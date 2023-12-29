@@ -55,10 +55,9 @@ final class UpdateApplicationFeatureRequestTest {
     @Test
     void valid() {
         UpdateApplicationFeatureRequest.builder()
-            .applicationId("test-application-id")
-            .enabled(true)
-            .featureName("test-feature-name")
-            .build();
+                .applicationId("test-application-id")
+                .enabled(true)
+                .featureName("test-feature-name")
+                .build();
     }
-
 }

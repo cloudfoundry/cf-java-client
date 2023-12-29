@@ -17,11 +17,11 @@
 package org.cloudfoundry.uaa.identityproviders;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
 import org.cloudfoundry.Nullable;
 
-import java.util.List;
-
-abstract class AbstractExternalIdentityProviderConfiguration extends AbstractIdentityProviderConfiguration {
+abstract class AbstractExternalIdentityProviderConfiguration
+        extends AbstractIdentityProviderConfiguration {
 
     @JsonProperty("attributeMappings")
     @Nullable
@@ -40,5 +40,4 @@ abstract class AbstractExternalIdentityProviderConfiguration extends AbstractIde
     @JsonProperty("storeCustomAttributes")
     @Nullable
     abstract Boolean getStoreCustomAttributes();
-
 }

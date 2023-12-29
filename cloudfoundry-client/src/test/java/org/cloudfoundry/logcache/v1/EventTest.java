@@ -24,5 +24,4 @@ class EventTest {
     void valid() {
         Event.builder().build();
     }
-
 }

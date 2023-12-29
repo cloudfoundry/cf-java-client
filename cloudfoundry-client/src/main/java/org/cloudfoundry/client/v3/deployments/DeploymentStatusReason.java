@@ -76,7 +76,8 @@ public enum DeploymentStatusReason {
             case "superseded":
                 return SUPERSEDED;
             default:
-                throw new IllegalArgumentException(String.format("Unknown deployment state: %s", s));
+                throw new IllegalArgumentException(
+                        String.format("Unknown deployment state: %s", s));
         }
     }
 
@@ -89,5 +90,4 @@ public enum DeploymentStatusReason {
     public String toString() {
         return getValue();
     }
-
 }

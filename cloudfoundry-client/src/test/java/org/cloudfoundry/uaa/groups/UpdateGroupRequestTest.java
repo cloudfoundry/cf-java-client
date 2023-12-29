@@ -67,11 +67,10 @@ final class UpdateGroupRequestTest {
     @Test
     void valid() {
         UpdateGroupRequest.builder()
-            .identityZoneId("test-identity-zone-id")
-            .displayName("group-test")
-            .groupId("test-group-id")
-            .version("*")
-            .build();
+                .identityZoneId("test-identity-zone-id")
+                .displayName("group-test")
+                .groupId("test-group-id")
+                .version("*")
+                .build();
     }
-
 }

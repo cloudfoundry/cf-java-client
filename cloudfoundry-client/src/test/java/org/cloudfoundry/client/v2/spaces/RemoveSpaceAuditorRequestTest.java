@@ -43,9 +43,8 @@ final class RemoveSpaceAuditorRequestTest {
     @Test
     void valid() {
         RemoveSpaceAuditorRequest.builder()
-            .auditorId("test-auditor-id")
-            .spaceId("test-space-id")
-            .build();
+                .auditorId("test-auditor-id")
+                .spaceId("test-space-id")
+                .build();
     }
-
 }

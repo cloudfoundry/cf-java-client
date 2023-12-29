@@ -36,5 +36,4 @@ class ListRouteDestinationsRequestTest {
             .routeId("test-route-destination-id")
             .build();
     }
-
 }

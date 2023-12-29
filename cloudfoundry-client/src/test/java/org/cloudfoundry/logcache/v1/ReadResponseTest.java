@@ -31,5 +31,4 @@ class ReadResponseTest {
     void valid() {
         ReadResponse.builder().envelopes(EnvelopeBatch.builder().build()).build();
     }
-
 }

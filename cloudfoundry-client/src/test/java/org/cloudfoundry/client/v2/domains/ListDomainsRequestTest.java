@@ -25,5 +25,4 @@ final class ListDomainsRequestTest {
         ListDomainsRequest.builder()
             .build();
     }
-
 }

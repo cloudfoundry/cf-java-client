@@ -36,5 +36,4 @@ final class GetClientRequestTest {
             .clientId("test-client-id")
             .build();
     }
-
 }

@@ -36,5 +36,4 @@ final class DeleteDropletRequestTest {
             .dropletId("test-droplet-id")
             .build();
     }
-
 }

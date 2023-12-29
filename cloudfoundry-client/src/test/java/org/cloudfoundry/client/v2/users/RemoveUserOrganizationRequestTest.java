@@ -43,9 +43,8 @@ final class RemoveUserOrganizationRequestTest {
     @Test
     void valid() {
         RemoveUserOrganizationRequest.builder()
-            .organizationId("test-space-id")
-            .userId("test-user-id")
-            .build();
+                .organizationId("test-space-id")
+                .userId("test-user-id")
+                .build();
     }
-
 }

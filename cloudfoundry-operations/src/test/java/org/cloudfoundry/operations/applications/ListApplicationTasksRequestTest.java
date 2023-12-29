@@ -36,5 +36,4 @@ final class ListApplicationTasksRequestTest {
             .name("test-name")
             .build();
     }
-
 }

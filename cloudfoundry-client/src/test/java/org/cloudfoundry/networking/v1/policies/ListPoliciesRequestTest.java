@@ -25,5 +25,4 @@ class ListPoliciesRequestTest {
         ListPoliciesRequest.builder()
             .build();
     }
-
 }

@@ -43,9 +43,8 @@ final class TerminateProcessInstanceRequestTest {
     @Test
     void valid() {
         TerminateProcessInstanceRequest.builder()
-            .index("test-index")
-            .processId("test-process-id")
-            .build();
+                .index("test-index")
+                .processId("test-process-id")
+                .build();
     }
-
 }

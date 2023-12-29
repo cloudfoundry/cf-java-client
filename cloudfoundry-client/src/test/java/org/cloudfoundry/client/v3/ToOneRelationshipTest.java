@@ -25,5 +25,4 @@ final class ToOneRelationshipTest {
         ToOneRelationship.builder()
             .build();
     }
-
 }

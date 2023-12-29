@@ -46,7 +46,9 @@ final class ApplicationManifestUtilsTest {
                 .service("test-service-name")
                 .build());
 
-        List<ApplicationManifest> actual = ApplicationManifestUtils.read(new ClassPathResource("fixtures/manifest-kilo.yml").getFile().toPath());
+        List<ApplicationManifest> actual =
+                ApplicationManifestUtils.read(
+                        new ClassPathResource("fixtures/manifest-kilo.yml").getFile().toPath());
 
         assertThat(actual).isEqualTo(expected);
     }
@@ -115,7 +117,9 @@ final class ApplicationManifestUtilsTest {
                 .service("alternate-instance-2")
                 .build());
 
-        List<ApplicationManifest> actual = ApplicationManifestUtils.read(new ClassPathResource("fixtures/manifest-charlie.yml").getFile().toPath());
+        List<ApplicationManifest> actual =
+                ApplicationManifestUtils.read(
+                        new ClassPathResource("fixtures/manifest-charlie.yml").getFile().toPath());
 
         assertThat(actual).isEqualTo(expected);
     }
@@ -204,7 +208,9 @@ final class ApplicationManifestUtilsTest {
                 .service("alternate-instance-2")
                 .build());
 
-        List<ApplicationManifest> actual = ApplicationManifestUtils.read(new ClassPathResource("fixtures/manifest-delta.yml").getFile().toPath());
+        List<ApplicationManifest> actual =
+                ApplicationManifestUtils.read(
+                        new ClassPathResource("fixtures/manifest-delta.yml").getFile().toPath());
 
         assertThat(actual).isEqualTo(expected);
     }
@@ -224,7 +230,9 @@ final class ApplicationManifestUtilsTest {
                 .noRoute(false)
                 .build());
 
-        List<ApplicationManifest> actual = ApplicationManifestUtils.read(new ClassPathResource("fixtures/manifest-lima.yml").getFile().toPath());
+        List<ApplicationManifest> actual =
+                ApplicationManifestUtils.read(
+                        new ClassPathResource("fixtures/manifest-lima.yml").getFile().toPath());
 
         assertThat(actual).isEqualTo(expected);
     }
@@ -319,7 +327,9 @@ final class ApplicationManifestUtilsTest {
                 .service("beta-instance-2")
                 .build());
 
-        List<ApplicationManifest> actual = ApplicationManifestUtils.read(new ClassPathResource("fixtures/manifest-beta.yml").getFile().toPath());
+        List<ApplicationManifest> actual =
+                ApplicationManifestUtils.read(
+                        new ClassPathResource("fixtures/manifest-beta.yml").getFile().toPath());
 
         assertThat(actual).isEqualTo(expected);
     }
@@ -353,7 +363,9 @@ final class ApplicationManifestUtilsTest {
                 .service("indigo-instance-2")
                 .build());
 
-        List<ApplicationManifest> actual = ApplicationManifestUtils.read(new ClassPathResource("fixtures/manifest-juliet.yml").getFile().toPath());
+        List<ApplicationManifest> actual =
+                ApplicationManifestUtils.read(
+                        new ClassPathResource("fixtures/manifest-juliet.yml").getFile().toPath());
 
         assertThat(actual).isEqualTo(expected);
     }
@@ -383,11 +395,12 @@ final class ApplicationManifestUtilsTest {
     void relativePath() throws IOException {
         Path root = new ClassPathResource("fixtures/manifest-november.yml").getFile().toPath();
 
-        List<ApplicationManifest> expected = Collections.singletonList(
-            ApplicationManifest.builder()
-                .name("alpha-application-1")
-                .path(root.getParent().resolve("alpha-path"))
-                .build());
+        List<ApplicationManifest> expected =
+                Collections.singletonList(
+                        ApplicationManifest.builder()
+                                .name("alpha-application-1")
+                                .path(root.getParent().resolve("alpha-path"))
+                                .build());
 
         List<ApplicationManifest> actual = ApplicationManifestUtils.read(root);
 
@@ -444,7 +457,9 @@ final class ApplicationManifestUtilsTest {
                 .build()
         );
 
-        List<ApplicationManifest> actual = ApplicationManifestUtils.read(new ClassPathResource("fixtures/manifest-mike.yml").getFile().toPath());
+        List<ApplicationManifest> actual =
+                ApplicationManifestUtils.read(
+                        new ClassPathResource("fixtures/manifest-mike.yml").getFile().toPath());
 
         assertThat(actual).isEqualTo(expected);
     }
@@ -457,7 +472,9 @@ final class ApplicationManifestUtilsTest {
                 .buildpack("oscar-buildpack")
                 .build());
 
-        List<ApplicationManifest> actual = ApplicationManifestUtils.read(new ClassPathResource("fixtures/manifest-oscar.yml").getFile().toPath());
+        List<ApplicationManifest> actual =
+                ApplicationManifestUtils.read(
+                        new ClassPathResource("fixtures/manifest-oscar.yml").getFile().toPath());
 
         assertThat(actual).isEqualTo(expected);
     }
@@ -472,9 +489,10 @@ final class ApplicationManifestUtilsTest {
                 .memory(1024)
                 .build());
 
-        List<ApplicationManifest> actual = ApplicationManifestUtils.read(
-            new ClassPathResource("fixtures/manifest-papa-1.yml").getFile().toPath(),
-            new ClassPathResource("fixtures/vars-papa-1.yml").getFile().toPath());
+        List<ApplicationManifest> actual =
+                ApplicationManifestUtils.read(
+                        new ClassPathResource("fixtures/manifest-papa-1.yml").getFile().toPath(),
+                        new ClassPathResource("fixtures/vars-papa-1.yml").getFile().toPath());
 
         assertThat(actual).isEqualTo(expected);
     }
@@ -482,11 +500,17 @@ final class ApplicationManifestUtilsTest {
     @Test
     void readWithVariableSubstitution_throwExceptionOnMissing() throws IOException {
         assertThatExceptionOfType(NoSuchElementException.class)
-            .isThrownBy(() -> {
-                ApplicationManifestUtils.read(
-                    new ClassPathResource("fixtures/manifest-papa-2.yml").getFile().toPath(),
-                    new ClassPathResource("fixtures/vars-papa-2.yml").getFile().toPath());
-            }).withMessageMatching("Expected to find variable: abcdef");
+                .isThrownBy(
+                        () -> {
+                            ApplicationManifestUtils.read(
+                                    new ClassPathResource("fixtures/manifest-papa-2.yml")
+                                            .getFile()
+                                            .toPath(),
+                                    new ClassPathResource("fixtures/vars-papa-2.yml")
+                                            .getFile()
+                                            .toPath());
+                        })
+                .withMessageMatching("Expected to find variable: abcdef");
     }
 
     @Test
@@ -497,9 +521,10 @@ final class ApplicationManifestUtilsTest {
                 .buildpack("((regex*))")
                 .build());
 
-        List<ApplicationManifest> actual = ApplicationManifestUtils.read(
-            new ClassPathResource("fixtures/manifest-papa-7.yml").getFile().toPath(),
-            new ClassPathResource("fixtures/vars-papa-7.yml").getFile().toPath());
+        List<ApplicationManifest> actual =
+                ApplicationManifestUtils.read(
+                        new ClassPathResource("fixtures/manifest-papa-7.yml").getFile().toPath(),
+                        new ClassPathResource("fixtures/vars-papa-7.yml").getFile().toPath());
 
         assertThat(actual).isEqualTo(expected);
     }
@@ -512,9 +537,10 @@ final class ApplicationManifestUtilsTest {
                 .buildpack("((endless_2))")
                 .build());
 
-        List<ApplicationManifest> actual = ApplicationManifestUtils.read(
-            new ClassPathResource("fixtures/manifest-papa-3.yml").getFile().toPath(),
-            new ClassPathResource("fixtures/vars-papa-3.yml").getFile().toPath());
+        List<ApplicationManifest> actual =
+                ApplicationManifestUtils.read(
+                        new ClassPathResource("fixtures/manifest-papa-3.yml").getFile().toPath(),
+                        new ClassPathResource("fixtures/vars-papa-3.yml").getFile().toPath());
 
         assertThat(actual).isEqualTo(expected);
     }
@@ -527,9 +553,10 @@ final class ApplicationManifestUtilsTest {
                 .buildpack("((test))")
                 .build());
 
-        List<ApplicationManifest> actual = ApplicationManifestUtils.read(
-            new ClassPathResource("fixtures/manifest-papa-4.yml").getFile().toPath(),
-            new ClassPathResource("fixtures/vars-papa-4.yml").getFile().toPath());
+        List<ApplicationManifest> actual =
+                ApplicationManifestUtils.read(
+                        new ClassPathResource("fixtures/manifest-papa-4.yml").getFile().toPath(),
+                        new ClassPathResource("fixtures/vars-papa-4.yml").getFile().toPath());
 
         assertThat(actual).isEqualTo(expected);
     }
@@ -542,9 +569,10 @@ final class ApplicationManifestUtilsTest {
                 .buildpack("one and two is a very nice buildpack name for three")
                 .build());
 
-        List<ApplicationManifest> actual = ApplicationManifestUtils.read(
-            new ClassPathResource("fixtures/manifest-papa-5.yml").getFile().toPath(),
-            new ClassPathResource("fixtures/vars-papa-5.yml").getFile().toPath());
+        List<ApplicationManifest> actual =
+                ApplicationManifestUtils.read(
+                        new ClassPathResource("fixtures/manifest-papa-5.yml").getFile().toPath(),
+                        new ClassPathResource("fixtures/vars-papa-5.yml").getFile().toPath());
 
         assertThat(actual).isEqualTo(expected);
     }
@@ -557,13 +585,13 @@ final class ApplicationManifestUtilsTest {
                 .buildpack("buildpack_papa_6")
                 .build());
 
-        List<ApplicationManifest> actual = ApplicationManifestUtils.read(
-            new ClassPathResource("fixtures/manifest-papa-6.yml").getFile().toPath(),
-            new ClassPathResource("fixtures/vars-papa-6.yml").getFile().toPath());
+        List<ApplicationManifest> actual =
+                ApplicationManifestUtils.read(
+                        new ClassPathResource("fixtures/manifest-papa-6.yml").getFile().toPath(),
+                        new ClassPathResource("fixtures/vars-papa-6.yml").getFile().toPath());
 
         assertThat(actual).isEqualTo(expected);
     }
-
 
     @Test
     void unixRead() throws IOException {
@@ -590,34 +618,33 @@ final class ApplicationManifestUtilsTest {
     }
 
     private void read(String path, String expectedManifest) throws IOException {
-        List<ApplicationManifest> expected = Collections.singletonList(
-            ApplicationManifest.builder()
-                .name("alpha-application-1")
-                .buildpack("alpha-buildpack")
-                .command("alpha-command")
-                .disk(-1)
-                .healthCheckHttpEndpoint("alpha-health-check-http-endpoint")
-                .healthCheckType(NONE)
-                .instances(-1)
-                .memory(1)
-                .noRoute(true)
-                .path(Paths.get(path))
-                .randomRoute(true)
-                .route(Route.builder()
-                    .route("alpha-route-1")
-                    .build())
-                .route(Route.builder()
-                    .route("alpha-route-2")
-                    .build())
-                .stack("alpha-stack")
-                .timeout(-1)
-                .environmentVariable("ALPHA_KEY_1", "alpha-value-1")
-                .environmentVariable("ALPHA_KEY_2", "alpha-value-2")
-                .service("alpha-instance-1")
-                .service("alpha-instance-2")
-                .build());
+        List<ApplicationManifest> expected =
+                Collections.singletonList(
+                        ApplicationManifest.builder()
+                                .name("alpha-application-1")
+                                .buildpack("alpha-buildpack")
+                                .command("alpha-command")
+                                .disk(-1)
+                                .healthCheckHttpEndpoint("alpha-health-check-http-endpoint")
+                                .healthCheckType(NONE)
+                                .instances(-1)
+                                .memory(1)
+                                .noRoute(true)
+                                .path(Paths.get(path))
+                                .randomRoute(true)
+                                .route(Route.builder().route("alpha-route-1").build())
+                                .route(Route.builder().route("alpha-route-2").build())
+                                .stack("alpha-stack")
+                                .timeout(-1)
+                                .environmentVariable("ALPHA_KEY_1", "alpha-value-1")
+                                .environmentVariable("ALPHA_KEY_2", "alpha-value-2")
+                                .service("alpha-instance-1")
+                                .service("alpha-instance-2")
+                                .build());
 
-        List<ApplicationManifest> actual = ApplicationManifestUtils.read(new ClassPathResource(expectedManifest).getFile().toPath());
+        List<ApplicationManifest> actual =
+                ApplicationManifestUtils.read(
+                        new ClassPathResource(expectedManifest).getFile().toPath());
 
         assertThat(actual).isEqualTo(expected);
     }
@@ -625,60 +652,58 @@ final class ApplicationManifestUtilsTest {
     private void write(String path, String expectedManifest) throws IOException {
         Path out = Files.createTempFile("test-manifest-", ".yml");
 
-        ApplicationManifestUtils.write(out, Arrays.asList(
-            ApplicationManifest.builder()
-                .name("alpha-application-1")
-                .buildpack("alpha-buildpack")
-                .command("alpha-command")
-                .disk(512)
-                .healthCheckHttpEndpoint("alpha-health-check-http-endpoint")
-                .instances(-1)
-                .memory(512)
-                .noRoute(true)
-                .path(Paths.get(path))
-                .randomRoute(true)
-                .route(Route.builder()
-                    .route("alpha-route-1")
-                    .build())
-                .route(Route.builder()
-                    .route("alpha-route-2")
-                    .build())
-                .stack("alpha-stack")
-                .timeout(-1)
-                .environmentVariable("ALPHA_KEY_1", "alpha-value-1")
-                .environmentVariable("ALPHA_KEY_2", "alpha-value-2")
-                .service("alpha-instance-1")
-                .service("alpha-instance-2")
-                .build(),
-            ApplicationManifest.builder()
-                .name("alpha-application-2")
-                .buildpack("alpha-buildpack")
-                .command("alpha-command")
-                .domain("alpha-domain")
-                .domain("alpha-domains-1")
-                .domain("alpha-domains-2")
-                .healthCheckHttpEndpoint("alpha-health-check-http-endpoint")
-                .healthCheckType(PORT)
-                .host("alpha-host")
-                .host("alpha-hosts-1")
-                .host("alpha-hosts-2")
-                .instances(-1)
-                .noHostname(true)
-                .noRoute(true)
-                .path(Paths.get(path))
-                .randomRoute(true)
-                .stack("alpha-stack")
-                .timeout(-1)
-                .environmentVariable("ALPHA_KEY_1", "alpha-value-1")
-                .environmentVariable("ALPHA_KEY_2", "alpha-value-2")
-                .service("alpha-instance-1")
-                .service("alpha-instance-2")
-                .build()));
+        ApplicationManifestUtils.write(
+                out,
+                Arrays.asList(
+                        ApplicationManifest.builder()
+                                .name("alpha-application-1")
+                                .buildpack("alpha-buildpack")
+                                .command("alpha-command")
+                                .disk(512)
+                                .healthCheckHttpEndpoint("alpha-health-check-http-endpoint")
+                                .instances(-1)
+                                .memory(512)
+                                .noRoute(true)
+                                .path(Paths.get(path))
+                                .randomRoute(true)
+                                .route(Route.builder().route("alpha-route-1").build())
+                                .route(Route.builder().route("alpha-route-2").build())
+                                .stack("alpha-stack")
+                                .timeout(-1)
+                                .environmentVariable("ALPHA_KEY_1", "alpha-value-1")
+                                .environmentVariable("ALPHA_KEY_2", "alpha-value-2")
+                                .service("alpha-instance-1")
+                                .service("alpha-instance-2")
+                                .build(),
+                        ApplicationManifest.builder()
+                                .name("alpha-application-2")
+                                .buildpack("alpha-buildpack")
+                                .command("alpha-command")
+                                .domain("alpha-domain")
+                                .domain("alpha-domains-1")
+                                .domain("alpha-domains-2")
+                                .healthCheckHttpEndpoint("alpha-health-check-http-endpoint")
+                                .healthCheckType(PORT)
+                                .host("alpha-host")
+                                .host("alpha-hosts-1")
+                                .host("alpha-hosts-2")
+                                .instances(-1)
+                                .noHostname(true)
+                                .noRoute(true)
+                                .path(Paths.get(path))
+                                .randomRoute(true)
+                                .stack("alpha-stack")
+                                .timeout(-1)
+                                .environmentVariable("ALPHA_KEY_1", "alpha-value-1")
+                                .environmentVariable("ALPHA_KEY_2", "alpha-value-2")
+                                .service("alpha-instance-1")
+                                .service("alpha-instance-2")
+                                .build()));
 
-        List<String> expected = Files.readAllLines(new ClassPathResource(expectedManifest).getFile().toPath());
+        List<String> expected =
+                Files.readAllLines(new ClassPathResource(expectedManifest).getFile().toPath());
         List<String> actual = Files.readAllLines(out);
 
         assertThat(actual).isEqualTo(expected);
     }
-
 }

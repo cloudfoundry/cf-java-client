@@ -1,5 +1,6 @@
 package org.cloudfoundry.reactor.client.v3.routes;
 
+import java.util.Map;
 import org.cloudfoundry.client.v3.routes.CreateRouteRequest;
 import org.cloudfoundry.client.v3.routes.CreateRouteResponse;
 import org.cloudfoundry.client.v3.routes.DeleteRouteRequest;
@@ -22,8 +23,6 @@ import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
 import reactor.core.publisher.Mono;
 
-import java.util.Map;
-
 /**
  * The Reactor-based implementation of {@link RoutesV3}
  */
@@ -37,62 +36,108 @@ public class ReactorRoutesV3 extends AbstractClientV3Operations implements Route
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorRoutesV3(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
+    public ReactorRoutesV3(
+            ConnectionContext connectionContext,
+            Mono<String> root,
+            TokenProvider tokenProvider,
+            Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<CreateRouteResponse> create(CreateRouteRequest request) {
-        return post(request, CreateRouteResponse.class, uriComponentsBuilder -> uriComponentsBuilder.pathSegment("routes"))
-            .checkpoint();
+        return post(
+                        request,
+                        CreateRouteResponse.class,
+                        uriComponentsBuilder -> uriComponentsBuilder.pathSegment("routes"))
+                .checkpoint();
     }
 
     @Override
     public Mono<String> delete(DeleteRouteRequest request) {
-        return delete(request, uriComponentsBuilder -> uriComponentsBuilder.pathSegment("routes", request.getRouteId()))
-            .checkpoint();
+        return delete(
+                        request,
+                        uriComponentsBuilder ->
+                                uriComponentsBuilder.pathSegment("routes", request.getRouteId()))
+                .checkpoint();
     }
 
     @Override
     public Mono<GetRouteResponse> get(GetRouteRequest request) {
-        return get(request, GetRouteResponse.class, uriComponentsBuilder -> uriComponentsBuilder.pathSegment("routes", request.getRouteId()))
-            .checkpoint();
+        return get(
+                        request,
+                        GetRouteResponse.class,
+                        uriComponentsBuilder ->
+                                uriComponentsBuilder.pathSegment("routes", request.getRouteId()))
+                .checkpoint();
     }
 
     @Override
-    public Mono<InsertRouteDestinationsResponse> insertDestinations(InsertRouteDestinationsRequest request) {
-        return post(request, InsertRouteDestinationsResponse.class, uriComponentsBuilder -> uriComponentsBuilder.pathSegment("routes", request.getRouteId(), "destinations"))
-            .checkpoint();
+    public Mono<InsertRouteDestinationsResponse> insertDestinations(
+            InsertRouteDestinationsRequest request) {
+        return post(
+                        request,
+                        InsertRouteDestinationsResponse.class,
+                        uriComponentsBuilder ->
+                                uriComponentsBuilder.pathSegment(
+                                        "routes", request.getRouteId(), "destinations"))
+                .checkpoint();
     }
 
     @Override
     public Mono<ListRoutesResponse> list(ListRoutesRequest request) {
-        return get(request, ListRoutesResponse.class, uriComponentsBuilder -> uriComponentsBuilder.pathSegment("routes"))
-            .checkpoint();
+        return get(
+                        request,
+                        ListRoutesResponse.class,
+                        uriComponentsBuilder -> uriComponentsBuilder.pathSegment("routes"))
+                .checkpoint();
     }
 
     @Override
-    public Mono<ListRouteDestinationsResponse> listDestinations(ListRouteDestinationsRequest request) {
-        return get(request, ListRouteDestinationsResponse.class, uriComponentsBuilder -> uriComponentsBuilder.pathSegment("routes", request.getRouteId(), "destinations"))
-            .checkpoint();
+    public Mono<ListRouteDestinationsResponse> listDestinations(
+            ListRouteDestinationsRequest request) {
+        return get(
+                        request,
+                        ListRouteDestinationsResponse.class,
+                        uriComponentsBuilder ->
+                                uriComponentsBuilder.pathSegment(
+                                        "routes", request.getRouteId(), "destinations"))
+                .checkpoint();
     }
 
     @Override
     public Mono<Void> removeDestinations(RemoveRouteDestinationsRequest request) {
-        return delete(request, Void.class, uriComponentsBuilder -> uriComponentsBuilder.pathSegment("routes", request.getRouteId(), "destinations", request.getDestinationId()))
-            .checkpoint();
+        return delete(
+                        request,
+                        Void.class,
+                        uriComponentsBuilder ->
+                                uriComponentsBuilder.pathSegment(
+                                        "routes",
+                                        request.getRouteId(),
+                                        "destinations",
+                                        request.getDestinationId()))
+                .checkpoint();
     }
 
     @Override
-    public Mono<ReplaceRouteDestinationsResponse> replaceDestinations(ReplaceRouteDestinationsRequest request) {
-        return patch(request, ReplaceRouteDestinationsResponse.class, uriComponentsBuilder -> uriComponentsBuilder.pathSegment("routes", request.getRouteId(), "destinations"))
-            .checkpoint();
+    public Mono<ReplaceRouteDestinationsResponse> replaceDestinations(
+            ReplaceRouteDestinationsRequest request) {
+        return patch(
+                        request,
+                        ReplaceRouteDestinationsResponse.class,
+                        uriComponentsBuilder ->
+                                uriComponentsBuilder.pathSegment(
+                                        "routes", request.getRouteId(), "destinations"))
+                .checkpoint();
     }
 
     @Override
     public Mono<UpdateRouteResponse> update(UpdateRouteRequest request) {
-        return patch(request, UpdateRouteResponse.class, uriComponentsBuilder -> uriComponentsBuilder.pathSegment("routes", request.getRouteId()))
-            .checkpoint();
+        return patch(
+                        request,
+                        UpdateRouteResponse.class,
+                        uriComponentsBuilder ->
+                                uriComponentsBuilder.pathSegment("routes", request.getRouteId()))
+                .checkpoint();
     }
-
 }

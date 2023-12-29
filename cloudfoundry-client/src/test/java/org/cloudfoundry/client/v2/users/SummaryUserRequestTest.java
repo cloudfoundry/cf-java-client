@@ -36,5 +36,4 @@ final class SummaryUserRequestTest {
             .userId("test-uaa-id")
             .build();
     }
-
 }

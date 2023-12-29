@@ -56,9 +56,9 @@ final class PushApplicationRequestTest {
     @Test
     void validApplication() {
         PushApplicationRequest.builder()
-            .path(Paths.get("test-application"))
-            .name("test-name")
-            .build();
+                .path(Paths.get("test-application"))
+                .name("test-name")
+                .build();
     }
 
     @Test
@@ -68,5 +68,4 @@ final class PushApplicationRequestTest {
             .name("test-name")
             .build();
     }
-
 }

@@ -43,9 +43,8 @@ final class UnbindRouteServiceInstanceRequestTest {
     @Test
     void valid() {
         UnbindRouteServiceInstanceRequest.builder()
-            .domainName("test-domain-name")
-            .serviceInstanceName("test-service-instance-name")
-            .build();
+                .domainName("test-domain-name")
+                .serviceInstanceName("test-service-instance-name")
+                .build();
     }
-
 }

@@ -47,5 +47,4 @@ final class RestartApplicationInstanceRequestTest {
             .name("test-name")
             .build();
     }
-
 }

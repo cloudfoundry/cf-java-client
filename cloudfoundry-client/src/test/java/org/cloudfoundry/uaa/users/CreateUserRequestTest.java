@@ -62,12 +62,8 @@ final class CreateUserRequestTest {
     @Test
     void valid() {
         CreateUserRequest.builder()
-            .email(Email.builder()
-                .primary(true)
-                .value("test-email")
-                .build())
-            .userName("test-userName")
-            .build();
+                .email(Email.builder().primary(true).value("test-email").build())
+                .userName("test-userName")
+                .build();
     }
-
 }

@@ -43,9 +43,8 @@ final class CreateServiceKeyRequestTest {
     @Test
     void valid() {
         CreateServiceKeyRequest.builder()
-            .name("name")
-            .serviceInstanceId("service-instance-id")
-            .build();
+                .name("name")
+                .serviceInstanceId("service-instance-id")
+                .build();
     }
-
 }

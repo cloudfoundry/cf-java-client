@@ -43,9 +43,8 @@ final class UnshareDomainRequestTest {
     @Test
     void valid() {
         UnshareDomainRequest.builder()
-            .domain("test-domain")
-            .organization("test-organization")
-            .build();
+                .domain("test-domain")
+                .organization("test-organization")
+                .build();
     }
-
 }

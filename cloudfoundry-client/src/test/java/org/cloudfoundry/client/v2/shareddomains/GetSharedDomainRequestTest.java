@@ -36,5 +36,4 @@ final class GetSharedDomainRequestTest {
             .sharedDomainId("test-shared-domain-id")
             .build();
     }
-
 }

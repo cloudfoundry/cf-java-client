@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v3.serviceofferings;
 
+import java.util.Map;
 import org.cloudfoundry.client.v3.serviceofferings.DeleteServiceOfferingRequest;
 import org.cloudfoundry.client.v3.serviceofferings.GetServiceOfferingRequest;
 import org.cloudfoundry.client.v3.serviceofferings.GetServiceOfferingResponse;
@@ -29,12 +30,11 @@ import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
 import reactor.core.publisher.Mono;
 
-import java.util.Map;
-
 /**
  * The Reactor-based implementation of {@link ServiceOfferingsV3}
  */
-public final class ReactorServiceOfferingsV3 extends AbstractClientV3Operations implements ServiceOfferingsV3 {
+public final class ReactorServiceOfferingsV3 extends AbstractClientV3Operations
+        implements ServiceOfferingsV3 {
 
     /**
      * Creates an instance
@@ -44,32 +44,53 @@ public final class ReactorServiceOfferingsV3 extends AbstractClientV3Operations 
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorServiceOfferingsV3(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
+    public ReactorServiceOfferingsV3(
+            ConnectionContext connectionContext,
+            Mono<String> root,
+            TokenProvider tokenProvider,
+            Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<Void> delete(DeleteServiceOfferingRequest request) {
-        return delete(request, Void.class, builder -> builder.pathSegment("service_offerings", request.getServiceOfferingId()))
-            .checkpoint();
+        return delete(
+                        request,
+                        Void.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "service_offerings", request.getServiceOfferingId()))
+                .checkpoint();
     }
 
     @Override
     public Mono<GetServiceOfferingResponse> get(GetServiceOfferingRequest request) {
-        return get(request, GetServiceOfferingResponse.class, builder -> builder.pathSegment("service_offerings", request.getServiceOfferingId()))
-            .checkpoint();
+        return get(
+                        request,
+                        GetServiceOfferingResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "service_offerings", request.getServiceOfferingId()))
+                .checkpoint();
     }
 
     @Override
     public Mono<ListServiceOfferingsResponse> list(ListServiceOfferingsRequest request) {
-        return get(request, ListServiceOfferingsResponse.class, builder -> builder.pathSegment("service_offerings"))
-            .checkpoint();
+        return get(
+                        request,
+                        ListServiceOfferingsResponse.class,
+                        builder -> builder.pathSegment("service_offerings"))
+                .checkpoint();
     }
 
     @Override
     public Mono<UpdateServiceOfferingResponse> update(UpdateServiceOfferingRequest request) {
-        return patch(request, UpdateServiceOfferingResponse.class, builder -> builder.pathSegment("service_offerings", request.getServiceOfferingId()))
-            .checkpoint();
+        return patch(
+                        request,
+                        UpdateServiceOfferingResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "service_offerings", request.getServiceOfferingId()))
+                .checkpoint();
     }
-
 }

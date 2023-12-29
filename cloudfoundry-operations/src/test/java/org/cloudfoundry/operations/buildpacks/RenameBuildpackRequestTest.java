@@ -43,9 +43,8 @@ class RenameBuildpackRequestTest {
     @Test
     void valid() {
         RenameBuildpackRequest.builder()
-            .name("test-buildpack-name")
-            .newName("test-buildpack-new-name")
-            .build();
+                .name("test-buildpack-name")
+                .newName("test-buildpack-new-name")
+                .build();
     }
-
 }

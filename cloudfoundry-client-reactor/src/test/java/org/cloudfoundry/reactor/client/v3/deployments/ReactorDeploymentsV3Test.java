@@ -16,6 +16,13 @@
 
 package org.cloudfoundry.reactor.client.v3.deployments;
 
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+import static java.util.Collections.singletonList;
+
+import java.time.Duration;
+import java.util.Collections;
 import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.Pagination;
 import org.cloudfoundry.client.v3.Relationship;
@@ -39,17 +46,12 @@ import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-import java.time.Duration;
-import java.util.Collections;
-
-import static io.netty.handler.codec.http.HttpMethod.GET;
-import static io.netty.handler.codec.http.HttpMethod.POST;
-import static io.netty.handler.codec.http.HttpResponseStatus.OK;
-import static java.util.Collections.singletonList;
 
 class ReactorDeploymentsV3Test extends AbstractClientApiTest {
 
-    private final ReactorDeploymentsV3 deployments = new ReactorDeploymentsV3(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
+    private final ReactorDeploymentsV3 deployments =
+            new ReactorDeploymentsV3(
+                    CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     void cancel() {
@@ -64,12 +66,13 @@ class ReactorDeploymentsV3Test extends AbstractClientApiTest {
             .build());
 
         this.deployments
-            .cancel(CancelDeploymentRequest.builder()
-                .deploymentId("test-deployment-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .cancel(
+                        CancelDeploymentRequest.builder()
+                                .deploymentId("test-deployment-id")
+                                .build())
+                .as(StepVerifier::create)
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @SuppressWarnings("deprecation")
@@ -87,53 +90,77 @@ class ReactorDeploymentsV3Test extends AbstractClientApiTest {
             .build());
 
         this.deployments
-            .create(CreateDeploymentRequest.builder()
-                .droplet(Relationship.builder().id("44ccfa61-dbcf-4a0d-82fe-f668e9d2a962").build())
-                .relationships(DeploymentRelationships.builder()
-                    .app(ToOneRelationship.builder()
-                        .data(Relationship.builder()
-                            .id("305cea31-5a44-45ca-b51b-e89c7a8ef8b2")
-                            .build())
-                        .build())
-                    .build())
-                .build())
-            .as(StepVerifier::create)
-
-            .expectNext(CreateDeploymentResponse.builder()
-                .id("59c3d133-2b83-46f3-960e-7765a129aea4")
-                .state(DeploymentState.DEPLOYING)
-                .droplet(Relationship.builder()
-                    .id("44ccfa61-dbcf-4a0d-82fe-f668e9d2a962")
-                    .build())
-                .previousDroplet(Relationship.builder()
-                    .id("cc6bc315-bd06-49ce-92c2-bc3ad45268c2")
-                    .build())
-                .newProcesses(singletonList(Process.builder()
-                    .id("fd5d3e60-f88c-4c37-b1ae-667cfc65a856")
-                    .type("web-deployment-59c3d133-2b83-46f3-960e-7765a129aea4")
-                    .build()))
-                .revision(Revision.builder()
-                    .id("56126cba-656a-4eba-a81e-7e9951b2df57")
-                    .version(1)
-                    .build())
-                .createdAt("2018-04-25T22:42:10Z")
-                .updatedAt("2018-04-25T22:42:10Z")
-                .relationships(DeploymentRelationships.builder()
-                    .app(ToOneRelationship.builder()
-                        .data(Relationship.builder()
-                            .id("305cea31-5a44-45ca-b51b-e89c7a8ef8b2")
-                            .build())
-                        .build())
-                    .build())
-                .link("self", Link.builder()
-                    .href("https://api.example.org/v3/deployments/59c3d133-2b83-46f3-960e-7765a129aea4")
-                    .build())
-                .link("app", Link.builder()
-                    .href("https://api.example.org/v3/apps/305cea31-5a44-45ca-b51b-e89c7a8ef8b2")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .create(
+                        CreateDeploymentRequest.builder()
+                                .droplet(
+                                        Relationship.builder()
+                                                .id("44ccfa61-dbcf-4a0d-82fe-f668e9d2a962")
+                                                .build())
+                                .relationships(
+                                        DeploymentRelationships.builder()
+                                                .app(
+                                                        ToOneRelationship.builder()
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id(
+                                                                                        "305cea31-5a44-45ca-b51b-e89c7a8ef8b2")
+                                                                                .build())
+                                                                .build())
+                                                .build())
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        CreateDeploymentResponse.builder()
+                                .id("59c3d133-2b83-46f3-960e-7765a129aea4")
+                                .state(DeploymentState.DEPLOYING)
+                                .droplet(
+                                        Relationship.builder()
+                                                .id("44ccfa61-dbcf-4a0d-82fe-f668e9d2a962")
+                                                .build())
+                                .previousDroplet(
+                                        Relationship.builder()
+                                                .id("cc6bc315-bd06-49ce-92c2-bc3ad45268c2")
+                                                .build())
+                                .newProcesses(
+                                        singletonList(
+                                                Process.builder()
+                                                        .id("fd5d3e60-f88c-4c37-b1ae-667cfc65a856")
+                                                        .type(
+                                                                "web-deployment-59c3d133-2b83-46f3-960e-7765a129aea4")
+                                                        .build()))
+                                .revision(
+                                        Revision.builder()
+                                                .id("56126cba-656a-4eba-a81e-7e9951b2df57")
+                                                .version(1)
+                                                .build())
+                                .createdAt("2018-04-25T22:42:10Z")
+                                .updatedAt("2018-04-25T22:42:10Z")
+                                .relationships(
+                                        DeploymentRelationships.builder()
+                                                .app(
+                                                        ToOneRelationship.builder()
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id(
+                                                                                        "305cea31-5a44-45ca-b51b-e89c7a8ef8b2")
+                                                                                .build())
+                                                                .build())
+                                                .build())
+                                .link(
+                                        "self",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/deployments/59c3d133-2b83-46f3-960e-7765a129aea4")
+                                                .build())
+                                .link(
+                                        "app",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/305cea31-5a44-45ca-b51b-e89c7a8ef8b2")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @SuppressWarnings("deprecation")
@@ -150,46 +177,60 @@ class ReactorDeploymentsV3Test extends AbstractClientApiTest {
             .build());
 
         this.deployments
-            .get(GetDeploymentRequest.builder()
-                .deploymentId("test-deployment-id")
-                .build())
-            .as(StepVerifier::create)
-
-            .expectNext(GetDeploymentResponse.builder()
-                .id("59c3d133-2b83-46f3-960e-7765a129aea4")
-                .state(DeploymentState.DEPLOYING)
-                .droplet(Relationship.builder()
-                    .id("44ccfa61-dbcf-4a0d-82fe-f668e9d2a962")
-                    .build())
-                .previousDroplet(Relationship.builder()
-                    .id("cc6bc315-bd06-49ce-92c2-bc3ad45268c2")
-                    .build())
-                .newProcesses(singletonList(Process.builder()
-                    .id("fd5d3e60-f88c-4c37-b1ae-667cfc65a856")
-                    .type("web-deployment-59c3d133-2b83-46f3-960e-7765a129aea4")
-                    .build()))
-                .revision(Revision.builder()
-                    .id("56126cba-656a-4eba-a81e-7e9951b2df57")
-                    .version(1)
-                    .build())
-                .createdAt("2018-04-25T22:42:10Z")
-                .updatedAt("2018-04-25T22:42:10Z")
-                .relationships(DeploymentRelationships.builder()
-                    .app(ToOneRelationship.builder()
-                        .data(Relationship.builder()
-                            .id("305cea31-5a44-45ca-b51b-e89c7a8ef8b2")
-                            .build())
-                        .build())
-                    .build())
-                .link("self", Link.builder()
-                    .href("https://api.example.org/v3/deployments/59c3d133-2b83-46f3-960e-7765a129aea4")
-                    .build())
-                .link("app", Link.builder()
-                    .href("https://api.example.org/v3/apps/305cea31-5a44-45ca-b51b-e89c7a8ef8b2")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .get(GetDeploymentRequest.builder().deploymentId("test-deployment-id").build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        GetDeploymentResponse.builder()
+                                .id("59c3d133-2b83-46f3-960e-7765a129aea4")
+                                .state(DeploymentState.DEPLOYING)
+                                .droplet(
+                                        Relationship.builder()
+                                                .id("44ccfa61-dbcf-4a0d-82fe-f668e9d2a962")
+                                                .build())
+                                .previousDroplet(
+                                        Relationship.builder()
+                                                .id("cc6bc315-bd06-49ce-92c2-bc3ad45268c2")
+                                                .build())
+                                .newProcesses(
+                                        singletonList(
+                                                Process.builder()
+                                                        .id("fd5d3e60-f88c-4c37-b1ae-667cfc65a856")
+                                                        .type(
+                                                                "web-deployment-59c3d133-2b83-46f3-960e-7765a129aea4")
+                                                        .build()))
+                                .revision(
+                                        Revision.builder()
+                                                .id("56126cba-656a-4eba-a81e-7e9951b2df57")
+                                                .version(1)
+                                                .build())
+                                .createdAt("2018-04-25T22:42:10Z")
+                                .updatedAt("2018-04-25T22:42:10Z")
+                                .relationships(
+                                        DeploymentRelationships.builder()
+                                                .app(
+                                                        ToOneRelationship.builder()
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id(
+                                                                                        "305cea31-5a44-45ca-b51b-e89c7a8ef8b2")
+                                                                                .build())
+                                                                .build())
+                                                .build())
+                                .link(
+                                        "self",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/deployments/59c3d133-2b83-46f3-960e-7765a129aea4")
+                                                .build())
+                                .link(
+                                        "app",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/305cea31-5a44-45ca-b51b-e89c7a8ef8b2")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @SuppressWarnings("deprecation")
@@ -206,56 +247,82 @@ class ReactorDeploymentsV3Test extends AbstractClientApiTest {
             .build());
 
         this.deployments
-            .list(ListDeploymentsRequest.builder()
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(ListDeploymentsResponse.builder()
-                .pagination(Pagination.builder()
-                    .totalResults(1)
-                    .totalPages(1)
-                    .first(Link.builder()
-                        .href("https://api.example.org/v3/deployments?page=1&per_page=2")
-                        .build())
-                    .last(Link.builder()
-                        .href("https://api.example.org/v3/deployments?page=1&per_page=2")
-                        .build())
-                    .build())
-                .resource(DeploymentResource.builder()
-                    .id("59c3d133-2b83-46f3-960e-7765a129aea4")
-                    .state(DeploymentState.DEPLOYING)
-                    .droplet(Relationship.builder()
-                        .id("44ccfa61-dbcf-4a0d-82fe-f668e9d2a962")
-                        .build())
-                    .previousDroplet(Relationship.builder()
-                        .id("cc6bc315-bd06-49ce-92c2-bc3ad45268c2")
-                        .build())
-                    .newProcesses(singletonList(Process.builder()
-                        .id("fd5d3e60-f88c-4c37-b1ae-667cfc65a856")
-                        .type("web-deployment-59c3d133-2b83-46f3-960e-7765a129aea4")
-                        .build()))
-                    .revision(Revision.builder()
-                        .id("56126cba-656a-4eba-a81e-7e9951b2df57")
-                        .version(1)
-                        .build())
-                    .createdAt("2018-04-25T22:42:10Z")
-                    .updatedAt("2018-04-25T22:42:10Z")
-                    .relationships(DeploymentRelationships.builder()
-                        .app(ToOneRelationship.builder()
-                            .data(Relationship.builder()
-                                .id("305cea31-5a44-45ca-b51b-e89c7a8ef8b2")
+                .list(ListDeploymentsRequest.builder().build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        ListDeploymentsResponse.builder()
+                                .pagination(
+                                        Pagination.builder()
+                                                .totalResults(1)
+                                                .totalPages(1)
+                                                .first(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/deployments?page=1&per_page=2")
+                                                                .build())
+                                                .last(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/deployments?page=1&per_page=2")
+                                                                .build())
+                                                .build())
+                                .resource(
+                                        DeploymentResource.builder()
+                                                .id("59c3d133-2b83-46f3-960e-7765a129aea4")
+                                                .state(DeploymentState.DEPLOYING)
+                                                .droplet(
+                                                        Relationship.builder()
+                                                                .id(
+                                                                        "44ccfa61-dbcf-4a0d-82fe-f668e9d2a962")
+                                                                .build())
+                                                .previousDroplet(
+                                                        Relationship.builder()
+                                                                .id(
+                                                                        "cc6bc315-bd06-49ce-92c2-bc3ad45268c2")
+                                                                .build())
+                                                .newProcesses(
+                                                        singletonList(
+                                                                Process.builder()
+                                                                        .id(
+                                                                                "fd5d3e60-f88c-4c37-b1ae-667cfc65a856")
+                                                                        .type(
+                                                                                "web-deployment-59c3d133-2b83-46f3-960e-7765a129aea4")
+                                                                        .build()))
+                                                .revision(
+                                                        Revision.builder()
+                                                                .id(
+                                                                        "56126cba-656a-4eba-a81e-7e9951b2df57")
+                                                                .version(1)
+                                                                .build())
+                                                .createdAt("2018-04-25T22:42:10Z")
+                                                .updatedAt("2018-04-25T22:42:10Z")
+                                                .relationships(
+                                                        DeploymentRelationships.builder()
+                                                                .app(
+                                                                        ToOneRelationship.builder()
+                                                                                .data(
+                                                                                        Relationship
+                                                                                                .builder()
+                                                                                                .id(
+                                                                                                        "305cea31-5a44-45ca-b51b-e89c7a8ef8b2")
+                                                                                                .build())
+                                                                                .build())
+                                                                .build())
+                                                .link(
+                                                        "self",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/deployments/59c3d133-2b83-46f3-960e-7765a129aea4")
+                                                                .build())
+                                                .link(
+                                                        "app",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/305cea31-5a44-45ca-b51b-e89c7a8ef8b2")
+                                                                .build())
+                                                .build())
                                 .build())
-                            .build())
-                        .build())
-                    .link("self", Link.builder()
-                        .href("https://api.example.org/v3/deployments/59c3d133-2b83-46f3-960e-7765a129aea4")
-                        .build())
-                    .link("app", Link.builder()
-                        .href("https://api.example.org/v3/apps/305cea31-5a44-45ca-b51b-e89c7a8ef8b2")
-                        .build())
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
-
 }

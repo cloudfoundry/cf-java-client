@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v3.droplets;
 
+import java.util.Map;
 import org.cloudfoundry.client.v3.droplets.CopyDropletRequest;
 import org.cloudfoundry.client.v3.droplets.CopyDropletResponse;
 import org.cloudfoundry.client.v3.droplets.DeleteDropletRequest;
@@ -28,8 +29,6 @@ import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
 import reactor.core.publisher.Mono;
-
-import java.util.Map;
 
 /**
  * The Reactor-based implementation of {@link Droplets}
@@ -44,7 +43,11 @@ public final class ReactorDroplets extends AbstractClientV3Operations implements
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorDroplets(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
+    public ReactorDroplets(
+            ConnectionContext connectionContext,
+            Mono<String> root,
+            TokenProvider tokenProvider,
+            Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
@@ -56,19 +59,21 @@ public final class ReactorDroplets extends AbstractClientV3Operations implements
     @Override
     public Mono<String> delete(DeleteDropletRequest request) {
         return delete(request, builder -> builder.pathSegment("droplets", request.getDropletId()))
-            .checkpoint();
+                .checkpoint();
     }
 
     @Override
     public Mono<GetDropletResponse> get(GetDropletRequest request) {
-        return get(request, GetDropletResponse.class, builder -> builder.pathSegment("droplets", request.getDropletId()))
-            .checkpoint();
+        return get(
+                        request,
+                        GetDropletResponse.class,
+                        builder -> builder.pathSegment("droplets", request.getDropletId()))
+                .checkpoint();
     }
 
     @Override
     public Mono<ListDropletsResponse> list(ListDropletsRequest request) {
         return get(request, ListDropletsResponse.class, builder -> builder.pathSegment("droplets"))
-            .checkpoint();
+                .checkpoint();
     }
-
 }

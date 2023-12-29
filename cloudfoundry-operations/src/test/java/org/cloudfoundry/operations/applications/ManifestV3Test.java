@@ -22,9 +22,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ManifestV3Test {
 
-    private final ManifestV3Application testApplication = ManifestV3Application.builder()
-        .name("test-application-name")
-        .build();
+    private final ManifestV3Application testApplication =
+            ManifestV3Application.builder().name("test-application-name").build();
 
     @Test
     void illegalVersion() {

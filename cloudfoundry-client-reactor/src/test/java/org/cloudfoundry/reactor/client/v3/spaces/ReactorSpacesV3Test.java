@@ -16,6 +16,15 @@
 
 package org.cloudfoundry.reactor.client.v3.spaces;
 
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.PATCH;
+import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+
+import java.time.Duration;
+import java.util.Collections;
 import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.Pagination;
@@ -44,19 +53,12 @@ import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-import java.time.Duration;
-import java.util.Collections;
-
-import static io.netty.handler.codec.http.HttpMethod.DELETE;
-import static io.netty.handler.codec.http.HttpMethod.GET;
-import static io.netty.handler.codec.http.HttpMethod.PATCH;
-import static io.netty.handler.codec.http.HttpMethod.POST;
-import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
-import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 class ReactorSpacesV3Test extends AbstractClientApiTest {
 
-    private final ReactorSpacesV3 spaces = new ReactorSpacesV3(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
+    private final ReactorSpacesV3 spaces =
+            new ReactorSpacesV3(
+                    CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     void assignIsolationSegment() {
@@ -72,26 +74,33 @@ class ReactorSpacesV3Test extends AbstractClientApiTest {
             .build());
 
         this.spaces
-            .assignIsolationSegment(AssignSpaceIsolationSegmentRequest.builder()
-                .data(Relationship.builder()
-                    .id("[iso-seg-guid]")
-                    .build())
-                .spaceId("test-space-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(AssignSpaceIsolationSegmentResponse.builder()
-                .data(Relationship.builder()
-                    .id("e4c91047-3b29-4fda-b7f9-04033e5a9c9f")
-                    .build())
-                .link("self", Link.builder()
-                    .href("https://api.example.org/v3/spaces/885735b5-aea4-4cf5-8e44-961af0e41920/relationships/isolation_segment")
-                    .build())
-                .link("related", Link.builder()
-                    .href("https://api.example.org/v3/isolation_segments/e4c91047-3b29-4fda-b7f9-04033e5a9c9f")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .assignIsolationSegment(
+                        AssignSpaceIsolationSegmentRequest.builder()
+                                .data(Relationship.builder().id("[iso-seg-guid]").build())
+                                .spaceId("test-space-id")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        AssignSpaceIsolationSegmentResponse.builder()
+                                .data(
+                                        Relationship.builder()
+                                                .id("e4c91047-3b29-4fda-b7f9-04033e5a9c9f")
+                                                .build())
+                                .link(
+                                        "self",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/spaces/885735b5-aea4-4cf5-8e44-961af0e41920/relationships/isolation_segment")
+                                                .build())
+                                .link(
+                                        "related",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/isolation_segments/e4c91047-3b29-4fda-b7f9-04033e5a9c9f")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -108,38 +117,54 @@ class ReactorSpacesV3Test extends AbstractClientApiTest {
             .build());
 
         this.spaces
-            .create(CreateSpaceRequest.builder()
-                .name("my-space")
-                .relationships(SpaceRelationships.builder()
-                    .organization(ToOneRelationship.builder()
-                        .data(Relationship.builder()
-                            .id("e00705b9-7b42-4561-ae97-2520399d2133")
-                            .build())
-                        .build())
-                    .build())
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(CreateSpaceResponse.builder()
-                .createdAt("2017-02-01T01:33:58Z")
-                .id("885735b5-aea4-4cf5-8e44-961af0e41920")
-                .name("my-space")
-                .relationships(SpaceRelationships.builder()
-                    .organization(ToOneRelationship.builder()
-                        .data(Relationship.builder()
-                            .id("e00705b9-7b42-4561-ae97-2520399d2133")
-                            .build())
-                        .build())
-                    .build())
-                .updatedAt("2017-02-01T01:33:58Z")
-                .link("self", Link.builder()
-                    .href("https://api.example.org/v3/spaces/885735b5-aea4-4cf5-8e44-961af0e41920")
-                    .build())
-                .link("organization", Link.builder()
-                    .href("https://api.example.org/v3/organizations/e00705b9-7b42-4561-ae97-2520399d2133")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .create(
+                        CreateSpaceRequest.builder()
+                                .name("my-space")
+                                .relationships(
+                                        SpaceRelationships.builder()
+                                                .organization(
+                                                        ToOneRelationship.builder()
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id(
+                                                                                        "e00705b9-7b42-4561-ae97-2520399d2133")
+                                                                                .build())
+                                                                .build())
+                                                .build())
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        CreateSpaceResponse.builder()
+                                .createdAt("2017-02-01T01:33:58Z")
+                                .id("885735b5-aea4-4cf5-8e44-961af0e41920")
+                                .name("my-space")
+                                .relationships(
+                                        SpaceRelationships.builder()
+                                                .organization(
+                                                        ToOneRelationship.builder()
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id(
+                                                                                        "e00705b9-7b42-4561-ae97-2520399d2133")
+                                                                                .build())
+                                                                .build())
+                                                .build())
+                                .updatedAt("2017-02-01T01:33:58Z")
+                                .link(
+                                        "self",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/spaces/885735b5-aea4-4cf5-8e44-961af0e41920")
+                                                .build())
+                                .link(
+                                        "organization",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/organizations/e00705b9-7b42-4561-ae97-2520399d2133")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -155,13 +180,11 @@ class ReactorSpacesV3Test extends AbstractClientApiTest {
             .build());
 
         this.spaces
-            .delete(DeleteSpaceRequest.builder()
-                .spaceId("test-space-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext("test-job-id")
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .delete(DeleteSpaceRequest.builder().spaceId("test-space-id").build())
+                .as(StepVerifier::create)
+                .expectNext("test-job-id")
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -177,13 +200,12 @@ class ReactorSpacesV3Test extends AbstractClientApiTest {
             .build());
 
         this.spaces
-            .deleteUnmappedRoutes(DeleteUnmappedRoutesRequest.builder()
-                .spaceId("test-space-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext("test-job-id")
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .deleteUnmappedRoutes(
+                        DeleteUnmappedRoutesRequest.builder().spaceId("test-space-id").build())
+                .as(StepVerifier::create)
+                .expectNext("test-job-id")
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -199,25 +221,28 @@ class ReactorSpacesV3Test extends AbstractClientApiTest {
             .build());
 
         this.spaces
-            .get(GetSpaceRequest.builder()
-                .spaceId("test-space-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(GetSpaceResponse.builder()
-                .id("885735b5-aea4-4cf5-8e44-961af0e41920")
-                .createdAt("2017-02-01T01:33:58Z")
-                .updatedAt("2017-02-01T01:33:58Z")
-                .name("space1")
-                .metadata(Metadata.builder()
-                    .annotations(Collections.emptyMap())
-                    .labels(Collections.emptyMap())
-                    .build())
-                .link("self", Link.builder()
-                    .href("https://api.example.org/v3/spaces/885735b5-aea4-4cf5-8e44-961af0e41920")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .get(GetSpaceRequest.builder().spaceId("test-space-id").build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        GetSpaceResponse.builder()
+                                .id("885735b5-aea4-4cf5-8e44-961af0e41920")
+                                .createdAt("2017-02-01T01:33:58Z")
+                                .updatedAt("2017-02-01T01:33:58Z")
+                                .name("space1")
+                                .metadata(
+                                        Metadata.builder()
+                                                .annotations(Collections.emptyMap())
+                                                .labels(Collections.emptyMap())
+                                                .build())
+                                .link(
+                                        "self",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/spaces/885735b5-aea4-4cf5-8e44-961af0e41920")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -233,23 +258,30 @@ class ReactorSpacesV3Test extends AbstractClientApiTest {
             .build());
 
         this.spaces
-            .getIsolationSegment(GetSpaceIsolationSegmentRequest.builder()
-                .spaceId("test-space-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(GetSpaceIsolationSegmentResponse.builder()
-                .data(Relationship.builder()
-                    .id("e4c91047-3b29-4fda-b7f9-04033e5a9c9f")
-                    .build())
-                .link("self", Link.builder()
-                    .href("https://api.example.org/v3/spaces/885735b5-aea4-4cf5-8e44-961af0e41920/relationships/isolation_segment")
-                    .build())
-                .link("related", Link.builder()
-                    .href("https://api.example.org/v3/isolation_segments/e4c91047-3b29-4fda-b7f9-04033e5a9c9f")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .getIsolationSegment(
+                        GetSpaceIsolationSegmentRequest.builder().spaceId("test-space-id").build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        GetSpaceIsolationSegmentResponse.builder()
+                                .data(
+                                        Relationship.builder()
+                                                .id("e4c91047-3b29-4fda-b7f9-04033e5a9c9f")
+                                                .build())
+                                .link(
+                                        "self",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/spaces/885735b5-aea4-4cf5-8e44-961af0e41920/relationships/isolation_segment")
+                                                .build())
+                                .link(
+                                        "related",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/isolation_segments/e4c91047-3b29-4fda-b7f9-04033e5a9c9f")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -265,41 +297,54 @@ class ReactorSpacesV3Test extends AbstractClientApiTest {
             .build());
 
         this.spaces
-            .list(ListSpacesRequest.builder()
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(ListSpacesResponse.builder()
-                .pagination(Pagination.builder()
-                    .totalResults(2)
-                    .totalPages(1)
-                    .first(Link.builder()
-                        .href("https://api.example.org/v3/spaces?page=1&per_page=50")
-                        .build())
-                    .last(Link.builder()
-                        .href("https://api.example.org/v3/spaces?page=1&per_page=50")
-                        .build())
-                    .build())
-                .resource(SpaceResource.builder()
-                    .id("885735b5-aea4-4cf5-8e44-961af0e41920")
-                    .createdAt("2017-02-01T01:33:58Z")
-                    .updatedAt("2017-02-01T01:33:58Z")
-                    .name("space1")
-                    .link("self", Link.builder()
-                        .href("https://api.example.org/v3/spaces/885735b5-aea4-4cf5-8e44-961af0e41920")
-                        .build())
-                    .build())
-                .resource(SpaceResource.builder()
-                    .id("d4c91047-7b29-4fda-b7f9-04033e5c9c9f")
-                    .createdAt("2017-02-02T00:14:30Z")
-                    .updatedAt("2017-02-02T00:14:30Z")
-                    .name("space2")
-                    .link("self", Link.builder()
-                        .href("https://api.example.org/v3/spaces/d4c91047-7b29-4fda-b7f9-04033e5c9c9f")
-                        .build())
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .list(ListSpacesRequest.builder().build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        ListSpacesResponse.builder()
+                                .pagination(
+                                        Pagination.builder()
+                                                .totalResults(2)
+                                                .totalPages(1)
+                                                .first(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/spaces?page=1&per_page=50")
+                                                                .build())
+                                                .last(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/spaces?page=1&per_page=50")
+                                                                .build())
+                                                .build())
+                                .resource(
+                                        SpaceResource.builder()
+                                                .id("885735b5-aea4-4cf5-8e44-961af0e41920")
+                                                .createdAt("2017-02-01T01:33:58Z")
+                                                .updatedAt("2017-02-01T01:33:58Z")
+                                                .name("space1")
+                                                .link(
+                                                        "self",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/spaces/885735b5-aea4-4cf5-8e44-961af0e41920")
+                                                                .build())
+                                                .build())
+                                .resource(
+                                        SpaceResource.builder()
+                                                .id("d4c91047-7b29-4fda-b7f9-04033e5c9c9f")
+                                                .createdAt("2017-02-02T00:14:30Z")
+                                                .updatedAt("2017-02-02T00:14:30Z")
+                                                .name("space2")
+                                                .link(
+                                                        "self",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/spaces/d4c91047-7b29-4fda-b7f9-04033e5c9c9f")
+                                                                .build())
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -316,30 +361,36 @@ class ReactorSpacesV3Test extends AbstractClientApiTest {
             .build());
 
         this.spaces
-            .update(UpdateSpaceRequest.builder()
-                .spaceId("test-space-id")
-                .metadata(Metadata.builder()
-                    .annotation("version", "1.2.4")
-                    .label("dept", "1234")
-                    .build())
-                .name("test-space-name")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(UpdateSpaceResponse.builder()
-                .id("885735b5-aea4-4cf5-8e44-961af0e41920")
-                .createdAt("2017-02-01T01:33:58Z")
-                .updatedAt("2017-02-01T01:33:58Z")
-                .name("test-space-name")
-                .metadata(Metadata.builder()
-                    .annotation("version", "1.2.4")
-                    .label("dept", "1234")
-                    .build())
-                .link("self", Link.builder()
-                    .href("https://api.example.org/v3/spaces/885735b5-aea4-4cf5-8e44-961af0e41920")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .update(
+                        UpdateSpaceRequest.builder()
+                                .spaceId("test-space-id")
+                                .metadata(
+                                        Metadata.builder()
+                                                .annotation("version", "1.2.4")
+                                                .label("dept", "1234")
+                                                .build())
+                                .name("test-space-name")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        UpdateSpaceResponse.builder()
+                                .id("885735b5-aea4-4cf5-8e44-961af0e41920")
+                                .createdAt("2017-02-01T01:33:58Z")
+                                .updatedAt("2017-02-01T01:33:58Z")
+                                .name("test-space-name")
+                                .metadata(
+                                        Metadata.builder()
+                                                .annotation("version", "1.2.4")
+                                                .label("dept", "1234")
+                                                .build())
+                                .link(
+                                        "self",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/spaces/885735b5-aea4-4cf5-8e44-961af0e41920")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
-
 }

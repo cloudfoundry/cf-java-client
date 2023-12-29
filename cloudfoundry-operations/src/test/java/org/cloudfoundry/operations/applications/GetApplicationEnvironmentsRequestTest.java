@@ -36,5 +36,4 @@ final class GetApplicationEnvironmentsRequestTest {
             .name("test-name")
             .build();
     }
-
 }

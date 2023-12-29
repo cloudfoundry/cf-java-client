@@ -16,16 +16,15 @@
 
 package org.cloudfoundry.reactor.client;
 
+import java.util.Collection;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.cloudfoundry.QueryParameter;
 import org.cloudfoundry.reactor.util.AnnotationUtils;
 import org.cloudfoundry.reactor.util.AnnotationUtils.AnnotatedValue;
 import org.cloudfoundry.reactor.util.UriQueryParameter;
 import org.cloudfoundry.reactor.util.UriQueryParameterBuilder;
-
-import java.util.Collection;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * A builder for Cloud Foundry queries
@@ -34,15 +33,19 @@ public final class QueryBuilder implements UriQueryParameterBuilder {
 
     public Stream<UriQueryParameter> build(Object instance) {
         return AnnotationUtils.streamAnnotatedValues(instance, QueryParameter.class)
-            .map(QueryBuilder::processValue)
-            .filter(Objects::nonNull);
+                .map(QueryBuilder::processValue)
+                .filter(Objects::nonNull);
     }
 
-    private static UriQueryParameter processCollection(QueryParameter queryParameter, Object value) {
-        return processValue(queryParameter.value(), ((Collection<?>) value).stream()
-            .map(Object::toString)
-            .map(String::trim)
-            .collect(Collectors.joining(queryParameter.delimiter())));
+    private static UriQueryParameter processCollection(
+            QueryParameter queryParameter, Object value) {
+        return processValue(
+                queryParameter.value(),
+                ((Collection<?>) value)
+                        .stream()
+                                .map(Object::toString)
+                                .map(String::trim)
+                                .collect(Collectors.joining(queryParameter.delimiter())));
     }
 
     private static UriQueryParameter processValue(AnnotatedValue<QueryParameter> annotatedValue) {
@@ -58,5 +61,4 @@ public final class QueryBuilder implements UriQueryParameterBuilder {
     private static UriQueryParameter processValue(String name, String value) {
         return UriQueryParameter.of(name, value);
     }
-
 }

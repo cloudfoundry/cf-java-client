@@ -43,9 +43,8 @@ final class RemoveOrganizationPrivateDomainRequestTest {
     @Test
     void valid() {
         RemoveOrganizationPrivateDomainRequest.builder()
-            .organizationId("test-organization-id")
-            .privateDomainId("test-private-domain-id")
-            .build();
+                .organizationId("test-organization-id")
+                .privateDomainId("test-private-domain-id")
+                .build();
     }
-
 }

@@ -46,5 +46,4 @@ public interface ApplicationUsageEvents {
      * @return the response from the Purge and Reseed Application Usage Events request
      */
     Mono<Void> purgeAndReseed(PurgeAndReseedApplicationUsageEventsRequest request);
-
 }

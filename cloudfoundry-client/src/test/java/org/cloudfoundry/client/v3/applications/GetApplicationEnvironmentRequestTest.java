@@ -36,5 +36,4 @@ final class GetApplicationEnvironmentRequestTest {
             .applicationId("test-application-id")
             .build();
     }
-
 }

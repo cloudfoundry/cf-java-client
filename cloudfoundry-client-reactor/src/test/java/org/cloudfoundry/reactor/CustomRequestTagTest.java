@@ -16,17 +16,17 @@
 
 package org.cloudfoundry.reactor;
 
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+
+import java.time.Duration;
+import java.util.Collections;
 import org.cloudfoundry.reactor.util.AbstractReactorOperations;
 import org.cloudfoundry.reactor.util.Operator;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.time.Duration;
-import java.util.Collections;
-
-import static io.netty.handler.codec.http.HttpMethod.GET;
-import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 final class CustomRequestTagTest extends AbstractRestTest {
 
@@ -34,11 +34,12 @@ final class CustomRequestTagTest extends AbstractRestTest {
 
     private static final String CUSTOM_REQUEST_TAG_VALUE = "test-header-value";
 
-    private final DefaultConnectionContext connectionContext = DefaultConnectionContext.builder()
-        .apiHost(this.mockWebServer.getHostName())
-        .port(this.mockWebServer.getPort())
-        .secure(false)
-        .build();
+    private final DefaultConnectionContext connectionContext =
+            DefaultConnectionContext.builder()
+                    .apiHost(this.mockWebServer.getHostName())
+                    .port(this.mockWebServer.getPort())
+                    .secure(false)
+                    .build();
 
     @Test
     void addCustomHttpHeader() {
@@ -53,26 +54,23 @@ final class CustomRequestTagTest extends AbstractRestTest {
             .build());
 
         createOperator()
-            .flatMap(operator -> operator.get()
-                .uri(uri -> uri.path("/"))
-                .response()
-                .get())
-            .as(StepVerifier::create)
-            .expectNextMatches(httpClientResponse -> httpClientResponse.status()
-                .equals(OK))
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
-
+                .flatMap(operator -> operator.get().uri(uri -> uri.path("/")).response().get())
+                .as(StepVerifier::create)
+                .expectNextMatches(httpClientResponse -> httpClientResponse.status().equals(OK))
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     private Mono<Operator> createOperator() {
-        return new AbstractReactorOperations(this.connectionContext, this.root, TOKEN_PROVIDER, Collections.singletonMap(CUSTOM_REQUEST_TAG_NAME, CUSTOM_REQUEST_TAG_VALUE)) {
+        return new AbstractReactorOperations(
+                this.connectionContext,
+                this.root,
+                TOKEN_PROVIDER,
+                Collections.singletonMap(CUSTOM_REQUEST_TAG_NAME, CUSTOM_REQUEST_TAG_VALUE)) {
 
             private Mono<Operator> getOperator() {
                 return createOperator();
             }
-
         }.getOperator();
     }
-
 }

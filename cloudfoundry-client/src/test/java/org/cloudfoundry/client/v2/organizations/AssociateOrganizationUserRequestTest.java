@@ -43,9 +43,8 @@ final class AssociateOrganizationUserRequestTest {
     @Test
     void valid() {
         AssociateOrganizationUserRequest.builder()
-            .organizationId("test-organization-id")
-            .userId("test-user-id")
-            .build();
+                .organizationId("test-organization-id")
+                .userId("test-user-id")
+                .build();
     }
-
 }

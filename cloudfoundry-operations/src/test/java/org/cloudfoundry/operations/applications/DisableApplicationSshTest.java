@@ -36,5 +36,4 @@ final class DisableApplicationSshTest {
             .name("test-name")
             .build();
     }
-
 }

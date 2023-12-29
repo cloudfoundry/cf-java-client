@@ -36,5 +36,4 @@ final class ListSecurityGroupSpacesRequestTest {
             .securityGroupId("test-security-group-id")
             .build();
     }
-
 }

@@ -36,5 +36,4 @@ final class GetGroupRequestTest {
             .groupId("test-group-id")
             .build();
     }
-
 }

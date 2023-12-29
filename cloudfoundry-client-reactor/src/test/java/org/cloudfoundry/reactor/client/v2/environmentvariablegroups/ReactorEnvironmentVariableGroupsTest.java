@@ -16,6 +16,12 @@
 
 package org.cloudfoundry.reactor.client.v2.environmentvariablegroups;
 
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.PUT;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+
+import java.time.Duration;
+import java.util.Collections;
 import org.cloudfoundry.client.v2.environmentvariablegroups.GetRunningEnvironmentVariablesRequest;
 import org.cloudfoundry.client.v2.environmentvariablegroups.GetRunningEnvironmentVariablesResponse;
 import org.cloudfoundry.client.v2.environmentvariablegroups.GetStagingEnvironmentVariablesRequest;
@@ -31,16 +37,11 @@ import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-import java.time.Duration;
-import java.util.Collections;
-
-import static io.netty.handler.codec.http.HttpMethod.GET;
-import static io.netty.handler.codec.http.HttpMethod.PUT;
-import static io.netty.handler.codec.http.HttpResponseStatus.OK;
-
 class ReactorEnvironmentVariableGroupsTest extends AbstractClientApiTest {
 
-    private ReactorEnvironmentVariableGroups environmentVariableGroups = new ReactorEnvironmentVariableGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
+    private ReactorEnvironmentVariableGroups environmentVariableGroups =
+            new ReactorEnvironmentVariableGroups(
+                    CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     void getRunningEnvironmentVariables() {
@@ -55,15 +56,16 @@ class ReactorEnvironmentVariableGroupsTest extends AbstractClientApiTest {
             .build());
 
         this.environmentVariableGroups
-            .getRunningEnvironmentVariables(GetRunningEnvironmentVariablesRequest.builder()
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(GetRunningEnvironmentVariablesResponse.builder()
-                .environmentVariable("abc", 123)
-                .environmentVariable("do-re-me", "far-so-la-tee")
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .getRunningEnvironmentVariables(
+                        GetRunningEnvironmentVariablesRequest.builder().build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        GetRunningEnvironmentVariablesResponse.builder()
+                                .environmentVariable("abc", 123)
+                                .environmentVariable("do-re-me", "far-so-la-tee")
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -79,15 +81,16 @@ class ReactorEnvironmentVariableGroupsTest extends AbstractClientApiTest {
             .build());
 
         this.environmentVariableGroups
-            .getStagingEnvironmentVariables(GetStagingEnvironmentVariablesRequest.builder()
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(GetStagingEnvironmentVariablesResponse.builder()
-                .environmentVariable("abc", 123)
-                .environmentVariable("do-re-me", "far-so-la-tee")
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .getStagingEnvironmentVariables(
+                        GetStagingEnvironmentVariablesRequest.builder().build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        GetStagingEnvironmentVariablesResponse.builder()
+                                .environmentVariable("abc", 123)
+                                .environmentVariable("do-re-me", "far-so-la-tee")
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -104,17 +107,19 @@ class ReactorEnvironmentVariableGroupsTest extends AbstractClientApiTest {
             .build());
 
         this.environmentVariableGroups
-            .updateRunningEnvironmentVariables(UpdateRunningEnvironmentVariablesRequest.builder()
-                .environmentVariable("abc", 123)
-                .environmentVariable("do-re-me", "fa-so-la-tee")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(UpdateRunningEnvironmentVariablesResponse.builder()
-                .environmentVariable("abc", 123)
-                .environmentVariable("do-re-me", "fa-so-la-tee")
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .updateRunningEnvironmentVariables(
+                        UpdateRunningEnvironmentVariablesRequest.builder()
+                                .environmentVariable("abc", 123)
+                                .environmentVariable("do-re-me", "fa-so-la-tee")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        UpdateRunningEnvironmentVariablesResponse.builder()
+                                .environmentVariable("abc", 123)
+                                .environmentVariable("do-re-me", "fa-so-la-tee")
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -131,15 +136,17 @@ class ReactorEnvironmentVariableGroupsTest extends AbstractClientApiTest {
             .build());
 
         this.environmentVariableGroups
-            .updateRunningEnvironmentVariables(UpdateRunningEnvironmentVariablesRequest.builder()
-                .environmentVariables(Collections.emptyMap())
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(UpdateRunningEnvironmentVariablesResponse.builder()
-                .environmentVariables(Collections.emptyMap())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .updateRunningEnvironmentVariables(
+                        UpdateRunningEnvironmentVariablesRequest.builder()
+                                .environmentVariables(Collections.emptyMap())
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        UpdateRunningEnvironmentVariablesResponse.builder()
+                                .environmentVariables(Collections.emptyMap())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -156,17 +163,19 @@ class ReactorEnvironmentVariableGroupsTest extends AbstractClientApiTest {
             .build());
 
         this.environmentVariableGroups
-            .updateStagingEnvironmentVariables(UpdateStagingEnvironmentVariablesRequest.builder()
-                .environmentVariable("abc", 123)
-                .environmentVariable("do-re-me", "far-so-la-tee")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(UpdateStagingEnvironmentVariablesResponse.builder()
-                .environmentVariable("abc", 123)
-                .environmentVariable("do-re-me", "far-so-la-tee")
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .updateStagingEnvironmentVariables(
+                        UpdateStagingEnvironmentVariablesRequest.builder()
+                                .environmentVariable("abc", 123)
+                                .environmentVariable("do-re-me", "far-so-la-tee")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        UpdateStagingEnvironmentVariablesResponse.builder()
+                                .environmentVariable("abc", 123)
+                                .environmentVariable("do-re-me", "far-so-la-tee")
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -183,15 +192,16 @@ class ReactorEnvironmentVariableGroupsTest extends AbstractClientApiTest {
             .build());
 
         this.environmentVariableGroups
-            .updateStagingEnvironmentVariables(UpdateStagingEnvironmentVariablesRequest.builder()
-                .environmentVariables(Collections.emptyMap())
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(UpdateStagingEnvironmentVariablesResponse.builder()
-                .environmentVariables(Collections.emptyMap())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .updateStagingEnvironmentVariables(
+                        UpdateStagingEnvironmentVariablesRequest.builder()
+                                .environmentVariables(Collections.emptyMap())
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        UpdateStagingEnvironmentVariablesResponse.builder()
+                                .environmentVariables(Collections.emptyMap())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
-
 }

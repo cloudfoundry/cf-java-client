@@ -47,5 +47,4 @@ final class ExpirePasswordRequestTest {
             .userId("test-user-id")
             .build();
     }
-
 }

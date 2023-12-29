@@ -25,5 +25,4 @@ final class ListServicePlanVisibilitiesRequestTest {
         ListServicePlanVisibilitiesRequest.builder()
             .build();
     }
-
 }

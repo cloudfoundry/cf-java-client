@@ -30,5 +30,4 @@ public interface Info {
      * @return the response from the Get Info request
      */
     Mono<GetInfoResponse> get(GetInfoRequest request);
-
 }

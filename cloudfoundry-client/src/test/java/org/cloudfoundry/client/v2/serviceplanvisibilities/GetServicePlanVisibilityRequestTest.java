@@ -33,8 +33,7 @@ final class GetServicePlanVisibilityRequestTest {
     @Test
     void valid() {
         GetServicePlanVisibilityRequest.builder()
-            .servicePlanVisibilityId("test-service-plan-visibility-id")
-            .build();
+                .servicePlanVisibilityId("test-service-plan-visibility-id")
+                .build();
     }
-
 }

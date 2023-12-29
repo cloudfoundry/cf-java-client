@@ -121,9 +121,9 @@ final class TupleUtilsTest {
                 assertThat(first).isEqualTo(1);
                 assertThat(second).isEqualTo(2);
 
-                return -1;
-            })
-            .apply(Tuples.of(1, 2));
+                                    return -1;
+                                })
+                        .apply(Tuples.of(1, 2));
 
         assertThat(result).isEqualTo(-1);
     }
@@ -136,9 +136,9 @@ final class TupleUtilsTest {
                 assertThat(second).isEqualTo(2);
                 assertThat(third).isEqualTo(3);
 
-                return -1;
-            })
-            .apply(Tuples.of(1, 2, 3));
+                                    return -1;
+                                })
+                        .apply(Tuples.of(1, 2, 3));
 
         assertThat(result).isEqualTo(-1);
     }
@@ -152,9 +152,9 @@ final class TupleUtilsTest {
                 assertThat(third).isEqualTo(3);
                 assertThat(fourth).isEqualTo(4);
 
-                return -1;
-            })
-            .apply(Tuples.of(1, 2, 3, 4));
+                                    return -1;
+                                })
+                        .apply(Tuples.of(1, 2, 3, 4));
 
         assertThat(result).isEqualTo(-1);
     }
@@ -169,9 +169,9 @@ final class TupleUtilsTest {
                 assertThat(fourth).isEqualTo(4);
                 assertThat(fifth).isEqualTo(5);
 
-                return -1;
-            })
-            .apply(Tuples.of(1, 2, 3, 4, 5));
+                                    return -1;
+                                })
+                        .apply(Tuples.of(1, 2, 3, 4, 5));
 
         assertThat(result).isEqualTo(-1);
     }
@@ -187,9 +187,9 @@ final class TupleUtilsTest {
                 assertThat(fifth).isEqualTo(5);
                 assertThat(sixth).isEqualTo(6);
 
-                return -1;
-            })
-            .apply(Tuples.of(1, 2, 3, 4, 5, 6));
+                                    return -1;
+                                })
+                        .apply(Tuples.of(1, 2, 3, 4, 5, 6));
 
         assertThat(result).isEqualTo(-1);
     }
@@ -206,9 +206,9 @@ final class TupleUtilsTest {
                 assertThat(sixth).isEqualTo(6);
                 assertThat(seventh).isEqualTo(7);
 
-                return -1;
-            })
-            .apply(Tuples.of(1, 2, 3, 4, 5, 6, 7));
+                                    return -1;
+                                })
+                        .apply(Tuples.of(1, 2, 3, 4, 5, 6, 7));
 
         assertThat(result).isEqualTo(-1);
     }
@@ -226,9 +226,9 @@ final class TupleUtilsTest {
                 assertThat(seventh).isEqualTo(7);
                 assertThat(eighth).isEqualTo(8);
 
-                return -1;
-            })
-            .apply(Tuples.of(1, 2, 3, 4, 5, 6, 7, 8));
+                                    return -1;
+                                })
+                        .apply(Tuples.of(1, 2, 3, 4, 5, 6, 7, 8));
 
         assertThat(result).isEqualTo(-1);
     }
@@ -240,9 +240,9 @@ final class TupleUtilsTest {
                 assertThat(first).isEqualTo(1);
                 assertThat(second).isEqualTo(2);
 
-                return true;
-            })
-            .test(Tuples.of(1, 2));
+                                    return true;
+                                })
+                        .test(Tuples.of(1, 2));
 
         assertThat(result).isTrue();
     }
@@ -255,9 +255,9 @@ final class TupleUtilsTest {
                 assertThat(second).isEqualTo(2);
                 assertThat(third).isEqualTo(3);
 
-                return true;
-            })
-            .test(Tuples.of(1, 2, 3));
+                                    return true;
+                                })
+                        .test(Tuples.of(1, 2, 3));
 
         assertThat(result).isTrue();
     }
@@ -271,9 +271,9 @@ final class TupleUtilsTest {
                 assertThat(third).isEqualTo(3);
                 assertThat(fourth).isEqualTo(4);
 
-                return true;
-            })
-            .test(Tuples.of(1, 2, 3, 4));
+                                    return true;
+                                })
+                        .test(Tuples.of(1, 2, 3, 4));
 
         assertThat(result).isTrue();
     }
@@ -288,9 +288,9 @@ final class TupleUtilsTest {
                 assertThat(fourth).isEqualTo(4);
                 assertThat(fifth).isEqualTo(5);
 
-                return true;
-            })
-            .test(Tuples.of(1, 2, 3, 4, 5));
+                                    return true;
+                                })
+                        .test(Tuples.of(1, 2, 3, 4, 5));
 
         assertThat(result).isTrue();
     }
@@ -306,9 +306,9 @@ final class TupleUtilsTest {
                 assertThat(fifth).isEqualTo(5);
                 assertThat(sixth).isEqualTo(6);
 
-                return true;
-            })
-            .test(Tuples.of(1, 2, 3, 4, 5, 6));
+                                    return true;
+                                })
+                        .test(Tuples.of(1, 2, 3, 4, 5, 6));
 
         assertThat(result).isTrue();
     }
@@ -325,9 +325,9 @@ final class TupleUtilsTest {
                 assertThat(sixth).isEqualTo(6);
                 assertThat(seventh).isEqualTo(7);
 
-                return true;
-            })
-            .test(Tuples.of(1, 2, 3, 4, 5, 6, 7));
+                                    return true;
+                                })
+                        .test(Tuples.of(1, 2, 3, 4, 5, 6, 7));
 
         assertThat(result).isTrue();
     }
@@ -345,11 +345,10 @@ final class TupleUtilsTest {
                 assertThat(seventh).isEqualTo(7);
                 assertThat(eighth).isEqualTo(8);
 
-                return true;
-            })
-            .test(Tuples.of(1, 2, 3, 4, 5, 6, 7, 8));
+                                    return true;
+                                })
+                        .test(Tuples.of(1, 2, 3, 4, 5, 6, 7, 8));
 
         assertThat(result).isTrue();
     }
-
 }

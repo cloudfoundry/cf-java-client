@@ -25,5 +25,4 @@ class ListRouterGroupsRequestTest {
         ListRouterGroupsRequest.builder()
             .build();
     }
-
 }

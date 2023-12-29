@@ -36,5 +36,4 @@ final class OrganizationSummaryDetailRequestTest {
             .name("test-organization-name")
             .build();
     }
-
 }

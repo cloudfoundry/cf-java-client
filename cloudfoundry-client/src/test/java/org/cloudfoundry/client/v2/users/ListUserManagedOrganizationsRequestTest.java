@@ -36,5 +36,4 @@ final class ListUserManagedOrganizationsRequestTest {
             .userId("test-user-id")
             .build();
     }
-
 }

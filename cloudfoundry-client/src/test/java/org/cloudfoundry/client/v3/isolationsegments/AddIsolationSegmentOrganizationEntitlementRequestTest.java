@@ -37,8 +37,7 @@ final class AddIsolationSegmentOrganizationEntitlementRequestTest {
     @Test
     void valid() {
         AddIsolationSegmentOrganizationEntitlementRequest.builder()
-            .isolationSegmentId("test-isolation-segment-id")
-            .build();
+                .isolationSegmentId("test-isolation-segment-id")
+                .build();
     }
-
 }

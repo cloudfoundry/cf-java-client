@@ -16,6 +16,17 @@
 
 package org.cloudfoundry.reactor.client.v2.serviceplanvisibilities;
 
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpMethod.PUT;
+import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
+import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
+import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+
+import java.time.Duration;
+import java.util.Collections;
 import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.jobs.JobEntity;
 import org.cloudfoundry.client.v2.serviceplanvisibilities.CreateServicePlanVisibilityRequest;
@@ -38,21 +49,12 @@ import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-import java.time.Duration;
-import java.util.Collections;
-
-import static io.netty.handler.codec.http.HttpMethod.DELETE;
-import static io.netty.handler.codec.http.HttpMethod.GET;
-import static io.netty.handler.codec.http.HttpMethod.POST;
-import static io.netty.handler.codec.http.HttpMethod.PUT;
-import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
-import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
-import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
-import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 final class ReactorServicePlanVisibilitiesTest extends AbstractClientApiTest {
 
-    private final ServicePlanVisibilities servicePlanVisibilities = new ReactorServicePlanVisibilities(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
+    private final ServicePlanVisibilities servicePlanVisibilities =
+            new ReactorServicePlanVisibilities(
+                    CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     void create() {
@@ -68,26 +70,35 @@ final class ReactorServicePlanVisibilitiesTest extends AbstractClientApiTest {
             .build());
 
         this.servicePlanVisibilities
-            .create(CreateServicePlanVisibilityRequest.builder()
-                .organizationId("09be17a1-0cc6-4edb-955c-cf2a2ae85470")
-                .servicePlanId("43f5496b-9117-404a-a637-eb38141b05af")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(CreateServicePlanVisibilityResponse.builder()
-                .metadata(Metadata.builder()
-                    .createdAt("2015-07-27T22:43:28Z")
-                    .id("28a22749-25f4-44bd-a371-c37e2ee53175")
-                    .url("/v2/service_plan_visibilities/28a22749-25f4-44bd-a371-c37e2ee53175")
-                    .build())
-                .entity(ServicePlanVisibilityEntity.builder()
-                    .organizationId("09be17a1-0cc6-4edb-955c-cf2a2ae85470")
-                    .organizationUrl("/v2/organizations/09be17a1-0cc6-4edb-955c-cf2a2ae85470")
-                    .servicePlanId("43f5496b-9117-404a-a637-eb38141b05af")
-                    .servicePlanUrl("/v2/service_plans/43f5496b-9117-404a-a637-eb38141b05af")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .create(
+                        CreateServicePlanVisibilityRequest.builder()
+                                .organizationId("09be17a1-0cc6-4edb-955c-cf2a2ae85470")
+                                .servicePlanId("43f5496b-9117-404a-a637-eb38141b05af")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        CreateServicePlanVisibilityResponse.builder()
+                                .metadata(
+                                        Metadata.builder()
+                                                .createdAt("2015-07-27T22:43:28Z")
+                                                .id("28a22749-25f4-44bd-a371-c37e2ee53175")
+                                                .url(
+                                                        "/v2/service_plan_visibilities/28a22749-25f4-44bd-a371-c37e2ee53175")
+                                                .build())
+                                .entity(
+                                        ServicePlanVisibilityEntity.builder()
+                                                .organizationId(
+                                                        "09be17a1-0cc6-4edb-955c-cf2a2ae85470")
+                                                .organizationUrl(
+                                                        "/v2/organizations/09be17a1-0cc6-4edb-955c-cf2a2ae85470")
+                                                .servicePlanId(
+                                                        "43f5496b-9117-404a-a637-eb38141b05af")
+                                                .servicePlanUrl(
+                                                        "/v2/service_plans/43f5496b-9117-404a-a637-eb38141b05af")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -102,12 +113,13 @@ final class ReactorServicePlanVisibilitiesTest extends AbstractClientApiTest {
             .build());
 
         this.servicePlanVisibilities
-            .delete(DeleteServicePlanVisibilityRequest.builder()
-                .servicePlanVisibilityId("test-service-plan-visibility-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .delete(
+                        DeleteServicePlanVisibilityRequest.builder()
+                                .servicePlanVisibilityId("test-service-plan-visibility-id")
+                                .build())
+                .as(StepVerifier::create)
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -123,24 +135,29 @@ final class ReactorServicePlanVisibilitiesTest extends AbstractClientApiTest {
             .build());
 
         this.servicePlanVisibilities
-            .delete(DeleteServicePlanVisibilityRequest.builder()
-                .async(true)
-                .servicePlanVisibilityId("test-service-plan-visibility-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(DeleteServicePlanVisibilityResponse.builder()
-                .metadata(Metadata.builder()
-                    .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
-                    .createdAt("2016-02-02T17:16:31Z")
-                    .url("/v2/jobs/2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
-                    .build())
-                .entity(JobEntity.builder()
-                    .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
-                    .status("queued")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .delete(
+                        DeleteServicePlanVisibilityRequest.builder()
+                                .async(true)
+                                .servicePlanVisibilityId("test-service-plan-visibility-id")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        DeleteServicePlanVisibilityResponse.builder()
+                                .metadata(
+                                        Metadata.builder()
+                                                .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                                                .createdAt("2016-02-02T17:16:31Z")
+                                                .url(
+                                                        "/v2/jobs/2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                                                .build())
+                                .entity(
+                                        JobEntity.builder()
+                                                .id("2d9707ba-6f0b-4aef-a3de-fe9bdcf0c9d1")
+                                                .status("queued")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -156,25 +173,34 @@ final class ReactorServicePlanVisibilitiesTest extends AbstractClientApiTest {
             .build());
 
         this.servicePlanVisibilities
-            .get(GetServicePlanVisibilityRequest.builder()
-                .servicePlanVisibilityId("test-service-plan-visibility-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(GetServicePlanVisibilityResponse.builder()
-                .metadata(Metadata.builder()
-                    .createdAt("2015-07-27T22:43:28Z")
-                    .id("18365c25-898b-4365-911d-6f6a09154297")
-                    .url("/v2/service_plan_visibilities/18365c25-898b-4365-911d-6f6a09154297")
-                    .build())
-                .entity(ServicePlanVisibilityEntity.builder()
-                    .organizationId("a1cc950b-ed5b-41eb-8eee-d9a8f85aa1ea")
-                    .organizationUrl("/v2/organizations/a1cc950b-ed5b-41eb-8eee-d9a8f85aa1ea")
-                    .servicePlanId("ea1ba716-e720-4aef-8a90-439924bb53d0")
-                    .servicePlanUrl("/v2/service_plans/ea1ba716-e720-4aef-8a90-439924bb53d0")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .get(
+                        GetServicePlanVisibilityRequest.builder()
+                                .servicePlanVisibilityId("test-service-plan-visibility-id")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        GetServicePlanVisibilityResponse.builder()
+                                .metadata(
+                                        Metadata.builder()
+                                                .createdAt("2015-07-27T22:43:28Z")
+                                                .id("18365c25-898b-4365-911d-6f6a09154297")
+                                                .url(
+                                                        "/v2/service_plan_visibilities/18365c25-898b-4365-911d-6f6a09154297")
+                                                .build())
+                                .entity(
+                                        ServicePlanVisibilityEntity.builder()
+                                                .organizationId(
+                                                        "a1cc950b-ed5b-41eb-8eee-d9a8f85aa1ea")
+                                                .organizationUrl(
+                                                        "/v2/organizations/a1cc950b-ed5b-41eb-8eee-d9a8f85aa1ea")
+                                                .servicePlanId(
+                                                        "ea1ba716-e720-4aef-8a90-439924bb53d0")
+                                                .servicePlanUrl(
+                                                        "/v2/service_plans/ea1ba716-e720-4aef-8a90-439924bb53d0")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -190,30 +216,41 @@ final class ReactorServicePlanVisibilitiesTest extends AbstractClientApiTest {
             .build());
 
         this.servicePlanVisibilities
-            .list(ListServicePlanVisibilitiesRequest.builder()
-                .organizationId("test-organization-id")
-                .page(-1)
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(ListServicePlanVisibilitiesResponse.builder()
-                .totalPages(1)
-                .totalResults(1)
-                .resource(ServicePlanVisibilityResource.builder()
-                    .metadata(Metadata.builder()
-                        .id("3d5c0584-fbf0-4d75-b68e-226e77496f69")
-                        .url("/v2/service_plan_visibilities/3d5c0584-fbf0-4d75-b68e-226e77496f69")
-                        .createdAt("2015-07-27T22:43:28Z")
-                        .build())
-                    .entity(ServicePlanVisibilityEntity.builder()
-                        .organizationId("1dbe25db-6a8c-43e7-a941-cc483bb45570")
-                        .organizationUrl("/v2/organizations/1dbe25db-6a8c-43e7-a941-cc483bb45570")
-                        .servicePlanId("69cab29d-826c-48bf-b435-b43013f9c11b")
-                        .servicePlanUrl("/v2/service_plans/69cab29d-826c-48bf-b435-b43013f9c11b")
-                        .build())
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .list(
+                        ListServicePlanVisibilitiesRequest.builder()
+                                .organizationId("test-organization-id")
+                                .page(-1)
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        ListServicePlanVisibilitiesResponse.builder()
+                                .totalPages(1)
+                                .totalResults(1)
+                                .resource(
+                                        ServicePlanVisibilityResource.builder()
+                                                .metadata(
+                                                        Metadata.builder()
+                                                                .id(
+                                                                        "3d5c0584-fbf0-4d75-b68e-226e77496f69")
+                                                                .url(
+                                                                        "/v2/service_plan_visibilities/3d5c0584-fbf0-4d75-b68e-226e77496f69")
+                                                                .createdAt("2015-07-27T22:43:28Z")
+                                                                .build())
+                                                .entity(
+                                                        ServicePlanVisibilityEntity.builder()
+                                                                .organizationId(
+                                                                        "1dbe25db-6a8c-43e7-a941-cc483bb45570")
+                                                                .organizationUrl(
+                                                                        "/v2/organizations/1dbe25db-6a8c-43e7-a941-cc483bb45570")
+                                                                .servicePlanId(
+                                                                        "69cab29d-826c-48bf-b435-b43013f9c11b")
+                                                                .servicePlanUrl(
+                                                                        "/v2/service_plans/69cab29d-826c-48bf-b435-b43013f9c11b")
+                                                                .build())
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -230,29 +267,36 @@ final class ReactorServicePlanVisibilitiesTest extends AbstractClientApiTest {
             .build());
 
         this.servicePlanVisibilities
-            .update(UpdateServicePlanVisibilityRequest.builder()
-                .organizationId("e4d0b68b-9e73-4253-b03f-2bfda6cd814b")
-                .servicePlanId("7288464d-3866-436a-915c-2bada4725e7e")
-                .servicePlanVisibilityId("test-service-plan-visibility-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(UpdateServicePlanVisibilityResponse.builder()
-                .metadata(Metadata.builder()
-                    .createdAt("2015-07-27T22:43:28Z")
-                    .id("5f1514f9-66ee-4799-9de2-69f2ec3cb5f1")
-                    .updatedAt("2015-07-27T22:43:28Z")
-                    .url("/v2/service_plan_visibilities/5f1514f9-66ee-4799-9de2-69f2ec3cb5f1")
-                    .build())
-                .entity(ServicePlanVisibilityEntity.builder()
-                    .organizationId("e4d0b68b-9e73-4253-b03f-2bfda6cd814b")
-                    .organizationUrl("/v2/organizations/e4d0b68b-9e73-4253-b03f-2bfda6cd814b")
-                    .servicePlanId("7288464d-3866-436a-915c-2bada4725e7e")
-                    .servicePlanUrl("/v2/service_plans/7288464d-3866-436a-915c-2bada4725e7e")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .update(
+                        UpdateServicePlanVisibilityRequest.builder()
+                                .organizationId("e4d0b68b-9e73-4253-b03f-2bfda6cd814b")
+                                .servicePlanId("7288464d-3866-436a-915c-2bada4725e7e")
+                                .servicePlanVisibilityId("test-service-plan-visibility-id")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        UpdateServicePlanVisibilityResponse.builder()
+                                .metadata(
+                                        Metadata.builder()
+                                                .createdAt("2015-07-27T22:43:28Z")
+                                                .id("5f1514f9-66ee-4799-9de2-69f2ec3cb5f1")
+                                                .updatedAt("2015-07-27T22:43:28Z")
+                                                .url(
+                                                        "/v2/service_plan_visibilities/5f1514f9-66ee-4799-9de2-69f2ec3cb5f1")
+                                                .build())
+                                .entity(
+                                        ServicePlanVisibilityEntity.builder()
+                                                .organizationId(
+                                                        "e4d0b68b-9e73-4253-b03f-2bfda6cd814b")
+                                                .organizationUrl(
+                                                        "/v2/organizations/e4d0b68b-9e73-4253-b03f-2bfda6cd814b")
+                                                .servicePlanId(
+                                                        "7288464d-3866-436a-915c-2bada4725e7e")
+                                                .servicePlanUrl(
+                                                        "/v2/service_plans/7288464d-3866-436a-915c-2bada4725e7e")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
-
-
 }

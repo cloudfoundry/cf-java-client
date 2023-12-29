@@ -57,10 +57,9 @@ class CreateBuildpackRequestTest {
     @Test
     void valid() {
         CreateBuildpackRequest.builder()
-            .buildpack(Paths.get("test-buildpack"))
-            .name("test-name")
-            .position(0)
-            .build();
+                .buildpack(Paths.get("test-buildpack"))
+                .name("test-name")
+                .position(0)
+                .build();
     }
-
 }

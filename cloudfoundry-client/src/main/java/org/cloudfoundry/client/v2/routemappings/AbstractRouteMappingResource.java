@@ -21,6 +21,5 @@ import org.cloudfoundry.client.v2.Resource;
 /**
  * The resource response payload for Route Mapping
  */
-public abstract class AbstractRouteMappingResource extends Resource<org.cloudfoundry.client.v2.routemappings.RouteMappingEntity> {
-
-}
+public abstract class AbstractRouteMappingResource
+        extends Resource<org.cloudfoundry.client.v2.routemappings.RouteMappingEntity> {}

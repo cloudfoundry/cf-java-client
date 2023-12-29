@@ -33,8 +33,7 @@ final class ListApplicationServiceBindingsRequestTest {
     @Test
     void valid() {
         ListApplicationServiceBindingsRequest.builder()
-            .applicationId("test-application-id")
-            .build();
+                .applicationId("test-application-id")
+                .build();
     }
-
 }

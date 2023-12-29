@@ -25,5 +25,4 @@ class ListTagsRequestTest {
         ListTagsRequest.builder()
             .build();
     }
-
 }

@@ -70,5 +70,4 @@ public interface Processes {
      * @return the response from the Update Process request
      */
     Mono<UpdateProcessResponse> update(UpdateProcessRequest request);
-
 }

@@ -43,9 +43,8 @@ final class BindRouteServiceInstanceRequestTest {
     @Test
     void valid() {
         BindRouteServiceInstanceRequest.builder()
-            .domainName("test-domain-name")
-            .serviceInstanceName("test-service-instance-name")
-            .build();
+                .domainName("test-domain-name")
+                .serviceInstanceName("test-service-instance-name")
+                .build();
     }
-
 }

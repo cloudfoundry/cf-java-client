@@ -36,5 +36,4 @@ final class ListSpaceUserRolesRequestTest {
             .spaceId("test-space-id")
             .build();
     }
-
 }

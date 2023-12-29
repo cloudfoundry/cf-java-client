@@ -37,5 +37,4 @@ final class DeleteServiceBrokerRequestTest {
             .serviceBrokerId("test-service-broker-id")
             .build();
     }
-
 }

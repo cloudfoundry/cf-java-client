@@ -25,5 +25,4 @@ final class LdapConfigurationTest {
         LdapConfiguration.builder()
             .build();
     }
-
 }

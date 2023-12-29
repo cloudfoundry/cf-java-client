@@ -36,5 +36,4 @@ final class DeletePackageRequestTest {
             .packageId("test-package-id")
             .build();
     }
-
 }

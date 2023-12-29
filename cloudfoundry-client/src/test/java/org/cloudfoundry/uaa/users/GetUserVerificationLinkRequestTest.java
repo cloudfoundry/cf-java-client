@@ -43,9 +43,8 @@ final class GetUserVerificationLinkRequestTest {
     @Test
     void valid() {
         GetUserVerificationLinkRequest.builder()
-            .userId("test-user-id")
-            .redirectUri("test-redirect-uri")
-            .build();
+                .userId("test-user-id")
+                .redirectUri("test-redirect-uri")
+                .build();
     }
-
 }

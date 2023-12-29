@@ -14,7 +14,7 @@ public interface ServiceBrokersV3 {
      * @return the response from the Create Service Broker request
      */
     Mono<String> create(CreateServiceBrokerRequest request);
-    
+
     /**
      * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/release-candidate/#delete-a-service-broker">Delete a service broker</a> request
      *
@@ -22,7 +22,7 @@ public interface ServiceBrokersV3 {
      * @return the response from the Delete Service Broker request
      */
     Mono<String> delete(DeleteServiceBrokerRequest request);
-    
+
     /**
      * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/release-candidate/#get-a-service-broker">Get a service broker</a> request
      *
@@ -30,7 +30,7 @@ public interface ServiceBrokersV3 {
      * @return the response from the Get Service Broker request
      */
     Mono<GetServiceBrokerResponse> get(GetServiceBrokerRequest request);
-    
+
     /**
      * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/release-candidate/#list-service-brokers">List service brokers</a> request
      *
@@ -38,7 +38,7 @@ public interface ServiceBrokersV3 {
      * @return the response from the List Service Brokers request
      */
     Mono<ListServiceBrokersResponse> list(ListServiceBrokersRequest request);
-    
+
     /**
      * Makes the <a href="http://v3-apidocs.cloudfoundry.org/version/release-candidate/#update-a-service-broker">Update a service broker</a> request
      *
@@ -46,5 +46,4 @@ public interface ServiceBrokersV3 {
      * @return the response from the Update Service Broker request
      */
     Mono<UpdateServiceBrokerResponse> update(UpdateServiceBrokerRequest request);
-    
 }

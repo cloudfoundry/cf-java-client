@@ -20,7 +20,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-
 final class WordListRandomWordsTest {
 
     private final WordListRandomWords randomWords = new WordListRandomWords();
@@ -34,5 +33,4 @@ final class WordListRandomWordsTest {
     void getNoun() {
         assertThat(this.randomWords.getNoun()).isNotNull();
     }
-
 }

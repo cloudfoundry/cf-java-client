@@ -30,5 +30,4 @@ public interface JobsV3 {
      * @return the response from the Get Job request
      */
     Mono<GetJobResponse> get(GetJobRequest request);
-
 }

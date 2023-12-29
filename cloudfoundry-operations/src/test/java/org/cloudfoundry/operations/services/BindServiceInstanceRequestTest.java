@@ -43,9 +43,8 @@ final class BindServiceInstanceRequestTest {
     @Test
     void valid() {
         BindServiceInstanceRequest.builder()
-            .applicationName("test-application-name")
-            .serviceInstanceName("test-service-instance-name")
-            .build();
+                .applicationName("test-application-name")
+                .serviceInstanceName("test-service-instance-name")
+                .build();
     }
-
 }

@@ -36,5 +36,4 @@ class DeleteRouteRequestTest {
             .routeId("test-route-id")
             .build();
     }
-
 }

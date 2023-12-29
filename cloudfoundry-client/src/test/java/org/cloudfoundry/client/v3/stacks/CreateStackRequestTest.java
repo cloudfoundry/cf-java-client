@@ -88,22 +88,17 @@ class CreateStackRequestTest {
     @Test
     void validRequestWithMetadataTest() {
         CreateStackRequest.builder()
-            .name("valid name")
-            .metadata(Metadata.builder()
-                .label("label-key", "label-value")
-                .build())
-            .build();
+                .name("valid name")
+                .metadata(Metadata.builder().label("label-key", "label-value").build())
+                .build();
     }
 
     @Test
     void validRequestWithAllFieldsTest() {
         CreateStackRequest.builder()
-            .name("valid name")
-            .description("valid description")
-            .metadata(Metadata.builder()
-                .label("label-key", "label-value")
-                .build())
-            .build();
+                .name("valid name")
+                .description("valid description")
+                .metadata(Metadata.builder().label("label-key", "label-value").build())
+                .build();
     }
-
 }

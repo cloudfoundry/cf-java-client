@@ -36,5 +36,4 @@ final class ListSpaceRoutesRequestTest {
             .spaceId("test-space-id")
             .build();
     }
-
 }

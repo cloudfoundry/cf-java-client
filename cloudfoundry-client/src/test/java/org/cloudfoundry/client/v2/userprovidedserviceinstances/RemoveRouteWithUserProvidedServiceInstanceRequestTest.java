@@ -43,9 +43,8 @@ final class RemoveRouteWithUserProvidedServiceInstanceRequestTest {
     @Test
     void valid() {
         RemoveUserProvidedServiceInstanceRouteRequest.builder()
-            .routeId("test-route-id")
-            .userProvidedServiceInstanceId("test-user-provided-service-instance-id")
-            .build();
+                .routeId("test-route-id")
+                .userProvidedServiceInstanceId("test-user-provided-service-instance-id")
+                .build();
     }
-
 }

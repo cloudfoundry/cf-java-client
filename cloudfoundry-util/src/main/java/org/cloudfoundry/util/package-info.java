@@ -17,5 +17,4 @@
 /**
  * Utilities for working with Cloud Foundry Client APIs
  */
-
 package org.cloudfoundry.util;

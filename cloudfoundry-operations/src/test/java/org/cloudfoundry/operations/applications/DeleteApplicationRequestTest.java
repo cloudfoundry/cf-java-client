@@ -37,5 +37,4 @@ final class DeleteApplicationRequestTest {
             .deleteRoutes(true)
             .build();
     }
-
 }

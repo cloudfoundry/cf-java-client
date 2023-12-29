@@ -46,5 +46,4 @@ class ReplaceRouteDestinationsRequestTest {
             .routeId("test-route-destination-id")
             .build();
     }
-
 }

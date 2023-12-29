@@ -17,21 +17,18 @@
 package org.cloudfoundry.reactor.uaa;
 
 import io.netty.handler.codec.http.HttpHeaders;
-import org.cloudfoundry.uaa.Versioned;
-
 import java.util.Optional;
+import org.cloudfoundry.uaa.Versioned;
 
 final class VersionBuilder {
 
-    private VersionBuilder() {
-    }
+    private VersionBuilder() {}
 
     static void augment(HttpHeaders httpHeaders, Object request) {
         if (request instanceof Versioned) {
             Versioned versioned = (Versioned) request;
             Optional.ofNullable(versioned.getVersion())
-                .ifPresent(version -> httpHeaders.set("If-Match", version));
+                    .ifPresent(version -> httpHeaders.set("If-Match", version));
         }
     }
-
 }

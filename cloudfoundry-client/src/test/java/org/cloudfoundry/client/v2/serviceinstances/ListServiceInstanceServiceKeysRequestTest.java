@@ -33,8 +33,7 @@ final class ListServiceInstanceServiceKeysRequestTest {
     @Test
     void valid() {
         ListServiceInstanceServiceKeysRequest.builder()
-            .serviceInstanceId("test-service-instance-id")
-            .build();
+                .serviceInstanceId("test-service-instance-id")
+                .build();
     }
-
 }

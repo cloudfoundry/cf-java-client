@@ -108,5 +108,4 @@ final class ApplicationManifestTest {
             .name("test-name")
             .build();
     }
-
 }

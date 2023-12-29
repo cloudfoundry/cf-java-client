@@ -51,13 +51,13 @@ final class CreateIdentityZoneRequestTest {
     @Test
     void validMax() {
         CreateIdentityZoneRequest.builder()
-            .configuration(IdentityZoneConfiguration.builder().build())
-            .description("test-description")
-            .identityZoneId("test-identity-zone-id")
-            .name("test-name")
-            .subdomain("test-sub-domain")
-            .version(1)
-            .build();
+                .configuration(IdentityZoneConfiguration.builder().build())
+                .description("test-description")
+                .identityZoneId("test-identity-zone-id")
+                .name("test-name")
+                .subdomain("test-sub-domain")
+                .version(1)
+                .build();
     }
 
     @Test
@@ -67,5 +67,4 @@ final class CreateIdentityZoneRequestTest {
             .subdomain("test-sub-domain")
             .build();
     }
-
 }

@@ -36,5 +36,4 @@ final class ListSpaceApplicationsRequestTest {
             .spaceId("test-space-id")
             .build();
     }
-
 }

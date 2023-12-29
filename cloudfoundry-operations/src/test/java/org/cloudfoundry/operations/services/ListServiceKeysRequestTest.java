@@ -36,5 +36,4 @@ class ListServiceKeysRequestTest {
             .serviceInstanceName("service-instance")
             .build();
     }
-
 }

@@ -92,5 +92,4 @@ final class DelayUtilsTest {
             .expectComplete()
             .verify(Duration.ofSeconds(5));
     }
-
 }

@@ -46,15 +46,12 @@ final class ResourceTest {
     @Test
     void valid() {
         StubResource.builder()
-            .createdAt("test-created-at")
-            .id("test-id")
-            .updatedAt("test-updated-at")
-            .build();
+                .createdAt("test-created-at")
+                .id("test-id")
+                .updatedAt("test-updated-at")
+                .build();
     }
 
     @Value.Immutable
-    static abstract class _StubResource extends Resource {
-
-    }
-
+    abstract static class _StubResource extends Resource {}
 }

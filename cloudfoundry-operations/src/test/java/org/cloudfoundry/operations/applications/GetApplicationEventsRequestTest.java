@@ -36,5 +36,4 @@ final class GetApplicationEventsRequestTest {
             .name("test-name")
             .build();
     }
-
 }

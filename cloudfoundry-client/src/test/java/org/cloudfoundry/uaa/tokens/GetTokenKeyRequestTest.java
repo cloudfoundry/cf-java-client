@@ -25,5 +25,4 @@ final class GetTokenKeyRequestTest {
         GetTokenKeyRequest.builder()
             .build();
     }
-
 }

@@ -25,5 +25,4 @@ final class ListServiceInstancesRequestTest {
         ListServiceInstancesRequest.builder()
             .build();
     }
-
 }

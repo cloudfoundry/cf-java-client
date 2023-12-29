@@ -64,22 +64,21 @@ class UpdateIdentityZoneRequestTest {
     @Test
     void validMax() {
         UpdateIdentityZoneRequest.builder()
-            .configuration(IdentityZoneConfiguration.builder().build())
-            .description("test-new-description")
-            .identityZoneId("test-id")
-            .name("test-name")
-            .subdomain("test-sub-domain")
-            .version(1)
-            .build();
+                .configuration(IdentityZoneConfiguration.builder().build())
+                .description("test-new-description")
+                .identityZoneId("test-id")
+                .name("test-name")
+                .subdomain("test-sub-domain")
+                .version(1)
+                .build();
     }
 
     @Test
     void validMin() {
         UpdateIdentityZoneRequest.builder()
-            .identityZoneId("test-id")
-            .name("test-name")
-            .subdomain("test-sub-domain")
-            .build();
+                .identityZoneId("test-id")
+                .name("test-name")
+                .subdomain("test-sub-domain")
+                .build();
     }
-
 }

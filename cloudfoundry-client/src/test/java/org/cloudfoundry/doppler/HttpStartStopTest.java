@@ -190,15 +190,15 @@ final class HttpStartStopTest {
     @Test
     void valid() {
         HttpStartStop.builder()
-            .contentLength(0L)
-            .peerType(PeerType.CLIENT)
-            .remoteAddress("test-remote-address")
-            .requestId(UUID.randomUUID())
-            .startTimestamp(0L)
-            .statusCode(0)
-            .stopTimestamp(0L)
-            .uri("test-uri")
-            .userAgent("test-user-agent")
-            .build();
+                .contentLength(0L)
+                .peerType(PeerType.CLIENT)
+                .remoteAddress("test-remote-address")
+                .requestId(UUID.randomUUID())
+                .startTimestamp(0L)
+                .statusCode(0)
+                .stopTimestamp(0L)
+                .uri("test-uri")
+                .userAgent("test-user-agent")
+                .build();
     }
 }

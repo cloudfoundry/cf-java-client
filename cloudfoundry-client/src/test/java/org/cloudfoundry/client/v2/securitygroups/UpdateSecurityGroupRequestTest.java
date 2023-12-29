@@ -36,11 +36,10 @@ class UpdateSecurityGroupRequestTest {
     @Test
     void valid() {
         UpdateSecurityGroupRequest.builder()
-            .name("test-security-group-name")
-            .rule(RuleEntity.builder().build())
-            .securityGroupId("test-security-group-id")
-            .spaceId("test-space-id")
-            .build();
+                .name("test-security-group-name")
+                .rule(RuleEntity.builder().build())
+                .securityGroupId("test-security-group-id")
+                .spaceId("test-space-id")
+                .build();
     }
-
 }

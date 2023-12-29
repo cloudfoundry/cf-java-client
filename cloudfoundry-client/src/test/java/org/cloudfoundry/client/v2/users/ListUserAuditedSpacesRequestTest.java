@@ -36,5 +36,4 @@ final class ListUserAuditedSpacesRequestTest {
             .userId("test-user-id")
             .build();
     }
-
 }

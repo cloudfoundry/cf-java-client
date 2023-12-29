@@ -69,12 +69,11 @@ final class GetTokenByPasswordRequestTest {
     @Test
     void valid() {
         GetTokenByPasswordRequest.builder()
-            .clientId("test-client-id")
-            .clientSecret("test-client-secret")
-            .password("test-password")
-            .tokenFormat(TokenFormat.OPAQUE)
-            .username("test-username")
-            .build();
+                .clientId("test-client-id")
+                .clientSecret("test-client-secret")
+                .password("test-password")
+                .tokenFormat(TokenFormat.OPAQUE)
+                .username("test-username")
+                .build();
     }
-
 }

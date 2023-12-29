@@ -36,5 +36,4 @@ final class GetPackageRequestTest {
             .packageId("test-package-id")
             .build();
     }
-
 }

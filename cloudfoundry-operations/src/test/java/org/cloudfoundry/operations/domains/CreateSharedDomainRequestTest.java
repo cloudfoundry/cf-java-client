@@ -36,5 +36,4 @@ final class CreateSharedDomainRequestTest {
             .domain("test-domain")
             .build();
     }
-
 }

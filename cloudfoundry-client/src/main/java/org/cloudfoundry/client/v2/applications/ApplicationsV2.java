@@ -30,7 +30,8 @@ public interface ApplicationsV2 {
      * @param request the Associate Route with the Application request
      * @return the response from the Associate Route with the Application request
      */
-    Mono<AssociateApplicationRouteResponse> associateRoute(AssociateApplicationRouteRequest request);
+    Mono<AssociateApplicationRouteResponse> associateRoute(
+            AssociateApplicationRouteRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/apps/copy_the_app_bits_for_an_app.html">Copy the app bits for an Application</a> request
@@ -95,7 +96,8 @@ public interface ApplicationsV2 {
      * @param request the Get Application Permissions request
      * @return the response from the Get Application Permissions request
      */
-    Mono<GetApplicationPermissionsResponse> getPermissions(GetApplicationPermissionsRequest request);
+    Mono<GetApplicationPermissionsResponse> getPermissions(
+            GetApplicationPermissionsRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/apps/get_the_instance_information_for_a_started_app.html">Get the instance information for a STARTED App</a> request
@@ -127,7 +129,8 @@ public interface ApplicationsV2 {
      * @param request the List Service Bindings request
      * @return the response from the List Service Bindings request
      */
-    Mono<ListApplicationServiceBindingsResponse> listServiceBindings(ListApplicationServiceBindingsRequest request);
+    Mono<ListApplicationServiceBindingsResponse> listServiceBindings(
+            ListApplicationServiceBindingsRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/apps/remove_route_from_the_app.html">Remove Route from the Application</a> request
@@ -200,5 +203,4 @@ public interface ApplicationsV2 {
      * @return the response from the Upload Droplet request
      */
     Mono<UploadApplicationDropletResponse> uploadDroplet(UploadApplicationDropletRequest request);
-
 }

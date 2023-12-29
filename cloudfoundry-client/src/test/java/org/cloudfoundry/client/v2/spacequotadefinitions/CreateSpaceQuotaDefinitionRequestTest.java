@@ -103,13 +103,12 @@ final class CreateSpaceQuotaDefinitionRequestTest {
     @Test
     void valid() {
         CreateSpaceQuotaDefinitionRequest.builder()
-            .memoryLimit(100)
-            .name("test-space-quota-definition-name")
-            .nonBasicServicesAllowed(true)
-            .organizationId("test-organization-id")
-            .totalRoutes(1)
-            .totalServices(1)
-            .build();
+                .memoryLimit(100)
+                .name("test-space-quota-definition-name")
+                .nonBasicServicesAllowed(true)
+                .organizationId("test-organization-id")
+                .totalRoutes(1)
+                .totalServices(1)
+                .build();
     }
-
 }

@@ -47,5 +47,4 @@ final class CreateApplicationRequestTest {
             .spaceId("test-space-id")
             .build();
     }
-
 }

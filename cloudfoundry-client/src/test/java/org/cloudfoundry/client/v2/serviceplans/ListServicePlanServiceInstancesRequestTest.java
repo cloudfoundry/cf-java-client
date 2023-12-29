@@ -33,8 +33,7 @@ final class ListServicePlanServiceInstancesRequestTest {
     @Test
     void valid() {
         ListServicePlanServiceInstancesRequest.builder()
-            .servicePlanId("test-service-plan-id")
-            .build();
+                .servicePlanId("test-service-plan-id")
+                .build();
     }
-
 }

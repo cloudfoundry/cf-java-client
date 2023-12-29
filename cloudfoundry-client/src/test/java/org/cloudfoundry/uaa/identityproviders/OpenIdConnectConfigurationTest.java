@@ -55,10 +55,9 @@ final class OpenIdConnectConfigurationTest {
     @Test
     void valid() {
         OpenIdConnectConfiguration.builder()
-            .authUrl("test-auth-url")
-            .tokenUrl("test-token-url")
-            .relyingPartyId("test-relying-party-id")
-            .build();
+                .authUrl("test-auth-url")
+                .tokenUrl("test-token-url")
+                .relyingPartyId("test-relying-party-id")
+                .build();
     }
-
 }

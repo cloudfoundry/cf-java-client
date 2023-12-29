@@ -35,17 +35,16 @@ final class AuthorizeByAuthorizationCodeGrantBrowserRequestTest {
     @Test
     void validMax() {
         AuthorizeByAuthorizationCodeGrantBrowserRequest.builder()
-            .clientId("test-client-id")
-            .redirectUri("http://redirect.to/app")
-            .scope("test-scope")
-            .build();
+                .clientId("test-client-id")
+                .redirectUri("http://redirect.to/app")
+                .scope("test-scope")
+                .build();
     }
 
     @Test
     void validMin() {
         AuthorizeByAuthorizationCodeGrantBrowserRequest.builder()
-            .clientId("test-client-id")
-            .build();
+                .clientId("test-client-id")
+                .build();
     }
-
 }

@@ -36,5 +36,4 @@ final class DeleteApplicationRequestTest {
             .applicationId("test-application-id")
             .build();
     }
-
 }

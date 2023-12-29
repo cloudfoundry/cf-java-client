@@ -30,5 +30,4 @@ public interface ResourceMatch {
      * @return the response from the List Matching Resources request
      */
     Mono<ListMatchingResourcesResponse> list(ListMatchingResourcesRequest request);
-
 }

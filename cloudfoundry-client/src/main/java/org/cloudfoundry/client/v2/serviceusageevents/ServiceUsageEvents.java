@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.client.v2.serviceusageevents;
 
-
 import reactor.core.publisher.Mono;
 
 /**
@@ -47,5 +46,4 @@ public interface ServiceUsageEvents {
      * @return the response from the Purge and Reseed Service Usage Events request
      */
     Mono<Void> purgeAndReseed(PurgeAndReseedServiceUsageEventsRequest request);
-
 }

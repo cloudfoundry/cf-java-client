@@ -29,5 +29,4 @@ final class SortOrderTest {
         assertThat(ASCENDING.getValue()).isEqualTo("ascending");
         assertThat(DESCENDING.getValue()).isEqualTo("descending");
     }
-
 }

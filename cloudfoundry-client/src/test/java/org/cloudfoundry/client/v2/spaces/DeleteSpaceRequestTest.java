@@ -36,5 +36,4 @@ final class DeleteSpaceRequestTest {
             .spaceId("space-test-id")
             .build();
     }
-
 }

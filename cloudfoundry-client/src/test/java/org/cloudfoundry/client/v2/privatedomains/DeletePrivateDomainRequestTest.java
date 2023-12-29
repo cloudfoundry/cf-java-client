@@ -36,5 +36,4 @@ final class DeletePrivateDomainRequestTest {
             .privateDomainId("test-private-domain-id")
             .build();
     }
-
 }

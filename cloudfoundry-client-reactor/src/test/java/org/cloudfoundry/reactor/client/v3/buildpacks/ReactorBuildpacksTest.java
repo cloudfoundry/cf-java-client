@@ -16,6 +16,20 @@
 
 package org.cloudfoundry.reactor.client.v3.buildpacks;
 
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.PATCH;
+import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
+import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
+
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.time.Duration;
+import java.util.Collections;
 import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.Pagination;
@@ -41,24 +55,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 import reactor.test.StepVerifier;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.time.Duration;
-import java.util.Collections;
-
-import static io.netty.handler.codec.http.HttpMethod.DELETE;
-import static io.netty.handler.codec.http.HttpMethod.GET;
-import static io.netty.handler.codec.http.HttpMethod.PATCH;
-import static io.netty.handler.codec.http.HttpMethod.POST;
-import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
-import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
-import static io.netty.handler.codec.http.HttpResponseStatus.OK;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 
 final class ReactorBuildpacksTest extends AbstractClientApiTest {
 
-    private final ReactorBuildpacksV3 buildpacks = new ReactorBuildpacksV3(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
+    private final ReactorBuildpacksV3 buildpacks =
+            new ReactorBuildpacksV3(
+                    CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     void create() {
@@ -74,38 +76,47 @@ final class ReactorBuildpacksTest extends AbstractClientApiTest {
             .build());
 
         this.buildpacks
-            .create(CreateBuildpackRequest.builder()
-                .name("ruby_buildpack")
-                .position(42)
-                .enabled(true)
-                .locked(false)
-                .stack("windows64")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(CreateBuildpackResponse.builder()
-                .id("fd35633f-5c5c-4e4e-a5a9-0722c970a9d2")
-                .createdAt("2016-03-18T23:26:46Z")
-                .updatedAt("2016-10-17T20:00:42Z")
-                .name("ruby_buildpack")
-                .state(BuildpackState.AWAITING_UPLOAD)
-                .stack("windows64")
-                .position(42)
-                .enabled(true)
-                .locked(false)
-                .metadata(Metadata.builder()
-                    .annotations(Collections.emptyMap())
-                    .labels(Collections.emptyMap())
-                    .build())
-                .link("self", Link.builder()
-                    .href("https://api.example.org/v3/buildpacks/fd35633f-5c5c-4e4e-a5a9-0722c970a9d2")
-                    .build())
-                .link("upload", Link.builder()
-                    .href("https://api.example.org/v3/buildpacks/fd35633f-5c5c-4e4e-a5a9-0722c970a9d2/upload")
-                    .method("POST")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .create(
+                        CreateBuildpackRequest.builder()
+                                .name("ruby_buildpack")
+                                .position(42)
+                                .enabled(true)
+                                .locked(false)
+                                .stack("windows64")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        CreateBuildpackResponse.builder()
+                                .id("fd35633f-5c5c-4e4e-a5a9-0722c970a9d2")
+                                .createdAt("2016-03-18T23:26:46Z")
+                                .updatedAt("2016-10-17T20:00:42Z")
+                                .name("ruby_buildpack")
+                                .state(BuildpackState.AWAITING_UPLOAD)
+                                .stack("windows64")
+                                .position(42)
+                                .enabled(true)
+                                .locked(false)
+                                .metadata(
+                                        Metadata.builder()
+                                                .annotations(Collections.emptyMap())
+                                                .labels(Collections.emptyMap())
+                                                .build())
+                                .link(
+                                        "self",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/buildpacks/fd35633f-5c5c-4e4e-a5a9-0722c970a9d2")
+                                                .build())
+                                .link(
+                                        "upload",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/buildpacks/fd35633f-5c5c-4e4e-a5a9-0722c970a9d2/upload")
+                                                .method("POST")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -121,13 +132,11 @@ final class ReactorBuildpacksTest extends AbstractClientApiTest {
             .build());
 
         this.buildpacks
-            .delete(DeleteBuildpackRequest.builder()
-                .buildpackId("test-buildpack-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext("[guid]")
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .delete(DeleteBuildpackRequest.builder().buildpackId("test-buildpack-id").build())
+                .as(StepVerifier::create)
+                .expectNext("[guid]")
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -143,34 +152,40 @@ final class ReactorBuildpacksTest extends AbstractClientApiTest {
             .build());
 
         this.buildpacks
-            .get(GetBuildpackRequest.builder()
-                .buildpackId("test-buildpack-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(GetBuildpackResponse.builder()
-                .id("fd35633f-5c5c-4e4e-a5a9-0722c970a9d2")
-                .createdAt("2016-03-18T23:26:46Z")
-                .updatedAt("2016-10-17T20:00:42Z")
-                .name("ruby_buildpack")
-                .state(BuildpackState.AWAITING_UPLOAD)
-                .stack("windows64")
-                .position(42)
-                .enabled(true)
-                .locked(false)
-                .metadata(Metadata.builder()
-                    .annotations(Collections.emptyMap())
-                    .labels(Collections.emptyMap())
-                    .build())
-                .link("self", Link.builder()
-                    .href("https://api.example.org/v3/buildpacks/fd35633f-5c5c-4e4e-a5a9-0722c970a9d2")
-                    .build())
-                .link("upload", Link.builder()
-                    .href("https://api.example.org/v3/buildpacks/fd35633f-5c5c-4e4e-a5a9-0722c970a9d2/upload")
-                    .method("POST")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .get(GetBuildpackRequest.builder().buildpackId("test-buildpack-id").build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        GetBuildpackResponse.builder()
+                                .id("fd35633f-5c5c-4e4e-a5a9-0722c970a9d2")
+                                .createdAt("2016-03-18T23:26:46Z")
+                                .updatedAt("2016-10-17T20:00:42Z")
+                                .name("ruby_buildpack")
+                                .state(BuildpackState.AWAITING_UPLOAD)
+                                .stack("windows64")
+                                .position(42)
+                                .enabled(true)
+                                .locked(false)
+                                .metadata(
+                                        Metadata.builder()
+                                                .annotations(Collections.emptyMap())
+                                                .labels(Collections.emptyMap())
+                                                .build())
+                                .link(
+                                        "self",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/buildpacks/fd35633f-5c5c-4e4e-a5a9-0722c970a9d2")
+                                                .build())
+                                .link(
+                                        "upload",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/buildpacks/fd35633f-5c5c-4e4e-a5a9-0722c970a9d2/upload")
+                                                .method("POST")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -186,48 +201,63 @@ final class ReactorBuildpacksTest extends AbstractClientApiTest {
             .build());
 
         this.buildpacks
-            .list(ListBuildpacksRequest.builder()
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(ListBuildpacksResponse.builder()
-                .pagination(Pagination.builder()
-                    .totalResults(3)
-                    .totalPages(2)
-                    .first(Link.builder()
-                        .href("https://api.example.org/v3/buildpacks?page=1&per_page=2")
-                        .build())
-                    .last(Link.builder()
-                        .href("https://api.example.org/v3/buildpacks?page=2&per_page=2")
-                        .build())
-                    .next(Link.builder()
-                        .href("https://api.example.org/v3/buildpacks?page=2&per_page=2")
-                        .build())
-                    .build())
-                .resource(BuildpackResource.builder()
-                    .id("fd35633f-5c5c-4e4e-a5a9-0722c970a9d2")
-                    .createdAt("2016-03-18T23:26:46Z")
-                    .updatedAt("2016-10-17T20:00:42Z")
-                    .name("my-buildpack")
-                    .state(BuildpackState.AWAITING_UPLOAD)
-                    .stack("my-stack")
-                    .position(1)
-                    .enabled(true)
-                    .locked(false)
-                    .metadata(Metadata.builder()
-                        .annotations(Collections.emptyMap())
-                        .labels(Collections.emptyMap())
-                        .build())
-                    .link("self", Link.builder()
-                        .href("https://api.example.org/v3/buildpacks/fd35633f-5c5c-4e4e-a5a9-0722c970a9d2")
-                        .build())
-                    .link("upload", Link.builder()
-                        .href("https://api.example.org/v3/buildpacks/fd35633f-5c5c-4e4e-a5a9-0722c970a9d2/upload")
-                        .method("POST")
-                        .build())
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .list(ListBuildpacksRequest.builder().build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        ListBuildpacksResponse.builder()
+                                .pagination(
+                                        Pagination.builder()
+                                                .totalResults(3)
+                                                .totalPages(2)
+                                                .first(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/buildpacks?page=1&per_page=2")
+                                                                .build())
+                                                .last(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/buildpacks?page=2&per_page=2")
+                                                                .build())
+                                                .next(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/buildpacks?page=2&per_page=2")
+                                                                .build())
+                                                .build())
+                                .resource(
+                                        BuildpackResource.builder()
+                                                .id("fd35633f-5c5c-4e4e-a5a9-0722c970a9d2")
+                                                .createdAt("2016-03-18T23:26:46Z")
+                                                .updatedAt("2016-10-17T20:00:42Z")
+                                                .name("my-buildpack")
+                                                .state(BuildpackState.AWAITING_UPLOAD)
+                                                .stack("my-stack")
+                                                .position(1)
+                                                .enabled(true)
+                                                .locked(false)
+                                                .metadata(
+                                                        Metadata.builder()
+                                                                .annotations(Collections.emptyMap())
+                                                                .labels(Collections.emptyMap())
+                                                                .build())
+                                                .link(
+                                                        "self",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/buildpacks/fd35633f-5c5c-4e4e-a5a9-0722c970a9d2")
+                                                                .build())
+                                                .link(
+                                                        "upload",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/buildpacks/fd35633f-5c5c-4e4e-a5a9-0722c970a9d2/upload")
+                                                                .method("POST")
+                                                                .build())
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -244,39 +274,48 @@ final class ReactorBuildpacksTest extends AbstractClientApiTest {
             .build());
 
         this.buildpacks
-            .update(UpdateBuildpackRequest.builder()
-                .buildpackId("test-buildpack-id")
-                .name("ruby_buildpack")
-                .position(42)
-                .enabled(true)
-                .locked(false)
-                .stack("windows64")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(UpdateBuildpackResponse.builder()
-                .id("fd35633f-5c5c-4e4e-a5a9-0722c970a9d2")
-                .createdAt("2016-03-18T23:26:46Z")
-                .updatedAt("2016-10-17T20:00:42Z")
-                .name("ruby_buildpack")
-                .state(BuildpackState.AWAITING_UPLOAD)
-                .stack("windows64")
-                .position(42)
-                .enabled(true)
-                .locked(false)
-                .metadata(Metadata.builder()
-                    .annotations(Collections.emptyMap())
-                    .labels(Collections.emptyMap())
-                    .build())
-                .link("self", Link.builder()
-                    .href("https://api.example.org/v3/buildpacks/fd35633f-5c5c-4e4e-a5a9-0722c970a9d2")
-                    .build())
-                .link("upload", Link.builder()
-                    .href("https://api.example.org/v3/buildpacks/fd35633f-5c5c-4e4e-a5a9-0722c970a9d2/upload")
-                    .method("POST")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .update(
+                        UpdateBuildpackRequest.builder()
+                                .buildpackId("test-buildpack-id")
+                                .name("ruby_buildpack")
+                                .position(42)
+                                .enabled(true)
+                                .locked(false)
+                                .stack("windows64")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        UpdateBuildpackResponse.builder()
+                                .id("fd35633f-5c5c-4e4e-a5a9-0722c970a9d2")
+                                .createdAt("2016-03-18T23:26:46Z")
+                                .updatedAt("2016-10-17T20:00:42Z")
+                                .name("ruby_buildpack")
+                                .state(BuildpackState.AWAITING_UPLOAD)
+                                .stack("windows64")
+                                .position(42)
+                                .enabled(true)
+                                .locked(false)
+                                .metadata(
+                                        Metadata.builder()
+                                                .annotations(Collections.emptyMap())
+                                                .labels(Collections.emptyMap())
+                                                .build())
+                                .link(
+                                        "self",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/buildpacks/fd35633f-5c5c-4e4e-a5a9-0722c970a9d2")
+                                                .build())
+                                .link(
+                                        "upload",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/buildpacks/fd35633f-5c5c-4e4e-a5a9-0722c970a9d2/upload")
+                                                .method("POST")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -287,54 +326,81 @@ final class ReactorBuildpacksTest extends AbstractClientApiTest {
                 .contents(consumer((headers, body) -> {
                     String boundary = extractBoundary(headers);
 
-                    assertThat(body.readString(Charset.defaultCharset()))
-                        .isEqualTo("--" + boundary + "\r\n" +
-                            "content-disposition: form-data; name=\"bits\"; filename=\"test-buildpack.zip\"\r\n" +
-                            "content-length: 12\r\n" +
-                            "content-type: application/zip\r\n" +
-                            "content-transfer-encoding: binary\r\n" +
-                            "\r\n" +
-                            "test-content" +
-                            "\r\n" +
-                            "--" + boundary + "--\r\n");
-                }))
-                .build())
-            .response(TestResponse.builder()
-                .status(CREATED)
-                .payload("fixtures/client/v3/buildpacks/POST_{id}_upload_response.json")
-                .build())
-            .build());
+                                                            assertThat(
+                                                                            body.readString(
+                                                                                    Charset
+                                                                                            .defaultCharset()))
+                                                                    .isEqualTo(
+                                                                            "--"
+                                                                                    + boundary
+                                                                                    + "\r\n"
+                                                                                    + "content-disposition:"
+                                                                                    + " form-data;"
+                                                                                    + " name=\"bits\";"
+                                                                                    + " filename=\"test-buildpack.zip\"\r\n"
+                                                                                    + "content-length:"
+                                                                                    + " 12\r\n"
+                                                                                    + "content-type:"
+                                                                                    + " application/zip\r\n"
+                                                                                    + "content-transfer-encoding:"
+                                                                                    + " binary\r\n"
+                                                                                    + "\r\n"
+                                                                                    + "test-content\r\n"
+                                                                                    + "--"
+                                                                                    + boundary
+                                                                                    + "--\r\n");
+                                                        }))
+                                        .build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(CREATED)
+                                        .payload(
+                                                "fixtures/client/v3/buildpacks/POST_{id}_upload_response.json")
+                                        .build())
+                        .build());
 
         this.buildpacks
-            .upload(UploadBuildpackRequest.builder()
-                .bits(new ClassPathResource("fixtures/client/v3/buildpacks/test-buildpack.zip").getFile().toPath())
-                .buildpackId("test-buildpack-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(UploadBuildpackResponse.builder()
-                .id("fd35633f-5c5c-4e4e-a5a9-0722c970a9d2")
-                .createdAt("2016-03-18T23:26:46Z")
-                .updatedAt("2016-10-17T20:00:42Z")
-                .name("ruby_buildpack")
-                .state(BuildpackState.AWAITING_UPLOAD)
-                .stack("windows64")
-                .position(42)
-                .enabled(true)
-                .locked(false)
-                .metadata(Metadata.builder()
-                    .annotations(Collections.emptyMap())
-                    .labels(Collections.emptyMap())
-                    .build())
-                .link("self", Link.builder()
-                    .href("https://api.example.org/v3/buildpacks/fd35633f-5c5c-4e4e-a5a9-0722c970a9d2")
-                    .build())
-                .link("upload", Link.builder()
-                    .href("https://api.example.org/v3/buildpacks/fd35633f-5c5c-4e4e-a5a9-0722c970a9d2/upload")
-                    .method("POST")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .upload(
+                        UploadBuildpackRequest.builder()
+                                .bits(
+                                        new ClassPathResource(
+                                                        "fixtures/client/v3/buildpacks/test-buildpack.zip")
+                                                .getFile()
+                                                .toPath())
+                                .buildpackId("test-buildpack-id")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        UploadBuildpackResponse.builder()
+                                .id("fd35633f-5c5c-4e4e-a5a9-0722c970a9d2")
+                                .createdAt("2016-03-18T23:26:46Z")
+                                .updatedAt("2016-10-17T20:00:42Z")
+                                .name("ruby_buildpack")
+                                .state(BuildpackState.AWAITING_UPLOAD)
+                                .stack("windows64")
+                                .position(42)
+                                .enabled(true)
+                                .locked(false)
+                                .metadata(
+                                        Metadata.builder()
+                                                .annotations(Collections.emptyMap())
+                                                .labels(Collections.emptyMap())
+                                                .build())
+                                .link(
+                                        "self",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/buildpacks/fd35633f-5c5c-4e4e-a5a9-0722c970a9d2")
+                                                .build())
+                                .link(
+                                        "upload",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/buildpacks/fd35633f-5c5c-4e4e-a5a9-0722c970a9d2/upload")
+                                                .method("POST")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
-
 }

@@ -35,17 +35,16 @@ final class AuthorizeByOpenIdWithAuthorizationCodeGrantRequestTest {
     @Test
     void validMax() {
         AuthorizeByOpenIdWithAuthorizationCodeGrantRequest.builder()
-            .clientId("test-client-id")
-            .redirectUri("http://redirect.to/app")
-            .scope("test-scope")
-            .build();
+                .clientId("test-client-id")
+                .redirectUri("http://redirect.to/app")
+                .scope("test-scope")
+                .build();
     }
 
     @Test
     void validMin() {
         AuthorizeByOpenIdWithAuthorizationCodeGrantRequest.builder()
-            .clientId("test-client-id")
-            .build();
+                .clientId("test-client-id")
+                .build();
     }
-
 }

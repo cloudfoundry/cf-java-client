@@ -25,5 +25,4 @@ final class AttributeMappingsTest {
         AttributeMappings.builder()
             .build();
     }
-
 }

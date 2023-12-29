@@ -17,9 +17,8 @@
 package org.cloudfoundry.uaa.users;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.cloudfoundry.Nullable;
-
 import java.util.List;
+import org.cloudfoundry.Nullable;
 
 /**
  * The summary entity response payload for User
@@ -93,5 +92,4 @@ public abstract class AbstractUserSummary extends AbstractUserId {
      */
     @JsonProperty("zoneId")
     public abstract String getZoneId();
-
 }

@@ -43,9 +43,8 @@ final class AssociateUserOrganizationRequestTest {
     @Test
     void valid() {
         AssociateUserOrganizationRequest.builder()
-            .organizationId("test-space-id")
-            .userId("test-user-id")
-            .build();
+                .organizationId("test-space-id")
+                .userId("test-user-id")
+                .build();
     }
-
 }

@@ -76,5 +76,4 @@ public enum DropletState {
     public String toString() {
         return getValue();
     }
-
 }

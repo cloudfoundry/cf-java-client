@@ -36,5 +36,4 @@ final class GetOrganizationMemoryUsageRequestTest {
             .organizationId("test-organization-id")
             .build();
     }
-
 }

@@ -43,9 +43,8 @@ final class CreateDomainRequestTest {
     @Test
     void valid() {
         CreateDomainRequest.builder()
-            .domain("test-domain")
-            .organization("test-organization")
-            .build();
+                .domain("test-domain")
+                .organization("test-organization")
+                .build();
     }
-
 }

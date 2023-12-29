@@ -72,5 +72,4 @@ final class CreateRouteRequestTest {
             .space("test-space")
             .build();
     }
-
 }

@@ -64,12 +64,12 @@ final class BatchChangeSecretRequestTest {
     @Test
     void valid() {
         BatchChangeSecretRequest.builder()
-            .changeSecret(ChangeSecret.builder()
-                .clientId("test-client-id")
-                .oldSecret("test-old-secret")
-                .secret("test-secret")
-                .build())
-            .build();
+                .changeSecret(
+                        ChangeSecret.builder()
+                                .clientId("test-client-id")
+                                .oldSecret("test-old-secret")
+                                .secret("test-secret")
+                                .build())
+                .build();
     }
-
 }

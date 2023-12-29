@@ -24,5 +24,4 @@ class CounterTest {
     void valid() {
         Counter.builder().build();
     }
-
 }

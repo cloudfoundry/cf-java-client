@@ -33,8 +33,7 @@ final class SetSecurityGroupRunningDefaultRequestTest {
     @Test
     void valid() {
         SetSecurityGroupRunningDefaultRequest.builder()
-            .securityGroupId("test-security-group-default-id")
-            .build();
+                .securityGroupId("test-security-group-default-id")
+                .build();
     }
-
 }

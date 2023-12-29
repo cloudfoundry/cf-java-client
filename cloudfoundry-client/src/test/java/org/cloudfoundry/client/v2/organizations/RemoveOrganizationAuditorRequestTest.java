@@ -43,9 +43,8 @@ final class RemoveOrganizationAuditorRequestTest {
     @Test
     void valid() {
         RemoveOrganizationAuditorRequest.builder()
-            .auditorId("test-auditor-id")
-            .organizationId("test-organization-id")
-            .build();
+                .auditorId("test-auditor-id")
+                .organizationId("test-organization-id")
+                .build();
     }
-
 }

@@ -16,6 +16,16 @@
 
 package org.cloudfoundry.reactor.client.v3.stacks;
 
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.PATCH;
+import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
+import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+
+import java.time.Duration;
+import java.util.Collections;
 import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.Pagination;
@@ -36,20 +46,12 @@ import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-import java.time.Duration;
-import java.util.Collections;
-
-import static io.netty.handler.codec.http.HttpMethod.DELETE;
-import static io.netty.handler.codec.http.HttpMethod.GET;
-import static io.netty.handler.codec.http.HttpMethod.PATCH;
-import static io.netty.handler.codec.http.HttpMethod.POST;
-import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
-import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
-import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 class ReactorStacksV3Test extends AbstractClientApiTest {
 
-    private final ReactorStacksV3 stacks = new ReactorStacksV3(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
+    private final ReactorStacksV3 stacks =
+            new ReactorStacksV3(
+                    CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     void create() {
@@ -64,27 +66,34 @@ class ReactorStacksV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.stacks.create(CreateStackRequest.builder()
-            .name("test-stack-name")
-            .description("test-stack-description")
-            .build())
-            .as(StepVerifier::create)
-            .expectNext(CreateStackResponse.builder()
-                .id("11c916c9-c2f9-440e-8e73-102e79c4704d")
-                .name("test-stack-name")
-                .description("test-stack-description")
-                .createdAt("2018-11-09T22:43:28Z")
-                .updatedAt("2018-11-09T22:43:28Z")
-                .metadata(Metadata.builder()
-                    .putAllAnnotations(Collections.emptyMap())
-                    .putAllLabels(Collections.emptyMap())
-                    .build())
-                .link("self", Link.builder()
-                    .href("https://api.example.com/v3/stacks/11c916c9-c2f9-440e-8e73-102e79c4704d")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+        this.stacks
+                .create(
+                        CreateStackRequest.builder()
+                                .name("test-stack-name")
+                                .description("test-stack-description")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        CreateStackResponse.builder()
+                                .id("11c916c9-c2f9-440e-8e73-102e79c4704d")
+                                .name("test-stack-name")
+                                .description("test-stack-description")
+                                .createdAt("2018-11-09T22:43:28Z")
+                                .updatedAt("2018-11-09T22:43:28Z")
+                                .metadata(
+                                        Metadata.builder()
+                                                .putAllAnnotations(Collections.emptyMap())
+                                                .putAllLabels(Collections.emptyMap())
+                                                .build())
+                                .link(
+                                        "self",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.com/v3/stacks/11c916c9-c2f9-440e-8e73-102e79c4704d")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -99,12 +108,10 @@ class ReactorStacksV3Test extends AbstractClientApiTest {
             .build());
 
         this.stacks
-            .delete(DeleteStackRequest.builder()
-                .stackId("test-stack-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .delete(DeleteStackRequest.builder().stackId("test-stack-id").build())
+                .as(StepVerifier::create)
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -120,26 +127,32 @@ class ReactorStacksV3Test extends AbstractClientApiTest {
             .build());
 
         this.stacks
-            .get(GetStackRequest.builder()
-                .stackId("11c916c9-c2f9-440e-8e73-102e79c4704d")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(GetStackResponse.builder()
-                .id("11c916c9-c2f9-440e-8e73-102e79c4704d")
-                .name("test-stack-name")
-                .description("test-stack-description")
-                .createdAt("2018-11-09T22:43:28Z")
-                .updatedAt("2018-11-09T22:43:28Z")
-                .metadata(Metadata.builder()
-                    .putAllAnnotations(Collections.emptyMap())
-                    .putAllLabels(Collections.emptyMap())
-                    .build())
-                .link("self", Link.builder()
-                    .href("https://api.example.com/v3/stacks/11c916c9-c2f9-440e-8e73-102e79c4704d")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .get(
+                        GetStackRequest.builder()
+                                .stackId("11c916c9-c2f9-440e-8e73-102e79c4704d")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        GetStackResponse.builder()
+                                .id("11c916c9-c2f9-440e-8e73-102e79c4704d")
+                                .name("test-stack-name")
+                                .description("test-stack-description")
+                                .createdAt("2018-11-09T22:43:28Z")
+                                .updatedAt("2018-11-09T22:43:28Z")
+                                .metadata(
+                                        Metadata.builder()
+                                                .putAllAnnotations(Collections.emptyMap())
+                                                .putAllLabels(Collections.emptyMap())
+                                                .build())
+                                .link(
+                                        "self",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.com/v3/stacks/11c916c9-c2f9-440e-8e73-102e79c4704d")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -154,53 +167,76 @@ class ReactorStacksV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.stacks.list(ListStacksRequest.builder().build())
-            .as(StepVerifier::create)
-            .expectNext(ListStacksResponse.builder()
-                .pagination(Pagination.builder()
-                    .totalResults(3)
-                    .totalPages(2)
-                    .first(Link.builder()
-                        .href("https://api.example.org/v3/stacks?page=1&per_page=2")
-                        .build())
-                    .last(Link.builder()
-                        .href("https://api.example.org/v3/stacks?page=2&per_page=2")
-                        .build())
-                    .next(Link.builder()
-                        .href("https://api.example.org/v3/stacks?page=2&per_page=2")
-                        .build())
-                    .build())
-                .resource(StackResource.builder()
-                    .id("11c916c9-c2f9-440e-8e73-102e79c4704d")
-                    .name("test-stack-name-1")
-                    .description("test-stack-description-1")
-                    .createdAt("2018-11-09T22:43:28Z")
-                    .updatedAt("2018-11-09T22:43:28Z")
-                    .metadata(Metadata.builder()
-                        .putAllAnnotations(Collections.emptyMap())
-                        .putAllLabels(Collections.emptyMap())
-                        .build())
-                    .link("self", Link.builder()
-                        .href("https://api.example.org/v3/stacks/11c916c9-c2f9-440e-8e73-102e79c4704d")
-                        .build())
-                    .build())
-                .resource(StackResource.builder()
-                    .id("81c916c9-c2f9-440e-8e73-102e79c4704h")
-                    .name("test-stack-name-2")
-                    .description("test-stack-description-2")
-                    .createdAt("2018-11-09T22:43:29Z")
-                    .updatedAt("2018-11-09T22:43:29Z")
-                    .metadata(Metadata.builder()
-                        .putAllAnnotations(Collections.emptyMap())
-                        .putAllLabels(Collections.emptyMap())
-                        .build())
-                    .link("self", Link.builder()
-                        .href("https://api.example.org/v3/stacks/81c916c9-c2f9-440e-8e73-102e79c4704h")
-                        .build())
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+        this.stacks
+                .list(ListStacksRequest.builder().build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        ListStacksResponse.builder()
+                                .pagination(
+                                        Pagination.builder()
+                                                .totalResults(3)
+                                                .totalPages(2)
+                                                .first(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/stacks?page=1&per_page=2")
+                                                                .build())
+                                                .last(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/stacks?page=2&per_page=2")
+                                                                .build())
+                                                .next(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/stacks?page=2&per_page=2")
+                                                                .build())
+                                                .build())
+                                .resource(
+                                        StackResource.builder()
+                                                .id("11c916c9-c2f9-440e-8e73-102e79c4704d")
+                                                .name("test-stack-name-1")
+                                                .description("test-stack-description-1")
+                                                .createdAt("2018-11-09T22:43:28Z")
+                                                .updatedAt("2018-11-09T22:43:28Z")
+                                                .metadata(
+                                                        Metadata.builder()
+                                                                .putAllAnnotations(
+                                                                        Collections.emptyMap())
+                                                                .putAllLabels(
+                                                                        Collections.emptyMap())
+                                                                .build())
+                                                .link(
+                                                        "self",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/stacks/11c916c9-c2f9-440e-8e73-102e79c4704d")
+                                                                .build())
+                                                .build())
+                                .resource(
+                                        StackResource.builder()
+                                                .id("81c916c9-c2f9-440e-8e73-102e79c4704h")
+                                                .name("test-stack-name-2")
+                                                .description("test-stack-description-2")
+                                                .createdAt("2018-11-09T22:43:29Z")
+                                                .updatedAt("2018-11-09T22:43:29Z")
+                                                .metadata(
+                                                        Metadata.builder()
+                                                                .putAllAnnotations(
+                                                                        Collections.emptyMap())
+                                                                .putAllLabels(
+                                                                        Collections.emptyMap())
+                                                                .build())
+                                                .link(
+                                                        "self",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/stacks/81c916c9-c2f9-440e-8e73-102e79c4704h")
+                                                                .build())
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -217,30 +253,36 @@ class ReactorStacksV3Test extends AbstractClientApiTest {
             .build());
 
         this.stacks
-            .update(UpdateStackRequest.builder()
-                .stackId("test-stack-id")
-                .metadata(Metadata.builder()
-                    .label("key", "value")
-                    .annotation("note", "detailed information")
-                    .build())
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(UpdateStackResponse.builder()
-                .id("11c916c9-c2f9-440e-8e73-102e79c4704d")
-                .name("test-stack-name")
-                .description("test-stack-description")
-                .createdAt("2018-11-09T22:43:28Z")
-                .updatedAt("2018-11-09T22:43:28Z")
-                .metadata(Metadata.builder()
-                    .label("key", "value")
-                    .annotation("note", "detailed information")
-                    .build())
-                .link("self", Link.builder()
-                    .href("https://api.example.com/v3/stacks/11c916c9-c2f9-440e-8e73-102e79c4704d")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .update(
+                        UpdateStackRequest.builder()
+                                .stackId("test-stack-id")
+                                .metadata(
+                                        Metadata.builder()
+                                                .label("key", "value")
+                                                .annotation("note", "detailed information")
+                                                .build())
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        UpdateStackResponse.builder()
+                                .id("11c916c9-c2f9-440e-8e73-102e79c4704d")
+                                .name("test-stack-name")
+                                .description("test-stack-description")
+                                .createdAt("2018-11-09T22:43:28Z")
+                                .updatedAt("2018-11-09T22:43:28Z")
+                                .metadata(
+                                        Metadata.builder()
+                                                .label("key", "value")
+                                                .annotation("note", "detailed information")
+                                                .build())
+                                .link(
+                                        "self",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.com/v3/stacks/11c916c9-c2f9-440e-8e73-102e79c4704d")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
-
 }

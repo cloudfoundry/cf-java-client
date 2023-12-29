@@ -47,5 +47,4 @@ final class CreateUserProvidedServiceInstanceRequestTest {
             .spaceId("space-id")
             .build();
     }
-
 }

@@ -43,9 +43,8 @@ class UpdateRouterGroupRequestTest {
     @Test
     void valid() {
         UpdateRouterGroupRequest.builder()
-            .reservablePorts("999-9999")
-            .routerGroupId("test-router-group-id")
-            .build();
+                .reservablePorts("999-9999")
+                .routerGroupId("test-router-group-id")
+                .build();
     }
-
 }

@@ -36,5 +36,4 @@ final class RouteExistsRequestTest {
             .domainId("test-domain-id")
             .build();
     }
-
 }

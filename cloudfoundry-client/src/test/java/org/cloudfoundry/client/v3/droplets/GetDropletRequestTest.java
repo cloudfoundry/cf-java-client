@@ -36,5 +36,4 @@ final class GetDropletRequestTest {
             .dropletId("test-droplet-id")
             .build();
     }
-
 }

@@ -36,5 +36,4 @@ final class GetJobRequestTest {
             .jobId("test-job-id")
             .build();
     }
-
 }

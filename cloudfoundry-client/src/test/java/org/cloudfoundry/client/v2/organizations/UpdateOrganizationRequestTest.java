@@ -36,5 +36,4 @@ final class UpdateOrganizationRequestTest {
             .organizationId("test-organization-id")
             .build();
     }
-
 }

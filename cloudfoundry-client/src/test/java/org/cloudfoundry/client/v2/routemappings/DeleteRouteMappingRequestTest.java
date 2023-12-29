@@ -36,5 +36,4 @@ final class DeleteRouteMappingRequestTest {
             .routeMappingId("route-mapping-id")
             .build();
     }
-
 }

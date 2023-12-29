@@ -51,15 +51,14 @@ final class CreateApplicationRequestTest {
     @Test
     void valid() {
         CreateApplicationRequest.builder()
-            .name("test-name")
-            .relationships(ApplicationRelationships.builder()
-                .space(ToOneRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("test-id")
-                        .build())
-                    .build())
-                .build())
-            .build();
+                .name("test-name")
+                .relationships(
+                        ApplicationRelationships.builder()
+                                .space(
+                                        ToOneRelationship.builder()
+                                                .data(Relationship.builder().id("test-id").build())
+                                                .build())
+                                .build())
+                .build();
     }
-
 }

@@ -33,8 +33,7 @@ final class ListServiceInstanceServiceBindingsRequestTest {
     @Test
     void valid() {
         ListServiceInstanceServiceBindingsRequest.builder()
-            .serviceInstanceId("test-service-instance-id")
-            .build();
+                .serviceInstanceId("test-service-instance-id")
+                .build();
     }
-
 }

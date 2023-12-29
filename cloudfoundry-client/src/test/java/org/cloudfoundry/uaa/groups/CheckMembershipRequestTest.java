@@ -43,10 +43,8 @@ final class CheckMembershipRequestTest {
     @Test
     void valid() {
         CheckMembershipRequest.builder()
-            .groupId("test-group-id")
-            .memberId("test-member-id")
-            .build();
+                .groupId("test-group-id")
+                .memberId("test-member-id")
+                .build();
     }
-
-
 }

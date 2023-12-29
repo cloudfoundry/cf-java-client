@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.operations;
 
-import org.springframework.util.ReflectionUtils;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
@@ -32,8 +32,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.springframework.util.ReflectionUtils;
 
 /**
  * {@code TestObjects} provides a generic utility which transforms a builder object of type {@code T}, by calling its configuration methods with default values.
@@ -99,15 +98,21 @@ public abstract class TestObjects {
 
     private static <T> T fill(T builder, Optional<String> modifier) {
         Class<?> builderType = builder.getClass();
-        assertThat(isBuilderType(builderType)).as("Cannot fill type %s", builderType.getName()).isTrue();
+        assertThat(isBuilderType(builderType))
+                .as("Cannot fill type %s", builderType.getName())
+                .isTrue();
         assertThat(buildsRequestType(builderType)).as("Do not fill Request types").isFalse();
 
         List<Method> builderMethods = getMethods(builderType);
         Set<String> builtGetters = getBuiltGetters(builderType);
 
         return getConfigurationMethods(builderType, builderMethods, builtGetters).stream()
-            .collect(() -> builder, (b, method) -> ReflectionUtils.invokeMethod(method, b, getConfiguredValue(method, modifier)), (a, b) -> {
-            });
+                .collect(
+                        () -> builder,
+                        (b, method) ->
+                                ReflectionUtils.invokeMethod(
+                                        method, b, getConfiguredValue(method, modifier)),
+                        (a, b) -> {});
     }
 
     private static Method getBuildMethod(Class<?> builderType) {
@@ -121,22 +126,23 @@ public abstract class TestObjects {
     private static Set<String> getBuiltGetters(Class<?> builderType) {
         Class<?> builtType = getBuiltType(builderType);
         return Arrays.stream(ReflectionUtils.getUniqueDeclaredMethods(builtType))
-            .map(Method::getName)
-            .filter(s -> s.startsWith("get"))
-            .collect(Collectors.toSet());
+                .map(Method::getName)
+                .filter(s -> s.startsWith("get"))
+                .collect(Collectors.toSet());
     }
 
     private static Class<?> getBuiltType(Class<?> builderType) {
         return getBuildMethod(builderType).getReturnType();
     }
 
-    private static List<Method> getConfigurationMethods(Class<?> builderType, List<Method> builderMethods, Set<String> builtGetters) {
+    private static List<Method> getConfigurationMethods(
+            Class<?> builderType, List<Method> builderMethods, Set<String> builtGetters) {
         return builderMethods.stream()
-            .filter(TestObjects::isPublic)
-            .filter(returnsThisType(builderType))
-            .filter(TestObjects::hasSingleParameter)
-            .filter(method -> hasMatchingGetter(method, builtGetters))
-            .collect(Collectors.toList());
+                .filter(TestObjects::isPublic)
+                .filter(returnsThisType(builderType))
+                .filter(TestObjects::hasSingleParameter)
+                .filter(method -> hasMatchingGetter(method, builtGetters))
+                .collect(Collectors.toList());
     }
 
     private static Object getConfiguredBuilder(Class<?> parameterType, Optional<String> modifier) {
@@ -151,13 +157,13 @@ public abstract class TestObjects {
     }
 
     private static String getConfiguredString(Method method, Optional<String> modifier) {
-        return modifier
-            .map(m -> String.format("test-%s%s", m, method.getName()))
-            .orElse(String.format("test-%s", method.getName()));
+        return modifier.map(m -> String.format("test-%s%s", m, method.getName()))
+                .orElse(String.format("test-%s", method.getName()));
     }
 
     @SuppressWarnings("unchecked")
-    private static Object getConfiguredValue(Method configurationMethod, Optional<String> modifier) {
+    private static Object getConfiguredValue(
+            Method configurationMethod, Optional<String> modifier) {
         Class<?> parameterType = getParameter(configurationMethod).getType();
 
         if (isBuiltType(parameterType)) {
@@ -185,7 +191,8 @@ public abstract class TestObjects {
         } else if (parameterType.isArray()) {
             return Array.newInstance(parameterType.getComponentType(), 0);
         } else {
-            throw new IllegalStateException(String.format("Unable to configure %s", configurationMethod));
+            throw new IllegalStateException(
+                    String.format("Unable to configure %s", configurationMethod));
         }
     }
 
@@ -199,7 +206,10 @@ public abstract class TestObjects {
 
     private static boolean hasMatchingGetter(Method method, Set<String> builtGetters) {
         String propertyName = method.getName();
-        String candidate = String.format("get%s%s", propertyName.substring(0, 1).toUpperCase(), propertyName.substring(1));
+        String candidate =
+                String.format(
+                        "get%s%s",
+                        propertyName.substring(0, 1).toUpperCase(), propertyName.substring(1));
         return builtGetters.contains(candidate);
     }
 
@@ -209,20 +219,20 @@ public abstract class TestObjects {
 
     private static boolean isBuilderType(Class<?> aType) {
         return Optional.ofNullable(getBuildMethod(aType))
-            .map(Method::getReturnType)
-            .map(TestObjects::getBuilderMethod)
-            .map(Method::getReturnType)
-            .map(aType::equals)
-            .orElse(false);
+                .map(Method::getReturnType)
+                .map(TestObjects::getBuilderMethod)
+                .map(Method::getReturnType)
+                .map(aType::equals)
+                .orElse(false);
     }
 
     private static boolean isBuiltType(Class<?> aType) {
         return Optional.ofNullable(getBuilderMethod(aType))
-            .map(Method::getReturnType)
-            .map(TestObjects::getBuildMethod)
-            .map(Method::getReturnType)
-            .map(aType::equals)
-            .orElse(false);
+                .map(Method::getReturnType)
+                .map(TestObjects::getBuildMethod)
+                .map(Method::getReturnType)
+                .map(aType::equals)
+                .orElse(false);
     }
 
     private static boolean isPublic(Method method) {
@@ -232,5 +242,4 @@ public abstract class TestObjects {
     private static Predicate<Method> returnsThisType(Class<?> aType) {
         return method -> aType == method.getReturnType();
     }
-
 }

@@ -43,9 +43,8 @@ final class RemoveOrganizationManagerByUsernameRequestTest {
     @Test
     void valid() {
         RemoveOrganizationManagerByUsernameRequest.builder()
-            .organizationId("test-organization-id")
-            .username("test-username")
-            .build();
+                .organizationId("test-organization-id")
+                .username("test-username")
+                .build();
     }
-
 }

@@ -75,5 +75,4 @@ public enum JobState {
     public String toString() {
         return getValue();
     }
-
 }

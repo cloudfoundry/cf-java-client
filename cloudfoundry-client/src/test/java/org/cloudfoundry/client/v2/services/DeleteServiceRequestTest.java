@@ -36,5 +36,4 @@ final class DeleteServiceRequestTest {
             .serviceId("test-service-id")
             .build();
     }
-
 }

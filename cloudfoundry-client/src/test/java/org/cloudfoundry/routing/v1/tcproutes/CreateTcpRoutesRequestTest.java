@@ -95,14 +95,14 @@ class CreateTcpRoutesRequestTest {
     @Test
     void valid() {
         CreateTcpRoutesRequest.builder()
-            .tcpRoute(TcpRouteConfiguration.builder()
-                .backendIp("test-backend-ip")
-                .backendPort(9999)
-                .port(999)
-                .routerGroupId("test-router-group-id")
-                .ttl(99)
-                .build())
-            .build();
+                .tcpRoute(
+                        TcpRouteConfiguration.builder()
+                                .backendIp("test-backend-ip")
+                                .backendPort(9999)
+                                .port(999)
+                                .routerGroupId("test-router-group-id")
+                                .ttl(99)
+                                .build())
+                .build();
     }
-
 }

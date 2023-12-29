@@ -43,9 +43,8 @@ final class DeleteServiceKeyRequestTest {
     @Test
     void valid() {
         DeleteServiceKeyRequest.builder()
-            .serviceInstanceName("test-service-instance-name")
-            .serviceKeyName("test-service-key-name")
-            .build();
+                .serviceInstanceName("test-service-instance-name")
+                .serviceKeyName("test-service-key-name")
+                .build();
     }
-
 }

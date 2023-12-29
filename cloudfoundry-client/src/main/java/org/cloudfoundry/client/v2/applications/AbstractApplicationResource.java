@@ -21,6 +21,5 @@ import org.cloudfoundry.client.v2.Resource;
 /**
  * The core resource in application responses
  */
-public abstract class AbstractApplicationResource extends Resource<org.cloudfoundry.client.v2.applications.ApplicationEntity> {
-
-}
+public abstract class AbstractApplicationResource
+        extends Resource<org.cloudfoundry.client.v2.applications.ApplicationEntity> {}

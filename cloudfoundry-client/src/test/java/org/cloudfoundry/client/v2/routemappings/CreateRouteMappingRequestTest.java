@@ -43,9 +43,8 @@ final class CreateRouteMappingRequestTest {
     @Test
     void valid() {
         CreateRouteMappingRequest.builder()
-            .applicationId("application-id")
-            .routeId("route-id")
-            .build();
+                .applicationId("application-id")
+                .routeId("route-id")
+                .build();
     }
-
 }

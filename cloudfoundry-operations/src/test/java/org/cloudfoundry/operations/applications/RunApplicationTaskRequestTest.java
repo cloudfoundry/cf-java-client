@@ -43,12 +43,11 @@ final class RunApplicationTaskRequestTest {
     @Test
     void valid() {
         RunApplicationTaskRequest.builder()
-            .applicationName("test-application-name")
-            .command("test-command")
-            .disk(1)
-            .memory(1)
-            .taskName("test-task-name")
-            .build();
+                .applicationName("test-application-name")
+                .command("test-command")
+                .disk(1)
+                .memory(1)
+                .taskName("test-task-name")
+                .build();
     }
-
 }

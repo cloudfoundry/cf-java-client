@@ -36,5 +36,4 @@ final class DeleteServiceInstanceRequestTest {
             .name("test-service-name")
             .build();
     }
-
 }

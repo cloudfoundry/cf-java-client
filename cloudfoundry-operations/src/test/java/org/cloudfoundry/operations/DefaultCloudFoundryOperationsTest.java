@@ -22,13 +22,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 final class DefaultCloudFoundryOperationsTest extends AbstractOperationsTest {
 
-    private final DefaultCloudFoundryOperations operations = DefaultCloudFoundryOperations.builder()
-        .cloudFoundryClient(this.cloudFoundryClient)
-        .dopplerClient(this.dopplerClient)
-        .organization(TEST_ORGANIZATION_NAME)
-        .space(TEST_SPACE_NAME)
-        .uaaClient(this.uaaClient)
-        .build();
+    private final DefaultCloudFoundryOperations operations =
+            DefaultCloudFoundryOperations.builder()
+                    .cloudFoundryClient(this.cloudFoundryClient)
+                    .dopplerClient(this.dopplerClient)
+                    .organization(TEST_ORGANIZATION_NAME)
+                    .space(TEST_SPACE_NAME)
+                    .uaaClient(this.uaaClient)
+                    .build();
 
     @Test
     void advanced() {
@@ -99,5 +100,4 @@ final class DefaultCloudFoundryOperationsTest extends AbstractOperationsTest {
     void userAdmin() {
         assertThat(this.operations.userAdmin()).isNotNull();
     }
-
 }

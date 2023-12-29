@@ -16,6 +16,13 @@
 
 package org.cloudfoundry.reactor.client.v3.builds;
 
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+
+import java.time.Duration;
+import java.util.Collections;
 import org.cloudfoundry.client.v3.BuildpackData;
 import org.cloudfoundry.client.v3.Lifecycle;
 import org.cloudfoundry.client.v3.LifecycleType;
@@ -39,17 +46,12 @@ import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-import java.time.Duration;
-import java.util.Collections;
-
-import static io.netty.handler.codec.http.HttpMethod.GET;
-import static io.netty.handler.codec.http.HttpMethod.POST;
-import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
-import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 final class ReactorBuildsTest extends AbstractClientApiTest {
 
-    private final ReactorBuilds builds = new ReactorBuilds(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
+    private final ReactorBuilds builds =
+            new ReactorBuilds(
+                    CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     void create() {
@@ -65,43 +67,53 @@ final class ReactorBuildsTest extends AbstractClientApiTest {
             .build());
 
         this.builds
-            .create(CreateBuildRequest.builder()
-                .getPackage(Relationship.builder()
-                    .id("[package-guid]")
-                    .build())
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(CreateBuildResponse.builder()
-                .id("585bc3c1-3743-497d-88b0-403ad6b56d16")
-                .createdAt("2016-03-28T23:39:34Z")
-                .updatedAt("2016-06-08T16:41:26Z")
-                .createdBy(CreatedBy.builder()
-                    .id("3cb4e243-bed4-49d5-8739-f8b45abdec1c")
-                    .name("bill")
-                    .email("bill@example.com")
-                    .build())
-                .state(BuildState.STAGING)
-                .error(null)
-                .lifecycle(Lifecycle.builder()
-                    .type(LifecycleType.BUILDPACK)
-                    .data(BuildpackData.builder()
-                        .buildpack("ruby_buildpack")
-                        .stack("cflinuxfs2")
-                        .build())
-                    .build())
-                .inputPackage(Relationship.builder()
-                    .id("8e4da443-f255-499c-8b47-b3729b5b7432")
-                    .build())
-                .droplet(null)
-                .link("self", Link.builder()
-                    .href("https://api.example.org/v3/builds/585bc3c1-3743-497d-88b0-403ad6b56d16")
-                    .build())
-                .link("app", Link.builder()
-                    .href("https://api.example.org/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058396")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .create(
+                        CreateBuildRequest.builder()
+                                .getPackage(Relationship.builder().id("[package-guid]").build())
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        CreateBuildResponse.builder()
+                                .id("585bc3c1-3743-497d-88b0-403ad6b56d16")
+                                .createdAt("2016-03-28T23:39:34Z")
+                                .updatedAt("2016-06-08T16:41:26Z")
+                                .createdBy(
+                                        CreatedBy.builder()
+                                                .id("3cb4e243-bed4-49d5-8739-f8b45abdec1c")
+                                                .name("bill")
+                                                .email("bill@example.com")
+                                                .build())
+                                .state(BuildState.STAGING)
+                                .error(null)
+                                .lifecycle(
+                                        Lifecycle.builder()
+                                                .type(LifecycleType.BUILDPACK)
+                                                .data(
+                                                        BuildpackData.builder()
+                                                                .buildpack("ruby_buildpack")
+                                                                .stack("cflinuxfs2")
+                                                                .build())
+                                                .build())
+                                .inputPackage(
+                                        Relationship.builder()
+                                                .id("8e4da443-f255-499c-8b47-b3729b5b7432")
+                                                .build())
+                                .droplet(null)
+                                .link(
+                                        "self",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/builds/585bc3c1-3743-497d-88b0-403ad6b56d16")
+                                                .build())
+                                .link(
+                                        "app",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058396")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -117,43 +129,53 @@ final class ReactorBuildsTest extends AbstractClientApiTest {
             .build());
 
         this.builds
-            .get(GetBuildRequest.builder()
-                .buildId("test-build-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(GetBuildResponse.builder()
-                .id("585bc3c1-3743-497d-88b0-403ad6b56d16")
-                .createdAt("2016-03-28T23:39:34Z")
-                .updatedAt("2016-03-28T23:39:47Z")
-                .createdBy(CreatedBy.builder()
-                    .id("3cb4e243-bed4-49d5-8739-f8b45abdec1c")
-                    .name("bill")
-                    .email("bill@example.com")
-                    .build())
-                .state(BuildState.STAGED)
-                .error(null)
-                .lifecycle(Lifecycle.builder()
-                    .type(LifecycleType.BUILDPACK)
-                    .data(BuildpackData.builder()
-                        .buildpack("ruby_buildpack")
-                        .stack("cflinuxfs2")
-                        .build())
-                    .build())
-                .inputPackage(Relationship.builder()
-                    .id("8e4da443-f255-499c-8b47-b3729b5b7432")
-                    .build())
-                .droplet(Droplet.builder()
-                    .id("1e1186e7-d803-4c46-b9d6-5c81e50fe55a")
-                    .build())
-                .link("self", Link.builder()
-                    .href("https://api.example.org/v3/builds/585bc3c1-3743-497d-88b0-403ad6b56d16")
-                    .build())
-                .link("app", Link.builder()
-                    .href("https://api.example.org/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058396")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .get(GetBuildRequest.builder().buildId("test-build-id").build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        GetBuildResponse.builder()
+                                .id("585bc3c1-3743-497d-88b0-403ad6b56d16")
+                                .createdAt("2016-03-28T23:39:34Z")
+                                .updatedAt("2016-03-28T23:39:47Z")
+                                .createdBy(
+                                        CreatedBy.builder()
+                                                .id("3cb4e243-bed4-49d5-8739-f8b45abdec1c")
+                                                .name("bill")
+                                                .email("bill@example.com")
+                                                .build())
+                                .state(BuildState.STAGED)
+                                .error(null)
+                                .lifecycle(
+                                        Lifecycle.builder()
+                                                .type(LifecycleType.BUILDPACK)
+                                                .data(
+                                                        BuildpackData.builder()
+                                                                .buildpack("ruby_buildpack")
+                                                                .stack("cflinuxfs2")
+                                                                .build())
+                                                .build())
+                                .inputPackage(
+                                        Relationship.builder()
+                                                .id("8e4da443-f255-499c-8b47-b3729b5b7432")
+                                                .build())
+                                .droplet(
+                                        Droplet.builder()
+                                                .id("1e1186e7-d803-4c46-b9d6-5c81e50fe55a")
+                                                .build())
+                                .link(
+                                        "self",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/builds/585bc3c1-3743-497d-88b0-403ad6b56d16")
+                                                .build())
+                                .link(
+                                        "app",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058396")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -169,51 +191,69 @@ final class ReactorBuildsTest extends AbstractClientApiTest {
             .build());
 
         this.builds
-            .list(ListBuildsRequest.builder()
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(ListBuildsResponse.builder()
-                .pagination(Pagination.builder()
-                    .totalResults(1)
-                    .totalPages(1)
-                    .first(Link.builder()
-                        .href("https://api.example.org/v3/builds?states=STAGING&page=1&per_page=2")
-                        .build())
-                    .last(Link.builder()
-                        .href("https://api.example.org/v3/builds?states=STAGING&page=1&per_page=2")
-                        .build())
-                    .build())
-                .resource(BuildResource.builder()
-                    .id("585bc3c1-3743-497d-88b0-403ad6b56d16")
-                    .createdAt("2016-03-28T23:39:34Z")
-                    .updatedAt("2016-06-08T16:41:26Z")
-                    .createdBy(CreatedBy.builder()
-                        .id("3cb4e243-bed4-49d5-8739-f8b45abdec1c")
-                        .name("bill")
-                        .email("bill@example.com")
-                        .build())
-                    .state(BuildState.STAGING)
-                    .error(null)
-                    .lifecycle(Lifecycle.builder()
-                        .type(LifecycleType.BUILDPACK)
-                        .data(BuildpackData.builder()
-                            .buildpack("ruby_buildpack")
-                            .stack("cflinuxfs2")
-                            .build())
-                        .build())
-                    .inputPackage(Relationship.builder()
-                        .id("8e4da443-f255-499c-8b47-b3729b5b7432")
-                        .build())
-                    .link("self", Link.builder()
-                        .href("https://api.example.org/v3/builds/585bc3c1-3743-497d-88b0-403ad6b56d16")
-                        .build())
-                    .link("app", Link.builder()
-                        .href("https://api.example.org/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058396")
-                        .build())
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .list(ListBuildsRequest.builder().build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        ListBuildsResponse.builder()
+                                .pagination(
+                                        Pagination.builder()
+                                                .totalResults(1)
+                                                .totalPages(1)
+                                                .first(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/builds?states=STAGING&page=1&per_page=2")
+                                                                .build())
+                                                .last(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/builds?states=STAGING&page=1&per_page=2")
+                                                                .build())
+                                                .build())
+                                .resource(
+                                        BuildResource.builder()
+                                                .id("585bc3c1-3743-497d-88b0-403ad6b56d16")
+                                                .createdAt("2016-03-28T23:39:34Z")
+                                                .updatedAt("2016-06-08T16:41:26Z")
+                                                .createdBy(
+                                                        CreatedBy.builder()
+                                                                .id(
+                                                                        "3cb4e243-bed4-49d5-8739-f8b45abdec1c")
+                                                                .name("bill")
+                                                                .email("bill@example.com")
+                                                                .build())
+                                                .state(BuildState.STAGING)
+                                                .error(null)
+                                                .lifecycle(
+                                                        Lifecycle.builder()
+                                                                .type(LifecycleType.BUILDPACK)
+                                                                .data(
+                                                                        BuildpackData.builder()
+                                                                                .buildpack(
+                                                                                        "ruby_buildpack")
+                                                                                .stack("cflinuxfs2")
+                                                                                .build())
+                                                                .build())
+                                                .inputPackage(
+                                                        Relationship.builder()
+                                                                .id(
+                                                                        "8e4da443-f255-499c-8b47-b3729b5b7432")
+                                                                .build())
+                                                .link(
+                                                        "self",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/builds/585bc3c1-3743-497d-88b0-403ad6b56d16")
+                                                                .build())
+                                                .link(
+                                                        "app",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058396")
+                                                                .build())
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
-
 }

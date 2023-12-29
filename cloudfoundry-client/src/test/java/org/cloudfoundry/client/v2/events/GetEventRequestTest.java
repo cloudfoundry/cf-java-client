@@ -36,5 +36,4 @@ final class GetEventRequestTest {
             .eventId("test-event-id")
             .build();
     }
-
 }

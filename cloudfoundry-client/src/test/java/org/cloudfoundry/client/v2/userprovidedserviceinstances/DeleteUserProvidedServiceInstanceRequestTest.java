@@ -33,8 +33,7 @@ final class DeleteUserProvidedServiceInstanceRequestTest {
     @Test
     void valid() {
         DeleteUserProvidedServiceInstanceRequest.builder()
-            .userProvidedServiceInstanceId("test-user-provided-service-instance-id")
-            .build();
+                .userProvidedServiceInstanceId("test-user-provided-service-instance-id")
+                .build();
     }
-
 }

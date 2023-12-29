@@ -43,9 +43,8 @@ final class RemoveUserAuditedSpaceRequestTest {
     @Test
     void valid() {
         RemoveUserManagedSpaceRequest.builder()
-            .managedSpaceId("test-space-id")
-            .userId("test-user-id")
-            .build();
+                .managedSpaceId("test-space-id")
+                .userId("test-user-id")
+                .build();
     }
-
 }

@@ -16,6 +16,11 @@
 
 package org.cloudfoundry.reactor.client.v2.blobstores;
 
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+
+import java.time.Duration;
+import java.util.Collections;
 import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.blobstores.DeleteBlobstoreBuildpackCachesRequest;
 import org.cloudfoundry.client.v2.blobstores.DeleteBlobstoreBuildpackCachesResponse;
@@ -27,15 +32,11 @@ import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-import java.time.Duration;
-import java.util.Collections;
-
-import static io.netty.handler.codec.http.HttpMethod.DELETE;
-import static io.netty.handler.codec.http.HttpResponseStatus.OK;
-
 final class ReactorBlobstoresTest extends AbstractClientApiTest {
 
-    private ReactorBlobstores blobstores = new ReactorBlobstores(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
+    private ReactorBlobstores blobstores =
+            new ReactorBlobstores(
+                    CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     void delete() {
@@ -50,22 +51,24 @@ final class ReactorBlobstoresTest extends AbstractClientApiTest {
             .build());
 
         this.blobstores
-            .deleteBuildpackCaches(DeleteBlobstoreBuildpackCachesRequest.builder()
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(DeleteBlobstoreBuildpackCachesResponse.builder()
-                .metadata(Metadata.builder()
-                    .createdAt("2016-06-08T16:41:31Z")
-                    .id("919a6964-ea88-43cc-9ac1-0dbc3769f743")
-                    .url("/v2/jobs/919a6964-ea88-43cc-9ac1-0dbc3769f743")
-                    .build())
-                .entity(JobEntity.builder()
-                    .id("919a6964-ea88-43cc-9ac1-0dbc3769f743")
-                    .status("queued")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .deleteBuildpackCaches(DeleteBlobstoreBuildpackCachesRequest.builder().build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        DeleteBlobstoreBuildpackCachesResponse.builder()
+                                .metadata(
+                                        Metadata.builder()
+                                                .createdAt("2016-06-08T16:41:31Z")
+                                                .id("919a6964-ea88-43cc-9ac1-0dbc3769f743")
+                                                .url(
+                                                        "/v2/jobs/919a6964-ea88-43cc-9ac1-0dbc3769f743")
+                                                .build())
+                                .entity(
+                                        JobEntity.builder()
+                                                .id("919a6964-ea88-43cc-9ac1-0dbc3769f743")
+                                                .status("queued")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
-
 }

@@ -21,6 +21,5 @@ import org.cloudfoundry.client.v2.Resource;
 /**
  * Route Resource in responses
  */
-public abstract class AbstractSecurityGroupResource extends Resource<org.cloudfoundry.client.v2.securitygroups.SecurityGroupEntity> {
-
-}
+public abstract class AbstractSecurityGroupResource
+        extends Resource<org.cloudfoundry.client.v2.securitygroups.SecurityGroupEntity> {}

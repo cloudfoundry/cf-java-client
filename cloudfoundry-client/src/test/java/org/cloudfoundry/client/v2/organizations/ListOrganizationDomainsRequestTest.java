@@ -36,5 +36,4 @@ final class ListOrganizationDomainsRequestTest {
             .organizationId("test-organization-id")
             .build();
     }
-
 }

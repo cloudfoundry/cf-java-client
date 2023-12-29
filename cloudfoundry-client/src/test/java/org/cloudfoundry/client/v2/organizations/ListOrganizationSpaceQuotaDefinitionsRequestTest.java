@@ -33,8 +33,7 @@ final class ListOrganizationSpaceQuotaDefinitionsRequestTest {
     @Test
     void valid() {
         ListOrganizationSpaceQuotaDefinitionsRequest.builder()
-            .organizationId("test-organization-id")
-            .build();
+                .organizationId("test-organization-id")
+                .build();
     }
-
 }

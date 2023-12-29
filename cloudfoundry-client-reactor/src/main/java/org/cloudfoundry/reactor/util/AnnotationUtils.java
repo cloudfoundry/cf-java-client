@@ -16,9 +16,6 @@
 
 package org.cloudfoundry.reactor.util;
 
-import org.cloudfoundry.reactor.client.MethodNameComparator;
-import reactor.core.Exceptions;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -27,11 +24,12 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
+import org.cloudfoundry.reactor.client.MethodNameComparator;
+import reactor.core.Exceptions;
 
 public final class AnnotationUtils {
 
-    private AnnotationUtils() {
-    }
+    private AnnotationUtils() {}
 
     public static class AnnotatedValue<T extends Annotation> {
 
@@ -51,10 +49,10 @@ public final class AnnotationUtils {
         public Object getValue() {
             return this.value;
         }
-
     }
 
-    public static <T extends Annotation> Optional<T> findAnnotation(Class<?> type, Class<T> annotationType) {
+    public static <T extends Annotation> Optional<T> findAnnotation(
+            Class<?> type, Class<T> annotationType) {
         Class<?> clazz = type;
         T annotation = clazz.getAnnotation(annotationType);
 
@@ -71,15 +69,17 @@ public final class AnnotationUtils {
         return Optional.ofNullable(annotation);
     }
 
-    public static <T extends Annotation> Stream<AnnotatedValue<T>> streamAnnotatedValues(Object instance, Class<T> annotationClass) {
+    public static <T extends Annotation> Stream<AnnotatedValue<T>> streamAnnotatedValues(
+            Object instance, Class<T> annotationClass) {
         Class<?> instanceClass = instance.getClass();
         return Arrays.stream(instanceClass.getMethods())
-            .sorted(MethodNameComparator.INSTANCE)
-            .map(processMethod(instance, annotationClass))
-            .filter(Objects::nonNull);
+                .sorted(MethodNameComparator.INSTANCE)
+                .map(processMethod(instance, annotationClass))
+                .filter(Objects::nonNull);
     }
 
-    private static <T extends Annotation> Optional<T> findAnnotation(Method method, Class<T> annotationType) {
+    private static <T extends Annotation> Optional<T> findAnnotation(
+            Method method, Class<T> annotationType) {
         Class<?> clazz = method.getDeclaringClass();
         T annotation = method.getAnnotation(annotationType);
 
@@ -91,8 +91,9 @@ public final class AnnotationUtils {
             }
 
             try {
-                annotation = clazz.getDeclaredMethod(method.getName(), method.getParameterTypes())
-                    .getAnnotation(annotationType);
+                annotation =
+                        clazz.getDeclaredMethod(method.getName(), method.getParameterTypes())
+                                .getAnnotation(annotationType);
             } catch (NoSuchMethodException e) {
                 // No equivalent method found
             }
@@ -109,13 +110,18 @@ public final class AnnotationUtils {
         }
     }
 
-    private static <T extends Annotation> Function<T, Optional<AnnotatedValue<T>>> processAnnotation(Method method, Object instance) {
-        return annotation -> getValue(method, instance).map(value -> new AnnotatedValue<T>(annotation, value));
+    private static <T extends Annotation>
+            Function<T, Optional<AnnotatedValue<T>>> processAnnotation(
+                    Method method, Object instance) {
+        return annotation ->
+                getValue(method, instance).map(value -> new AnnotatedValue<T>(annotation, value));
     }
 
-    private static <T extends Annotation> Function<Method, AnnotatedValue<T>> processMethod(Object instance, Class<T> annotationClass) {
-        return method -> findAnnotation(method, annotationClass).flatMap(processAnnotation(method, instance))
-            .orElse(null);
+    private static <T extends Annotation> Function<Method, AnnotatedValue<T>> processMethod(
+            Object instance, Class<T> annotationClass) {
+        return method ->
+                findAnnotation(method, annotationClass)
+                        .flatMap(processAnnotation(method, instance))
+                        .orElse(null);
     }
-
 }

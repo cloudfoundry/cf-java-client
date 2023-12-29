@@ -24,5 +24,4 @@ class MetricTest {
     void valid() {
         Metric.builder().build();
     }
-
 }

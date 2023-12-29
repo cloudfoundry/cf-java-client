@@ -43,9 +43,8 @@ final class UnsetEnvironmentVariableApplicationRequestTest {
     @Test
     void valid() {
         UnsetEnvironmentVariableApplicationRequest.builder()
-            .name("test-name")
-            .variableName("test-variable-name")
-            .build();
+                .name("test-name")
+                .variableName("test-variable-name")
+                .build();
     }
-
 }

@@ -102,13 +102,12 @@ final class CreateOrganizationQuotaDefinitionRequestTest {
     @Test
     void valid() {
         CreateOrganizationQuotaDefinitionRequest.builder()
-            .instanceMemoryLimit(1024)
-            .memoryLimit(1024)
-            .name("test-quota-definition-name")
-            .nonBasicServicesAllowed(false)
-            .totalRoutes(-1)
-            .totalServices(-1)
-            .build();
+                .instanceMemoryLimit(1024)
+                .memoryLimit(1024)
+                .name("test-quota-definition-name")
+                .nonBasicServicesAllowed(false)
+                .totalRoutes(-1)
+                .totalServices(-1)
+                .build();
     }
-
 }

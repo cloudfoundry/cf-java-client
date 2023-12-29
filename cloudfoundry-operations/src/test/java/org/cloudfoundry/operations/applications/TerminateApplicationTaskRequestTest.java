@@ -43,9 +43,8 @@ final class TerminateApplicationTaskRequestTest {
     @Test
     void valid() {
         TerminateApplicationTaskRequest.builder()
-            .applicationName("test-application-name")
-            .sequenceId(1)
-            .build();
+                .applicationName("test-application-name")
+                .sequenceId(1)
+                .build();
     }
-
 }

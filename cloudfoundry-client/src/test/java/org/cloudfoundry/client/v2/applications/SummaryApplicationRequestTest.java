@@ -36,5 +36,4 @@ final class SummaryApplicationRequestTest {
             .applicationId("test-application-id")
             .build();
     }
-
 }

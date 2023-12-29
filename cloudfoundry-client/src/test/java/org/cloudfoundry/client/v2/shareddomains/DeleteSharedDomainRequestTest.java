@@ -36,5 +36,4 @@ final class DeleteSharedDomainRequestTest {
             .sharedDomainId("test-shared-domain-id")
             .build();
     }
-
 }

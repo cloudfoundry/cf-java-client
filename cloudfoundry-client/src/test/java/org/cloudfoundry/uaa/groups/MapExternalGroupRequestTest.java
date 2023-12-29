@@ -43,9 +43,8 @@ final class MapExternalGroupRequestTest {
     @Test
     void valid() {
         MapExternalGroupRequest.builder()
-            .groupId("test-group-id")
-            .externalGroup("test-external-group")
-            .build();
+                .groupId("test-group-id")
+                .externalGroup("test-external-group")
+                .build();
     }
-
 }

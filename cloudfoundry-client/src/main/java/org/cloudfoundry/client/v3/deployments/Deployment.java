@@ -17,13 +17,12 @@
 package org.cloudfoundry.client.v3.deployments;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.Resource;
 import org.cloudfoundry.client.v3.ToOneRelationship;
-
-import java.util.List;
 
 /**
  * Base class for responses that are deployments
@@ -100,5 +99,4 @@ public abstract class Deployment extends Resource {
     @JsonProperty("strategy")
     @Nullable
     public abstract DeploymentStrategy getStrategy();
-
 }

@@ -36,5 +36,4 @@ final class ListApplicationDropletsRequestTest {
             .applicationId("test-application-id")
             .build();
     }
-
 }

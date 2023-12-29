@@ -43,9 +43,8 @@ final class RemoveSpaceDeveloperRequestTest {
     @Test
     void valid() {
         RemoveSpaceDeveloperRequest.builder()
-            .developerId("test-developer-id")
-            .spaceId("test-space-id")
-            .build();
+                .developerId("test-developer-id")
+                .spaceId("test-space-id")
+                .build();
     }
-
 }

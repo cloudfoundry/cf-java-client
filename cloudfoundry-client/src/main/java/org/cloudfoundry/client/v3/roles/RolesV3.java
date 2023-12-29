@@ -54,5 +54,4 @@ public interface RolesV3 {
      * @return the response from the List Roles request
      */
     Mono<ListRolesResponse> list(ListRolesRequest request);
-
 }

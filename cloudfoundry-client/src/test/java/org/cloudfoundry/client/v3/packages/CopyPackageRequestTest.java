@@ -51,15 +51,14 @@ final class CopyPackageRequestTest {
     @Test
     void valid() {
         CopyPackageRequest.builder()
-            .relationships(PackageRelationships.builder()
-                .application(ToOneRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("test-id")
-                        .build())
-                    .build())
-                .build())
-            .sourcePackageId("test-source-package-id")
-            .build();
+                .relationships(
+                        PackageRelationships.builder()
+                                .application(
+                                        ToOneRelationship.builder()
+                                                .data(Relationship.builder().id("test-id").build())
+                                                .build())
+                                .build())
+                .sourcePackageId("test-source-package-id")
+                .build();
     }
-
 }

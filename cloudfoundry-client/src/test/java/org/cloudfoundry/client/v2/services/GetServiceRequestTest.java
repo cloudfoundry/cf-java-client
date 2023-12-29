@@ -36,5 +36,4 @@ final class GetServiceRequestTest {
             .serviceId("test-service-id")
             .build();
     }
-
 }

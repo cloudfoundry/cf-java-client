@@ -44,5 +44,4 @@ final class MethodNameComparatorTest {
     private void bravo() {
         // text fixture
     }
-
 }

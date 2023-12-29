@@ -37,5 +37,4 @@ final class GetServiceBrokerRequestTest {
             .serviceBrokerId("test-service-broker-id")
             .build();
     }
-
 }

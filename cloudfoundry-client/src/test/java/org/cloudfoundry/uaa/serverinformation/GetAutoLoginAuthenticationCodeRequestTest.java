@@ -69,11 +69,10 @@ final class GetAutoLoginAuthenticationCodeRequestTest {
     @Test
     void valid() {
         GetAutoLoginAuthenticationCodeRequest.builder()
-            .clientId("test-client-id")
-            .clientSecret("test-client-secret")
-            .password("test-password")
-            .username("test-username")
-            .build();
+                .clientId("test-client-id")
+                .clientSecret("test-client-secret")
+                .password("test-password")
+                .username("test-username")
+                .build();
     }
-
 }

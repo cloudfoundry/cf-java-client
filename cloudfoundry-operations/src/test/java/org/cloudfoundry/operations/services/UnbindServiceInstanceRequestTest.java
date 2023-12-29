@@ -43,9 +43,8 @@ final class UnbindServiceInstanceRequestTest {
     @Test
     void valid() {
         UnbindServiceInstanceRequest.builder()
-            .applicationName("test-application-name")
-            .serviceInstanceName("test-service-instance-name")
-            .build();
+                .applicationName("test-application-name")
+                .serviceInstanceName("test-service-instance-name")
+                .build();
     }
-
 }

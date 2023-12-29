@@ -43,9 +43,8 @@ final class ListSpaceUsersRequestTest {
     @Test
     void valid() {
         ListSpaceUsersRequest.builder()
-            .organizationName("test-organization")
-            .spaceName("test-space")
-            .build();
+                .organizationName("test-organization")
+                .spaceName("test-space")
+                .build();
     }
-
 }

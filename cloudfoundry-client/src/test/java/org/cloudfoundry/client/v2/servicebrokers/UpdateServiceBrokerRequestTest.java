@@ -37,5 +37,4 @@ final class UpdateServiceBrokerRequestTest {
             .serviceBrokerId("test-service-broker-id")
             .build();
     }
-
 }

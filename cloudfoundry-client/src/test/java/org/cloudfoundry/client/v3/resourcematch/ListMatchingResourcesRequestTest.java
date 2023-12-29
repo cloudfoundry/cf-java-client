@@ -34,11 +34,10 @@ class ListMatchingResourcesRequestTest {
     @Test
     void valid() {
         ListMatchingResourcesRequest.builder()
-            .resource(MatchedResource.builder()
-                .checksum(Checksum.builder()
-                    .value("test-checksum")
-                    .build())
-                .build())
-            .build();
+                .resource(
+                        MatchedResource.builder()
+                                .checksum(Checksum.builder().value("test-checksum").build())
+                                .build())
+                .build();
     }
 }

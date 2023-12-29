@@ -36,5 +36,4 @@ final class CheckReservedRoutesRequestTest {
             .domainId("test-domain-id")
             .build();
     }
-
 }

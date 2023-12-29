@@ -43,9 +43,8 @@ final class AssociateSecurityGroupSpaceRequestTest {
     @Test
     void valid() {
         AssociateSecurityGroupSpaceRequest.builder()
-            .securityGroupId("test-security-group-id")
-            .spaceId("test-space-id")
-            .build();
+                .securityGroupId("test-security-group-id")
+                .spaceId("test-space-id")
+                .build();
     }
-
 }

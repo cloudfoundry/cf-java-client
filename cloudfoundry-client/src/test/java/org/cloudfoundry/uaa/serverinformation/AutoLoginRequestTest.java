@@ -47,5 +47,4 @@ final class AutoLoginRequestTest {
             .code("test-code")
             .build();
     }
-
 }

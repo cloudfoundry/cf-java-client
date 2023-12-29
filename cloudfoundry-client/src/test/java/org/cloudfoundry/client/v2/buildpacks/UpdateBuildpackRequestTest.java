@@ -36,5 +36,4 @@ final class UpdateBuildpackRequestTest {
             .buildpackId("test-buildpack-id")
             .build();
     }
-
 }

@@ -43,9 +43,8 @@ final class AssociateSpaceManagerRequestTest {
     @Test
     void valid() {
         AssociateSpaceManagerRequest.builder()
-            .managerId("test-manager-id")
-            .spaceId("test-space-id")
-            .build();
+                .managerId("test-manager-id")
+                .spaceId("test-space-id")
+                .build();
     }
-
 }

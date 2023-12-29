@@ -36,5 +36,4 @@ final class StopApplicationRequestTest {
             .name("test-name")
             .build();
     }
-
 }

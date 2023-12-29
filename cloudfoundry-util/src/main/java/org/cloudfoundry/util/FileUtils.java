@@ -16,13 +16,6 @@
 
 package org.cloudfoundry.util;
 
-import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
-import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
-import org.apache.commons.compress.archivers.zip.ZipFile;
-import reactor.core.Exceptions;
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
@@ -36,6 +29,12 @@ import java.util.Enumeration;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
+import org.apache.commons.compress.archivers.zip.ZipFile;
+import reactor.core.Exceptions;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 /**
  * Utilities for files
@@ -44,20 +43,20 @@ public final class FileUtils {
 
     private static final Integer DEFAULT_PERMISSIONS = 0744;
 
-    private static final Map<PosixFilePermission, Integer> PERMISSION_MODES = FluentMap.<PosixFilePermission, Integer>builder()
-        .entry(PosixFilePermission.OWNER_READ, 0400)
-        .entry(PosixFilePermission.OWNER_WRITE, 0200)
-        .entry(PosixFilePermission.OWNER_EXECUTE, 0100)
-        .entry(PosixFilePermission.GROUP_READ, 0040)
-        .entry(PosixFilePermission.GROUP_WRITE, 0020)
-        .entry(PosixFilePermission.GROUP_EXECUTE, 0010)
-        .entry(PosixFilePermission.OTHERS_READ, 0004)
-        .entry(PosixFilePermission.OTHERS_WRITE, 0002)
-        .entry(PosixFilePermission.OTHERS_EXECUTE, 0001)
-        .build();
+    private static final Map<PosixFilePermission, Integer> PERMISSION_MODES =
+            FluentMap.<PosixFilePermission, Integer>builder()
+                    .entry(PosixFilePermission.OWNER_READ, 0400)
+                    .entry(PosixFilePermission.OWNER_WRITE, 0200)
+                    .entry(PosixFilePermission.OWNER_EXECUTE, 0100)
+                    .entry(PosixFilePermission.GROUP_READ, 0040)
+                    .entry(PosixFilePermission.GROUP_WRITE, 0020)
+                    .entry(PosixFilePermission.GROUP_EXECUTE, 0010)
+                    .entry(PosixFilePermission.OTHERS_READ, 0004)
+                    .entry(PosixFilePermission.OTHERS_WRITE, 0002)
+                    .entry(PosixFilePermission.OTHERS_EXECUTE, 0001)
+                    .build();
 
-    private FileUtils() {
-    }
+    private FileUtils() {}
 
     /**
      * Compresses a candidate {@link Path} if it is a directory.  Otherwise returns the original {@link Path}.
@@ -77,25 +76,30 @@ public final class FileUtils {
      * @return the {@link Path} for a compressed artifact
      */
     public static Mono<Path> compress(Path candidate, Predicate<String> filter) {
-        return Mono
-            .defer(() -> {
-                try {
-                    Path staging = Files.createTempFile(String.format("compressed-%s-", candidate.getFileName()), ".zip");
+        return Mono.defer(
+                        () -> {
+                            try {
+                                Path staging =
+                                        Files.createTempFile(
+                                                String.format(
+                                                        "compressed-%s-", candidate.getFileName()),
+                                                ".zip");
 
-                    try (ZipArchiveOutputStream out = new ZipArchiveOutputStream(staging.toFile())) {
-                        if (Files.isDirectory(candidate)) {
-                            compressFromDirectory(candidate, filter, out);
-                        } else {
-                            compressFromZip(candidate, filter, out);
-                        }
-                    }
+                                try (ZipArchiveOutputStream out =
+                                        new ZipArchiveOutputStream(staging.toFile())) {
+                                    if (Files.isDirectory(candidate)) {
+                                        compressFromDirectory(candidate, filter, out);
+                                    } else {
+                                        compressFromZip(candidate, filter, out);
+                                    }
+                                }
 
-                    return Mono.just(staging);
-                } catch (IOException e) {
-                    throw Exceptions.propagate(e);
-                }
-            })
-            .subscribeOn(Schedulers.boundedElastic());
+                                return Mono.just(staging);
+                            } catch (IOException e) {
+                                throw Exceptions.propagate(e);
+                            }
+                        })
+                .subscribeOn(Schedulers.boundedElastic());
     }
 
     /**
@@ -107,7 +111,9 @@ public final class FileUtils {
      */
     public static String getRelativePathName(Path root, Path path) {
         Path relative = root.relativize(path);
-        return Files.isDirectory(path) && !relative.toString().endsWith("/") ? String.format("%s/", relative.toString()) : relative.toString();
+        return Files.isDirectory(path) && !relative.toString().endsWith("/")
+                ? String.format("%s/", relative.toString())
+                : relative.toString();
     }
 
     /**
@@ -134,16 +140,17 @@ public final class FileUtils {
         try {
             MessageDigest digest = MessageDigest.getInstance("sha1");
 
-            ByteArrayPool.withByteArray(buffer -> {
-                try {
-                    int length;
-                    while ((length = in.read(buffer)) != -1) {
-                        digest.update(buffer, 0, length);
-                    }
-                } catch (IOException e) {
-                    throw Exceptions.propagate(e);
-                }
-            });
+            ByteArrayPool.withByteArray(
+                    buffer -> {
+                        try {
+                            int length;
+                            while ((length = in.read(buffer)) != -1) {
+                                digest.update(buffer, 0, length);
+                            }
+                        } catch (IOException e) {
+                            throw Exceptions.propagate(e);
+                        }
+                    });
 
             return String.format("%040x", new BigInteger(1, digest.digest()));
         } catch (NoSuchAlgorithmException e) {
@@ -189,30 +196,41 @@ public final class FileUtils {
         }
     }
 
-    private static void compressFromDirectory(Path candidate, Predicate<String> filter, ZipArchiveOutputStream out) {
+    private static void compressFromDirectory(
+            Path candidate, Predicate<String> filter, ZipArchiveOutputStream out) {
         try (Stream<Path> contents = Files.walk(candidate)) {
-            contents
-                .filter(path -> {
-                    try {
-                        return !Files.isSameFile(candidate, path);
-                    } catch (IOException e) {
-                        throw Exceptions.propagate(e);
-                    }
-                })
-                .filter(path -> filter.test(getRelativePathName(candidate, path)))
-                .forEach(path -> {
-                    try (InputStream in = Files.isDirectory(path) ? null : Files.newInputStream(path)) {
-                        write(in, Files.getLastModifiedTime(path), getUnixMode(path), out, getRelativePathName(candidate, path));
-                    } catch (IOException e) {
-                        throw Exceptions.propagate(e);
-                    }
-                });
+            contents.filter(
+                            path -> {
+                                try {
+                                    return !Files.isSameFile(candidate, path);
+                                } catch (IOException e) {
+                                    throw Exceptions.propagate(e);
+                                }
+                            })
+                    .filter(path -> filter.test(getRelativePathName(candidate, path)))
+                    .forEach(
+                            path -> {
+                                try (InputStream in =
+                                        Files.isDirectory(path)
+                                                ? null
+                                                : Files.newInputStream(path)) {
+                                    write(
+                                            in,
+                                            Files.getLastModifiedTime(path),
+                                            getUnixMode(path),
+                                            out,
+                                            getRelativePathName(candidate, path));
+                                } catch (IOException e) {
+                                    throw Exceptions.propagate(e);
+                                }
+                            });
         } catch (IOException e) {
             throw Exceptions.propagate(e);
         }
     }
 
-    private static void compressFromZip(Path candidate, Predicate<String> filter, ZipArchiveOutputStream out) {
+    private static void compressFromZip(
+            Path candidate, Predicate<String> filter, ZipArchiveOutputStream out) {
         try (ZipFile zipFile = new ZipFile(candidate.toFile())) {
             Enumeration<ZipArchiveEntry> entries = zipFile.getEntries();
 
@@ -222,7 +240,12 @@ public final class FileUtils {
                 if (filter.test(entry.getName())) {
                     try (InputStream in = zipFile.getInputStream(entry)) {
                         int mode = entry.getUnixMode();
-                        write(in, entry.getLastModifiedTime(), mode == 0 ? DEFAULT_PERMISSIONS : mode, out, entry.getName());
+                        write(
+                                in,
+                                entry.getLastModifiedTime(),
+                                mode == 0 ? DEFAULT_PERMISSIONS : mode,
+                                out,
+                                entry.getName());
                     }
                 }
             }
@@ -236,16 +259,19 @@ public final class FileUtils {
             return DEFAULT_PERMISSIONS;
         }
 
-        return Files.getPosixFilePermissions(path).stream()
-            .mapToInt(PERMISSION_MODES::get)
-            .sum();
+        return Files.getPosixFilePermissions(path).stream().mapToInt(PERMISSION_MODES::get).sum();
     }
 
     private static boolean isPosixFile(Path path) {
         return path.getFileSystem().supportedFileAttributeViews().contains("posix");
     }
 
-    private static void write(InputStream in, FileTime lastModifiedTime, int mode, ZipArchiveOutputStream out, String path) {
+    private static void write(
+            InputStream in,
+            FileTime lastModifiedTime,
+            int mode,
+            ZipArchiveOutputStream out,
+            String path) {
         try {
             ZipArchiveEntry entry = new ZipArchiveEntry(path);
             entry.setUnixMode(mode);
@@ -253,16 +279,17 @@ public final class FileUtils {
             out.putArchiveEntry(entry);
 
             if (in != null) {
-                ByteArrayPool.withByteArray(buffer -> {
-                    try {
-                        int length;
-                        while ((length = in.read(buffer)) != -1) {
-                            out.write(buffer, 0, length);
-                        }
-                    } catch (IOException e) {
-                        throw Exceptions.propagate(e);
-                    }
-                });
+                ByteArrayPool.withByteArray(
+                        buffer -> {
+                            try {
+                                int length;
+                                while ((length = in.read(buffer)) != -1) {
+                                    out.write(buffer, 0, length);
+                                }
+                            } catch (IOException e) {
+                                throw Exceptions.propagate(e);
+                            }
+                        });
             }
 
             out.closeArchiveEntry();
@@ -270,5 +297,4 @@ public final class FileUtils {
             throw Exceptions.propagate(e);
         }
     }
-
 }

@@ -16,6 +16,15 @@
 
 package org.cloudfoundry.reactor.client.v3.serviceofferings;
 
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.PATCH;
+import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
+import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+
+import java.time.Duration;
+import java.util.Collections;
 import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.Pagination;
@@ -39,19 +48,12 @@ import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-import java.time.Duration;
-import java.util.Collections;
-
-import static io.netty.handler.codec.http.HttpMethod.DELETE;
-import static io.netty.handler.codec.http.HttpMethod.GET;
-import static io.netty.handler.codec.http.HttpMethod.PATCH;
-import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
-import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
-import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 final class ReactorServiceOfferingsTest extends AbstractClientApiTest {
 
-    private final ReactorServiceOfferingsV3 serviceOfferings = new ReactorServiceOfferingsV3(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
+    private final ReactorServiceOfferingsV3 serviceOfferings =
+            new ReactorServiceOfferingsV3(
+                    CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     void delete() {
@@ -65,12 +67,13 @@ final class ReactorServiceOfferingsTest extends AbstractClientApiTest {
             .build());
 
         this.serviceOfferings
-            .delete(DeleteServiceOfferingRequest.builder()
-                .serviceOfferingId("test-service-offering-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .delete(
+                        DeleteServiceOfferingRequest.builder()
+                                .serviceOfferingId("test-service-offering-id")
+                                .build())
+                .as(StepVerifier::create)
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -86,55 +89,75 @@ final class ReactorServiceOfferingsTest extends AbstractClientApiTest {
             .build());
 
         this.serviceOfferings
-            .get(GetServiceOfferingRequest.builder()
-                .serviceOfferingId("test-service-offering-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(GetServiceOfferingResponse.builder()
-                .id("bf7eb420-11e5-11ea-b7db-4b5d5e7976a9")
-                .name("my_service_offering")
-                .description("Provides my service")
-                .available(true)
-                .tags("relational", "caching")
-                .requires(Collections.emptyList())
-                .createdAt("2019-11-28T13:44:02Z")
-                .updatedAt("2019-11-28T13:44:02Z")
-                .shareable(true)
-                .documentationUrl("https://some-documentation-link.io")
-                .brokerCatalog(BrokerCatalog.builder()
-                    .brokerCatalogId("db730a8c-11e5-11ea-838a-0f4fff3b1cfb")
-                    .metadata(Collections.singletonMap("shareable", true))
-                    .features(Features.builder()
-                        .planUpdateable(true)
-                        .bindable(true)
-                        .instancesRetrievable(true)
-                        .bindingsRetrievable(true)
-                        .allowContextUpdates(false)
-                        .build())
-                    .build())
-                .relationships(ServiceOfferingRelationships.builder()
-                    .serviceBroker(ToOneRelationship.builder()
-                        .data(Relationship.builder()
-                            .id("13c60e38-11e7-11ea-9106-33ee3c5bd4d7")
-                            .build())
-                        .build())
-                    .build())
-                .metadata(Metadata.builder()
-                    .annotations(Collections.emptyMap())
-                    .labels(Collections.emptyMap())
-                    .build())
-                .link("self", Link.builder()
-                    .href("https://api.example.org/v3/service_offerings/bf7eb420-11e5-11ea-b7db-4b5d5e7976a")
-                    .build())
-                .link("service_plans", Link.builder()
-                    .href("https://api.example.org/v3/service_plans?service_offering_guids=bf7eb420-11e5-11ea-b7db-4b5d5e7976a")
-                    .build())
-                .link("service_broker", Link.builder()
-                    .href("https://api.example.org/v3/service_brokers/13c60e38-11e7-11ea-9106-33ee3c5bd4d7")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .get(
+                        GetServiceOfferingRequest.builder()
+                                .serviceOfferingId("test-service-offering-id")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        GetServiceOfferingResponse.builder()
+                                .id("bf7eb420-11e5-11ea-b7db-4b5d5e7976a9")
+                                .name("my_service_offering")
+                                .description("Provides my service")
+                                .available(true)
+                                .tags("relational", "caching")
+                                .requires(Collections.emptyList())
+                                .createdAt("2019-11-28T13:44:02Z")
+                                .updatedAt("2019-11-28T13:44:02Z")
+                                .shareable(true)
+                                .documentationUrl("https://some-documentation-link.io")
+                                .brokerCatalog(
+                                        BrokerCatalog.builder()
+                                                .brokerCatalogId(
+                                                        "db730a8c-11e5-11ea-838a-0f4fff3b1cfb")
+                                                .metadata(
+                                                        Collections.singletonMap("shareable", true))
+                                                .features(
+                                                        Features.builder()
+                                                                .planUpdateable(true)
+                                                                .bindable(true)
+                                                                .instancesRetrievable(true)
+                                                                .bindingsRetrievable(true)
+                                                                .allowContextUpdates(false)
+                                                                .build())
+                                                .build())
+                                .relationships(
+                                        ServiceOfferingRelationships.builder()
+                                                .serviceBroker(
+                                                        ToOneRelationship.builder()
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id(
+                                                                                        "13c60e38-11e7-11ea-9106-33ee3c5bd4d7")
+                                                                                .build())
+                                                                .build())
+                                                .build())
+                                .metadata(
+                                        Metadata.builder()
+                                                .annotations(Collections.emptyMap())
+                                                .labels(Collections.emptyMap())
+                                                .build())
+                                .link(
+                                        "self",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/service_offerings/bf7eb420-11e5-11ea-b7db-4b5d5e7976a")
+                                                .build())
+                                .link(
+                                        "service_plans",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/service_plans?service_offering_guids=bf7eb420-11e5-11ea-b7db-4b5d5e7976a")
+                                                .build())
+                                .link(
+                                        "service_broker",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/service_brokers/13c60e38-11e7-11ea-9106-33ee3c5bd4d7")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -150,112 +173,171 @@ final class ReactorServiceOfferingsTest extends AbstractClientApiTest {
             .build());
 
         this.serviceOfferings
-            .list(ListServiceOfferingsRequest.builder()
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(ListServiceOfferingsResponse.builder()
-                .pagination(Pagination.builder()
-                    .totalResults(3)
-                    .totalPages(2)
-                    .first(Link.builder()
-                        .href("https://api.example.org/v3/service_offerings?page=1&per_page=2")
-                        .build())
-                    .last(Link.builder()
-                        .href("https://api.example.org/v3/service_offerings?page=2&per_page=2")
-                        .build())
-                    .next(Link.builder()
-                        .href("https://api.example.org/v3/service_offerings?page=2&per_page=2")
-                        .build())
-                    .build())
-                .resource(ServiceOfferingResource.builder()
-                    .id("bf7eb420-11e5-11ea-b7db-4b5d5e7976a9")
-                    .name("my_service_offering")
-                    .description("Provides my service")
-                    .available(true)
-                    .tags("relational", "caching")
-                    .requires(Collections.emptyList())
-                    .createdAt("2019-11-28T13:44:02Z")
-                    .updatedAt("2019-11-28T13:44:02Z")
-                    .shareable(true)
-                    .documentationUrl("https://some-documentation-link.io")
-                    .brokerCatalog(BrokerCatalog.builder()
-                        .brokerCatalogId("db730a8c-11e5-11ea-838a-0f4fff3b1cfb")
-                        .metadata(Collections.singletonMap("shareable", true))
-                        .features(Features.builder()
-                            .planUpdateable(true)
-                            .bindable(true)
-                            .instancesRetrievable(true)
-                            .bindingsRetrievable(true)
-                            .allowContextUpdates(false)
-                            .build())
-                        .build())
-                    .relationships(ServiceOfferingRelationships.builder()
-                        .serviceBroker(ToOneRelationship.builder()
-                            .data(Relationship.builder()
-                                .id("13c60e38-11e7-11ea-9106-33ee3c5bd4d7")
+                .list(ListServiceOfferingsRequest.builder().build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        ListServiceOfferingsResponse.builder()
+                                .pagination(
+                                        Pagination.builder()
+                                                .totalResults(3)
+                                                .totalPages(2)
+                                                .first(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/service_offerings?page=1&per_page=2")
+                                                                .build())
+                                                .last(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/service_offerings?page=2&per_page=2")
+                                                                .build())
+                                                .next(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/service_offerings?page=2&per_page=2")
+                                                                .build())
+                                                .build())
+                                .resource(
+                                        ServiceOfferingResource.builder()
+                                                .id("bf7eb420-11e5-11ea-b7db-4b5d5e7976a9")
+                                                .name("my_service_offering")
+                                                .description("Provides my service")
+                                                .available(true)
+                                                .tags("relational", "caching")
+                                                .requires(Collections.emptyList())
+                                                .createdAt("2019-11-28T13:44:02Z")
+                                                .updatedAt("2019-11-28T13:44:02Z")
+                                                .shareable(true)
+                                                .documentationUrl(
+                                                        "https://some-documentation-link.io")
+                                                .brokerCatalog(
+                                                        BrokerCatalog.builder()
+                                                                .brokerCatalogId(
+                                                                        "db730a8c-11e5-11ea-838a-0f4fff3b1cfb")
+                                                                .metadata(
+                                                                        Collections.singletonMap(
+                                                                                "shareable", true))
+                                                                .features(
+                                                                        Features.builder()
+                                                                                .planUpdateable(
+                                                                                        true)
+                                                                                .bindable(true)
+                                                                                .instancesRetrievable(
+                                                                                        true)
+                                                                                .bindingsRetrievable(
+                                                                                        true)
+                                                                                .allowContextUpdates(
+                                                                                        false)
+                                                                                .build())
+                                                                .build())
+                                                .relationships(
+                                                        ServiceOfferingRelationships.builder()
+                                                                .serviceBroker(
+                                                                        ToOneRelationship.builder()
+                                                                                .data(
+                                                                                        Relationship
+                                                                                                .builder()
+                                                                                                .id(
+                                                                                                        "13c60e38-11e7-11ea-9106-33ee3c5bd4d7")
+                                                                                                .build())
+                                                                                .build())
+                                                                .build())
+                                                .metadata(
+                                                        Metadata.builder()
+                                                                .annotations(Collections.emptyMap())
+                                                                .labels(Collections.emptyMap())
+                                                                .build())
+                                                .link(
+                                                        "self",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/service_offerings/bf7eb420-11e5-11ea-b7db-4b5d5e7976a")
+                                                                .build())
+                                                .link(
+                                                        "service_plans",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/service_plans?service_offering_guids=bf7eb420-11e5-11ea-b7db-4b5d5e7976a")
+                                                                .build())
+                                                .link(
+                                                        "service_broker",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/service_brokers/13c60e38-11e7-11ea-9106-33ee3c5bd4d7")
+                                                                .build())
+                                                .build())
+                                .resource(
+                                        ServiceOfferingResource.builder()
+                                                .id("20e6cd62-12bb-11ea-90d1-7bfec2c75bcd")
+                                                .name("other_service_offering")
+                                                .description("Provides another service")
+                                                .available(true)
+                                                .tag("caching")
+                                                .requires(Collections.emptyList())
+                                                .createdAt("2019-11-29T16:44:02Z")
+                                                .updatedAt("2019-11-29T16:44:02Z")
+                                                .shareable(true)
+                                                .documentationUrl(
+                                                        "https://some-other-documentation-link.io")
+                                                .brokerCatalog(
+                                                        BrokerCatalog.builder()
+                                                                .brokerCatalogId(
+                                                                        "3cb11822-12bb-11ea-beb1-a350dc7453b9")
+                                                                .metadata(
+                                                                        Collections.singletonMap(
+                                                                                "shareable", true))
+                                                                .features(
+                                                                        Features.builder()
+                                                                                .planUpdateable(
+                                                                                        true)
+                                                                                .bindable(true)
+                                                                                .instancesRetrievable(
+                                                                                        true)
+                                                                                .bindingsRetrievable(
+                                                                                        true)
+                                                                                .allowContextUpdates(
+                                                                                        false)
+                                                                                .build())
+                                                                .build())
+                                                .relationships(
+                                                        ServiceOfferingRelationships.builder()
+                                                                .serviceBroker(
+                                                                        ToOneRelationship.builder()
+                                                                                .data(
+                                                                                        Relationship
+                                                                                                .builder()
+                                                                                                .id(
+                                                                                                        "13c60e38-11e7-11ea-9106-33ee3c5bd4d7")
+                                                                                                .build())
+                                                                                .build())
+                                                                .build())
+                                                .metadata(
+                                                        Metadata.builder()
+                                                                .annotations(Collections.emptyMap())
+                                                                .labels(Collections.emptyMap())
+                                                                .build())
+                                                .link(
+                                                        "self",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/service_offerings/20e6cd62-12bb-11ea-90d1-7bfec2c75bcd")
+                                                                .build())
+                                                .link(
+                                                        "service_plans",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/service_plans?service_offering_guids=20e6cd62-12bb-11ea-90d1-7bfec2c75bcd")
+                                                                .build())
+                                                .link(
+                                                        "service_broker",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/service_brokers/13c60e38-11e7-11ea-9106-33ee3c5bd4d7")
+                                                                .build())
+                                                .build())
                                 .build())
-                            .build())
-                        .build())
-                    .metadata(Metadata.builder()
-                        .annotations(Collections.emptyMap())
-                        .labels(Collections.emptyMap())
-                        .build())
-                    .link("self", Link.builder()
-                        .href("https://api.example.org/v3/service_offerings/bf7eb420-11e5-11ea-b7db-4b5d5e7976a")
-                        .build())
-                    .link("service_plans", Link.builder()
-                        .href("https://api.example.org/v3/service_plans?service_offering_guids=bf7eb420-11e5-11ea-b7db-4b5d5e7976a")
-                        .build())
-                    .link("service_broker", Link.builder()
-                        .href("https://api.example.org/v3/service_brokers/13c60e38-11e7-11ea-9106-33ee3c5bd4d7")
-                        .build())
-                    .build())
-                .resource(ServiceOfferingResource.builder()
-                    .id("20e6cd62-12bb-11ea-90d1-7bfec2c75bcd")
-                    .name("other_service_offering")
-                    .description("Provides another service")
-                    .available(true)
-                    .tag("caching")
-                    .requires(Collections.emptyList())
-                    .createdAt("2019-11-29T16:44:02Z")
-                    .updatedAt("2019-11-29T16:44:02Z")
-                    .shareable(true)
-                    .documentationUrl("https://some-other-documentation-link.io")
-                    .brokerCatalog(BrokerCatalog.builder()
-                        .brokerCatalogId("3cb11822-12bb-11ea-beb1-a350dc7453b9")
-                        .metadata(Collections.singletonMap("shareable", true))
-                        .features(Features.builder()
-                            .planUpdateable(true)
-                            .bindable(true)
-                            .instancesRetrievable(true)
-                            .bindingsRetrievable(true)
-                            .allowContextUpdates(false)
-                            .build())
-                        .build())
-                    .relationships(ServiceOfferingRelationships.builder()
-                        .serviceBroker(ToOneRelationship.builder()
-                            .data(Relationship.builder()
-                                .id("13c60e38-11e7-11ea-9106-33ee3c5bd4d7")
-                                .build())
-                            .build())
-                        .build())
-                    .metadata(Metadata.builder()
-                        .annotations(Collections.emptyMap())
-                        .labels(Collections.emptyMap())
-                        .build())
-                    .link("self", Link.builder()
-                        .href("https://api.example.org/v3/service_offerings/20e6cd62-12bb-11ea-90d1-7bfec2c75bcd")
-                        .build())
-                    .link("service_plans", Link.builder()
-                        .href("https://api.example.org/v3/service_plans?service_offering_guids=20e6cd62-12bb-11ea-90d1-7bfec2c75bcd")
-                        .build())
-                    .link("service_broker", Link.builder()
-                        .href("https://api.example.org/v3/service_brokers/13c60e38-11e7-11ea-9106-33ee3c5bd4d7")
-                        .build())
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -272,59 +354,79 @@ final class ReactorServiceOfferingsTest extends AbstractClientApiTest {
             .build());
 
         this.serviceOfferings
-            .update(UpdateServiceOfferingRequest.builder()
-                .serviceOfferingId("test-service-offering-id")
-                .metadata(Metadata.builder()
-                    .annotation("note", "detailed information")
-                    .label("key", "value")
-                    .build())
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(UpdateServiceOfferingResponse.builder()
-                .id("bf7eb420-11e5-11ea-b7db-4b5d5e7976a9")
-                .name("my_service_offering")
-                .description("Provides my service")
-                .available(true)
-                .tags("relational", "caching")
-                .requires(Collections.emptyList())
-                .createdAt("2019-11-28T13:44:02Z")
-                .updatedAt("2019-11-28T13:44:02Z")
-                .shareable(true)
-                .documentationUrl("https://some-documentation-link.io")
-                .brokerCatalog(BrokerCatalog.builder()
-                    .brokerCatalogId("db730a8c-11e5-11ea-838a-0f4fff3b1cfb")
-                    .metadata(Collections.singletonMap("shareable", true))
-                    .features(Features.builder()
-                        .planUpdateable(true)
-                        .bindable(true)
-                        .instancesRetrievable(true)
-                        .bindingsRetrievable(true)
-                        .allowContextUpdates(false)
-                        .build())
-                    .build())
-                .relationships(ServiceOfferingRelationships.builder()
-                    .serviceBroker(ToOneRelationship.builder()
-                        .data(Relationship.builder()
-                            .id("13c60e38-11e7-11ea-9106-33ee3c5bd4d7")
-                            .build())
-                        .build())
-                    .build())
-                .metadata(Metadata.builder()
-                    .annotations(Collections.emptyMap())
-                    .labels(Collections.emptyMap())
-                    .build())
-                .link("self", Link.builder()
-                    .href("https://api.example.org/v3/service_offerings/bf7eb420-11e5-11ea-b7db-4b5d5e7976a")
-                    .build())
-                .link("service_plans", Link.builder()
-                    .href("https://api.example.org/v3/service_plans?service_offering_guids=bf7eb420-11e5-11ea-b7db-4b5d5e7976a")
-                    .build())
-                .link("service_broker", Link.builder()
-                    .href("https://api.example.org/v3/service_brokers/13c60e38-11e7-11ea-9106-33ee3c5bd4d7")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .update(
+                        UpdateServiceOfferingRequest.builder()
+                                .serviceOfferingId("test-service-offering-id")
+                                .metadata(
+                                        Metadata.builder()
+                                                .annotation("note", "detailed information")
+                                                .label("key", "value")
+                                                .build())
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        UpdateServiceOfferingResponse.builder()
+                                .id("bf7eb420-11e5-11ea-b7db-4b5d5e7976a9")
+                                .name("my_service_offering")
+                                .description("Provides my service")
+                                .available(true)
+                                .tags("relational", "caching")
+                                .requires(Collections.emptyList())
+                                .createdAt("2019-11-28T13:44:02Z")
+                                .updatedAt("2019-11-28T13:44:02Z")
+                                .shareable(true)
+                                .documentationUrl("https://some-documentation-link.io")
+                                .brokerCatalog(
+                                        BrokerCatalog.builder()
+                                                .brokerCatalogId(
+                                                        "db730a8c-11e5-11ea-838a-0f4fff3b1cfb")
+                                                .metadata(
+                                                        Collections.singletonMap("shareable", true))
+                                                .features(
+                                                        Features.builder()
+                                                                .planUpdateable(true)
+                                                                .bindable(true)
+                                                                .instancesRetrievable(true)
+                                                                .bindingsRetrievable(true)
+                                                                .allowContextUpdates(false)
+                                                                .build())
+                                                .build())
+                                .relationships(
+                                        ServiceOfferingRelationships.builder()
+                                                .serviceBroker(
+                                                        ToOneRelationship.builder()
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id(
+                                                                                        "13c60e38-11e7-11ea-9106-33ee3c5bd4d7")
+                                                                                .build())
+                                                                .build())
+                                                .build())
+                                .metadata(
+                                        Metadata.builder()
+                                                .annotations(Collections.emptyMap())
+                                                .labels(Collections.emptyMap())
+                                                .build())
+                                .link(
+                                        "self",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/service_offerings/bf7eb420-11e5-11ea-b7db-4b5d5e7976a")
+                                                .build())
+                                .link(
+                                        "service_plans",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/service_plans?service_offering_guids=bf7eb420-11e5-11ea-b7db-4b5d5e7976a")
+                                                .build())
+                                .link(
+                                        "service_broker",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/service_brokers/13c60e38-11e7-11ea-9106-33ee3c5bd4d7")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
-
 }

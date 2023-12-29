@@ -55,10 +55,9 @@ final class SetOrganizationRoleRequestTest {
     @Test
     void valid() {
         SetOrganizationRoleRequest.builder()
-            .organizationName("test-organization")
-            .organizationRole(OrganizationRole.MANAGER)
-            .username("test-username")
-            .build();
+                .organizationName("test-organization")
+                .organizationRole(OrganizationRole.MANAGER)
+                .username("test-username")
+                .build();
     }
-
 }

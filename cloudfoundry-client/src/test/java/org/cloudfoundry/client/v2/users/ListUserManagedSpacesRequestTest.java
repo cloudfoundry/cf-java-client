@@ -36,5 +36,4 @@ final class ListUserManagedSpacesRequestTest {
             .userId("test-user-id")
             .build();
     }
-
 }

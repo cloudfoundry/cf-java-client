@@ -25,5 +25,4 @@ final class PaginationTest {
         Pagination.builder()
             .build();
     }
-
 }

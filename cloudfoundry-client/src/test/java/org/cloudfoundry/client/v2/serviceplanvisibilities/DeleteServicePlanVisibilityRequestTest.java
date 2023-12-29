@@ -33,8 +33,7 @@ final class DeleteServicePlanVisibilityRequestTest {
     @Test
     void valid() {
         DeleteServicePlanVisibilityRequest.builder()
-            .servicePlanVisibilityId("test-service-plan-visibility-id")
-            .build();
+                .servicePlanVisibilityId("test-service-plan-visibility-id")
+                .build();
     }
-
 }

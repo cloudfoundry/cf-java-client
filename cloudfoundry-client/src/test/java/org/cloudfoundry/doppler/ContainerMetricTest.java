@@ -96,12 +96,11 @@ final class ContainerMetricTest {
     @Test
     void valid() {
         ContainerMetric.builder()
-            .applicationId("test-application-id")
-            .cpuPercentage(0.0)
-            .diskBytes(0L)
-            .instanceIndex(0)
-            .memoryBytes(0L)
-            .build();
+                .applicationId("test-application-id")
+                .cpuPercentage(0.0)
+                .diskBytes(0L)
+                .instanceIndex(0)
+                .memoryBytes(0L)
+                .build();
     }
-
 }

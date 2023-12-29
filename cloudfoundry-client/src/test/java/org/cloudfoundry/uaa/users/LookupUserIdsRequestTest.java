@@ -25,5 +25,4 @@ final class LookupUserIdsRequestTest {
         LookupUserIdsRequest.builder()
             .build();
     }
-
 }

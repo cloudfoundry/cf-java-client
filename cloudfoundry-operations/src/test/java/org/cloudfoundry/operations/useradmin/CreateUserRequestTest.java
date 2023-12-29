@@ -58,5 +58,4 @@ final class CreateUserRequestTest {
             .username("test-username")
             .build();
     }
-
 }

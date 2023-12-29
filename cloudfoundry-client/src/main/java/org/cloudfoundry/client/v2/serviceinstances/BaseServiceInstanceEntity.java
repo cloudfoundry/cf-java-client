@@ -16,13 +16,11 @@
 
 package org.cloudfoundry.client.v2.serviceinstances;
 
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.cloudfoundry.AllowNulls;
-import org.cloudfoundry.Nullable;
-
 import java.util.List;
 import java.util.Map;
+import org.cloudfoundry.AllowNulls;
+import org.cloudfoundry.Nullable;
 
 /**
  * The entity response payload for both types of Service Instances
@@ -99,5 +97,4 @@ public abstract class BaseServiceInstanceEntity {
     @JsonProperty("type")
     @Nullable
     public abstract String getType();
-
 }

@@ -43,9 +43,8 @@ final class RemoveSecurityGroupSpaceRequestTest {
     @Test
     void valid() {
         RemoveSecurityGroupSpaceRequest.builder()
-            .securityGroupId("test-security-group-id")
-            .spaceId("test-space-id")
-            .build();
+                .securityGroupId("test-security-group-id")
+                .spaceId("test-space-id")
+                .build();
     }
-
 }

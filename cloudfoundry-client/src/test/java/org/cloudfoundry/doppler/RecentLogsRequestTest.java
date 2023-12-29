@@ -36,5 +36,4 @@ final class RecentLogsRequestTest {
             .applicationId("test-application-id")
             .build();
     }
-
 }

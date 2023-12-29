@@ -16,6 +16,11 @@
 
 package org.cloudfoundry.reactor.client.v3.admin;
 
+import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
+
+import java.time.Duration;
+import java.util.Collections;
 import org.cloudfoundry.client.v3.admin.ClearBuildpackCacheRequest;
 import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
@@ -24,15 +29,11 @@ import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-import java.time.Duration;
-import java.util.Collections;
-
-import static io.netty.handler.codec.http.HttpMethod.POST;
-import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
-
 final class ReactorAdminV3Test extends AbstractClientApiTest {
 
-    private final ReactorAdminV3 admin = new ReactorAdminV3(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
+    private final ReactorAdminV3 admin =
+            new ReactorAdminV3(
+                    CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     void clearBuildpackCache() {
@@ -47,12 +48,10 @@ final class ReactorAdminV3Test extends AbstractClientApiTest {
             .build());
 
         this.admin
-            .clearBuildpackCache(ClearBuildpackCacheRequest.builder()
-                .build())
-            .as(StepVerifier::create)
-            .expectNext("[guid]")
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .clearBuildpackCache(ClearBuildpackCacheRequest.builder().build())
+                .as(StepVerifier::create)
+                .expectNext("[guid]")
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
-
 }

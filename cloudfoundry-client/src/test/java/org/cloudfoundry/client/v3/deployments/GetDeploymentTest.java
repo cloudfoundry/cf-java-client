@@ -36,5 +36,4 @@ final class GetDeploymentTest {
             .deploymentId("deployment-id")
             .build();
     }
-
 }

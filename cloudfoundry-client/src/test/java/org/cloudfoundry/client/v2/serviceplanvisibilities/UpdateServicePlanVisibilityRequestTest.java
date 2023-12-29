@@ -55,10 +55,9 @@ final class UpdateServicePlanVisibilityRequestTest {
     @Test
     void valid() {
         UpdateServicePlanVisibilityRequest.builder()
-            .organizationId("organization-id")
-            .servicePlanId("service-plan-id")
-            .servicePlanVisibilityId("test-service-plan-visibility-id")
-            .build();
+                .organizationId("organization-id")
+                .servicePlanId("service-plan-id")
+                .servicePlanVisibilityId("test-service-plan-visibility-id")
+                .build();
     }
-
 }

@@ -16,6 +16,17 @@
 
 package org.cloudfoundry.reactor.client.v3.domains;
 
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.PATCH;
+import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
+import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
+import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+
+import java.time.Duration;
+import java.util.Collections;
 import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.Pagination;
@@ -43,21 +54,12 @@ import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-import java.time.Duration;
-import java.util.Collections;
-
-import static io.netty.handler.codec.http.HttpMethod.DELETE;
-import static io.netty.handler.codec.http.HttpMethod.GET;
-import static io.netty.handler.codec.http.HttpMethod.PATCH;
-import static io.netty.handler.codec.http.HttpMethod.POST;
-import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
-import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
-import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
-import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 final class ReactorDomainsV3Test extends AbstractClientApiTest {
 
-    private final ReactorDomainsV3 domains = new ReactorDomainsV3(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
+    private final ReactorDomainsV3 domains =
+            new ReactorDomainsV3(
+                    CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     void create() {
@@ -73,34 +75,45 @@ final class ReactorDomainsV3Test extends AbstractClientApiTest {
             .build());
 
         this.domains
-            .create(CreateDomainRequest.builder()
-                .name("test-domain.com")
-                .internal(false)
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(CreateDomainResponse.builder()
-                .id("3a5d3d89-3f89-4f05-8188-8a2b298c79d5")
-                .name("test-domain.com")
-                .createdAt("2019-03-08T01:06:19Z")
-                .updatedAt("2019-03-08T01:06:19Z")
-                .isInternal(false)
-                .metadata(Metadata.builder()
-                    .labels(Collections.emptyMap())
-                    .annotations(Collections.emptyMap())
-                    .build())
-                .relationships(DomainRelationships.builder()
-                    .organization(ToOneRelationship.builder().build())
-                    .sharedOrganizations(ToManyRelationship.builder().build())
-                    .build())
-                .link("self", Link.builder()
-                    .href("https://api.example.org/v3/domains/3a5d3d89-3f89-4f05-8188-8a2b298c79d5")
-                    .build())
-                .link("route_reservations", Link.builder()
-                    .href("https://api.example.org/v3/domains/3a5d3d89-3f89-4f05-8188-8a2b298c79d5/route_reservations")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .create(
+                        CreateDomainRequest.builder()
+                                .name("test-domain.com")
+                                .internal(false)
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        CreateDomainResponse.builder()
+                                .id("3a5d3d89-3f89-4f05-8188-8a2b298c79d5")
+                                .name("test-domain.com")
+                                .createdAt("2019-03-08T01:06:19Z")
+                                .updatedAt("2019-03-08T01:06:19Z")
+                                .isInternal(false)
+                                .metadata(
+                                        Metadata.builder()
+                                                .labels(Collections.emptyMap())
+                                                .annotations(Collections.emptyMap())
+                                                .build())
+                                .relationships(
+                                        DomainRelationships.builder()
+                                                .organization(ToOneRelationship.builder().build())
+                                                .sharedOrganizations(
+                                                        ToManyRelationship.builder().build())
+                                                .build())
+                                .link(
+                                        "self",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/domains/3a5d3d89-3f89-4f05-8188-8a2b298c79d5")
+                                                .build())
+                                .link(
+                                        "route_reservations",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/domains/3a5d3d89-3f89-4f05-8188-8a2b298c79d5/route_reservations")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -116,13 +129,11 @@ final class ReactorDomainsV3Test extends AbstractClientApiTest {
             .build());
 
         this.domains
-            .delete(DeleteDomainRequest.builder()
-                .domainId("test-domain-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext("[guid]")
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .delete(DeleteDomainRequest.builder().domainId("test-domain-id").build())
+                .as(StepVerifier::create)
+                .expectNext("[guid]")
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -138,50 +149,71 @@ final class ReactorDomainsV3Test extends AbstractClientApiTest {
             .build());
 
         this.domains
-            .get(GetDomainRequest.builder()
-                .domainId("test-domain-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(GetDomainResponse.builder()
-                .id("3a5d3d89-3f89-4f05-8188-8a2b298c79d5")
-                .name("test-domain.com")
-                .createdAt("2019-03-08T01:06:19Z")
-                .updatedAt("2019-03-08T01:06:19Z")
-                .isInternal(false)
-                .metadata(Metadata.builder()
-                    .labels(Collections.emptyMap())
-                    .annotations(Collections.emptyMap())
-                    .build())
-                .relationships(DomainRelationships.builder()
-                    .organization(ToOneRelationship.builder()
-                        .data(Relationship.builder()
-                            .id("3a3f3d89-3f89-4f05-8188-751b298c79d5")
-                            .build())
-                        .build())
-                    .sharedOrganizations(ToManyRelationship.builder()
-                        .data(Relationship.builder()
-                            .id("404f3d89-3f89-6z72-8188-751b298d88d5")
-                            .build())
-                        .data(Relationship.builder()
-                            .id("416d3d89-3f89-8h67-2189-123b298d3592")
-                            .build())
-                        .build())
-                    .build())
-                .link("self", Link.builder()
-                    .href("https://api.example.org/v3/domains/3a5d3d89-3f89-4f05-8188-8a2b298c79d5")
-                    .build())
-                .link("organization", Link.builder()
-                    .href("https://api.example.org/v3/organizations/3a3f3d89-3f89-4f05-8188-751b298c79d5")
-                    .build())
-                .link("route_reservations", Link.builder()
-                    .href("https://api.example.org/v3/domains/3a5d3d89-3f89-4f05-8188-8a2b298c79d5/route_reservations")
-                    .build())
-                .link("shared_organizations", Link.builder()
-                    .href("https://api.example.org/v3/domains/3a5d3d89-3f89-4f05-8188-8a2b298c79d5/relationships/shared_organizations")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .get(GetDomainRequest.builder().domainId("test-domain-id").build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        GetDomainResponse.builder()
+                                .id("3a5d3d89-3f89-4f05-8188-8a2b298c79d5")
+                                .name("test-domain.com")
+                                .createdAt("2019-03-08T01:06:19Z")
+                                .updatedAt("2019-03-08T01:06:19Z")
+                                .isInternal(false)
+                                .metadata(
+                                        Metadata.builder()
+                                                .labels(Collections.emptyMap())
+                                                .annotations(Collections.emptyMap())
+                                                .build())
+                                .relationships(
+                                        DomainRelationships.builder()
+                                                .organization(
+                                                        ToOneRelationship.builder()
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id(
+                                                                                        "3a3f3d89-3f89-4f05-8188-751b298c79d5")
+                                                                                .build())
+                                                                .build())
+                                                .sharedOrganizations(
+                                                        ToManyRelationship.builder()
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id(
+                                                                                        "404f3d89-3f89-6z72-8188-751b298d88d5")
+                                                                                .build())
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id(
+                                                                                        "416d3d89-3f89-8h67-2189-123b298d3592")
+                                                                                .build())
+                                                                .build())
+                                                .build())
+                                .link(
+                                        "self",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/domains/3a5d3d89-3f89-4f05-8188-8a2b298c79d5")
+                                                .build())
+                                .link(
+                                        "organization",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/organizations/3a3f3d89-3f89-4f05-8188-751b298c79d5")
+                                                .build())
+                                .link(
+                                        "route_reservations",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/domains/3a5d3d89-3f89-4f05-8188-8a2b298c79d5/route_reservations")
+                                                .build())
+                                .link(
+                                        "shared_organizations",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/domains/3a5d3d89-3f89-4f05-8188-8a2b298c79d5/relationships/shared_organizations")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -197,47 +229,68 @@ final class ReactorDomainsV3Test extends AbstractClientApiTest {
             .build());
 
         this.domains
-            .list(ListDomainsRequest.builder()
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(ListDomainsResponse.builder()
-                .pagination(Pagination.builder()
-                    .totalResults(3)
-                    .totalPages(2)
-                    .first(Link.builder()
-                        .href("https://api.example.org/v3/domains?page=1&per_page=2")
-                        .build())
-                    .last(Link.builder()
-                        .href("https://api.example.org/v3/domains?page=2&per_page=2")
-                        .build())
-                    .next(Link.builder()
-                        .href("https://api.example.org/v3/domains?page=2&per_page=2")
-                        .build())
-                    .build())
-                .resource(DomainResource.builder()
-                    .id("3a5d3d89-3f89-4f05-8188-8a2b298c79d5")
-                    .metadata(Metadata.builder()
-                        .annotations(Collections.emptyMap())
-                        .labels(Collections.emptyMap())
-                        .build())
-                    .createdAt("2019-03-08T01:06:19Z")
-                    .updatedAt("2019-03-08T01:06:19Z")
-                    .name("test-domain.com")
-                    .isInternal(false)
-                    .relationships(DomainRelationships.builder()
-                        .organization(ToOneRelationship.builder().data(null).build())
-                        .sharedOrganizations(ToManyRelationship.builder().build())
-                        .build())
-                    .link("self", Link.builder()
-                        .href("https://api.example.org/v3/domains/3a5d3d89-3f89-4f05-8188-8a2b298c79d5")
-                        .build())
-                    .link("route_reservations", Link.builder()
-                        .href("https://api.example.org/v3/domains/3a5d3d89-3f89-4f05-8188-8a2b298c79d5/route_reservations")
-                        .build())
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .list(ListDomainsRequest.builder().build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        ListDomainsResponse.builder()
+                                .pagination(
+                                        Pagination.builder()
+                                                .totalResults(3)
+                                                .totalPages(2)
+                                                .first(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/domains?page=1&per_page=2")
+                                                                .build())
+                                                .last(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/domains?page=2&per_page=2")
+                                                                .build())
+                                                .next(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/domains?page=2&per_page=2")
+                                                                .build())
+                                                .build())
+                                .resource(
+                                        DomainResource.builder()
+                                                .id("3a5d3d89-3f89-4f05-8188-8a2b298c79d5")
+                                                .metadata(
+                                                        Metadata.builder()
+                                                                .annotations(Collections.emptyMap())
+                                                                .labels(Collections.emptyMap())
+                                                                .build())
+                                                .createdAt("2019-03-08T01:06:19Z")
+                                                .updatedAt("2019-03-08T01:06:19Z")
+                                                .name("test-domain.com")
+                                                .isInternal(false)
+                                                .relationships(
+                                                        DomainRelationships.builder()
+                                                                .organization(
+                                                                        ToOneRelationship.builder()
+                                                                                .data(null)
+                                                                                .build())
+                                                                .sharedOrganizations(
+                                                                        ToManyRelationship.builder()
+                                                                                .build())
+                                                                .build())
+                                                .link(
+                                                        "self",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/domains/3a5d3d89-3f89-4f05-8188-8a2b298c79d5")
+                                                                .build())
+                                                .link(
+                                                        "route_reservations",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/domains/3a5d3d89-3f89-4f05-8188-8a2b298c79d5/route_reservations")
+                                                                .build())
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -254,26 +307,32 @@ final class ReactorDomainsV3Test extends AbstractClientApiTest {
             .build());
 
         this.domains
-            .share(ShareDomainRequest.builder()
-                .domainId("test-domain-id")
-                .data(Relationship.builder()
-                    .id("404f3d89-3f89-6z72-8188-751b298d88d5")
-                    .build())
-                .data(Relationship.builder()
-                    .id("416d3d89-3f89-8h67-2189-123b298d3592")
-                    .build())
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(ShareDomainResponse.builder()
-                .data(Relationship.builder()
-                    .id("404f3d89-3f89-6z72-8188-751b298d88d5")
-                    .build())
-                .data(Relationship.builder()
-                    .id("416d3d89-3f89-8h67-2189-123b298d3592")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .share(
+                        ShareDomainRequest.builder()
+                                .domainId("test-domain-id")
+                                .data(
+                                        Relationship.builder()
+                                                .id("404f3d89-3f89-6z72-8188-751b298d88d5")
+                                                .build())
+                                .data(
+                                        Relationship.builder()
+                                                .id("416d3d89-3f89-8h67-2189-123b298d3592")
+                                                .build())
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        ShareDomainResponse.builder()
+                                .data(
+                                        Relationship.builder()
+                                                .id("404f3d89-3f89-6z72-8188-751b298d88d5")
+                                                .build())
+                                .data(
+                                        Relationship.builder()
+                                                .id("416d3d89-3f89-8h67-2189-123b298d3592")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -288,14 +347,15 @@ final class ReactorDomainsV3Test extends AbstractClientApiTest {
             .build());
 
         this.domains
-            .unshare(UnshareDomainRequest.builder()
-                .domainId("test-domain-id")
-                .organizationId("test-org-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext()
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .unshare(
+                        UnshareDomainRequest.builder()
+                                .domainId("test-domain-id")
+                                .organizationId("test-org-id")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext()
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -312,53 +372,78 @@ final class ReactorDomainsV3Test extends AbstractClientApiTest {
             .build());
 
         this.domains
-            .update(UpdateDomainRequest.builder()
-                .domainId("test-domain-id")
-                .metadata(Metadata.builder()
-                    .annotation("note", "detailed information")
-                    .label("key", "value")
-                    .build())
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(UpdateDomainResponse.builder()
-                .id("3a5d3d89-3f89-4f05-8188-8a2b298c79d5")
-                .name("test-domain.com")
-                .createdAt("2019-03-08T01:06:19Z")
-                .updatedAt("2019-03-08T01:06:19Z")
-                .isInternal(false)
-                .metadata(Metadata.builder()
-                    .label("key", "value")
-                    .annotation("note", "detailed information")
-                    .build())
-                .relationships(DomainRelationships.builder()
-                    .organization(ToOneRelationship.builder()
-                        .data(Relationship.builder()
-                            .id("3a3f3d89-3f89-4f05-8188-751b298c79d5")
-                            .build())
-                        .build())
-                    .sharedOrganizations(ToManyRelationship.builder()
-                        .data(Relationship.builder()
-                            .id("404f3d89-3f89-6z72-8188-751b298d88d5")
-                            .build())
-                        .data(Relationship.builder()
-                            .id("416d3d89-3f89-8h67-2189-123b298d3592")
-                            .build())
-                        .build())
-                    .build())
-                .link("self", Link.builder()
-                    .href("https://api.example.org/v3/domains/3a5d3d89-3f89-4f05-8188-8a2b298c79d5")
-                    .build())
-                .link("organization", Link.builder()
-                    .href("https://api.example.org/v3/organizations/3a3f3d89-3f89-4f05-8188-751b298c79d5")
-                    .build())
-                .link("route_reservations", Link.builder()
-                    .href("https://api.example.org/v3/domains/3a5d3d89-3f89-4f05-8188-8a2b298c79d5/route_reservations")
-                    .build())
-                .link("shared_organizations", Link.builder()
-                    .href("https://api.example.org/v3/domains/3a5d3d89-3f89-4f05-8188-8a2b298c79d5/relationships/shared_organizations")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .update(
+                        UpdateDomainRequest.builder()
+                                .domainId("test-domain-id")
+                                .metadata(
+                                        Metadata.builder()
+                                                .annotation("note", "detailed information")
+                                                .label("key", "value")
+                                                .build())
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        UpdateDomainResponse.builder()
+                                .id("3a5d3d89-3f89-4f05-8188-8a2b298c79d5")
+                                .name("test-domain.com")
+                                .createdAt("2019-03-08T01:06:19Z")
+                                .updatedAt("2019-03-08T01:06:19Z")
+                                .isInternal(false)
+                                .metadata(
+                                        Metadata.builder()
+                                                .label("key", "value")
+                                                .annotation("note", "detailed information")
+                                                .build())
+                                .relationships(
+                                        DomainRelationships.builder()
+                                                .organization(
+                                                        ToOneRelationship.builder()
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id(
+                                                                                        "3a3f3d89-3f89-4f05-8188-751b298c79d5")
+                                                                                .build())
+                                                                .build())
+                                                .sharedOrganizations(
+                                                        ToManyRelationship.builder()
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id(
+                                                                                        "404f3d89-3f89-6z72-8188-751b298d88d5")
+                                                                                .build())
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id(
+                                                                                        "416d3d89-3f89-8h67-2189-123b298d3592")
+                                                                                .build())
+                                                                .build())
+                                                .build())
+                                .link(
+                                        "self",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/domains/3a5d3d89-3f89-4f05-8188-8a2b298c79d5")
+                                                .build())
+                                .link(
+                                        "organization",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/organizations/3a3f3d89-3f89-4f05-8188-751b298c79d5")
+                                                .build())
+                                .link(
+                                        "route_reservations",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/domains/3a5d3d89-3f89-4f05-8188-8a2b298c79d5/route_reservations")
+                                                .build())
+                                .link(
+                                        "shared_organizations",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/domains/3a5d3d89-3f89-4f05-8188-8a2b298c79d5/relationships/shared_organizations")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 }

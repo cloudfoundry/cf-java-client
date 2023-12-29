@@ -47,5 +47,4 @@ final class RemoveMemberRequestTest {
             .memberId("test-member-id")
             .build();
     }
-
 }

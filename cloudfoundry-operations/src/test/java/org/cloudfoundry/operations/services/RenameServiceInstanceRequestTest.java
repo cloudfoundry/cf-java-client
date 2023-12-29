@@ -43,9 +43,8 @@ final class RenameServiceInstanceRequestTest {
     @Test
     void valid() {
         RenameServiceInstanceRequest.builder()
-            .name("test-service-name")
-            .newName("test-service-new-name")
-            .build();
+                .name("test-service-name")
+                .newName("test-service-new-name")
+                .build();
     }
-
 }

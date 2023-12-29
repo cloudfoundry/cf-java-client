@@ -43,9 +43,8 @@ class RemoveRouteDestinationsRequestTest {
     @Test
     void valid() {
         RemoveRouteDestinationsRequest.builder()
-            .destinationId("test-destination-id")
-            .routeId("test-route-id")
-            .build();
+                .destinationId("test-destination-id")
+                .routeId("test-route-id")
+                .build();
     }
-
 }

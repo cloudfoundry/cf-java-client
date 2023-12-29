@@ -36,5 +36,4 @@ final class ListServiceServicePlansRequestTest {
             .serviceId("test-service-id")
             .build();
     }
-
 }

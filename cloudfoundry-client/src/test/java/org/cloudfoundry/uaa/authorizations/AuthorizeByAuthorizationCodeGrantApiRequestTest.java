@@ -35,10 +35,10 @@ final class AuthorizeByAuthorizationCodeGrantApiRequestTest {
     @Test
     void validMax() {
         AuthorizeByAuthorizationCodeGrantApiRequest.builder()
-            .clientId("test-client-id")
-            .redirectUri("http://redirect.to/app")
-            .state("test-state")
-            .build();
+                .clientId("test-client-id")
+                .redirectUri("http://redirect.to/app")
+                .state("test-state")
+                .build();
     }
 
     @Test
@@ -47,5 +47,4 @@ final class AuthorizeByAuthorizationCodeGrantApiRequestTest {
             .clientId("test-client-id")
             .build();
     }
-
 }

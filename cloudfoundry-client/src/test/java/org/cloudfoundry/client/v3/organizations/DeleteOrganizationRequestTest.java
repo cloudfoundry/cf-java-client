@@ -36,5 +36,4 @@ final class DeleteOrganizationRequestTest {
             .organizationId("test-id")
             .build();
     }
-
 }

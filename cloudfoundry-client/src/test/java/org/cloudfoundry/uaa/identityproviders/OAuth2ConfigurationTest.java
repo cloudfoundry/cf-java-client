@@ -55,10 +55,9 @@ final class OAuth2ConfigurationTest {
     @Test
     void valid() {
         OAuth2Configuration.builder()
-            .authUrl("test-auth-url")
-            .tokenUrl("test-token-url")
-            .relyingPartyId("test-relying-party-id")
-            .build();
+                .authUrl("test-auth-url")
+                .tokenUrl("test-token-url")
+                .relyingPartyId("test-relying-party-id")
+                .build();
     }
-
 }

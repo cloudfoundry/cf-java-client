@@ -36,5 +36,4 @@ final class GetDomainRequestTest {
             .domainId("test-domain-id")
             .build();
     }
-
 }

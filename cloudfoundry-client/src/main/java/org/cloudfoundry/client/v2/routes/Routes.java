@@ -29,7 +29,8 @@ public interface Routes {
      * @param request the Associate an Application with the Route request
      * @return the response from the Associate an Application with the Route request
      */
-    Mono<AssociateRouteApplicationResponse> associateApplication(AssociateRouteApplicationRequest request);
+    Mono<AssociateRouteApplicationResponse> associateApplication(
+            AssociateRouteApplicationRequest request);
 
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/routes/creating_a_route.html">Creating a Route</a> request
@@ -102,5 +103,4 @@ public interface Routes {
      * @return the response from the Update a Route request
      */
     Mono<UpdateRouteResponse> update(UpdateRouteRequest request);
-
 }

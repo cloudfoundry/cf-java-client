@@ -36,5 +36,4 @@ final class GetBuildRequestTest {
             .buildId("test-build-id")
             .build();
     }
-
 }

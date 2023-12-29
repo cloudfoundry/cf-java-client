@@ -44,9 +44,8 @@ final class BindServiceInstanceRouteRequestTest {
     @Test
     void valid() {
         BindServiceInstanceRouteRequest.builder()
-            .serviceInstanceId("test-service-instance-id")
-            .routeId("test-route-id")
-            .build();
+                .serviceInstanceId("test-service-instance-id")
+                .routeId("test-route-id")
+                .build();
     }
-
 }

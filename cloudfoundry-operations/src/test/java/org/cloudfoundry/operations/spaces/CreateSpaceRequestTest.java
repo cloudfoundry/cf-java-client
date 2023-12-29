@@ -36,5 +36,4 @@ final class CreateSpaceRequestTest {
             .name("test-name")
             .build();
     }
-
 }

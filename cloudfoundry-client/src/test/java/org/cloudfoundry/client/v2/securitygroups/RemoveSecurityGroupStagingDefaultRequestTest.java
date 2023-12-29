@@ -33,8 +33,7 @@ final class RemoveSecurityGroupStagingDefaultRequestTest {
     @Test
     void valid() {
         RemoveSecurityGroupStagingDefaultRequest.builder()
-            .securityGroupId("test-security-group-default-id")
-            .build();
+                .securityGroupId("test-security-group-default-id")
+                .build();
     }
-
 }

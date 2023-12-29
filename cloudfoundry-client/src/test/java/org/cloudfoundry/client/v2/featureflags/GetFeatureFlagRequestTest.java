@@ -63,5 +63,4 @@ final class GetFeatureFlagRequestTest {
             .name("test_feature_flag_name")
             .build();
     }
-
 }

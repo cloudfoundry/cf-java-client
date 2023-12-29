@@ -33,5 +33,4 @@ public interface Predicate2<T1, T2> {
      * @return {@code true} if the input arguments match the predicate, otherwise {@code false}
      */
     boolean test(T1 t1, T2 t2);
-
 }

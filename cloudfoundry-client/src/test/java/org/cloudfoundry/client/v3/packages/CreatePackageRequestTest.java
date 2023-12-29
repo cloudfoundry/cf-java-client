@@ -16,6 +16,8 @@
 
 package org.cloudfoundry.client.v3.packages;
 
+import static org.cloudfoundry.client.v3.packages.PackageType.BITS;
+
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.ToOneRelationship;
 import org.junit.jupiter.api.Test;
@@ -56,17 +58,15 @@ final class CreatePackageRequestTest {
     @Test
     void valid() {
         CreatePackageRequest.builder()
-            .data(BitsData.builder()
-                .build())
-            .relationships(PackageRelationships.builder()
-                .application(ToOneRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("test-id")
-                        .build())
-                    .build())
-                .build())
-            .type(BITS)
-            .build();
+                .data(BitsData.builder().build())
+                .relationships(
+                        PackageRelationships.builder()
+                                .application(
+                                        ToOneRelationship.builder()
+                                                .data(Relationship.builder().id("test-id").build())
+                                                .build())
+                                .build())
+                .type(BITS)
+                .build();
     }
-
 }

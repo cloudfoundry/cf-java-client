@@ -33,8 +33,7 @@ final class ListIsolationSegmentEntitledOrganizationsRequestTest {
     @Test
     void valid() {
         ListIsolationSegmentEntitledOrganizationsRequest.builder()
-            .isolationSegmentId("test-isolation-segment-id")
-            .build();
+                .isolationSegmentId("test-isolation-segment-id")
+                .build();
     }
-
 }

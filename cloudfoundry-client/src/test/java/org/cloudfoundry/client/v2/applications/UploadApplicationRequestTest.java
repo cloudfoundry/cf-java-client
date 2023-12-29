@@ -48,9 +48,8 @@ final class UploadApplicationRequestTest {
     @Test
     void valid() {
         UploadApplicationRequest.builder()
-            .application(TEST_APPLICATION)
-            .applicationId("test-application-id")
-            .build();
+                .application(TEST_APPLICATION)
+                .applicationId("test-application-id")
+                .build();
     }
-
 }

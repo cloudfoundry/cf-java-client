@@ -25,5 +25,4 @@ final class DeleteOrphanedRoutesRequestTest {
         DeleteOrphanedRoutesRequest.builder()
             .build();
     }
-
 }

@@ -37,5 +37,4 @@ final class GetServiceKeyRequestTest {
             .serviceKeyId("test-service-key-id")
             .build();
     }
-
 }

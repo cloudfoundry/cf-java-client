@@ -36,5 +36,4 @@ final class GetOrganizationUserRolesRequestTest {
             .organizationId("test-organization-id")
             .build();
     }
-
 }

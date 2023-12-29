@@ -45,18 +45,17 @@ final class GetTokenByClientCredentialsRequestTest {
     @Test
     void validMax() {
         GetTokenByClientCredentialsRequest.builder()
-            .clientId("test-client-id")
-            .clientSecret("test-client-secret")
-            .tokenFormat(TokenFormat.OPAQUE)
-            .build();
+                .clientId("test-client-id")
+                .clientSecret("test-client-secret")
+                .tokenFormat(TokenFormat.OPAQUE)
+                .build();
     }
 
     @Test
     void validMin() {
         GetTokenByClientCredentialsRequest.builder()
-            .clientId("test-client-id")
-            .clientSecret("test-client-secret")
-            .build();
+                .clientId("test-client-id")
+                .clientSecret("test-client-secret")
+                .build();
     }
-
 }

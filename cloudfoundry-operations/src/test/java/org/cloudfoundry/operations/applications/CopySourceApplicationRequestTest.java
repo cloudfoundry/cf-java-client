@@ -54,9 +54,8 @@ final class CopySourceApplicationRequestTest {
     @Test
     void valid() {
         CopySourceApplicationRequest.builder()
-            .name("test-name")
-            .targetName("test-target-name")
-            .build();
+                .name("test-name")
+                .targetName("test-target-name")
+                .build();
     }
-
 }

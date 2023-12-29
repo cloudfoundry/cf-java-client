@@ -33,8 +33,7 @@ final class GetApplicationEnvironmentVariablesRequestTest {
     @Test
     void valid() {
         GetApplicationEnvironmentVariablesRequest.builder()
-            .applicationId("test-application-id")
-            .build();
+                .applicationId("test-application-id")
+                .build();
     }
-
 }

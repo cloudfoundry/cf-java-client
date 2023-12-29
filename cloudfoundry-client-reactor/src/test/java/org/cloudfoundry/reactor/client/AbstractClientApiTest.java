@@ -16,8 +16,7 @@
 
 package org.cloudfoundry.reactor.client;
 
-import okhttp3.Headers;
-import org.cloudfoundry.reactor.AbstractRestTest;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -26,8 +25,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import okhttp3.Headers;
+import org.cloudfoundry.reactor.AbstractRestTest;
 
 public abstract class AbstractClientApiTest extends AbstractRestTest {
 
@@ -43,7 +42,8 @@ public abstract class AbstractClientApiTest extends AbstractRestTest {
     }
 
     protected static byte[] getBytes(String path) {
-        try (InputStream in = new FileInputStream(new File("src/test/resources", path)); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+        try (InputStream in = new FileInputStream(new File("src/test/resources", path));
+                ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             byte[] buffer = new byte[8192];
             int len;
 
@@ -56,5 +56,4 @@ public abstract class AbstractClientApiTest extends AbstractRestTest {
             throw new RuntimeException(e);
         }
     }
-
 }

@@ -33,11 +33,13 @@ class PushManifestV3RequestTest {
     @Test
     void valid() {
         PushManifestV3Request.builder()
-            .manifest(ManifestV3.builder()
-                .application(ManifestV3Application.builder()
-                    .name("test-application-name")
-                    .build())
-                .build())
-            .build();
+                .manifest(
+                        ManifestV3.builder()
+                                .application(
+                                        ManifestV3Application.builder()
+                                                .name("test-application-name")
+                                                .build())
+                                .build())
+                .build();
     }
 }

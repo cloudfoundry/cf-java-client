@@ -25,5 +25,4 @@ final class ListMetadatasRequestTest {
         ListMetadatasRequest.builder()
             .build();
     }
-
 }

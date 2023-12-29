@@ -16,6 +16,11 @@
 
 package org.cloudfoundry.reactor.client.v2.jobs;
 
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+
+import java.time.Duration;
+import java.util.Collections;
 import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.jobs.ErrorDetails;
 import org.cloudfoundry.client.v2.jobs.GetJobRequest;
@@ -28,15 +33,11 @@ import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-import java.time.Duration;
-import java.util.Collections;
-
-import static io.netty.handler.codec.http.HttpMethod.GET;
-import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 final class ReactorJobsTest extends AbstractClientApiTest {
 
-    private final ReactorJobs jobs = new ReactorJobs(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
+    private final ReactorJobs jobs =
+            new ReactorJobs(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     void get() {
@@ -51,29 +52,35 @@ final class ReactorJobsTest extends AbstractClientApiTest {
             .build());
 
         this.jobs
-            .get(GetJobRequest.builder()
-                .jobId("test-job-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(GetJobResponse.builder()
-                .metadata(Metadata.builder()
-                    .id("e86ffe00-a243-48f7-be05-8f1f41bee864")
-                    .createdAt("2015-11-30T23:38:44Z")
-                    .url("/v2/jobs/e86ffe00-a243-48f7-be05-8f1f41bee864")
-                    .build())
-                .entity(JobEntity.builder()
-                    .id("e86ffe00-a243-48f7-be05-8f1f41bee864")
-                    .status("failed")
-                    .error("Use of entity>error is deprecated in favor of entity>error_details.")
-                    .errorDetails(ErrorDetails.builder()
-                        .errorCode("UnknownError")
-                        .description("An unknown error occurred.")
-                        .code(10001)
-                        .build())
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .get(GetJobRequest.builder().jobId("test-job-id").build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        GetJobResponse.builder()
+                                .metadata(
+                                        Metadata.builder()
+                                                .id("e86ffe00-a243-48f7-be05-8f1f41bee864")
+                                                .createdAt("2015-11-30T23:38:44Z")
+                                                .url(
+                                                        "/v2/jobs/e86ffe00-a243-48f7-be05-8f1f41bee864")
+                                                .build())
+                                .entity(
+                                        JobEntity.builder()
+                                                .id("e86ffe00-a243-48f7-be05-8f1f41bee864")
+                                                .status("failed")
+                                                .error(
+                                                        "Use of entity>error is deprecated in favor"
+                                                                + " of entity>error_details.")
+                                                .errorDetails(
+                                                        ErrorDetails.builder()
+                                                                .errorCode("UnknownError")
+                                                                .description(
+                                                                        "An unknown error"
+                                                                                + " occurred.")
+                                                                .code(10001)
+                                                                .build())
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
-
 }

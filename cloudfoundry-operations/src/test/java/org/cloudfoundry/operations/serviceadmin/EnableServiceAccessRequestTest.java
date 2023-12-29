@@ -23,10 +23,9 @@ final class EnableServiceAccessRequestTest {
     @Test
     void valid() {
         ListServiceAccessSettingsRequest.builder()
-            .brokerName("test-broker-name")
-            .organizationName("test-organization-name")
-            .serviceName("test-service-name")
-            .build();
+                .brokerName("test-broker-name")
+                .organizationName("test-organization-name")
+                .serviceName("test-service-name")
+                .build();
     }
-
 }

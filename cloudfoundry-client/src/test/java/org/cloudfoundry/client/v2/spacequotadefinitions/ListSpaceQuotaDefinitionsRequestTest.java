@@ -25,5 +25,4 @@ final class ListSpaceQuotaDefinitionsRequestTest {
         ListSpaceQuotaDefinitionsRequest.builder()
             .build();
     }
-
 }

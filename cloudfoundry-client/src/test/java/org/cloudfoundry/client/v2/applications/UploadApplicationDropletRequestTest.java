@@ -48,9 +48,8 @@ final class UploadApplicationDropletRequestTest {
     @Test
     void valid() {
         UploadApplicationDropletRequest.builder()
-            .droplet(TEST_DROPLET)
-            .applicationId("test-application-id")
-            .build();
+                .droplet(TEST_DROPLET)
+                .applicationId("test-application-id")
+                .build();
     }
-
 }

@@ -16,6 +16,15 @@
 
 package org.cloudfoundry.reactor.client.v3.processes;
 
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.PATCH;
+import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+
+import java.time.Duration;
+import java.util.Collections;
 import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.Pagination;
@@ -46,19 +55,12 @@ import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-import java.time.Duration;
-import java.util.Collections;
-
-import static io.netty.handler.codec.http.HttpMethod.DELETE;
-import static io.netty.handler.codec.http.HttpMethod.GET;
-import static io.netty.handler.codec.http.HttpMethod.PATCH;
-import static io.netty.handler.codec.http.HttpMethod.POST;
-import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
-import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 final class ReactorProcessesTest extends AbstractClientApiTest {
 
-    private final ReactorProcesses processes = new ReactorProcesses(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
+    private final ReactorProcesses processes =
+            new ReactorProcesses(
+                    CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     void deleteInstance() {
@@ -72,13 +74,14 @@ final class ReactorProcessesTest extends AbstractClientApiTest {
             .build());
 
         this.processes
-            .terminateInstance(TerminateProcessInstanceRequest.builder()
-                .processId("test-process-id")
-                .index("test-index")
-                .build())
-            .as(StepVerifier::create)
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .terminateInstance(
+                        TerminateProcessInstanceRequest.builder()
+                                .processId("test-process-id")
+                                .index("test-index")
+                                .build())
+                .as(StepVerifier::create)
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -94,51 +97,67 @@ final class ReactorProcessesTest extends AbstractClientApiTest {
             .build());
 
         this.processes
-            .get(GetProcessRequest.builder()
-                .processId("test-process-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(GetProcessResponse.builder()
-                .id("6a901b7c-9417-4dc1-8189-d3234aa0ab82")
-                .type("web")
-                .command("rackup")
-                .instances(5)
-                .memoryInMb(256)
-                .diskInMb(1_024)
-                .healthCheck(HealthCheck.builder()
-                    .type(HealthCheckType.PORT)
-                    .data(Data.builder()
-                        .timeout(null)
-                        .endpoint(null)
-                        .build())
-                    .build())
-                .metadata(Metadata.builder()
-                    .annotations(Collections.emptyMap())
-                    .labels(Collections.emptyMap())
-                    .build())
-                .relationships(ProcessRelationships.builder()
-                    .build())
-                .createdAt("2016-03-23T18:48:22Z")
-                .updatedAt("2016-03-23T18:48:42Z")
-                .link("self", Link.builder()
-                    .href("https://api.example.org/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82")
-                    .build())
-                .link("scale", Link.builder()
-                    .href("https://api.example.org/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82/actions/scale")
-                    .method("POST")
-                    .build())
-                .link("app", Link.builder()
-                    .href("https://api.example.org/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5")
-                    .build())
-                .link("space", Link.builder()
-                    .href("https://api.example.org/v3/spaces/2f35885d-0c9d-4423-83ad-fd05066f8576")
-                    .build())
-                .link("stats", Link.builder()
-                    .href("https://api.example.org/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82/stats")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .get(GetProcessRequest.builder().processId("test-process-id").build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        GetProcessResponse.builder()
+                                .id("6a901b7c-9417-4dc1-8189-d3234aa0ab82")
+                                .type("web")
+                                .command("rackup")
+                                .instances(5)
+                                .memoryInMb(256)
+                                .diskInMb(1_024)
+                                .healthCheck(
+                                        HealthCheck.builder()
+                                                .type(HealthCheckType.PORT)
+                                                .data(
+                                                        Data.builder()
+                                                                .timeout(null)
+                                                                .endpoint(null)
+                                                                .build())
+                                                .build())
+                                .metadata(
+                                        Metadata.builder()
+                                                .annotations(Collections.emptyMap())
+                                                .labels(Collections.emptyMap())
+                                                .build())
+                                .relationships(ProcessRelationships.builder().build())
+                                .createdAt("2016-03-23T18:48:22Z")
+                                .updatedAt("2016-03-23T18:48:42Z")
+                                .link(
+                                        "self",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82")
+                                                .build())
+                                .link(
+                                        "scale",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82/actions/scale")
+                                                .method("POST")
+                                                .build())
+                                .link(
+                                        "app",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5")
+                                                .build())
+                                .link(
+                                        "space",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/spaces/2f35885d-0c9d-4423-83ad-fd05066f8576")
+                                                .build())
+                                .link(
+                                        "stats",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82/stats")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -154,36 +173,39 @@ final class ReactorProcessesTest extends AbstractClientApiTest {
             .build());
 
         this.processes
-            .getStatistics(GetProcessStatisticsRequest.builder()
-                .processId("test-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(GetProcessStatisticsResponse.builder()
-                .resource(ProcessStatisticsResource.builder()
-                    .type("web")
-                    .index(0)
-                    .state(ProcessState.RUNNING)
-                    .usage(ProcessUsage.builder()
-                        .time("2016-03-23T23:17:30.476314154Z")
-                        .cpu(0.00038711029163348665)
-                        .memory(19177472L)
-                        .disk(69705728L)
-                        .build())
-                    .host("10.244.16.10")
-                    .instancePort(PortMapping.builder()
-                        .external(64546)
-                        .externalTlsProxyPort(1234)
-                        .internal(8080)
-                        .internalTlsProxyPort(5678)
-                        .build())
-                    .uptime(9042L)
-                    .memoryQuota(268435456L)
-                    .diskQuota(1073741824L)
-                    .fileDescriptorQuota(16384L)
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .getStatistics(GetProcessStatisticsRequest.builder().processId("test-id").build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        GetProcessStatisticsResponse.builder()
+                                .resource(
+                                        ProcessStatisticsResource.builder()
+                                                .type("web")
+                                                .index(0)
+                                                .state(ProcessState.RUNNING)
+                                                .usage(
+                                                        ProcessUsage.builder()
+                                                                .time(
+                                                                        "2016-03-23T23:17:30.476314154Z")
+                                                                .cpu(0.00038711029163348665)
+                                                                .memory(19177472L)
+                                                                .disk(69705728L)
+                                                                .build())
+                                                .host("10.244.16.10")
+                                                .instancePort(
+                                                        PortMapping.builder()
+                                                                .external(64546)
+                                                                .externalTlsProxyPort(1234)
+                                                                .internal(8080)
+                                                                .internalTlsProxyPort(5678)
+                                                                .build())
+                                                .uptime(9042L)
+                                                .memoryQuota(268435456L)
+                                                .diskQuota(1073741824L)
+                                                .fileDescriptorQuota(16384L)
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -199,23 +221,23 @@ final class ReactorProcessesTest extends AbstractClientApiTest {
             .build());
 
         this.processes
-            .getStatistics(GetProcessStatisticsRequest.builder()
-                .processId("test-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(GetProcessStatisticsResponse.builder()
-                .resource(ProcessStatisticsResource.builder()
-                    .type("web")
-                    .index(0)
-                    .state(ProcessState.STARTING)
-                    .usage(ProcessUsage.builder().build())
-                    .host("")
-                    .uptime(4L)
-                    .fileDescriptorQuota(16384L)
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .getStatistics(GetProcessStatisticsRequest.builder().processId("test-id").build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        GetProcessStatisticsResponse.builder()
+                                .resource(
+                                        ProcessStatisticsResource.builder()
+                                                .type("web")
+                                                .index(0)
+                                                .state(ProcessState.STARTING)
+                                                .usage(ProcessUsage.builder().build())
+                                                .host("")
+                                                .uptime(4L)
+                                                .fileDescriptorQuota(16384L)
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -231,104 +253,149 @@ final class ReactorProcessesTest extends AbstractClientApiTest {
             .build());
 
         this.processes
-            .list(ListProcessesRequest.builder()
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(ListProcessesResponse.builder()
-                .pagination(Pagination.builder()
-                    .totalResults(3)
-                    .totalPages(2)
-                    .first(Link.builder()
-                        .href("https://api.example.org/v3/processes?page=1&per_page=2")
-                        .build())
-                    .last(Link.builder()
-                        .href("https://api.example.org/v3/processes?page=2&per_page=2")
-                        .build())
-                    .next(Link.builder()
-                        .href("https://api.example.org/v3/processes?page=2&per_page=2")
-                        .build())
-                    .build())
-                .resource(ProcessResource.builder()
-                    .id("6a901b7c-9417-4dc1-8189-d3234aa0ab82")
-                    .type("web")
-                    .command("[PRIVATE DATA HIDDEN IN LISTS]")
-                    .instances(5)
-                    .memoryInMb(256)
-                    .diskInMb(1_024)
-                    .healthCheck(HealthCheck.builder()
-                        .type(HealthCheckType.PORT)
-                        .data(Data.builder()
-                            .timeout(null)
-                            .endpoint(null)
-                            .build())
-                        .build())
-                    .metadata(Metadata.builder()
-                        .annotations(Collections.emptyMap())
-                        .labels(Collections.emptyMap())
-                        .build())
-                    .relationships(ProcessRelationships.builder()
-                        .build())
-                    .createdAt("2016-03-23T18:48:22Z")
-                    .updatedAt("2016-03-23T18:48:42Z")
-                    .link("self", Link.builder()
-                        .href("https://api.example.org/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82")
-                        .build())
-                    .link("scale", Link.builder()
-                        .href("https://api.example.org/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82/actions/scale")
-                        .method("POST")
-                        .build())
-                    .link("app", Link.builder()
-                        .href("https://api.example.org/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5")
-                        .build())
-                    .link("space", Link.builder()
-                        .href("https://api.example.org/v3/spaces/2f35885d-0c9d-4423-83ad-fd05066f8576")
-                        .build())
-                    .link("stats", Link.builder()
-                        .href("https://api.example.org/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82/stats")
-                        .build())
-                    .build())
-                .resource(ProcessResource.builder()
-                    .id("3fccacd9-4b02-4b96-8d02-8e865865e9eb")
-                    .type("worker")
-                    .command("[PRIVATE DATA HIDDEN IN LISTS]")
-                    .instances(1)
-                    .memoryInMb(256)
-                    .diskInMb(1_024)
-                    .healthCheck(HealthCheck.builder()
-                        .type(HealthCheckType.PROCESS)
-                        .data(Data.builder()
-                            .timeout(null)
-                            .endpoint(null)
-                            .build())
-                        .build())
-                    .metadata(Metadata.builder()
-                        .annotations(Collections.emptyMap())
-                        .labels(Collections.emptyMap())
-                        .build())
-                    .relationships(ProcessRelationships.builder()
-                        .build())
-                    .createdAt("2016-03-23T18:48:22Z")
-                    .updatedAt("2016-03-23T18:48:42Z")
-                    .link("self", Link.builder()
-                        .href("https://api.example.org/v3/processes/3fccacd9-4b02-4b96-8d02-8e865865e9eb")
-                        .build())
-                    .link("scale", Link.builder()
-                        .href("https://api.example.org/v3/processes/3fccacd9-4b02-4b96-8d02-8e865865e9eb/actions/scale")
-                        .method("POST")
-                        .build())
-                    .link("app", Link.builder()
-                        .href("https://api.example.org/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5")
-                        .build())
-                    .link("space", Link.builder()
-                        .href("https://api.example.org/v3/spaces/2f35885d-0c9d-4423-83ad-fd05066f8576")
-                        .build())
-                    .link("stats", Link.builder()
-                        .href("https://api.example.org/v3/processes/3fccacd9-4b02-4b96-8d02-8e865865e9eb/stats")
-                        .build())
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .list(ListProcessesRequest.builder().build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        ListProcessesResponse.builder()
+                                .pagination(
+                                        Pagination.builder()
+                                                .totalResults(3)
+                                                .totalPages(2)
+                                                .first(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/processes?page=1&per_page=2")
+                                                                .build())
+                                                .last(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/processes?page=2&per_page=2")
+                                                                .build())
+                                                .next(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/processes?page=2&per_page=2")
+                                                                .build())
+                                                .build())
+                                .resource(
+                                        ProcessResource.builder()
+                                                .id("6a901b7c-9417-4dc1-8189-d3234aa0ab82")
+                                                .type("web")
+                                                .command("[PRIVATE DATA HIDDEN IN LISTS]")
+                                                .instances(5)
+                                                .memoryInMb(256)
+                                                .diskInMb(1_024)
+                                                .healthCheck(
+                                                        HealthCheck.builder()
+                                                                .type(HealthCheckType.PORT)
+                                                                .data(
+                                                                        Data.builder()
+                                                                                .timeout(null)
+                                                                                .endpoint(null)
+                                                                                .build())
+                                                                .build())
+                                                .metadata(
+                                                        Metadata.builder()
+                                                                .annotations(Collections.emptyMap())
+                                                                .labels(Collections.emptyMap())
+                                                                .build())
+                                                .relationships(
+                                                        ProcessRelationships.builder().build())
+                                                .createdAt("2016-03-23T18:48:22Z")
+                                                .updatedAt("2016-03-23T18:48:42Z")
+                                                .link(
+                                                        "self",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82")
+                                                                .build())
+                                                .link(
+                                                        "scale",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82/actions/scale")
+                                                                .method("POST")
+                                                                .build())
+                                                .link(
+                                                        "app",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5")
+                                                                .build())
+                                                .link(
+                                                        "space",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/spaces/2f35885d-0c9d-4423-83ad-fd05066f8576")
+                                                                .build())
+                                                .link(
+                                                        "stats",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82/stats")
+                                                                .build())
+                                                .build())
+                                .resource(
+                                        ProcessResource.builder()
+                                                .id("3fccacd9-4b02-4b96-8d02-8e865865e9eb")
+                                                .type("worker")
+                                                .command("[PRIVATE DATA HIDDEN IN LISTS]")
+                                                .instances(1)
+                                                .memoryInMb(256)
+                                                .diskInMb(1_024)
+                                                .healthCheck(
+                                                        HealthCheck.builder()
+                                                                .type(HealthCheckType.PROCESS)
+                                                                .data(
+                                                                        Data.builder()
+                                                                                .timeout(null)
+                                                                                .endpoint(null)
+                                                                                .build())
+                                                                .build())
+                                                .metadata(
+                                                        Metadata.builder()
+                                                                .annotations(Collections.emptyMap())
+                                                                .labels(Collections.emptyMap())
+                                                                .build())
+                                                .relationships(
+                                                        ProcessRelationships.builder().build())
+                                                .createdAt("2016-03-23T18:48:22Z")
+                                                .updatedAt("2016-03-23T18:48:42Z")
+                                                .link(
+                                                        "self",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/processes/3fccacd9-4b02-4b96-8d02-8e865865e9eb")
+                                                                .build())
+                                                .link(
+                                                        "scale",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/processes/3fccacd9-4b02-4b96-8d02-8e865865e9eb/actions/scale")
+                                                                .method("POST")
+                                                                .build())
+                                                .link(
+                                                        "app",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5")
+                                                                .build())
+                                                .link(
+                                                        "space",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/spaces/2f35885d-0c9d-4423-83ad-fd05066f8576")
+                                                                .build())
+                                                .link(
+                                                        "stats",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/processes/3fccacd9-4b02-4b96-8d02-8e865865e9eb/stats")
+                                                                .build())
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -345,54 +412,73 @@ final class ReactorProcessesTest extends AbstractClientApiTest {
             .build());
 
         this.processes
-            .scale(ScaleProcessRequest.builder()
-                .processId("test-process-id")
-                .instances(5)
-                .memoryInMb(256)
-                .diskInMb(1_024)
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(ScaleProcessResponse.builder()
-                .id("6a901b7c-9417-4dc1-8189-d3234aa0ab82")
-                .type("web")
-                .command("rackup")
-                .instances(5)
-                .memoryInMb(256)
-                .diskInMb(1_024)
-                .healthCheck(HealthCheck.builder()
-                    .type(HealthCheckType.PORT)
-                    .data(Data.builder()
-                        .timeout(null)
-                        .endpoint(null)
-                        .build())
-                    .build())
-                .metadata(Metadata.builder()
-                    .annotations(Collections.emptyMap())
-                    .labels(Collections.emptyMap())
-                    .build())
-                .relationships(ProcessRelationships.builder()
-                    .build())
-                .createdAt("2016-03-23T18:48:22Z")
-                .updatedAt("2016-03-23T18:48:42Z")
-                .link("self", Link.builder()
-                    .href("https://api.example.org/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82")
-                    .build())
-                .link("scale", Link.builder()
-                    .href("https://api.example.org/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82/actions/scale")
-                    .method("POST")
-                    .build())
-                .link("app", Link.builder()
-                    .href("https://api.example.org/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5")
-                    .build())
-                .link("space", Link.builder()
-                    .href("https://api.example.org/v3/spaces/2f35885d-0c9d-4423-83ad-fd05066f8576")
-                    .build())
-                .link("stats", Link.builder()
-                    .href("https://api.example.org/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82/stats")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .scale(
+                        ScaleProcessRequest.builder()
+                                .processId("test-process-id")
+                                .instances(5)
+                                .memoryInMb(256)
+                                .diskInMb(1_024)
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        ScaleProcessResponse.builder()
+                                .id("6a901b7c-9417-4dc1-8189-d3234aa0ab82")
+                                .type("web")
+                                .command("rackup")
+                                .instances(5)
+                                .memoryInMb(256)
+                                .diskInMb(1_024)
+                                .healthCheck(
+                                        HealthCheck.builder()
+                                                .type(HealthCheckType.PORT)
+                                                .data(
+                                                        Data.builder()
+                                                                .timeout(null)
+                                                                .endpoint(null)
+                                                                .build())
+                                                .build())
+                                .metadata(
+                                        Metadata.builder()
+                                                .annotations(Collections.emptyMap())
+                                                .labels(Collections.emptyMap())
+                                                .build())
+                                .relationships(ProcessRelationships.builder().build())
+                                .createdAt("2016-03-23T18:48:22Z")
+                                .updatedAt("2016-03-23T18:48:42Z")
+                                .link(
+                                        "self",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82")
+                                                .build())
+                                .link(
+                                        "scale",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82/actions/scale")
+                                                .method("POST")
+                                                .build())
+                                .link(
+                                        "app",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5")
+                                                .build())
+                                .link(
+                                        "space",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/spaces/2f35885d-0c9d-4423-83ad-fd05066f8576")
+                                                .build())
+                                .link(
+                                        "stats",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82/stats")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -409,52 +495,70 @@ final class ReactorProcessesTest extends AbstractClientApiTest {
             .build());
 
         this.processes
-            .update(UpdateProcessRequest.builder()
-                .processId("test-process-id")
-                .command("rackup")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(UpdateProcessResponse.builder()
-                .id("6a901b7c-9417-4dc1-8189-d3234aa0ab82")
-                .type("web")
-                .command("rackup")
-                .instances(5)
-                .memoryInMb(256)
-                .diskInMb(1_024)
-                .healthCheck(HealthCheck.builder()
-                    .type(HealthCheckType.PORT)
-                    .data(Data.builder()
-                        .timeout(null)
-                        .endpoint(null)
-                        .build())
-                    .build())
-                .metadata(Metadata.builder()
-                    .annotations(Collections.emptyMap())
-                    .labels(Collections.emptyMap())
-                    .build())
-                .relationships(ProcessRelationships.builder()
-                    .build())
-                .createdAt("2016-03-23T18:48:22Z")
-                .updatedAt("2016-03-23T18:48:42Z")
-                .link("self", Link.builder()
-                    .href("https://api.example.org/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82")
-                    .build())
-                .link("scale", Link.builder()
-                    .href("https://api.example.org/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82/actions/scale")
-                    .method("POST")
-                    .build())
-                .link("app", Link.builder()
-                    .href("https://api.example.org/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5")
-                    .build())
-                .link("space", Link.builder()
-                    .href("https://api.example.org/v3/spaces/2f35885d-0c9d-4423-83ad-fd05066f8576")
-                    .build())
-                .link("stats", Link.builder()
-                    .href("https://api.example.org/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82/stats")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .update(
+                        UpdateProcessRequest.builder()
+                                .processId("test-process-id")
+                                .command("rackup")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        UpdateProcessResponse.builder()
+                                .id("6a901b7c-9417-4dc1-8189-d3234aa0ab82")
+                                .type("web")
+                                .command("rackup")
+                                .instances(5)
+                                .memoryInMb(256)
+                                .diskInMb(1_024)
+                                .healthCheck(
+                                        HealthCheck.builder()
+                                                .type(HealthCheckType.PORT)
+                                                .data(
+                                                        Data.builder()
+                                                                .timeout(null)
+                                                                .endpoint(null)
+                                                                .build())
+                                                .build())
+                                .metadata(
+                                        Metadata.builder()
+                                                .annotations(Collections.emptyMap())
+                                                .labels(Collections.emptyMap())
+                                                .build())
+                                .relationships(ProcessRelationships.builder().build())
+                                .createdAt("2016-03-23T18:48:22Z")
+                                .updatedAt("2016-03-23T18:48:42Z")
+                                .link(
+                                        "self",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82")
+                                                .build())
+                                .link(
+                                        "scale",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82/actions/scale")
+                                                .method("POST")
+                                                .build())
+                                .link(
+                                        "app",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/ccc25a0f-c8f4-4b39-9f1b-de9f328d0ee5")
+                                                .build())
+                                .link(
+                                        "space",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/spaces/2f35885d-0c9d-4423-83ad-fd05066f8576")
+                                                .build())
+                                .link(
+                                        "stats",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/processes/6a901b7c-9417-4dc1-8189-d3234aa0ab82/stats")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
-
 }

@@ -55,10 +55,9 @@ final class UnmapExternalGroupByGroupDisplayNameRequestTest {
     @Test
     void valid() {
         UnmapExternalGroupByGroupDisplayNameRequest.builder()
-            .groupDisplayName("test-group-display-name")
-            .externalGroup("test-external-group")
-            .origin("test-origin")
-            .build();
+                .groupDisplayName("test-group-display-name")
+                .externalGroup("test-external-group")
+                .origin("test-origin")
+                .build();
     }
-
 }

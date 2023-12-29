@@ -36,5 +36,4 @@ final class DeleteIsolationSegmentRequestTest {
             .isolationSegmentId("test-id")
             .build();
     }
-
 }

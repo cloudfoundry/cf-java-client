@@ -34,10 +34,7 @@ final class CreateBuildRequestTest {
     @Test
     void valid() {
         CreateBuildRequest.builder()
-            .getPackage(Relationship.builder()
-                .id("test-id")
-                .build())
-            .build();
+                .getPackage(Relationship.builder().id("test-id").build())
+                .build();
     }
-
 }

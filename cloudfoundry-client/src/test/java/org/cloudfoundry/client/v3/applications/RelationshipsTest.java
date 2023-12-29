@@ -35,12 +35,10 @@ final class RelationshipsTest {
     @Test
     void valid() {
         ApplicationRelationships.builder()
-            .space(ToOneRelationship.builder()
-                .data(Relationship.builder()
-                    .id("test-id")
-                    .build())
-                .build())
-            .build();
+                .space(
+                        ToOneRelationship.builder()
+                                .data(Relationship.builder().id("test-id").build())
+                                .build())
+                .build();
     }
-
 }

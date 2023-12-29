@@ -43,10 +43,9 @@ final class ChangeSecretRequestTest {
     @Test
     void valid() {
         ChangeSecretRequest.builder()
-            .clientId("test-client-id")
-            .oldSecret("test-old-secret")
-            .secret("test-secret")
-            .build();
+                .clientId("test-client-id")
+                .oldSecret("test-old-secret")
+                .secret("test-secret")
+                .build();
     }
-
 }

@@ -21,6 +21,5 @@ import org.cloudfoundry.client.v2.Resource;
 /**
  * The base class for User Organization resources
  */
-public abstract class AbstractUserOrganizationResource extends Resource<org.cloudfoundry.client.v2.users.UserOrganizationEntity> {
-
-}
+public abstract class AbstractUserOrganizationResource
+        extends Resource<org.cloudfoundry.client.v2.users.UserOrganizationEntity> {}

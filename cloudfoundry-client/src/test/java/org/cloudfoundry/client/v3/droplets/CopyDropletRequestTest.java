@@ -51,15 +51,14 @@ final class CopyDropletRequestTest {
     @Test
     void valid() {
         CopyDropletRequest.builder()
-            .relationships(DropletRelationships.builder()
-                .application(ToOneRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("test-id")
-                        .build())
-                    .build())
-                .build())
-            .sourceDropletId("test-source-id")
-            .build();
+                .relationships(
+                        DropletRelationships.builder()
+                                .application(
+                                        ToOneRelationship.builder()
+                                                .data(Relationship.builder().id("test-id").build())
+                                                .build())
+                                .build())
+                .sourceDropletId("test-source-id")
+                .build();
     }
-
 }

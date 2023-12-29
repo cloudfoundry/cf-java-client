@@ -25,5 +25,4 @@ final class UpdateRunningEnvironmentVariablesRequestTest {
         UpdateRunningEnvironmentVariablesRequest.builder()
             .build();
     }
-
 }

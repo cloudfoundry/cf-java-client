@@ -43,9 +43,8 @@ final class CreatePrivateDomainRequestTest {
     @Test
     void valid() {
         CreatePrivateDomainRequest.builder()
-            .name("test-name")
-            .owningOrganizationId("test-owning-organization-id")
-            .build();
+                .name("test-name")
+                .owningOrganizationId("test-owning-organization-id")
+                .build();
     }
-
 }

@@ -37,18 +37,15 @@ final class AssignOrganizationDefaultIsolationSegmentRequestTest {
     @Test
     void validData() {
         AssignOrganizationDefaultIsolationSegmentRequest.builder()
-            .data(Relationship.builder()
-                .id("test-isolation-segment-id")
-                .build())
-            .organizationId("test-organization-id")
-            .build();
+                .data(Relationship.builder().id("test-isolation-segment-id").build())
+                .organizationId("test-organization-id")
+                .build();
     }
 
     @Test
     void validNoData() {
         AssignOrganizationDefaultIsolationSegmentRequest.builder()
-            .organizationId("test-organization-id")
-            .build();
+                .organizationId("test-organization-id")
+                .build();
     }
-
 }

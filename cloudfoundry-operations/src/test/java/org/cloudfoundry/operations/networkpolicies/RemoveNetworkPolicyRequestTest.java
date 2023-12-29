@@ -69,11 +69,10 @@ final class RemoveNetworkPolicyRequestTest {
     @Test
     void valid() {
         RemoveNetworkPolicyRequest.builder()
-            .destination("test-destination")
-            .protocol("test-protocol")
-            .startPort(1234)
-            .source("test-source")
-            .build();
+                .destination("test-destination")
+                .protocol("test-protocol")
+                .startPort(1234)
+                .source("test-source")
+                .build();
     }
-
 }

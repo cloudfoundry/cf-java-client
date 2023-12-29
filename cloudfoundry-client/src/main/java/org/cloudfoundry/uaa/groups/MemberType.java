@@ -61,5 +61,4 @@ public enum MemberType {
     public String toString() {
         return getValue();
     }
-
 }

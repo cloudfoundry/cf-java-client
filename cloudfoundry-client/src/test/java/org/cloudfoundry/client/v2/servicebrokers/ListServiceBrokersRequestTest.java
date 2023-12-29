@@ -26,5 +26,4 @@ final class ListServiceBrokersRequestTest {
         ListServiceBrokersRequest.builder()
             .build();
     }
-
 }

@@ -34,9 +34,9 @@ final class DeleteSecurityGroupRequestTest {
     @Test
     void validMax() {
         DeleteSecurityGroupRequest.builder()
-            .securityGroupId("test-security-group-id")
-            .async(true)
-            .build();
+                .securityGroupId("test-security-group-id")
+                .async(true)
+                .build();
     }
 
     @Test
@@ -45,5 +45,4 @@ final class DeleteSecurityGroupRequestTest {
             .securityGroupId("test-security-group-id")
             .build();
     }
-
 }

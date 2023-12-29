@@ -25,13 +25,14 @@ class UpdateServicePlanVisibilityTest {
     @Test
     void valid() {
         UpdateServicePlanVisibilityRequest.builder()
-            .servicePlanId("test-service-plan-id")
-            .type(Visibility.ORGANIZATION)
-            .organization(Organization.builder()
-                .name("test-organization")
-                .guid("test-organization-id")
-                .build())
-            .build();
+                .servicePlanId("test-service-plan-id")
+                .type(Visibility.ORGANIZATION)
+                .organization(
+                        Organization.builder()
+                                .name("test-organization")
+                                .guid("test-organization-id")
+                                .build())
+                .build();
     }
 
     @Test
@@ -46,5 +47,4 @@ class UpdateServicePlanVisibilityTest {
                 .build();
         });
     }
-
 }

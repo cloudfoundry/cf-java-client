@@ -36,5 +36,4 @@ final class StreamRequestTest {
             .applicationId("test-application-id")
             .build();
     }
-
 }

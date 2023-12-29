@@ -36,5 +36,4 @@ final class GetStackRequestTest {
             .name("test-stack-name")
             .build();
     }
-
 }

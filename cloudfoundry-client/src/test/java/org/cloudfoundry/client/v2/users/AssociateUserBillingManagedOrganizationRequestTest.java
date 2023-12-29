@@ -43,9 +43,8 @@ final class AssociateUserBillingManagedOrganizationRequestTest {
     @Test
     void valid() {
         AssociateUserBillingManagedOrganizationRequest.builder()
-            .billingManagedOrganizationId("test-managed-space-id")
-            .userId("test-user-id")
-            .build();
+                .billingManagedOrganizationId("test-managed-space-id")
+                .userId("test-user-id")
+                .build();
     }
-
 }

@@ -33,20 +33,16 @@ class DeletePoliciesRequestTest {
     @Test
     void valid() {
         DeletePoliciesRequest.builder()
-            .policy(Policy.builder()
-                .destination(Destination.builder()
-                    .id("test-destination-id")
-                    .ports(Ports.builder()
-                        .end(2)
-                        .start(1)
-                        .build())
-                    .protocol("test-protocol")
-                    .build())
-                .source(Source.builder()
-                    .id("test-source-id")
-                    .build())
-                .build())
-            .build();
+                .policy(
+                        Policy.builder()
+                                .destination(
+                                        Destination.builder()
+                                                .id("test-destination-id")
+                                                .ports(Ports.builder().end(2).start(1).build())
+                                                .protocol("test-protocol")
+                                                .build())
+                                .source(Source.builder().id("test-source-id").build())
+                                .build())
+                .build();
     }
-
 }

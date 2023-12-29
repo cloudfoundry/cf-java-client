@@ -63,18 +63,22 @@ final class CreateRouteRequestTest {
     @Test
     void valid() {
         CreateRouteRequest.builder()
-            .relationships(RouteRelationships.builder()
-                .domain(ToOneRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("test-domain-id")
-                        .build())
-                    .build())
-                .space(ToOneRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("test-space-id")
-                        .build())
-                    .build())
-                .build());
+                .relationships(
+                        RouteRelationships.builder()
+                                .domain(
+                                        ToOneRelationship.builder()
+                                                .data(
+                                                        Relationship.builder()
+                                                                .id("test-domain-id")
+                                                                .build())
+                                                .build())
+                                .space(
+                                        ToOneRelationship.builder()
+                                                .data(
+                                                        Relationship.builder()
+                                                                .id("test-space-id")
+                                                                .build())
+                                                .build())
+                                .build());
     }
-
 }

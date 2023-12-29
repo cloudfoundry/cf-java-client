@@ -33,8 +33,7 @@ final class UpdateSpaceQuotaDefinitionRequestTest {
     @Test
     void valid() {
         UpdateSpaceQuotaDefinitionRequest.builder()
-            .spaceQuotaDefinitionId("test-space-quota-definition-id")
-            .build();
+                .spaceQuotaDefinitionId("test-space-quota-definition-id")
+                .build();
     }
-
 }

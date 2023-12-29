@@ -70,11 +70,10 @@ final class SetSpaceRoleRequestTest {
     @Test
     void valid() {
         SetSpaceRoleRequest.builder()
-            .organizationName("test-organization")
-            .spaceName("test-space")
-            .spaceRole(SpaceRole.AUDITOR)
-            .username("test-username")
-            .build();
+                .organizationName("test-organization")
+                .spaceName("test-space")
+                .spaceRole(SpaceRole.AUDITOR)
+                .username("test-username")
+                .build();
     }
-
 }

@@ -38,5 +38,4 @@ final class CreateUserRequestTest {
             .uaaId("test-uaa-id")
             .build();
     }
-
 }

@@ -19,5 +19,4 @@ final class GetServiceBrokerRequestTest {
             GetServiceBrokerRequest.builder().build();
         });
     }
-    
 }

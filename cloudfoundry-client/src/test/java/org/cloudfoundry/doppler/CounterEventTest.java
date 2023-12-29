@@ -55,5 +55,4 @@ final class CounterEventTest {
             .name("test-name")
             .build();
     }
-
 }

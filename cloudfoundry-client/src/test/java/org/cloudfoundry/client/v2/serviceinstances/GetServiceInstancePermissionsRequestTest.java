@@ -34,8 +34,7 @@ final class GetServiceInstancePermissionsRequestTest {
     @Test
     void valid() {
         GetServiceInstancePermissionsRequest.builder()
-            .serviceInstanceId("test-service-instance-id")
-            .build();
+                .serviceInstanceId("test-service-instance-id")
+                .build();
     }
-
 }

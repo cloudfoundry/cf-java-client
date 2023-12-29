@@ -138,5 +138,4 @@ public interface CloudFoundryOperations {
      * @return the Cloud Foundry User Admin Operations API
      */
     UserAdmin userAdmin();
-
 }

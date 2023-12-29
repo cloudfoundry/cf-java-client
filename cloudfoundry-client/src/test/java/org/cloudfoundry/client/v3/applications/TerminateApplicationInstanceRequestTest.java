@@ -55,10 +55,9 @@ final class TerminateApplicationInstanceRequestTest {
     @Test
     void valid() {
         TerminateApplicationInstanceRequest.builder()
-            .applicationId("test-application-id")
-            .index("test-index")
-            .type("test-type")
-            .build();
+                .applicationId("test-application-id")
+                .index("test-index")
+                .type("test-type")
+                .build();
     }
-
 }

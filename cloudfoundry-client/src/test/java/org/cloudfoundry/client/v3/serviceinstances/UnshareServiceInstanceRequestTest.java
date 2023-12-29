@@ -43,9 +43,8 @@ class UnshareServiceInstanceRequestTest {
     @Test
     void valid() {
         UnshareServiceInstanceRequest.builder()
-            .serviceInstanceId("test-service-instance-id")
-            .spaceId("test-space-id")
-            .build();
+                .serviceInstanceId("test-service-instance-id")
+                .spaceId("test-space-id")
+                .build();
     }
-
 }

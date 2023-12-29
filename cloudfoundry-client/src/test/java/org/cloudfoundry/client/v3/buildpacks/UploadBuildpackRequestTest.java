@@ -48,9 +48,8 @@ final class UploadBuildpackRequestTest {
     @Test
     void valid() {
         UploadBuildpackRequest.builder()
-            .bits(TEST_BUILDPACK)
-            .buildpackId("test-buildpack-id")
-            .build();
+                .bits(TEST_BUILDPACK)
+                .buildpackId("test-buildpack-id")
+                .build();
     }
-
 }

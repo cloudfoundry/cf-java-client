@@ -59,5 +59,4 @@ public abstract class ServiceBinding extends Resource {
     @JsonProperty("metadata")
     @Nullable
     public abstract Metadata getMetadata();
-
 }

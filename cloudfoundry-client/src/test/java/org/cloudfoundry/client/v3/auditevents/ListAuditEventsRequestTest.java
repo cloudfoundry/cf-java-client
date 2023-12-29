@@ -34,11 +34,11 @@ class ListAuditEventsRequestTest {
     @Test
     void valid() {
         ListAuditEventsRequest.builder()
-            .organizationIds("organization-id-1", "organization-id-2")
-            .type("test-type")
-            .orderBy("nothing")
-            .targetId("test-target-id")
-            .build();
+                .organizationIds("organization-id-1", "organization-id-2")
+                .type("test-type")
+                .orderBy("nothing")
+                .targetId("test-target-id")
+                .build();
     }
 
     @Test

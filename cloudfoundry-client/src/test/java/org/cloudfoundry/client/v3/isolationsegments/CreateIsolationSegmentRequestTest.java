@@ -36,5 +36,4 @@ final class CreateIsolationSegmentRequestTest {
             .name("test-name")
             .build();
     }
-
 }

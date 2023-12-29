@@ -45,5 +45,4 @@ public abstract class Stack extends Resource {
     @JsonProperty("metadata")
     @Nullable
     public abstract Metadata getMetadata();
-
 }

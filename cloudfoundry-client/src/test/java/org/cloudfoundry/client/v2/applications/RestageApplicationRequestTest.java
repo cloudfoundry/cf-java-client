@@ -36,5 +36,4 @@ final class RestageApplicationRequestTest {
             .applicationId("test-application-id")
             .build();
     }
-
 }

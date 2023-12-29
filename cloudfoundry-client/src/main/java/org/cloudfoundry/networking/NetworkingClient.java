@@ -33,5 +33,4 @@ public interface NetworkingClient {
      * Main entry point to the Tags API
      */
     Tags tags();
-
 }

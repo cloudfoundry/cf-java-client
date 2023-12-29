@@ -36,5 +36,4 @@ final class ListMembersRequestTest {
             .groupId("test-group-id")
             .build();
     }
-
 }

@@ -36,5 +36,4 @@ final class UpdateProcessRequestTest {
             .processId("test-process-id")
             .build();
     }
-
 }

@@ -44,9 +44,8 @@ final class UnbindServiceInstanceRouteRequestTest {
     @Test
     void valid() {
         UnbindServiceInstanceRouteRequest.builder()
-            .serviceInstanceId("test-service-instance-id")
-            .routeId("test-route-id")
-            .build();
+                .serviceInstanceId("test-service-instance-id")
+                .routeId("test-route-id")
+                .build();
     }
-
 }

@@ -58,5 +58,4 @@ public abstract class Organization extends Resource {
     @JsonProperty("suspended")
     @Nullable
     public abstract Boolean getSuspended();
-
 }

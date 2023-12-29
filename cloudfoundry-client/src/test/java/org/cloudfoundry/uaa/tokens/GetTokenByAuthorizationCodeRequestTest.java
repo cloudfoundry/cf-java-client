@@ -55,10 +55,9 @@ final class GetTokenByAuthorizationCodeRequestTest {
     @Test
     void valid() {
         GetTokenByAuthorizationCodeRequest.builder()
-            .authorizationCode("test-authorization-code")
-            .clientId("test-client-id")
-            .clientSecret("test-client-secret")
-            .build();
+                .authorizationCode("test-authorization-code")
+                .clientId("test-client-id")
+                .clientSecret("test-client-secret")
+                .build();
     }
-
 }

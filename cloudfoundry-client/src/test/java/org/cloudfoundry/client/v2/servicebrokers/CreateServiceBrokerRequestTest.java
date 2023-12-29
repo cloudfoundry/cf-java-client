@@ -69,11 +69,10 @@ final class CreateServiceBrokerRequestTest {
     @Test
     void valid() {
         CreateServiceBrokerRequest.builder()
-            .name("name")
-            .authenticationPassword("password")
-            .authenticationUsername("username")
-            .brokerUrl("http://somewhere-over-the-rainbow.org")
-            .build();
+                .name("name")
+                .authenticationPassword("password")
+                .authenticationUsername("username")
+                .brokerUrl("http://somewhere-over-the-rainbow.org")
+                .build();
     }
-
 }

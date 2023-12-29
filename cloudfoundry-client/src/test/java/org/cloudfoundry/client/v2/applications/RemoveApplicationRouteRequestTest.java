@@ -43,9 +43,8 @@ final class RemoveApplicationRouteRequestTest {
     @Test
     void valid() {
         RemoveApplicationRouteRequest.builder()
-            .applicationId("test-application-id")
-            .routeId("test-route-id")
-            .build();
+                .applicationId("test-application-id")
+                .routeId("test-route-id")
+                .build();
     }
-
 }

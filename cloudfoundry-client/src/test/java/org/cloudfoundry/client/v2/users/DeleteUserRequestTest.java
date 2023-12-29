@@ -37,5 +37,4 @@ final class DeleteUserRequestTest {
             .userId("test-user-id")
             .build();
     }
-
 }

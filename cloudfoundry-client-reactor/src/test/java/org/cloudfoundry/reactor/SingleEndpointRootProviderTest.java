@@ -23,28 +23,26 @@ import java.time.Duration;
 
 final class SingleEndpointRootProviderTest extends AbstractRestTest {
 
-    private final SingleEndpointRootProvider rootProvider = SingleEndpointRootProvider.builder()
-        .apiHost("localhost")
-        .build();
+    private final SingleEndpointRootProvider rootProvider =
+            SingleEndpointRootProvider.builder().apiHost("localhost").build();
 
     @Test
     void getRoot() {
         this.rootProvider
-            .getRoot(CONNECTION_CONTEXT)
-            .as(StepVerifier::create)
-            .expectNext("https://localhost:443")
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .getRoot(CONNECTION_CONTEXT)
+                .as(StepVerifier::create)
+                .expectNext("https://localhost:443")
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
     void getRootKey() {
         this.rootProvider
-            .getRoot(null, CONNECTION_CONTEXT)
-            .as(StepVerifier::create)
-            .expectNext("https://localhost:443")
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .getRoot(null, CONNECTION_CONTEXT)
+                .as(StepVerifier::create)
+                .expectNext("https://localhost:443")
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
-
 }

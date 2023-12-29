@@ -17,13 +17,12 @@
 package org.cloudfoundry.client.v3.domains;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
 import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.Resource;
 import org.cloudfoundry.client.v3.routes.Protocol;
-
-import java.util.List;
 
 public abstract class Domain extends Resource {
 
@@ -67,5 +66,4 @@ public abstract class Domain extends Resource {
      */
     @JsonProperty("internal")
     public abstract boolean isInternal();
-
 }

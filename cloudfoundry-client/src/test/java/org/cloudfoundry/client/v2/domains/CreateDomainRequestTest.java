@@ -48,5 +48,4 @@ final class CreateDomainRequestTest {
             .wildcard(true)
             .build();
     }
-
 }

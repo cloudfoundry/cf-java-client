@@ -35,10 +35,10 @@ final class AuthorizeByOpenIdWithImplicitGrantRequestTest {
     @Test
     void validMax() {
         AuthorizeByOpenIdWithImplicitGrantRequest.builder()
-            .clientId("test-client-id")
-            .redirectUri("http://redirect.to/app")
-            .scope("test-scope")
-            .build();
+                .clientId("test-client-id")
+                .redirectUri("http://redirect.to/app")
+                .scope("test-scope")
+                .build();
     }
 
     @Test
@@ -47,5 +47,4 @@ final class AuthorizeByOpenIdWithImplicitGrantRequestTest {
             .clientId("test-client-id")
             .build();
     }
-
 }

@@ -35,12 +35,11 @@ class UpdateBuildpackRequestTest {
     @Test
     void valid() {
         UpdateBuildpackRequest.builder()
-            .buildpack(Paths.get("test-buildpack"))
-            .enable(false)
-            .lock(true)
-            .name("test-name")
-            .position(0)
-            .build();
+                .buildpack(Paths.get("test-buildpack"))
+                .enable(false)
+                .lock(true)
+                .name("test-name")
+                .position(0)
+                .build();
     }
-
 }

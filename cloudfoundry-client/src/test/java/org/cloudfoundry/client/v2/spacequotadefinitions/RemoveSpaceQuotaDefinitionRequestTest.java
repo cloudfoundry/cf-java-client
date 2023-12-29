@@ -43,9 +43,8 @@ final class RemoveSpaceQuotaDefinitionRequestTest {
     @Test
     void valid() {
         RemoveSpaceQuotaDefinitionRequest.builder()
-            .spaceId("test-space-id")
-            .spaceQuotaDefinitionId("test-space-quota-definition-id")
-            .build();
+                .spaceId("test-space-id")
+                .spaceQuotaDefinitionId("test-space-quota-definition-id")
+                .build();
     }
-
 }

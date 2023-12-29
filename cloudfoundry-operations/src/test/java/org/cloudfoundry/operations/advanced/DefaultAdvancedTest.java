@@ -16,6 +16,9 @@
 
 package org.cloudfoundry.operations.advanced;
 
+import static org.mockito.Mockito.when;
+
+import java.time.Duration;
 import org.cloudfoundry.operations.AbstractOperationsTest;
 import org.cloudfoundry.uaa.UaaClient;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByAuthorizationCodeGrantApiRequest;
@@ -23,9 +26,6 @@ import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.time.Duration;
-
-import static org.mockito.Mockito.when;
 
 final class DefaultAdvancedTest extends AbstractOperationsTest {
 
@@ -36,19 +36,20 @@ final class DefaultAdvancedTest extends AbstractOperationsTest {
         requestAuthorizeByAuthorizationCodeGrantApi(this.uaaClient);
 
         this.advanced
-            .sshCode()
-            .as(StepVerifier::create)
-            .expectNext("test-code")
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .sshCode()
+                .as(StepVerifier::create)
+                .expectNext("test-code")
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     private static void requestAuthorizeByAuthorizationCodeGrantApi(UaaClient uaaClient) {
-        when(uaaClient.authorizations()
-            .authorizationCodeGrantApi(AuthorizeByAuthorizationCodeGrantApiRequest.builder()
-                .clientId("ssh-proxy")
-                .build()))
-            .thenReturn(Mono.just("test-code"));
+        when(uaaClient
+                        .authorizations()
+                        .authorizationCodeGrantApi(
+                                AuthorizeByAuthorizationCodeGrantApiRequest.builder()
+                                        .clientId("ssh-proxy")
+                                        .build()))
+                .thenReturn(Mono.just("test-code"));
     }
-
 }

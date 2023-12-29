@@ -158,5 +158,4 @@ public interface Services {
      * @return a completion indicator
      */
     Mono<Void> updateUserProvidedInstance(UpdateUserProvidedServiceInstanceRequest request);
-
 }

@@ -33,8 +33,7 @@ final class GetServiceInstanceParametersRequestTest {
     @Test
     void valid() {
         GetServiceInstanceParametersRequest.builder()
-            .serviceInstanceId("test-service-instance-id")
-            .build();
+                .serviceInstanceId("test-service-instance-id")
+                .build();
     }
-
 }

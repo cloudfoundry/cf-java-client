@@ -36,5 +36,4 @@ final class DeleteQuotaRequestTest {
             .name("test-quota")
             .build();
     }
-
 }

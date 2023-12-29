@@ -25,5 +25,4 @@ final class UserInfoRequestTest {
         UserInfoRequest.builder()
             .build();
     }
-
 }

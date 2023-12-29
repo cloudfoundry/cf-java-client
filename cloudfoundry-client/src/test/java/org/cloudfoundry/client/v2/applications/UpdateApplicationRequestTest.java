@@ -36,5 +36,4 @@ final class UpdateApplicationRequestTest {
             .applicationId("test-application-id")
             .build();
     }
-
 }

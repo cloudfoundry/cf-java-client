@@ -16,6 +16,10 @@
 
 package org.cloudfoundry.reactor.routing.v1.tcproutes;
 
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+
+import java.time.Duration;
 import org.cloudfoundry.reactor.AbstractRestTest;
 import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
@@ -27,10 +31,6 @@ import reactor.netty.Connection;
 import reactor.netty.http.client.HttpClientResponse;
 import reactor.test.StepVerifier;
 
-import java.time.Duration;
-
-import static io.netty.handler.codec.http.HttpMethod.GET;
-import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 final class EventStreamCodecTest extends AbstractRestTest {
 
@@ -47,23 +47,21 @@ final class EventStreamCodecTest extends AbstractRestTest {
                 .build())
             .build());
 
-        CONNECTION_CONTEXT.getHttpClient()
-            .get()
-            .uri(this.root.block())
-            .responseConnection(EventStreamCodecTest::toEventsFlux)
-            .as(StepVerifier::create)
-            .expectNext(ServerSentEvent.builder()
-                .data("This is the first message.")
-                .build())
-            .expectNext(ServerSentEvent.builder()
-                .data("This is the second message, it")
-                .data("has two lines.")
-                .build())
-            .expectNext(ServerSentEvent.builder()
-                .data("This is the third message.")
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+        CONNECTION_CONTEXT
+                .getHttpClient()
+                .get()
+                .uri(this.root.block())
+                .responseConnection(EventStreamCodecTest::toEventsFlux)
+                .as(StepVerifier::create)
+                .expectNext(ServerSentEvent.builder().data("This is the first message.").build())
+                .expectNext(
+                        ServerSentEvent.builder()
+                                .data("This is the second message, it")
+                                .data("has two lines.")
+                                .build())
+                .expectNext(ServerSentEvent.builder().data("This is the third message.").build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -79,19 +77,16 @@ final class EventStreamCodecTest extends AbstractRestTest {
                 .build())
             .build());
 
-        CONNECTION_CONTEXT.getHttpClient()
-            .get()
-            .uri(this.root.block())
-            .responseConnection(EventStreamCodecTest::toEventsFlux)
-            .as(StepVerifier::create)
-            .expectNext(ServerSentEvent.builder()
-                .data("test")
-                .build())
-            .expectNext(ServerSentEvent.builder()
-                .data("test")
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+        CONNECTION_CONTEXT
+                .getHttpClient()
+                .get()
+                .uri(this.root.block())
+                .responseConnection(EventStreamCodecTest::toEventsFlux)
+                .as(StepVerifier::create)
+                .expectNext(ServerSentEvent.builder().data("test").build())
+                .expectNext(ServerSentEvent.builder().data("test").build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -107,20 +102,16 @@ final class EventStreamCodecTest extends AbstractRestTest {
                 .build())
             .build());
 
-        CONNECTION_CONTEXT.getHttpClient()
-            .get()
-            .uri(this.root.block())
-            .responseConnection(EventStreamCodecTest::toEventsFlux)
-            .as(StepVerifier::create)
-            .expectNext(ServerSentEvent.builder()
-                .data("")
-                .build())
-            .expectNext(ServerSentEvent.builder()
-                .data("")
-                .data("")
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+        CONNECTION_CONTEXT
+                .getHttpClient()
+                .get()
+                .uri(this.root.block())
+                .responseConnection(EventStreamCodecTest::toEventsFlux)
+                .as(StepVerifier::create)
+                .expectNext(ServerSentEvent.builder().data("").build())
+                .expectNext(ServerSentEvent.builder().data("").data("").build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -136,18 +127,15 @@ final class EventStreamCodecTest extends AbstractRestTest {
                 .build())
             .build());
 
-        CONNECTION_CONTEXT.getHttpClient()
-            .get()
-            .uri(this.root.block())
-            .responseConnection(EventStreamCodecTest::toEventsFlux)
-            .as(StepVerifier::create)
-            .expectNext(ServerSentEvent.builder()
-                .data("YHOO")
-                .data("+2")
-                .data("10")
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+        CONNECTION_CONTEXT
+                .getHttpClient()
+                .get()
+                .uri(this.root.block())
+                .responseConnection(EventStreamCodecTest::toEventsFlux)
+                .as(StepVerifier::create)
+                .expectNext(ServerSentEvent.builder().data("YHOO").data("+2").data("10").build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -163,24 +151,17 @@ final class EventStreamCodecTest extends AbstractRestTest {
                 .build())
             .build());
 
-        CONNECTION_CONTEXT.getHttpClient()
-            .get()
-            .uri(this.root.block())
-            .responseConnection(EventStreamCodecTest::toEventsFlux)
-            .as(StepVerifier::create)
-            .expectNext(ServerSentEvent.builder()
-                .id("1")
-                .data("first event")
-                .build())
-            .expectNext(ServerSentEvent.builder()
-                .id("")
-                .data("second event")
-                .build())
-            .expectNext(ServerSentEvent.builder()
-                .data(" third event")
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+        CONNECTION_CONTEXT
+                .getHttpClient()
+                .get()
+                .uri(this.root.block())
+                .responseConnection(EventStreamCodecTest::toEventsFlux)
+                .as(StepVerifier::create)
+                .expectNext(ServerSentEvent.builder().id("1").data("first event").build())
+                .expectNext(ServerSentEvent.builder().id("").data("second event").build())
+                .expectNext(ServerSentEvent.builder().data(" third event").build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -196,32 +177,24 @@ final class EventStreamCodecTest extends AbstractRestTest {
                 .build())
             .build());
 
-        CONNECTION_CONTEXT.getHttpClient()
-            .get()
-            .uri(this.root.block())
-            .responseConnection(EventStreamCodecTest::toEventsFlux)
-            .as(StepVerifier::create)
-            .expectNext(ServerSentEvent.builder()
-                .eventType("add")
-                .data("73857293")
-                .build())
-            .expectNext(ServerSentEvent.builder()
-                .eventType("remove")
-                .data("2153")
-                .build())
-            .expectNext(ServerSentEvent.builder()
-                .eventType("add")
-                .data("113411")
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+        CONNECTION_CONTEXT
+                .getHttpClient()
+                .get()
+                .uri(this.root.block())
+                .responseConnection(EventStreamCodecTest::toEventsFlux)
+                .as(StepVerifier::create)
+                .expectNext(ServerSentEvent.builder().eventType("add").data("73857293").build())
+                .expectNext(ServerSentEvent.builder().eventType("remove").data("2153").build())
+                .expectNext(ServerSentEvent.builder().eventType("add").data("113411").build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
-    private static Flux<ServerSentEvent> toEventsFlux(HttpClientResponse response, Connection connection) {
-        connection.addHandler(EventStreamCodec.createDecoder(response));
+    private static Flux<ServerSentEvent> toEventsFlux(
+            HttpClientResponse response, Connection connection) {
+        connection.addHandlerLast(EventStreamCodec.createDecoder(response));
         ByteBufFlux body = connection.inbound().receive();
 
         return EventStreamCodec.decode(body);
     }
-
 }

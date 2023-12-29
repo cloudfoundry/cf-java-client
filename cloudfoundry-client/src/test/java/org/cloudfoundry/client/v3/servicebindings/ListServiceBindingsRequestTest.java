@@ -25,5 +25,4 @@ final class ListServiceBindingsRequestTest {
         ListServiceBindingsRequest.builder()
             .build();
     }
-
 }

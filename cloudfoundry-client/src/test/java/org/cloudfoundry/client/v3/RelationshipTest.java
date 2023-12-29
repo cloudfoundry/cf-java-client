@@ -36,5 +36,4 @@ final class RelationshipTest {
             .id("test-id")
             .build();
     }
-
 }

@@ -55,10 +55,9 @@ final class CreateServiceInstanceRequestTest {
     @Test
     void valid() {
         CreateServiceInstanceRequest.builder()
-            .planName("test-plan-name")
-            .serviceName("test-service-name")
-            .serviceInstanceName("test-service-instance-name")
-            .build();
+                .planName("test-plan-name")
+                .serviceName("test-service-name")
+                .serviceInstanceName("test-service-instance-name")
+                .build();
     }
-
 }

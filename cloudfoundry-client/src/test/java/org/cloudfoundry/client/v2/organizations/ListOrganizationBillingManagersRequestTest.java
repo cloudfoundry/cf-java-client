@@ -33,8 +33,7 @@ final class ListOrganizationBillingManagersRequestTest {
     @Test
     void valid() {
         ListOrganizationBillingManagersRequest.builder()
-            .organizationId("test-organization-id")
-            .build();
+                .organizationId("test-organization-id")
+                .build();
     }
-
 }

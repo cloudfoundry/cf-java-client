@@ -36,6 +36,4 @@ class ReadRequestTest {
             .sourceId("test")
             .build();
     }
-
-
 }

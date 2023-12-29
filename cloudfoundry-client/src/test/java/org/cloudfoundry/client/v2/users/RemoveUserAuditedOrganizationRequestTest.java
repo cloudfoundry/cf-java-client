@@ -43,9 +43,8 @@ final class RemoveUserAuditedOrganizationRequestTest {
     @Test
     void valid() {
         RemoveUserAuditedOrganizationRequest.builder()
-            .auditedOrganizationId("test-space-id")
-            .userId("test-user-id")
-            .build();
+                .auditedOrganizationId("test-space-id")
+                .userId("test-user-id")
+                .build();
     }
-
 }

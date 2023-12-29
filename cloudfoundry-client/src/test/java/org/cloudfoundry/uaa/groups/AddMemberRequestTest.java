@@ -69,11 +69,10 @@ final class AddMemberRequestTest {
     @Test
     void valid() {
         AddMemberRequest.builder()
-            .groupId("test-group-id")
-            .memberId("test-member-id")
-            .origin("test-origin")
-            .type(MemberType.USER)
-            .build();
+                .groupId("test-group-id")
+                .memberId("test-member-id")
+                .origin("test-origin")
+                .type(MemberType.USER)
+                .build();
     }
-
 }

@@ -37,5 +37,4 @@ final class DeleteServicePlanRequestTest {
             .servicePlanId("test-id")
             .build();
     }
-
 }

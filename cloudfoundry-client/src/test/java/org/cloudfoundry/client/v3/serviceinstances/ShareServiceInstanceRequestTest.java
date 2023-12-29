@@ -37,11 +37,8 @@ class ShareServiceInstanceRequestTest {
     @Test
     void valid() {
         ShareServiceInstanceRequest.builder()
-            .serviceInstanceId("test-service-instance-id")
-            .data(Relationship.builder()
-                .id("test-space-id")
-                .build())
-            .build();
+                .serviceInstanceId("test-service-instance-id")
+                .data(Relationship.builder().id("test-space-id").build())
+                .build();
     }
-
 }

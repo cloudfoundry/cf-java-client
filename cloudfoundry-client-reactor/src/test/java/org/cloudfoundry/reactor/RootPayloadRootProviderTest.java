@@ -26,21 +26,22 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 final class RootPayloadRootProviderTest extends AbstractRestTest {
 
-    private final RootPayloadRootProvider rootProvider = RootPayloadRootProvider.builder()
-        .apiHost("localhost")
-        .port(this.mockWebServer.getPort())
-        .secure(false)
-        .objectMapper(CONNECTION_CONTEXT.getObjectMapper())
-        .build();
+    private final RootPayloadRootProvider rootProvider =
+            RootPayloadRootProvider.builder()
+                    .apiHost("localhost")
+                    .port(this.mockWebServer.getPort())
+                    .secure(false)
+                    .objectMapper(CONNECTION_CONTEXT.getObjectMapper())
+                    .build();
 
     @Test
     void getRoot() {
         this.rootProvider
-            .getRoot(CONNECTION_CONTEXT)
-            .as(StepVerifier::create)
-            .expectNext(String.format("http://localhost:%d", this.mockWebServer.getPort()))
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .getRoot(CONNECTION_CONTEXT)
+                .as(StepVerifier::create)
+                .expectNext(String.format("http://localhost:%d", this.mockWebServer.getPort()))
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -56,11 +57,13 @@ final class RootPayloadRootProviderTest extends AbstractRestTest {
             .build());
 
         this.rootProvider
-            .getRoot("cloud_controller_v2", CONNECTION_CONTEXT)
-            .as(StepVerifier::create)
-            .expectNext(String.format("http://api.run.pivotal.io:%d/v2", this.mockWebServer.getPort()))
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .getRoot("cloud_controller_v2", CONNECTION_CONTEXT)
+                .as(StepVerifier::create)
+                .expectNext(
+                        String.format(
+                                "http://api.run.pivotal.io:%d/v2", this.mockWebServer.getPort()))
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -76,10 +79,9 @@ final class RootPayloadRootProviderTest extends AbstractRestTest {
             .build());
 
         this.rootProvider
-            .getRoot("invalid-key", CONNECTION_CONTEXT)
-            .as(StepVerifier::create)
-            .expectError(IllegalArgumentException.class)
-            .verify(Duration.ofSeconds(5));
+                .getRoot("invalid-key", CONNECTION_CONTEXT)
+                .as(StepVerifier::create)
+                .expectError(IllegalArgumentException.class)
+                .verify(Duration.ofSeconds(5));
     }
-
 }

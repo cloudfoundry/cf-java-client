@@ -64,5 +64,4 @@ class MetadataTest {
             .oldestTimestamp(1L)
             .build();
     }
-
 }

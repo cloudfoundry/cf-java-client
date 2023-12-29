@@ -43,10 +43,9 @@ final class AssociateUserProvidedServiceInstanceRouteRequestTest {
     @Test
     void valid() {
         AssociateUserProvidedServiceInstanceRouteRequest.builder()
-            .parameter("test-key", "test-value")
-            .routeId("test-route-id")
-            .userProvidedServiceInstanceId("test-user-provided-service-instance-id")
-            .build();
+                .parameter("test-key", "test-value")
+                .routeId("test-route-id")
+                .userProvidedServiceInstanceId("test-user-provided-service-instance-id")
+                .build();
     }
-
 }

@@ -33,8 +33,7 @@ final class ListOrganizationPrivateDomainsRequestTest {
     @Test
     void valid() {
         ListOrganizationPrivateDomainsRequest.builder()
-            .organizationId("test-organization-id")
-            .build();
+                .organizationId("test-organization-id")
+                .build();
     }
-
 }

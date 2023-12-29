@@ -36,5 +36,4 @@ final class UpdateRouteRequestTest {
             .routeId("test-route-id")
             .build();
     }
-
 }

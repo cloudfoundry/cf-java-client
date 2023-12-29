@@ -25,5 +25,4 @@ final class PurgeAndReseedServiceUsageEventsRequestTest {
         PurgeAndReseedServiceUsageEventsRequest.builder()
             .build();
     }
-
 }

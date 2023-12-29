@@ -36,5 +36,4 @@ final class VerifyUserRequestTest {
             .userId("test-user-id")
             .build();
     }
-
 }

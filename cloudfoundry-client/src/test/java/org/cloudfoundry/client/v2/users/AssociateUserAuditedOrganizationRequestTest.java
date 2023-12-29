@@ -43,9 +43,8 @@ final class AssociateUserAuditedOrganizationRequestTest {
     @Test
     void valid() {
         AssociateUserAuditedOrganizationRequest.builder()
-            .auditedOrganizationId("test-managed-space-id")
-            .userId("test-user-id")
-            .build();
+                .auditedOrganizationId("test-managed-space-id")
+                .userId("test-user-id")
+                .build();
     }
-
 }

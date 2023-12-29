@@ -26,21 +26,22 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 final class InfoPayloadRootProviderTest extends AbstractRestTest {
 
-    private final InfoPayloadRootProvider rootProvider = InfoPayloadRootProvider.builder()
-        .apiHost("localhost")
-        .port(this.mockWebServer.getPort())
-        .secure(false)
-        .objectMapper(CONNECTION_CONTEXT.getObjectMapper())
-        .build();
+    private final InfoPayloadRootProvider rootProvider =
+            InfoPayloadRootProvider.builder()
+                    .apiHost("localhost")
+                    .port(this.mockWebServer.getPort())
+                    .secure(false)
+                    .objectMapper(CONNECTION_CONTEXT.getObjectMapper())
+                    .build();
 
     @Test
     void getRoot() {
         this.rootProvider
-            .getRoot(CONNECTION_CONTEXT)
-            .as(StepVerifier::create)
-            .expectNext(String.format("http://localhost:%d", this.mockWebServer.getPort()))
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .getRoot(CONNECTION_CONTEXT)
+                .as(StepVerifier::create)
+                .expectNext(String.format("http://localhost:%d", this.mockWebServer.getPort()))
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -56,11 +57,11 @@ final class InfoPayloadRootProviderTest extends AbstractRestTest {
             .build());
 
         this.rootProvider
-            .getRoot("authorization_endpoint", CONNECTION_CONTEXT)
-            .as(StepVerifier::create)
-            .expectNext("http://localhost:8080/uaa")
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .getRoot("authorization_endpoint", CONNECTION_CONTEXT)
+                .as(StepVerifier::create)
+                .expectNext("http://localhost:8080/uaa")
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -76,10 +77,9 @@ final class InfoPayloadRootProviderTest extends AbstractRestTest {
             .build());
 
         this.rootProvider
-            .getRoot("invalid-key", CONNECTION_CONTEXT)
-            .as(StepVerifier::create)
-            .expectError(IllegalArgumentException.class)
-            .verify(Duration.ofSeconds(5));
+                .getRoot("invalid-key", CONNECTION_CONTEXT)
+                .as(StepVerifier::create)
+                .expectError(IllegalArgumentException.class)
+                .verify(Duration.ofSeconds(5));
     }
-
 }

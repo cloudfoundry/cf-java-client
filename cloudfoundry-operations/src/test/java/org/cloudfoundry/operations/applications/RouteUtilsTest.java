@@ -32,48 +32,32 @@ class RouteUtilsTest {
     @Test
     void complexHit() {
         List<DomainSummary> availableDomains = new ArrayList<>();
-        availableDomains.add(DomainSummary.builder()
-            .id("1")
-            .name("test.com")
-            .build());
-        availableDomains.add(DomainSummary.builder()
-            .id("2")
-            .name("test.test.com")
-            .build());
+        availableDomains.add(DomainSummary.builder().id("1").name("test.com").build());
+        availableDomains.add(DomainSummary.builder().id("2").name("test.test.com").build());
 
-        DecomposedRoute expected = DecomposedRoute.builder()
-            .domain("test.test.com")
-            .build();
+        DecomposedRoute expected = DecomposedRoute.builder().domain("test.test.com").build();
 
         RouteUtils.decomposeRoute(availableDomains, "test.test.com", null)
-            .as(StepVerifier::create)
-            .expectNext(expected)
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .as(StepVerifier::create)
+                .expectNext(expected)
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
     void complexPathHit() {
         List<DomainSummary> availableDomains = new ArrayList<>();
-        availableDomains.add(DomainSummary.builder()
-            .id("1")
-            .name("test.com")
-            .build());
-        availableDomains.add(DomainSummary.builder()
-            .id("2")
-            .name("test.test.com")
-            .build());
+        availableDomains.add(DomainSummary.builder().id("1").name("test.com").build());
+        availableDomains.add(DomainSummary.builder().id("2").name("test.test.com").build());
 
-        DecomposedRoute expected = DecomposedRoute.builder()
-            .domain("test.test.com")
-            .path("/path")
-            .build();
+        DecomposedRoute expected =
+                DecomposedRoute.builder().domain("test.test.com").path("/path").build();
 
         RouteUtils.decomposeRoute(availableDomains, "test.test.com/path", null)
-            .as(StepVerifier::create)
-            .expectNext(expected)
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .as(StepVerifier::create)
+                .expectNext(expected)
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -155,97 +139,64 @@ class RouteUtilsTest {
     @Test
     void routeDecompositionPathHit() {
         List<DomainSummary> availableDomains = new ArrayList<>();
-        availableDomains.add(DomainSummary.builder()
-            .id("1")
-            .name("test.com")
-            .build());
-        availableDomains.add(DomainSummary.builder()
-            .id("2")
-            .name("test.test.com")
-            .build());
+        availableDomains.add(DomainSummary.builder().id("1").name("test.com").build());
+        availableDomains.add(DomainSummary.builder().id("2").name("test.test.com").build());
 
-        DecomposedRoute expected = DecomposedRoute.builder()
-            .domain("test.com")
-            .path("/path")
-            .build();
+        DecomposedRoute expected =
+                DecomposedRoute.builder().domain("test.com").path("/path").build();
 
         RouteUtils.decomposeRoute(availableDomains, "test.com/path", null)
-            .as(StepVerifier::create)
-            .expectNext(expected)
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .as(StepVerifier::create)
+                .expectNext(expected)
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
     void simpleHit() {
         List<DomainSummary> availableDomains = new ArrayList<>();
-        availableDomains.add(DomainSummary.builder()
-            .id("1")
-            .name("test.com")
-            .build());
-        availableDomains.add(DomainSummary.builder()
-            .id("2")
-            .name("test.test.com")
-            .build());
+        availableDomains.add(DomainSummary.builder().id("1").name("test.com").build());
+        availableDomains.add(DomainSummary.builder().id("2").name("test.test.com").build());
 
-        DecomposedRoute expected = DecomposedRoute.builder()
-            .domain("test.com")
-            .build();
+        DecomposedRoute expected = DecomposedRoute.builder().domain("test.com").build();
 
         RouteUtils.decomposeRoute(availableDomains, "test.com", null)
-            .as(StepVerifier::create)
-            .expectNext(expected)
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .as(StepVerifier::create)
+                .expectNext(expected)
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
     void simpleHostHit() {
         List<DomainSummary> availableDomains = new ArrayList<>();
-        availableDomains.add(DomainSummary.builder()
-            .id("1")
-            .name("test.com")
-            .build());
-        availableDomains.add(DomainSummary.builder()
-            .id("2")
-            .name("test.test.com")
-            .build());
+        availableDomains.add(DomainSummary.builder().id("1").name("test.com").build());
+        availableDomains.add(DomainSummary.builder().id("2").name("test.test.com").build());
 
-        DecomposedRoute expected = DecomposedRoute.builder()
-            .domain("test.com")
-            .host("host")
-            .build();
+        DecomposedRoute expected =
+                DecomposedRoute.builder().domain("test.com").host("host").build();
 
         RouteUtils.decomposeRoute(availableDomains, "host.test.com", null)
-            .as(StepVerifier::create)
-            .expectNext(expected)
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .as(StepVerifier::create)
+                .expectNext(expected)
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
     void simpleHostPathHit() {
         List<DomainSummary> availableDomains = new ArrayList<>();
-        availableDomains.add(DomainSummary.builder()
-            .id("1")
-            .name("test.com")
-            .build());
-        availableDomains.add(DomainSummary.builder()
-            .id("2")
-            .name("test.test.com")
-            .build());
+        availableDomains.add(DomainSummary.builder().id("1").name("test.com").build());
+        availableDomains.add(DomainSummary.builder().id("2").name("test.test.com").build());
 
-        DecomposedRoute expected = DecomposedRoute.builder()
-            .domain("test.com")
-            .host("host")
-            .path("/path")
-            .build();
+        DecomposedRoute expected =
+                DecomposedRoute.builder().domain("test.com").host("host").path("/path").build();
 
         RouteUtils.decomposeRoute(availableDomains, "host.test.com/path", null)
-            .as(StepVerifier::create)
-            .expectNext(expected)
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .as(StepVerifier::create)
+                .expectNext(expected)
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -271,26 +222,20 @@ class RouteUtilsTest {
     @Test
     void simplePathOverride() {
         List<DomainSummary> availableDomains = new ArrayList<>();
-        availableDomains.add(DomainSummary.builder()
-            .id("1")
-            .name("test.com")
-            .build());
-        availableDomains.add(DomainSummary.builder()
-            .id("2")
-            .name("test.test.com")
-            .build());
+        availableDomains.add(DomainSummary.builder().id("1").name("test.com").build());
+        availableDomains.add(DomainSummary.builder().id("2").name("test.test.com").build());
 
-        DecomposedRoute expected = DecomposedRoute.builder()
-            .domain("test.com")
-            .host("host")
-            .path("/override-path")
-            .build();
+        DecomposedRoute expected =
+                DecomposedRoute.builder()
+                        .domain("test.com")
+                        .host("host")
+                        .path("/override-path")
+                        .build();
 
         RouteUtils.decomposeRoute(availableDomains, "host.test.com/path", "/override-path")
-            .as(StepVerifier::create)
-            .expectNext(expected)
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .as(StepVerifier::create)
+                .expectNext(expected)
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
-
 }

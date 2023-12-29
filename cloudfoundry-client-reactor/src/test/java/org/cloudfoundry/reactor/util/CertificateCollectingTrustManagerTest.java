@@ -35,7 +35,8 @@ final class CertificateCollectingTrustManagerTest {
 
     private final X509TrustManager delegate = mock(X509TrustManager.class, RETURNS_SMART_NULLS);
 
-    private final CertificateCollectingTrustManager trustManager = new CertificateCollectingTrustManager(this.delegate);
+    private final CertificateCollectingTrustManager trustManager =
+            new CertificateCollectingTrustManager(this.delegate);
 
     @Test
     void checkClientTrustedAlreadyCollected() {
@@ -96,7 +97,8 @@ final class CertificateCollectingTrustManagerTest {
     void getCollectedCertificateChain() {
         this.trustManager.checkServerTrusted(this.chain, null);
 
-        X509Certificate[] collectedCertificateChain = this.trustManager.getCollectedCertificateChain();
+        X509Certificate[] collectedCertificateChain =
+                this.trustManager.getCollectedCertificateChain();
         assertThat(collectedCertificateChain).isNotNull();
         assertThat(collectedCertificateChain).hasSize(0);
         assertThat(collectedCertificateChain).isNotSameAs(this.chain);

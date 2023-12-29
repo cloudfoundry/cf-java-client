@@ -43,8 +43,8 @@ final class ApplyManifestRequestTest {
     @Test
     void valid() {
         ApplyManifestRequest.builder()
-            .spaceId("test-space-id")
-            .manifest("test-manifest".getBytes())
-            .build();
+                .spaceId("test-space-id")
+                .manifest("test-manifest".getBytes())
+                .build();
     }
 }

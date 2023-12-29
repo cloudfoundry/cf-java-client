@@ -25,5 +25,4 @@ final class GetInfoRequestTest {
         GetInfoRequest.builder()
             .build();
     }
-
 }

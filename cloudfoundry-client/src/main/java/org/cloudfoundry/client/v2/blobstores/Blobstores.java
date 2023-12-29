@@ -29,6 +29,6 @@ public interface Blobstores {
      * @param request the Delete Buildpack Caches request
      * @return the response from the Delete Buildpack Caches request
      */
-    Mono<DeleteBlobstoreBuildpackCachesResponse> deleteBuildpackCaches(DeleteBlobstoreBuildpackCachesRequest request);
-
+    Mono<DeleteBlobstoreBuildpackCachesResponse> deleteBuildpackCaches(
+            DeleteBlobstoreBuildpackCachesRequest request);
 }

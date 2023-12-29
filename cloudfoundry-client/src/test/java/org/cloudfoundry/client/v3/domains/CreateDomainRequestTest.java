@@ -36,24 +36,29 @@ final class CreateDomainRequestTest {
     @Test
     void valid() {
         CreateDomainRequest.builder()
-            .name("test-domain-name")
-            .internal(true)
-            .relationships(DomainRelationships.builder()
-                .organization(ToOneRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("test-org-id")
-                        .build())
-                    .build())
-                .sharedOrganizations(ToManyRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("shared-org-id-1")
-                        .build())
-                    .data(Relationship.builder()
-                        .id("shared-org-id-2")
-                        .build())
-                    .build())
-                .build())
-            .build();
+                .name("test-domain-name")
+                .internal(true)
+                .relationships(
+                        DomainRelationships.builder()
+                                .organization(
+                                        ToOneRelationship.builder()
+                                                .data(
+                                                        Relationship.builder()
+                                                                .id("test-org-id")
+                                                                .build())
+                                                .build())
+                                .sharedOrganizations(
+                                        ToManyRelationship.builder()
+                                                .data(
+                                                        Relationship.builder()
+                                                                .id("shared-org-id-1")
+                                                                .build())
+                                                .data(
+                                                        Relationship.builder()
+                                                                .id("shared-org-id-2")
+                                                                .build())
+                                                .build())
+                                .build())
+                .build();
     }
-
 }

@@ -25,5 +25,4 @@ final class ListFeatureFlagsRequestTest {
         ListFeatureFlagsRequest.builder()
             .build();
     }
-
 }

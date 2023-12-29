@@ -55,10 +55,9 @@ final class UnmapExternalGroupByGroupIdRequestTest {
     @Test
     void valid() {
         UnmapExternalGroupByGroupIdRequest.builder()
-            .groupId("test-group-id")
-            .externalGroup("test-external-group")
-            .origin("test-origin")
-            .build();
+                .groupId("test-group-id")
+                .externalGroup("test-external-group")
+                .origin("test-origin")
+                .build();
     }
-
 }

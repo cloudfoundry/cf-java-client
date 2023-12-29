@@ -43,9 +43,8 @@ final class AssociateSpaceDeveloperRequestTest {
     @Test
     void valid() {
         AssociateSpaceDeveloperRequest.builder()
-            .developerId("test-developer-id")
-            .spaceId("test-space-id")
-            .build();
+                .developerId("test-developer-id")
+                .spaceId("test-space-id")
+                .build();
     }
-
 }

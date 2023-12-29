@@ -25,5 +25,4 @@ final class ListPrivateDomainsRequestTest {
         ListPrivateDomainsRequest.builder()
             .build();
     }
-
 }

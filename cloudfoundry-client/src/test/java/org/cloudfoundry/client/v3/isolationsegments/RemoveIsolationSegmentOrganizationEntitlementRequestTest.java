@@ -43,9 +43,8 @@ final class RemoveIsolationSegmentOrganizationEntitlementRequestTest {
     @Test
     void valid() {
         RemoveIsolationSegmentOrganizationEntitlementRequest.builder()
-            .isolationSegmentId("test-isolation-segment-id")
-            .organizationId("test-organization-id")
-            .build();
+                .isolationSegmentId("test-isolation-segment-id")
+                .organizationId("test-organization-id")
+                .build();
     }
-
 }

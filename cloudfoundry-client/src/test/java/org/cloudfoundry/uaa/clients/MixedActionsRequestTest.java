@@ -43,14 +43,12 @@ final class MixedActionsRequestTest {
     @Test
     void valid() {
         MixedActionsRequest.builder()
-            .action(CreateClientAction.builder()
-                .authorizedGrantType(IMPLICIT)
-                .clientId("test-client-id")
-                .build())
-            .action(DeleteClientAction.builder()
-                .clientId("test-client-id")
-                .build())
-            .build();
+                .action(
+                        CreateClientAction.builder()
+                                .authorizedGrantType(IMPLICIT)
+                                .clientId("test-client-id")
+                                .build())
+                .action(DeleteClientAction.builder().clientId("test-client-id").build())
+                .build();
     }
-
 }

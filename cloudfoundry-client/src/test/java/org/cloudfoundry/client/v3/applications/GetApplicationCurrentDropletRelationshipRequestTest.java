@@ -33,8 +33,7 @@ final class GetApplicationCurrentDropletRelationshipRequestTest {
     @Test
     void valid() {
         GetApplicationCurrentDropletRelationshipRequest.builder()
-            .applicationId("test-application-id")
-            .build();
+                .applicationId("test-application-id")
+                .build();
     }
-
 }

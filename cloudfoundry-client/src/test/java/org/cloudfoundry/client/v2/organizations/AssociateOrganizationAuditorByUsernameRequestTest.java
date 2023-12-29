@@ -43,9 +43,8 @@ final class AssociateOrganizationAuditorByUsernameRequestTest {
     @Test
     void valid() {
         AssociateOrganizationAuditorByUsernameRequest.builder()
-            .organizationId("test-organization-id")
-            .username("test-username")
-            .build();
+                .organizationId("test-organization-id")
+                .username("test-username")
+                .build();
     }
-
 }

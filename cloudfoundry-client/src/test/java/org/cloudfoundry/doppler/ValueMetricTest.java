@@ -69,5 +69,4 @@ final class ValueMetricTest {
             .value(0.0)
             .build();
     }
-
 }

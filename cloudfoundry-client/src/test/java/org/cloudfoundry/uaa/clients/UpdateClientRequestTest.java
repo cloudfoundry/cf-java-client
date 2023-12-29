@@ -44,9 +44,8 @@ final class UpdateClientRequestTest {
     @Test
     void valid() {
         UpdateClientRequest.builder()
-            .authorizedGrantType(CLIENT_CREDENTIALS)
-            .clientId("test-client-id")
-            .build();
+                .authorizedGrantType(CLIENT_CREDENTIALS)
+                .clientId("test-client-id")
+                .build();
     }
-
 }

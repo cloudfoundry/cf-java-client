@@ -33,9 +33,8 @@ final class CreateStackRequestTest {
     @Test
     void valid() {
         CreateStackRequest.builder()
-            .description("test-stack-description")
-            .name("test-stack-name")
-            .build();
+                .description("test-stack-description")
+                .name("test-stack-name")
+                .build();
     }
-
 }

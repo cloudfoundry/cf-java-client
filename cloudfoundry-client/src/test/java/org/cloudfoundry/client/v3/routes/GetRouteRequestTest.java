@@ -36,5 +36,4 @@ class GetRouteRequestTest {
             .routeId("test-route-id")
             .build();
     }
-
 }

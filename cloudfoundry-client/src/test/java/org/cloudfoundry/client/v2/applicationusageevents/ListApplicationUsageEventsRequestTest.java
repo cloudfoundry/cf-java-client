@@ -25,5 +25,4 @@ final class ListApplicationUsageEventsRequestTest {
         ListApplicationUsageEventsRequest.builder()
             .build();
     }
-
 }

@@ -92,18 +92,18 @@ class InsertRouteDestinationsRequestTest {
     @Test
     void valid() {
         InsertRouteDestinationsRequest.builder()
-            .destination(Destination.builder()
-                .application(Application.builder()
-                    .applicationId("test-application-id")
-                    .process(Process.builder()
-                        .type("test-type")
-                        .build())
-                    .build())
-                .destinationId("test-destination-id")
-                .port(999)
-                .build())
-            .routeId("test-route-id")
-            .build();
+                .destination(
+                        Destination.builder()
+                                .application(
+                                        Application.builder()
+                                                .applicationId("test-application-id")
+                                                .process(
+                                                        Process.builder().type("test-type").build())
+                                                .build())
+                                .destinationId("test-destination-id")
+                                .port(999)
+                                .build())
+                .routeId("test-route-id")
+                .build();
     }
-
 }

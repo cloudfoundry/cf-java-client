@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v2.serviceusageevents;
 
+import java.util.Map;
 import org.cloudfoundry.client.v2.serviceusageevents.GetServiceUsageEventRequest;
 import org.cloudfoundry.client.v2.serviceusageevents.GetServiceUsageEventResponse;
 import org.cloudfoundry.client.v2.serviceusageevents.ListServiceUsageEventsRequest;
@@ -27,12 +28,11 @@ import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v2.AbstractClientV2Operations;
 import reactor.core.publisher.Mono;
 
-import java.util.Map;
-
 /**
  * The Reactor-based implementation of {@link ServiceUsageEvents}
  */
-public final class ReactorServiceUsageEvents extends AbstractClientV2Operations implements ServiceUsageEvents {
+public final class ReactorServiceUsageEvents extends AbstractClientV2Operations
+        implements ServiceUsageEvents {
 
     /**
      * Creates an instance
@@ -42,26 +42,43 @@ public final class ReactorServiceUsageEvents extends AbstractClientV2Operations 
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorServiceUsageEvents(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
+    public ReactorServiceUsageEvents(
+            ConnectionContext connectionContext,
+            Mono<String> root,
+            TokenProvider tokenProvider,
+            Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<GetServiceUsageEventResponse> get(GetServiceUsageEventRequest request) {
-        return get(request, GetServiceUsageEventResponse.class, builder -> builder.pathSegment("service_usage_events", request.getServiceUsageEventId()))
-            .checkpoint();
+        return get(
+                        request,
+                        GetServiceUsageEventResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "service_usage_events", request.getServiceUsageEventId()))
+                .checkpoint();
     }
 
     @Override
     public Mono<ListServiceUsageEventsResponse> list(ListServiceUsageEventsRequest request) {
-        return get(request, ListServiceUsageEventsResponse.class, builder -> builder.pathSegment("service_usage_events"))
-            .checkpoint();
+        return get(
+                        request,
+                        ListServiceUsageEventsResponse.class,
+                        builder -> builder.pathSegment("service_usage_events"))
+                .checkpoint();
     }
 
     @Override
     public Mono<Void> purgeAndReseed(PurgeAndReseedServiceUsageEventsRequest request) {
-        return post(request, Void.class, builder -> builder.pathSegment("service_usage_events", "destructively_purge_all_and_reseed_existing_instances"))
-            .checkpoint();
+        return post(
+                        request,
+                        Void.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "service_usage_events",
+                                        "destructively_purge_all_and_reseed_existing_instances"))
+                .checkpoint();
     }
-
 }

@@ -23,12 +23,10 @@ public final class MethodNameComparator implements Comparator<Method> {
 
     public static final MethodNameComparator INSTANCE = new MethodNameComparator();
 
-    private MethodNameComparator() {
-    }
+    private MethodNameComparator() {}
 
     @Override
     public int compare(Method a, Method b) {
         return a.getName().compareTo(b.getName());
     }
-
 }

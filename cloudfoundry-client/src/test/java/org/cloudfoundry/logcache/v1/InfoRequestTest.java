@@ -24,5 +24,4 @@ class InfoRequestTest {
     void valid() {
         InfoRequest.builder().build();
     }
-
 }

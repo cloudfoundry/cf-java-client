@@ -36,5 +36,4 @@ final class GetOrganizationUsageSummaryRequestTest {
             .organizationId("test-id")
             .build();
     }
-
 }

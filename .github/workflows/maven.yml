@@ -1,6 +1,12 @@
 name: Java CI
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build:
@@ -26,5 +32,8 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
       - name: Build with Maven
-        run: ./mvnw clean install -Dgpg.skip
+        run: ./mvnw clean package -Dgpg.skip
+      - if: ${{ matrix.java != 8 }}
+        name: Check style with Spotless
+        run: ./mvnw spotless:check
 

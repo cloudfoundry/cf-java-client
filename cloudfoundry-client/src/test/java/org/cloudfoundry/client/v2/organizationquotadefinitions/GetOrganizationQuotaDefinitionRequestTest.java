@@ -33,8 +33,7 @@ final class GetOrganizationQuotaDefinitionRequestTest {
     @Test
     void valid() {
         GetOrganizationQuotaDefinitionRequest.builder()
-            .organizationQuotaDefinitionId("test-organization-quota-definition-id")
-            .build();
+                .organizationQuotaDefinitionId("test-organization-quota-definition-id")
+                .build();
     }
-
 }

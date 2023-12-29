@@ -25,5 +25,4 @@ final class ListDropletsRequestTest {
         ListDropletsRequest.builder()
             .build();
     }
-
 }

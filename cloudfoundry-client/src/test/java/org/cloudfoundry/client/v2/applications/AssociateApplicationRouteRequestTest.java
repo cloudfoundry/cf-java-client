@@ -43,9 +43,8 @@ final class AssociateApplicationRouteRequestTest {
     @Test
     void valid() {
         AssociateApplicationRouteRequest.builder()
-            .applicationId("test-application-id")
-            .routeId("test-route-id")
-            .build();
+                .applicationId("test-application-id")
+                .routeId("test-route-id")
+                .build();
     }
-
 }

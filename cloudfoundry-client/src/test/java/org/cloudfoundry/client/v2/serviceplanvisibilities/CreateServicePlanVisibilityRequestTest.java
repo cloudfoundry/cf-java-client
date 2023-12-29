@@ -44,9 +44,8 @@ final class CreateServicePlanVisibilityRequestTest {
     @Test
     void valid() {
         CreateServicePlanVisibilityRequest.builder()
-            .organizationId("organization-id")
-            .servicePlanId("service-plan-id")
-            .build();
+                .organizationId("organization-id")
+                .servicePlanId("service-plan-id")
+                .build();
     }
-
 }

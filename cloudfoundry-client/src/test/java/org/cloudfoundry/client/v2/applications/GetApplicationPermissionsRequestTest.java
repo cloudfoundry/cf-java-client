@@ -36,5 +36,4 @@ final class GetApplicationPermissionsRequestTest {
             .applicationId("test-application-id")
             .build();
     }
-
 }

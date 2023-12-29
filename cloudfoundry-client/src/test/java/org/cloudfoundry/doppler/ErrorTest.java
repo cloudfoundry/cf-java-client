@@ -69,5 +69,4 @@ final class ErrorTest {
             .source("test-source")
             .build();
     }
-
 }

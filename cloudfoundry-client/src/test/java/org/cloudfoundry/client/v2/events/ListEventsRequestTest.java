@@ -25,5 +25,4 @@ final class ListEventsRequestTest {
         ListEventsRequest.builder()
             .build();
     }
-
 }

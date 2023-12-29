@@ -36,5 +36,4 @@ final class UpdateServiceOfferingRequestTest {
             .serviceOfferingId("test-id")
             .build();
     }
-
 }

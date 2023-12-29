@@ -43,9 +43,8 @@ final class AssociateSpaceManagerByUsernameRequestTest {
     @Test
     void valid() {
         AssociateSpaceManagerByUsernameRequest.builder()
-            .spaceId("test-space-id")
-            .username("test-username")
-            .build();
+                .spaceId("test-space-id")
+                .username("test-username")
+                .build();
     }
-
 }

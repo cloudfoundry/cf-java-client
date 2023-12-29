@@ -36,5 +36,4 @@ final class FirehoseRequestTest {
             .subscriptionId("test-subscription-id")
             .build();
     }
-
 }

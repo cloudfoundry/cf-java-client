@@ -26,5 +26,4 @@ final class ListSharedDomainsRequestTest {
             .name("test-name")
             .build();
     }
-
 }

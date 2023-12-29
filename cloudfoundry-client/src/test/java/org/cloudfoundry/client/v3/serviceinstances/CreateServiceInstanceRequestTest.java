@@ -27,34 +27,39 @@ class CreateServiceInstanceRequestTest {
     @Test
     void validManagedServiceInstance() {
         CreateServiceInstanceRequest.builder()
-            .type(ServiceInstanceType.MANAGED)
-            .name("test-service-instance-name")
-            .relationships(ServiceInstanceRelationships.builder()
-                .servicePlan(ToOneRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("test-service-plan-id")
-                        .build())
-                    .build())
-                .space(ToOneRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("test-space-id")
-                        .build())
-                    .build())
-                .build())
-            .tags("foo", "bar")
-            .parameter("key", "value")
-            .build();
+                .type(ServiceInstanceType.MANAGED)
+                .name("test-service-instance-name")
+                .relationships(
+                        ServiceInstanceRelationships.builder()
+                                .servicePlan(
+                                        ToOneRelationship.builder()
+                                                .data(
+                                                        Relationship.builder()
+                                                                .id("test-service-plan-id")
+                                                                .build())
+                                                .build())
+                                .space(
+                                        ToOneRelationship.builder()
+                                                .data(
+                                                        Relationship.builder()
+                                                                .id("test-space-id")
+                                                                .build())
+                                                .build())
+                                .build())
+                .tags("foo", "bar")
+                .parameter("key", "value")
+                .build();
     }
 
     @Test
     void validUserProvidedServiceInstance() {
         CreateServiceInstanceRequest.builder()
-            .type(ServiceInstanceType.USER_PROVIDED)
-            .syslogDrainUrl("https://syslog.com")
-            .routeServiceUrl("https://route.com")
-            .credential("key", "value")
-            .name("test-user-provided-name")
-            .build();
+                .type(ServiceInstanceType.USER_PROVIDED)
+                .syslogDrainUrl("https://syslog.com")
+                .routeServiceUrl("https://route.com")
+                .credential("key", "value")
+                .name("test-user-provided-name")
+                .build();
     }
 
     @Test
@@ -79,5 +84,4 @@ class CreateServiceInstanceRequestTest {
                 .build();
         });
     }
-
 }

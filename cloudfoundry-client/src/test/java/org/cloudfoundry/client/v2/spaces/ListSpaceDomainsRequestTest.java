@@ -36,5 +36,4 @@ final class ListSpaceDomainsRequestTest {
             .spaceId("test-space-id")
             .build();
     }
-
 }

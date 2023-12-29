@@ -36,5 +36,4 @@ final class SpaceSshAllowedRequestTest {
             .name("test-name")
             .build();
     }
-
 }

@@ -60,10 +60,9 @@ final class UploadBuildpackRequestTest {
     @Test
     void valid() {
         UploadBuildpackRequest.builder()
-            .buildpack(TEST_BUILDPACK)
-            .buildpackId("test-buildpack-id")
-            .filename("test-filename")
-            .build();
+                .buildpack(TEST_BUILDPACK)
+                .buildpackId("test-buildpack-id")
+                .filename("test-filename")
+                .build();
     }
-
 }

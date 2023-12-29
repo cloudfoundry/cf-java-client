@@ -34,11 +34,8 @@ final class UpdateDomainRequestTest {
     @Test
     void valid() {
         UpdateDomainRequest.builder()
-            .domainId("test-domain-id")
-            .metadata(Metadata.builder()
-                .label("test-label-key", "test-label-value")
-                .build())
-            .build();
+                .domainId("test-domain-id")
+                .metadata(Metadata.builder().label("test-label-key", "test-label-value").build())
+                .build();
     }
-
 }

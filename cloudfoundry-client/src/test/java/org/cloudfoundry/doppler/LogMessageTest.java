@@ -65,10 +65,9 @@ final class LogMessageTest {
     @Test
     void valid() {
         LogMessage.builder()
-            .message("test-message")
-            .messageType(MessageType.ERR)
-            .timestamp(0L)
-            .build();
+                .message("test-message")
+                .messageType(MessageType.ERR)
+                .timestamp(0L)
+                .build();
     }
-
 }

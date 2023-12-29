@@ -36,5 +36,4 @@ final class SamlConfigurationTest {
             .metaDataLocation("test-metadata-location")
             .build();
     }
-
 }

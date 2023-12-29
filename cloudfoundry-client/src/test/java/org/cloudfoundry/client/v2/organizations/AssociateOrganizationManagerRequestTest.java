@@ -43,9 +43,8 @@ final class AssociateOrganizationManagerRequestTest {
     @Test
     void valid() {
         AssociateOrganizationManagerRequest.builder()
-            .organizationId("test-organization-id")
-            .managerId("test-manager-id")
-            .build();
+                .organizationId("test-organization-id")
+                .managerId("test-manager-id")
+                .build();
     }
-
 }

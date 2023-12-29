@@ -36,5 +36,4 @@ final class DeleteDomainRequestTest {
             .domainId("test-id")
             .build();
     }
-
 }

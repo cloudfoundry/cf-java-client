@@ -8,5 +8,4 @@ final class ListServiceBrokersRequestTest {
     void valid() {
 	ListServiceBrokersRequest.builder().build();
     }
-    
 }

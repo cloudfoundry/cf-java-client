@@ -69,20 +69,18 @@ final class MapRouteRequestTest {
     @Test
     void validMax() {
         MapRouteRequest.builder()
-            .applicationName("test-applicationName")
-            .domain("test-domain")
-            .host("test-host")
-            .path("test-path")
-            .build();
+                .applicationName("test-applicationName")
+                .domain("test-domain")
+                .host("test-host")
+                .path("test-path")
+                .build();
     }
 
     @Test
     void validMin() {
         MapRouteRequest.builder()
-            .applicationName("test-applicationName")
-            .domain("test-domain")
-            .build();
+                .applicationName("test-applicationName")
+                .domain("test-domain")
+                .build();
     }
-
-
 }

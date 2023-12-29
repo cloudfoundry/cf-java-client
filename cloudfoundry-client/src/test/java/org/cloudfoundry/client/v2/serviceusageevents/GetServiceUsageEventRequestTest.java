@@ -33,8 +33,7 @@ final class GetServiceUsageEventRequestTest {
     @Test
     void valid() {
         GetServiceUsageEventRequest.builder()
-            .serviceUsageEventId("test-service-usage-event-id")
-            .build();
+                .serviceUsageEventId("test-service-usage-event-id")
+                .build();
     }
-
 }

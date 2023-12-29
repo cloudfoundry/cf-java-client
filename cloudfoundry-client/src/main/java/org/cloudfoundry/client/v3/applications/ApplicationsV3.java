@@ -53,7 +53,8 @@ public interface ApplicationsV3 {
      * @param request the Get Current Droplet request
      * @return the response from the Get Current Droplet request
      */
-    Mono<GetApplicationCurrentDropletResponse> getCurrentDroplet(GetApplicationCurrentDropletRequest request);
+    Mono<GetApplicationCurrentDropletResponse> getCurrentDroplet(
+            GetApplicationCurrentDropletRequest request);
 
     /**
      * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#get-current-droplet-association-for-an-app">Get Current Droplet Relationship</a> request
@@ -61,7 +62,8 @@ public interface ApplicationsV3 {
      * @param request the Get Current Droplet Relationship request
      * @return the response from the Get Current Droplet Relationship request
      */
-    Mono<GetApplicationCurrentDropletRelationshipResponse> getCurrentDropletRelationship(GetApplicationCurrentDropletRelationshipRequest request);
+    Mono<GetApplicationCurrentDropletRelationshipResponse> getCurrentDropletRelationship(
+            GetApplicationCurrentDropletRelationshipRequest request);
 
     /**
      * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#get-environment-for-an-app">Get Application Environment</a> request
@@ -69,7 +71,8 @@ public interface ApplicationsV3 {
      * @param request the Get Application Environment request
      * @return the response from the Get Application Environment request
      */
-    Mono<GetApplicationEnvironmentResponse> getEnvironment(GetApplicationEnvironmentRequest request);
+    Mono<GetApplicationEnvironmentResponse> getEnvironment(
+            GetApplicationEnvironmentRequest request);
 
     /**
      * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#get-environment-variables-for-an-app">Get Application Environment Variables</a> request
@@ -77,7 +80,8 @@ public interface ApplicationsV3 {
      * @param request the Get Application Environment Variables request
      * @return the response from the Get Application Environment Variables request
      */
-    Mono<GetApplicationEnvironmentVariablesResponse> getEnvironmentVariables(GetApplicationEnvironmentVariablesRequest request);
+    Mono<GetApplicationEnvironmentVariablesResponse> getEnvironmentVariables(
+            GetApplicationEnvironmentVariablesRequest request);
 
     /**
      * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.88.0/index.html#get-an-app-feature">Get Application Feature</a> request
@@ -93,7 +97,8 @@ public interface ApplicationsV3 {
      * @param request the Get Permissions for an Application request
      * @return the response from the Get Permissions for an Application request
      */
-    Mono<GetApplicationPermissionsResponse> getPermissions(GetApplicationPermissionsRequest request);
+    Mono<GetApplicationPermissionsResponse> getPermissions(
+            GetApplicationPermissionsRequest request);
 
     /**
      * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/#get-a-process">Get Application Process</a> request
@@ -109,7 +114,8 @@ public interface ApplicationsV3 {
      * @param request the Get Statistics for a Process for an Application request
      * @return the response from the Get Statistics for a Process for an Application request
      */
-    Mono<GetApplicationProcessStatisticsResponse> getProcessStatistics(GetApplicationProcessStatisticsRequest request);
+    Mono<GetApplicationProcessStatisticsResponse> getProcessStatistics(
+            GetApplicationProcessStatisticsRequest request);
 
     /**
      * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.90.0/#get-ssh-enabled-for-an-app">Get SSH enabled for an Application</a> request
@@ -205,7 +211,8 @@ public interface ApplicationsV3 {
      * @param request the Set Current Droplet request
      * @return the response from the Set Current Droplet request
      */
-    Mono<SetApplicationCurrentDropletResponse> setCurrentDroplet(SetApplicationCurrentDropletRequest request);
+    Mono<SetApplicationCurrentDropletResponse> setCurrentDroplet(
+            SetApplicationCurrentDropletRequest request);
 
     /**
      * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.27.0/index.html#start-an-app">Start Application</a> request
@@ -245,7 +252,8 @@ public interface ApplicationsV3 {
      * @param request the Update Application Environment Variables request
      * @return the response from the Update Application Environment Variables request
      */
-    Mono<UpdateApplicationEnvironmentVariablesResponse> updateEnvironmentVariables(UpdateApplicationEnvironmentVariablesRequest request);
+    Mono<UpdateApplicationEnvironmentVariablesResponse> updateEnvironmentVariables(
+            UpdateApplicationEnvironmentVariablesRequest request);
 
     /**
      * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.88.0/index.html#update-an-app-feature">Update Application Feature</a> request
@@ -254,5 +262,4 @@ public interface ApplicationsV3 {
      * @return the response from the Update Application Feature request
      */
     Mono<UpdateApplicationFeatureResponse> updateFeature(UpdateApplicationFeatureRequest request);
-
 }

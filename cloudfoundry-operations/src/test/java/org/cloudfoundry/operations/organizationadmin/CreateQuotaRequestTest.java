@@ -36,5 +36,4 @@ final class CreateQuotaRequestTest {
             .name("test-name")
             .build();
     }
-
 }

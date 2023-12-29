@@ -35,10 +35,10 @@ class CreateSecurityGroupRequestTest {
     @Test
     void validMax() {
         CreateSecurityGroupRequest.builder()
-            .name("test-security-group-name")
-            .rule(RuleEntity.builder().build())
-            .spaceId("test-space-id")
-            .build();
+                .name("test-security-group-name")
+                .rule(RuleEntity.builder().build())
+                .spaceId("test-space-id")
+                .build();
     }
 
     @Test
@@ -47,5 +47,4 @@ class CreateSecurityGroupRequestTest {
             .name("test-security-group-name")
             .build();
     }
-
 }

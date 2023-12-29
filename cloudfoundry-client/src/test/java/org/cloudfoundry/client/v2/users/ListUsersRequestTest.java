@@ -25,5 +25,4 @@ final class ListUsersRequestTest {
         ListUsersRequest.builder()
             .build();
     }
-
 }

@@ -33,8 +33,7 @@ final class DeleteServiceInstanceRequestTest {
     @Test
     void valid() {
         DeleteServiceInstanceRequest.builder()
-            .serviceInstanceId("test-service-instance-id")
-            .build();
+                .serviceInstanceId("test-service-instance-id")
+                .build();
     }
-
 }

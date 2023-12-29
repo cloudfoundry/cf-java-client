@@ -36,5 +36,4 @@ class GetSecurityGroupRequestTest {
             .securityGroupId("test-security-group-id")
             .build();
     }
-
 }

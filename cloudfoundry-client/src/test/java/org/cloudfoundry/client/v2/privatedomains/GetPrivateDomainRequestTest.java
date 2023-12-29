@@ -36,5 +36,4 @@ final class GetPrivateDomainRequestTest {
             .privateDomainId("test-private-domain-id")
             .build();
     }
-
 }

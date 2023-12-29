@@ -43,9 +43,8 @@ final class UpdateIsolationSegmentRequestTest {
     @Test
     void valid() {
         UpdateIsolationSegmentRequest.builder()
-            .isolationSegmentId("test-id")
-            .name("test-name")
-            .build();
+                .isolationSegmentId("test-id")
+                .name("test-name")
+                .build();
     }
-
 }

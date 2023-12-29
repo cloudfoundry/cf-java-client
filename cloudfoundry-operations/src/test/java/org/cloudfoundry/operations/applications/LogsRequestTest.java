@@ -36,5 +36,4 @@ final class LogsRequestTest {
             .name("test-name")
             .build();
     }
-
 }

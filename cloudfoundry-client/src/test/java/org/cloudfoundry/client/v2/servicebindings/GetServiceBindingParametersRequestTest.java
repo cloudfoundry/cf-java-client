@@ -33,8 +33,7 @@ final class GetServiceBindingParametersRequestTest {
     @Test
     void valid() {
         GetServiceBindingParametersRequest.builder()
-            .serviceBindingId("test-service-instance-id")
-            .build();
+                .serviceBindingId("test-service-instance-id")
+                .build();
     }
-
 }

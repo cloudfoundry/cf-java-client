@@ -77,13 +77,13 @@ class DeleteTcpRoutesRequestTest {
     @Test
     void valid() {
         DeleteTcpRoutesRequest.builder()
-            .tcpRoute(TcpRouteDeletion.builder()
-                .backendIp("test-backend-ip")
-                .backendPort(9999)
-                .port(999)
-                .routerGroupId("test-router-group-id")
-                .build())
-            .build();
+                .tcpRoute(
+                        TcpRouteDeletion.builder()
+                                .backendIp("test-backend-ip")
+                                .backendPort(9999)
+                                .port(999)
+                                .routerGroupId("test-router-group-id")
+                                .build())
+                .build();
     }
-
 }

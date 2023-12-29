@@ -16,10 +16,20 @@
 
 package org.cloudfoundry.reactor.uaa;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwsHeader;
 import io.jsonwebtoken.impl.DefaultClaims;
 import io.jsonwebtoken.impl.DefaultJwsHeader;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.util.Base64;
 import org.cloudfoundry.uaa.tokens.KeyType;
 import org.cloudfoundry.uaa.tokens.ListTokenKeysRequest;
 import org.cloudfoundry.uaa.tokens.ListTokenKeysResponse;
@@ -28,16 +38,6 @@ import org.cloudfoundry.uaa.tokens.Tokens;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
-import java.util.Base64;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 final class UaaSigningKeyResolverTest {
 
@@ -49,22 +49,21 @@ final class UaaSigningKeyResolverTest {
     void resolveExistingKey() throws NoSuchAlgorithmException {
         PublicKey publicKey = getKeyPair().getPublic();
 
-        when(
-            this.tokens.listKeys(ListTokenKeysRequest.builder()
-                .build())
-        ).thenReturn(
-            Mono.just(ListTokenKeysResponse.builder()
-                .key(TokenKey.builder()
-                    .algorithm(publicKey.getAlgorithm())
-                    .e("")
-                    .id("test-key-id")
-                    .keyType(KeyType.RSA)
-                    .n("")
-                    .use("")
-                    .value(getEncoded(publicKey))
-                    .build())
-                .build())
-        );
+        when(this.tokens.listKeys(ListTokenKeysRequest.builder().build()))
+                .thenReturn(
+                        Mono.just(
+                                ListTokenKeysResponse.builder()
+                                        .key(
+                                                TokenKey.builder()
+                                                        .algorithm(publicKey.getAlgorithm())
+                                                        .e("")
+                                                        .id("test-key-id")
+                                                        .keyType(KeyType.RSA)
+                                                        .n("")
+                                                        .use("")
+                                                        .value(getEncoded(publicKey))
+                                                        .build())
+                                        .build()));
 
         JwsHeader<?> header = new DefaultJwsHeader().setKeyId("test-key-id");
         Claims claims = new DefaultClaims();
@@ -77,22 +76,21 @@ final class UaaSigningKeyResolverTest {
     void resolveRefreshedKey() throws NoSuchAlgorithmException {
         PublicKey publicKey = getKeyPair().getPublic();
 
-        when(
-            this.tokens.listKeys(ListTokenKeysRequest.builder()
-                .build())
-        ).thenReturn(
-            Mono.just(ListTokenKeysResponse.builder()
-                .key(TokenKey.builder()
-                    .algorithm(publicKey.getAlgorithm())
-                    .e("")
-                    .id("test-key-id")
-                    .keyType(KeyType.RSA)
-                    .n("")
-                    .use("")
-                    .value(getEncoded(publicKey))
-                    .build())
-                .build())
-        );
+        when(this.tokens.listKeys(ListTokenKeysRequest.builder().build()))
+                .thenReturn(
+                        Mono.just(
+                                ListTokenKeysResponse.builder()
+                                        .key(
+                                                TokenKey.builder()
+                                                        .algorithm(publicKey.getAlgorithm())
+                                                        .e("")
+                                                        .id("test-key-id")
+                                                        .keyType(KeyType.RSA)
+                                                        .n("")
+                                                        .use("")
+                                                        .value(getEncoded(publicKey))
+                                                        .build())
+                                        .build()));
 
         JwsHeader<?> header = new DefaultJwsHeader().setKeyId("test-key-id");
         Claims claims = new DefaultClaims();
@@ -119,7 +117,9 @@ final class UaaSigningKeyResolverTest {
     }
 
     private static String getEncoded(PublicKey publicKey) {
-        return String.format("-----BEGIN PUBLIC KEY-----\n%s\n-----END PUBLIC KEY-----", Base64.getEncoder().encodeToString(publicKey.getEncoded()));
+        return String.format(
+                "-----BEGIN PUBLIC KEY-----\n%s\n-----END PUBLIC KEY-----",
+                Base64.getEncoder().encodeToString(publicKey.getEncoded()));
     }
 
     private KeyPair getKeyPair() throws NoSuchAlgorithmException {
@@ -127,5 +127,4 @@ final class UaaSigningKeyResolverTest {
         keyPairGenerator.initialize(1024);
         return keyPairGenerator.generateKeyPair();
     }
-
 }

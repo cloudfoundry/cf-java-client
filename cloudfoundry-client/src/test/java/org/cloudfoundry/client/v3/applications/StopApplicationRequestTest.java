@@ -36,5 +36,4 @@ final class StopApplicationRequestTest {
             .applicationId("test-application-id")
             .build();
     }
-
 }

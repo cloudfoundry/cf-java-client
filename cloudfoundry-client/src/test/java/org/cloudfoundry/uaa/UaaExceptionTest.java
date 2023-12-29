@@ -25,9 +25,9 @@ final class UaaExceptionTest {
     @Test
     void test() {
         assertThat(new UaaException(-1, "test-error", "test-error-description"))
-            .hasNoCause()
-            .hasMessage("test-error: test-error-description")
-            .extracting("statusCode", "error", "errorDescription").containsExactly(-1, "test-error", "test-error-description");
+                .hasNoCause()
+                .hasMessage("test-error: test-error-description")
+                .extracting("statusCode", "error", "errorDescription")
+                .containsExactly(-1, "test-error", "test-error-description");
     }
-
 }

@@ -56,20 +56,18 @@ final class CreateServiceBindingRequestTest {
     @Test
     void valid() {
         CreateServiceBindingRequest.builder()
-            .relationships(ServiceBindingRelationships.builder()
-                .application(ToOneRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("test-id")
-                        .build())
-                    .build())
-                .serviceInstance(ToOneRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("test-id")
-                        .build())
-                    .build())
-                .build())
-            .type(ServiceBindingType.APPLICATION)
-            .build();
+                .relationships(
+                        ServiceBindingRelationships.builder()
+                                .application(
+                                        ToOneRelationship.builder()
+                                                .data(Relationship.builder().id("test-id").build())
+                                                .build())
+                                .serviceInstance(
+                                        ToOneRelationship.builder()
+                                                .data(Relationship.builder().id("test-id").build())
+                                                .build())
+                                .build())
+                .type(ServiceBindingType.APPLICATION)
+                .build();
     }
-
 }

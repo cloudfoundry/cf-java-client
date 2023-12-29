@@ -1,11 +1,10 @@
 package org.cloudfoundry.client.v3.routes;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.Resource;
-
-import java.util.List;
 
 /**
  * Base class for responses that are routes
@@ -63,5 +62,4 @@ public abstract class Route extends Resource {
      */
     @JsonProperty("url")
     public abstract String getUrl();
-
 }

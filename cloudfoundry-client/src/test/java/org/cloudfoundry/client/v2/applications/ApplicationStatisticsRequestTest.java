@@ -36,5 +36,4 @@ final class ApplicationStatisticsRequestTest {
             .applicationId("test-application-id")
             .build();
     }
-
 }

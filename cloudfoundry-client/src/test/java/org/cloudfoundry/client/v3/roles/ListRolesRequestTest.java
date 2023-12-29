@@ -25,5 +25,4 @@ class ListRolesRequestTest {
         ListRolesRequest.builder()
             .build();
     }
-
 }

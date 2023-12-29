@@ -36,5 +36,4 @@ final class DeleteIdentityZoneRequestTest {
             .identityZoneId("test-identity-zone-id")
             .build();
     }
-
 }

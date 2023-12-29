@@ -58,20 +58,19 @@ final class RefreshTokenRequestTest {
     @Test
     void validMax() {
         RefreshTokenRequest.builder()
-            .clientId("test-client-id")
-            .clientSecret("test-client-secret")
-            .refreshToken("test-refresh-token")
-            .tokenFormat(TokenFormat.OPAQUE)
-            .build();
+                .clientId("test-client-id")
+                .clientSecret("test-client-secret")
+                .refreshToken("test-refresh-token")
+                .tokenFormat(TokenFormat.OPAQUE)
+                .build();
     }
 
     @Test
     void validMin() {
         RefreshTokenRequest.builder()
-            .clientId("test-client-id")
-            .clientSecret("test-client-secret")
-            .refreshToken("test-refresh-token")
-            .build();
+                .clientId("test-client-id")
+                .clientSecret("test-client-secret")
+                .refreshToken("test-refresh-token")
+                .build();
     }
-
 }

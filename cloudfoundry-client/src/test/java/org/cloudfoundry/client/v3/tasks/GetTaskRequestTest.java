@@ -36,5 +36,4 @@ final class GetTaskRequestTest {
             .taskId("test-task-id")
             .build();
     }
-
 }

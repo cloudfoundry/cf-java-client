@@ -34,9 +34,8 @@ final class DeleteIdentityProviderRequestTest {
     @Test
     void valid() {
         DeleteIdentityProviderRequest.builder()
-            .identityProviderId("test-identity-provider-id")
-            .identityZoneId("test-identity-zone-id")
-            .build();
+                .identityProviderId("test-identity-provider-id")
+                .identityZoneId("test-identity-zone-id")
+                .build();
     }
-
 }

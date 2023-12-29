@@ -39,7 +39,8 @@ public final class ClientV2Exception extends AbstractCloudFoundryException {
      * @param description the description
      * @param errorCode   the error code
      */
-    public ClientV2Exception(Integer statusCode, Integer code, String description, String errorCode) {
+    public ClientV2Exception(
+            Integer statusCode, Integer code, String description, String errorCode) {
         super(statusCode, String.format("%s(%d): %s", errorCode, code, description));
         this.code = code;
         this.description = description;
@@ -66,5 +67,4 @@ public final class ClientV2Exception extends AbstractCloudFoundryException {
     public String getErrorCode() {
         return this.errorCode;
     }
-
 }

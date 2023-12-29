@@ -55,10 +55,9 @@ final class LockoutPolicyTest {
     @Test
     void valid() {
         LockoutPolicy.builder()
-            .lockAccountPeriodInSecond(0)
-            .lockoutPeriodInSecond(0)
-            .numberOfAllowedFailures(0)
-            .build();
+                .lockAccountPeriodInSecond(0)
+                .lockoutPeriodInSecond(0)
+                .numberOfAllowedFailures(0)
+                .build();
     }
-
 }

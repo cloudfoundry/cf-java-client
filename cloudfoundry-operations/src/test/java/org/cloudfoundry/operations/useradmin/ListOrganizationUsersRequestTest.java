@@ -36,5 +36,4 @@ final class ListOrganizationUsersRequestTest {
             .organizationName("test-organization")
             .build();
     }
-
 }

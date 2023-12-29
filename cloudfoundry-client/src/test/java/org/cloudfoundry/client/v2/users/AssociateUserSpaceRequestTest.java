@@ -47,5 +47,4 @@ final class AssociateUserSpaceRequestTest {
             .userId("test-user-id")
             .build();
     }
-
 }

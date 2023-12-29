@@ -36,5 +36,4 @@ final class CheckRouteRequestTest {
             .domain("test-domain")
             .build();
     }
-
 }

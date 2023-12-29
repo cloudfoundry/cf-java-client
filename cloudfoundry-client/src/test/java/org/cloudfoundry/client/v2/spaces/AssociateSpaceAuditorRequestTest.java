@@ -43,9 +43,8 @@ final class AssociateSpaceAuditorRequestTest {
     @Test
     void valid() {
         AssociateSpaceAuditorRequest.builder()
-            .auditorId("test-auditor-id")
-            .spaceId("test-space-id")
-            .build();
+                .auditorId("test-auditor-id")
+                .spaceId("test-space-id")
+                .build();
     }
-
 }

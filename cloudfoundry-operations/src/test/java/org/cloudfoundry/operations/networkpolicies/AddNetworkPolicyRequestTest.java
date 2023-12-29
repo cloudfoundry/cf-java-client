@@ -43,9 +43,8 @@ final class AddNetworkPolicyRequestTest {
     @Test
     void valid() {
         AddNetworkPolicyRequest.builder()
-            .destination("test-destination")
-            .source("test-source")
-            .build();
+                .destination("test-destination")
+                .source("test-source")
+                .build();
     }
-
 }

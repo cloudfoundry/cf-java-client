@@ -123,14 +123,13 @@ final class PasswordPolicyTest {
     @Test
     void valid() {
         PasswordPolicy.builder()
-            .maximumLength(0)
-            .minimumDigit(0)
-            .minimumLength(0)
-            .minimumLowerCaseCharacter(0)
-            .minimumSpecialCharacter(0)
-            .minimumUpperCaseCharacter(0)
-            .passwordExpirationInMonth(0)
-            .build();
+                .maximumLength(0)
+                .minimumDigit(0)
+                .minimumLength(0)
+                .minimumLowerCaseCharacter(0)
+                .minimumSpecialCharacter(0)
+                .minimumUpperCaseCharacter(0)
+                .passwordExpirationInMonth(0)
+                .build();
     }
-
 }

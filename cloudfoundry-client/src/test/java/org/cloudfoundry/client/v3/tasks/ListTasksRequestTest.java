@@ -25,5 +25,4 @@ final class ListTasksRequestTest {
         ListTasksRequest.builder()
             .build();
     }
-
 }

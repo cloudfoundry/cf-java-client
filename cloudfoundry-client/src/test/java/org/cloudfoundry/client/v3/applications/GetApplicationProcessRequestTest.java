@@ -43,9 +43,8 @@ final class GetApplicationProcessRequestTest {
     @Test
     void valid() {
         GetApplicationProcessRequest.builder()
-            .applicationId("test-application-id")
-            .type("test-type")
-            .build();
+                .applicationId("test-application-id")
+                .type("test-type")
+                .build();
     }
-
 }

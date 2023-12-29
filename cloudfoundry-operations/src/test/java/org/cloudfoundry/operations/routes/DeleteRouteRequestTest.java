@@ -47,5 +47,4 @@ final class DeleteRouteRequestTest {
             .domain("test-domain")
             .build();
     }
-
 }

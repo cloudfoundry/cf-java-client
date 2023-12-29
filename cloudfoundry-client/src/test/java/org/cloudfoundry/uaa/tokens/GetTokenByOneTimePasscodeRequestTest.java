@@ -58,20 +58,19 @@ final class GetTokenByOneTimePasscodeRequestTest {
     @Test
     void validMax() {
         GetTokenByOneTimePasscodeRequest.builder()
-            .clientId("test-client-id")
-            .clientSecret("test-client-secret")
-            .passcode("test-passcode")
-            .tokenFormat(TokenFormat.OPAQUE)
-            .build();
+                .clientId("test-client-id")
+                .clientSecret("test-client-secret")
+                .passcode("test-passcode")
+                .tokenFormat(TokenFormat.OPAQUE)
+                .build();
     }
 
     @Test
     void validMin() {
         GetTokenByOneTimePasscodeRequest.builder()
-            .clientId("test-client-id")
-            .clientSecret("test-client-secret")
-            .passcode("test-passcode")
-            .build();
+                .clientId("test-client-id")
+                .clientSecret("test-client-secret")
+                .passcode("test-passcode")
+                .build();
     }
-
 }

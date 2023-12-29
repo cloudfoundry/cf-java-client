@@ -17,10 +17,9 @@
 package org.cloudfoundry.uaa.groups;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.uaa.Metadata;
-
-import java.util.List;
 
 /**
  * The entity response payload for Group
@@ -69,5 +68,4 @@ abstract class AbstractGroup {
      */
     @JsonProperty("zoneId")
     abstract String getZoneId();
-
 }

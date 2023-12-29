@@ -16,6 +16,16 @@
 
 package org.cloudfoundry.reactor.uaa.groups;
 
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpMethod.PUT;
+import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+import static org.cloudfoundry.uaa.SortOrder.ASCENDING;
+
+import java.time.Duration;
+import java.util.Collections;
 import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
@@ -59,20 +69,12 @@ import org.cloudfoundry.uaa.users.Name;
 import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-import java.time.Duration;
-import java.util.Collections;
-
-import static io.netty.handler.codec.http.HttpMethod.DELETE;
-import static io.netty.handler.codec.http.HttpMethod.GET;
-import static io.netty.handler.codec.http.HttpMethod.POST;
-import static io.netty.handler.codec.http.HttpMethod.PUT;
-import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
-import static io.netty.handler.codec.http.HttpResponseStatus.OK;
-import static org.cloudfoundry.uaa.SortOrder.ASCENDING;
 
 final class ReactorGroupsTest extends AbstractUaaApiTest {
 
-    private final ReactorGroups groups = new ReactorGroups(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
+    private final ReactorGroups groups =
+            new ReactorGroups(
+                    CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     void addMember() {
@@ -88,20 +90,22 @@ final class ReactorGroupsTest extends AbstractUaaApiTest {
             .build());
 
         this.groups
-            .addMember(AddMemberRequest.builder()
-                .groupId("test-group-id")
-                .origin("uaa")
-                .type(MemberType.USER)
-                .memberId("40bc8ef1-0719-4a0c-9f60-e9f843cd4af2")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(AddMemberResponse.builder()
-                .origin("uaa")
-                .type(MemberType.USER)
-                .memberId("40bc8ef1-0719-4a0c-9f60-e9f843cd4af2")
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .addMember(
+                        AddMemberRequest.builder()
+                                .groupId("test-group-id")
+                                .origin("uaa")
+                                .type(MemberType.USER)
+                                .memberId("40bc8ef1-0719-4a0c-9f60-e9f843cd4af2")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        AddMemberResponse.builder()
+                                .origin("uaa")
+                                .type(MemberType.USER)
+                                .memberId("40bc8ef1-0719-4a0c-9f60-e9f843cd4af2")
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -117,18 +121,20 @@ final class ReactorGroupsTest extends AbstractUaaApiTest {
             .build());
 
         this.groups
-            .checkMembership(CheckMembershipRequest.builder()
-                .groupId("test-group-id")
-                .memberId("test-member-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(CheckMembershipResponse.builder()
-                .origin("uaa")
-                .type(MemberType.USER)
-                .memberId("test-member-id")
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .checkMembership(
+                        CheckMembershipRequest.builder()
+                                .groupId("test-group-id")
+                                .memberId("test-member-id")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        CheckMembershipResponse.builder()
+                                .origin("uaa")
+                                .type(MemberType.USER)
+                                .memberId("test-member-id")
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -146,36 +152,41 @@ final class ReactorGroupsTest extends AbstractUaaApiTest {
             .build());
 
         this.groups
-            .create(CreateGroupRequest.builder()
-                .description("the cool group")
-                .displayName("Cool Group Name")
-                .identityZoneId("uaa")
-                .member(MemberSummary.builder()
-                    .origin("uaa")
-                    .type(MemberType.USER)
-                    .memberId("f0e6a061-6e3a-4be9-ace5-142ee24e20b7")
-                    .build())
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(CreateGroupResponse.builder()
-                .id("46081184-7ca9-453d-9bf8-74da7113bec6")
-                .metadata(Metadata.builder()
-                    .created("2016-06-03T17:59:30.527Z")
-                    .lastModified("2016-06-03T17:59:30.527Z")
-                    .version(0)
-                    .build())
-                .description("the cool group")
-                .displayName("Cool Group Name")
-                .member(MemberSummary.builder()
-                    .origin("uaa")
-                    .type(MemberType.USER)
-                    .memberId("f0e6a061-6e3a-4be9-ace5-142ee24e20b7")
-                    .build())
-                .schema("urn:scim:schemas:core:1.0")
-                .zoneId("uaa")
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .create(
+                        CreateGroupRequest.builder()
+                                .description("the cool group")
+                                .displayName("Cool Group Name")
+                                .identityZoneId("uaa")
+                                .member(
+                                        MemberSummary.builder()
+                                                .origin("uaa")
+                                                .type(MemberType.USER)
+                                                .memberId("f0e6a061-6e3a-4be9-ace5-142ee24e20b7")
+                                                .build())
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        CreateGroupResponse.builder()
+                                .id("46081184-7ca9-453d-9bf8-74da7113bec6")
+                                .metadata(
+                                        Metadata.builder()
+                                                .created("2016-06-03T17:59:30.527Z")
+                                                .lastModified("2016-06-03T17:59:30.527Z")
+                                                .version(0)
+                                                .build())
+                                .description("the cool group")
+                                .displayName("Cool Group Name")
+                                .member(
+                                        MemberSummary.builder()
+                                                .origin("uaa")
+                                                .type(MemberType.USER)
+                                                .memberId("f0e6a061-6e3a-4be9-ace5-142ee24e20b7")
+                                                .build())
+                                .schema("urn:scim:schemas:core:1.0")
+                                .zoneId("uaa")
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -192,30 +203,30 @@ final class ReactorGroupsTest extends AbstractUaaApiTest {
             .build());
 
         this.groups
-            .delete(DeleteGroupRequest.builder()
-                .groupId("test-group-id")
-                .version("*")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(DeleteGroupResponse.builder()
-                .id("test-group-id")
-                .metadata(Metadata.builder()
-                    .created("2016-06-03T17:59:30.527Z")
-                    .lastModified("2016-06-03T17:59:30.561Z")
-                    .version(1)
-                    .build())
-                .description("the cool group")
-                .displayName("Cooler Group Name for Delete")
-                .member(MemberSummary.builder()
-                    .origin("uaa")
-                    .type(MemberType.USER)
-                    .memberId("f0e6a061-6e3a-4be9-ace5-142ee24e20b7")
-                    .build())
-                .schema("urn:scim:schemas:core:1.0")
-                .zoneId("uaa")
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .delete(DeleteGroupRequest.builder().groupId("test-group-id").version("*").build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        DeleteGroupResponse.builder()
+                                .id("test-group-id")
+                                .metadata(
+                                        Metadata.builder()
+                                                .created("2016-06-03T17:59:30.527Z")
+                                                .lastModified("2016-06-03T17:59:30.561Z")
+                                                .version(1)
+                                                .build())
+                                .description("the cool group")
+                                .displayName("Cooler Group Name for Delete")
+                                .member(
+                                        MemberSummary.builder()
+                                                .origin("uaa")
+                                                .type(MemberType.USER)
+                                                .memberId("f0e6a061-6e3a-4be9-ace5-142ee24e20b7")
+                                                .build())
+                                .schema("urn:scim:schemas:core:1.0")
+                                .zoneId("uaa")
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -231,29 +242,30 @@ final class ReactorGroupsTest extends AbstractUaaApiTest {
             .build());
 
         this.groups
-            .get(GetGroupRequest.builder()
-                .groupId("test-group-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(GetGroupResponse.builder()
-                .id("test-group-id")
-                .metadata(Metadata.builder()
-                    .created("2016-06-03T17:59:30.527Z")
-                    .lastModified("2016-06-03T17:59:30.561Z")
-                    .version(1)
-                    .build())
-                .description("the cool group")
-                .displayName("Cooler Group Name for Retrieve")
-                .member(MemberSummary.builder()
-                    .origin("uaa")
-                    .type(MemberType.USER)
-                    .memberId("f0e6a061-6e3a-4be9-ace5-142ee24e20b7")
-                    .build())
-                .schema("urn:scim:schemas:core:1.0")
-                .zoneId("uaa")
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .get(GetGroupRequest.builder().groupId("test-group-id").build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        GetGroupResponse.builder()
+                                .id("test-group-id")
+                                .metadata(
+                                        Metadata.builder()
+                                                .created("2016-06-03T17:59:30.527Z")
+                                                .lastModified("2016-06-03T17:59:30.561Z")
+                                                .version(1)
+                                                .build())
+                                .description("the cool group")
+                                .displayName("Cooler Group Name for Retrieve")
+                                .member(
+                                        MemberSummary.builder()
+                                                .origin("uaa")
+                                                .type(MemberType.USER)
+                                                .memberId("f0e6a061-6e3a-4be9-ace5-142ee24e20b7")
+                                                .build())
+                                .schema("urn:scim:schemas:core:1.0")
+                                .zoneId("uaa")
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -271,40 +283,48 @@ final class ReactorGroupsTest extends AbstractUaaApiTest {
             .build());
 
         this.groups
-            .list(ListGroupsRequest.builder()
-                .filter("id+eq+\"f87c557a-8ddc-43d3-98fb-e420ebc7f0f1\"+or+displayName+eq+\"Cooler Group Name for List\"")
-                .count(50)
-                .startIndex(1)
-                .sortBy("email")
-                .sortOrder(ASCENDING)
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(ListGroupsResponse.builder()
-                .resource(Group.builder()
-                    .id("f87c557a-8ddc-43d3-98fb-e420ebc7f0f1")
-                    .metadata(Metadata.builder()
-                        .created("2016-06-16T00:01:41.692Z")
-                        .lastModified("2016-06-16T00:01:41.728Z")
-                        .version(1)
-                        .build())
-                    .description("the cool group")
-                    .displayName("Cooler Group Name for List")
-                    .member(MemberSummary.builder()
-                        .origin("uaa")
-                        .type(MemberType.USER)
-                        .memberId("40bc8ef1-0719-4a0c-9f60-e9f843cd4af2")
-                        .build())
-                    .schema("urn:scim:schemas:core:1.0")
-                    .zoneId("uaa")
-                    .build()
-                )
-                .startIndex(1)
-                .itemsPerPage(50)
-                .totalResults(1)
-                .schema("urn:scim:schemas:core:1.0")
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .list(
+                        ListGroupsRequest.builder()
+                                .filter(
+                                        "id+eq+\"f87c557a-8ddc-43d3-98fb-e420ebc7f0f1\"+or+displayName+eq+\"Cooler"
+                                            + " Group Name for List\"")
+                                .count(50)
+                                .startIndex(1)
+                                .sortBy("email")
+                                .sortOrder(ASCENDING)
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        ListGroupsResponse.builder()
+                                .resource(
+                                        Group.builder()
+                                                .id("f87c557a-8ddc-43d3-98fb-e420ebc7f0f1")
+                                                .metadata(
+                                                        Metadata.builder()
+                                                                .created("2016-06-16T00:01:41.692Z")
+                                                                .lastModified(
+                                                                        "2016-06-16T00:01:41.728Z")
+                                                                .version(1)
+                                                                .build())
+                                                .description("the cool group")
+                                                .displayName("Cooler Group Name for List")
+                                                .member(
+                                                        MemberSummary.builder()
+                                                                .origin("uaa")
+                                                                .type(MemberType.USER)
+                                                                .memberId(
+                                                                        "40bc8ef1-0719-4a0c-9f60-e9f843cd4af2")
+                                                                .build())
+                                                .schema("urn:scim:schemas:core:1.0")
+                                                .zoneId("uaa")
+                                                .build())
+                                .startIndex(1)
+                                .itemsPerPage(50)
+                                .totalResults(1)
+                                .schema("urn:scim:schemas:core:1.0")
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -321,27 +341,31 @@ final class ReactorGroupsTest extends AbstractUaaApiTest {
             .build());
 
         this.groups
-            .listExternalGroupMappings(ListExternalGroupMappingsRequest.builder()
-                .filter("group_id+eq+\"0480db7f-d1bc-4d2b-b723-febc684c0ee9\"")
-                .count(50)
-                .startIndex(1)
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(ListExternalGroupMappingsResponse.builder()
-                .resource(ExternalGroupResource.builder()
-                    .groupId("c4a41861-6c83-45a7-995e-64fb66565dce")
-                    .displayName("Group For Testing Retrieving External Group Mappings")
-                    .origin("ldap")
-                    .externalGroup("external group")
-                    .build()
-                )
-                .startIndex(1)
-                .itemsPerPage(1)
-                .totalResults(1)
-                .schema("urn:scim:schemas:core:1.0")
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .listExternalGroupMappings(
+                        ListExternalGroupMappingsRequest.builder()
+                                .filter("group_id+eq+\"0480db7f-d1bc-4d2b-b723-febc684c0ee9\"")
+                                .count(50)
+                                .startIndex(1)
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        ListExternalGroupMappingsResponse.builder()
+                                .resource(
+                                        ExternalGroupResource.builder()
+                                                .groupId("c4a41861-6c83-45a7-995e-64fb66565dce")
+                                                .displayName(
+                                                        "Group For Testing Retrieving External"
+                                                                + " Group Mappings")
+                                                .origin("ldap")
+                                                .externalGroup("external group")
+                                                .build())
+                                .startIndex(1)
+                                .itemsPerPage(1)
+                                .totalResults(1)
+                                .schema("urn:scim:schemas:core:1.0")
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -358,45 +382,58 @@ final class ReactorGroupsTest extends AbstractUaaApiTest {
             .build());
 
         this.groups
-            .listMembers(ListMembersRequest.builder()
-                .groupId("f87c557a-8ddc-43d3-98fb-e420ebc7f0f1")
-                .returnEntities(true)
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(ListMembersResponse.builder()
-                .member(Member.builder()
-                    .memberId("40bc8ef1-0719-4a0c-9f60-e9f843cd4af2")
-                    .type(MemberType.USER)
-                    .origin("uaa")
-                    .entity(UserEntity.builder()
-                        .id("40bc8ef1-0719-4a0c-9f60-e9f843cd4af2")
-                        .externalId("test-user")
-                        .meta(Meta.builder()
-                            .version(0)
-                            .created("2016-06-16T00:01:41.665Z")
-                            .lastModified("2016-06-16T00:01:41.665Z")
-                            .build())
-                        .userName("40HfKc")
-                        .name(Name.builder()
-                            .familyName("cool-familyName")
-                            .givenName("cool-name")
-                            .build())
-                        .email(Email.builder()
-                            .value("cool@chill.com")
-                            .primary(false)
-                            .build())
-                        .active(true)
-                        .verified(true)
-                        .origin("uaa")
-                        .zoneId("uaa")
-                        .passwordLastModified("2016-06-16T00:01:41.000Z")
-                        .schema("urn:scim:schemas:core:1.0")
-                        .build()
-                    )
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .listMembers(
+                        ListMembersRequest.builder()
+                                .groupId("f87c557a-8ddc-43d3-98fb-e420ebc7f0f1")
+                                .returnEntities(true)
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        ListMembersResponse.builder()
+                                .member(
+                                        Member.builder()
+                                                .memberId("40bc8ef1-0719-4a0c-9f60-e9f843cd4af2")
+                                                .type(MemberType.USER)
+                                                .origin("uaa")
+                                                .entity(
+                                                        UserEntity.builder()
+                                                                .id(
+                                                                        "40bc8ef1-0719-4a0c-9f60-e9f843cd4af2")
+                                                                .externalId("test-user")
+                                                                .meta(
+                                                                        Meta.builder()
+                                                                                .version(0)
+                                                                                .created(
+                                                                                        "2016-06-16T00:01:41.665Z")
+                                                                                .lastModified(
+                                                                                        "2016-06-16T00:01:41.665Z")
+                                                                                .build())
+                                                                .userName("40HfKc")
+                                                                .name(
+                                                                        Name.builder()
+                                                                                .familyName(
+                                                                                        "cool-familyName")
+                                                                                .givenName(
+                                                                                        "cool-name")
+                                                                                .build())
+                                                                .email(
+                                                                        Email.builder()
+                                                                                .value(
+                                                                                        "cool@chill.com")
+                                                                                .primary(false)
+                                                                                .build())
+                                                                .active(true)
+                                                                .verified(true)
+                                                                .origin("uaa")
+                                                                .zoneId("uaa")
+                                                                .passwordLastModified(
+                                                                        "2016-06-16T00:01:41.000Z")
+                                                                .schema("urn:scim:schemas:core:1.0")
+                                                                .build())
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -413,20 +450,23 @@ final class ReactorGroupsTest extends AbstractUaaApiTest {
             .build());
 
         this.groups
-            .listMembers(ListMembersRequest.builder()
-                .groupId("f87c557a-8ddc-43d3-98fb-e420ebc7f0f1")
-                .returnEntities(false)
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(ListMembersResponse.builder()
-                .member(Member.builder()
-                    .memberId("40bc8ef1-0719-4a0c-9f60-e9f843cd4af2")
-                    .type(MemberType.USER)
-                    .origin("uaa")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .listMembers(
+                        ListMembersRequest.builder()
+                                .groupId("f87c557a-8ddc-43d3-98fb-e420ebc7f0f1")
+                                .returnEntities(false)
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        ListMembersResponse.builder()
+                                .member(
+                                        Member.builder()
+                                                .memberId("40bc8ef1-0719-4a0c-9f60-e9f843cd4af2")
+                                                .type(MemberType.USER)
+                                                .origin("uaa")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -443,25 +483,28 @@ final class ReactorGroupsTest extends AbstractUaaApiTest {
             .build());
 
         this.groups
-            .mapExternalGroup(MapExternalGroupRequest.builder()
-                .groupId("76937b62-346c-4848-953c-d790b87ec80a")
-                .externalGroup("External group")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(MapExternalGroupResponse.builder()
-                .groupId("76937b62-346c-4848-953c-d790b87ec80a")
-                .displayName("Group For Testing Creating External Group Mapping")
-                .origin("ldap")
-                .externalGroup("External group")
-                .metadata(Metadata.builder()
-                    .created("2016-06-16T00:01:41.393Z")
-                    .lastModified("2016-06-16T00:01:41.393Z")
-                    .version(0)
-                    .build())
-                .schema("urn:scim:schemas:core:1.0")
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .mapExternalGroup(
+                        MapExternalGroupRequest.builder()
+                                .groupId("76937b62-346c-4848-953c-d790b87ec80a")
+                                .externalGroup("External group")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        MapExternalGroupResponse.builder()
+                                .groupId("76937b62-346c-4848-953c-d790b87ec80a")
+                                .displayName("Group For Testing Creating External Group Mapping")
+                                .origin("ldap")
+                                .externalGroup("External group")
+                                .metadata(
+                                        Metadata.builder()
+                                                .created("2016-06-16T00:01:41.393Z")
+                                                .lastModified("2016-06-16T00:01:41.393Z")
+                                                .version(0)
+                                                .build())
+                                .schema("urn:scim:schemas:core:1.0")
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -477,18 +520,20 @@ final class ReactorGroupsTest extends AbstractUaaApiTest {
             .build());
 
         this.groups
-            .removeMember(RemoveMemberRequest.builder()
-                .groupId("test-group-id")
-                .memberId("40bc8ef1-0719-4a0c-9f60-e9f843cd4af2")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(RemoveMemberResponse.builder()
-                .memberId("40bc8ef1-0719-4a0c-9f60-e9f843cd4af2")
-                .type(MemberType.USER)
-                .origin("uaa")
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .removeMember(
+                        RemoveMemberRequest.builder()
+                                .groupId("test-group-id")
+                                .memberId("40bc8ef1-0719-4a0c-9f60-e9f843cd4af2")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        RemoveMemberResponse.builder()
+                                .memberId("40bc8ef1-0719-4a0c-9f60-e9f843cd4af2")
+                                .type(MemberType.USER)
+                                .origin("uaa")
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -507,38 +552,43 @@ final class ReactorGroupsTest extends AbstractUaaApiTest {
             .build());
 
         this.groups
-            .update(UpdateGroupRequest.builder()
-                .identityZoneId("uaa")
-                .groupId("test-group-id")
-                .version("0")
-                .description("the cool group")
-                .displayName("Cooler Group Name for Update")
-                .member(MemberSummary.builder()
-                    .origin("uaa")
-                    .type(MemberType.USER)
-                    .memberId("f0e6a061-6e3a-4be9-ace5-142ee24e20b7")
-                    .build())
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(UpdateGroupResponse.builder()
-                .id("test-group-id")
-                .metadata(Metadata.builder()
-                    .created("2016-06-03T17:59:30.527Z")
-                    .lastModified("2016-06-03T17:59:30.561Z")
-                    .version(1)
-                    .build())
-                .description("the cool group")
-                .displayName("Cooler Group Name for Update")
-                .member(MemberSummary.builder()
-                    .origin("uaa")
-                    .type(MemberType.USER)
-                    .memberId("f0e6a061-6e3a-4be9-ace5-142ee24e20b7")
-                    .build())
-                .schema("urn:scim:schemas:core:1.0")
-                .zoneId("uaa")
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .update(
+                        UpdateGroupRequest.builder()
+                                .identityZoneId("uaa")
+                                .groupId("test-group-id")
+                                .version("0")
+                                .description("the cool group")
+                                .displayName("Cooler Group Name for Update")
+                                .member(
+                                        MemberSummary.builder()
+                                                .origin("uaa")
+                                                .type(MemberType.USER)
+                                                .memberId("f0e6a061-6e3a-4be9-ace5-142ee24e20b7")
+                                                .build())
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        UpdateGroupResponse.builder()
+                                .id("test-group-id")
+                                .metadata(
+                                        Metadata.builder()
+                                                .created("2016-06-03T17:59:30.527Z")
+                                                .lastModified("2016-06-03T17:59:30.561Z")
+                                                .version(1)
+                                                .build())
+                                .description("the cool group")
+                                .displayName("Cooler Group Name for Update")
+                                .member(
+                                        MemberSummary.builder()
+                                                .origin("uaa")
+                                                .type(MemberType.USER)
+                                                .memberId("f0e6a061-6e3a-4be9-ace5-142ee24e20b7")
+                                                .build())
+                                .schema("urn:scim:schemas:core:1.0")
+                                .zoneId("uaa")
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -554,26 +604,31 @@ final class ReactorGroupsTest extends AbstractUaaApiTest {
             .build());
 
         this.groups
-            .unmapExternalGroupByGroupDisplayName(UnmapExternalGroupByGroupDisplayNameRequest.builder()
-                .groupDisplayName("Group For Testing Deleting External Group Mapping By Name")
-                .externalGroup("external group")
-                .origin("ldap")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(UnmapExternalGroupByGroupDisplayNameResponse.builder()
-                .groupId("f8f0048f-de32-4d20-b41d-5820b690063d")
-                .displayName("Group For Testing Deleting External Group Mapping By Name")
-                .origin("ldap")
-                .externalGroup("external group")
-                .metadata(Metadata.builder()
-                    .created("2016-06-16T00:01:41.465Z")
-                    .lastModified("2016-06-16T00:01:41.465Z")
-                    .version(0)
-                    .build())
-                .schema("urn:scim:schemas:core:1.0")
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .unmapExternalGroupByGroupDisplayName(
+                        UnmapExternalGroupByGroupDisplayNameRequest.builder()
+                                .groupDisplayName(
+                                        "Group For Testing Deleting External Group Mapping By Name")
+                                .externalGroup("external group")
+                                .origin("ldap")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        UnmapExternalGroupByGroupDisplayNameResponse.builder()
+                                .groupId("f8f0048f-de32-4d20-b41d-5820b690063d")
+                                .displayName(
+                                        "Group For Testing Deleting External Group Mapping By Name")
+                                .origin("ldap")
+                                .externalGroup("external group")
+                                .metadata(
+                                        Metadata.builder()
+                                                .created("2016-06-16T00:01:41.465Z")
+                                                .lastModified("2016-06-16T00:01:41.465Z")
+                                                .version(0)
+                                                .build())
+                                .schema("urn:scim:schemas:core:1.0")
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -589,26 +644,28 @@ final class ReactorGroupsTest extends AbstractUaaApiTest {
             .build());
 
         this.groups
-            .unmapExternalGroupByGroupId(UnmapExternalGroupByGroupIdRequest.builder()
-                .groupId("d68167b4-81b3-490d-9838-94092d5c89f6")
-                .externalGroup("external group")
-                .origin("ldap")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(UnmapExternalGroupByGroupIdResponse.builder()
-                .groupId("d68167b4-81b3-490d-9838-94092d5c89f6")
-                .displayName("Group For Testing Deleting External Group Mapping")
-                .origin("ldap")
-                .externalGroup("external group")
-                .metadata(Metadata.builder()
-                    .created("2016-06-16T00:01:41.223Z")
-                    .lastModified("2016-06-16T00:01:41.223Z")
-                    .version(0)
-                    .build())
-                .schema("urn:scim:schemas:core:1.0")
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .unmapExternalGroupByGroupId(
+                        UnmapExternalGroupByGroupIdRequest.builder()
+                                .groupId("d68167b4-81b3-490d-9838-94092d5c89f6")
+                                .externalGroup("external group")
+                                .origin("ldap")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        UnmapExternalGroupByGroupIdResponse.builder()
+                                .groupId("d68167b4-81b3-490d-9838-94092d5c89f6")
+                                .displayName("Group For Testing Deleting External Group Mapping")
+                                .origin("ldap")
+                                .externalGroup("external group")
+                                .metadata(
+                                        Metadata.builder()
+                                                .created("2016-06-16T00:01:41.223Z")
+                                                .lastModified("2016-06-16T00:01:41.223Z")
+                                                .version(0)
+                                                .build())
+                                .schema("urn:scim:schemas:core:1.0")
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
-
 }

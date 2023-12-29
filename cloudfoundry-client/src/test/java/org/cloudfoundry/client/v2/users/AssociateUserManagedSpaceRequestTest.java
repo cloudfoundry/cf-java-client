@@ -43,9 +43,8 @@ final class AssociateUserManagedSpaceRequestTest {
     @Test
     void valid() {
         AssociateUserManagedSpaceRequest.builder()
-            .managedSpaceId("test-managed-space-id")
-            .userId("test-user-id")
-            .build();
+                .managedSpaceId("test-managed-space-id")
+                .userId("test-user-id")
+                .build();
     }
-
 }

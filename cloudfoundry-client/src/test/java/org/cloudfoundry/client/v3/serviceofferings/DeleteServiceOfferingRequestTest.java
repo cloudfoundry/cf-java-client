@@ -36,5 +36,4 @@ final class DeleteServiceOfferingRequestTest {
             .serviceOfferingId("test-id")
             .build();
     }
-
 }

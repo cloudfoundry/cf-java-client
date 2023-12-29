@@ -64,5 +64,4 @@ abstract class AbstractTcpRoute {
      */
     @JsonProperty("ttl")
     abstract Integer getTtl();
-
 }

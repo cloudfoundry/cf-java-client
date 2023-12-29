@@ -36,5 +36,4 @@ final class CancelTaskRequestTest {
             .taskId("test-task-id")
             .build();
     }
-
 }

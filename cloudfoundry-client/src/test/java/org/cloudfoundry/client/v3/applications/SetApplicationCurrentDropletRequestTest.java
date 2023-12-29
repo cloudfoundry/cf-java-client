@@ -47,11 +47,8 @@ final class SetApplicationCurrentDropletRequestTest {
     @Test
     void valid() {
         SetApplicationCurrentDropletRequest.builder()
-            .applicationId("test-application-id")
-            .data(Relationship.builder()
-                .id("test-droplet-id")
-                .build())
-            .build();
+                .applicationId("test-application-id")
+                .data(Relationship.builder().id("test-droplet-id").build())
+                .build();
     }
-
 }

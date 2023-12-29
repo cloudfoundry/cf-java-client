@@ -36,5 +36,4 @@ final class GetApplicationSshEnabledRequestTest {
             .applicationId("test-application-id")
             .build();
     }
-
 }

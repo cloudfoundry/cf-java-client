@@ -47,7 +47,6 @@ public interface ServiceBrokers {
      */
     Mono<GetServiceBrokerResponse> get(GetServiceBrokerRequest request);
 
-
     /**
      * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/service_brokers/list_all_service_brokers.html">List all Service Brokers</a> request
      *
@@ -63,5 +62,4 @@ public interface ServiceBrokers {
      * @return the response from the Update Service Broker request
      */
     Mono<UpdateServiceBrokerResponse> update(UpdateServiceBrokerRequest request);
-
 }

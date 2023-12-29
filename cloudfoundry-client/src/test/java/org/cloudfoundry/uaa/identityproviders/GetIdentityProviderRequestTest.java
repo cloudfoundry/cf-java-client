@@ -34,9 +34,8 @@ final class GetIdentityProviderRequestTest {
     @Test
     void valid() {
         GetIdentityProviderRequest.builder()
-            .identityProviderId("test-identity-provider-id")
-            .identityZoneId("test-identity-zone-id")
-            .build();
+                .identityProviderId("test-identity-provider-id")
+                .identityZoneId("test-identity-zone-id")
+                .build();
     }
-
 }

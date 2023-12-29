@@ -36,5 +36,4 @@ final class ScaleProcessRequestTest {
             .processId("test-process-id")
             .build();
     }
-
 }

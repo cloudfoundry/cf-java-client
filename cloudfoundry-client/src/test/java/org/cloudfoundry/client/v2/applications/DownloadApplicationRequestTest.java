@@ -36,5 +36,4 @@ final class DownloadApplicationRequestTest {
             .applicationId("test-application-id")
             .build();
     }
-
 }

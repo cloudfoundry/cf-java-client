@@ -16,12 +16,28 @@
 
 package org.cloudfoundry.reactor.tokenprovider;
 
+import static io.netty.handler.codec.http.HttpHeaderNames.AUTHORIZATION;
+import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
+import static io.netty.handler.codec.http.HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED;
+import static reactor.core.publisher.Sinks.EmitFailureHandler.FAIL_FAST;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.AsciiString;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Base64;
+import java.util.Date;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
@@ -42,23 +58,6 @@ import reactor.netty.ByteBufFlux;
 import reactor.netty.http.client.HttpClientForm;
 import reactor.netty.http.client.HttpClientRequest;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Base64;
-import java.util.Date;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Function;
-
-import static io.netty.handler.codec.http.HttpHeaderNames.AUTHORIZATION;
-import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
-import static io.netty.handler.codec.http.HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED;
-import static reactor.core.publisher.Sinks.EmitFailureHandler.FAIL_FAST;
-
 /**
  * An abstract base class for all token providers that interact with the UAA. It encapsulates the logic to refresh the token before
  * expiration.
@@ -77,11 +76,14 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
 
     private static final ZoneId UTC = ZoneId.of("UTC");
 
-    private final ConcurrentMap<ConnectionContext, Mono<String>> accessTokens = new ConcurrentHashMap<>(1);
+    private final ConcurrentMap<ConnectionContext, Mono<String>> accessTokens =
+            new ConcurrentHashMap<>(1);
 
-    private final ConcurrentMap<ConnectionContext, RefreshToken> refreshTokenStreams = new ConcurrentHashMap<>(1);
+    private final ConcurrentMap<ConnectionContext, RefreshToken> refreshTokenStreams =
+            new ConcurrentHashMap<>(1);
 
-    private final ConcurrentMap<ConnectionContext, Mono<String>> refreshTokens = new ConcurrentHashMap<>(1);
+    private final ConcurrentMap<ConnectionContext, Mono<String>> refreshTokens =
+            new ConcurrentHashMap<>(1);
 
     /**
      * The client id. Defaults to {@code cf}.
@@ -139,10 +141,16 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Access Token: {}", accessToken);
 
-            parseToken(accessToken).ifPresent(claims -> {
-                LOGGER.debug("Access Token Issued At:  {} UTC", toLocalDateTime(claims.getIssuedAt()));
-                LOGGER.debug("Access Token Expires At: {} UTC", toLocalDateTime(claims.getExpiration()));
-            });
+            parseToken(accessToken)
+                    .ifPresent(
+                            claims -> {
+                                LOGGER.debug(
+                                        "Access Token Issued At:  {} UTC",
+                                        toLocalDateTime(claims.getIssuedAt()));
+                                LOGGER.debug(
+                                        "Access Token Expires At: {} UTC",
+                                        toLocalDateTime(claims.getExpiration()));
+                            });
         }
 
         return String.format("%s %s", payload.get(TOKEN_TYPE), accessToken);
@@ -171,7 +179,8 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
         return LocalDateTime.from(date.toInstant().atZone(UTC));
     }
 
-    private static Function<UriComponentsBuilder, UriComponentsBuilder> tokenUriTransformer(String identityZoneId) {
+    private static Function<UriComponentsBuilder, UriComponentsBuilder> tokenUriTransformer(
+            String identityZoneId) {
         return root -> {
             if (identityZoneId != null) {
                 root.host(String.format("%s.%s", identityZoneId, root.build().getHost()));
@@ -190,24 +199,42 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
 
     private Operator createOperator(ConnectionContext connectionContext, String root) {
         OperatorContext context = OperatorContext.of(connectionContext, root);
-        return new Operator(context, connectionContext.getHttpClient()).withErrorPayloadMapper(ErrorPayloadMappers.uaa(connectionContext.getObjectMapper()));
+        return new Operator(context, connectionContext.getHttpClient())
+                .withErrorPayloadMapper(
+                        ErrorPayloadMappers.uaa(connectionContext.getObjectMapper()));
     }
 
     private Consumer<Map<String, String>> extractRefreshToken(ConnectionContext connectionContext) {
-        return payload -> Optional.ofNullable(payload.get(REFRESH_TOKEN))
-            .ifPresent(refreshToken -> {
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Refresh Token: {}", refreshToken);
+        return payload ->
+                Optional.ofNullable(payload.get(REFRESH_TOKEN))
+                        .ifPresent(
+                                refreshToken -> {
+                                    if (LOGGER.isDebugEnabled()) {
+                                        LOGGER.debug("Refresh Token: {}", refreshToken);
 
-                    parseToken(refreshToken).ifPresent(claims -> {
-                        LOGGER.debug("Refresh Token Issued At:  {} UTC", toLocalDateTime(claims.getIssuedAt()));
-                        LOGGER.debug("Refresh Token Expires At: {} UTC", toLocalDateTime(claims.getExpiration()));
-                    });
-                }
+                                        parseToken(refreshToken)
+                                                .ifPresent(
+                                                        claims -> {
+                                                            LOGGER.debug(
+                                                                    "Refresh Token Issued At:  {}"
+                                                                            + " UTC",
+                                                                    toLocalDateTime(
+                                                                            claims.getIssuedAt()));
+                                                            LOGGER.debug(
+                                                                    "Refresh Token Expires At: {}"
+                                                                            + " UTC",
+                                                                    toLocalDateTime(
+                                                                            claims
+                                                                                    .getExpiration()));
+                                                        });
+                                    }
 
-                this.refreshTokens.put(connectionContext, Mono.just(refreshToken));
-                getRefreshTokenStream(connectionContext).sink.emitNext(refreshToken, FAIL_FAST);
-            });
+                                    this.refreshTokens.put(
+                                            connectionContext, Mono.just(refreshToken));
+                                    getRefreshTokenStream(connectionContext)
+                                            .sink
+                                            .emitNext(refreshToken, FAIL_FAST);
+                                });
     }
 
     private RefreshToken getRefreshTokenStream(ConnectionContext connectionContext) {
@@ -215,64 +242,106 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
     }
 
     private Mono<String> primaryToken(ConnectionContext connectionContext) {
-        return requestToken(connectionContext, this::tokenRequestTransformer, tokensExtractor(connectionContext));
+        return requestToken(
+                connectionContext,
+                this::tokenRequestTransformer,
+                tokensExtractor(connectionContext));
     }
 
     private Mono<String> refreshToken(ConnectionContext connectionContext, String refreshToken) {
-        return requestToken(connectionContext, refreshTokenGrantTokenRequestTransformer(refreshToken), tokensExtractor(connectionContext))
-            .onErrorResume(t -> t instanceof UaaException && ((UaaException) t).getStatusCode() == HttpResponseStatus.UNAUTHORIZED.code(), t -> Mono.empty());
+        return requestToken(
+                        connectionContext,
+                        refreshTokenGrantTokenRequestTransformer(refreshToken),
+                        tokensExtractor(connectionContext))
+                .onErrorResume(
+                        t ->
+                                t instanceof UaaException
+                                        && ((UaaException) t).getStatusCode()
+                                                == HttpResponseStatus.UNAUTHORIZED.code(),
+                        t -> Mono.empty());
     }
 
-    private BiConsumer<HttpClientRequest, HttpClientForm> refreshTokenGrantTokenRequestTransformer(String refreshToken) {
-        return (request, form) -> form.multipart(false)
-            .attr("client_id", getClientId())
-            .attr("client_secret", getClientSecret())
-            .attr("grant_type", "refresh_token")
-            .attr("refresh_token", refreshToken);
+    private BiConsumer<HttpClientRequest, HttpClientForm> refreshTokenGrantTokenRequestTransformer(
+            String refreshToken) {
+        return (request, form) ->
+                form.multipart(false)
+                        .attr("client_id", getClientId())
+                        .attr("client_secret", getClientSecret())
+                        .attr("grant_type", "refresh_token")
+                        .attr("refresh_token", refreshToken);
     }
 
-    private Mono<String> requestToken(ConnectionContext connectionContext, BiConsumer<HttpClientRequest, HttpClientForm> tokenRequestTransformer, Function<ByteBufFlux, Mono<String>> tokenExtractor) {
-        return connectionContext.getRootProvider()
-            .getRoot(AUTHORIZATION_ENDPOINT, connectionContext)
-            .map(root -> createOperator(connectionContext, root))
-            .flatMap(operator -> operator.headers(this::addHeaders)
-                .post()
-                .uri(tokenUriTransformer(getIdentityZoneSubdomain()))
-                .sendForm(tokenRequestTransformer)
-                .response()
-                .parseBodyToToken(responseWithBody -> tokenExtractor.apply(responseWithBody.getBody())));
+    private Mono<String> requestToken(
+            ConnectionContext connectionContext,
+            BiConsumer<HttpClientRequest, HttpClientForm> tokenRequestTransformer,
+            Function<ByteBufFlux, Mono<String>> tokenExtractor) {
+        return connectionContext
+                .getRootProvider()
+                .getRoot(AUTHORIZATION_ENDPOINT, connectionContext)
+                .map(root -> createOperator(connectionContext, root))
+                .flatMap(
+                        operator ->
+                                operator.headers(this::addHeaders)
+                                        .post()
+                                        .uri(tokenUriTransformer(getIdentityZoneSubdomain()))
+                                        .sendForm(tokenRequestTransformer)
+                                        .response()
+                                        .parseBodyToToken(
+                                                responseWithBody ->
+                                                        tokenExtractor.apply(
+                                                                responseWithBody.getBody())));
     }
 
     private void setAuthorization(HttpHeaders headers) {
-        String encoded = Base64.getEncoder().encodeToString(new AsciiString(getClientId()).concat(":").concat(getClientSecret()).toByteArray());
+        String encoded =
+                Base64.getEncoder()
+                        .encodeToString(
+                                new AsciiString(getClientId())
+                                        .concat(":")
+                                        .concat(getClientSecret())
+                                        .toByteArray());
         headers.set(AUTHORIZATION, String.format("Basic %s", encoded));
     }
 
     private Mono<String> token(ConnectionContext connectionContext) {
-        Mono<String> cached = this.refreshTokens.getOrDefault(connectionContext, Mono.empty())
-            .flatMap(refreshToken -> refreshToken(connectionContext, refreshToken)
-                .doOnSubscribe(s -> LOGGER.debug("Negotiating using refresh token")))
-            .switchIfEmpty(primaryToken(connectionContext)
-                .doOnSubscribe(s -> LOGGER.debug("Negotiating using token provider")));
+        Mono<String> cached =
+                this.refreshTokens
+                        .getOrDefault(connectionContext, Mono.empty())
+                        .flatMap(
+                                refreshToken ->
+                                        refreshToken(connectionContext, refreshToken)
+                                                .doOnSubscribe(
+                                                        s ->
+                                                                LOGGER.debug(
+                                                                        "Negotiating using refresh"
+                                                                                + " token")))
+                        .switchIfEmpty(
+                                primaryToken(connectionContext)
+                                        .doOnSubscribe(
+                                                s ->
+                                                        LOGGER.debug(
+                                                                "Negotiating using token"
+                                                                        + " provider")));
 
-        return connectionContext.getCacheDuration()
-            .map(cached::cache)
-            .orElseGet(cached::cache)
-            .checkpoint();
+        return connectionContext
+                .getCacheDuration()
+                .map(cached::cache)
+                .orElseGet(cached::cache)
+                .checkpoint();
     }
 
     @SuppressWarnings("unchecked")
-    private Function<ByteBufFlux, Mono<String>> tokensExtractor(ConnectionContext connectionContext) {
-        return body -> JsonCodec.decode(connectionContext.getObjectMapper(), body, Map.class)
-            .map(payload -> (Map<String, String>) payload)
-            .doOnNext(extractRefreshToken(connectionContext))
-            .map(AbstractUaaTokenProvider::extractAccessToken);
+    private Function<ByteBufFlux, Mono<String>> tokensExtractor(
+            ConnectionContext connectionContext) {
+        return body ->
+                JsonCodec.decode(connectionContext.getObjectMapper(), body, Map.class)
+                        .map(payload -> (Map<String, String>) payload)
+                        .doOnNext(extractRefreshToken(connectionContext))
+                        .map(AbstractUaaTokenProvider::extractAccessToken);
     }
 
     private static final class RefreshToken {
 
         private Sinks.Many<String> sink = Sinks.many().replay().latest();
-
     }
-
 }

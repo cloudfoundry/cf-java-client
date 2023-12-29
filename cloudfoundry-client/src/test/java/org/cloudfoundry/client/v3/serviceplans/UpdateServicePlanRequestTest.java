@@ -36,5 +36,4 @@ final class UpdateServicePlanRequestTest {
             .servicePlanId("test-service-plan-id")
             .build();
     }
-
 }

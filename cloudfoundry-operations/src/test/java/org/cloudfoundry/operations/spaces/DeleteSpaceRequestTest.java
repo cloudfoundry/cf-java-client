@@ -36,5 +36,4 @@ final class DeleteSpaceRequestTest {
             .name("test-name")
             .build();
     }
-
 }

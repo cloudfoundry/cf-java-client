@@ -33,8 +33,7 @@ final class UpdateUserProvidedServiceInstanceRequestTest {
     @Test
     void valid() {
         UpdateUserProvidedServiceInstanceRequest.builder()
-            .userProvidedServiceInstanceId("test-id")
-            .build();
+                .userProvidedServiceInstanceId("test-id")
+                .build();
     }
-
 }

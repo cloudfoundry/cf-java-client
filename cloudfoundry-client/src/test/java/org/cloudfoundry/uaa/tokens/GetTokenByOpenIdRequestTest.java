@@ -61,21 +61,20 @@ final class GetTokenByOpenIdRequestTest {
     @Test
     void validMax() {
         GetTokenByOpenIdRequest.builder()
-            .authorizationCode("test-authorization-code")
-            .clientId("test-client-id")
-            .clientSecret("test-client-secret")
-            .redirectUri("test-redirect-uri")
-            .tokenFormat(TokenFormat.OPAQUE)
-            .build();
+                .authorizationCode("test-authorization-code")
+                .clientId("test-client-id")
+                .clientSecret("test-client-secret")
+                .redirectUri("test-redirect-uri")
+                .tokenFormat(TokenFormat.OPAQUE)
+                .build();
     }
 
     @Test
     void validMin() {
         GetTokenByOpenIdRequest.builder()
-            .authorizationCode("test-authorization-code")
-            .clientId("test-client-id")
-            .clientSecret("test-client-secret")
-            .build();
+                .authorizationCode("test-authorization-code")
+                .clientId("test-client-id")
+                .clientSecret("test-client-secret")
+                .build();
     }
-
 }

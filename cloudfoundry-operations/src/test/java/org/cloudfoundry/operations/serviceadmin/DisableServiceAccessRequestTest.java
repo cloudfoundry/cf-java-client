@@ -36,5 +36,4 @@ final class DisableServiceAccessRequestTest {
             .serviceName("test-service-name")
             .build();
     }
-
 }

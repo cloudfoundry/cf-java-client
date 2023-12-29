@@ -43,9 +43,8 @@ final class AssociateOrganizationBillingManagerByUsernameRequestTest {
     @Test
     void valid() {
         AssociateOrganizationBillingManagerByUsernameRequest.builder()
-            .organizationId("test-organization-id")
-            .username("test-username")
-            .build();
+                .organizationId("test-organization-id")
+                .username("test-username")
+                .build();
     }
-
 }

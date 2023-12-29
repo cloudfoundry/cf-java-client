@@ -33,8 +33,7 @@ final class GetOrganizationDefaultIsolationSegmentRequestTest {
     @Test
     void valid() {
         GetOrganizationDefaultIsolationSegmentRequest.builder()
-            .organizationId("test-organization-id")
-            .build();
+                .organizationId("test-organization-id")
+                .build();
     }
-
 }

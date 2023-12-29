@@ -37,5 +37,4 @@ final class DeleteStackRequestTest {
             .stackId("test-stack-id")
             .build();
     }
-
 }

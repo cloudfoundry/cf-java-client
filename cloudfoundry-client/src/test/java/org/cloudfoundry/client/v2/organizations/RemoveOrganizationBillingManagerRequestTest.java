@@ -43,9 +43,8 @@ final class RemoveOrganizationBillingManagerRequestTest {
     @Test
     void valid() {
         RemoveOrganizationBillingManagerRequest.builder()
-            .billingManagerId("test-billing-manager-id")
-            .organizationId("test-organization-id")
-            .build();
+                .billingManagerId("test-billing-manager-id")
+                .organizationId("test-organization-id")
+                .build();
     }
-
 }

@@ -19,16 +19,15 @@ package org.cloudfoundry.reactor.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.handler.codec.http.HttpHeaderNames;
-import reactor.core.Exceptions;
-import reactor.netty.http.client.HttpClientForm;
-import reactor.netty.http.client.HttpClientRequest;
-
 import java.io.ByteArrayInputStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import reactor.core.Exceptions;
+import reactor.netty.http.client.HttpClientForm;
+import reactor.netty.http.client.HttpClientRequest;
 
 public final class MultipartHttpClientRequest {
 
@@ -40,7 +39,8 @@ public final class MultipartHttpClientRequest {
 
     private final HttpClientRequest request;
 
-    public MultipartHttpClientRequest(ObjectMapper objectMapper, HttpClientRequest request, HttpClientForm form) {
+    public MultipartHttpClientRequest(
+            ObjectMapper objectMapper, HttpClientRequest request, HttpClientForm form) {
         this.objectMapper = objectMapper;
         this.request = request;
         this.form = form;
@@ -52,16 +52,18 @@ public final class MultipartHttpClientRequest {
     }
 
     public void done() {
-        List<PartHttpClientRequest> parts = this.partConsumers.stream()
-            .map(partConsumer -> {
-                PartHttpClientRequest part = new PartHttpClientRequest(this.objectMapper);
-                partConsumer.accept(part);
-                return part;
-            })
-            .collect(Collectors.toList());
+        List<PartHttpClientRequest> parts =
+                this.partConsumers.stream()
+                        .map(
+                                partConsumer -> {
+                                    PartHttpClientRequest part =
+                                            new PartHttpClientRequest(this.objectMapper);
+                                    partConsumer.accept(part);
+                                    return part;
+                                })
+                        .collect(Collectors.toList());
 
-        this.request.requestHeaders()
-            .remove(HttpHeaderNames.TRANSFER_ENCODING);
+        this.request.requestHeaders().remove(HttpHeaderNames.TRANSFER_ENCODING);
 
         this.form.multipart(true);
 
@@ -123,13 +125,12 @@ public final class MultipartHttpClientRequest {
 
         private HttpClientForm send(HttpClientForm form) {
             if (this.file != null) {
-                return form.file(this.name, getFilenameOrDefault(), this.file.toFile(), this.contentType);
+                return form.file(
+                        this.name, getFilenameOrDefault(), this.file.toFile(), this.contentType);
             } else if (this.payload != null) {
                 return form.file(this.name, this.payload, this.contentType);
             }
             return form;
         }
-
     }
-
 }

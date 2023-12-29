@@ -33,8 +33,7 @@ final class ListUserProvidedServiceInstanceServiceBindingsRequestTest {
     @Test
     void valid() {
         ListUserProvidedServiceInstanceServiceBindingsRequest.builder()
-            .userProvidedServiceInstanceId("test-user-provided-service-instance-id")
-            .build();
+                .userProvidedServiceInstanceId("test-user-provided-service-instance-id")
+                .build();
     }
-
 }

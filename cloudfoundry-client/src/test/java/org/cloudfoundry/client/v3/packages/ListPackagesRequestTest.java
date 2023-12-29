@@ -25,5 +25,4 @@ final class ListPackagesRequestTest {
         ListPackagesRequest.builder()
             .build();
     }
-
 }

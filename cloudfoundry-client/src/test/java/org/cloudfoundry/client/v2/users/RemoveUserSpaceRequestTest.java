@@ -47,5 +47,4 @@ final class RemoveUserSpaceRequestTest {
             .userId("test-user-id")
             .build();
     }
-
 }

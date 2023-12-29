@@ -36,5 +36,4 @@ final class DeleteServiceBindingRequestTest {
             .serviceBindingId("test-service-binding-id")
             .build();
     }
-
 }

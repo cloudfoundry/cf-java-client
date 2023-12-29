@@ -36,5 +36,4 @@ final class GetServiceInstanceRequestTest {
             .name("test-service-name")
             .build();
     }
-
 }

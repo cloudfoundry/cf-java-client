@@ -33,8 +33,7 @@ final class GetApplicationUsageEventRequestTest {
     @Test
     void valid() {
         GetApplicationUsageEventRequest.builder()
-            .applicationUsageEventId("test-application-usage-event-id")
-            .build();
+                .applicationUsageEventId("test-application-usage-event-id")
+                .build();
     }
-
 }

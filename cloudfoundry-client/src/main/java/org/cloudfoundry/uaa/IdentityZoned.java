@@ -41,5 +41,4 @@ public interface IdentityZoned {
     @JsonIgnore
     @Nullable
     String getIdentityZoneSubdomain();
-
 }

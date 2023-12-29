@@ -36,5 +36,4 @@ final class DisallowSpaceSshRequestTest {
             .name("test-name")
             .build();
     }
-
 }

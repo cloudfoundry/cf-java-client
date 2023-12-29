@@ -16,6 +16,11 @@
 
 package org.cloudfoundry.reactor.client.v3.jobs;
 
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+
+import java.time.Duration;
+import java.util.Collections;
 import org.cloudfoundry.client.v3.Error;
 import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.jobs.GetJobRequest;
@@ -28,15 +33,12 @@ import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-import java.time.Duration;
-import java.util.Collections;
-
-import static io.netty.handler.codec.http.HttpMethod.GET;
-import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 final class ReactorJobsV3Test extends AbstractClientApiTest {
 
-    private final ReactorJobsV3 jobs = new ReactorJobsV3(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
+    private final ReactorJobsV3 jobs =
+            new ReactorJobsV3(
+                    CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     void get() {
@@ -51,30 +53,35 @@ final class ReactorJobsV3Test extends AbstractClientApiTest {
             .build());
 
         this.jobs
-            .get(GetJobRequest.builder()
-                .jobId("test-job-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(GetJobResponse.builder()
-                .id("b19ae525-cbd3-4155-b156-dc0c2a431b4c")
-                .createdAt("2016-10-19T20:25:04Z")
-                .updatedAt("2016-11-08T16:41:26Z")
-                .operation("app.delete")
-                .state(JobState.FAILED)
-                .link("self", Link.builder()
-                    .href("https://api.example.org/v3/jobs/b19ae525-cbd3-4155-b156-dc0c2a431b4c")
-                    .build())
-                .link("app", Link.builder()
-                    .href("https://api.example.org/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058396")
-                    .build())
-                .error(Error.builder()
-                    .code(10008)
-                    .title("CF-UnprocessableEntity")
-                    .detail("something went wrong")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .get(GetJobRequest.builder().jobId("test-job-id").build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        GetJobResponse.builder()
+                                .id("b19ae525-cbd3-4155-b156-dc0c2a431b4c")
+                                .createdAt("2016-10-19T20:25:04Z")
+                                .updatedAt("2016-11-08T16:41:26Z")
+                                .operation("app.delete")
+                                .state(JobState.FAILED)
+                                .link(
+                                        "self",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/jobs/b19ae525-cbd3-4155-b156-dc0c2a431b4c")
+                                                .build())
+                                .link(
+                                        "app",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058396")
+                                                .build())
+                                .error(
+                                        Error.builder()
+                                                .code(10008)
+                                                .title("CF-UnprocessableEntity")
+                                                .detail("something went wrong")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
-
 }

@@ -47,5 +47,4 @@ final class CreateRouteRequestTest {
             .spaceId("test-space-id")
             .build();
     }
-
 }

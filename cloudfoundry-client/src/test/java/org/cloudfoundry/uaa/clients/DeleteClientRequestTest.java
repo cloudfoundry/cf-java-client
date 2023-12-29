@@ -36,5 +36,4 @@ final class DeleteClientRequestTest {
             .clientId("test-client-id")
             .build();
     }
-
 }

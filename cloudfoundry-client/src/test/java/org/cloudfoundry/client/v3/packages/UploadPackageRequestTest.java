@@ -52,5 +52,4 @@ final class UploadPackageRequestTest {
             .packageId("test-package-id")
             .build();
     }
-
 }

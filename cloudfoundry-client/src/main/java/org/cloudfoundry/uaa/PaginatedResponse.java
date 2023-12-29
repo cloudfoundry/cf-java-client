@@ -17,7 +17,6 @@
 package org.cloudfoundry.uaa;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.List;
 
 /**
@@ -56,5 +55,4 @@ public abstract class PaginatedResponse<T> {
      */
     @JsonProperty("totalResults")
     public abstract Integer getTotalResults();
-
 }

@@ -36,5 +36,4 @@ final class DeleteGroupRequestTest {
             .groupId("test-group-id")
             .build();
     }
-
 }

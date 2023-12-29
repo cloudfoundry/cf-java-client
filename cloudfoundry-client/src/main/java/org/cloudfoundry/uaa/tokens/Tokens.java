@@ -37,7 +37,8 @@ public interface Tokens {
      * @param request the Authorization Code request
      * @return the response from the Authorization Code request
      */
-    Mono<GetTokenByAuthorizationCodeResponse> getByAuthorizationCode(GetTokenByAuthorizationCodeRequest request);
+    Mono<GetTokenByAuthorizationCodeResponse> getByAuthorizationCode(
+            GetTokenByAuthorizationCodeRequest request);
 
     /**
      * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#client-credentials-grant">Client Credentials Grant</a> request
@@ -45,7 +46,8 @@ public interface Tokens {
      * @param request the Client Credentials request
      * @return the response from the Client Credentials request
      */
-    Mono<GetTokenByClientCredentialsResponse> getByClientCredentials(GetTokenByClientCredentialsRequest request);
+    Mono<GetTokenByClientCredentialsResponse> getByClientCredentials(
+            GetTokenByClientCredentialsRequest request);
 
     /**
      * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#one-time-passcode">One-time Passcode</a> request
@@ -53,7 +55,8 @@ public interface Tokens {
      * @param request the One Time Passcode token request
      * @return the response from the One Time Passcode token request
      */
-    Mono<GetTokenByOneTimePasscodeResponse> getByOneTimePasscode(GetTokenByOneTimePasscodeRequest request);
+    Mono<GetTokenByOneTimePasscodeResponse> getByOneTimePasscode(
+            GetTokenByOneTimePasscodeRequest request);
 
     /**
      * Makes the <a href="https://docs.cloudfoundry.org/api/uaa/#openid-connect">OpenID Connect</a> request
@@ -94,5 +97,4 @@ public interface Tokens {
      * @return the response from the refresh token request
      */
     Mono<RefreshTokenResponse> refresh(RefreshTokenRequest request);
-
 }

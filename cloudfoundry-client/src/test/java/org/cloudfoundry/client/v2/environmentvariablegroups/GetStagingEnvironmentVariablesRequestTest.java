@@ -25,5 +25,4 @@ final class GetStagingEnvironmentVariablesRequestTest {
         GetStagingEnvironmentVariablesRequest.builder()
             .build();
     }
-
 }

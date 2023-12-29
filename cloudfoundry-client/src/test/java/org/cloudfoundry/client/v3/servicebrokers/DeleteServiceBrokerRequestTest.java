@@ -19,5 +19,4 @@ final class DeleteServiceBrokerRequestTest {
             DeleteServiceBrokerRequest.builder().build();
         });
     }
-    
 }

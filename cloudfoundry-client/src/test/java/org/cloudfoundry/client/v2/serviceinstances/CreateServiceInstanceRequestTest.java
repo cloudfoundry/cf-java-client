@@ -55,10 +55,9 @@ final class CreateServiceInstanceRequestTest {
     @Test
     void valid() {
         CreateServiceInstanceRequest.builder()
-            .name("name")
-            .servicePlanId("service-plan-id")
-            .spaceId("space-id")
-            .build();
+                .name("name")
+                .servicePlanId("service-plan-id")
+                .spaceId("space-id")
+                .build();
     }
-
 }

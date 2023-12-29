@@ -36,5 +36,4 @@ final class DownloadApplicationDropletRequestTest {
             .applicationId("test-application-id")
             .build();
     }
-
 }

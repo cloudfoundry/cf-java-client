@@ -25,5 +25,4 @@ final class ListBuildsRequestTest {
         ListBuildsRequest.builder()
             .build();
     }
-
 }

@@ -39,5 +39,4 @@ public interface RootProvider {
      * @return the normalized API root
      */
     Mono<String> getRoot(String key, ConnectionContext connectionContext);
-
 }

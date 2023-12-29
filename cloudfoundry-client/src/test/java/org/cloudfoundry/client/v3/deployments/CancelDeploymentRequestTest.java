@@ -36,5 +36,4 @@ final class CancelDeploymentRequestTest {
             .deploymentId("test-deployment-id")
             .build();
     }
-
 }

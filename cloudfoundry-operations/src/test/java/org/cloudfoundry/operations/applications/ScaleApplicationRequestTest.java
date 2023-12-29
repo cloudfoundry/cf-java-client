@@ -36,5 +36,4 @@ final class ScaleApplicationRequestTest {
             .name("test-name")
             .build();
     }
-
 }

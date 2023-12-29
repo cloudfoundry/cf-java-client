@@ -36,5 +36,4 @@ final class CreateOrganizationRequestTest {
             .name("test-name")
             .build();
     }
-
 }

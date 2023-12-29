@@ -51,15 +51,14 @@ final class CreateSpaceRequestTest {
     @Test
     void valid() {
         CreateSpaceRequest.builder()
-            .name("test-name")
-            .relationships(SpaceRelationships.builder()
-                .organization(ToOneRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("test-id")
-                        .build())
-                    .build())
-                .build())
-            .build();
+                .name("test-name")
+                .relationships(
+                        SpaceRelationships.builder()
+                                .organization(
+                                        ToOneRelationship.builder()
+                                                .data(Relationship.builder().id("test-id").build())
+                                                .build())
+                                .build())
+                .build();
     }
-
 }

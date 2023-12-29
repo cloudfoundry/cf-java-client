@@ -18,9 +18,9 @@ package org.cloudfoundry.client.v3;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
-
 import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.Arrays;
 
 final class ClientV3ExceptionTest {
 
@@ -40,13 +40,13 @@ final class ClientV3ExceptionTest {
                     .build()));
 
         assertThat(exception)
-            .hasNoCause()
-            .hasMessage("test-title-1(-2): test-detail-1, test-title-2(-3): test-detail-2")
-            .extracting("statusCode").isEqualTo(-1);
+                .hasNoCause()
+                .hasMessage("test-title-1(-2): test-detail-1, test-title-2(-3): test-detail-2")
+                .extracting("statusCode")
+                .isEqualTo(-1);
 
         assertThat(exception.getErrors())
-            .flatExtracting(Error::getCode, Error::getDetail, Error::getTitle)
-            .contains(-2, "test-detail-1", "test-title-1", -3, "test-detail-2", "test-title-2");
+                .flatExtracting(Error::getCode, Error::getDetail, Error::getTitle)
+                .contains(-2, "test-detail-1", "test-title-1", -3, "test-detail-2", "test-title-2");
     }
-
 }

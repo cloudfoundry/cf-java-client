@@ -25,5 +25,4 @@ final class ListTokenKeysRequestTest {
         ListTokenKeysRequest.builder()
             .build();
     }
-
 }

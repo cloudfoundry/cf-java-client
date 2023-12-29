@@ -62,7 +62,8 @@ public enum DeploymentState {
             case "canceled":
                 return CANCELED;
             default:
-                throw new IllegalArgumentException(String.format("Unknown deployment state: %s", s));
+                throw new IllegalArgumentException(
+                        String.format("Unknown deployment state: %s", s));
         }
     }
 
@@ -75,5 +76,4 @@ public enum DeploymentState {
     public String toString() {
         return getValue();
     }
-
 }

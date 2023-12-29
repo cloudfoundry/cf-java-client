@@ -33,8 +33,7 @@ final class ListServiceInstanceRoutesRequestTest {
     @Test
     void valid() {
         ListServiceInstanceRoutesRequest.builder()
-            .serviceInstanceId("test-service-instance-id")
-            .build();
+                .serviceInstanceId("test-service-instance-id")
+                .build();
     }
-
 }

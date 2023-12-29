@@ -125,39 +125,48 @@ class CreateRoleRequestTest {
     @Test
     void validOrgRole() {
         CreateRoleRequest.builder()
-            .type(RoleType.ORGANIZATION_AUDITOR)
-            .relationships(RoleRelationships.builder()
-                .user(ToOneRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("test-user-id")
-                        .build())
-                    .build())
-                .organization(ToOneRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("test-org-id")
-                        .build())
-                    .build())
-                .build())
-            .build();
+                .type(RoleType.ORGANIZATION_AUDITOR)
+                .relationships(
+                        RoleRelationships.builder()
+                                .user(
+                                        ToOneRelationship.builder()
+                                                .data(
+                                                        Relationship.builder()
+                                                                .id("test-user-id")
+                                                                .build())
+                                                .build())
+                                .organization(
+                                        ToOneRelationship.builder()
+                                                .data(
+                                                        Relationship.builder()
+                                                                .id("test-org-id")
+                                                                .build())
+                                                .build())
+                                .build())
+                .build();
     }
 
     @Test
     void validSpaceRole() {
         CreateRoleRequest.builder()
-            .type(RoleType.SPACE_AUDITOR)
-            .relationships(RoleRelationships.builder()
-                .user(ToOneRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("test-user-id")
-                        .build())
-                    .build())
-                .space(ToOneRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("test-space-id")
-                        .build())
-                    .build())
-                .build())
-            .build();
+                .type(RoleType.SPACE_AUDITOR)
+                .relationships(
+                        RoleRelationships.builder()
+                                .user(
+                                        ToOneRelationship.builder()
+                                                .data(
+                                                        Relationship.builder()
+                                                                .id("test-user-id")
+                                                                .build())
+                                                .build())
+                                .space(
+                                        ToOneRelationship.builder()
+                                                .data(
+                                                        Relationship.builder()
+                                                                .id("test-space-id")
+                                                                .build())
+                                                .build())
+                                .build())
+                .build();
     }
-
 }

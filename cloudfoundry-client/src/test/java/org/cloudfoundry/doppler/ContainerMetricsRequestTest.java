@@ -36,5 +36,4 @@ final class ContainerMetricsRequestTest {
             .applicationId("test-application-id")
             .build();
     }
-
 }

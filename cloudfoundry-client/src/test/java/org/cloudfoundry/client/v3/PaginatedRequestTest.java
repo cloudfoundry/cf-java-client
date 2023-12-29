@@ -66,8 +66,5 @@ final class PaginatedRequestTest {
     }
 
     @Value.Immutable
-    static abstract class _StubPaginatedRequest extends PaginatedRequest {
-
-    }
-
+    abstract static class _StubPaginatedRequest extends PaginatedRequest {}
 }

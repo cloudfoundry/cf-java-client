@@ -25,5 +25,4 @@ class ListGroupsRequestTest {
         ListGroupsRequest.builder()
             .build();
     }
-
 }

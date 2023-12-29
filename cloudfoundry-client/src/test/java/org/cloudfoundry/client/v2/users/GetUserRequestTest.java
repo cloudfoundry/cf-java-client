@@ -36,5 +36,4 @@ final class GetUserRequestTest {
             .userId("test-user-id")
             .build();
     }
-
 }

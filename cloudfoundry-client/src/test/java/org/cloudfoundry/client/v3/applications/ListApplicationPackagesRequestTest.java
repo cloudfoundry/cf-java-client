@@ -36,5 +36,4 @@ final class ListApplicationPackagesRequestTest {
             .applicationId("test-application-id")
             .build();
     }
-
 }

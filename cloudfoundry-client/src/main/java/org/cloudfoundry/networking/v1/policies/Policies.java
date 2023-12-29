@@ -46,5 +46,4 @@ public interface Policies {
      * @return the response to the List Policies request
      */
     Mono<ListPoliciesResponse> list(ListPoliciesRequest request);
-
 }

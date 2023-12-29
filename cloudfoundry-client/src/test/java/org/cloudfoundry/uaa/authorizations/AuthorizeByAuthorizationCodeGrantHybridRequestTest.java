@@ -35,10 +35,10 @@ final class AuthorizeByAuthorizationCodeGrantHybridRequestTest {
     @Test
     void validMax() {
         AuthorizeByAuthorizationCodeGrantHybridRequest.builder()
-            .clientId("test-client-id")
-            .redirectUri("http://redirect.to/app")
-            .scope("test-scope")
-            .build();
+                .clientId("test-client-id")
+                .redirectUri("http://redirect.to/app")
+                .scope("test-scope")
+                .build();
     }
 
     @Test
@@ -47,5 +47,4 @@ final class AuthorizeByAuthorizationCodeGrantHybridRequestTest {
             .clientId("test-client-id")
             .build();
     }
-
 }

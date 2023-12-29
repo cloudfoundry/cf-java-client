@@ -46,9 +46,9 @@ final class GetApplicationProcessStatisticsRequestTest {
     @Test
     void valid() {
         GetApplicationProcessStatisticsRequest.builder()
-            .applicationId("test-id")
-            .type("test-type")
-            .build();
+                .applicationId("test-id")
+                .type("test-type")
+                .build();
     }
 
     @Test
@@ -60,8 +60,8 @@ final class GetApplicationProcessStatisticsRequestTest {
             .uptime(0L)
             .build();
         GetApplicationProcessStatisticsResponse.builder()
-            .resource(processStatisticsResource)
-            .build();
+                .resource(processStatisticsResource)
+                .build();
     }
 
     @Test
@@ -99,7 +99,7 @@ final class GetApplicationProcessStatisticsRequestTest {
             .fileDescriptorQuota(16384L)
             .build();
         GetApplicationProcessStatisticsResponse.builder()
-            .resource(processStatisticsResource)
-            .build();
+                .resource(processStatisticsResource)
+                .build();
     }
 }

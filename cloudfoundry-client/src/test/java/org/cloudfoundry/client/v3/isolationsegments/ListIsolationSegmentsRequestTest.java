@@ -25,5 +25,4 @@ final class ListIsolationSegmentsRequestTest {
         ListIsolationSegmentsRequest.builder()
             .build();
     }
-
 }

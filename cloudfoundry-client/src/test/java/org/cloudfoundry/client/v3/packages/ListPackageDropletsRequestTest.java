@@ -36,5 +36,4 @@ final class ListPackageDropletsRequestTest {
             .packageId("test-package-id")
             .build();
     }
-
 }

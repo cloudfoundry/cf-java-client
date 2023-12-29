@@ -1,8 +1,9 @@
 package org.cloudfoundry.reactor.client.v3.servicebrokers;
 
+import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import java.time.Duration;
 import java.util.Collections;
-
 import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.Pagination;
@@ -24,8 +25,7 @@ import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import org.junit.jupiter.api.Test;
-import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.HttpResponseStatus;
+
 import reactor.test.StepVerifier;
 
 final class ReactorServiceBrokersV3Test extends AbstractClientApiTest {
@@ -44,7 +44,7 @@ final class ReactorServiceBrokersV3Test extends AbstractClientApiTest {
 			.header("Location", "https://api.example.org/v3/jobs/af5c57f6-8769-41fa-a499-2c84ed896788")
 			.build())
 		.build());
-	
+
 	this.serviceBrokersV3
 	    .create(CreateServiceBrokerRequest.builder()
 		    .name("my_service_broker")
@@ -78,7 +78,7 @@ final class ReactorServiceBrokersV3Test extends AbstractClientApiTest {
 			.header("Location", "https://api.example.org/v3/jobs/af5c57f6-8769-41fa-a499-2c84ed896788")
 			.build())
 		.build());
-	
+
 	this.serviceBrokersV3
 	    .delete(DeleteServiceBrokerRequest.builder()
 		    .serviceBrokerId("test-service-broker-id")
@@ -100,7 +100,7 @@ final class ReactorServiceBrokersV3Test extends AbstractClientApiTest {
 			.payload("fixtures/client/v3/service_brokers/GET_{id}_response.json")
 			.build())
 		.build());
-	
+
 	this.serviceBrokersV3
 	    .get(GetServiceBrokerRequest.builder()
 		    .serviceBrokerId("test-service-broker-id")
@@ -148,7 +148,7 @@ final class ReactorServiceBrokersV3Test extends AbstractClientApiTest {
 			.payload("fixtures/client/v3/service_brokers/GET_response.json")
 			.build())
 		.build());
-	
+
 	this.serviceBrokersV3
 	    .list(ListServiceBrokersRequest.builder()
 		    .build())
@@ -173,7 +173,7 @@ final class ReactorServiceBrokersV3Test extends AbstractClientApiTest {
         		    .url("https://example.service-broker.com")
         		    .createdAt("2015-11-13T17:02:56Z")
         		    .updatedAt("2016-06-08T16:41:26Z")
-        		    .relationships(ServiceBrokerRelationships.builder()	    
+        		    .relationships(ServiceBrokerRelationships.builder()
         			    .build())
         		    .metadata(Metadata.builder()
         			    .labels(Collections.emptyMap())
@@ -230,7 +230,7 @@ final class ReactorServiceBrokersV3Test extends AbstractClientApiTest {
 			.header("Location", "https://api.example.org/v3/jobs/af5c57f6-8769-41fa-a499-2c84ed896788")
 			.build())
 		.build());
-	
+
 	this.serviceBrokersV3
 	    .update(UpdateServiceBrokerRequest.builder()
 		    .serviceBrokerId("test-service-broker-id")
@@ -265,47 +265,65 @@ final class ReactorServiceBrokersV3Test extends AbstractClientApiTest {
 			.build())
 		.build());
 
-	this.serviceBrokersV3
-	    .update(UpdateServiceBrokerRequest.builder()
-		    .serviceBrokerId("test-service-broker-id")
-		    .metadata(Metadata.builder()
-			    .label("type", "dev")
-			    .annotations(Collections.emptyMap())
-			    .build())
-		    .build())
-	    .doOnSuccess(response -> System.out.println(response))
-	    .as(StepVerifier::create)
-	    .expectNext(UpdateServiceBrokerResponse.builder()
-		    .serviceBroker(ServiceBrokerResource.builder()
-			    .id("dde5ad2a-d8f4-44dc-a56f-0452d744f1c3")
-                            .name("my_service_broker")
-                            .url("https://example.service-broker.com")
-                            .createdAt("2015-11-13T17:02:56Z")
-                            .updatedAt("2016-06-08T16:41:26Z")
-                            .relationships(ServiceBrokerRelationships.builder()
-                                            .space(ToOneRelationship.builder()
-                                            .data(Relationship.builder()
-                                                    .id("2f35885d-0c9d-4423-83ad-fd05066f8576")
-                                                    .build())
-                                            .build())
-                                    .build())
-                            .metadata(Metadata.builder()
-                                    .label("type", "dev")
-                                    .annotations(Collections.emptyMap())
-                                    .build())
-                            .link("self", Link.builder()
-                                    .href("https://api.example.org/v3/service_brokers/dde5ad2a-d8f4-44dc-a56f-0452d744f1c3")
-                                    .build())
-                            .link("service_offerings", Link.builder()
-                                    .href("https://api.example.org/v3/service_offerings?service_broker_guids=dde5ad2a-d8f4-44dc-a56f-0452d744f1c3")
-                                    .build())
-                            .link("space", Link.builder()
-                                    .href("https://api.example.org/v3/spaces/2f35885d-0c9d-4423-83ad-fd05066f8576")
-                                    .build())
-                            .build())
-                    .build())
-	    .expectComplete()
-	    .verify(Duration.ofSeconds(5));
+        this.serviceBrokersV3
+                .update(
+                        UpdateServiceBrokerRequest.builder()
+                                .serviceBrokerId("test-service-broker-id")
+                                .metadata(
+                                        Metadata.builder()
+                                                .label("type", "dev")
+                                                .annotations(Collections.emptyMap())
+                                                .build())
+                                .build())
+                .doOnSuccess(response -> System.out.println(response))
+                .as(StepVerifier::create)
+                .expectNext(
+                        UpdateServiceBrokerResponse.builder()
+                                .serviceBroker(
+                                        ServiceBrokerResource.builder()
+                                                .id("dde5ad2a-d8f4-44dc-a56f-0452d744f1c3")
+                                                .name("my_service_broker")
+                                                .url("https://example.service-broker.com")
+                                                .createdAt("2015-11-13T17:02:56Z")
+                                                .updatedAt("2016-06-08T16:41:26Z")
+                                                .relationships(
+                                                        ServiceBrokerRelationships.builder()
+                                                                .space(
+                                                                        ToOneRelationship.builder()
+                                                                                .data(
+                                                                                        Relationship
+                                                                                                .builder()
+                                                                                                .id(
+                                                                                                        "2f35885d-0c9d-4423-83ad-fd05066f8576")
+                                                                                                .build())
+                                                                                .build())
+                                                                .build())
+                                                .metadata(
+                                                        Metadata.builder()
+                                                                .label("type", "dev")
+                                                                .annotations(Collections.emptyMap())
+                                                                .build())
+                                                .link(
+                                                        "self",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/service_brokers/dde5ad2a-d8f4-44dc-a56f-0452d744f1c3")
+                                                                .build())
+                                                .link(
+                                                        "service_offerings",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/service_offerings?service_broker_guids=dde5ad2a-d8f4-44dc-a56f-0452d744f1c3")
+                                                                .build())
+                                                .link(
+                                                        "space",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/spaces/2f35885d-0c9d-4423-83ad-fd05066f8576")
+                                                                .build())
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
-    
 }

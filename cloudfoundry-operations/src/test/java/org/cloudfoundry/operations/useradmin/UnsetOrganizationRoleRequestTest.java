@@ -55,10 +55,9 @@ final class UnsetOrganizationRoleRequestTest {
     @Test
     void valid() {
         UnsetOrganizationRoleRequest.builder()
-            .organizationName("test-organization")
-            .organizationRole(OrganizationRole.MANAGER)
-            .username("test-username")
-            .build();
+                .organizationName("test-organization")
+                .organizationRole(OrganizationRole.MANAGER)
+                .username("test-username")
+                .build();
     }
-
 }

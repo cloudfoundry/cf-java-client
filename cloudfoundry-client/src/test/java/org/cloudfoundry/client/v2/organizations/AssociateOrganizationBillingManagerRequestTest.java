@@ -43,9 +43,8 @@ final class AssociateOrganizationBillingManagerRequestTest {
     @Test
     void valid() {
         AssociateOrganizationBillingManagerRequest.builder()
-            .billingManagerId("test-billing-manager-id")
-            .organizationId("test-organization-id")
-            .build();
+                .billingManagerId("test-billing-manager-id")
+                .organizationId("test-organization-id")
+                .build();
     }
-
 }

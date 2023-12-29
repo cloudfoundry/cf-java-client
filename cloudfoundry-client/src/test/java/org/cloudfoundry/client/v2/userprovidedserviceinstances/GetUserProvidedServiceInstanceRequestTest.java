@@ -33,8 +33,7 @@ final class GetUserProvidedServiceInstanceRequestTest {
     @Test
     void valid() {
         GetUserProvidedServiceInstanceRequest.builder()
-            .userProvidedServiceInstanceId("test-user-provided-service-instance-id")
-            .build();
+                .userProvidedServiceInstanceId("test-user-provided-service-instance-id")
+                .build();
     }
-
 }

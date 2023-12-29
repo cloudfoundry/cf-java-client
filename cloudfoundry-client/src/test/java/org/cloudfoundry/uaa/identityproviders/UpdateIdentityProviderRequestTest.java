@@ -100,15 +100,13 @@ final class UpdateIdentityProviderRequestTest {
     @Test
     void valid() {
         UpdateIdentityProviderRequest.builder()
-            .configuration(InternalConfiguration.builder()
-                .build())
-            .identityZoneId("test-identity-zone-id")
-            .identityProviderId("test-identity-provider-id")
-            .name("test-name")
-            .originKey("test-origin-key")
-            .type(Type.INTERNAL)
-            .version(0)
-            .build();
+                .configuration(InternalConfiguration.builder().build())
+                .identityZoneId("test-identity-zone-id")
+                .identityProviderId("test-identity-provider-id")
+                .name("test-name")
+                .originKey("test-origin-key")
+                .type(Type.INTERNAL)
+                .version(0)
+                .build();
     }
-
 }

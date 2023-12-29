@@ -36,5 +36,4 @@ final class ListServiceAccessSettingsRequestTest {
             .serviceName("test-service-name")
             .build();
     }
-
 }

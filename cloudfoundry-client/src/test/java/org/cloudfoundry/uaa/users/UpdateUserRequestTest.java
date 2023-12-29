@@ -117,19 +117,12 @@ final class UpdateUserRequestTest {
     @Test
     void valid() {
         UpdateUserRequest.builder()
-            .active(true)
-            .email(Email.builder()
-                .primary(true)
-                .value("john.doe@pivotal.io")
-                .build())
-            .id("user-id")
-            .version("*")
-            .name(Name.builder()
-                .familyName("Doe")
-                .givenName("John")
-                .build())
-            .userName("jdoe")
-            .build();
+                .active(true)
+                .email(Email.builder().primary(true).value("john.doe@pivotal.io").build())
+                .id("user-id")
+                .version("*")
+                .name(Name.builder().familyName("Doe").givenName("John").build())
+                .userName("jdoe")
+                .build();
     }
-
 }

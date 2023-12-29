@@ -36,5 +36,4 @@ class GetRoleRequestTest {
             .roleId("test-role-id")
             .build();
     }
-
 }

@@ -55,5 +55,4 @@ final class IdentityZoneBuilderTest {
             return "test-identity-zone-subdomain";
         }
     }
-
 }

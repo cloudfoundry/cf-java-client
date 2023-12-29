@@ -43,9 +43,8 @@ final class ChangeUserPasswordRequestTest {
     @Test
     void valid() {
         ChangeUserPasswordRequest.builder()
-            .password("test-password")
-            .userId("test-user-id")
-            .build();
+                .password("test-password")
+                .userId("test-user-id")
+                .build();
     }
-
 }

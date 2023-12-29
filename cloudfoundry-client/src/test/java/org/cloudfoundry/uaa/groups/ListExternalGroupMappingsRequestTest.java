@@ -25,5 +25,4 @@ final class ListExternalGroupMappingsRequestTest {
         ListExternalGroupMappingsRequest.builder()
             .build();
     }
-
 }

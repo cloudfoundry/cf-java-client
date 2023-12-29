@@ -27,14 +27,14 @@ final class CreateDeploymentRequestTest {
     @Test
     void noDropletValid() {
         CreateDeploymentRequest.builder()
-            .relationships(DeploymentRelationships.builder()
-                .app(ToOneRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("app-id")
-                        .build())
-                    .build())
-                .build())
-            .build();
+                .relationships(
+                        DeploymentRelationships.builder()
+                                .app(
+                                        ToOneRelationship.builder()
+                                                .data(Relationship.builder().id("app-id").build())
+                                                .build())
+                                .build())
+                .build();
     }
 
     @Test
@@ -49,14 +49,14 @@ final class CreateDeploymentRequestTest {
     @Test
     void valid() {
         CreateDeploymentRequest.builder()
-            .droplet(Relationship.builder().id("droplet-id").build())
-            .relationships(DeploymentRelationships.builder()
-                .app(ToOneRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("app-id")
-                        .build())
-                    .build())
-                .build())
-            .build();
+                .droplet(Relationship.builder().id("droplet-id").build())
+                .relationships(
+                        DeploymentRelationships.builder()
+                                .app(
+                                        ToOneRelationship.builder()
+                                                .data(Relationship.builder().id("app-id").build())
+                                                .build())
+                                .build())
+                .build();
     }
 }

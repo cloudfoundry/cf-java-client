@@ -33,8 +33,7 @@ class UpdateOrganizationQuotaDefinitionRequestTest {
     @Test
     void valid() {
         UpdateOrganizationQuotaDefinitionRequest.builder()
-            .organizationQuotaDefinitionId("test-organization-quota-definition-id")
-            .build();
+                .organizationQuotaDefinitionId("test-organization-quota-definition-id")
+                .build();
     }
-
 }

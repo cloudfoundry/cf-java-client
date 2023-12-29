@@ -33,8 +33,7 @@ final class ListIsolationSegmentSpacesRelationshipRequestTest {
     @Test
     void valid() {
         ListIsolationSegmentSpacesRelationshipRequest.builder()
-            .isolationSegmentId("test-isolation-segment-id")
-            .build();
+                .isolationSegmentId("test-isolation-segment-id")
+                .build();
     }
-
 }

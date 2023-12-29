@@ -36,5 +36,4 @@ final class ListOrganizationSpacesRequestTest {
             .organizationId("test-organization-id")
             .build();
     }
-
 }

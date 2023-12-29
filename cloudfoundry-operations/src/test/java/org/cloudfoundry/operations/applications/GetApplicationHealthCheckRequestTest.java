@@ -36,5 +36,4 @@ final class GetApplicationHealthCheckRequestTest {
             .name("test-name")
             .build();
     }
-
 }

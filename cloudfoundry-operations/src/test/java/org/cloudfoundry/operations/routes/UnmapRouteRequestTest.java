@@ -54,9 +54,8 @@ final class UnmapRouteRequestTest {
     @Test
     void valid() {
         UnmapRouteRequest.builder()
-            .applicationName("test-applicationName")
-            .domain("test-domain")
-            .build();
+                .applicationName("test-applicationName")
+                .domain("test-domain")
+                .build();
     }
-
 }

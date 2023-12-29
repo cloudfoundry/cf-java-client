@@ -23,12 +23,11 @@ final class UpdateMetadataRequestTest {
     @Test
     void valid() {
         UpdateMetadataRequest.builder()
-            .appIcon("test-icon")
-            .appLaunchUrl("test-app-launch-url")
-            .showOnHomePage(true)
-            .clientId("test-client-id")
-            .clientName("test-client-name")
-            .build();
+                .appIcon("test-icon")
+                .appLaunchUrl("test-app-launch-url")
+                .showOnHomePage(true)
+                .clientId("test-client-id")
+                .clientName("test-client-name")
+                .build();
     }
-
 }

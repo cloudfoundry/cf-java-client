@@ -25,5 +25,4 @@ final class ListRouteMappingsRequestTest {
         ListRouteMappingsRequest.builder()
             .build();
     }
-
 }

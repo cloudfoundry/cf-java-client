@@ -43,9 +43,8 @@ final class RemoveApplicationServiceBindingRequestTest {
     @Test
     void valid() {
         RemoveApplicationServiceBindingRequest.builder()
-            .applicationId("test-application-id")
-            .serviceBindingId("test-service-binding-id")
-            .build();
+                .applicationId("test-application-id")
+                .serviceBindingId("test-service-binding-id")
+                .build();
     }
-
 }

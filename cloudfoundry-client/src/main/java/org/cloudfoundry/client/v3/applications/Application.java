@@ -58,5 +58,4 @@ public abstract class Application extends Resource {
      */
     @JsonProperty("state")
     public abstract ApplicationState getState();
-
 }

@@ -33,8 +33,7 @@ final class GetOrganizationInstanceUsageRequestTest {
     @Test
     void valid() {
         GetOrganizationInstanceUsageRequest.builder()
-            .organizationId("test-organization-id")
-            .build();
+                .organizationId("test-organization-id")
+                .build();
     }
-
 }

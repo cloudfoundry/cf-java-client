@@ -47,5 +47,4 @@ final class SetFeatureFlagRequestTest {
             .name("test-name")
             .build();
     }
-
 }

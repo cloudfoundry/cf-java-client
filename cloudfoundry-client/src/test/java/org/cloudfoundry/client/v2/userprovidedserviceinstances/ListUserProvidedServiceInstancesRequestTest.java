@@ -25,5 +25,4 @@ final class ListUserProvidedServiceInstancesRequestTest {
         ListUserProvidedServiceInstancesRequest.builder()
             .build();
     }
-
 }

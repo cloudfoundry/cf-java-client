@@ -33,8 +33,7 @@ final class UpdateServiceInstanceRequestTest {
     @Test
     void valid() {
         UpdateServiceInstanceRequest.builder()
-            .serviceInstanceName("test-service-instance-name")
-            .build();
+                .serviceInstanceName("test-service-instance-name")
+                .build();
     }
-
 }

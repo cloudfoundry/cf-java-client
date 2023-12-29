@@ -47,11 +47,8 @@ final class ShareDomainRequestTest {
     @Test
     void valid() {
         ShareDomainRequest.builder()
-            .domainId("test-domain-id")
-            .data(Relationship.builder()
-                .id("shared-organization-id")
-                .build())
-            .build();
+                .domainId("test-domain-id")
+                .data(Relationship.builder().id("shared-organization-id").build())
+                .build();
     }
-
 }

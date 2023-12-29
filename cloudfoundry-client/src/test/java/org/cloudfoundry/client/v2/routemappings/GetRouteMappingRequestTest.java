@@ -36,5 +36,4 @@ final class GetRouteMappingRequestTest {
             .routeMappingId("route-mapping-id")
             .build();
     }
-
 }

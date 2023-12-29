@@ -43,9 +43,8 @@ final class CopyApplicationRequestTest {
     @Test
     void valid() {
         CopyApplicationRequest.builder()
-            .applicationId("test-application-id")
-            .sourceApplicationId("test-source-application-id")
-            .build();
+                .applicationId("test-application-id")
+                .sourceApplicationId("test-source-application-id")
+                .build();
     }
-
 }

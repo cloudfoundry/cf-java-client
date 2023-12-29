@@ -69,11 +69,10 @@ final class CreateServiceBrokerRequestTest {
     @Test
     void valid() {
         CreateServiceBrokerRequest.builder()
-            .name("test-broker")
-            .url("test-broker-url")
-            .username("test-username")
-            .password("test-password")
-            .build();
+                .name("test-broker")
+                .url("test-broker-url")
+                .username("test-username")
+                .password("test-password")
+                .build();
     }
-
 }

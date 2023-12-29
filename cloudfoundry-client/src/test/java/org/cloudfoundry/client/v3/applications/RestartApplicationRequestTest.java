@@ -36,5 +36,4 @@ final class RestartApplicationRequestTest {
             .applicationId("test-application-id")
             .build();
     }
-
 }

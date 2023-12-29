@@ -43,9 +43,8 @@ final class CreateSpaceRequestTest {
     @Test
     void valid() {
         CreateSpaceRequest.builder()
-            .name("test-name")
-            .organizationId("test-organization-id")
-            .build();
+                .name("test-name")
+                .organizationId("test-organization-id")
+                .build();
     }
-
 }

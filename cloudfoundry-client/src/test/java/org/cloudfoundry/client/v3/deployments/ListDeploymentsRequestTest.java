@@ -25,5 +25,4 @@ final class ListDeploymentsRequestTest {
         ListDeploymentsRequest.builder()
             .build();
     }
-
 }

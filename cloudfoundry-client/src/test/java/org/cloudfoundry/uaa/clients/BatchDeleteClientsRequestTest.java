@@ -45,5 +45,4 @@ final class BatchDeleteClientsRequestTest {
             .clientId("test-client-id")
             .build();
     }
-
 }

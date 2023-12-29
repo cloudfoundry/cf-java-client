@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.logcache.v1;
 
+import java.util.Map;
 import org.cloudfoundry.logcache.v1.InfoRequest;
 import org.cloudfoundry.logcache.v1.InfoResponse;
 import org.cloudfoundry.logcache.v1.MetaRequest;
@@ -26,27 +27,25 @@ import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import reactor.core.publisher.Mono;
 
-import java.util.Map;
-
 final class ReactorLogCacheEndpoints extends AbstractLogCacheOperations {
 
-    ReactorLogCacheEndpoints(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
+    ReactorLogCacheEndpoints(
+            ConnectionContext connectionContext,
+            Mono<String> root,
+            TokenProvider tokenProvider,
+            Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     Mono<InfoResponse> info(InfoRequest request) {
-        return get(request, InfoResponse.class, "info")
-            .checkpoint();
+        return get(request, InfoResponse.class, "info").checkpoint();
     }
 
     Mono<MetaResponse> meta(MetaRequest request) {
-        return get(request, MetaResponse.class, "meta")
-            .checkpoint();
+        return get(request, MetaResponse.class, "meta").checkpoint();
     }
 
     Mono<ReadResponse> read(ReadRequest request) {
-        return get(request, ReadResponse.class, "read", request.getSourceId())
-            .checkpoint();
+        return get(request, ReadResponse.class, "read", request.getSourceId()).checkpoint();
     }
-
 }

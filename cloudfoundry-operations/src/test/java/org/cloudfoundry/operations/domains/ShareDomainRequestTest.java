@@ -43,9 +43,8 @@ final class ShareDomainRequestTest {
     @Test
     void valid() {
         ShareDomainRequest.builder()
-            .domain("test-domain")
-            .organization("test-organization")
-            .build();
+                .domain("test-domain")
+                .organization("test-organization")
+                .build();
     }
-
 }

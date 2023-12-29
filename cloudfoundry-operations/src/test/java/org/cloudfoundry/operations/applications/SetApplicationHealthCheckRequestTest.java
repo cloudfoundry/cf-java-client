@@ -43,9 +43,8 @@ final class SetApplicationHealthCheckRequestTest {
     @Test
     void valid() {
         SetApplicationHealthCheckRequest.builder()
-            .name("test-name")
-            .type(ApplicationHealthCheck.NONE)
-            .build();
+                .name("test-name")
+                .type(ApplicationHealthCheck.NONE)
+                .build();
     }
-
 }

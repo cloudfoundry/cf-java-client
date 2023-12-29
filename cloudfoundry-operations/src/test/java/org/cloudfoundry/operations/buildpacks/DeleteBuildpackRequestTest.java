@@ -35,9 +35,8 @@ class DeleteBuildpackRequestTest {
     @Test
     void valid() {
         DeleteBuildpackRequest.builder()
-            .name("test-buildpack-name")
-            .completionTimeout(Duration.ofSeconds(5))
-            .build();
+                .name("test-buildpack-name")
+                .completionTimeout(Duration.ofSeconds(5))
+                .build();
     }
-
 }

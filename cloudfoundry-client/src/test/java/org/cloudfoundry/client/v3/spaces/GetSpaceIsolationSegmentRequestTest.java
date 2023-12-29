@@ -36,5 +36,4 @@ final class GetSpaceIsolationSegmentRequestTest {
             .spaceId("test-space-id")
             .build();
     }
-
 }

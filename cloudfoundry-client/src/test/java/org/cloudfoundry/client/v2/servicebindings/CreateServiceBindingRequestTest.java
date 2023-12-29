@@ -43,9 +43,8 @@ final class CreateServiceBindingRequestTest {
     @Test
     void valid() {
         CreateServiceBindingRequest.builder()
-            .applicationId("app-id")
-            .serviceInstanceId("test-service-instance-id")
-            .build();
+                .applicationId("app-id")
+                .serviceInstanceId("test-service-instance-id")
+                .build();
     }
-
 }

@@ -36,5 +36,4 @@ final class ListSpaceSecurityGroupsRequestTest {
             .spaceId("test-space-id")
             .build();
     }
-
 }

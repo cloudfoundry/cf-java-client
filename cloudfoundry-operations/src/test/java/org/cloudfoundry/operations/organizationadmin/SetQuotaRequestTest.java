@@ -43,9 +43,8 @@ final class SetQuotaRequestTest {
     @Test
     void valid() {
         SetQuotaRequest.builder()
-            .organizationName("test-organization")
-            .quotaName("test-quota")
-            .build();
+                .organizationName("test-organization")
+                .quotaName("test-quota")
+                .build();
     }
-
 }

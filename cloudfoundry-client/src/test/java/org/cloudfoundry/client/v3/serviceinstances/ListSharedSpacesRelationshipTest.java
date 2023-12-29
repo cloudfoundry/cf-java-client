@@ -33,8 +33,7 @@ class ListSharedSpacesRelationshipTest {
     @Test
     void valid() {
         ListSharedSpacesRelationshipRequest.builder()
-            .serviceInstanceId("test-service-instance-id")
-            .build();
+                .serviceInstanceId("test-service-instance-id")
+                .build();
     }
-
 }

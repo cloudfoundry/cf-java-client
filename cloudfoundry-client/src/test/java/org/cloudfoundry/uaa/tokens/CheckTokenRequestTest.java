@@ -58,20 +58,19 @@ final class CheckTokenRequestTest {
     @Test
     void validMax() {
         CheckTokenRequest.builder()
-            .clientId("test-client-id")
-            .clientSecret("test-client-secret")
-            .token("test-token")
-            .scope("test-scope")
-            .build();
+                .clientId("test-client-id")
+                .clientSecret("test-client-secret")
+                .token("test-token")
+                .scope("test-scope")
+                .build();
     }
 
     @Test
     void validMin() {
         CheckTokenRequest.builder()
-            .clientId("test-client-id")
-            .clientSecret("test-client-secret")
-            .token("test-token")
-            .build();
+                .clientId("test-client-id")
+                .clientSecret("test-client-secret")
+                .token("test-token")
+                .build();
     }
-
 }

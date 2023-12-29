@@ -25,5 +25,4 @@ final class ToManyRelationshipTest {
         ToManyRelationship.builder()
             .build();
     }
-
 }

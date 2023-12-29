@@ -43,9 +43,8 @@ final class RemoveUserBillingManagedOrganizationRequestTest {
     @Test
     void valid() {
         RemoveUserBillingManagedOrganizationRequest.builder()
-            .billingManagedOrganizationId("test-space-id")
-            .userId("test-user-id")
-            .build();
+                .billingManagedOrganizationId("test-space-id")
+                .userId("test-user-id")
+                .build();
     }
-
 }

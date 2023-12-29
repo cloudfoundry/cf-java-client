@@ -16,6 +16,15 @@
 
 package org.cloudfoundry.reactor.client.v3.roles;
 
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
+import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+
+import java.time.Duration;
+import java.util.Collections;
 import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.Pagination;
 import org.cloudfoundry.client.v3.Relationship;
@@ -37,19 +46,12 @@ import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-import java.time.Duration;
-import java.util.Collections;
-
-import static io.netty.handler.codec.http.HttpMethod.DELETE;
-import static io.netty.handler.codec.http.HttpMethod.GET;
-import static io.netty.handler.codec.http.HttpMethod.POST;
-import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
-import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
-import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 class ReactorRolesV3Test extends AbstractClientApiTest {
 
-    private final ReactorRolesV3 roles = new ReactorRolesV3(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
+    private final ReactorRolesV3 roles =
+            new ReactorRolesV3(
+                    CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     void create() {
@@ -64,53 +66,76 @@ class ReactorRolesV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.roles.create(CreateRoleRequest.builder()
-            .type(RoleType.ORGANIZATION_AUDITOR)
-            .relationships(RoleRelationships.builder()
-                .user(ToOneRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("test-user-id")
-                        .build())
-                    .build())
-                .organization(ToOneRelationship.builder()
-                    .data(Relationship.builder()
-                        .id("test-organization-id")
-                        .build())
-                    .build())
-                .build())
-            .build())
-            .as(StepVerifier::create)
-            .expectNext(CreateRoleResponse.builder()
-                .id("40557c70-d1bd-4976-a2ab-a85f5e882418")
-                .createdAt("2019-10-10T17:19:12Z")
-                .updatedAt("2019-10-10T17:19:12Z")
-                .type(RoleType.ORGANIZATION_AUDITOR)
-                .relationships(RoleRelationships.builder()
-                    .organization(ToOneRelationship.builder()
-                        .data(Relationship.builder()
-                            .id("test-organization-id")
-                            .build())
-                        .build())
-                    .user(ToOneRelationship.builder()
-                        .data(Relationship.builder()
-                            .id("test-user-id")
-                            .build())
-                        .build())
-                    .space(ToOneRelationship.builder()
-                        .build())
-                    .build())
-                .link("self", Link.builder()
-                    .href("https://api.example.org/v3/roles/40557c70-d1bd-4976-a2ab-a85f5e882418")
-                    .build())
-                .link("user", Link.builder()
-                    .href("https://api.example.org/v3/users/test-user-id")
-                    .build())
-                .link("organization", Link.builder()
-                    .href("https://api.example.org/v3/organizations/test-organization-id")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+        this.roles
+                .create(
+                        CreateRoleRequest.builder()
+                                .type(RoleType.ORGANIZATION_AUDITOR)
+                                .relationships(
+                                        RoleRelationships.builder()
+                                                .user(
+                                                        ToOneRelationship.builder()
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id("test-user-id")
+                                                                                .build())
+                                                                .build())
+                                                .organization(
+                                                        ToOneRelationship.builder()
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id(
+                                                                                        "test-organization-id")
+                                                                                .build())
+                                                                .build())
+                                                .build())
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        CreateRoleResponse.builder()
+                                .id("40557c70-d1bd-4976-a2ab-a85f5e882418")
+                                .createdAt("2019-10-10T17:19:12Z")
+                                .updatedAt("2019-10-10T17:19:12Z")
+                                .type(RoleType.ORGANIZATION_AUDITOR)
+                                .relationships(
+                                        RoleRelationships.builder()
+                                                .organization(
+                                                        ToOneRelationship.builder()
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id(
+                                                                                        "test-organization-id")
+                                                                                .build())
+                                                                .build())
+                                                .user(
+                                                        ToOneRelationship.builder()
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id("test-user-id")
+                                                                                .build())
+                                                                .build())
+                                                .space(ToOneRelationship.builder().build())
+                                                .build())
+                                .link(
+                                        "self",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/roles/40557c70-d1bd-4976-a2ab-a85f5e882418")
+                                                .build())
+                                .link(
+                                        "user",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/users/test-user-id")
+                                                .build())
+                                .link(
+                                        "organization",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/organizations/test-organization-id")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -126,13 +151,11 @@ class ReactorRolesV3Test extends AbstractClientApiTest {
             .build());
 
         this.roles
-            .delete(DeleteRoleRequest.builder()
-                .roleId("test-role-id")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext("test-role-id")
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .delete(DeleteRoleRequest.builder().roleId("test-role-id").build())
+                .as(StepVerifier::create)
+                .expectNext("test-role-id")
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -148,41 +171,57 @@ class ReactorRolesV3Test extends AbstractClientApiTest {
             .build());
 
         this.roles
-            .get(GetRoleRequest.builder()
-                .roleId("40557c70-d1bd-4976-a2ab-a85f5e882418")
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(GetRoleResponse.builder()
-                .id("40557c70-d1bd-4976-a2ab-a85f5e882418")
-                .type(RoleType.ORGANIZATION_AUDITOR)
-                .createdAt("2019-10-10T17:19:12Z")
-                .updatedAt("2019-10-10T17:19:12Z")
-                .relationships(RoleRelationships.builder()
-                    .organization(ToOneRelationship.builder()
-                        .data(Relationship.builder()
-                            .id("test-organization-id")
-                            .build())
-                        .build())
-                    .user(ToOneRelationship.builder()
-                        .data(Relationship.builder()
-                            .id("test-user-id")
-                            .build())
-                        .build())
-                    .space(ToOneRelationship.builder()
-                        .build())
-                    .build())
-                .link("self", Link.builder()
-                    .href("https://api.example.org/v3/roles/40557c70-d1bd-4976-a2ab-a85f5e882418")
-                    .build())
-                .link("user", Link.builder()
-                    .href("https://api.example.org/v3/users/test-user-id")
-                    .build())
-                .link("organization", Link.builder()
-                    .href("https://api.example.org/v3/organizations/test-organization-id")
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .get(
+                        GetRoleRequest.builder()
+                                .roleId("40557c70-d1bd-4976-a2ab-a85f5e882418")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        GetRoleResponse.builder()
+                                .id("40557c70-d1bd-4976-a2ab-a85f5e882418")
+                                .type(RoleType.ORGANIZATION_AUDITOR)
+                                .createdAt("2019-10-10T17:19:12Z")
+                                .updatedAt("2019-10-10T17:19:12Z")
+                                .relationships(
+                                        RoleRelationships.builder()
+                                                .organization(
+                                                        ToOneRelationship.builder()
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id(
+                                                                                        "test-organization-id")
+                                                                                .build())
+                                                                .build())
+                                                .user(
+                                                        ToOneRelationship.builder()
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id("test-user-id")
+                                                                                .build())
+                                                                .build())
+                                                .space(ToOneRelationship.builder().build())
+                                                .build())
+                                .link(
+                                        "self",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/roles/40557c70-d1bd-4976-a2ab-a85f5e882418")
+                                                .build())
+                                .link(
+                                        "user",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/users/test-user-id")
+                                                .build())
+                                .link(
+                                        "organization",
+                                        Link.builder()
+                                                .href(
+                                                        "https://api.example.org/v3/organizations/test-organization-id")
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Test
@@ -197,83 +236,131 @@ class ReactorRolesV3Test extends AbstractClientApiTest {
                 .build())
             .build());
 
-        this.roles.list(ListRolesRequest.builder().build())
-            .as(StepVerifier::create)
-            .expectNext(ListRolesResponse.builder()
-                .pagination(Pagination.builder()
-                    .totalResults(3)
-                    .totalPages(2)
-                    .first(Link.builder()
-                        .href("https://api.example.org/v3/roles?page=1&per_page=2")
-                        .build())
-                    .last(Link.builder()
-                        .href("https://api.example.org/v3/roles?page=2&per_page=2")
-                        .build())
-                    .next(Link.builder()
-                        .href("https://api.example.org/v3/roles?page=2&per_page=2")
-                        .build())
-                    .build())
-                .resource(RoleResource.builder()
-                    .id("40557c70-d1bd-4976-a2ab-a85f5e882418")
-                    .createdAt("2019-10-10T17:19:12Z")
-                    .updatedAt("2019-10-10T17:19:12Z")
-                    .type(RoleType.ORGANIZATION_AUDITOR)
-                    .relationships(RoleRelationships.builder()
-                        .organization(ToOneRelationship.builder()
-                            .data(Relationship.builder()
-                                .id("test-organization-id")
+        this.roles
+                .list(ListRolesRequest.builder().build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        ListRolesResponse.builder()
+                                .pagination(
+                                        Pagination.builder()
+                                                .totalResults(3)
+                                                .totalPages(2)
+                                                .first(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/roles?page=1&per_page=2")
+                                                                .build())
+                                                .last(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/roles?page=2&per_page=2")
+                                                                .build())
+                                                .next(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/roles?page=2&per_page=2")
+                                                                .build())
+                                                .build())
+                                .resource(
+                                        RoleResource.builder()
+                                                .id("40557c70-d1bd-4976-a2ab-a85f5e882418")
+                                                .createdAt("2019-10-10T17:19:12Z")
+                                                .updatedAt("2019-10-10T17:19:12Z")
+                                                .type(RoleType.ORGANIZATION_AUDITOR)
+                                                .relationships(
+                                                        RoleRelationships.builder()
+                                                                .organization(
+                                                                        ToOneRelationship.builder()
+                                                                                .data(
+                                                                                        Relationship
+                                                                                                .builder()
+                                                                                                .id(
+                                                                                                        "test-organization-id")
+                                                                                                .build())
+                                                                                .build())
+                                                                .user(
+                                                                        ToOneRelationship.builder()
+                                                                                .data(
+                                                                                        Relationship
+                                                                                                .builder()
+                                                                                                .id(
+                                                                                                        "test-user-id")
+                                                                                                .build())
+                                                                                .build())
+                                                                .space(
+                                                                        ToOneRelationship.builder()
+                                                                                .build())
+                                                                .build())
+                                                .link(
+                                                        "self",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/roles/40557c70-d1bd-4976-a2ab-a85f5e882418")
+                                                                .build())
+                                                .link(
+                                                        "user",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/users/test-user-id")
+                                                                .build())
+                                                .link(
+                                                        "organization",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/organizations/test-organization-id")
+                                                                .build())
+                                                .build())
+                                .resource(
+                                        RoleResource.builder()
+                                                .id("12347c70-d1bd-4976-a2ab-a85f5e882418")
+                                                .createdAt("2047-11-10T17:19:12Z")
+                                                .updatedAt("2047-11-10T17:19:12Z")
+                                                .type(RoleType.SPACE_AUDITOR)
+                                                .relationships(
+                                                        RoleRelationships.builder()
+                                                                .space(
+                                                                        ToOneRelationship.builder()
+                                                                                .data(
+                                                                                        Relationship
+                                                                                                .builder()
+                                                                                                .id(
+                                                                                                        "test-space-id")
+                                                                                                .build())
+                                                                                .build())
+                                                                .user(
+                                                                        ToOneRelationship.builder()
+                                                                                .data(
+                                                                                        Relationship
+                                                                                                .builder()
+                                                                                                .id(
+                                                                                                        "test-user-id")
+                                                                                                .build())
+                                                                                .build())
+                                                                .organization(
+                                                                        ToOneRelationship.builder()
+                                                                                .build())
+                                                                .build())
+                                                .link(
+                                                        "self",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/roles/12347c70-d1bd-4976-a2ab-a85f5e882418")
+                                                                .build())
+                                                .link(
+                                                        "user",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/users/test-user-id")
+                                                                .build())
+                                                .link(
+                                                        "space",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/spaces/test-space-id")
+                                                                .build())
+                                                .build())
                                 .build())
-                            .build())
-                        .user(ToOneRelationship.builder()
-                            .data(Relationship.builder()
-                                .id("test-user-id")
-                                .build())
-                            .build())
-                        .space(ToOneRelationship.builder()
-                            .build())
-                        .build())
-                    .link("self", Link.builder()
-                        .href("https://api.example.org/v3/roles/40557c70-d1bd-4976-a2ab-a85f5e882418")
-                        .build())
-                    .link("user", Link.builder()
-                        .href("https://api.example.org/v3/users/test-user-id")
-                        .build())
-                    .link("organization", Link.builder()
-                        .href("https://api.example.org/v3/organizations/test-organization-id")
-                        .build())
-                    .build())
-                .resource(RoleResource.builder()
-                    .id("12347c70-d1bd-4976-a2ab-a85f5e882418")
-                    .createdAt("2047-11-10T17:19:12Z")
-                    .updatedAt("2047-11-10T17:19:12Z")
-                    .type(RoleType.SPACE_AUDITOR)
-                    .relationships(RoleRelationships.builder()
-                        .space(ToOneRelationship.builder()
-                            .data(Relationship.builder()
-                                .id("test-space-id")
-                                .build())
-                            .build())
-                        .user(ToOneRelationship.builder()
-                            .data(Relationship.builder()
-                                .id("test-user-id")
-                                .build())
-                            .build())
-                        .organization(ToOneRelationship.builder()
-                            .build())
-                        .build())
-                    .link("self", Link.builder()
-                        .href("https://api.example.org/v3/roles/12347c70-d1bd-4976-a2ab-a85f5e882418")
-                        .build())
-                    .link("user", Link.builder()
-                        .href("https://api.example.org/v3/users/test-user-id")
-                        .build())
-                    .link("space", Link.builder()
-                        .href("https://api.example.org/v3/spaces/test-space-id")
-                        .build())
-                    .build())
-                .build())
-            .expectComplete()
-            .verify(Duration.ofSeconds(5));
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
-
 }

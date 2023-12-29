@@ -36,5 +36,4 @@ final class EnableApplicationSshRequestTest {
             .name("test-name")
             .build();
     }
-
 }

@@ -45,10 +45,9 @@ final class InviteUsersRequestTest {
     @Test
     void valid() {
         InviteUsersRequest.builder()
-            .clientId("test-client-id")
-            .email("test-email")
-            .redirectUri("test-redirect-uri")
-            .build();
+                .clientId("test-client-id")
+                .email("test-email")
+                .redirectUri("test-redirect-uri")
+                .build();
     }
-
 }

@@ -25,5 +25,4 @@ final class ListOrganizationQuotaDefinitionsRequestTest {
         ListOrganizationQuotaDefinitionsRequest.builder()
             .build();
     }
-
 }

@@ -25,5 +25,4 @@ final class KeystoneConfigurationTest {
         KeystoneConfiguration.builder()
             .build();
     }
-
 }

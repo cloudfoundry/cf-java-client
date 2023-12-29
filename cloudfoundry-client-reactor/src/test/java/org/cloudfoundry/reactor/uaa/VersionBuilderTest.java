@@ -59,7 +59,5 @@ final class VersionBuilderTest {
         public String getVersion() {
             return this.version;
         }
-
     }
-
 }

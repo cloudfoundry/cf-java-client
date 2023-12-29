@@ -43,11 +43,11 @@ final class BatchUpdateClientsRequestTest {
     @Test
     void valid() {
         BatchUpdateClientsRequest.builder()
-            .client(UpdateClient.builder()
-                .clientId("test-client-id")
-                .authorizedGrantType(CLIENT_CREDENTIALS)
-                .build())
-            .build();
+                .client(
+                        UpdateClient.builder()
+                                .clientId("test-client-id")
+                                .authorizedGrantType(CLIENT_CREDENTIALS)
+                                .build())
+                .build();
     }
-
 }

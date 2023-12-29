@@ -37,11 +37,9 @@ final class AssignSpaceIsolationSegmentRequestTest {
     @Test
     void validData() {
         AssignSpaceIsolationSegmentRequest.builder()
-            .data(Relationship.builder()
-                .id("test-isolation-segment-id")
-                .build())
-            .spaceId("test-space-id")
-            .build();
+                .data(Relationship.builder().id("test-isolation-segment-id").build())
+                .spaceId("test-space-id")
+                .build();
     }
 
     @Test
@@ -50,5 +48,4 @@ final class AssignSpaceIsolationSegmentRequestTest {
             .spaceId("test-space-id")
             .build();
     }
-
 }

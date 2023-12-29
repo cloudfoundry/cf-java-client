@@ -36,5 +36,4 @@ final class ListApplicationTasksRequestTest {
             .applicationId("test-application-id")
             .build();
     }
-
 }

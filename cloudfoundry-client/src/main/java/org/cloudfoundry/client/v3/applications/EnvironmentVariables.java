@@ -17,10 +17,9 @@
 package org.cloudfoundry.client.v3.applications;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.Map;
 import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.client.v3.Link;
-
-import java.util.Map;
 
 /**
  * The environment variables of an application
@@ -40,5 +39,4 @@ public abstract class EnvironmentVariables {
     @AllowNulls
     @JsonProperty("var")
     abstract Map<String, String> getVars();
-
 }

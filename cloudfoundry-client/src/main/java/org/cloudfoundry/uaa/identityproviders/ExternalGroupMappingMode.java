@@ -48,7 +48,8 @@ public enum ExternalGroupMappingMode {
             case "as_scopes":
                 return AS_SCOPES;
             default:
-                throw new IllegalArgumentException(String.format("Unknown external group mapping mode: %s", s));
+                throw new IllegalArgumentException(
+                        String.format("Unknown external group mapping mode: %s", s));
         }
     }
 
@@ -61,5 +62,4 @@ public enum ExternalGroupMappingMode {
     public String toString() {
         return getValue();
     }
-
 }

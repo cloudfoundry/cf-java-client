@@ -36,5 +36,4 @@ final class RestartApplicationRequestTest {
             .name("test-name")
             .build();
     }
-
 }

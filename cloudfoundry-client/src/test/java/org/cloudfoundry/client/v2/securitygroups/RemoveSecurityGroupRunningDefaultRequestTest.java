@@ -33,8 +33,7 @@ final class RemoveSecurityGroupRunningDefaultRequestTest {
     @Test
     void valid() {
         RemoveSecurityGroupRunningDefaultRequest.builder()
-            .securityGroupId("test-security-group-default-id")
-            .build();
+                .securityGroupId("test-security-group-default-id")
+                .build();
     }
-
 }

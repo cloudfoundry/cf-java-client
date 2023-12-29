@@ -36,5 +36,4 @@ class DeleteRoleRequestTest {
             .roleId("test-role-id")
             .build();
     }
-
 }

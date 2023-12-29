@@ -36,5 +36,4 @@ final class GetIdentityZoneRequestTest {
             .identityZoneId("test-identity-zone-id")
             .build();
     }
-
 }

@@ -43,9 +43,8 @@ final class AssociateSpaceQuotaDefinitionRequestTest {
     @Test
     void valid() {
         AssociateSpaceQuotaDefinitionRequest.builder()
-            .spaceId("test-space-id")
-            .spaceQuotaDefinitionId("test-space-quota-definition-id")
-            .build();
+                .spaceId("test-space-id")
+                .spaceQuotaDefinitionId("test-space-quota-definition-id")
+                .build();
     }
-
 }

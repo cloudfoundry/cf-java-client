@@ -17,23 +17,25 @@
 package org.cloudfoundry.reactor.uaa;
 
 import io.netty.handler.codec.http.HttpHeaders;
-import org.cloudfoundry.uaa.IdentityZoned;
-
 import java.util.Optional;
+import org.cloudfoundry.uaa.IdentityZoned;
 
 final class IdentityZoneBuilder {
 
-    private IdentityZoneBuilder() {
-    }
+    private IdentityZoneBuilder() {}
 
     static void augment(HttpHeaders httpHeaders, Object request) {
         if (request instanceof IdentityZoned) {
             IdentityZoned identityZoned = (IdentityZoned) request;
             Optional.ofNullable(identityZoned.getIdentityZoneId())
-                .ifPresent(identityZoneId -> httpHeaders.set("X-Identity-Zone-Id", identityZoneId));
+                    .ifPresent(
+                            identityZoneId ->
+                                    httpHeaders.set("X-Identity-Zone-Id", identityZoneId));
             Optional.ofNullable(identityZoned.getIdentityZoneSubdomain())
-                .ifPresent(identityZoneSubdomain -> httpHeaders.set("X-Identity-Zone-Subdomain", identityZoneSubdomain));
+                    .ifPresent(
+                            identityZoneSubdomain ->
+                                    httpHeaders.set(
+                                            "X-Identity-Zone-Subdomain", identityZoneSubdomain));
         }
     }
-
 }

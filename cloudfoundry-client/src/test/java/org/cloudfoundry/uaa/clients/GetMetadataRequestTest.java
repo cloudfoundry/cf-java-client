@@ -36,5 +36,4 @@ final class GetMetadataRequestTest {
             .clientId("test-client-id")
             .build();
     }
-
 }

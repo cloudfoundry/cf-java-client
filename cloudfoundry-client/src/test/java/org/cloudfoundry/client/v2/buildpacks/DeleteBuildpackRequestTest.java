@@ -36,5 +36,4 @@ class DeleteBuildpackRequestTest {
             .buildpackId("test-buildpack-id")
             .build();
     }
-
 }

@@ -67,14 +67,14 @@ final class CreateIdentityProviderRequestTest {
     @Test
     void valid() {
         CreateIdentityProviderRequest.builder()
-            .configuration(SamlConfiguration.builder()
-                .metaDataLocation("test-metadata-location")
-                .build())
-            .identityZoneId("test-identity-zone-id")
-            .name("test-name")
-            .originKey("test-origin-key")
-            .type(Type.SAML)
-            .build();
+                .configuration(
+                        SamlConfiguration.builder()
+                                .metaDataLocation("test-metadata-location")
+                                .build())
+                .identityZoneId("test-identity-zone-id")
+                .name("test-name")
+                .originKey("test-origin-key")
+                .type(Type.SAML)
+                .build();
     }
-
 }

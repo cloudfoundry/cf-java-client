@@ -36,5 +36,4 @@ final class GetServiceBindingRequestTest {
             .serviceBindingId("test-service-binding-id")
             .build();
     }
-
 }

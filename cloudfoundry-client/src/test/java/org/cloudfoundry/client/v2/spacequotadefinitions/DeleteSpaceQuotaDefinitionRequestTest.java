@@ -33,8 +33,7 @@ final class DeleteSpaceQuotaDefinitionRequestTest {
     @Test
     void valid() {
         DeleteSpaceQuotaDefinitionRequest.builder()
-            .spaceQuotaDefinitionId("test-space-quota-definition-id")
-            .build();
+                .spaceQuotaDefinitionId("test-space-quota-definition-id")
+                .build();
     }
-
 }

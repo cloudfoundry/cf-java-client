@@ -26,6 +26,4 @@ final class ListIdentityProvidersRequestTest {
             .identityZoneId("text-identity-zone-id")
             .build();
     }
-
-
 }

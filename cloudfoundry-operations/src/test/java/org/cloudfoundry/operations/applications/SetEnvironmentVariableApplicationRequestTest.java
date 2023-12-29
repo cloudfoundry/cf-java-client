@@ -55,10 +55,9 @@ final class SetEnvironmentVariableApplicationRequestTest {
     @Test
     void valid() {
         SetEnvironmentVariableApplicationRequest.builder()
-            .name("test-name")
-            .variableName("test-variable-name")
-            .variableValue("test-variable-value")
-            .build();
+                .name("test-name")
+                .variableName("test-variable-name")
+                .variableValue("test-variable-value")
+                .build();
     }
-
 }

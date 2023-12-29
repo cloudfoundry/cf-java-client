@@ -36,5 +36,4 @@ final class CreateGroupRequestTest {
             .displayName("group-test")
             .build();
     }
-
 }

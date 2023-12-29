@@ -17,6 +17,9 @@
 package org.cloudfoundry.reactor;
 
 import io.netty.handler.codec.http.HttpHeaders;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.cloudfoundry.reactor.util.JsonCodec;
 import org.cloudfoundry.reactor.util.Operator;
 import org.cloudfoundry.reactor.util.OperatorContext;
@@ -26,10 +29,6 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
-
-import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * An abstract implementation of {@link RootProvider} that ensures that returned values are trusted (if configured) and cached.
@@ -47,16 +46,20 @@ abstract class AbstractRootProvider implements RootProvider {
         Matcher matcher = HOSTNAME_PATTERN.matcher(getApiHost());
 
         if (!matcher.matches()) {
-            throw new IllegalArgumentException(String.format("API hostname %s is not correctly formatted (e.g. 'api.local.pcfdev.io')", getApiHost()));
+            throw new IllegalArgumentException(
+                    String.format(
+                            "API hostname %s is not correctly formatted (e.g."
+                                    + " 'api.local.pcfdev.io')",
+                            getApiHost()));
         }
     }
 
     public Mono<Operator> createOperator(ConnectionContext connectionContext) {
         HttpClient httpClient = connectionContext.getHttpClient();
         return getRoot(connectionContext)
-            .map(root -> OperatorContext.of(connectionContext, root))
-            .map(operatorContext -> new Operator(operatorContext, httpClient))
-            .map(operator -> operator.headers(this::addHeaders));
+                .map(root -> OperatorContext.of(connectionContext, root))
+                .map(operatorContext -> new Operator(operatorContext, httpClient))
+                .map(operator -> operator.headers(this::addHeaders));
     }
 
     /**
@@ -66,32 +69,32 @@ abstract class AbstractRootProvider implements RootProvider {
 
     @Override
     public final Mono<String> getRoot(String key, ConnectionContext connectionContext) {
-        Mono<String> cached = doGetRoot(key, connectionContext)
-            .delayUntil(uri -> trust(uri.getHost(), uri.getPort(), connectionContext))
-            .map(UriComponents::toUriString);
+        Mono<String> cached =
+                doGetRoot(key, connectionContext)
+                        .delayUntil(uri -> trust(uri.getHost(), uri.getPort(), connectionContext))
+                        .map(UriComponents::toUriString);
 
-        return connectionContext.getCacheDuration()
-            .map(cached::cache)
-            .orElseGet(cached::cache);
+        return connectionContext.getCacheDuration().map(cached::cache).orElseGet(cached::cache);
     }
 
     @Override
     public final Mono<String> getRoot(ConnectionContext connectionContext) {
-        Mono<String> cached = doGetRoot(connectionContext)
-            .delayUntil(uri -> trust(uri.getHost(), uri.getPort(), connectionContext))
-            .map(UriComponents::toUriString);
+        Mono<String> cached =
+                doGetRoot(connectionContext)
+                        .delayUntil(uri -> trust(uri.getHost(), uri.getPort(), connectionContext))
+                        .map(UriComponents::toUriString);
 
-        return connectionContext.getCacheDuration()
-            .map(cached::cache)
-            .orElseGet(cached::cache);
+        return connectionContext.getCacheDuration().map(cached::cache).orElseGet(cached::cache);
     }
 
     protected abstract Mono<UriComponents> doGetRoot(ConnectionContext connectionContext);
 
-    protected abstract Mono<UriComponents> doGetRoot(String key, ConnectionContext connectionContext);
+    protected abstract Mono<UriComponents> doGetRoot(
+            String key, ConnectionContext connectionContext);
 
     protected final UriComponents getRoot() {
-        UriComponentsBuilder builder = UriComponentsBuilder.newInstance().scheme("https").host(getApiHost());
+        UriComponentsBuilder builder =
+                UriComponentsBuilder.newInstance().scheme("https").host(getApiHost());
         getPort().ifPresent(builder::port);
 
         return normalize(builder);
@@ -135,5 +138,4 @@ abstract class AbstractRootProvider implements RootProvider {
     private Mono<Void> trust(String host, int port, ConnectionContext connectionContext) {
         return connectionContext.trust(host, port);
     }
-
 }

@@ -21,6 +21,5 @@ import org.cloudfoundry.client.v2.Resource;
 /**
  * The base class for Event resources
  */
-public abstract class AbstractEventResource extends Resource<org.cloudfoundry.client.v2.events.EventEntity> {
-
-}
+public abstract class AbstractEventResource
+        extends Resource<org.cloudfoundry.client.v2.events.EventEntity> {}

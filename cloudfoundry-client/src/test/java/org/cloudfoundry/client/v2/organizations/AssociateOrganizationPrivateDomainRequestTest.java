@@ -43,9 +43,8 @@ final class AssociateOrganizationPrivateDomainRequestTest {
     @Test
     void valid() {
         AssociateOrganizationPrivateDomainRequest.builder()
-            .organizationId("test-organization-id")
-            .privateDomainId("test-private-domain-id")
-            .build();
+                .organizationId("test-organization-id")
+                .privateDomainId("test-private-domain-id")
+                .build();
     }
-
 }

@@ -43,9 +43,8 @@ final class GetApplicationFeatureRequestTest {
     @Test
     void valid() {
         GetApplicationFeatureRequest.builder()
-            .applicationId("test-application-id")
-            .featureName("test-feature-name")
-            .build();
+                .applicationId("test-application-id")
+                .featureName("test-feature-name")
+                .build();
     }
-
 }

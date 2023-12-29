@@ -36,5 +36,4 @@ final class GetSpaceRequestTest {
             .name("test-name")
             .build();
     }
-
 }

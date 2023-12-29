@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v3.auditevents;
 
+import java.util.Map;
 import org.cloudfoundry.client.v3.auditevents.AuditEventsV3;
 import org.cloudfoundry.client.v3.auditevents.GetAuditEventRequest;
 import org.cloudfoundry.client.v3.auditevents.GetAuditEventResponse;
@@ -26,24 +27,31 @@ import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
 import reactor.core.publisher.Mono;
 
-import java.util.Map;
-
 public class ReactorAuditEventsV3 extends AbstractClientV3Operations implements AuditEventsV3 {
 
-    public ReactorAuditEventsV3(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider, Map<String, String> requestTags) {
+    public ReactorAuditEventsV3(
+            ConnectionContext connectionContext,
+            Mono<String> root,
+            TokenProvider tokenProvider,
+            Map<String, String> requestTags) {
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
     @Override
     public Mono<GetAuditEventResponse> get(GetAuditEventRequest request) {
-        return get(request, GetAuditEventResponse.class, builder -> builder.pathSegment("audit_events", request.getEventId()))
-            .checkpoint();
+        return get(
+                        request,
+                        GetAuditEventResponse.class,
+                        builder -> builder.pathSegment("audit_events", request.getEventId()))
+                .checkpoint();
     }
 
     @Override
     public Mono<ListAuditEventsResponse> list(ListAuditEventsRequest request) {
-        return get(request, ListAuditEventsResponse.class, builder -> builder.pathSegment("audit_events"))
-            .checkpoint();
+        return get(
+                        request,
+                        ListAuditEventsResponse.class,
+                        builder -> builder.pathSegment("audit_events"))
+                .checkpoint();
     }
-
 }

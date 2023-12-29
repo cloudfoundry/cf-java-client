@@ -43,9 +43,8 @@ final class RemoveOrganizationManagerRequestTest {
     @Test
     void valid() {
         RemoveOrganizationManagerRequest.builder()
-            .managerId("test-manager-id")
-            .organizationId("test-organization-id")
-            .build();
+                .managerId("test-manager-id")
+                .organizationId("test-organization-id")
+                .build();
     }
-
 }
