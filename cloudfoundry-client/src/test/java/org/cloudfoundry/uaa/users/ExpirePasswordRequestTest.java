@@ -16,22 +16,32 @@
 
 package org.cloudfoundry.uaa.users;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class ExpirePasswordRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noPasswordChangeRequired() {
-        ExpirePasswordRequest.builder().userId("test-user-id").build();
-    }
+final class ExpirePasswordRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noUserId() {
-        ExpirePasswordRequest.builder().passwordChangeRequired(true).build();
+    @Test
+    void noPasswordChangeRequired() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    ExpirePasswordRequest.builder().userId("test-user-id").build();
+                });
     }
 
     @Test
-    public void valid() {
+    void noUserId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    ExpirePasswordRequest.builder().passwordChangeRequired(true).build();
+                });
+    }
+
+    @Test
+    void valid() {
         ExpirePasswordRequest.builder().passwordChangeRequired(true).userId("test-user-id").build();
     }
 }

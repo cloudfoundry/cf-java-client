@@ -16,17 +16,23 @@
 
 package org.cloudfoundry.client.v2.applications;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class DownloadApplicationDropletRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noApplicationId() {
-        DownloadApplicationDropletRequest.builder().build();
+final class DownloadApplicationDropletRequestTest {
+
+    @Test
+    void noApplicationId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    DownloadApplicationDropletRequest.builder().build();
+                });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         DownloadApplicationDropletRequest.builder().applicationId("test-application-id").build();
     }
 }

@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.client.v2.events;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class ListEventsRequestTest {
+final class ListEventsRequestTest {
 
     @Test
-    public void valid() {
+    void valid() {
         ListEventsRequest.builder().build();
     }
 }

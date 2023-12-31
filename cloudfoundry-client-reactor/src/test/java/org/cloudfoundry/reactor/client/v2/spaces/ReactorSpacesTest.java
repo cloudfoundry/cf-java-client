@@ -122,17 +122,17 @@ import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import org.cloudfoundry.util.FluentMap;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-public final class ReactorSpacesTest extends AbstractClientApiTest {
+final class ReactorSpacesTest extends AbstractClientApiTest {
 
     private final ReactorSpaces spaces =
             new ReactorSpaces(
                     CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void associateAuditor() {
+    void associateAuditor() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -199,7 +199,7 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void associateAuditorByUsername() {
+    void associateAuditorByUsername() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -268,7 +268,7 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void associateDeveloper() {
+    void associateDeveloper() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -335,7 +335,7 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void associateManager() {
+    void associateManager() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -402,7 +402,7 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void associateSecurityGroup() {
+    void associateSecurityGroup() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -470,7 +470,7 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void associateSpaceDeveloperByUsername() {
+    void associateSpaceDeveloperByUsername() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -539,7 +539,7 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void associateSpaceManagerByUsername() {
+    void associateSpaceManagerByUsername() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -608,7 +608,7 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void create() {
+    void create() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -675,7 +675,7 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -694,7 +694,7 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void deleteAsync() {
+    void deleteAsync() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -733,7 +733,7 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void deleteRecursive() {
+    void deleteRecursive() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -756,7 +756,7 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -819,7 +819,7 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
 
     @SuppressWarnings("deprecation")
     @Test
-    public void getSummary() {
+    void getSummary() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -917,7 +917,7 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -986,7 +986,7 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
 
     @SuppressWarnings("deprecation")
     @Test
-    public void listApplications() {
+    void listApplications() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -1071,7 +1071,7 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void listAuditors() {
+    void listAuditors() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -1134,7 +1134,7 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void listDevelopers() {
+    void listDevelopers() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -1197,7 +1197,7 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void listDomains() {
+    void listDomains() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -1257,7 +1257,7 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void listEvents() {
+    void listEvents() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -1322,7 +1322,7 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void listManagers() {
+    void listManagers() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -1385,7 +1385,7 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void listRoutes() {
+    void listRoutes() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -1444,7 +1444,7 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void listSecurityGroups() {
+    void listSecurityGroups() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -1503,7 +1503,7 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void listServiceInstances() {
+    void listServiceInstances() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -1570,7 +1570,7 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void listServices() {
+    void listServices() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -1630,7 +1630,7 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void listUserRoles() {
+    void listUserRoles() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -1696,7 +1696,7 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void removeAuditor() {
+    void removeAuditor() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -1719,7 +1719,7 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void removeAuditorByUsername() {
+    void removeAuditorByUsername() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -1788,7 +1788,7 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void removeDeveloper() {
+    void removeDeveloper() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -1811,7 +1811,7 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void removeDeveloperByUsername() {
+    void removeDeveloperByUsername() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -1880,7 +1880,7 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void removeManager() {
+    void removeManager() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -1903,7 +1903,7 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void removeManagerByUsername() {
+    void removeManagerByUsername() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -1972,7 +1972,7 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void removeSecurityGroup() {
+    void removeSecurityGroup() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -1996,7 +1996,7 @@ public final class ReactorSpacesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void update() {
+    void update() {
         mockRequest(
                 InteractionContext.builder()
                         .request(

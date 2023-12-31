@@ -31,17 +31,17 @@ import org.cloudfoundry.routing.v1.routergroups.ListRouterGroupsResponse;
 import org.cloudfoundry.routing.v1.routergroups.RouterGroup;
 import org.cloudfoundry.routing.v1.routergroups.UpdateRouterGroupRequest;
 import org.cloudfoundry.routing.v1.routergroups.UpdateRouterGroupResponse;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-public final class ReactorRouterGroupsTest extends AbstractRoutingApiTest {
+final class ReactorRouterGroupsTest extends AbstractRoutingApiTest {
 
     private final ReactorRouterGroups routerGroups =
             new ReactorRouterGroups(
                     CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void list() {
+    void list() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -72,7 +72,7 @@ public final class ReactorRouterGroupsTest extends AbstractRoutingApiTest {
     }
 
     @Test
-    public void update() {
+    void update() {
         mockRequest(
                 InteractionContext.builder()
                         .request(

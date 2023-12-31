@@ -54,17 +54,17 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-public final class ReactorUserProvidedServiceInstancesTest extends AbstractClientApiTest {
+final class ReactorUserProvidedServiceInstancesTest extends AbstractClientApiTest {
 
     private final ReactorUserProvidedServiceInstances userProvidedServiceInstances =
             new ReactorUserProvidedServiceInstances(
                     CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void associateRoute() {
+    void associateRoute() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -121,7 +121,7 @@ public final class ReactorUserProvidedServiceInstancesTest extends AbstractClien
     }
 
     @Test
-    public void create() {
+    void create() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -181,7 +181,7 @@ public final class ReactorUserProvidedServiceInstancesTest extends AbstractClien
     }
 
     @Test
-    public void delete() {
+    void delete() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -205,7 +205,7 @@ public final class ReactorUserProvidedServiceInstancesTest extends AbstractClien
     }
 
     @Test
-    public void get() {
+    void get() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -260,7 +260,7 @@ public final class ReactorUserProvidedServiceInstancesTest extends AbstractClien
     }
 
     @Test
-    public void list() {
+    void list() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -319,7 +319,7 @@ public final class ReactorUserProvidedServiceInstancesTest extends AbstractClien
     }
 
     @Test
-    public void listRoutes() {
+    void listRoutes() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -386,7 +386,7 @@ public final class ReactorUserProvidedServiceInstancesTest extends AbstractClien
     }
 
     @Test
-    public void listServiceBindings() {
+    void listServiceBindings() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -449,7 +449,7 @@ public final class ReactorUserProvidedServiceInstancesTest extends AbstractClien
     }
 
     @Test
-    public void removeRoute() {
+    void removeRoute() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -474,7 +474,7 @@ public final class ReactorUserProvidedServiceInstancesTest extends AbstractClien
     }
 
     @Test
-    public void update() {
+    void update() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -533,7 +533,7 @@ public final class ReactorUserProvidedServiceInstancesTest extends AbstractClien
     }
 
     @Test
-    public void updateWithEmptyCredentials() {
+    void updateWithEmptyCredentials() {
         mockRequest(
                 InteractionContext.builder()
                         .request(

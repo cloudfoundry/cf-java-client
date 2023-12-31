@@ -47,7 +47,6 @@ import org.cloudfoundry.uaa.users.CreateUserResponse;
 import org.cloudfoundry.uaa.users.Email;
 import org.cloudfoundry.uaa.users.Name;
 import org.cloudfoundry.util.PaginationUtils;
-import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;

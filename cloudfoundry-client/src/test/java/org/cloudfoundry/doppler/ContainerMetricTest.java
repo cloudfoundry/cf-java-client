@@ -16,12 +16,14 @@
 
 package org.cloudfoundry.doppler;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class ContainerMetricTest {
+import org.junit.jupiter.api.Test;
+
+final class ContainerMetricTest {
 
     @Test
-    public void dropsonde() {
+    void dropsonde() {
         ContainerMetric.from(
                 new org.cloudfoundry.dropsonde.events.ContainerMetric.Builder()
                         .applicationId("test-application-id")
@@ -32,58 +34,78 @@ public final class ContainerMetricTest {
                         .build());
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void noApplicationId() {
-        ContainerMetric.builder()
-                .cpuPercentage(0.0)
-                .diskBytes(0L)
-                .instanceIndex(0)
-                .memoryBytes(0L)
-                .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noCpuPercentage() {
-        ContainerMetric.builder()
-                .applicationId("test-application-id")
-                .diskBytes(0L)
-                .instanceIndex(0)
-                .memoryBytes(0L)
-                .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noDiskBytes() {
-        ContainerMetric.builder()
-                .applicationId("test-application-id")
-                .cpuPercentage(0.0)
-                .instanceIndex(0)
-                .memoryBytes(0L)
-                .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noInstanceIndex() {
-        ContainerMetric.builder()
-                .applicationId("test-application-id")
-                .cpuPercentage(0.0)
-                .diskBytes(0L)
-                .memoryBytes(0L)
-                .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noMemoryBytes() {
-        ContainerMetric.builder()
-                .applicationId("test-application-id")
-                .cpuPercentage(0.0)
-                .diskBytes(0L)
-                .instanceIndex(0)
-                .build();
+    @Test
+    void noApplicationId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    ContainerMetric.builder()
+                            .cpuPercentage(0.0)
+                            .diskBytes(0L)
+                            .instanceIndex(0)
+                            .memoryBytes(0L)
+                            .build();
+                });
     }
 
     @Test
-    public void valid() {
+    void noCpuPercentage() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    ContainerMetric.builder()
+                            .applicationId("test-application-id")
+                            .diskBytes(0L)
+                            .instanceIndex(0)
+                            .memoryBytes(0L)
+                            .build();
+                });
+    }
+
+    @Test
+    void noDiskBytes() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    ContainerMetric.builder()
+                            .applicationId("test-application-id")
+                            .cpuPercentage(0.0)
+                            .instanceIndex(0)
+                            .memoryBytes(0L)
+                            .build();
+                });
+    }
+
+    @Test
+    void noInstanceIndex() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    ContainerMetric.builder()
+                            .applicationId("test-application-id")
+                            .cpuPercentage(0.0)
+                            .diskBytes(0L)
+                            .memoryBytes(0L)
+                            .build();
+                });
+    }
+
+    @Test
+    void noMemoryBytes() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    ContainerMetric.builder()
+                            .applicationId("test-application-id")
+                            .cpuPercentage(0.0)
+                            .diskBytes(0L)
+                            .instanceIndex(0)
+                            .build();
+                });
+    }
+
+    @Test
+    void valid() {
         ContainerMetric.builder()
                 .applicationId("test-application-id")
                 .cpuPercentage(0.0)

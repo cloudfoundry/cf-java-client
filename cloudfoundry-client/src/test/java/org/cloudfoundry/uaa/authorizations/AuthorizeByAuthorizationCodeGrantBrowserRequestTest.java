@@ -16,20 +16,26 @@
 
 package org.cloudfoundry.uaa.authorizations;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class AuthorizeByAuthorizationCodeGrantBrowserRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noClientId() {
-        AuthorizeByAuthorizationCodeGrantBrowserRequest.builder()
-                .redirectUri("http://redirect.to/app")
-                .scope("test-scope")
-                .build();
+final class AuthorizeByAuthorizationCodeGrantBrowserRequestTest {
+
+    @Test
+    void noClientId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    AuthorizeByAuthorizationCodeGrantBrowserRequest.builder()
+                            .redirectUri("http://redirect.to/app")
+                            .scope("test-scope")
+                            .build();
+                });
     }
 
     @Test
-    public void validMax() {
+    void validMax() {
         AuthorizeByAuthorizationCodeGrantBrowserRequest.builder()
                 .clientId("test-client-id")
                 .redirectUri("http://redirect.to/app")
@@ -38,7 +44,7 @@ public final class AuthorizeByAuthorizationCodeGrantBrowserRequestTest {
     }
 
     @Test
-    public void validMin() {
+    void validMin() {
         AuthorizeByAuthorizationCodeGrantBrowserRequest.builder()
                 .clientId("test-client-id")
                 .build();

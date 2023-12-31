@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.client.v2.services;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class ListServicesRequestTest {
+final class ListServicesRequestTest {
 
     @Test
-    public void valid() {
+    void valid() {
         ListServicesRequest.builder().build();
     }
 }

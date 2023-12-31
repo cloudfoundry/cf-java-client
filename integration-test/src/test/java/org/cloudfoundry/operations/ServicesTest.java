@@ -51,7 +51,6 @@ import org.cloudfoundry.operations.services.UnbindServiceInstanceRequest;
 import org.cloudfoundry.operations.services.UpdateServiceInstanceRequest;
 import org.cloudfoundry.operations.services.UpdateUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.util.PaginationUtils;
-import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import reactor.core.publisher.Flux;

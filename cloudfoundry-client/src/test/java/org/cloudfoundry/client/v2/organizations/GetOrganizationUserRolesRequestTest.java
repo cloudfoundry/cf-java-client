@@ -16,17 +16,23 @@
 
 package org.cloudfoundry.client.v2.organizations;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class GetOrganizationUserRolesRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noOrganizationId() {
-        GetOrganizationUserRolesRequest.builder().build();
+final class GetOrganizationUserRolesRequestTest {
+
+    @Test
+    void noOrganizationId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    GetOrganizationUserRolesRequest.builder().build();
+                });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         GetOrganizationUserRolesRequest.builder().organizationId("test-organization-id").build();
     }
 }

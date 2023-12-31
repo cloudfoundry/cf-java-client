@@ -26,18 +26,18 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefini
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpaceQuotaDefinitionsResponse;
 import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionResource;
 import org.cloudfoundry.operations.AbstractOperationsTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-public final class DefaultSpaceAdminTest extends AbstractOperationsTest {
+final class DefaultSpaceAdminTest extends AbstractOperationsTest {
 
     private final DefaultSpaceAdmin spaceAdmin =
             new DefaultSpaceAdmin(
                     Mono.just(this.cloudFoundryClient), Mono.just(TEST_ORGANIZATION_ID));
 
     @Test
-    public void get() {
+    void get() {
         requestSpaceQuotaDefinitions(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
 
         this.spaceAdmin
@@ -52,7 +52,7 @@ public final class DefaultSpaceAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void getNotFound() {
+    void getNotFound() {
         requestSpaceQuotaDefinitionsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
 
         this.spaceAdmin
@@ -72,7 +72,7 @@ public final class DefaultSpaceAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         requestSpaceQuotaDefinitions(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
 
         this.spaceAdmin

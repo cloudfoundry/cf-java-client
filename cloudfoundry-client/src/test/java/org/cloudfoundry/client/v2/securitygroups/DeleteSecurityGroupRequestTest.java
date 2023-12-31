@@ -16,17 +16,23 @@
 
 package org.cloudfoundry.client.v2.securitygroups;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class DeleteSecurityGroupRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noSecurityGroupId() {
-        DeleteSecurityGroupRequest.builder().async(true).build();
+final class DeleteSecurityGroupRequestTest {
+
+    @Test
+    void noSecurityGroupId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    DeleteSecurityGroupRequest.builder().async(true).build();
+                });
     }
 
     @Test
-    public void validMax() {
+    void validMax() {
         DeleteSecurityGroupRequest.builder()
                 .securityGroupId("test-security-group-id")
                 .async(true)
@@ -34,7 +40,7 @@ public final class DeleteSecurityGroupRequestTest {
     }
 
     @Test
-    public void validMin() {
+    void validMin() {
         DeleteSecurityGroupRequest.builder().securityGroupId("test-security-group-id").build();
     }
 }

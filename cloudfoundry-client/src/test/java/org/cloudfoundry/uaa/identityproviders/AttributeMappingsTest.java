@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.uaa.identityproviders;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class AttributeMappingsTest {
+final class AttributeMappingsTest {
 
     @Test
-    public void valid() {
+    void valid() {
         AttributeMappings.builder().build();
     }
 }

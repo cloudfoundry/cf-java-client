@@ -16,17 +16,23 @@
 
 package org.cloudfoundry.client.v3.deployments;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class CancelDeploymentRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noDeploymentId() {
-        CancelDeploymentRequest.builder().build();
+final class CancelDeploymentRequestTest {
+
+    @Test
+    void noDeploymentId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    CancelDeploymentRequest.builder().build();
+                });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         CancelDeploymentRequest.builder().deploymentId("test-deployment-id").build();
     }
 }

@@ -16,20 +16,26 @@
 
 package org.cloudfoundry.client.v3.domains;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.ToManyRelationship;
 import org.cloudfoundry.client.v3.ToOneRelationship;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class CreateDomainRequestTest {
+final class CreateDomainRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        CreateDomainRequest.builder().build();
+    @Test
+    void noName() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    CreateDomainRequest.builder().build();
+                });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         CreateDomainRequest.builder()
                 .name("test-domain-name")
                 .internal(true)

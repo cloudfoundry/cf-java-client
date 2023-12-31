@@ -16,22 +16,32 @@
 
 package org.cloudfoundry.operations.services;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class RenameServiceInstanceRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        RenameServiceInstanceRequest.builder().newName("test-service-new-name").build();
-    }
+final class RenameServiceInstanceRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noNewName() {
-        RenameServiceInstanceRequest.builder().name("test-service-name").build();
+    @Test
+    void noName() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    RenameServiceInstanceRequest.builder().newName("test-service-new-name").build();
+                });
     }
 
     @Test
-    public void valid() {
+    void noNewName() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    RenameServiceInstanceRequest.builder().name("test-service-name").build();
+                });
+    }
+
+    @Test
+    void valid() {
         RenameServiceInstanceRequest.builder()
                 .name("test-service-name")
                 .newName("test-service-new-name")

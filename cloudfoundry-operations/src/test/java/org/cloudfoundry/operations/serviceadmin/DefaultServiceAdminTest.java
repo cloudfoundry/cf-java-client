@@ -52,17 +52,17 @@ import org.cloudfoundry.client.v2.services.ListServicesResponse;
 import org.cloudfoundry.client.v2.services.ServiceEntity;
 import org.cloudfoundry.client.v2.services.ServiceResource;
 import org.cloudfoundry.operations.AbstractOperationsTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-public final class DefaultServiceAdminTest extends AbstractOperationsTest {
+final class DefaultServiceAdminTest extends AbstractOperationsTest {
 
     private final DefaultServiceAdmin serviceAdmin =
             new DefaultServiceAdmin(Mono.just(this.cloudFoundryClient), Mono.just(TEST_SPACE_ID));
 
     @Test
-    public void createServiceBroker() {
+    void createServiceBroker() {
         requestCreateServiceBroker(
                 this.cloudFoundryClient,
                 "test-service-broker-name",
@@ -85,7 +85,7 @@ public final class DefaultServiceAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void createServiceBrokerWithSpaceScope() {
+    void createServiceBrokerWithSpaceScope() {
         requestCreateServiceBroker(
                 this.cloudFoundryClient,
                 "test-service-broker-name",
@@ -109,7 +109,7 @@ public final class DefaultServiceAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void deleteServiceBroker() {
+    void deleteServiceBroker() {
         requestListServiceBrokers(this.cloudFoundryClient, "test-service-broker-name");
         requestDeleteServiceBroker(this.cloudFoundryClient, "test-service-broker-id");
 
@@ -124,7 +124,7 @@ public final class DefaultServiceAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void deleteServiceBrokerNoServiceBroker() {
+    void deleteServiceBrokerNoServiceBroker() {
         requestListServiceBrokersEmpty(this.cloudFoundryClient, "test-service-broker-name");
         requestDeleteServiceBroker(this.cloudFoundryClient, "test-service-broker-id");
 
@@ -145,7 +145,7 @@ public final class DefaultServiceAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void disableServiceAccess() {
+    void disableServiceAccess() {
         requestListServicesWithName(this.cloudFoundryClient, "test-service-name");
         requestListServicePlans(this.cloudFoundryClient, "test-service-id");
         requestListServicePlanVisibilities(this.cloudFoundryClient, "test-service-plan-id");
@@ -164,7 +164,7 @@ public final class DefaultServiceAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void disableServiceAccessSpecifyAll() {
+    void disableServiceAccessSpecifyAll() {
         requestListServicesWithName(this.cloudFoundryClient, "test-service-name");
         requestListServicePlans(this.cloudFoundryClient, "test-service-id");
         requestListServicePlanVisibilities(
@@ -187,7 +187,7 @@ public final class DefaultServiceAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void disableServiceAccessSpecifyOrganization() {
+    void disableServiceAccessSpecifyOrganization() {
         requestListServicesWithName(this.cloudFoundryClient, "test-service-name");
         requestListServicePlans(this.cloudFoundryClient, "test-service-id");
         requestListServicePlanVisibilities(
@@ -209,7 +209,7 @@ public final class DefaultServiceAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void disableServiceAccessSpecifyServicePlan() {
+    void disableServiceAccessSpecifyServicePlan() {
         requestListServicesWithName(this.cloudFoundryClient, "test-service-name");
         requestListServicePlans(this.cloudFoundryClient, "test-service-id");
         requestListServicePlanVisibilities(this.cloudFoundryClient, "test-service-plan-id");
@@ -229,7 +229,7 @@ public final class DefaultServiceAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void enableServiceAccess() {
+    void enableServiceAccess() {
         requestListServicesWithName(this.cloudFoundryClient, "test-service-name");
         requestListServicePlans(this.cloudFoundryClient, "test-service-id");
         requestListServicePlanVisibilities(this.cloudFoundryClient, "test-service-plan-id");
@@ -247,7 +247,7 @@ public final class DefaultServiceAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void enableServiceAccessOrganizationNotFound() {
+    void enableServiceAccessOrganizationNotFound() {
         requestListServicesWithName(this.cloudFoundryClient, "test-service-name");
         requestListServicePlans(this.cloudFoundryClient, "test-service-id");
         requestListOrganizationsEmpty(this.cloudFoundryClient, "bogus-organization-name");
@@ -269,7 +269,7 @@ public final class DefaultServiceAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void enableServiceAccessServiceNotFound() {
+    void enableServiceAccessServiceNotFound() {
         requestListServicesWithNameEmpty(this.cloudFoundryClient, "bogus-service-name");
 
         this.serviceAdmin
@@ -288,7 +288,7 @@ public final class DefaultServiceAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void enableServiceAccessSpecifyAll() {
+    void enableServiceAccessSpecifyAll() {
         requestListServicesWithName(this.cloudFoundryClient, "test-service-name");
         requestListServicePlans(this.cloudFoundryClient, "test-service-id");
         requestListOrganizations(this.cloudFoundryClient, "test-organization-name");
@@ -308,7 +308,7 @@ public final class DefaultServiceAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void enableServiceAccessSpecifyOrganization() {
+    void enableServiceAccessSpecifyOrganization() {
         requestListServicesWithName(this.cloudFoundryClient, "test-service-name");
         requestListServicePlans(this.cloudFoundryClient, "test-service-id");
         requestListServicePlanVisibilities(this.cloudFoundryClient, "test-service-plan-id");
@@ -328,7 +328,7 @@ public final class DefaultServiceAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void enableServiceAccessSpecifyServicePlan() {
+    void enableServiceAccessSpecifyServicePlan() {
         requestListServicesWithName(this.cloudFoundryClient, "test-service-name");
         requestListServicePlans(this.cloudFoundryClient, "test-service-id");
         requestListServicePlanVisibilities(this.cloudFoundryClient, "test-service-plan-id");
@@ -347,7 +347,7 @@ public final class DefaultServiceAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void enableServiceAccessSpecifyServicePlanWithoutPublicVisibility() {
+    void enableServiceAccessSpecifyServicePlanWithoutPublicVisibility() {
         ServicePlanResource servicePlan1 =
                 buildServicePlan("test-service-plan-id-1", "test-service-plan-name-1");
         ServicePlanResource servicePlan2 =
@@ -373,7 +373,7 @@ public final class DefaultServiceAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void listServiceAccessSettings() {
+    void listServiceAccessSettings() {
         requestListServiceBrokers(this.cloudFoundryClient);
         requestListServicePlanVisibilitiesEmpty(this.cloudFoundryClient);
         requestListServicesWithBroker(this.cloudFoundryClient, "test-service-broker-id");
@@ -395,7 +395,7 @@ public final class DefaultServiceAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void listServiceAccessSettingsNoBrokers() {
+    void listServiceAccessSettingsNoBrokers() {
         requestListServiceBrokersEmpty(this.cloudFoundryClient);
         requestListServicePlanVisibilitiesEmpty(this.cloudFoundryClient);
 
@@ -411,7 +411,7 @@ public final class DefaultServiceAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void listServiceAccessSettingsSpecifyBroker() {
+    void listServiceAccessSettingsSpecifyBroker() {
         requestListServiceBrokers(this.cloudFoundryClient);
         requestListServicePlanVisibilitiesEmpty(this.cloudFoundryClient);
         requestListServicesWithBroker(this.cloudFoundryClient, "test-service-broker-id");
@@ -436,7 +436,7 @@ public final class DefaultServiceAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void listServiceAccessSettingsSpecifyBrokerNotFound() {
+    void listServiceAccessSettingsSpecifyBrokerNotFound() {
         requestListServiceBrokers(this.cloudFoundryClient);
         requestListServicePlanVisibilitiesEmpty(this.cloudFoundryClient);
 
@@ -457,7 +457,7 @@ public final class DefaultServiceAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void listServiceAccessSettingsSpecifyOrganization() {
+    void listServiceAccessSettingsSpecifyOrganization() {
         requestListServiceBrokers(this.cloudFoundryClient);
         requestListServicePlanVisibilities(this.cloudFoundryClient);
         requestListOrganizations(this.cloudFoundryClient, "test-organization-name");
@@ -484,7 +484,7 @@ public final class DefaultServiceAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void listServiceAccessSettingsSpecifyOrganizationNotFound() {
+    void listServiceAccessSettingsSpecifyOrganizationNotFound() {
         requestListServiceBrokers(this.cloudFoundryClient);
         requestListServicePlanVisibilities(this.cloudFoundryClient);
         requestListOrganizationsEmpty(this.cloudFoundryClient, "bogus-organization-name");
@@ -505,7 +505,7 @@ public final class DefaultServiceAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void listServiceAccessSettingsSpecifyService() {
+    void listServiceAccessSettingsSpecifyService() {
         requestListServicesWithName(this.cloudFoundryClient, "test-service-name");
         requestListServiceBrokers(this.cloudFoundryClient);
         requestListServicePlanVisibilitiesEmpty(this.cloudFoundryClient);
@@ -531,7 +531,7 @@ public final class DefaultServiceAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void listServiceAccessSettingsSpecifyServiceNotFound() {
+    void listServiceAccessSettingsSpecifyServiceNotFound() {
         requestListServiceBrokers(this.cloudFoundryClient);
         requestListServicePlanVisibilitiesEmpty(this.cloudFoundryClient);
         requestListServicesWithNameEmpty(this.cloudFoundryClient, "bogus-service-name");
@@ -551,7 +551,7 @@ public final class DefaultServiceAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void listServiceBrokers() {
+    void listServiceBrokers() {
         requestListServiceBrokers(this.cloudFoundryClient);
 
         this.serviceAdmin
@@ -568,7 +568,7 @@ public final class DefaultServiceAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void listServiceBrokersNoBrokers() {
+    void listServiceBrokersNoBrokers() {
         requestListServiceBrokersEmpty(this.cloudFoundryClient);
 
         this.serviceAdmin
@@ -579,7 +579,7 @@ public final class DefaultServiceAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void updateServiceBroker() {
+    void updateServiceBroker() {
         requestListServiceBrokers(this.cloudFoundryClient, "test-service-broker-name");
         requestUpdateServiceBroker(
                 this.cloudFoundryClient,
@@ -603,7 +603,7 @@ public final class DefaultServiceAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void updateServiceBrokerNoServiceBroker() {
+    void updateServiceBrokerNoServiceBroker() {
         requestListServiceBrokersEmpty(this.cloudFoundryClient, "test-service-broker-name");
         requestUpdateServiceBroker(
                 this.cloudFoundryClient,

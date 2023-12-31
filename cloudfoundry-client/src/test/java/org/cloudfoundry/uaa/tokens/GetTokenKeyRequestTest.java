@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.uaa.tokens;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class GetTokenKeyRequestTest {
+final class GetTokenKeyRequestTest {
 
     @Test
-    public void valid() {
+    void valid() {
         GetTokenKeyRequest.builder().build();
     }
 }

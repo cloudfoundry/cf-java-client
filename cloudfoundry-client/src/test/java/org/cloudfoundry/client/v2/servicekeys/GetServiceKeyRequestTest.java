@@ -16,17 +16,23 @@
 
 package org.cloudfoundry.client.v2.servicekeys;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class GetServiceKeyRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noServiceKeyId() {
-        GetServiceKeyRequest.builder().build();
+final class GetServiceKeyRequestTest {
+
+    @Test
+    void noServiceKeyId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    GetServiceKeyRequest.builder().build();
+                });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         GetServiceKeyRequest.builder().serviceKeyId("test-service-key-id").build();
     }
 }

@@ -16,25 +16,37 @@
 
 package org.cloudfoundry.client.v3.applications;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.cloudfoundry.client.v3.processes.ProcessState;
 import org.cloudfoundry.client.v3.processes.ProcessStatisticsResource;
 import org.cloudfoundry.client.v3.processes.ProcessUsage;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class GetApplicationProcessStatisticsRequestTest {
+final class GetApplicationProcessStatisticsRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noApplicationId() {
-        GetApplicationProcessStatisticsRequest.builder().type("test-type").build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noType() {
-        GetApplicationProcessStatisticsRequest.builder().applicationId("test-id").build();
+    @Test
+    void noApplicationId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    GetApplicationProcessStatisticsRequest.builder().type("test-type").build();
+                });
     }
 
     @Test
-    public void valid() {
+    void noType() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    GetApplicationProcessStatisticsRequest.builder()
+                            .applicationId("test-id")
+                            .build();
+                });
+    }
+
+    @Test
+    void valid() {
         GetApplicationProcessStatisticsRequest.builder()
                 .applicationId("test-id")
                 .type("test-type")
@@ -42,7 +54,7 @@ public final class GetApplicationProcessStatisticsRequestTest {
     }
 
     @Test
-    public void validDownResource() {
+    void validDownResource() {
         ProcessStatisticsResource processStatisticsResource =
                 ProcessStatisticsResource.builder()
                         .type("web")
@@ -55,22 +67,26 @@ public final class GetApplicationProcessStatisticsRequestTest {
                 .build();
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void invalidRunningResource() {
-        ProcessStatisticsResource processStatisticsResource =
-                ProcessStatisticsResource.builder()
-                        .type("web")
-                        .index(0)
-                        .state(ProcessState.RUNNING)
-                        .uptime(0L)
-                        .build();
-        GetApplicationProcessStatisticsResponse.builder()
-                .resource(processStatisticsResource)
-                .build();
+    @Test
+    void invalidRunningResource() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    ProcessStatisticsResource processStatisticsResource =
+                            ProcessStatisticsResource.builder()
+                                    .type("web")
+                                    .index(0)
+                                    .state(ProcessState.RUNNING)
+                                    .uptime(0L)
+                                    .build();
+                    GetApplicationProcessStatisticsResponse.builder()
+                            .resource(processStatisticsResource)
+                            .build();
+                });
     }
 
     @Test
-    public void validRunningResponse() {
+    void validRunningResponse() {
         ProcessUsage processUsage =
                 ProcessUsage.builder()
                         .time("")

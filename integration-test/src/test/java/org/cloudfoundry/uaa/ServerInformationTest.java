@@ -21,7 +21,6 @@ import org.cloudfoundry.uaa.serverinformation.AutoLoginRequest;
 import org.cloudfoundry.uaa.serverinformation.GetAutoLoginAuthenticationCodeRequest;
 import org.cloudfoundry.uaa.serverinformation.GetAutoLoginAuthenticationCodeResponse;
 import org.cloudfoundry.uaa.serverinformation.GetInfoRequest;
-import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;

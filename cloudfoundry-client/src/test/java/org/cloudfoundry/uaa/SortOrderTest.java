@@ -20,12 +20,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.uaa.SortOrder.ASCENDING;
 import static org.cloudfoundry.uaa.SortOrder.DESCENDING;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class SortOrderTest {
+final class SortOrderTest {
 
     @Test
-    public void sortOrder() {
+    void sortOrder() {
         assertThat(ASCENDING.getValue()).isEqualTo("ascending");
         assertThat(DESCENDING.getValue()).isEqualTo("descending");
     }

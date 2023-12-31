@@ -70,17 +70,17 @@ import org.cloudfoundry.uaa.clients.UpdateClientResponse;
 import org.cloudfoundry.uaa.clients.UpdateMetadataRequest;
 import org.cloudfoundry.uaa.clients.UpdateMetadataResponse;
 import org.cloudfoundry.uaa.clients.UpdateSecretAction;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-public final class ReactorClientsTest extends AbstractUaaApiTest {
+final class ReactorClientsTest extends AbstractUaaApiTest {
 
     private final ReactorClients clients =
             new ReactorClients(
                     CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void batchChangeSecret() {
+    void batchChangeSecret() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -161,7 +161,7 @@ public final class ReactorClientsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void batchCreate() {
+    void batchCreate() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -252,7 +252,7 @@ public final class ReactorClientsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void batchDelete() {
+    void batchDelete() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -315,7 +315,7 @@ public final class ReactorClientsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void batchUpdate() {
+    void batchUpdate() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -410,7 +410,7 @@ public final class ReactorClientsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void changeSecrets() {
+    void changeSecrets() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -445,7 +445,7 @@ public final class ReactorClientsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void create() {
+    void create() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -499,7 +499,7 @@ public final class ReactorClientsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -538,7 +538,7 @@ public final class ReactorClientsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void deserialize() {
+    void deserialize() {
         mockRequest(
                 InteractionContext.builder()
                         .request(TestRequest.builder().method(GET).path("/oauth/clients").build())
@@ -597,7 +597,7 @@ public final class ReactorClientsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -636,7 +636,7 @@ public final class ReactorClientsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void getMetadata() {
+    void getMetadata() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -666,7 +666,7 @@ public final class ReactorClientsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -720,7 +720,7 @@ public final class ReactorClientsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void listMetadatas() {
+    void listMetadatas() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -774,7 +774,7 @@ public final class ReactorClientsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void mixedActions() {
+    void mixedActions() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -876,7 +876,7 @@ public final class ReactorClientsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void update() {
+    void update() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -922,7 +922,7 @@ public final class ReactorClientsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void updateMetadata() {
+    void updateMetadata() {
         mockRequest(
                 InteractionContext.builder()
                         .request(

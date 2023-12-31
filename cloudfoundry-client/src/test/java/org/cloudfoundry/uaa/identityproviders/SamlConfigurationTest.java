@@ -16,17 +16,23 @@
 
 package org.cloudfoundry.uaa.identityproviders;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class SamlConfigurationTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noMetadataLocation() {
-        SamlConfiguration.builder().build();
+final class SamlConfigurationTest {
+
+    @Test
+    void noMetadataLocation() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    SamlConfiguration.builder().build();
+                });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         SamlConfiguration.builder().metaDataLocation("test-metadata-location").build();
     }
 }

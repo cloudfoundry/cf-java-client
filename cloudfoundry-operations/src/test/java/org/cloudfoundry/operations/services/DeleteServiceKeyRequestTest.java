@@ -16,22 +16,36 @@
 
 package org.cloudfoundry.operations.services;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class DeleteServiceKeyRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noServiceInstanceName() {
-        DeleteServiceKeyRequest.builder().serviceKeyName("test-service-key-name").build();
-    }
+final class DeleteServiceKeyRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noServiceKeyName() {
-        DeleteServiceKeyRequest.builder().serviceInstanceName("test-service-instance-name").build();
+    @Test
+    void noServiceInstanceName() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    DeleteServiceKeyRequest.builder()
+                            .serviceKeyName("test-service-key-name")
+                            .build();
+                });
     }
 
     @Test
-    public void valid() {
+    void noServiceKeyName() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    DeleteServiceKeyRequest.builder()
+                            .serviceInstanceName("test-service-instance-name")
+                            .build();
+                });
+    }
+
+    @Test
+    void valid() {
         DeleteServiceKeyRequest.builder()
                 .serviceInstanceName("test-service-instance-name")
                 .serviceKeyName("test-service-key-name")

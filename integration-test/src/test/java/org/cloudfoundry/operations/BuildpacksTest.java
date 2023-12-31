@@ -21,7 +21,6 @@ import org.cloudfoundry.operations.buildpacks.Buildpack;
 import org.cloudfoundry.operations.buildpacks.CreateBuildpackRequest;
 import org.cloudfoundry.operations.buildpacks.DeleteBuildpackRequest;
 import org.cloudfoundry.operations.buildpacks.UpdateBuildpackRequest;
-import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import reactor.core.publisher.Mono;

@@ -18,12 +18,12 @@ package org.cloudfoundry.uaa;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class UaaExceptionTest {
+final class UaaExceptionTest {
 
     @Test
-    public void test() {
+    void test() {
         assertThat(new UaaException(-1, "test-error", "test-error-description"))
                 .hasNoCause()
                 .hasMessage("test-error: test-error-description")

@@ -16,37 +16,47 @@
 
 package org.cloudfoundry.uaa.tokens;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class GetTokenByClientCredentialsRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noClientId() {
+final class GetTokenByClientCredentialsRequestTest {
+
+    @Test
+    void noClientId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    GetTokenByClientCredentialsRequest.builder()
+                            .clientSecret("test-client-secret")
+                            .tokenFormat(TokenFormat.OPAQUE)
+                            .build();
+                });
+    }
+
+    @Test
+    void noClientSecret() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    GetTokenByClientCredentialsRequest.builder()
+                            .clientId("test-client-id")
+                            .tokenFormat(TokenFormat.OPAQUE)
+                            .build();
+                });
+    }
+
+    @Test
+    void validMax() {
         GetTokenByClientCredentialsRequest.builder()
+                .clientId("test-client-id")
                 .clientSecret("test-client-secret")
                 .tokenFormat(TokenFormat.OPAQUE)
                 .build();
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void noClientSecret() {
-        GetTokenByClientCredentialsRequest.builder()
-                .clientId("test-client-id")
-                .tokenFormat(TokenFormat.OPAQUE)
-                .build();
-    }
-
     @Test
-    public void validMax() {
-        GetTokenByClientCredentialsRequest.builder()
-                .clientId("test-client-id")
-                .clientSecret("test-client-secret")
-                .tokenFormat(TokenFormat.OPAQUE)
-                .build();
-    }
-
-    @Test
-    public void validMin() {
+    void validMin() {
         GetTokenByClientCredentialsRequest.builder()
                 .clientId("test-client-id")
                 .clientSecret("test-client-secret")

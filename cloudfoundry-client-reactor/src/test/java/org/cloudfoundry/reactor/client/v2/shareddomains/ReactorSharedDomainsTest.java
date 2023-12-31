@@ -41,17 +41,18 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-public final class ReactorSharedDomainsTest extends AbstractClientApiTest {
+final class ReactorSharedDomainsTest extends AbstractClientApiTest {
 
     private final ReactorSharedDomains sharedDomains =
             new ReactorSharedDomains(
                     CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void create() {
+    void create() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -97,7 +98,7 @@ public final class ReactorSharedDomainsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -120,7 +121,7 @@ public final class ReactorSharedDomainsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void deleteAsync() {
+    void deleteAsync() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -164,7 +165,7 @@ public final class ReactorSharedDomainsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void listSharedDomains() {
+    void listSharedDomains() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -267,14 +268,15 @@ public final class ReactorSharedDomainsTest extends AbstractClientApiTest {
                 .verify(Duration.ofSeconds(5));
     }
 
-    public static final class Get extends AbstractClientApiTest {
+    @Nested
+    public final class Get extends AbstractClientApiTest {
 
         private final ReactorSharedDomains sharedDomains =
                 new ReactorSharedDomains(
                         CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
         @Test
-        public void get() {
+        void get() {
             mockRequest(interactionContext());
 
             this.sharedDomains

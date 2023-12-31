@@ -38,17 +38,17 @@ import org.cloudfoundry.uaa.serverinformation.GetInfoRequest;
 import org.cloudfoundry.uaa.serverinformation.GetInfoResponse;
 import org.cloudfoundry.uaa.serverinformation.Links;
 import org.cloudfoundry.uaa.serverinformation.Prompts;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-public final class ReactorServerInformationTest extends AbstractUaaApiTest {
+final class ReactorServerInformationTest extends AbstractUaaApiTest {
 
     private final ReactorServerInformation info =
             new ReactorServerInformation(
                     CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void autoLogin() {
+    void autoLogin() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -67,7 +67,7 @@ public final class ReactorServerInformationTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void getAutoLoginAuthenticationCode() {
+    void getAutoLoginAuthenticationCode() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -102,7 +102,7 @@ public final class ReactorServerInformationTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void getInfo() {
+    void getInfo() {
         Map<String, String> ipDefinitions = new HashMap<>();
         ipDefinitions.put(
                 "SAMLMetadataUrl",

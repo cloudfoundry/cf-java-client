@@ -16,17 +16,23 @@
 
 package org.cloudfoundry.client.v2.servicebindings;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class GetServiceBindingParametersRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noServiceInstanceId() {
-        GetServiceBindingParametersRequest.builder().build();
+final class GetServiceBindingParametersRequestTest {
+
+    @Test
+    void noServiceInstanceId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    GetServiceBindingParametersRequest.builder().build();
+                });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         GetServiceBindingParametersRequest.builder()
                 .serviceBindingId("test-service-instance-id")
                 .build();

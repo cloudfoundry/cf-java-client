@@ -16,34 +16,48 @@
 
 package org.cloudfoundry.client.v3;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.immutables.value.Value;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class PaginatedRequestTest {
+final class PaginatedRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void excessivePerPage() {
-        StubPaginatedRequest.builder().perPage(10_000).build();
+    @Test
+    void excessivePerPage() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    StubPaginatedRequest.builder().perPage(10_000).build();
+                });
     }
 
     @Test
-    public void validNoValues() {
+    void validNoValues() {
         StubPaginatedRequest.builder().build();
     }
 
     @Test
-    public void validValues() {
+    void validValues() {
         StubPaginatedRequest.builder().page(10).perPage(10).orderBy("name").build();
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void zeroPage() {
-        StubPaginatedRequest.builder().page(0).build();
+    @Test
+    void zeroPage() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    StubPaginatedRequest.builder().page(0).build();
+                });
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void zeroPerPage() {
-        StubPaginatedRequest.builder().perPage(0).build();
+    @Test
+    void zeroPerPage() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    StubPaginatedRequest.builder().perPage(0).build();
+                });
     }
 
     @Value.Immutable

@@ -16,18 +16,24 @@
 
 package org.cloudfoundry.client.v3.builds;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.cloudfoundry.client.v3.Relationship;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class CreateBuildRequestTest {
+final class CreateBuildRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noPackage() {
-        CreateBuildRequest.builder().build();
+    @Test
+    void noPackage() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    CreateBuildRequest.builder().build();
+                });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         CreateBuildRequest.builder()
                 .getPackage(Relationship.builder().id("test-id").build())
                 .build();

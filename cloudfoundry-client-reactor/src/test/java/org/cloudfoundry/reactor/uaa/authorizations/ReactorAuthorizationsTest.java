@@ -36,17 +36,17 @@ import org.cloudfoundry.uaa.authorizations.AuthorizeByOpenIdWithIdTokenRequest;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByOpenIdWithImplicitGrantRequest;
 import org.cloudfoundry.uaa.authorizations.GetOpenIdProviderConfigurationRequest;
 import org.cloudfoundry.uaa.authorizations.GetOpenIdProviderConfigurationResponse;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-public final class ReactorAuthorizationsTest extends AbstractUaaApiTest {
+final class ReactorAuthorizationsTest extends AbstractUaaApiTest {
 
     private final ReactorAuthorizations authorizations =
             new ReactorAuthorizations(
                     CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void authorizeByAuthorizationCodeGrantApi() {
+    void authorizeByAuthorizationCodeGrantApi() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -78,7 +78,7 @@ public final class ReactorAuthorizationsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void authorizeByAuthorizationCodeGrantBrowser() {
+    void authorizeByAuthorizationCodeGrantBrowser() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -109,7 +109,7 @@ public final class ReactorAuthorizationsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void authorizeByAuthorizationCodeGrantHybrid() {
+    void authorizeByAuthorizationCodeGrantHybrid() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -154,7 +154,7 @@ public final class ReactorAuthorizationsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void authorizeByImplicitGrantBrowser() {
+    void authorizeByImplicitGrantBrowser() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -192,7 +192,7 @@ public final class ReactorAuthorizationsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void authorizeByOpenIdWithAuthorizationCodeGrant() {
+    void authorizeByOpenIdWithAuthorizationCodeGrant() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -222,7 +222,7 @@ public final class ReactorAuthorizationsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void authorizeByOpenIdWithToken() {
+    void authorizeByOpenIdWithToken() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -267,7 +267,7 @@ public final class ReactorAuthorizationsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void authorizeByOpenIdWithimplicitGrant() {
+    void authorizeByOpenIdWithimplicitGrant() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -297,7 +297,7 @@ public final class ReactorAuthorizationsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void getOpenIdProviderConfigurationRequest() {
+    void getOpenIdProviderConfigurationRequest() {
         mockRequest(
                 InteractionContext.builder()
                         .request(

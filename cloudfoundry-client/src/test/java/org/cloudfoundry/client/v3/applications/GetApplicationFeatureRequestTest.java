@@ -16,22 +16,34 @@
 
 package org.cloudfoundry.client.v3.applications;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class GetApplicationFeatureRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noApplicationId() {
-        GetApplicationFeatureRequest.builder().applicationId("test-application-id").build();
-    }
+final class GetApplicationFeatureRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noFeatureName() {
-        GetApplicationFeatureRequest.builder().featureName("test-feature-name").build();
+    @Test
+    void noApplicationId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    GetApplicationFeatureRequest.builder()
+                            .applicationId("test-application-id")
+                            .build();
+                });
     }
 
     @Test
-    public void valid() {
+    void noFeatureName() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    GetApplicationFeatureRequest.builder().featureName("test-feature-name").build();
+                });
+    }
+
+    @Test
+    void valid() {
         GetApplicationFeatureRequest.builder()
                 .applicationId("test-application-id")
                 .featureName("test-feature-name")

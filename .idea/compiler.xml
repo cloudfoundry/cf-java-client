@@ -18,13 +18,14 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="cloudfoundry-client" options="-Werror -Xlint:all -Xlint:-options -Xlint:-processing -Xlint:-serial" />
-      <module name="cloudfoundry-client-reactor" options="-Werror -Xlint:all -Xlint:-options -Xlint:-processing -Xlint:-serial" />
-      <module name="cloudfoundry-operations" options="-Werror -Xlint:all -Xlint:-options -Xlint:-processing -Xlint:-serial" />
-      <module name="cloudfoundry-util" options="-Werror -Xlint:all -Xlint:-options -Xlint:-processing -Xlint:-serial" />
-      <module name="integration-test" options="-Werror -Xlint:all -Xlint:-options -Xlint:-processing -Xlint:-serial" />
-      <module name="test-log-cache" options="-Werror -Xlint:all -Xlint:-options -Xlint:-processing -Xlint:-serial" />
-      <module name="test-service-broker" options="-Werror -Xlint:all -Xlint:-options -Xlint:-processing -Xlint:-serial" />
+      <module name="cloudfoundry-client" options="-Xlint:all -Xlint:-options -Xlint:-processing -Xlint:-serial -J--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED" />
+      <module name="cloudfoundry-client-reactor" options="-Xlint:all -Xlint:-options -Xlint:-processing -Xlint:-serial -J--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED" />
+      <module name="cloudfoundry-java-client" options="-Xlint:all -Xlint:-options -Xlint:-processing -Xlint:-serial -J--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED" />
+      <module name="cloudfoundry-operations" options="-Xlint:all -Xlint:-options -Xlint:-processing -Xlint:-serial -J--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED" />
+      <module name="cloudfoundry-util" options="-Xlint:all -Xlint:-options -Xlint:-processing -Xlint:-serial -J--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED" />
+      <module name="integration-test" options="-Xlint:all -Xlint:-options -Xlint:-processing -Xlint:-serial -J--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED" />
+      <module name="test-log-cache" options="-Xlint:all -Xlint:-options -Xlint:-processing -Xlint:-serial -J--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED" />
+      <module name="test-service-broker" options="-Xlint:all -Xlint:-options -Xlint:-processing -Xlint:-serial -J--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED" />
     </option>
   </component>
 </project>

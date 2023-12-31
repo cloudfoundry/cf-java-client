@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.uaa.identityproviders;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class InternalConfigurationTest {
+final class InternalConfigurationTest {
 
     @Test
-    public void valid() {
+    void valid() {
         InternalConfiguration.builder().build();
     }
 }

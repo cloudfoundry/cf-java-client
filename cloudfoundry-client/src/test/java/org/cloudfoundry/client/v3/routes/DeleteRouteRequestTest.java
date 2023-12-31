@@ -16,17 +16,23 @@
 
 package org.cloudfoundry.client.v3.routes;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class DeleteRouteRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noRouteId() {
-        DeleteRouteRequest.builder().build();
+class DeleteRouteRequestTest {
+
+    @Test
+    void noRouteId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    DeleteRouteRequest.builder().build();
+                });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         DeleteRouteRequest.builder().routeId("test-route-id").build();
     }
 }

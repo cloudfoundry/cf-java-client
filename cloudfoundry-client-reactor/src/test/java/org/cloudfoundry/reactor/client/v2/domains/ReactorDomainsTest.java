@@ -45,17 +45,17 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-public final class ReactorDomainsTest extends AbstractClientApiTest {
+final class ReactorDomainsTest extends AbstractClientApiTest {
 
     private final ReactorDomains domains =
             new ReactorDomains(
                     CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void create() {
+    void create() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -105,7 +105,7 @@ public final class ReactorDomainsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -124,7 +124,7 @@ public final class ReactorDomainsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void deleteAsync() {
+    void deleteAsync() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -167,7 +167,7 @@ public final class ReactorDomainsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -205,7 +205,7 @@ public final class ReactorDomainsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void listDomains() {
+    void listDomains() {
         mockRequest(
                 InteractionContext.builder()
                         .request(TestRequest.builder().method(GET).path("/domains?page=-1").build())
@@ -295,7 +295,7 @@ public final class ReactorDomainsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void listSpaces() {
+    void listSpaces() {
         mockRequest(
                 InteractionContext.builder()
                         .request(

@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.uaa.groups;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class ListGroupsRequestTest {
+class ListGroupsRequestTest {
 
     @Test
-    public void valid() {
+    void valid() {
         ListGroupsRequest.builder().build();
     }
 }

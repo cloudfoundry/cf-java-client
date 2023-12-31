@@ -59,17 +59,17 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
+class ReactorOrganizationsV3Test extends AbstractClientApiTest {
 
     private final ReactorOrganizationsV3 organizations =
             new ReactorOrganizationsV3(
                     CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void assignDefaultIsolationSegment() {
+    void assignDefaultIsolationSegment() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -119,7 +119,7 @@ public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void create() {
+    void create() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -163,7 +163,7 @@ public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -192,7 +192,7 @@ public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -237,7 +237,7 @@ public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void getDefaultDomain() {
+    void getDefaultDomain() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -326,7 +326,7 @@ public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void getDefaultIsolationSegment() {
+    void getDefaultIsolationSegment() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -373,7 +373,7 @@ public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void getUsageSummary() {
+    void getUsageSummary() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -420,7 +420,7 @@ public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         mockRequest(
                 InteractionContext.builder()
                         .request(TestRequest.builder().method(GET).path("/organizations").build())
@@ -482,7 +482,7 @@ public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void listDomains() {
+    void listDomains() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -578,7 +578,7 @@ public class ReactorOrganizationsV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void update() {
+    void update() {
         mockRequest(
                 InteractionContext.builder()
                         .request(

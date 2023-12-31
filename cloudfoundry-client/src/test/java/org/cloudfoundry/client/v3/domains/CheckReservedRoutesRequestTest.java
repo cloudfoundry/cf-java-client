@@ -16,17 +16,23 @@
 
 package org.cloudfoundry.client.v3.domains;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class CheckReservedRoutesRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noDomainId() {
-        CheckReservedRoutesRequest.builder().build();
+final class CheckReservedRoutesRequestTest {
+
+    @Test
+    void noDomainId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    CheckReservedRoutesRequest.builder().build();
+                });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         CheckReservedRoutesRequest.builder().domainId("test-domain-id").build();
     }
 }
