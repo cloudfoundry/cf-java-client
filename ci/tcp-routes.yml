@@ -21,4 +21,4 @@
 - type: replace
   path: /product-properties/.cloud_controller.default_quota_memory_limit_mb
   value:
-    value: 20480
+    value: ((DEFAULT_QUOTA_MEM_MB))
