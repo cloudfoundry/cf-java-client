@@ -74,7 +74,8 @@ om \
   configure-product \
   --config /tmp/cf.yml \
   --ops-file cf-java-client/ci/tcp-routes.yml \
-  --var TCP_ROUTES_LB="tcp:${TCP_ROUTES_LB}"
+  --var TCP_ROUTES_LB="tcp:${TCP_ROUTES_LB}" \
+  --var DEFAULT_QUOTA_MEM_MB=${DEFAULT_QUOTA_MEM_MB}
 
 om \
   --target "$(jq -n -r --argjson claim "${CLAIM}" '$claim.ops_manager.url')" \
