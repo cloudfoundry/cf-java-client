@@ -25,6 +25,7 @@ import org.cloudfoundry.uaa.identityzones.GetIdentityZoneResponse;
 import org.cloudfoundry.uaa.identityzones.ListIdentityZonesRequest;
 import org.cloudfoundry.uaa.identityzones.ListIdentityZonesResponse;
 import org.cloudfoundry.uaa.identityzones.UpdateIdentityZoneRequest;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
