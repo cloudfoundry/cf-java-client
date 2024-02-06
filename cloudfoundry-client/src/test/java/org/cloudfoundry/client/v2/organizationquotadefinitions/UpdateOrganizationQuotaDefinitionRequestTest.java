@@ -16,17 +16,23 @@
 
 package org.cloudfoundry.client.v2.organizationquotadefinitions;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class UpdateOrganizationQuotaDefinitionRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noOrganizationQuotaDefinitionId() {
-        UpdateOrganizationQuotaDefinitionRequest.builder().build();
+class UpdateOrganizationQuotaDefinitionRequestTest {
+
+    @Test
+    void noOrganizationQuotaDefinitionId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    UpdateOrganizationQuotaDefinitionRequest.builder().build();
+                });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         UpdateOrganizationQuotaDefinitionRequest.builder()
                 .organizationQuotaDefinitionId("test-organization-quota-definition-id")
                 .build();

@@ -18,12 +18,12 @@ package org.cloudfoundry.client.v2;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class ClientV2ExceptionTest {
+final class ClientV2ExceptionTest {
 
     @Test
-    public void test() {
+    void test() {
         assertThat(new ClientV2Exception(-1, -2, "test-description", "test-error-code"))
                 .hasNoCause()
                 .hasMessage("test-error-code(-2): test-description")

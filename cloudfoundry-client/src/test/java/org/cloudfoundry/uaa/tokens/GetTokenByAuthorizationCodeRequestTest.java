@@ -16,36 +16,50 @@
 
 package org.cloudfoundry.uaa.tokens;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class GetTokenByAuthorizationCodeRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noAuthorizationCode() {
-        GetTokenByAuthorizationCodeRequest.builder()
-                .clientId("test-client-id")
-                .clientSecret("test-client-secret")
-                .build();
-    }
+final class GetTokenByAuthorizationCodeRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noClientId() {
-        GetTokenByAuthorizationCodeRequest.builder()
-                .authorizationCode("test-authorization-code")
-                .clientSecret("test-client-secret")
-                .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noClientSecret() {
-        GetTokenByAuthorizationCodeRequest.builder()
-                .authorizationCode("test-authorization-code")
-                .clientId("test-client-id")
-                .build();
+    @Test
+    void noAuthorizationCode() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    GetTokenByAuthorizationCodeRequest.builder()
+                            .clientId("test-client-id")
+                            .clientSecret("test-client-secret")
+                            .build();
+                });
     }
 
     @Test
-    public void valid() {
+    void noClientId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    GetTokenByAuthorizationCodeRequest.builder()
+                            .authorizationCode("test-authorization-code")
+                            .clientSecret("test-client-secret")
+                            .build();
+                });
+    }
+
+    @Test
+    void noClientSecret() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    GetTokenByAuthorizationCodeRequest.builder()
+                            .authorizationCode("test-authorization-code")
+                            .clientId("test-client-id")
+                            .build();
+                });
+    }
+
+    @Test
+    void valid() {
         GetTokenByAuthorizationCodeRequest.builder()
                 .authorizationCode("test-authorization-code")
                 .clientId("test-client-id")

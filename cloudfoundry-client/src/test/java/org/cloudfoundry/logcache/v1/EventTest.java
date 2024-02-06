@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.logcache.v1;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class EventTest {
+class EventTest {
 
     @Test
-    public void valid() {
+    void valid() {
         Event.builder().build();
     }
 }

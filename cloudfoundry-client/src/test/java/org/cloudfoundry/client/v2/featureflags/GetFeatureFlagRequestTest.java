@@ -16,34 +16,54 @@
 
 package org.cloudfoundry.client.v2.featureflags;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class GetFeatureFlagRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void badName1() {
-        GetFeatureFlagRequest.builder()
-                .name("mustn't have spaces or / chars (or quotes, or parentheses, or commas)")
-                .build();
-    }
+final class GetFeatureFlagRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void badName2() {
-        GetFeatureFlagRequest.builder().name("good_name_with_bad_at_end ").build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void badName3() {
-        GetFeatureFlagRequest.builder().name("good_name_with_bad_at_end.").build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        GetFeatureFlagRequest.builder().build();
+    @Test
+    void badName1() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    GetFeatureFlagRequest.builder()
+                            .name(
+                                    "mustn't have spaces or / chars (or quotes, or parentheses, or"
+                                            + " commas)")
+                            .build();
+                });
     }
 
     @Test
-    public void valid() {
+    void badName2() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    GetFeatureFlagRequest.builder().name("good_name_with_bad_at_end ").build();
+                });
+    }
+
+    @Test
+    void badName3() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    GetFeatureFlagRequest.builder().name("good_name_with_bad_at_end.").build();
+                });
+    }
+
+    @Test
+    void noName() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    GetFeatureFlagRequest.builder().build();
+                });
+    }
+
+    @Test
+    void valid() {
         GetFeatureFlagRequest.builder().name("test_feature_flag_name").build();
     }
 }

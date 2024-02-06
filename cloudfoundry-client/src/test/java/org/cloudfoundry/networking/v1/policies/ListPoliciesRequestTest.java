@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.networking.v1.policies;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class ListPoliciesRequestTest {
+class ListPoliciesRequestTest {
 
     @Test
-    public void valid() {
+    void valid() {
         ListPoliciesRequest.builder().build();
     }
 }

@@ -16,17 +16,23 @@
 
 package org.cloudfoundry.networking.v1.policies;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class CreatePoliciesRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noPolicy() {
-        CreatePoliciesRequest.builder().build();
+class CreatePoliciesRequestTest {
+
+    @Test
+    void noPolicy() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    CreatePoliciesRequest.builder().build();
+                });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         CreatePoliciesRequest.builder()
                 .policy(
                         Policy.builder()

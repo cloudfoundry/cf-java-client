@@ -1,16 +1,22 @@
 package org.cloudfoundry.client.v3.servicebrokers;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class GetServiceBrokerRequestTest {
+import org.junit.jupiter.api.Test;
+
+final class GetServiceBrokerRequestTest {
 
     @Test
-    public void valid() {
+    void valid() {
         GetServiceBrokerRequest.builder().serviceBrokerId("test-service-broker-id").build();
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void noServiceBrokerId() {
-        GetServiceBrokerRequest.builder().build();
+    @Test
+    void noServiceBrokerId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    GetServiceBrokerRequest.builder().build();
+                });
     }
 }

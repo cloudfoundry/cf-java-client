@@ -38,17 +38,17 @@ import org.cloudfoundry.client.v2.organizations.OrganizationResource;
 import org.cloudfoundry.client.v2.organizations.UpdateOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.UpdateOrganizationResponse;
 import org.cloudfoundry.operations.AbstractOperationsTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-public final class DefaultOrganizationAdminTest extends AbstractOperationsTest {
+final class DefaultOrganizationAdminTest extends AbstractOperationsTest {
 
     private final DefaultOrganizationAdmin organizationAdmin =
             new DefaultOrganizationAdmin(Mono.just(this.cloudFoundryClient));
 
     @Test
-    public void createQuota() {
+    void createQuota() {
         requestCreateOrganizationQuota(
                 this.cloudFoundryClient, 3, 4, "test-quota", true, 1, 2, "test-quota-id");
 
@@ -80,7 +80,7 @@ public final class DefaultOrganizationAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void createQuotaError() {
+    void createQuotaError() {
         requestCreateOrganizationQuotaError(this.cloudFoundryClient, "test-quota-error");
 
         this.organizationAdmin
@@ -97,7 +97,7 @@ public final class DefaultOrganizationAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void getQuota() {
+    void getQuota() {
         requestListOrganizationQuotas(this.cloudFoundryClient, "test-quota");
 
         this.organizationAdmin
@@ -120,7 +120,7 @@ public final class DefaultOrganizationAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void getQuotaNotFound() {
+    void getQuotaNotFound() {
         requestListOrganizationQuotasEmpty(this.cloudFoundryClient, "test-quota-not-found");
 
         this.organizationAdmin
@@ -135,7 +135,7 @@ public final class DefaultOrganizationAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void listQuotas() {
+    void listQuotas() {
         requestListOrganizationQuotas(this.cloudFoundryClient);
 
         this.organizationAdmin
@@ -158,7 +158,7 @@ public final class DefaultOrganizationAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void setQuota() {
+    void setQuota() {
         requestListOrganizationQuotas(this.cloudFoundryClient, "test-quota");
         requestListOrganizations(this.cloudFoundryClient, "test-organization");
         requestUpdateOrganization(this.cloudFoundryClient, "test-organization-id", "test-quota-id");
@@ -175,7 +175,7 @@ public final class DefaultOrganizationAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void setQuotaOrganizationNotFound() {
+    void setQuotaOrganizationNotFound() {
         requestListOrganizationQuotas(this.cloudFoundryClient, "test-quota");
         requestListOrganizationEmpty(this.cloudFoundryClient, "test-organization-not-found");
 
@@ -197,7 +197,7 @@ public final class DefaultOrganizationAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void setQuotaQuotaNotFound() {
+    void setQuotaQuotaNotFound() {
         requestListOrganizationQuotasEmpty(this.cloudFoundryClient, "test-quota-not-found");
         requestListOrganizations(this.cloudFoundryClient, "test-organization");
 
@@ -217,7 +217,7 @@ public final class DefaultOrganizationAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void updateQuota() {
+    void updateQuota() {
         requestListOrganizationQuotas(this.cloudFoundryClient, "test-quota");
         requestUpdateOrganizationQuota(
                 this.cloudFoundryClient, "test-quota-id", 3, 4, "new-test-quota", true, 1, 2);
@@ -251,7 +251,7 @@ public final class DefaultOrganizationAdminTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void updateQuotaNotFound() {
+    void updateQuotaNotFound() {
         requestListOrganizationQuotasEmpty(this.cloudFoundryClient, "test-quota-not-found");
 
         this.organizationAdmin

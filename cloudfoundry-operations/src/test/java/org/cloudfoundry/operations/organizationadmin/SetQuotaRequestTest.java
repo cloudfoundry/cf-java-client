@@ -16,22 +16,32 @@
 
 package org.cloudfoundry.operations.organizationadmin;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class SetQuotaRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noOrganizationName() {
-        SetQuotaRequest.builder().quotaName("test-quota").build();
-    }
+final class SetQuotaRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noQuotaName() {
-        SetQuotaRequest.builder().organizationName("test-organization").build();
+    @Test
+    void noOrganizationName() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    SetQuotaRequest.builder().quotaName("test-quota").build();
+                });
     }
 
     @Test
-    public void valid() {
+    void noQuotaName() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    SetQuotaRequest.builder().organizationName("test-organization").build();
+                });
+    }
+
+    @Test
+    void valid() {
         SetQuotaRequest.builder()
                 .organizationName("test-organization")
                 .quotaName("test-quota")

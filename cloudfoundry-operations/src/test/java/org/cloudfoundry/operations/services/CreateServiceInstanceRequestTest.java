@@ -16,36 +16,50 @@
 
 package org.cloudfoundry.operations.services;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class CreateServiceInstanceRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noPlan() {
-        CreateServiceInstanceRequest.builder()
-                .serviceName("test-service-name")
-                .serviceInstanceName("test-service-instance-name")
-                .build();
-    }
+final class CreateServiceInstanceRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noServiceInstanceName() {
-        CreateServiceInstanceRequest.builder()
-                .planName("test-plan-name")
-                .serviceName("test-service-name")
-                .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noServiceName() {
-        CreateServiceInstanceRequest.builder()
-                .planName("test-plan-name")
-                .serviceInstanceName("test-service-instance-name")
-                .build();
+    @Test
+    void noPlan() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    CreateServiceInstanceRequest.builder()
+                            .serviceName("test-service-name")
+                            .serviceInstanceName("test-service-instance-name")
+                            .build();
+                });
     }
 
     @Test
-    public void valid() {
+    void noServiceInstanceName() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    CreateServiceInstanceRequest.builder()
+                            .planName("test-plan-name")
+                            .serviceName("test-service-name")
+                            .build();
+                });
+    }
+
+    @Test
+    void noServiceName() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    CreateServiceInstanceRequest.builder()
+                            .planName("test-plan-name")
+                            .serviceInstanceName("test-service-instance-name")
+                            .build();
+                });
+    }
+
+    @Test
+    void valid() {
         CreateServiceInstanceRequest.builder()
                 .planName("test-plan-name")
                 .serviceName("test-service-name")

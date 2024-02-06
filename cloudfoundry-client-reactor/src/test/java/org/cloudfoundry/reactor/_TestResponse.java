@@ -17,7 +17,7 @@
 package org.cloudfoundry.reactor;
 
 import io.netty.handler.codec.http.HttpResponseStatus;
-import okhttp3.mockwebserver.MockResponse;
+import mockwebserver3.MockResponse;
 import okio.Buffer;
 import org.cloudfoundry.AllowNulls;
 import org.immutables.value.Value;

@@ -16,17 +16,23 @@
 
 package org.cloudfoundry.uaa.groups;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class CreateGroupRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noDisplayName() {
-        CreateGroupRequest.builder().build();
+final class CreateGroupRequestTest {
+
+    @Test
+    void noDisplayName() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    CreateGroupRequest.builder().build();
+                });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         CreateGroupRequest.builder().displayName("group-test").build();
     }
 }

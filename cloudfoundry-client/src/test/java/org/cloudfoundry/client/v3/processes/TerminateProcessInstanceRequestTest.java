@@ -16,22 +16,32 @@
 
 package org.cloudfoundry.client.v3.processes;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class TerminateProcessInstanceRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noIndex() {
-        TerminateProcessInstanceRequest.builder().processId("test-process-id").build();
-    }
+final class TerminateProcessInstanceRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noProcessId() {
-        TerminateProcessInstanceRequest.builder().index("test-index").build();
+    @Test
+    void noIndex() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    TerminateProcessInstanceRequest.builder().processId("test-process-id").build();
+                });
     }
 
     @Test
-    public void valid() {
+    void noProcessId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    TerminateProcessInstanceRequest.builder().index("test-index").build();
+                });
+    }
+
+    @Test
+    void valid() {
         TerminateProcessInstanceRequest.builder()
                 .index("test-index")
                 .processId("test-process-id")

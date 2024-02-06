@@ -16,17 +16,23 @@
 
 package org.cloudfoundry.client.v2.privatedomains;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class GetPrivateDomainRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noPrivateDomainId() {
-        GetPrivateDomainRequest.builder().build();
+final class GetPrivateDomainRequestTest {
+
+    @Test
+    void noPrivateDomainId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    GetPrivateDomainRequest.builder().build();
+                });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         GetPrivateDomainRequest.builder().privateDomainId("test-private-domain-id").build();
     }
 }

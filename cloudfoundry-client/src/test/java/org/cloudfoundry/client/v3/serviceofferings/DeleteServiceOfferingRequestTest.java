@@ -16,17 +16,23 @@
 
 package org.cloudfoundry.client.v3.serviceofferings;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class DeleteServiceOfferingRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noServiceOfferingId() {
-        DeleteServiceOfferingRequest.builder().build();
+final class DeleteServiceOfferingRequestTest {
+
+    @Test
+    void noServiceOfferingId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    DeleteServiceOfferingRequest.builder().build();
+                });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         DeleteServiceOfferingRequest.builder().serviceOfferingId("test-id").build();
     }
 }

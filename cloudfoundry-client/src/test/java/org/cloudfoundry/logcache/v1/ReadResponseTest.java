@@ -18,17 +18,17 @@ package org.cloudfoundry.logcache.v1;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class ReadResponseTest {
+class ReadResponseTest {
 
     @Test
-    public void missingEnvelopes() {
+    void missingEnvelopes() {
         assertThat(ReadResponse.builder().build().getEnvelopes()).isNotNull();
     }
 
     @Test
-    public void valid() {
+    void valid() {
         ReadResponse.builder().envelopes(EnvelopeBatch.builder().build()).build();
     }
 }

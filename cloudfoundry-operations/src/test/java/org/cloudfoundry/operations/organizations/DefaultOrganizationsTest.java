@@ -67,18 +67,18 @@ import org.cloudfoundry.client.v2.spacequotadefinitions.SpaceQuotaDefinitionReso
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.operations.AbstractOperationsTest;
 import org.cloudfoundry.operations.spaceadmin.SpaceQuota;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import reactor.test.scheduler.VirtualTimeScheduler;
 
-public final class DefaultOrganizationsTest extends AbstractOperationsTest {
+final class DefaultOrganizationsTest extends AbstractOperationsTest {
 
     private final DefaultOrganizations organizations =
             new DefaultOrganizations(Mono.just(this.cloudFoundryClient), Mono.just(TEST_USERNAME));
 
     @Test
-    public void create() {
+    void create() {
         requestCreateOrganization(this.cloudFoundryClient, TEST_ORGANIZATION_NAME, null);
         requestGetFeatureFlagEnabled(this.cloudFoundryClient, "set_roles_by_username");
         requestAssociateOrganizationManagerByUsername(this.cloudFoundryClient, TEST_USERNAME);
@@ -95,7 +95,7 @@ public final class DefaultOrganizationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void createSetRolesByUsernameDisabled() {
+    void createSetRolesByUsernameDisabled() {
         requestCreateOrganization(this.cloudFoundryClient, TEST_ORGANIZATION_NAME, null);
         requestGetFeatureFlagDisabled(this.cloudFoundryClient, "set_roles_by_username");
 
@@ -110,7 +110,7 @@ public final class DefaultOrganizationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void createWithQuota() {
+    void createWithQuota() {
         requestOrganizationQuotaDefinitions(this.cloudFoundryClient, "test-quota-definition-name");
         requestCreateOrganization(
                 this.cloudFoundryClient,
@@ -132,7 +132,7 @@ public final class DefaultOrganizationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         requestOrganizations(this.cloudFoundryClient, TEST_ORGANIZATION_NAME);
         requestDeleteOrganization(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
         requestJobSuccess(this.cloudFoundryClient, "test-id");
@@ -149,7 +149,7 @@ public final class DefaultOrganizationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void deleteFailure() {
+    void deleteFailure() {
         requestOrganizations(this.cloudFoundryClient, TEST_ORGANIZATION_NAME);
         requestDeleteOrganization(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
         requestJobFailure(this.cloudFoundryClient, "test-id");
@@ -172,7 +172,7 @@ public final class DefaultOrganizationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void info() {
+    void info() {
         requestOrganizations(this.cloudFoundryClient, TEST_ORGANIZATION_NAME);
         requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
         requestSharedDomains(this.cloudFoundryClient);
@@ -201,7 +201,7 @@ public final class DefaultOrganizationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         requestOrganizations(this.cloudFoundryClient);
 
         this.organizations
@@ -213,7 +213,7 @@ public final class DefaultOrganizationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void rename() {
+    void rename() {
         requestOrganizations(this.cloudFoundryClient, TEST_ORGANIZATION_NAME);
         requestUpdateOrganization(
                 this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-new-organization-name");

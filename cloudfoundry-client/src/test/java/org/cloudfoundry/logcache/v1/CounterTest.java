@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.logcache.v1;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class CounterTest {
+class CounterTest {
 
     @Test
-    public void valid() {
+    void valid() {
         Counter.builder().build();
     }
 }

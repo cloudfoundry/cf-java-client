@@ -34,17 +34,17 @@ import org.cloudfoundry.routing.v1.tcproutes.ListTcpRoutesResponse;
 import org.cloudfoundry.routing.v1.tcproutes.TcpRoute;
 import org.cloudfoundry.routing.v1.tcproutes.TcpRouteConfiguration;
 import org.cloudfoundry.routing.v1.tcproutes.TcpRouteDeletion;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-public final class ReactorTcpRoutesTest extends AbstractRoutingApiTest {
+final class ReactorTcpRoutesTest extends AbstractRoutingApiTest {
 
     private final ReactorTcpRoutes tcpRoutes =
             new ReactorTcpRoutes(
                     CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void create() {
+    void create() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -75,7 +75,7 @@ public final class ReactorTcpRoutesTest extends AbstractRoutingApiTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -105,7 +105,7 @@ public final class ReactorTcpRoutesTest extends AbstractRoutingApiTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         mockRequest(
                 InteractionContext.builder()
                         .request(TestRequest.builder().method(GET).path("/v1/tcp_routes").build())

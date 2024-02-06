@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.client.v3.droplets;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class ListDropletsRequestTest {
+final class ListDropletsRequestTest {
 
     @Test
-    public void valid() {
+    void valid() {
         ListDropletsRequest.builder().build();
     }
 }

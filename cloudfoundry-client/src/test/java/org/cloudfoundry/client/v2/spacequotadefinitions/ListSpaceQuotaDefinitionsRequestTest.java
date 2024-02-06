@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.client.v2.spacequotadefinitions;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class ListSpaceQuotaDefinitionsRequestTest {
+final class ListSpaceQuotaDefinitionsRequestTest {
 
     @Test
-    public void valid() {
+    void valid() {
         ListSpaceQuotaDefinitionsRequest.builder().build();
     }
 }

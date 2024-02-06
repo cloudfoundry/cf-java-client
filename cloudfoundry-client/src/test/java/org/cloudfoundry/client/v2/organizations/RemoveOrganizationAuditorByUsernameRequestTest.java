@@ -16,24 +16,36 @@
 
 package org.cloudfoundry.client.v2.organizations;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class RemoveOrganizationAuditorByUsernameRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noOrganizationId() {
-        RemoveOrganizationAuditorByUsernameRequest.builder().username("test-username").build();
-    }
+final class RemoveOrganizationAuditorByUsernameRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noUsername() {
-        RemoveOrganizationAuditorByUsernameRequest.builder()
-                .organizationId("test-organization-id")
-                .build();
+    @Test
+    void noOrganizationId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    RemoveOrganizationAuditorByUsernameRequest.builder()
+                            .username("test-username")
+                            .build();
+                });
     }
 
     @Test
-    public void valid() {
+    void noUsername() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    RemoveOrganizationAuditorByUsernameRequest.builder()
+                            .organizationId("test-organization-id")
+                            .build();
+                });
+    }
+
+    @Test
+    void valid() {
         RemoveOrganizationAuditorByUsernameRequest.builder()
                 .username("test-username")
                 .organizationId("test-organization-id")

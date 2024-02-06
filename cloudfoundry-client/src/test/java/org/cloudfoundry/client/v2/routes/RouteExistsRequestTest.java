@@ -16,17 +16,23 @@
 
 package org.cloudfoundry.client.v2.routes;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class RouteExistsRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noDomainId() {
-        RouteExistsRequest.builder().build();
+final class RouteExistsRequestTest {
+
+    @Test
+    void noDomainId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    RouteExistsRequest.builder().build();
+                });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         RouteExistsRequest.builder().domainId("test-domain-id").build();
     }
 }

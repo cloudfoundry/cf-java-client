@@ -27,7 +27,6 @@ import org.cloudfoundry.operations.networkpolicies.ListNetworkPoliciesRequest;
 import org.cloudfoundry.operations.networkpolicies.Policy;
 import org.cloudfoundry.operations.networkpolicies.RemoveNetworkPolicyRequest;
 import org.cloudfoundry.util.ResourceUtils;
-import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;

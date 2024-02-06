@@ -16,17 +16,23 @@
 
 package org.cloudfoundry.client.v2.organizations;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class ListOrganizationBillingManagersRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noOrganizationId() {
-        ListOrganizationBillingManagersRequest.builder().build();
+final class ListOrganizationBillingManagersRequestTest {
+
+    @Test
+    void noOrganizationId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    ListOrganizationBillingManagersRequest.builder().build();
+                });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         ListOrganizationBillingManagersRequest.builder()
                 .organizationId("test-organization-id")
                 .build();

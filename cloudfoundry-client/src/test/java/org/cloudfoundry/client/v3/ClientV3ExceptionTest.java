@@ -19,12 +19,12 @@ package org.cloudfoundry.client.v3;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class ClientV3ExceptionTest {
+final class ClientV3ExceptionTest {
 
     @Test
-    public void test() {
+    void test() {
         ClientV3Exception exception =
                 new ClientV3Exception(
                         -1,

@@ -16,25 +16,37 @@
 
 package org.cloudfoundry.client.v3.applications;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.cloudfoundry.client.v3.Relationship;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class SetApplicationCurrentDropletRequestTest {
+final class SetApplicationCurrentDropletRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noApplicationId() {
-        SetApplicationCurrentDropletRequest.builder()
-                .data(Relationship.builder().id("test-droplet-id").build())
-                .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noDropletId() {
-        SetApplicationCurrentDropletRequest.builder().applicationId("test-application-id").build();
+    @Test
+    void noApplicationId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    SetApplicationCurrentDropletRequest.builder()
+                            .data(Relationship.builder().id("test-droplet-id").build())
+                            .build();
+                });
     }
 
     @Test
-    public void valid() {
+    void noDropletId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    SetApplicationCurrentDropletRequest.builder()
+                            .applicationId("test-application-id")
+                            .build();
+                });
+    }
+
+    @Test
+    void valid() {
         SetApplicationCurrentDropletRequest.builder()
                 .applicationId("test-application-id")
                 .data(Relationship.builder().id("test-droplet-id").build())

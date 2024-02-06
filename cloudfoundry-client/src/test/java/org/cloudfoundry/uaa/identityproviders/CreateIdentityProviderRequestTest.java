@@ -16,51 +16,65 @@
 
 package org.cloudfoundry.uaa.identityproviders;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class CreateIdentityProviderRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        CreateIdentityProviderRequest.builder()
-                .configuration(
-                        SamlConfiguration.builder()
-                                .metaDataLocation("test-metadata-location")
-                                .build())
-                .identityZoneId("test-identity-zone-id")
-                .type(Type.SAML)
-                .originKey("test-origin-key")
-                .build();
-    }
+final class CreateIdentityProviderRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noOriginKey() {
-        CreateIdentityProviderRequest.builder()
-                .configuration(
-                        SamlConfiguration.builder()
-                                .metaDataLocation("test-metadata-location")
-                                .build())
-                .identityZoneId("test-identity-zone-id")
-                .name("test-name")
-                .type(Type.SAML)
-                .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noType() {
-        CreateIdentityProviderRequest.builder()
-                .configuration(
-                        SamlConfiguration.builder()
-                                .metaDataLocation("test-metadata-location")
-                                .build())
-                .identityZoneId("test-identity-zone-id")
-                .name("test-name")
-                .originKey("test-origin-key")
-                .build();
+    @Test
+    void noName() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    CreateIdentityProviderRequest.builder()
+                            .configuration(
+                                    SamlConfiguration.builder()
+                                            .metaDataLocation("test-metadata-location")
+                                            .build())
+                            .identityZoneId("test-identity-zone-id")
+                            .type(Type.SAML)
+                            .originKey("test-origin-key")
+                            .build();
+                });
     }
 
     @Test
-    public void valid() {
+    void noOriginKey() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    CreateIdentityProviderRequest.builder()
+                            .configuration(
+                                    SamlConfiguration.builder()
+                                            .metaDataLocation("test-metadata-location")
+                                            .build())
+                            .identityZoneId("test-identity-zone-id")
+                            .name("test-name")
+                            .type(Type.SAML)
+                            .build();
+                });
+    }
+
+    @Test
+    void noType() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    CreateIdentityProviderRequest.builder()
+                            .configuration(
+                                    SamlConfiguration.builder()
+                                            .metaDataLocation("test-metadata-location")
+                                            .build())
+                            .identityZoneId("test-identity-zone-id")
+                            .name("test-name")
+                            .originKey("test-origin-key")
+                            .build();
+                });
+    }
+
+    @Test
+    void valid() {
         CreateIdentityProviderRequest.builder()
                 .configuration(
                         SamlConfiguration.builder()

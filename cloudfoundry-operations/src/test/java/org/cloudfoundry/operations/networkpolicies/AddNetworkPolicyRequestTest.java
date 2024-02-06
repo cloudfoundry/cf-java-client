@@ -16,22 +16,32 @@
 
 package org.cloudfoundry.operations.networkpolicies;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class AddNetworkPolicyRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noDestination() {
-        AddNetworkPolicyRequest.builder().source("test-source").build();
-    }
+final class AddNetworkPolicyRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noSource() {
-        AddNetworkPolicyRequest.builder().destination("test-destination").build();
+    @Test
+    void noDestination() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    AddNetworkPolicyRequest.builder().source("test-source").build();
+                });
     }
 
     @Test
-    public void valid() {
+    void noSource() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    AddNetworkPolicyRequest.builder().destination("test-destination").build();
+                });
+    }
+
+    @Test
+    void valid() {
         AddNetworkPolicyRequest.builder()
                 .destination("test-destination")
                 .source("test-source")

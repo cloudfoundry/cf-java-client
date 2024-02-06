@@ -16,17 +16,23 @@
 
 package org.cloudfoundry.client.v2.serviceinstances;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class GetServiceInstancePermissionsRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noServiceInstanceId() {
-        GetServiceInstancePermissionsRequest.builder().build();
+final class GetServiceInstancePermissionsRequestTest {
+
+    @Test
+    void noServiceInstanceId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    GetServiceInstancePermissionsRequest.builder().build();
+                });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         GetServiceInstancePermissionsRequest.builder()
                 .serviceInstanceId("test-service-instance-id")
                 .build();

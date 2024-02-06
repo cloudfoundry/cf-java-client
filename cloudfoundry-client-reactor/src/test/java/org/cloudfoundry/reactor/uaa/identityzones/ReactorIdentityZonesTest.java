@@ -60,17 +60,17 @@ import org.cloudfoundry.uaa.identityzones.TokenPolicy;
 import org.cloudfoundry.uaa.identityzones.UpdateIdentityZoneRequest;
 import org.cloudfoundry.uaa.identityzones.UpdateIdentityZoneResponse;
 import org.cloudfoundry.uaa.identityzones.UserConfig;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-public final class ReactorIdentityZonesTest extends AbstractUaaApiTest {
+final class ReactorIdentityZonesTest extends AbstractUaaApiTest {
 
     private final ReactorIdentityZones identityZones =
             new ReactorIdentityZones(
                     CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void create() {
+    void create() {
         IdentityZoneConfiguration testConfiguration =
                 IdentityZoneConfiguration.builder()
                         .clientSecretPolicy(
@@ -298,7 +298,7 @@ public final class ReactorIdentityZonesTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -450,7 +450,7 @@ public final class ReactorIdentityZonesTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -682,7 +682,7 @@ public final class ReactorIdentityZonesTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         mockRequest(
                 InteractionContext.builder()
                         .request(TestRequest.builder().method(GET).path("/identity-zones").build())
@@ -846,7 +846,7 @@ public final class ReactorIdentityZonesTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void update() {
+    void update() {
         mockRequest(
                 InteractionContext.builder()
                         .request(

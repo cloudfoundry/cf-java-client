@@ -66,17 +66,17 @@ import org.cloudfoundry.uaa.groups.UserEntity;
 import org.cloudfoundry.uaa.users.Email;
 import org.cloudfoundry.uaa.users.Meta;
 import org.cloudfoundry.uaa.users.Name;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-public final class ReactorGroupsTest extends AbstractUaaApiTest {
+final class ReactorGroupsTest extends AbstractUaaApiTest {
 
     private final ReactorGroups groups =
             new ReactorGroups(
                     CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void addMember() {
+    void addMember() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -114,7 +114,7 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void checkMember() {
+    void checkMember() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -148,7 +148,7 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void create() {
+    void create() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -204,7 +204,7 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -248,7 +248,7 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -291,7 +291,7 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -354,7 +354,7 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void listExternalGroupMappings() {
+    void listExternalGroupMappings() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -399,7 +399,7 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void listMembers() {
+    void listMembers() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -471,7 +471,7 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void listMembersNoEntity() {
+    void listMembersNoEntity() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -509,7 +509,7 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void mapExternalGroup() {
+    void mapExternalGroup() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -551,7 +551,7 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void removeMember() {
+    void removeMember() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -586,7 +586,7 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void success() {
+    void success() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -645,7 +645,7 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void unmapExternalGroupByGroupDisplayName() {
+    void unmapExternalGroupByGroupDisplayName() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -691,7 +691,7 @@ public final class ReactorGroupsTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void unmapExternalGroupByGroupId() {
+    void unmapExternalGroupByGroupId() {
         mockRequest(
                 InteractionContext.builder()
                         .request(

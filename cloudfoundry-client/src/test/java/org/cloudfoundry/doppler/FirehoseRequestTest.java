@@ -16,17 +16,23 @@
 
 package org.cloudfoundry.doppler;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class FirehoseRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noSubscriptionId() {
-        FirehoseRequest.builder().build();
+final class FirehoseRequestTest {
+
+    @Test
+    void noSubscriptionId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    FirehoseRequest.builder().build();
+                });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         FirehoseRequest.builder().subscriptionId("test-subscription-id").build();
     }
 }

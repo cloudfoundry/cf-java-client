@@ -45,17 +45,17 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-public final class ReactorPrivateDomainsTest extends AbstractClientApiTest {
+final class ReactorPrivateDomainsTest extends AbstractClientApiTest {
 
     private final ReactorPrivateDomains privateDomains =
             new ReactorPrivateDomains(
                     CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void create() {
+    void create() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -105,7 +105,7 @@ public final class ReactorPrivateDomainsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -127,7 +127,7 @@ public final class ReactorPrivateDomainsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void deleteAsync() {
+    void deleteAsync() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -170,7 +170,7 @@ public final class ReactorPrivateDomainsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -217,7 +217,7 @@ public final class ReactorPrivateDomainsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -267,7 +267,7 @@ public final class ReactorPrivateDomainsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void listSharedOrganizations() {
+    void listSharedOrganizations() {
         mockRequest(
                 InteractionContext.builder()
                         .request(

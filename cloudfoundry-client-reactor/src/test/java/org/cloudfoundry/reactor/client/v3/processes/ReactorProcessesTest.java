@@ -52,17 +52,17 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-public final class ReactorProcessesTest extends AbstractClientApiTest {
+final class ReactorProcessesTest extends AbstractClientApiTest {
 
     private final ReactorProcesses processes =
             new ReactorProcesses(
                     CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void deleteInstance() {
+    void deleteInstance() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -85,7 +85,7 @@ public final class ReactorProcessesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -166,7 +166,7 @@ public final class ReactorProcessesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void getProcessStatistics() {
+    void getProcessStatistics() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -219,7 +219,7 @@ public final class ReactorProcessesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void getProcessStatisticsWithNullFields() {
+    void getProcessStatisticsWithNullFields() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -256,7 +256,7 @@ public final class ReactorProcessesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         mockRequest(
                 InteractionContext.builder()
                         .request(TestRequest.builder().method(GET).path("/processes").build())
@@ -414,7 +414,7 @@ public final class ReactorProcessesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void scale() {
+    void scale() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -503,7 +503,7 @@ public final class ReactorProcessesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void update() {
+    void update() {
         mockRequest(
                 InteractionContext.builder()
                         .request(

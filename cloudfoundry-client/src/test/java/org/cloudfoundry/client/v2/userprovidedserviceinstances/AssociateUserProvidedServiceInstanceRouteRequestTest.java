@@ -16,24 +16,36 @@
 
 package org.cloudfoundry.client.v2.userprovidedserviceinstances;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class AssociateUserProvidedServiceInstanceRouteRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noRouteId() {
-        AssociateUserProvidedServiceInstanceRouteRequest.builder()
-                .userProvidedServiceInstanceId("test-user-provided-service-instance-id")
-                .build();
-    }
+final class AssociateUserProvidedServiceInstanceRouteRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noUserProvidedServiceInstanceId() {
-        AssociateUserProvidedServiceInstanceRouteRequest.builder().routeId("test-route-id").build();
+    @Test
+    void noRouteId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    AssociateUserProvidedServiceInstanceRouteRequest.builder()
+                            .userProvidedServiceInstanceId("test-user-provided-service-instance-id")
+                            .build();
+                });
     }
 
     @Test
-    public void valid() {
+    void noUserProvidedServiceInstanceId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    AssociateUserProvidedServiceInstanceRouteRequest.builder()
+                            .routeId("test-route-id")
+                            .build();
+                });
+    }
+
+    @Test
+    void valid() {
         AssociateUserProvidedServiceInstanceRouteRequest.builder()
                 .parameter("test-key", "test-value")
                 .routeId("test-route-id")

@@ -16,14 +16,16 @@
 
 package org.cloudfoundry.client.v3.servicebindings;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.ToOneRelationship;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class RelationshipsTest {
+final class RelationshipsTest {
 
     @Test
-    public void noApplication() {
+    void noApplication() {
         ServiceBindingRelationships.builder()
                 .serviceInstance(
                         ToOneRelationship.builder()
@@ -32,18 +34,22 @@ public final class RelationshipsTest {
                 .build();
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void noServiceInstance() {
-        ServiceBindingRelationships.builder()
-                .application(
-                        ToOneRelationship.builder()
-                                .data(Relationship.builder().id("test-id").build())
-                                .build())
-                .build();
+    @Test
+    void noServiceInstance() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    ServiceBindingRelationships.builder()
+                            .application(
+                                    ToOneRelationship.builder()
+                                            .data(Relationship.builder().id("test-id").build())
+                                            .build())
+                            .build();
+                });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         ServiceBindingRelationships.builder()
                 .application(
                         ToOneRelationship.builder()

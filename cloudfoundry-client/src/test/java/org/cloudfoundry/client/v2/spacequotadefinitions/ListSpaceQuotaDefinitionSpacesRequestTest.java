@@ -16,17 +16,23 @@
 
 package org.cloudfoundry.client.v2.spacequotadefinitions;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class ListSpaceQuotaDefinitionSpacesRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noSpaceQuotaDefinitionId() {
-        ListSpaceQuotaDefinitionSpacesRequest.builder().build();
+final class ListSpaceQuotaDefinitionSpacesRequestTest {
+
+    @Test
+    void noSpaceQuotaDefinitionId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    ListSpaceQuotaDefinitionSpacesRequest.builder().build();
+                });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         ListSpaceQuotaDefinitionSpacesRequest.builder()
                 .spaceQuotaDefinitionId("test-space-quota-definition-id")
                 .build();
