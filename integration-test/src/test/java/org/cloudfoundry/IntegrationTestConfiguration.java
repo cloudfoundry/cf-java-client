@@ -238,11 +238,6 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean
-    CloudFoundryVersionConditionalRule cloudFoundryVersionConditionalRule(Version serverVersion) {
-        return new CloudFoundryVersionConditionalRule(serverVersion);
-    }
-
-    @Bean
     DefaultConnectionContext connectionContext(@Value("${test.apiHost}") String apiHost,
                                                @Value("${test.proxy.host:}") String proxyHost,
                                                @Value("${test.proxy.password:}") String proxyPassword,

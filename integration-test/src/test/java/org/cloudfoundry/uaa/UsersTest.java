@@ -43,7 +43,7 @@ import org.cloudfoundry.uaa.users.UserInfoRequest;
 import org.cloudfoundry.uaa.users.UserInfoResponse;
 import org.cloudfoundry.uaa.users.VerifyUserRequest;
 import org.cloudfoundry.uaa.users.VerifyUserResponse;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -53,13 +53,13 @@ import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public final class UsersTest extends AbstractIntegrationTest {
+final class UsersTest extends AbstractIntegrationTest {
 
     @Autowired
     private UaaClient uaaClient;
 
     @Test
-    public void changePassword() {
+    void changePassword() {
         String userName = this.nameFactory.getUserName();
 
         requestCreateUser(this.uaaClient, userName)
@@ -80,7 +80,7 @@ public final class UsersTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void create() {
+    void create() {
         String userName = this.nameFactory.getUserName();
 
         this.uaaClient.users()
@@ -107,7 +107,7 @@ public final class UsersTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         String userName = this.nameFactory.getUserName();
 
         createUserId(this.uaaClient, userName)
@@ -126,7 +126,7 @@ public final class UsersTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_10)
     @Test
-    public void expirePassword() {
+    void expirePassword() {
         String userName = this.nameFactory.getUserName();
 
         createUserId(this.uaaClient, userName)
@@ -145,7 +145,7 @@ public final class UsersTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(equalTo = CloudFoundryVersion.PCF_1_9)
     @Test
-    public void expirePassword19() {
+    void expirePassword19() {
         String userName = this.nameFactory.getUserName();
 
         createUserId(this.uaaClient, userName)
@@ -162,7 +162,7 @@ public final class UsersTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void getVerificationLink() {
+    void getVerificationLink() {
         String userName = this.nameFactory.getUserName();
 
         createUserId(this.uaaClient, userName)
@@ -178,7 +178,7 @@ public final class UsersTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void invite() {
+    void invite() {
         this.uaaClient.users()
             .invite(InviteUsersRequest.builder()
                 .email("test@email.address")
@@ -197,7 +197,7 @@ public final class UsersTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         String userName = this.nameFactory.getUserName();
 
         createUserId(this.uaaClient, userName)
@@ -214,7 +214,7 @@ public final class UsersTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void lookup() {
+    void lookup() {
         String userName = this.nameFactory.getUserName();
 
         createUserId(this.uaaClient, userName)
@@ -231,7 +231,7 @@ public final class UsersTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void update() {
+    void update() {
         String userName = this.nameFactory.getUserName();
 
         createUserId(this.uaaClient, userName)
@@ -258,7 +258,7 @@ public final class UsersTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void userInfo() {
+    void userInfo() {
         this.uaaClient.users()
             .userInfo(UserInfoRequest.builder()
                 .build())
@@ -270,7 +270,7 @@ public final class UsersTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void verifyUser() {
+    void verifyUser() {
         String userName = this.nameFactory.getUserName();
 
         createUserId(this.uaaClient, userName)

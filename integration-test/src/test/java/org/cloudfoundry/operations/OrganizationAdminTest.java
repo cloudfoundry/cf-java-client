@@ -25,7 +25,7 @@ import org.cloudfoundry.operations.organizationadmin.SetQuotaRequest;
 import org.cloudfoundry.operations.organizationadmin.UpdateQuotaRequest;
 import org.cloudfoundry.operations.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.operations.organizations.OrganizationInfoRequest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -34,13 +34,13 @@ import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public final class OrganizationAdminTest extends AbstractIntegrationTest {
+final class OrganizationAdminTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryOperations cloudFoundryOperations;
 
     @Test
-    public void createQuota() {
+    void createQuota() {
         String quotaName = this.nameFactory.getQuotaDefinitionName();
 
         this.cloudFoundryOperations.organizationAdmin()
@@ -60,7 +60,7 @@ public final class OrganizationAdminTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void deleteQuota() {
+    void deleteQuota() {
         String quotaName = this.nameFactory.getQuotaDefinitionName();
 
         requestCreateQuota(this.cloudFoundryOperations, quotaName)
@@ -75,7 +75,7 @@ public final class OrganizationAdminTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void getQuota() {
+    void getQuota() {
         String quotaName = this.nameFactory.getQuotaDefinitionName();
 
         requestCreateQuota(this.cloudFoundryOperations, quotaName)
@@ -91,7 +91,7 @@ public final class OrganizationAdminTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listQuotas() {
+    void listQuotas() {
         String quotaName = this.nameFactory.getQuotaDefinitionName();
 
         requestCreateQuota(this.cloudFoundryOperations, quotaName)
@@ -106,7 +106,7 @@ public final class OrganizationAdminTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void setQuota() {
+    void setQuota() {
         String organizationName = this.nameFactory.getOrganizationName();
         String quotaName = this.nameFactory.getQuotaDefinitionName();
 
@@ -131,7 +131,7 @@ public final class OrganizationAdminTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void updateQuota() {
+    void updateQuota() {
         String quotaName = this.nameFactory.getQuotaDefinitionName();
 
         requestCreateQuota(this.cloudFoundryOperations, quotaName)

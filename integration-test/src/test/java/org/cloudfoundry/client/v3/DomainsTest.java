@@ -43,7 +43,7 @@ import org.cloudfoundry.client.v3.routes.CreateRouteResponse;
 import org.cloudfoundry.client.v3.routes.RouteRelationships;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,7 +74,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_7)
     @Test
-    public void checkReservedRoutes() {
+    void checkReservedRoutes() {
         String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
@@ -94,7 +94,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_7)
     @Test
-    public void checkReservedRoutesByHost() {
+    void checkReservedRoutesByHost() {
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
 
@@ -120,7 +120,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_7)
     @Test
-    public void checkReservedRoutesByPath() {
+    void checkReservedRoutesByPath() {
         String domainName = this.nameFactory.getDomainName();
         String path = this.nameFactory.getPath();
 
@@ -193,7 +193,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_6)
     @Test
-    public void create() {
+    void create() {
         String domainName = this.nameFactory.getDomainName();
 
         this.cloudFoundryClient.domainsV3()
@@ -209,7 +209,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_6)
     @Test
-    public void createForAnOrganization() {
+    void createForAnOrganization() {
         String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
@@ -239,7 +239,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_7)
     @Test
-    public void delete() {
+    void delete() {
         String domainName = this.nameFactory.getDomainName();
 
         createDomainId(this.cloudFoundryClient, domainName)
@@ -256,7 +256,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_6)
     @Test
-    public void get() {
+    void get() {
         String domainName = this.nameFactory.getDomainName();
 
         createDomainId(this.cloudFoundryClient, domainName)
@@ -272,7 +272,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_6)
     @Test
-    public void list() {
+    void list() {
         String domainName = this.nameFactory.getDomainName();
 
         createDomainId(this.cloudFoundryClient, domainName)
@@ -291,7 +291,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_7)
     @Test
-    public void listFilterById() {
+    void listFilterById() {
         String domainName = this.nameFactory.getDomainName();
 
         createDomainId(this.cloudFoundryClient, domainName)
@@ -309,7 +309,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_7)
     @Test
-    public void listFilterByName() {
+    void listFilterByName() {
         String domainName = this.nameFactory.getDomainName();
 
         createDomainId(this.cloudFoundryClient, domainName)
@@ -330,7 +330,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_7)
     @Test
-    public void listFilterByOwningOrganizationId() {
+    void listFilterByOwningOrganizationId() {
         String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
@@ -360,7 +360,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_7)
     @Test
-    public void share() {
+    void share() {
         String domainName = this.nameFactory.getDomainName();
         String organizationName = this.nameFactory.getOrganizationName();
 
@@ -394,7 +394,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_7)
     @Test
-    public void unshare() {
+    void unshare() {
         String domainName = this.nameFactory.getDomainName();
         String organizationName = this.nameFactory.getOrganizationName();
 
@@ -424,7 +424,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_7)
     @Test
-    public void update() {
+    void update() {
         String domainName = this.nameFactory.getDomainName();
 
         createDomainId(this.cloudFoundryClient, domainName)

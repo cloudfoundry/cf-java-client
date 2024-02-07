@@ -25,20 +25,20 @@ import org.cloudfoundry.uaa.identityzones.GetIdentityZoneResponse;
 import org.cloudfoundry.uaa.identityzones.ListIdentityZonesRequest;
 import org.cloudfoundry.uaa.identityzones.ListIdentityZonesResponse;
 import org.cloudfoundry.uaa.identityzones.UpdateIdentityZoneRequest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
 
-public final class IdentityZonesTest extends AbstractIntegrationTest {
+final class IdentityZonesTest extends AbstractIntegrationTest {
 
     @Autowired
     private UaaClient uaaClient;
 
     @Test
-    public void create() {
+    void create() {
         String identityZoneName = this.nameFactory.getIdentityZoneName();
         String subdomainName = this.nameFactory.getDomainName();
 
@@ -57,7 +57,7 @@ public final class IdentityZonesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         String identityZoneName = this.nameFactory.getIdentityZoneName();
         String subdomainName = this.nameFactory.getDomainName();
 
@@ -75,7 +75,7 @@ public final class IdentityZonesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         String identityZoneName = this.nameFactory.getIdentityZoneName();
         String subdomainName = this.nameFactory.getDomainName();
 
@@ -92,7 +92,7 @@ public final class IdentityZonesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         String identityZoneName = this.nameFactory.getIdentityZoneName();
         String subdomainName = this.nameFactory.getDomainName();
 
@@ -109,7 +109,7 @@ public final class IdentityZonesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void update() {
+    void update() {
         String identityZoneName = this.nameFactory.getIdentityZoneName();
         String baseSubdomainName = this.nameFactory.getDomainName();
         String newSubdomainName = this.nameFactory.getDomainName();

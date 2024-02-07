@@ -18,7 +18,7 @@ package org.cloudfoundry.operations;
 
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.operations.organizations.CreateOrganizationRequest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -26,7 +26,7 @@ import reactor.test.StepVerifier;
 import java.time.Duration;
 
 
-public final class OrganizationsTest extends AbstractIntegrationTest {
+final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryOperations cloudFoundryOperations;
@@ -35,7 +35,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     private Mono<String> organizationId;
 
     @Test
-    public void create() {
+    void create() {
         String organizationName = this.nameFactory.getOrganizationName();
 
         this.cloudFoundryOperations.organizations()
@@ -52,7 +52,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         this.organizationId
             .flatMapMany(organizationId -> this.cloudFoundryOperations.organizations()
                 .list()

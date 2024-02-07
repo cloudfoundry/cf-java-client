@@ -34,8 +34,8 @@ import org.cloudfoundry.client.v3.packages.UploadPackageRequest;
 import org.cloudfoundry.util.DelayTimeoutException;
 import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.ResourceMatchingUtilsV3;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import reactor.core.Exceptions;
@@ -49,7 +49,7 @@ import java.util.EnumSet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.util.DelayUtils.exponentialBackOff;
 
-public class ResourceMatchTest extends AbstractIntegrationTest {
+class ResourceMatchTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
@@ -59,8 +59,8 @@ public class ResourceMatchTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
     @Test
-    @Ignore("Cloud Controller is configured not to cache resource smaller than 4k - Find a better way to test this")
-    public void upload() throws IOException {
+    @Disabled("Cloud Controller is configured not to cache resource smaller than 4k - Find a better way to test this")
+    void upload() throws IOException {
         createAndUploadPackage()
             .flatMap(this::waitForReady)
             .then(ResourceMatchingUtilsV3.getMatchedResources(this.cloudFoundryClient, new ClassPathResource("test-application.zip").getFile().toPath()))

@@ -45,7 +45,7 @@ import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -60,7 +60,7 @@ import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 @SuppressWarnings("deprecation")
-public final class DomainsTest extends AbstractIntegrationTest {
+final class DomainsTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
@@ -75,7 +75,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     private Mono<String> userId;
 
     @Test
-    public void create() {
+    void create() {
         String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
@@ -90,7 +90,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
@@ -104,7 +104,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void deleteNotAsync() {
+    void deleteNotAsync() {
         String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
@@ -117,7 +117,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
@@ -136,7 +136,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
@@ -158,7 +158,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listDomainSpaces() {
+    void listDomainSpaces() {
         String domainName = this.nameFactory.getDomainName();
 
         Mono.zip(this.organizationId, this.spaceId)
@@ -180,7 +180,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listDomainSpacesFilterByApplicationId() {
+    void listDomainSpacesFilterByApplicationId() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -208,7 +208,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listDomainSpacesFilterByDeveloperId() {
+    void listDomainSpacesFilterByDeveloperId() {
         String domainName = this.nameFactory.getDomainName();
 
         Mono.zip(this.spaceId, this.organizationId, this.userId)
@@ -231,7 +231,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listDomainSpacesFilterByName() {
+    void listDomainSpacesFilterByName() {
         String domainName = this.nameFactory.getDomainName();
 
         Mono.zip(this.organizationId, this.spaceId)
@@ -254,7 +254,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listDomainSpacesFilterByOrganizationId() {
+    void listDomainSpacesFilterByOrganizationId() {
         String domainName = this.nameFactory.getDomainName();
 
         Mono.zip(this.organizationId, this.spaceId)
@@ -277,7 +277,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByName() {
+    void listFilterByName() {
         String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
@@ -299,7 +299,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByOwningOrganizationId() {
+    void listFilterByOwningOrganizationId() {
         String domainName = this.nameFactory.getDomainName();
 
         this.organizationId

@@ -33,7 +33,7 @@ import org.cloudfoundry.uaa.identityproviders.TlsConfiguration;
 import org.cloudfoundry.uaa.identityproviders.UpdateIdentityProviderRequest;
 import org.cloudfoundry.uaa.identityzones.CreateIdentityZoneRequest;
 import org.cloudfoundry.uaa.identityzones.CreateIdentityZoneResponse;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -44,7 +44,7 @@ import static org.cloudfoundry.uaa.identityproviders.Type.LDAP;
 import static org.cloudfoundry.uaa.identityproviders.Type.OAUTH2;
 import static org.cloudfoundry.uaa.identityproviders.Type.SAML;
 
-public final class IdentityProvidersTest extends AbstractIntegrationTest {
+final class IdentityProvidersTest extends AbstractIntegrationTest {
 
     @Autowired
     private UaaClient uaaClient;
@@ -53,7 +53,7 @@ public final class IdentityProvidersTest extends AbstractIntegrationTest {
     private Mono<String> userId;
 
     @Test
-    public void createLdapSimpleBind() {
+    void createLdapSimpleBind() {
         String identityZoneName = this.nameFactory.getIdentityZoneName();
         String name = this.nameFactory.getIdentityProviderName();
         String subdomainName = this.nameFactory.getDomainName();
@@ -93,7 +93,7 @@ public final class IdentityProvidersTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void createOAuth() {
+    void createOAuth() {
         String identityZoneName = this.nameFactory.getIdentityZoneName();
         String name = this.nameFactory.getIdentityProviderName();
         String subdomainName = this.nameFactory.getDomainName();
@@ -128,7 +128,7 @@ public final class IdentityProvidersTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void createSaml() {
+    void createSaml() {
         String identityZoneName = this.nameFactory.getIdentityZoneName();
         String name = this.nameFactory.getIdentityProviderName();
         String subdomainName = this.nameFactory.getDomainName();
@@ -177,7 +177,7 @@ public final class IdentityProvidersTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         String identityZoneName = this.nameFactory.getIdentityZoneName();
         String name = this.nameFactory.getIdentityProviderName();
         String subdomainName = this.nameFactory.getDomainName();
@@ -199,7 +199,7 @@ public final class IdentityProvidersTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         String identityZoneName = this.nameFactory.getIdentityZoneName();
         String name = this.nameFactory.getIdentityProviderName();
         String subdomainName = this.nameFactory.getDomainName();
@@ -219,7 +219,7 @@ public final class IdentityProvidersTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         String identityZoneName = this.nameFactory.getIdentityZoneName();
         String name = this.nameFactory.getIdentityProviderName();
         String subdomainName = this.nameFactory.getDomainName();
@@ -240,7 +240,7 @@ public final class IdentityProvidersTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void update() {
+    void update() {
         String identityZoneName = this.nameFactory.getIdentityZoneName();
         String oldName = this.nameFactory.getIdentityProviderName();
         String newName = this.nameFactory.getIdentityProviderName();

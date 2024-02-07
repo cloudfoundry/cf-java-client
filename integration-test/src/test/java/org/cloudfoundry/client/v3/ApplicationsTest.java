@@ -88,7 +88,7 @@ import org.cloudfoundry.client.v3.spaces.SpaceRelationships;
 import org.cloudfoundry.util.DelayUtils;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import reactor.core.publisher.Mono;
@@ -107,7 +107,7 @@ import static org.cloudfoundry.client.v3.applications.ApplicationState.STOPPED;
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
-public final class ApplicationsTest extends AbstractIntegrationTest {
+final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
@@ -119,7 +119,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     private Mono<String> spaceId;
 
     @Test
-    public void create() {
+    void create() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -148,7 +148,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -165,7 +165,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -182,7 +182,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void getDropletAssociation() {
+    void getDropletAssociation() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -208,7 +208,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void getEnvironment() {
+    void getEnvironment() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -225,7 +225,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void getFeature() {
+    void getFeature() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -247,7 +247,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_10)
     @Test
-    public void getPermissions() {
+    void getPermissions() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -266,7 +266,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void getSshEnabled() {
+    void getSshEnabled() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -285,7 +285,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -305,7 +305,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
     @Test
-    public void listApplicationRoutes() {
+    void listApplicationRoutes() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -336,7 +336,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
     @Test
-    public void listApplicationRoutesByDomain() {
+    void listApplicationRoutesByDomain() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -368,7 +368,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
     @Test
-    public void listApplicationRoutesByHost() {
+    void listApplicationRoutesByHost() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
@@ -402,7 +402,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
     @Test
-    public void listApplicationRoutesByLabelSelector() {
+    void listApplicationRoutesByLabelSelector() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
         String spaceName = this.nameFactory.getSpaceName();
@@ -435,7 +435,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
     @Test
-    public void listApplicationRoutesByOrganizationId() {
+    void listApplicationRoutesByOrganizationId() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
         String organizationName = this.nameFactory.getOrganizationName();
@@ -471,7 +471,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
     @Test
-    public void listApplicationRoutesByPath() {
+    void listApplicationRoutesByPath() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
         String path = this.nameFactory.getPath();
@@ -506,7 +506,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
     @Test
-    public void listApplicationRoutesBySpaceId() {
+    void listApplicationRoutesBySpaceId() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
         String spaceName = this.nameFactory.getSpaceName();
@@ -541,7 +541,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFeatures() {
+    void listFeatures() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -561,7 +561,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterBySpaceId() {
+    void listFilterBySpaceId() {
         String applicationName = this.nameFactory.getApplicationName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -587,7 +587,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
     @Test
-    public void scale() {
+    void scale() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -608,7 +608,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void setAndGetDroplet() {
+    void setAndGetDroplet() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -638,7 +638,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void start() {
+    void start() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -657,7 +657,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void restart() {
+    void restart() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -683,7 +683,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void stop() {
+    void stop() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -703,7 +703,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void update() {
+    void update() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -724,7 +724,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void updateAndGetEnvironmentVariables() {
+    void updateAndGetEnvironmentVariables() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -746,7 +746,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void updateFeature() {
+    void updateFeature() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId

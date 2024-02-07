@@ -37,7 +37,7 @@ import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.applications.ApplicationHealthCheck;
 import org.cloudfoundry.operations.applications.PushApplicationRequest;
 import org.cloudfoundry.util.PaginationUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import reactor.core.publisher.Flux;
@@ -51,7 +51,7 @@ import static org.cloudfoundry.client.v3.tasks.TaskState.RUNNING;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_12)
-public final class TasksTest extends AbstractIntegrationTest {
+final class TasksTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
@@ -60,7 +60,7 @@ public final class TasksTest extends AbstractIntegrationTest {
     private CloudFoundryOperations cloudFoundryOperations;
 
     @Test
-    public void cancel() throws IOException {
+    void cancel() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, applicationName)
@@ -81,7 +81,7 @@ public final class TasksTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void create() throws IOException {
+    void create() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, applicationName)
@@ -104,7 +104,7 @@ public final class TasksTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void get() throws IOException {
+    void get() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, applicationName)
@@ -125,7 +125,7 @@ public final class TasksTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() throws IOException {
+    void list() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, applicationName)
@@ -148,7 +148,7 @@ public final class TasksTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByApplication() throws IOException {
+    void listFilterByApplication() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, applicationName)
@@ -171,7 +171,7 @@ public final class TasksTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByName() throws IOException {
+    void listFilterByName() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, applicationName)
@@ -194,7 +194,7 @@ public final class TasksTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByState() throws IOException {
+    void listFilterByState() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, applicationName)

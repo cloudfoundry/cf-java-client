@@ -98,8 +98,8 @@ import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -117,7 +117,7 @@ import static java.time.temporal.ChronoUnit.MINUTES;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
-public final class SpacesTest extends AbstractIntegrationTest {
+final class SpacesTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
@@ -141,7 +141,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     private UaaClient uaaClient;
 
     @Test
-    public void associateAuditor() {
+    void associateAuditor() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();
@@ -163,7 +163,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void associateAuditorByUsername() {
+    void associateAuditorByUsername() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();
@@ -184,7 +184,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void associateDeveloper() {
+    void associateDeveloper() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();
@@ -206,7 +206,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void associateDeveloperByUsername() {
+    void associateDeveloperByUsername() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();
@@ -226,7 +226,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void associateManager() {
+    void associateManager() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();
@@ -248,7 +248,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void associateManagerByUsername() {
+    void associateManagerByUsername() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();
@@ -268,7 +268,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void associateSecurityGroup() {
+    void associateSecurityGroup() {
         String securityGroupName = this.nameFactory.getSecurityGroupName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -292,7 +292,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void create() {
+    void create() {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
@@ -309,7 +309,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
@@ -329,7 +329,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void deleteAsyncFalse() {
+    void deleteAsyncFalse() {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
@@ -348,7 +348,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
@@ -365,7 +365,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void getSummary() {
+    void getSummary() {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
@@ -382,7 +382,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -402,7 +402,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listApplications() {
+    void listApplications() {
         String applicationName = this.nameFactory.getApplicationName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -419,7 +419,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listApplicationsFilterByDiego() {
+    void listApplicationsFilterByDiego() {
         String applicationName = this.nameFactory.getApplicationName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -436,7 +436,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listApplicationsFilterByName() {
+    void listApplicationsFilterByName() {
         String applicationName = this.nameFactory.getApplicationName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -459,7 +459,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listApplicationsFilterByOrganizationId() {
+    void listApplicationsFilterByOrganizationId() {
         String applicationName = this.nameFactory.getApplicationName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -478,7 +478,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listApplicationsFilterByStackId() {
+    void listApplicationsFilterByStackId() {
         String applicationName = this.nameFactory.getApplicationName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -497,7 +497,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listAuditors() {
+    void listAuditors() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();
@@ -522,7 +522,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listDevelopers() {
+    void listDevelopers() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();
@@ -548,7 +548,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @SuppressWarnings("deprecation")
     @Test
-    public void listDomains() {
+    void listDomains() {
         String domainName = this.nameFactory.getDomainName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -564,7 +564,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @SuppressWarnings("deprecation")
     @Test
-    public void listDomainsFilterByName() {
+    void listDomainsFilterByName() {
         String domainName = this.nameFactory.getDomainName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -579,7 +579,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listEvents() {
+    void listEvents() {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
@@ -593,7 +593,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listEventsFilterByActee() {
+    void listEventsFilterByActee() {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
@@ -607,7 +607,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listEventsFilterByTimestamp() {
+    void listEventsFilterByTimestamp() {
         String spaceName = this.nameFactory.getSpaceName();
         String timestamp = getPastTimestamp();
 
@@ -622,7 +622,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listEventsFilterByType() {
+    void listEventsFilterByType() {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
@@ -640,7 +640,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByApplicationId() {
+    void listFilterByApplicationId() {
         String applicationName = this.nameFactory.getApplicationName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -663,7 +663,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByDeveloperId() {
+    void listFilterByDeveloperId() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();
@@ -683,7 +683,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByName() {
+    void listFilterByName() {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
@@ -701,7 +701,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByOrganizationId() {
+    void listFilterByOrganizationId() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -719,7 +719,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listManagers() {
+    void listManagers() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();
@@ -735,7 +735,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listManagersFilterByAuditedOrganizationId() {
+    void listManagersFilterByAuditedOrganizationId() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();
@@ -762,7 +762,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listManagersFilterByAuditedSpaceId() {
+    void listManagersFilterByAuditedSpaceId() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();
@@ -781,7 +781,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listManagersFilterByBillingManagedOrganizationId() {
+    void listManagersFilterByBillingManagedOrganizationId() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();
@@ -813,7 +813,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listManagersFilterByManagedOrganizationId() {
+    void listManagersFilterByManagedOrganizationId() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();
@@ -845,7 +845,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listManagersFilterByManagedSpaceId() {
+    void listManagersFilterByManagedSpaceId() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();
@@ -861,7 +861,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listManagersFilterByOrganizationId() {
+    void listManagersFilterByOrganizationId() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();
@@ -886,7 +886,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listRoutes() {
+    void listRoutes() {
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
         String spaceName = this.nameFactory.getSpaceName();
@@ -910,7 +910,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listRoutesFilterByDomainId() {
+    void listRoutesFilterByDomainId() {
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
         String spaceName = this.nameFactory.getSpaceName();
@@ -935,7 +935,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listRoutesFilterByHost() {
+    void listRoutesFilterByHost() {
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
         String spaceName = this.nameFactory.getSpaceName();
@@ -959,7 +959,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listRoutesFilterByPath() {
+    void listRoutesFilterByPath() {
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
         String spaceName = this.nameFactory.getSpaceName();
@@ -983,7 +983,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listSecurityGroups() {
+    void listSecurityGroups() {
         String securityGroupName = this.nameFactory.getSecurityGroupName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -1008,7 +1008,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listSecurityGroupsFilterByName() {
+    void listSecurityGroupsFilterByName() {
         String securityGroupName = this.nameFactory.getSecurityGroupName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -1033,7 +1033,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listServiceInstances() {
+    void listServiceInstances() {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -1053,7 +1053,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listServiceInstancesFilterByGatewayName() {
+    void listServiceInstancesFilterByGatewayName() {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -1072,7 +1072,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listServiceInstancesFilterByName() {
+    void listServiceInstancesFilterByName() {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -1091,7 +1091,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listServiceInstancesFilterByServiceBindingId() {
+    void listServiceInstancesFilterByServiceBindingId() {
         String applicationName = this.nameFactory.getApplicationName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
         String spaceName = this.nameFactory.getSpaceName();
@@ -1118,7 +1118,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listServiceInstancesFilterByServiceKeyId() {
+    void listServiceInstancesFilterByServiceKeyId() {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
         String serviceKeyName = this.nameFactory.getServiceKeyName();
         String spaceName = this.nameFactory.getSpaceName();
@@ -1144,7 +1144,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listServiceInstancesFilterByServicePlanId() {
+    void listServiceInstancesFilterByServicePlanId() {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -1166,7 +1166,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listServices() {
+    void listServices() {
         this.spaceId
             .flatMapMany(spaceId -> requestListSpaceServices(this.cloudFoundryClient, spaceId)
                 .filter(resource -> this.serviceName.equals(ResourceUtils.getEntity(resource).getLabel())))
@@ -1177,7 +1177,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listServicesFilterByActive() {
+    void listServicesFilterByActive() {
         this.spaceId
             .flatMapMany(spaceId -> requestListSpaceServices(this.cloudFoundryClient, spaceId)
                 .filter(resource -> this.serviceName.equals(ResourceUtils.getEntity(resource).getLabel())))
@@ -1189,7 +1189,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listServicesFilterByLabel() {
+    void listServicesFilterByLabel() {
         Mono
             .zip(this.serviceBrokerId, this.spaceId)
             .flatMapMany(function((serviceBrokerId, spaceId) -> requestListSpaceServices(this.cloudFoundryClient, spaceId, builder -> builder.label(this.serviceName))
@@ -1202,9 +1202,9 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     //TODO: Await https://github.com/cloudfoundry/cloud_controller_ng/issues/856 for this test to work
-    @Ignore("Await https://github.com/cloudfoundry/cloud_controller_ng/issues/856 for this test to work")
+    @Disabled("Await https://github.com/cloudfoundry/cloud_controller_ng/issues/856 for this test to work")
     @Test
-    public void listServicesFilterByServiceBrokerId() {
+    void listServicesFilterByServiceBrokerId() {
         Mono
             .zip(this.serviceBrokerId, this.spaceId)
             .flatMapMany(function((serviceBrokerId, spaceId) -> requestListSpaceServices(this.cloudFoundryClient, spaceId, builder -> builder.serviceBrokerId(serviceBrokerId))))
@@ -1216,7 +1216,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listUserRoles() {
+    void listUserRoles() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();
@@ -1240,7 +1240,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void removeAuditor() {
+    void removeAuditor() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();
@@ -1259,7 +1259,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void removeAuditorByUsername() {
+    void removeAuditorByUsername() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();
@@ -1278,7 +1278,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void removeDeveloper() {
+    void removeDeveloper() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();
@@ -1297,7 +1297,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void removeDeveloperByUsername() {
+    void removeDeveloperByUsername() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();
@@ -1316,7 +1316,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void removeManager() {
+    void removeManager() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();
@@ -1335,7 +1335,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void removeManagerByUsername() {
+    void removeManagerByUsername() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();
@@ -1354,7 +1354,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void removeSecurityGroup() {
+    void removeSecurityGroup() {
         String securityGroupName = this.nameFactory.getSecurityGroupName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -1378,7 +1378,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void update() {
+    void update() {
         String spaceName = this.nameFactory.getSpaceName();
         String spaceName2 = this.nameFactory.getSpaceName();
 
@@ -1401,7 +1401,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void updateEmptyManagers() {
+    void updateEmptyManagers() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String userName = this.nameFactory.getUserName();

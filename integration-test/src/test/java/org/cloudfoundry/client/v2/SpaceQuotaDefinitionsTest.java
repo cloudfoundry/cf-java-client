@@ -37,8 +37,8 @@ import org.cloudfoundry.client.v2.spaces.SpaceEntity;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -49,7 +49,7 @@ import java.time.Duration;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
-public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
+final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
@@ -58,7 +58,7 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
     private Mono<String> organizationId;
 
     @Test
-    public void associateSpace() {
+    void associateSpace() {
         String quotaName = this.nameFactory.getQuotaDefinitionName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -81,7 +81,7 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void create() {
+    void create() {
         String quotaName = this.nameFactory.getQuotaDefinitionName();
 
         this.organizationId
@@ -103,7 +103,7 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         String quotaName = this.nameFactory.getQuotaDefinitionName();
 
         this.organizationId
@@ -121,7 +121,7 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         String quotaName = this.nameFactory.getQuotaDefinitionName();
 
         this.organizationId
@@ -139,7 +139,7 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         String quotaName = this.nameFactory.getQuotaDefinitionName();
 
         this.organizationId
@@ -158,7 +158,7 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listSpaces() {
+    void listSpaces() {
         String quotaName = this.nameFactory.getQuotaDefinitionName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -184,7 +184,7 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listSpacesFilterByApplicationId() {
+    void listSpacesFilterByApplicationId() {
         String applicationName = this.nameFactory.getApplicationName();
         String quotaName = this.nameFactory.getQuotaDefinitionName();
         String spaceName = this.nameFactory.getSpaceName();
@@ -215,14 +215,14 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
     }
 
     //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/643
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/643")
+    @Disabled("Await https://github.com/cloudfoundry/cf-java-client/issues/643")
     @Test
-    public void listSpacesFilterByDeveloperId() {
+    void listSpacesFilterByDeveloperId() {
 
     }
 
     @Test
-    public void listSpacesFilterByName() {
+    void listSpacesFilterByName() {
         String quotaName = this.nameFactory.getQuotaDefinitionName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -249,7 +249,7 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listSpacesFilterByOrganizationId() {
+    void listSpacesFilterByOrganizationId() {
         String quotaName = this.nameFactory.getQuotaDefinitionName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -277,7 +277,7 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listSpacesNotFound() {
+    void listSpacesNotFound() {
         String quotaName = this.nameFactory.getQuotaDefinitionName();
 
         this.organizationId
@@ -293,7 +293,7 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listSpacesQueryBySpaceId() {
+    void listSpacesQueryBySpaceId() {
         String quotaName = this.nameFactory.getQuotaDefinitionName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -319,7 +319,7 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void removeSpace() {
+    void removeSpace() {
         String quotaName = this.nameFactory.getQuotaDefinitionName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -341,7 +341,7 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void update() {
+    void update() {
         String quotaName1 = this.nameFactory.getQuotaDefinitionName();
         String quotaName2 = this.nameFactory.getQuotaDefinitionName();
 

@@ -38,7 +38,7 @@ import org.cloudfoundry.operations.applications.ApplicationHealthCheck;
 import org.cloudfoundry.operations.applications.GetApplicationRequest;
 import org.cloudfoundry.operations.applications.PushApplicationRequest;
 import org.cloudfoundry.util.PaginationUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import reactor.core.publisher.Flux;
@@ -89,7 +89,7 @@ public final class DeploymentsTest extends AbstractIntegrationTest {
     @SuppressWarnings("deprecation")
     @Test
     @IfCloudFoundryVersion(lessThanOrEqualTo = CloudFoundryVersion.PCF_2_10)
-    public void cancel() throws Exception {
+    void cancel() throws Exception {
         String name = this.nameFactory.getApplicationName();
         Path path = new ClassPathResource("test-application.zip").getFile().toPath();
 
@@ -115,7 +115,7 @@ public final class DeploymentsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void create() throws Exception {
+    void create() throws Exception {
         String name = this.nameFactory.getApplicationName();
         Path path = new ClassPathResource("test-application.zip").getFile().toPath();
 
@@ -146,7 +146,7 @@ public final class DeploymentsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void get() throws Exception {
+    void get() throws Exception {
         String name = this.nameFactory.getApplicationName();
         Path path = new ClassPathResource("test-application.zip").getFile().toPath();
 
@@ -167,7 +167,7 @@ public final class DeploymentsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() throws Exception {
+    void list() throws Exception {
         String name = this.nameFactory.getApplicationName();
         Path path = new ClassPathResource("test-application.zip").getFile().toPath();
 
@@ -189,7 +189,7 @@ public final class DeploymentsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByApplication() throws Exception {
+    void listFilterByApplication() throws Exception {
         String name = this.nameFactory.getApplicationName();
         Path path = new ClassPathResource("test-application.zip").getFile().toPath();
 
@@ -212,7 +212,7 @@ public final class DeploymentsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByState() throws Exception {
+    void listFilterByState() throws Exception {
         String name = this.nameFactory.getApplicationName();
         Path path = new ClassPathResource("test-application.zip").getFile().toPath();
 
@@ -236,7 +236,7 @@ public final class DeploymentsTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_7)
     @Test
-    public void listFilterByStatusValues() throws Exception {
+    void listFilterByStatusValues() throws Exception {
         String name = this.nameFactory.getApplicationName();
         Path path = new ClassPathResource("test-application.zip").getFile().toPath();
 

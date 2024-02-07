@@ -29,7 +29,7 @@ import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceResponse;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import reactor.core.Exceptions;
@@ -44,7 +44,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.ServiceBrokerUtils.createServiceBroker;
 import static org.cloudfoundry.ServiceBrokerUtils.deleteServiceBroker;
 
-public final class ServiceBrokersTest extends AbstractIntegrationTest {
+final class ServiceBrokersTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
@@ -59,7 +59,7 @@ public final class ServiceBrokersTest extends AbstractIntegrationTest {
     private String serviceBrokerName;
 
     @Test
-    public void create() {
+    void create() {
         String planName = this.nameFactory.getPlanName();
         String serviceBrokerName = this.nameFactory.getServiceBrokerName();
         String serviceName = this.nameFactory.getServiceName();
@@ -101,7 +101,7 @@ public final class ServiceBrokersTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         String planName = this.nameFactory.getPlanName();
         String serviceBrokerName = this.nameFactory.getServiceBrokerName();
         String serviceName = this.nameFactory.getServiceName();
@@ -131,7 +131,7 @@ public final class ServiceBrokersTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         this.serviceBrokerId
             .flatMap(serviceBrokerId -> this.cloudFoundryClient.serviceBrokers()
                 .get(GetServiceBrokerRequest.builder()
@@ -144,7 +144,7 @@ public final class ServiceBrokersTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         PaginationUtils
             .requestClientV2Resources(page -> this.cloudFoundryClient.serviceBrokers()
                 .list(ListServiceBrokersRequest.builder()
@@ -158,7 +158,7 @@ public final class ServiceBrokersTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void update() {
+    void update() {
         String planName = this.nameFactory.getPlanName();
         String serviceBrokerName1 = this.nameFactory.getServiceBrokerName();
         String serviceBrokerName2 = this.nameFactory.getServiceBrokerName();

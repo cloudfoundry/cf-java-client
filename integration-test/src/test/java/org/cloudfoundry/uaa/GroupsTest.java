@@ -47,7 +47,7 @@ import org.cloudfoundry.uaa.users.CreateUserResponse;
 import org.cloudfoundry.uaa.users.Email;
 import org.cloudfoundry.uaa.users.Name;
 import org.cloudfoundry.util.PaginationUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -61,13 +61,13 @@ import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 
-public final class GroupsTest extends AbstractIntegrationTest {
+final class GroupsTest extends AbstractIntegrationTest {
 
     @Autowired
     private UaaClient uaaClient;
 
     @Test
-    public void addMemberGroup() {
+    void addMemberGroup() {
         String baseDisplayName = this.nameFactory.getGroupName();
         String memberDisplayName = this.nameFactory.getGroupName();
 
@@ -97,7 +97,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void addMemberUser() {
+    void addMemberUser() {
         String displayName = this.nameFactory.getGroupName();
         String userName = this.nameFactory.getUserName();
 
@@ -127,7 +127,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void checkMembership() {
+    void checkMembership() {
         String displayName = this.nameFactory.getGroupName();
         String userName = this.nameFactory.getUserName();
 
@@ -155,7 +155,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void create() {
+    void create() {
         String displayName = this.nameFactory.getGroupName();
         String userName = this.nameFactory.getUserName();
 
@@ -177,7 +177,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         String displayName = this.nameFactory.getGroupName();
 
         createGroupId(this.uaaClient, displayName)
@@ -193,7 +193,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         String displayName = this.nameFactory.getGroupName();
 
         createGroupId(this.uaaClient, displayName)
@@ -209,7 +209,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         String displayName = this.nameFactory.getGroupName();
 
         createGroupId(this.uaaClient, displayName)
@@ -228,7 +228,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listExternalGroupMappings() {
+    void listExternalGroupMappings() {
         String displayName = this.nameFactory.getGroupName();
 
         createGroupId(this.uaaClient, displayName)
@@ -247,7 +247,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listMembers() {
+    void listMembers() {
         String displayName = this.nameFactory.getGroupName();
         String userName = this.nameFactory.getUserName();
 
@@ -274,7 +274,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listMembersWithEntity() {
+    void listMembersWithEntity() {
         String displayName = this.nameFactory.getGroupName();
         String userName = this.nameFactory.getUserName();
 
@@ -298,7 +298,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void mapExternalGroupMappings() {
+    void mapExternalGroupMappings() {
         String displayName = this.nameFactory.getGroupName();
 
         createGroupId(this.uaaClient, displayName)
@@ -320,7 +320,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void removeMember() {
+    void removeMember() {
         String displayName = this.nameFactory.getGroupName();
         String userName = this.nameFactory.getUserName();
 
@@ -345,7 +345,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void unmapExternalGroupMappingsByGroupDisplayName() {
+    void unmapExternalGroupMappingsByGroupDisplayName() {
         String displayName = this.nameFactory.getGroupName();
 
         createGroupId(this.uaaClient, displayName)
@@ -364,7 +364,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void unmapExternalGroupMappingsByGroupId() {
+    void unmapExternalGroupMappingsByGroupId() {
         String displayName = this.nameFactory.getGroupName();
 
         createGroupId(this.uaaClient, displayName)
@@ -383,7 +383,7 @@ public final class GroupsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void update() {
+    void update() {
         String baseDisplayName = this.nameFactory.getGroupName();
         String newDisplayName = this.nameFactory.getGroupName();
 

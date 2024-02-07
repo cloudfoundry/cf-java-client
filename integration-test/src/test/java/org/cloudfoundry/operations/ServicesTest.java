@@ -51,7 +51,7 @@ import org.cloudfoundry.operations.services.UnbindServiceInstanceRequest;
 import org.cloudfoundry.operations.services.UpdateServiceInstanceRequest;
 import org.cloudfoundry.operations.services.UpdateUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.util.PaginationUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import reactor.core.publisher.Flux;
@@ -65,7 +65,7 @@ import java.time.Duration;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.operations.routes.Level.SPACE;
 
-public final class ServicesTest extends AbstractIntegrationTest {
+final class ServicesTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
@@ -89,7 +89,7 @@ public final class ServicesTest extends AbstractIntegrationTest {
     private String spaceName;
 
     @Test
-    public void bindRoutePrivateDomain() {
+    void bindRoutePrivateDomain() {
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
         String path = this.nameFactory.getPath();
@@ -119,7 +119,7 @@ public final class ServicesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void bindService() throws IOException {
+    void bindService() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
@@ -142,7 +142,7 @@ public final class ServicesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void create() {
+    void create() {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         this.cloudFoundryOperations.services()
@@ -162,7 +162,7 @@ public final class ServicesTest extends AbstractIntegrationTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void createServiceKey() {
+    void createServiceKey() {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
         String serviceKeyName = this.nameFactory.getServiceKeyName();
 
@@ -182,7 +182,7 @@ public final class ServicesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void createUserProvidedServiceInstance() {
+    void createUserProvidedServiceInstance() {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         this.cloudFoundryOperations.services()
@@ -202,7 +202,7 @@ public final class ServicesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         this.serviceBrokerId
@@ -220,7 +220,7 @@ public final class ServicesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void deleteServiceKey() {
+    void deleteServiceKey() {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
         String serviceKeyName = this.nameFactory.getServiceKeyName();
 
@@ -238,7 +238,7 @@ public final class ServicesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void getManagedService() {
+    void getManagedService() {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         requestCreateServiceInstance(this.cloudFoundryOperations, this.planName, serviceInstanceName, this.serviceName)
@@ -254,7 +254,7 @@ public final class ServicesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void getServiceKey() {
+    void getServiceKey() {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
         String serviceKeyName = this.nameFactory.getServiceKeyName();
 
@@ -273,7 +273,7 @@ public final class ServicesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listServiceKey() {
+    void listServiceKey() {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
         String serviceKeyName = this.nameFactory.getServiceKeyName();
 
@@ -291,7 +291,7 @@ public final class ServicesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listServiceOfferings() {
+    void listServiceOfferings() {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         requestCreateServiceInstance(this.cloudFoundryOperations, this.planName, serviceInstanceName, this.serviceName)
@@ -307,7 +307,7 @@ public final class ServicesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void rename() {
+    void rename() {
         String serviceInstanceName1 = this.nameFactory.getServiceInstanceName();
         String serviceInstanceName2 = this.nameFactory.getServiceInstanceName();
 
@@ -327,7 +327,7 @@ public final class ServicesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void unbindRoute() {
+    void unbindRoute() {
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
         String path = this.nameFactory.getPath();
@@ -355,7 +355,7 @@ public final class ServicesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void unbindService() throws IOException {
+    void unbindService() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
@@ -378,7 +378,7 @@ public final class ServicesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void updateInstance() {
+    void updateInstance() {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         this.serviceBrokerId
@@ -397,7 +397,7 @@ public final class ServicesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void updateUserProvidedInstance() {
+    void updateUserProvidedInstance() {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         this.serviceBrokerId

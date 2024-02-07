@@ -48,7 +48,7 @@ import org.cloudfoundry.client.v3.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v3.spaces.CreateSpaceResponse;
 import org.cloudfoundry.client.v3.spaces.SpaceRelationships;
 import org.cloudfoundry.util.PaginationUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -60,7 +60,7 @@ import java.util.List;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
-public final class RoutesTest extends AbstractIntegrationTest {
+final class RoutesTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
@@ -73,7 +73,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
     @Test
-    public void create() {
+    void create() {
         String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
@@ -112,7 +112,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
     @Test
-    public void get() {
+    void get() {
         String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
@@ -136,7 +136,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
     @Test
-    public void insertDestinations() {
+    void insertDestinations() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
         Integer port = this.nameFactory.getPort();
@@ -173,7 +173,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
     @Test
-    public void list() {
+    void list() {
         String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
@@ -199,7 +199,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     //TODO: Test has not been validated
     @IfCloudFoundryVersion(greaterThan = CloudFoundryVersion.PCF_2_9)
     @Test
-    public void listByApplicationId() {
+    void listByApplicationId() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -230,7 +230,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
     @Test
-    public void listByDomain() {
+    void listByDomain() {
         String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
@@ -256,7 +256,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
     @Test
-    public void listByHost() {
+    void listByHost() {
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
 
@@ -283,7 +283,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
     @Test
-    public void listByLabelSelector() {
+    void listByLabelSelector() {
         String domainName = this.nameFactory.getDomainName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -310,7 +310,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
     @Test
-    public void listByOrganizationId() {
+    void listByOrganizationId() {
         String domainName = this.nameFactory.getDomainName();
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
@@ -339,7 +339,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
     @Test
-    public void listByPath() {
+    void listByPath() {
         String domainName = this.nameFactory.getDomainName();
         String path = this.nameFactory.getPath();
 
@@ -366,7 +366,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
     @Test
-    public void listBySpaceId() {
+    void listBySpaceId() {
         String domainName = this.nameFactory.getDomainName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -394,7 +394,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
     @Test
-    public void listDestinations() {
+    void listDestinations() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -429,7 +429,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
     @Test
-    public void listDestinationsByApplicationId() {
+    void listDestinationsByApplicationId() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -465,7 +465,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
     @Test
-    public void listDestinationsById() {
+    void listDestinationsById() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -501,7 +501,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
     @Test
-    public void removeDestinations() {
+    void removeDestinations() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -535,7 +535,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
     @Test
-    public void replaceDestinations() {
+    void replaceDestinations() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
         Integer port = this.nameFactory.getPort();
@@ -572,7 +572,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
     @Test
-    public void update() {
+    void update() {
         String domainName = this.nameFactory.getDomainName();
 
         this.organizationId

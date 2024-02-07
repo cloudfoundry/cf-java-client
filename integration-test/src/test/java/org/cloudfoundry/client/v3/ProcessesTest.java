@@ -41,7 +41,7 @@ import org.cloudfoundry.operations.applications.ApplicationHealthCheck;
 import org.cloudfoundry.operations.applications.GetApplicationRequest;
 import org.cloudfoundry.operations.applications.PushApplicationRequest;
 import org.cloudfoundry.util.PaginationUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import reactor.core.publisher.Mono;
@@ -54,7 +54,7 @@ import java.time.Duration;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_0)
-public final class ProcessesTest extends AbstractIntegrationTest {
+final class ProcessesTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
@@ -63,7 +63,7 @@ public final class ProcessesTest extends AbstractIntegrationTest {
     private CloudFoundryOperations cloudFoundryOperations;
 
     @Test
-    public void get() throws IOException {
+    void get() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         Path path =  new ClassPathResource("test-application.zip").getFile().toPath();
 
@@ -82,7 +82,7 @@ public final class ProcessesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void getStatistics() throws IOException {
+    void getStatistics() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         Path path =  new ClassPathResource("test-application.zip").getFile().toPath();
 
@@ -102,7 +102,7 @@ public final class ProcessesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() throws IOException {
+    void list() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         Path path =  new ClassPathResource("test-application.zip").getFile().toPath();
 
@@ -122,7 +122,7 @@ public final class ProcessesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void scale() throws IOException {
+    void scale() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         Path path =  new ClassPathResource("test-application.zip").getFile().toPath();
 
@@ -144,7 +144,7 @@ public final class ProcessesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void terminateInstance() throws IOException {
+    void terminateInstance() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         Path path =  new ClassPathResource("test-application.zip").getFile().toPath();
 
@@ -164,7 +164,7 @@ public final class ProcessesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void update() throws IOException {
+    void update() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         Path path =  new ClassPathResource("test-application.zip").getFile().toPath();
 

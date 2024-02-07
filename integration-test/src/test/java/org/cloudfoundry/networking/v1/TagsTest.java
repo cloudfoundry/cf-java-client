@@ -31,7 +31,7 @@ import org.cloudfoundry.networking.v1.policies.Source;
 import org.cloudfoundry.networking.v1.tags.ListTagsRequest;
 import org.cloudfoundry.networking.v1.tags.ListTagsResponse;
 import org.cloudfoundry.util.ResourceUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -40,7 +40,7 @@ import java.time.Duration;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
-public final class TagsTest extends AbstractIntegrationTest {
+final class TagsTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
@@ -53,7 +53,7 @@ public final class TagsTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_12)
     @Test
-    public void create() {
+    void create() {
         String destinationApplicationName = this.nameFactory.getApplicationName();
         String sourceApplicationName = this.nameFactory.getApplicationName();
         Integer port = this.nameFactory.getPort();

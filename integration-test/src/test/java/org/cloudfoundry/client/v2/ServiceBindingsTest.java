@@ -34,7 +34,7 @@ import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvide
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -50,7 +50,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
-public final class ServiceBindingsTest extends AbstractIntegrationTest {
+final class ServiceBindingsTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
@@ -59,7 +59,7 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
     private Mono<String> spaceId;
 
     @Test
-    public void create() {
+    void create() {
         String applicationName = this.nameFactory.getApplicationName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
@@ -76,7 +76,7 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         String applicationName = this.nameFactory.getApplicationName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
@@ -94,7 +94,7 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         String applicationName = this.nameFactory.getApplicationName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
@@ -116,7 +116,7 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         String applicationName = this.nameFactory.getApplicationName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
@@ -140,7 +140,7 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByApplicationId() {
+    void listFilterByApplicationId() {
         String applicationName = this.nameFactory.getApplicationName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
@@ -164,7 +164,7 @@ public final class ServiceBindingsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByServiceInstanceId() {
+    void listFilterByServiceInstanceId() {
         String applicationName = this.nameFactory.getApplicationName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 

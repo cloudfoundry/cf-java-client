@@ -68,7 +68,7 @@ import org.cloudfoundry.operations.services.CreateUserProvidedServiceInstanceReq
 import org.cloudfoundry.operations.services.GetServiceInstanceRequest;
 import org.cloudfoundry.operations.services.ServiceInstance;
 import org.cloudfoundry.util.FluentMap;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import reactor.core.publisher.Flux;
@@ -85,7 +85,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public final class ApplicationsTest extends AbstractIntegrationTest {
+final class ApplicationsTest extends AbstractIntegrationTest {
 
     private static final String DEFAULT_ROUTER_GROUP = "default-tcp";
 
@@ -102,7 +102,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     private String serviceName;
 
     @Test
-    public void copySource() throws IOException {
+    void copySource() throws IOException {
         String sourceName = this.nameFactory.getApplicationName();
         String targetName = this.nameFactory.getApplicationName();
 
@@ -125,7 +125,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void deleteApplication() throws IOException {
+    void deleteApplication() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, false)
@@ -141,7 +141,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void deleteApplicationAndRoutes() throws IOException {
+    void deleteApplicationAndRoutes() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, false)
@@ -159,7 +159,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void deleteApplicationWithServiceBindings() throws IOException {
+    void deleteApplicationWithServiceBindings() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
@@ -175,7 +175,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void disableSsh() throws IOException {
+    void disableSsh() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, false)
@@ -191,7 +191,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void enableSsh() throws IOException {
+    void enableSsh() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, false)
@@ -207,7 +207,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void get() throws IOException {
+    void get() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, false)
@@ -223,7 +223,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void getEvents() throws IOException {
+    void getEvents() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, true)
@@ -240,7 +240,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void getHealthCheck() throws IOException {
+    void getHealthCheck() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, true)
@@ -255,7 +255,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void getManifest() throws IOException {
+    void getManifest() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, true)
@@ -271,7 +271,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void getManifestForTcpRoute() throws IOException {
+    void getManifestForTcpRoute() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, true)
@@ -287,7 +287,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void getMultipleBuildpacks() throws IOException {
+    void getMultipleBuildpacks() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplicationPhp(this.cloudFoundryOperations, new ClassPathResource("test-php.zip").getFile().toPath(), applicationName, true)
@@ -303,7 +303,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void getMultipleBuildpacksManifest() throws IOException {
+    void getMultipleBuildpacksManifest() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplicationPhp(this.cloudFoundryOperations, new ClassPathResource("test-php.zip").getFile().toPath(), applicationName, true)
@@ -319,7 +319,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void getStopped() throws IOException {
+    void getStopped() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, true)
@@ -335,7 +335,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void getTcp() throws IOException {
+    void getTcp() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -353,7 +353,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() throws IOException {
+    void list() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, false)
@@ -368,7 +368,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_11)
     @Test
-    public void listTasks() throws IOException {
+    void listTasks() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String taskName = this.nameFactory.getTaskName();
 
@@ -386,7 +386,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void logs() throws IOException {
+    void logs() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, false)
@@ -404,7 +404,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void pushBindServices() throws IOException {
+    void pushBindServices() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
@@ -433,7 +433,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void pushDirectory() throws IOException {
+    void pushDirectory() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application").getFile().toPath(), applicationName, false)
@@ -443,7 +443,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void pushDomainHostPathRoute() throws IOException {
+    void pushDomainHostPathRoute() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
         String routePath = this.nameFactory.getPath();
@@ -474,7 +474,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void pushDomainNotFound() throws IOException {
+    void pushDomainNotFound() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -493,7 +493,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void pushExisting() throws IOException {
+    void pushExisting() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, false)
@@ -511,7 +511,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void pushManifestMultipleBuildpacks() throws IOException {
+    void pushManifestMultipleBuildpacks() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         List<String> buildpacks = Arrays.asList("staticfile_buildpack", "php_buildpack");
 
@@ -535,9 +535,10 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    //TODO how to select this version?
     @Test
-    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.UNSPECIFIED) //TODO how to select this version?
-    public void pushManifestV3() throws IOException {
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.UNSPECIFIED)
+    void pushManifestV3() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         ManifestV3 manifest = ManifestV3.builder()
@@ -559,9 +560,10 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
             .verify(Duration.ofMinutes(5));
     }
 
+    //TODO how to select this version?
     @Test
-    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.UNSPECIFIED) //TODO how to select this version?
-    public void pushManifestV3MultipleApplications() throws IOException {
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.UNSPECIFIED)
+    void pushManifestV3MultipleApplications() throws IOException {
         String applicationName1 = this.nameFactory.getApplicationName();
         String applicationName2 = this.nameFactory.getApplicationName();
 
@@ -593,7 +595,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void pushMultipleBuildpacks() throws IOException {
+    void pushMultipleBuildpacks() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         List<String> buildpacks = Arrays.asList("staticfile_buildpack", "php_buildpack");
 
@@ -616,7 +618,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void pushMultipleRoutes() throws IOException {
+    void pushMultipleRoutes() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -651,7 +653,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void pushNew() throws IOException {
+    void pushNew() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, false)
@@ -661,7 +663,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void pushNewDocker() {
+    void pushNewDocker() {
         String applicationName = this.nameFactory.getApplicationName();
 
         createDockerApplication(this.cloudFoundryOperations, applicationName, false)
@@ -671,7 +673,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void pushNoHostName() throws IOException {
+    void pushNoHostName() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -700,7 +702,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void pushNoRoute() throws IOException {
+    void pushNoRoute() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -734,7 +736,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void pushPrivateDomain() throws IOException {
+    void pushPrivateDomain() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -754,7 +756,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void pushRouteAndRoutePath() throws IOException {
+    void pushRouteAndRoutePath() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
         String routePath1 = this.nameFactory.getPath();
@@ -787,7 +789,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void pushRoutePath() throws IOException {
+    void pushRoutePath() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String routePath = this.nameFactory.getPath();
 
@@ -812,7 +814,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void pushTcpRoute() throws IOException {
+    void pushTcpRoute() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -842,7 +844,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void pushUpdateRoute() throws IOException {
+    void pushUpdateRoute() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
         String originalHostName = this.nameFactory.getHostName();
@@ -891,7 +893,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void pushUpdateTcpRoute() throws IOException {
+    void pushUpdateTcpRoute() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -941,7 +943,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void pushWithHost() throws IOException {
+    void pushWithHost() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String host = this.nameFactory.getHostName();
 
@@ -961,7 +963,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void rename() throws IOException {
+    void rename() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String newName = this.nameFactory.getApplicationName();
 
@@ -979,7 +981,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void restage() throws IOException {
+    void restage() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, false)
@@ -993,7 +995,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void restartInstance() throws IOException {
+    void restartInstance() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, false)
@@ -1008,7 +1010,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void restartNotStarted() throws IOException {
+    void restartNotStarted() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, true)
@@ -1022,7 +1024,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void restartStarted() throws IOException {
+    void restartStarted() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, false)
@@ -1037,7 +1039,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_11)
     @Test
-    public void runTask() throws IOException {
+    void runTask() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String taskName = this.nameFactory.getTaskName();
 
@@ -1058,7 +1060,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void scale() throws IOException {
+    void scale() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, false)
@@ -1078,7 +1080,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void setEnvironmentVariable() throws IOException {
+    void setEnvironmentVariable() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String variableName1 = this.nameFactory.getVariableName();
         String variableName2 = this.nameFactory.getVariableName();
@@ -1115,7 +1117,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void setHealthCheck() throws IOException {
+    void setHealthCheck() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, false)
@@ -1132,7 +1134,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void sshEnabled() throws IOException {
+    void sshEnabled() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, false)
@@ -1147,7 +1149,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void startNotStarted() throws IOException {
+    void startNotStarted() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, true)
@@ -1161,7 +1163,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void startStarted() throws IOException {
+    void startStarted() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, false)
@@ -1175,7 +1177,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void stop() throws IOException {
+    void stop() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, false)
@@ -1193,7 +1195,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_11)
     @Test
-    public void terminateTask() throws IOException {
+    void terminateTask() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String taskName = this.nameFactory.getTaskName();
 
@@ -1216,7 +1218,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void unsetEnvironmentVariableComplete() throws IOException {
+    void unsetEnvironmentVariableComplete() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String variableName1 = this.nameFactory.getVariableName();
         String variableName2 = this.nameFactory.getVariableName();
@@ -1259,7 +1261,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void unsetEnvironmentVariablePartial() throws IOException {
+    void unsetEnvironmentVariablePartial() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String variableName1 = this.nameFactory.getVariableName();
         String variableName2 = this.nameFactory.getVariableName();

@@ -21,7 +21,7 @@ import org.cloudfoundry.uaa.serverinformation.AutoLoginRequest;
 import org.cloudfoundry.uaa.serverinformation.GetAutoLoginAuthenticationCodeRequest;
 import org.cloudfoundry.uaa.serverinformation.GetAutoLoginAuthenticationCodeResponse;
 import org.cloudfoundry.uaa.serverinformation.GetInfoRequest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -31,7 +31,7 @@ import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public final class ServerInformationTest extends AbstractIntegrationTest {
+final class ServerInformationTest extends AbstractIntegrationTest {
 
     @Autowired
     private String clientId;
@@ -49,7 +49,7 @@ public final class ServerInformationTest extends AbstractIntegrationTest {
     private String username;
 
     @Test
-    public void autoLogin() {
+    void autoLogin() {
         getAuthenticationCode(this.uaaClient, this.clientId, this.clientSecret, this.password, this.username)
             .flatMap(code -> this.uaaClient.serverInformation()
                 .autoLogin(AutoLoginRequest.builder()
@@ -62,7 +62,7 @@ public final class ServerInformationTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void getAutoLoginAuthenticationCode() {
+    void getAutoLoginAuthenticationCode() {
         this.uaaClient.serverInformation()
             .getAuthenticationCode(GetAutoLoginAuthenticationCodeRequest.builder()
                 .clientId(this.clientId)
@@ -78,7 +78,7 @@ public final class ServerInformationTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void getInfo() {
+    void getInfo() {
         this.uaaClient.serverInformation()
             .getInfo(GetInfoRequest.builder()
                 .build())

@@ -20,7 +20,7 @@ import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.ApplicationUtils;
 import org.cloudfoundry.CloudFoundryVersion;
 import org.cloudfoundry.IfCloudFoundryVersion;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
@@ -58,7 +58,7 @@ public class LogCacheTest extends AbstractIntegrationTest implements Initializin
     }
 
     @Test
-    public void info() {
+    void info() {
         this.logCacheClient.info(InfoRequest.builder().build())
             .as(StepVerifier::create)
             .assertNext(response -> {
@@ -74,7 +74,7 @@ public class LogCacheTest extends AbstractIntegrationTest implements Initializin
     }
 
     @Test
-    public void meta() {
+    void meta() {
         this.logCacheClient.meta(MetaRequest.builder().build())
             .as(StepVerifier::create)
             .assertNext(response -> {
@@ -87,7 +87,7 @@ public class LogCacheTest extends AbstractIntegrationTest implements Initializin
     }
 
     @Test
-    public void readCounter() {
+    void readCounter() {
         final String name = this.nameFactory.getName("counter-");
         final int delta = this.random.nextInt(1000);
 
@@ -100,7 +100,7 @@ public class LogCacheTest extends AbstractIntegrationTest implements Initializin
     }
 
     @Test
-    public void readEvent() {
+    void readEvent() {
         final String title = this.nameFactory.getName("event-");
         final String body = "This is the body. " + new BigInteger(1024, this.random).toString(32);
 
@@ -113,7 +113,7 @@ public class LogCacheTest extends AbstractIntegrationTest implements Initializin
     }
 
     @Test
-    public void readGauge() {
+    void readGauge() {
         final String gaugeName = this.nameFactory.getName("gauge-");
         final Double value = this.random.nextDouble() % 100;
 
@@ -126,7 +126,7 @@ public class LogCacheTest extends AbstractIntegrationTest implements Initializin
     }
 
     @Test
-    public void readLogs() {
+    void readLogs() {
         final String logMessage = this.nameFactory.getName("log-");
 
         this.testLogCacheEndpoints.log(logMessage)

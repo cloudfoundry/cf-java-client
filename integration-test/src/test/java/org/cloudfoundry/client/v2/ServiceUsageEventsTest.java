@@ -31,7 +31,7 @@ import org.cloudfoundry.client.v2.serviceusageevents.PurgeAndReseedServiceUsageE
 import org.cloudfoundry.client.v2.serviceusageevents.ServiceUsageEventResource;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -41,7 +41,7 @@ import java.time.Duration;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
-public final class ServiceUsageEventsTest extends AbstractIntegrationTest {
+final class ServiceUsageEventsTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
@@ -56,7 +56,7 @@ public final class ServiceUsageEventsTest extends AbstractIntegrationTest {
     private Mono<String> spaceId;
 
     @Test
-    public void get() {
+    void get() {
         Mono
             .zip(this.serviceBrokerId, this.spaceId)
             .flatMap(function((serviceBrokerId, spaceId) -> seedEvents(this.cloudFoundryClient, this.nameFactory, serviceBrokerId, this.serviceName, spaceId)))
@@ -77,7 +77,7 @@ public final class ServiceUsageEventsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         Mono
             .zip(this.serviceBrokerId, this.spaceId)
             .flatMap(function((serviceBrokerId, spaceId) -> seedEvents(this.cloudFoundryClient, this.nameFactory, serviceBrokerId, this.serviceName, spaceId)))
@@ -97,7 +97,7 @@ public final class ServiceUsageEventsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listAfterServiceUsageEventId() {
+    void listAfterServiceUsageEventId() {
         Mono
             .zip(this.serviceBrokerId, this.spaceId)
             .flatMap(function((serviceBrokerId, spaceId) -> seedEvents(this.cloudFoundryClient, this.nameFactory, serviceBrokerId, this.serviceName, spaceId)))
@@ -118,7 +118,7 @@ public final class ServiceUsageEventsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByServiceId() {
+    void listFilterByServiceId() {
         Mono
             .zip(this.serviceBrokerId, this.spaceId)
             .flatMap(function((serviceBrokerId, spaceId) -> seedEvents(this.cloudFoundryClient, this.nameFactory, serviceBrokerId, this.serviceName, spaceId)))
@@ -139,7 +139,7 @@ public final class ServiceUsageEventsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByServiceInstanceType() {
+    void listFilterByServiceInstanceType() {
         Mono
             .zip(this.serviceBrokerId, this.spaceId)
             .flatMap(function((serviceBrokerId, spaceId) -> seedEvents(this.cloudFoundryClient, this.nameFactory, serviceBrokerId, this.serviceName, spaceId)))
@@ -160,7 +160,7 @@ public final class ServiceUsageEventsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listNoneFound() {
+    void listNoneFound() {
         this.cloudFoundryClient.serviceUsageEvents()
             .list(ListServiceUsageEventsRequest.builder()
                 .serviceId("test-service-id")
@@ -172,7 +172,7 @@ public final class ServiceUsageEventsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void purgeAndReseed() {
+    void purgeAndReseed() {
         this.cloudFoundryClient.serviceUsageEvents()
             .purgeAndReseed(PurgeAndReseedServiceUsageEventsRequest.builder()
                 .build())

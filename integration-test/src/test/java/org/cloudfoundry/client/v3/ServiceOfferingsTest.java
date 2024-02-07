@@ -31,7 +31,7 @@ import org.cloudfoundry.client.v3.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v3.spaces.CreateSpaceResponse;
 import org.cloudfoundry.client.v3.spaces.SpaceRelationships;
 import org.cloudfoundry.util.PaginationUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -44,7 +44,7 @@ import static org.cloudfoundry.ServiceBrokerUtils.createServiceBroker;
 import static org.cloudfoundry.ServiceBrokerUtils.deleteServiceBroker;
 
 @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_10)
-public final class ServiceOfferingsTest extends AbstractIntegrationTest {
+final class ServiceOfferingsTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
@@ -59,7 +59,7 @@ public final class ServiceOfferingsTest extends AbstractIntegrationTest {
     private String serviceName;
 
     @Test
-    public void delete() {
+    void delete() {
         String planName = this.nameFactory.getPlanName();
         String serviceBrokerName = this.nameFactory.getServiceBrokerName();
         String serviceName = this.nameFactory.getServiceName();
@@ -87,7 +87,7 @@ public final class ServiceOfferingsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         this.serviceBrokerId
             .flatMap(serviceBrokerId -> getServiceOfferingId(this.cloudFoundryClient, this.serviceName, serviceBrokerId))
             .flatMap(serviceOfferingId -> this.cloudFoundryClient.serviceOfferingsV3()
@@ -102,7 +102,7 @@ public final class ServiceOfferingsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         PaginationUtils.requestClientV3Resources(page -> this.cloudFoundryClient.serviceOfferingsV3()
             .list(ListServiceOfferingsRequest.builder()
                 .page(page)
@@ -116,7 +116,7 @@ public final class ServiceOfferingsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterBy() {
+    void listFilterBy() {
         this.serviceBrokerId
             .flatMapMany(serviceBrokerId -> PaginationUtils.requestClientV3Resources(page ->
                 this.cloudFoundryClient.serviceOfferingsV3()
@@ -133,7 +133,7 @@ public final class ServiceOfferingsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void update() {
+    void update() {
         String planName = this.nameFactory.getPlanName();
         String serviceBrokerName = this.nameFactory.getServiceBrokerName();
         String serviceName = this.nameFactory.getServiceName();

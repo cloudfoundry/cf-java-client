@@ -30,7 +30,7 @@ import org.cloudfoundry.client.v2.buildpacks.UploadBuildpackRequest;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import reactor.core.publisher.Flux;
@@ -41,13 +41,13 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Duration;
 
-public final class BuildpacksTest extends AbstractIntegrationTest {
+final class BuildpacksTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
 
     @Test
-    public void create() {
+    void create() {
         String buildpackName = this.nameFactory.getBuildpackName();
 
         this.cloudFoundryClient.buildpacks()
@@ -70,7 +70,7 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         String buildpackName = this.nameFactory.getBuildpackName();
 
         createBuildpackId(this.cloudFoundryClient, buildpackName)
@@ -86,7 +86,7 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void deleteAsync() {
+    void deleteAsync() {
         String buildpackName = this.nameFactory.getBuildpackName();
 
         createBuildpackId(this.cloudFoundryClient, buildpackName)
@@ -103,7 +103,7 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         String buildpackName = this.nameFactory.getBuildpackName();
 
         createBuildpackId(this.cloudFoundryClient, buildpackName)
@@ -124,7 +124,7 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         String buildpackName = this.nameFactory.getBuildpackName();
 
         createBuildpackId(this.cloudFoundryClient, buildpackName)
@@ -146,7 +146,7 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByName() {
+    void listFilterByName() {
         String buildpackName = this.nameFactory.getBuildpackName();
 
         createBuildpackId(this.cloudFoundryClient, buildpackName)
@@ -168,7 +168,7 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void update() {
+    void update() {
         String buildpackName = this.nameFactory.getBuildpackName();
 
         createBuildpackId(this.cloudFoundryClient, buildpackName)
@@ -192,7 +192,7 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void upload() throws IOException {
+    void upload() throws IOException {
         Path buildpack = new ClassPathResource("test-buildpack.zip").getFile().toPath();
         String buildpackName = this.nameFactory.getBuildpackName();
         String filename = buildpack.getFileName().toString();
@@ -218,7 +218,7 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void uploadDirectory() throws IOException {
+    void uploadDirectory() throws IOException {
         Path buildpack = new ClassPathResource("test-buildpack").getFile().toPath();
         String buildpackName = this.nameFactory.getBuildpackName();
         String filename = buildpack.getFileName().toString();

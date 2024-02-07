@@ -31,7 +31,7 @@ import org.cloudfoundry.client.v3.roles.RoleRelationships;
 import org.cloudfoundry.client.v3.roles.RoleResource;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -42,13 +42,13 @@ import java.time.Duration;
 import static org.cloudfoundry.client.v3.roles.RoleType.ORGANIZATION_USER;
 
 @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
-public final class RolesTest extends AbstractIntegrationTest {
+final class RolesTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
 
     @Test
-    public void create() {
+    void create() {
         String organizationName = this.nameFactory.getOrganizationName();
         String userId = this.nameFactory.getUserId();
 
@@ -87,7 +87,7 @@ public final class RolesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         String organizationName = this.nameFactory.getOrganizationName();
         String userId = this.nameFactory.getUserId();
 
@@ -107,7 +107,7 @@ public final class RolesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         String organizationName = this.nameFactory.getOrganizationName();
         String userId = this.nameFactory.getUserId();
 
@@ -126,7 +126,7 @@ public final class RolesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByOrganizationId() {
+    void listFilterByOrganizationId() {
         String organizationName = this.nameFactory.getOrganizationName();
         String userId = this.nameFactory.getUserId();
 

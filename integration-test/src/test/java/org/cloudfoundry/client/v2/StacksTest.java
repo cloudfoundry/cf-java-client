@@ -28,7 +28,7 @@ import org.cloudfoundry.client.v2.stacks.StackResource;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -38,7 +38,7 @@ import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public final class StacksTest extends AbstractIntegrationTest {
+final class StacksTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
@@ -47,7 +47,7 @@ public final class StacksTest extends AbstractIntegrationTest {
     private String stackName;
 
     @Test
-    public void create() {
+    void create() {
         String stackName = this.nameFactory.getStackName();
 
         this.cloudFoundryClient.stacks()
@@ -64,7 +64,7 @@ public final class StacksTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         String stackName = this.nameFactory.getStackName();
 
         createStackId(this.cloudFoundryClient, stackName)
@@ -80,7 +80,7 @@ public final class StacksTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void deleteAsync() {
+    void deleteAsync() {
         String stackName = this.nameFactory.getStackName();
 
         createStackId(this.cloudFoundryClient, stackName)
@@ -97,7 +97,7 @@ public final class StacksTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         getStackId(this.cloudFoundryClient, this.stackName)
             .flatMap(stackId -> this.cloudFoundryClient.stacks()
                 .get(GetStackRequest.builder()
@@ -111,7 +111,7 @@ public final class StacksTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         getStackId(this.cloudFoundryClient, this.stackName)
             .flatMapMany(stackId -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.stacks()
@@ -127,7 +127,7 @@ public final class StacksTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByName() {
+    void listFilterByName() {
         PaginationUtils
             .requestClientV2Resources(page -> this.cloudFoundryClient.stacks()
                 .list(ListStacksRequest.builder()

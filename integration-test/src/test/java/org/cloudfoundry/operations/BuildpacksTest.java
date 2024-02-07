@@ -21,7 +21,7 @@ import org.cloudfoundry.operations.buildpacks.Buildpack;
 import org.cloudfoundry.operations.buildpacks.CreateBuildpackRequest;
 import org.cloudfoundry.operations.buildpacks.DeleteBuildpackRequest;
 import org.cloudfoundry.operations.buildpacks.UpdateBuildpackRequest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import reactor.core.publisher.Mono;
@@ -32,13 +32,13 @@ import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public final class BuildpacksTest extends AbstractIntegrationTest {
+final class BuildpacksTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryOperations cloudFoundryOperations;
 
     @Test
-    public void create() throws IOException {
+    void create() throws IOException {
         String buildpackName = this.nameFactory.getBuildpackName();
 
         this.cloudFoundryOperations.buildpacks()
@@ -57,7 +57,7 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void createFromDirectory() throws IOException {
+    void createFromDirectory() throws IOException {
         String buildpackName = this.nameFactory.getBuildpackName();
 
         this.cloudFoundryOperations.buildpacks()
@@ -77,7 +77,7 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void delete() throws IOException {
+    void delete() throws IOException {
         String buildpackName = this.nameFactory.getBuildpackName();
 
         createBuildpack(this.cloudFoundryOperations, buildpackName)
@@ -94,7 +94,7 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void deleteBuildpackNotFound() {
+    void deleteBuildpackNotFound() {
         String buildpackName = this.nameFactory.getBuildpackName();
 
         this.cloudFoundryOperations.buildpacks()
@@ -107,7 +107,7 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() throws IOException {
+    void list() throws IOException {
         String buildpackName = this.nameFactory.getBuildpackName();
 
         createBuildpack(this.cloudFoundryOperations, buildpackName)
@@ -122,7 +122,7 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void update() throws IOException {
+    void update() throws IOException {
         String buildpackName = this.nameFactory.getBuildpackName();
 
         createBuildpack(this.cloudFoundryOperations, buildpackName)
@@ -142,7 +142,7 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void updateFromDirectory() throws IOException {
+    void updateFromDirectory() throws IOException {
         String buildpackName = this.nameFactory.getBuildpackName();
 
         createBuildpack(this.cloudFoundryOperations, buildpackName)

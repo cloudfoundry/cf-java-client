@@ -38,8 +38,8 @@ import org.cloudfoundry.uaa.tokens.RefreshTokenRequest;
 import org.cloudfoundry.uaa.tokens.RefreshTokenResponse;
 import org.cloudfoundry.uaa.tokens.TokenFormat;
 import org.cloudfoundry.uaa.tokens.TokenKey;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -49,7 +49,7 @@ import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public final class TokensTest extends AbstractIntegrationTest {
+final class TokensTest extends AbstractIntegrationTest {
 
     @Autowired
     private String clientId;
@@ -73,7 +73,7 @@ public final class TokensTest extends AbstractIntegrationTest {
     private String username;
 
     @Test
-    public void checkTokenNotAuthorized() {
+    void checkTokenNotAuthorized() {
         this.tokenProvider.getToken(this.connectionContext)
             .flatMap(token -> this.uaaClient.tokens()
                 .check(CheckTokenRequest.builder()
@@ -88,7 +88,7 @@ public final class TokensTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void getTokenByAuthorizationCode() {
+    void getTokenByAuthorizationCode() {
         requestGetAuthorizationCode(this.uaaClient, this.clientId)
             .flatMap(authorizationCode -> this.uaaClient.tokens()
                 .getByAuthorizationCode(GetTokenByAuthorizationCodeRequest.builder()
@@ -104,7 +104,7 @@ public final class TokensTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void getTokenByClientCredentials() {
+    void getTokenByClientCredentials() {
         this.uaaClient.tokens()
             .getByClientCredentials(GetTokenByClientCredentialsRequest.builder()
                 .clientId(this.clientId)
@@ -119,9 +119,9 @@ public final class TokensTest extends AbstractIntegrationTest {
     }
 
     //TODO: Ready to Implement - Await https://github.com/cloudfoundry/cf-java-client/issues/862 to get passcode
-    @Ignore("Ready to Implement - Await https://github.com/cloudfoundry/cf-java-client/issues/862 to get passcode")
+    @Disabled("Ready to Implement - Await https://github.com/cloudfoundry/cf-java-client/issues/862 to get passcode")
     @Test
-    public void getTokenByOneTimePasscode() {
+    void getTokenByOneTimePasscode() {
         this.uaaClient.tokens()
             .getByOneTimePasscode(GetTokenByOneTimePasscodeRequest.builder()
                 .passcode("some passcode")
@@ -137,7 +137,7 @@ public final class TokensTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void getTokenByOpenId() {
+    void getTokenByOpenId() {
         requestGetAuthorizationCode(this.uaaClient, this.clientId)
             .flatMap(authorizationCode -> this.uaaClient.tokens()
                 .getByOpenId(GetTokenByOpenIdRequest.builder()
@@ -154,7 +154,7 @@ public final class TokensTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void getTokenByPassword() {
+    void getTokenByPassword() {
         this.uaaClient.tokens()
             .getByPassword(GetTokenByPasswordRequest.builder()
                 .clientId(this.clientId)
@@ -171,7 +171,7 @@ public final class TokensTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void getTokenKey() {
+    void getTokenKey() {
         this.uaaClient.tokens()
             .getKey(GetTokenKeyRequest.builder()
                 .build())
@@ -182,7 +182,7 @@ public final class TokensTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listTokenKeys() {
+    void listTokenKeys() {
         this.uaaClient.tokens()
             .getKey(GetTokenKeyRequest.builder()
                 .build())
@@ -204,7 +204,7 @@ public final class TokensTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void refreshToken() {
+    void refreshToken() {
         getRequestToken(this.uaaClient, this.clientId, this.clientSecret, this.password, this.username)
             .flatMap(refreshToken -> this.uaaClient.tokens()
                 .refresh(RefreshTokenRequest.builder()

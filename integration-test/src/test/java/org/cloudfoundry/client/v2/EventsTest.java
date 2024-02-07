@@ -22,7 +22,7 @@ import org.cloudfoundry.client.v2.events.EventResource;
 import org.cloudfoundry.client.v2.events.GetEventRequest;
 import org.cloudfoundry.client.v2.events.ListEventsRequest;
 import org.cloudfoundry.util.ResourceUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -30,13 +30,13 @@ import reactor.test.StepVerifier;
 
 import java.time.Duration;
 
-public final class EventsTest extends AbstractIntegrationTest {
+final class EventsTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
 
     @Test
-    public void get() {
+    void get() {
         getFirstEvent(this.cloudFoundryClient)
             .flatMap(resource -> Mono.zip(
                 Mono.just(resource)
@@ -54,7 +54,7 @@ public final class EventsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         getFirstEvent(this.cloudFoundryClient)
             .flatMap(resource -> Mono.zip(
                 Mono.just(resource),
@@ -71,7 +71,7 @@ public final class EventsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByActee() {
+    void listFilterByActee() {
         getFirstEvent(this.cloudFoundryClient)
             .flatMap(resource -> Mono.zip(
                 Mono.just(resource),
@@ -89,7 +89,7 @@ public final class EventsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByOrganizationId() {
+    void listFilterByOrganizationId() {
         getFirstEvent(this.cloudFoundryClient)
             .flatMap(resource -> Mono.zip(
                 Mono.just(resource),
@@ -107,7 +107,7 @@ public final class EventsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterBySpaceId() {
+    void listFilterBySpaceId() {
         getFirstEvent(this.cloudFoundryClient)
             .flatMap(resource -> Mono.zip(
                 Mono.just(resource),
@@ -125,7 +125,7 @@ public final class EventsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByTimestamp() {
+    void listFilterByTimestamp() {
         getFirstEvent(this.cloudFoundryClient)
             .flatMap(resource -> Mono.zip(
                 Mono.just(resource),
@@ -143,7 +143,7 @@ public final class EventsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByType() {
+    void listFilterByType() {
         getFirstEvent(this.cloudFoundryClient)
             .flatMap(resource -> Mono.zip(
                 Mono.just(resource),

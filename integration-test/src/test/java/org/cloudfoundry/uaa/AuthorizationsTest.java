@@ -26,7 +26,7 @@ import org.cloudfoundry.uaa.authorizations.AuthorizeByOpenIdWithIdTokenRequest;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByOpenIdWithImplicitGrantRequest;
 import org.cloudfoundry.uaa.authorizations.GetOpenIdProviderConfigurationRequest;
 import org.cloudfoundry.uaa.authorizations.GetOpenIdProviderConfigurationResponse;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.test.StepVerifier;
 
@@ -35,7 +35,7 @@ import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public final class AuthorizationsTest extends AbstractIntegrationTest {
+final class AuthorizationsTest extends AbstractIntegrationTest {
 
     @Autowired
     private String clientId;
@@ -44,7 +44,7 @@ public final class AuthorizationsTest extends AbstractIntegrationTest {
     private UaaClient uaaClient;
 
     @Test
-    public void authorizeByAuthorizationCodeGrantApi() {
+    void authorizeByAuthorizationCodeGrantApi() {
         this.uaaClient.authorizations()
             .authorizationCodeGrantApi(AuthorizeByAuthorizationCodeGrantApiRequest.builder()
                 .clientId(this.clientId)
@@ -56,7 +56,7 @@ public final class AuthorizationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void authorizeByAuthorizationCodeGrantBrowser() {
+    void authorizeByAuthorizationCodeGrantBrowser() {
         this.uaaClient.authorizations()
             .authorizationCodeGrantBrowser(AuthorizeByAuthorizationCodeGrantBrowserRequest.builder()
                 .clientId(this.clientId)
@@ -69,7 +69,7 @@ public final class AuthorizationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void authorizeByAuthorizationCodeGrantHybrid() {
+    void authorizeByAuthorizationCodeGrantHybrid() {
         this.uaaClient.authorizations()
             .authorizationCodeGrantHybrid(AuthorizeByAuthorizationCodeGrantHybridRequest.builder()
                 .clientId(this.clientId)
@@ -82,7 +82,7 @@ public final class AuthorizationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void authorizeByImplicitGrantBrowser() {
+    void authorizeByImplicitGrantBrowser() {
         this.uaaClient.authorizations()
             .implicitGrantBrowser(AuthorizeByImplicitGrantBrowserRequest.builder()
                 .clientId(this.clientId)
@@ -95,7 +95,7 @@ public final class AuthorizationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void authorizeByOpenIdWithAuthorizationCodeGrant() {
+    void authorizeByOpenIdWithAuthorizationCodeGrant() {
         this.uaaClient.authorizations()
             .openIdWithAuthorizationCodeAndIdToken(AuthorizeByOpenIdWithAuthorizationCodeGrantRequest.builder()
                 .clientId("app")
@@ -109,7 +109,7 @@ public final class AuthorizationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void authorizeByOpenIdWithIdToken() {
+    void authorizeByOpenIdWithIdToken() {
         this.uaaClient.authorizations()
             .openIdWithIdToken(AuthorizeByOpenIdWithIdTokenRequest.builder()
                 .clientId("app")
@@ -123,7 +123,7 @@ public final class AuthorizationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void authorizeByOpenIdWithImplicitGrant() {
+    void authorizeByOpenIdWithImplicitGrant() {
         this.uaaClient.authorizations()
             .openIdWithTokenAndIdToken(AuthorizeByOpenIdWithImplicitGrantRequest.builder()
                 .clientId("app")
@@ -137,7 +137,7 @@ public final class AuthorizationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void openIdProviderConfiguration() {
+    void openIdProviderConfiguration() {
         this.uaaClient.authorizations()
             .getOpenIdProviderConfiguration(GetOpenIdProviderConfigurationRequest.builder()
                 .build())

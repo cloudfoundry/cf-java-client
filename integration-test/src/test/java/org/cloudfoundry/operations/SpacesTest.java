@@ -20,7 +20,7 @@ import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.operations.spaces.CreateSpaceRequest;
 import org.cloudfoundry.operations.spaces.GetSpaceRequest;
 import org.cloudfoundry.operations.spaces.SpaceDetail;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.test.StepVerifier;
 
@@ -28,7 +28,7 @@ import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public final class SpacesTest extends AbstractIntegrationTest {
+final class SpacesTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryOperations cloudFoundryOperations;
@@ -37,7 +37,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     private String organizationName;
 
     @Test
-    public void create() {
+    void create() {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.cloudFoundryOperations.spaces()
@@ -55,7 +55,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void getWithURLReservedCharacterInName() {
+    void getWithURLReservedCharacterInName() {
         String spaceName = this.nameFactory.getSpaceName() + "+test";
 
         this.cloudFoundryOperations.spaces()
@@ -75,7 +75,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         this.cloudFoundryOperations.spaces()
             .list()
             .count()

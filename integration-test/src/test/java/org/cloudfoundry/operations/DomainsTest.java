@@ -24,7 +24,7 @@ import org.cloudfoundry.operations.domains.Domain;
 import org.cloudfoundry.operations.domains.ShareDomainRequest;
 import org.cloudfoundry.operations.domains.UnshareDomainRequest;
 import org.cloudfoundry.operations.organizations.CreateOrganizationRequest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -36,7 +36,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.operations.domains.Status.OWNED;
 import static org.cloudfoundry.operations.domains.Status.SHARED;
 
-public final class DomainsTest extends AbstractIntegrationTest {
+final class DomainsTest extends AbstractIntegrationTest {
 
     private static final String DEFAULT_ROUTER_GROUP = "default-tcp";
 
@@ -47,7 +47,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     private String organizationName;
 
     @Test
-    public void createInvalidDomain() {
+    void createInvalidDomain() {
         this.cloudFoundryOperations.domains()
             .create(CreateDomainRequest.builder()
                 .domain("invalid-domain")
@@ -59,7 +59,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void createPrivate() {
+    void createPrivate() {
         String domainName = this.nameFactory.getDomainName();
 
         this.cloudFoundryOperations.domains()
@@ -77,7 +77,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void createShared() {
+    void createShared() {
         String domainName = this.nameFactory.getDomainName();
 
         this.cloudFoundryOperations.domains()
@@ -94,7 +94,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void createSharedTcp() {
+    void createSharedTcp() {
         String domainName = this.nameFactory.getDomainName();
 
         this.cloudFoundryOperations.domains()
@@ -112,7 +112,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         String domainName = this.nameFactory.getDomainName();
 
         requestCreateDomain(this.cloudFoundryOperations, domainName, this.organizationName)
@@ -127,7 +127,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listRouterGroups() {
+    void listRouterGroups() {
         this.cloudFoundryOperations.domains()
             .listRouterGroups()
             .filter(response -> DEFAULT_ROUTER_GROUP.equals(response.getName()))
@@ -138,7 +138,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listTcp() {
+    void listTcp() {
         String domainName = this.nameFactory.getDomainName();
 
         requestCreateTcpDomain(this.cloudFoundryOperations, domainName)
@@ -153,7 +153,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void share() {
+    void share() {
         String domainName = this.nameFactory.getDomainName();
         String targetOrganizationName = this.nameFactory.getOrganizationName();
 
@@ -170,7 +170,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void unshare() {
+    void unshare() {
         String domainName = this.nameFactory.getDomainName();
         String targetOrganizationName = this.nameFactory.getOrganizationName();
 

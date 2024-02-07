@@ -27,7 +27,7 @@ import org.cloudfoundry.operations.networkpolicies.ListNetworkPoliciesRequest;
 import org.cloudfoundry.operations.networkpolicies.Policy;
 import org.cloudfoundry.operations.networkpolicies.RemoveNetworkPolicyRequest;
 import org.cloudfoundry.util.ResourceUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -35,7 +35,7 @@ import reactor.test.StepVerifier;
 
 import java.time.Duration;
 
-public final class NetworkPoliciesTest extends AbstractIntegrationTest {
+final class NetworkPoliciesTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
@@ -48,7 +48,7 @@ public final class NetworkPoliciesTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_12)
     @Test
-    public void add() {
+    void add() {
         String destinationApplicationName = this.nameFactory.getApplicationName();
         String sourceApplicationName = this.nameFactory.getApplicationName();
         Integer port = this.nameFactory.getPort();
@@ -74,7 +74,7 @@ public final class NetworkPoliciesTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_12)
     @Test
-    public void list() {
+    void list() {
         String destinationApplicationName = this.nameFactory.getApplicationName();
         String sourceApplicationName = this.nameFactory.getApplicationName();
         Integer port = this.nameFactory.getPort();
@@ -98,7 +98,7 @@ public final class NetworkPoliciesTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_12)
     @Test
-    public void remove() {
+    void remove() {
         String destinationApplicationName = this.nameFactory.getApplicationName();
         String sourceApplicationName = this.nameFactory.getApplicationName();
         Integer port = this.nameFactory.getPort();

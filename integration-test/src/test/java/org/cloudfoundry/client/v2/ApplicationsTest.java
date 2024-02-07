@@ -69,7 +69,7 @@ import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.OperationUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.Assert;
@@ -97,7 +97,7 @@ import static org.cloudfoundry.client.ZipExpectations.zipEquality;
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
-public final class ApplicationsTest extends AbstractIntegrationTest {
+final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
@@ -112,7 +112,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     private Mono<String> stackId;
 
     @Test
-    public void associateRoute() {
+    void associateRoute() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -135,7 +135,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void copy() {
+    void copy() {
         String applicationName = this.nameFactory.getApplicationName();
         String copyApplicationName = this.nameFactory.getApplicationName();
 
@@ -164,7 +164,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void create() {
+    void create() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -183,7 +183,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void createDocker() {
+    void createDocker() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -207,7 +207,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -223,7 +223,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void downloadDroplet() {
+    void downloadDroplet() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -241,7 +241,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void environment() {
+    void environment() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -261,7 +261,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -278,7 +278,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_9)
     @Test
-    public void getPermissions() {
+    void getPermissions() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -297,7 +297,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void instances() {
+    void instances() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -315,7 +315,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -338,7 +338,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByDiego() {
+    void listFilterByDiego() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -362,7 +362,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByName() {
+    void listFilterByName() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -386,7 +386,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByOrganizationId() {
+    void listFilterByOrganizationId() {
         String applicationName = this.nameFactory.getApplicationName();
 
         Mono
@@ -414,7 +414,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterBySpaceId() {
+    void listFilterBySpaceId() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -441,7 +441,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByStackId() {
+    void listFilterByStackId() {
         String applicationName = this.nameFactory.getApplicationName();
 
         Mono.zip(this.spaceId, this.stackId)
@@ -467,7 +467,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listRoutes() {
+    void listRoutes() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -500,7 +500,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listRoutesFilterByDomainId() {
+    void listRoutesFilterByDomainId() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -534,7 +534,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listRoutesFilterByHost() {
+    void listRoutesFilterByHost() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -568,7 +568,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listRoutesFilterByPath() {
+    void listRoutesFilterByPath() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -602,7 +602,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listServiceBindings() {
+    void listServiceBindings() {
         String applicationName = this.nameFactory.getApplicationName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
@@ -623,7 +623,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listServiceBindingsFilterByServiceInstanceId() {
+    void listServiceBindingsFilterByServiceInstanceId() {
         String applicationName = this.nameFactory.getApplicationName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
@@ -656,7 +656,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void removeRoute() {
+    void removeRoute() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -683,7 +683,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void removeServiceBinding() {
+    void removeServiceBinding() {
         String applicationName = this.nameFactory.getApplicationName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
@@ -708,7 +708,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void restage() {
+    void restage() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -727,7 +727,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void statistics() {
+    void statistics() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -745,7 +745,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void summary() {
+    void summary() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -763,7 +763,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void terminateInstance() {
+    void terminateInstance() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -787,7 +787,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void update() {
+    void update() {
         String applicationName = this.nameFactory.getApplicationName();
         String applicationName2 = this.nameFactory.getApplicationName();
 
@@ -828,7 +828,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void uploadAndDownload() {
+    void uploadAndDownload() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -845,7 +845,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void uploadAndDownloadAsyncFalse() {
+    void uploadAndDownloadAsyncFalse() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
@@ -862,7 +862,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void uploadDirectory() throws IOException {
+    void uploadDirectory() throws IOException {
         Path application = new ClassPathResource("test-application").getFile().toPath();
         String applicationName = this.nameFactory.getApplicationName();
 
@@ -882,7 +882,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_9)
     @Test
-    public void uploadDroplet() throws IOException {
+    void uploadDroplet() throws IOException {
         Path droplet = new ClassPathResource("test-droplet.tgz").getFile().toPath();
         String applicationName = this.nameFactory.getApplicationName();
 

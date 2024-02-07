@@ -42,7 +42,7 @@ import org.cloudfoundry.client.v2.spaces.CreateSpaceResponse;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -54,7 +54,7 @@ import static org.cloudfoundry.ServiceBrokerUtils.createServiceBroker;
 import static org.cloudfoundry.ServiceBrokerUtils.deleteServiceBroker;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
-public final class ServicePlansTest extends AbstractIntegrationTest {
+final class ServicePlansTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
@@ -75,7 +75,7 @@ public final class ServicePlansTest extends AbstractIntegrationTest {
     private Mono<String> spaceId;
 
     @Test
-    public void delete() {
+    void delete() {
         String planName = this.nameFactory.getPlanName();
         String serviceBrokerName = this.nameFactory.getServiceBrokerName();
         String serviceName = this.nameFactory.getServiceName();
@@ -104,7 +104,7 @@ public final class ServicePlansTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void deleteAsyncFalse() {
+    void deleteAsyncFalse() {
         String planName = this.nameFactory.getPlanName();
         String serviceBrokerName = this.nameFactory.getServiceBrokerName();
         String serviceName = this.nameFactory.getServiceName();
@@ -132,7 +132,7 @@ public final class ServicePlansTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         this.serviceBrokerId
             .flatMap(serviceBrokerId -> getServicePlanId(this.cloudFoundryClient, serviceBrokerId))
             .flatMap(servicePlanId -> this.cloudFoundryClient.servicePlans()
@@ -147,7 +147,7 @@ public final class ServicePlansTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         PaginationUtils
             .requestClientV2Resources(page -> this.cloudFoundryClient.servicePlans()
                 .list(ListServicePlansRequest.builder()
@@ -162,7 +162,7 @@ public final class ServicePlansTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByActive() {
+    void listFilterByActive() {
         PaginationUtils
             .requestClientV2Resources(page -> this.cloudFoundryClient.servicePlans()
                 .list(ListServicePlansRequest.builder()
@@ -178,7 +178,7 @@ public final class ServicePlansTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByServiceBrokerId() {
+    void listFilterByServiceBrokerId() {
         this.serviceBrokerId
             .flatMapMany(serviceBrokerId -> PaginationUtils
                 .requestClientV2Resources(page -> this.cloudFoundryClient.servicePlans()
@@ -195,7 +195,7 @@ public final class ServicePlansTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByServiceId() {
+    void listFilterByServiceId() {
         this.serviceBrokerId
             .flatMap(serviceBrokerId -> getServiceId(this.cloudFoundryClient, this.serviceName))
             .flatMapMany(serviceId -> PaginationUtils
@@ -212,7 +212,7 @@ public final class ServicePlansTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByServiceInstanceId() {
+    void listFilterByServiceInstanceId() {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         this.serviceBrokerId
@@ -235,7 +235,7 @@ public final class ServicePlansTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listServiceInstances() {
+    void listServiceInstances() {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         this.serviceBrokerId
@@ -260,7 +260,7 @@ public final class ServicePlansTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listServiceInstancesFilterByName() {
+    void listServiceInstancesFilterByName() {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         this.serviceBrokerId
@@ -285,7 +285,7 @@ public final class ServicePlansTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listServiceInstancesFilterByServiceBindingId() {
+    void listServiceInstancesFilterByServiceBindingId() {
         String applicationName = this.nameFactory.getApplicationName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
@@ -318,7 +318,7 @@ public final class ServicePlansTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listServiceInstancesFilterByServiceKeyId() {
+    void listServiceInstancesFilterByServiceKeyId() {
         String serviceKeyName = this.nameFactory.getServiceKeyName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
@@ -350,7 +350,7 @@ public final class ServicePlansTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listServiceInstancesFilterBySpaceId() {
+    void listServiceInstancesFilterBySpaceId() {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         this.serviceBrokerId
@@ -375,7 +375,7 @@ public final class ServicePlansTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void update() {
+    void update() {
         String planName = this.nameFactory.getPlanName();
         String serviceBrokerName = this.nameFactory.getServiceBrokerName();
         String serviceName = this.nameFactory.getServiceName();

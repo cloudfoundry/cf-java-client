@@ -45,7 +45,7 @@ import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -56,7 +56,7 @@ import java.time.Duration;
 import static org.cloudfoundry.client.v2.securitygroups.Protocol.TCP;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
-public final class SecurityGroupsTest extends AbstractIntegrationTest {
+final class SecurityGroupsTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
@@ -65,7 +65,7 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
     private Mono<String> organizationId;
 
     @Test
-    public void associateSpace() {
+    void associateSpace() {
         String securityGroupName = this.nameFactory.getSecurityGroupName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -88,7 +88,7 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void create() {
+    void create() {
         String securityGroupName = this.nameFactory.getSecurityGroupName();
 
         this.cloudFoundryClient.securityGroups()
@@ -110,7 +110,7 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         String securityGroupName = this.nameFactory.getSecurityGroupName();
 
         createSecurityGroupId(this.cloudFoundryClient, securityGroupName)
@@ -126,7 +126,7 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void deleteSpace() {
+    void deleteSpace() {
         String securityGroupName = this.nameFactory.getSecurityGroupName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -148,7 +148,7 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         String securityGroupName = this.nameFactory.getSecurityGroupName();
 
         createSecurityGroupId(this.cloudFoundryClient, securityGroupName)
@@ -165,7 +165,7 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         String securityGroupName = this.nameFactory.getSecurityGroupName();
 
         requestCreateSecurityGroup(this.cloudFoundryClient, securityGroupName)
@@ -184,7 +184,7 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listRunningDefaults() {
+    void listRunningDefaults() {
         String securityGroupName1 = this.nameFactory.getSecurityGroupName();
         String securityGroupName2 = this.nameFactory.getSecurityGroupName();
 
@@ -201,7 +201,7 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listSpaces() {
+    void listSpaces() {
         String securityGroupName = this.nameFactory.getSecurityGroupName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -228,7 +228,7 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listStagingDefaults() {
+    void listStagingDefaults() {
         String securityGroupName1 = this.nameFactory.getSecurityGroupName();
         String securityGroupName2 = this.nameFactory.getSecurityGroupName();
 
@@ -245,7 +245,7 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void setRunningDefault() {
+    void setRunningDefault() {
         String securityGroupName = this.nameFactory.getSecurityGroupName();
 
         createSecurityGroupId(this.cloudFoundryClient, securityGroupName)
@@ -262,7 +262,7 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void setStagingDefault() {
+    void setStagingDefault() {
         String securityGroupName = this.nameFactory.getSecurityGroupName();
 
         createSecurityGroupId(this.cloudFoundryClient, securityGroupName)
@@ -279,7 +279,7 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void unsetRunningDefault() {
+    void unsetRunningDefault() {
         String securityGroupName = this.nameFactory.getSecurityGroupName();
 
         createSecurityGroupId(this.cloudFoundryClient, securityGroupName)
@@ -296,7 +296,7 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void unsetStagingDefault() {
+    void unsetStagingDefault() {
         String securityGroupName = this.nameFactory.getSecurityGroupName();
 
         createSecurityGroupId(this.cloudFoundryClient, securityGroupName)
@@ -313,7 +313,7 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void update() {
+    void update() {
         String oldSecurityGroupName = this.nameFactory.getSecurityGroupName();
         String newSecurityGroupName = this.nameFactory.getSecurityGroupName();
 

@@ -44,7 +44,7 @@ import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -58,7 +58,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
-public final class PrivateDomainsTest extends AbstractIntegrationTest {
+final class PrivateDomainsTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
@@ -70,7 +70,7 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
     private Mono<String> userId;
 
     @Test
-    public void create() {
+    void create() {
         String privateDomainName = this.nameFactory.getDomainName();
 
         this.organizationId
@@ -85,7 +85,7 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         String privateDomainName = this.nameFactory.getDomainName();
 
         this.organizationId
@@ -99,7 +99,7 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         String privateDomainName = this.nameFactory.getDomainName();
 
         this.organizationId
@@ -118,7 +118,7 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         String privateDomainName = this.nameFactory.getDomainName();
 
         this.organizationId
@@ -139,7 +139,7 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByName() {
+    void listFilterByName() {
         String privateDomainName = this.nameFactory.getDomainName();
 
         this.organizationId
@@ -160,7 +160,7 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listSharedOrganizations() {
+    void listSharedOrganizations() {
         String sharedOrganizationName = this.nameFactory.getOrganizationName();
         String privateDomainName = this.nameFactory.getDomainName();
 
@@ -186,7 +186,7 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listSharedOrganizationsFilterByAuditorId() {
+    void listSharedOrganizationsFilterByAuditorId() {
         String sharedOrganizationName = this.nameFactory.getOrganizationName();
         String privateDomainName = this.nameFactory.getDomainName();
 
@@ -217,7 +217,7 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listSharedOrganizationsFilterByBillingManagerId() {
+    void listSharedOrganizationsFilterByBillingManagerId() {
         String sharedOrganizationName = this.nameFactory.getOrganizationName();
         String privateDomainName = this.nameFactory.getDomainName();
 
@@ -248,7 +248,7 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listSharedOrganizationsFilterByManagerId() {
+    void listSharedOrganizationsFilterByManagerId() {
         String sharedOrganizationName = this.nameFactory.getOrganizationName();
         String privateDomainName = this.nameFactory.getDomainName();
 
@@ -279,7 +279,7 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listSharedOrganizationsFilterByName() {
+    void listSharedOrganizationsFilterByName() {
         String sharedOrganizationName = this.nameFactory.getOrganizationName();
         String privateDomainName = this.nameFactory.getDomainName();
 
@@ -305,7 +305,7 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listSharedOrganizationsFilterBySpaceId() {
+    void listSharedOrganizationsFilterBySpaceId() {
         String sharedOrganizationName = this.nameFactory.getOrganizationName();
         String privateDomainName = this.nameFactory.getDomainName();
         String spaceName = this.nameFactory.getSpaceName();
@@ -335,7 +335,7 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listSharedOrganizationsFilterByStatus() {
+    void listSharedOrganizationsFilterByStatus() {
         String sharedOrganizationName = this.nameFactory.getOrganizationName();
         String privateDomainName = this.nameFactory.getDomainName();
 
@@ -361,7 +361,7 @@ public final class PrivateDomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listSharedOrganizationsFilterByUserId() {
+    void listSharedOrganizationsFilterByUserId() {
         String sharedOrganizationName = this.nameFactory.getOrganizationName();
         String privateDomainName = this.nameFactory.getDomainName();
 

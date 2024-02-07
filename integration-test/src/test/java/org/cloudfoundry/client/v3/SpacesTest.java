@@ -47,8 +47,8 @@ import org.cloudfoundry.client.v3.spaces.SpaceResource;
 import org.cloudfoundry.client.v3.spaces.UpdateSpaceRequest;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.StreamUtils;
@@ -64,7 +64,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_12)
-public final class SpacesTest extends AbstractIntegrationTest {
+final class SpacesTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
@@ -73,7 +73,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     private Mono<String> organizationId;
 
     @Test
-    public void assignIsolationSegment() {
+    void assignIsolationSegment() {
         String isolationSegmentName = this.nameFactory.getIsolationSegmentName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -100,7 +100,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void create() {
+    void create() {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
@@ -125,7 +125,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_8)
     @Test
-    public void delete() {
+    void delete() {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
@@ -143,9 +143,9 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     //TODO: Await resolution of https://github.com/cloudfoundry/cloud_controller_ng/issues/1876
     @IfCloudFoundryVersion(greaterThan = CloudFoundryVersion.PCF_2_9)
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/1876")
+    @Disabled("Await https://github.com/cloudfoundry/cf-java-client/issues/1876")
     @Test
-    public void deleteUnmappedRoutes() {
+    void deleteUnmappedRoutes() {
         String domainName = this.nameFactory.getDomainName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -168,7 +168,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void getIsolationSegment() {
+    void getIsolationSegment() {
         String isolationSegmentName = this.nameFactory.getIsolationSegmentName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -192,7 +192,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
@@ -209,7 +209,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByName() {
+    void listFilterByName() {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
@@ -227,7 +227,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByOrganization() {
+    void listFilterByOrganization() {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
@@ -247,7 +247,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_8)
     @Test
-    public void update() {
+    void update() {
         String spaceName = this.nameFactory.getSpaceName();
         String newSpaceName = this.nameFactory.getSpaceName();
 
@@ -274,7 +274,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.UNSPECIFIED) //TODO how to select this version?
     @Test
-    public void applyManifest() throws IOException {
+    void applyManifest() throws IOException {
         String spaceName = this.nameFactory.getSpaceName();
 
         byte[] manifest;

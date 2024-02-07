@@ -41,7 +41,7 @@ import org.cloudfoundry.client.v2.routes.UpdateRouteRequest;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -54,7 +54,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
-public final class RoutesTest extends AbstractIntegrationTest {
+final class RoutesTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
@@ -69,7 +69,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     private Mono<String> stackId;
 
     @Test
-    public void associateApplication() {
+    void associateApplication() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -97,7 +97,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void create() {
+    void create() {
         String domainName = this.nameFactory.getDomainName();
 
         Mono
@@ -123,7 +123,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         String domainName = this.nameFactory.getDomainName();
 
         Mono
@@ -146,7 +146,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void deleteAsyncFalse() {
+    void deleteAsyncFalse() {
         String domainName = this.nameFactory.getDomainName();
 
         Mono
@@ -168,7 +168,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void exists() {
+    void exists() {
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
 
@@ -191,7 +191,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void existsDoesNotExist() {
+    void existsDoesNotExist() {
         String domainName = this.nameFactory.getDomainName();
         String hostName1 = this.nameFactory.getHostName();
         String hostName2 = this.nameFactory.getHostName();
@@ -220,7 +220,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         String domainName = this.nameFactory.getDomainName();
 
         Mono
@@ -250,7 +250,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listApplications() {
+    void listApplications() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -278,7 +278,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listApplicationsFilterByDiego() {
+    void listApplicationsFilterByDiego() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -307,7 +307,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listApplicationsFilterByName() {
+    void listApplicationsFilterByName() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -336,7 +336,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listApplicationsFilterByOrganizationId() {
+    void listApplicationsFilterByOrganizationId() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -366,7 +366,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listApplicationsFilterBySpaceId() {
+    void listApplicationsFilterBySpaceId() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -396,7 +396,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listApplicationsFilterByStackId() {
+    void listApplicationsFilterByStackId() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -428,7 +428,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByDomainId() {
+    void listFilterByDomainId() {
         String domainName = this.nameFactory.getDomainName();
 
         Mono
@@ -451,7 +451,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByHost() {
+    void listFilterByHost() {
         String domainName = this.nameFactory.getDomainName();
         String host = this.nameFactory.getHostName();
 
@@ -475,7 +475,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByOrganizationId() {
+    void listFilterByOrganizationId() {
         String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
@@ -499,7 +499,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByPath() {
+    void listFilterByPath() {
         String domainName = this.nameFactory.getDomainName();
         String path = this.nameFactory.getPath();
 
@@ -528,7 +528,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listMappings() {
+    void listMappings() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -560,7 +560,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listMappingsFilterByApplicationId() {
+    void listMappingsFilterByApplicationId() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -593,7 +593,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void removeApplication() {
+    void removeApplication() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -625,7 +625,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void update() {
+    void update() {
         String domainName = this.nameFactory.getDomainName();
 
         Mono

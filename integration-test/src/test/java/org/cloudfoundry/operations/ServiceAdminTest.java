@@ -27,7 +27,7 @@ import org.cloudfoundry.operations.serviceadmin.EnableServiceAccessRequest;
 import org.cloudfoundry.operations.serviceadmin.ListServiceAccessSettingsRequest;
 import org.cloudfoundry.operations.serviceadmin.ServiceAccess;
 import org.cloudfoundry.util.ResourceUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -38,7 +38,7 @@ import java.time.Duration;
 import static org.cloudfoundry.ServiceBrokerUtils.createServiceBroker;
 import static org.cloudfoundry.ServiceBrokerUtils.deleteServiceBroker;
 
-public final class ServiceAdminTest extends AbstractIntegrationTest {
+final class ServiceAdminTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
@@ -62,7 +62,7 @@ public final class ServiceAdminTest extends AbstractIntegrationTest {
     private String serviceName;
 
     @Test
-    public void disableServiceAccess() {
+    void disableServiceAccess() {
         String planName = this.nameFactory.getPlanName();
         String serviceBrokerName = this.nameFactory.getServiceBrokerName();
         String serviceName = this.nameFactory.getServiceName();
@@ -96,7 +96,7 @@ public final class ServiceAdminTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void disableServiceAccessSpecifyAll() {
+    void disableServiceAccessSpecifyAll() {
         String planName = this.nameFactory.getPlanName();
         String serviceBrokerName = this.nameFactory.getServiceBrokerName();
         String serviceName = this.nameFactory.getServiceName();
@@ -132,7 +132,7 @@ public final class ServiceAdminTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void disableServiceAccessSpecifyOrganization() {
+    void disableServiceAccessSpecifyOrganization() {
         String planName = this.nameFactory.getPlanName();
         String serviceBrokerName = this.nameFactory.getServiceBrokerName();
         String serviceName = this.nameFactory.getServiceName();
@@ -167,7 +167,7 @@ public final class ServiceAdminTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void disableServiceAccessSpecifyServicePlan() {
+    void disableServiceAccessSpecifyServicePlan() {
         String planName = this.nameFactory.getPlanName();
         String serviceBrokerName = this.nameFactory.getServiceBrokerName();
         String serviceName = this.nameFactory.getServiceName();
@@ -202,7 +202,7 @@ public final class ServiceAdminTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void enableServiceAccess() {
+    void enableServiceAccess() {
         String planName = this.nameFactory.getPlanName();
         String serviceBrokerName = this.nameFactory.getServiceBrokerName();
         String serviceName = this.nameFactory.getServiceName();
@@ -236,7 +236,7 @@ public final class ServiceAdminTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void enableServiceAccessSpecifyAll() {
+    void enableServiceAccessSpecifyAll() {
         String planName = this.nameFactory.getPlanName();
         String serviceBrokerName = this.nameFactory.getServiceBrokerName();
         String serviceName = this.nameFactory.getServiceName();
@@ -272,7 +272,7 @@ public final class ServiceAdminTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void enableServiceAccessSpecifyOrganization() {
+    void enableServiceAccessSpecifyOrganization() {
         String planName = this.nameFactory.getPlanName();
         String serviceBrokerName = this.nameFactory.getServiceBrokerName();
         String serviceName = this.nameFactory.getServiceName();
@@ -307,7 +307,7 @@ public final class ServiceAdminTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void enableServiceAccessSpecifyServicePlan() {
+    void enableServiceAccessSpecifyServicePlan() {
         String planName = this.nameFactory.getPlanName();
         String serviceBrokerName = this.nameFactory.getServiceBrokerName();
         String serviceName = this.nameFactory.getServiceName();
@@ -342,7 +342,7 @@ public final class ServiceAdminTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listServiceAccessSettings() {
+    void listServiceAccessSettings() {
         resetToEnabled(this.cloudFoundryOperations, this.serviceName)
             .thenMany(this.cloudFoundryOperations.serviceAdmin()
                 .listServiceAccessSettings(ListServiceAccessSettingsRequest.builder()
@@ -361,7 +361,7 @@ public final class ServiceAdminTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listServiceAccessSettingsSpecifyBroker() {
+    void listServiceAccessSettingsSpecifyBroker() {
         resetToEnabled(this.cloudFoundryOperations, this.serviceName)
             .thenMany(this.cloudFoundryOperations.serviceAdmin()
                 .listServiceAccessSettings(ListServiceAccessSettingsRequest.builder()
@@ -382,7 +382,7 @@ public final class ServiceAdminTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listServiceAccessSettingsSpecifyOrganization() {
+    void listServiceAccessSettingsSpecifyOrganization() {
         resetToEnabled(this.cloudFoundryOperations, this.serviceName)
             .thenMany(this.cloudFoundryOperations.serviceAdmin()
                 .listServiceAccessSettings(ListServiceAccessSettingsRequest.builder()
@@ -402,7 +402,7 @@ public final class ServiceAdminTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listServiceAccessSettingsSpecifyService() {
+    void listServiceAccessSettingsSpecifyService() {
         resetToEnabled(this.cloudFoundryOperations, this.serviceName)
             .thenMany(this.cloudFoundryOperations.serviceAdmin()
                 .listServiceAccessSettings(ListServiceAccessSettingsRequest.builder()

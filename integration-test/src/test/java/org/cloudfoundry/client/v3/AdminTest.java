@@ -22,20 +22,20 @@ import org.cloudfoundry.IfCloudFoundryVersion;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v3.admin.ClearBuildpackCacheRequest;
 import org.cloudfoundry.util.JobUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
 
-public final class AdminTest extends AbstractIntegrationTest {
+final class AdminTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_10)
     @Test
-    public void clearBuildpackCache() {
+    void clearBuildpackCache() {
         this.cloudFoundryClient.adminV3()
             .clearBuildpackCache(ClearBuildpackCacheRequest.builder()
                 .build())

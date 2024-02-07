@@ -38,7 +38,7 @@ import org.cloudfoundry.operations.useradmin.UnsetOrganizationRoleRequest;
 import org.cloudfoundry.operations.useradmin.UnsetSpaceRoleRequest;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -48,7 +48,7 @@ import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public final class UserAdminTest extends AbstractIntegrationTest {
+final class UserAdminTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
@@ -57,7 +57,7 @@ public final class UserAdminTest extends AbstractIntegrationTest {
     private CloudFoundryOperations cloudFoundryOperations;
 
     @Test
-    public void create() {
+    void create() {
         String username = this.nameFactory.getUserName();
 
         this.cloudFoundryOperations.userAdmin()
@@ -74,7 +74,7 @@ public final class UserAdminTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void createDuplicate() {
+    void createDuplicate() {
         String username = this.nameFactory.getUserName();
 
         createUser(this.cloudFoundryOperations, username)
@@ -85,7 +85,7 @@ public final class UserAdminTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         String username = this.nameFactory.getUserName();
 
         createUser(this.cloudFoundryOperations, username)
@@ -101,7 +101,7 @@ public final class UserAdminTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void deleteNotFound() {
+    void deleteNotFound() {
         this.cloudFoundryOperations.userAdmin()
             .delete(DeleteUserRequest.builder()
                 .username("not-found")
@@ -112,7 +112,7 @@ public final class UserAdminTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listOrganizationUsers() {
+    void listOrganizationUsers() {
         String organizationName = this.nameFactory.getOrganizationName();
         String username = this.nameFactory.getUserName();
 
@@ -133,7 +133,7 @@ public final class UserAdminTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listSpaceUsers() {
+    void listSpaceUsers() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String username = this.nameFactory.getUserName();
@@ -157,7 +157,7 @@ public final class UserAdminTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void setOrganizationUser() {
+    void setOrganizationUser() {
         String organizationName = this.nameFactory.getOrganizationName();
         String username = this.nameFactory.getUserName();
 
@@ -181,7 +181,7 @@ public final class UserAdminTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void setSpaceUser() {
+    void setSpaceUser() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String username = this.nameFactory.getUserName();
@@ -207,7 +207,7 @@ public final class UserAdminTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void unsetOrganizationUser() {
+    void unsetOrganizationUser() {
         String organizationName = this.nameFactory.getOrganizationName();
         String username = this.nameFactory.getUserName();
 
@@ -231,7 +231,7 @@ public final class UserAdminTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void unsetSpaceUser() {
+    void unsetSpaceUser() {
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
         String username = this.nameFactory.getUserName();

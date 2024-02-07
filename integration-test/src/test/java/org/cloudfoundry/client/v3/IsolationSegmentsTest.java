@@ -43,7 +43,7 @@ import org.cloudfoundry.client.v3.spaces.AssignSpaceIsolationSegmentRequest;
 import org.cloudfoundry.client.v3.spaces.AssignSpaceIsolationSegmentResponse;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -54,13 +54,13 @@ import java.time.Duration;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_11)
-public final class IsolationSegmentsTest extends AbstractIntegrationTest {
+final class IsolationSegmentsTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
 
     @Test
-    public void addOrganizationEntitlement() {
+    void addOrganizationEntitlement() {
         String isolationSegmentName = this.nameFactory.getIsolationSegmentName();
         String organizationName = this.nameFactory.getOrganizationName();
 
@@ -86,7 +86,7 @@ public final class IsolationSegmentsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void create() {
+    void create() {
         String isolationSegmentName = this.nameFactory.getIsolationSegmentName();
 
         this.cloudFoundryClient.isolationSegments()
@@ -103,7 +103,7 @@ public final class IsolationSegmentsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         String isolationSegmentName = this.nameFactory.getIsolationSegmentName();
 
         createIsolationSegmentId(this.cloudFoundryClient, isolationSegmentName)
@@ -118,7 +118,7 @@ public final class IsolationSegmentsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         String isolationSegmentName = this.nameFactory.getIsolationSegmentName();
 
         createIsolationSegmentId(this.cloudFoundryClient, isolationSegmentName)
@@ -134,7 +134,7 @@ public final class IsolationSegmentsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         String isolationSegmentName = this.nameFactory.getIsolationSegmentName();
 
         requestCreateIsolationSegment(this.cloudFoundryClient, isolationSegmentName)
@@ -150,7 +150,7 @@ public final class IsolationSegmentsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listEntitledOrganizations() {
+    void listEntitledOrganizations() {
         String isolationSegmentName = this.nameFactory.getIsolationSegmentName();
         String organizationName = this.nameFactory.getOrganizationName();
 
@@ -176,7 +176,7 @@ public final class IsolationSegmentsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listEntitledOrganizationsFilterByName() {
+    void listEntitledOrganizationsFilterByName() {
         String isolationSegmentName = this.nameFactory.getIsolationSegmentName();
         String organizationName = this.nameFactory.getOrganizationName();
 
@@ -203,7 +203,7 @@ public final class IsolationSegmentsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterById() {
+    void listFilterById() {
         String isolationSegmentName = this.nameFactory.getIsolationSegmentName();
 
         createIsolationSegmentId(this.cloudFoundryClient, isolationSegmentName)
@@ -220,7 +220,7 @@ public final class IsolationSegmentsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByName() {
+    void listFilterByName() {
         String isolationSegmentName = this.nameFactory.getIsolationSegmentName();
 
         requestCreateIsolationSegment(this.cloudFoundryClient, isolationSegmentName)
@@ -236,7 +236,7 @@ public final class IsolationSegmentsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByOrganizationId() {
+    void listFilterByOrganizationId() {
         String isolationSegmentName = this.nameFactory.getIsolationSegmentName();
         String organizationName = this.nameFactory.getOrganizationName();
 
@@ -257,7 +257,7 @@ public final class IsolationSegmentsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listOrganizationsRelationship() {
+    void listOrganizationsRelationship() {
         String isolationSegmentName = this.nameFactory.getIsolationSegmentName();
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
@@ -291,7 +291,7 @@ public final class IsolationSegmentsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listSpacesRelationship() {
+    void listSpacesRelationship() {
         String isolationSegmentName = this.nameFactory.getIsolationSegmentName();
         String organizationName = this.nameFactory.getOrganizationName();
         String spaceName = this.nameFactory.getSpaceName();
@@ -320,7 +320,7 @@ public final class IsolationSegmentsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void removeOrganizationEntitlement() {
+    void removeOrganizationEntitlement() {
         String isolationSegmentName = this.nameFactory.getIsolationSegmentName();
         String organizationName = this.nameFactory.getOrganizationName();
 
@@ -346,7 +346,7 @@ public final class IsolationSegmentsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void update() {
+    void update() {
         String isolationSegmentName1 = this.nameFactory.getIsolationSegmentName();
         String isolationSegmentName2 = this.nameFactory.getIsolationSegmentName();
 

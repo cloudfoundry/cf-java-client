@@ -41,7 +41,7 @@ import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServi
 import org.cloudfoundry.routing.RoutingClient;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -57,7 +57,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
-public final class UserProvidedServicesTest extends AbstractIntegrationTest {
+final class UserProvidedServicesTest extends AbstractIntegrationTest {
 
     private static final String DEFAULT_ROUTER_GROUP = "default-tcp";
 
@@ -74,7 +74,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
     private Mono<String> spaceId;
 
     @Test
-    public void create() {
+    void create() {
         String instanceName = this.nameFactory.getServiceInstanceName();
 
         this.spaceId
@@ -91,7 +91,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         String instanceName = this.nameFactory.getServiceInstanceName();
 
         this.spaceId
@@ -107,7 +107,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         String instanceName = this.nameFactory.getServiceInstanceName();
 
         this.spaceId
@@ -124,7 +124,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         String instanceName = this.nameFactory.getServiceInstanceName();
 
         this.spaceId
@@ -144,7 +144,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listRoutes() {
+    void listRoutes() {
         String domainName = this.nameFactory.getDomainName();
         String instanceName = this.nameFactory.getServiceInstanceName();
 
@@ -175,7 +175,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listRoutesFilterByDomainId() {
+    void listRoutesFilterByDomainId() {
         String domainName = this.nameFactory.getDomainName();
         String instanceName = this.nameFactory.getServiceInstanceName();
 
@@ -208,7 +208,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listRoutesFilterByHost() {
+    void listRoutesFilterByHost() {
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
         String instanceName = this.nameFactory.getServiceInstanceName();
@@ -241,7 +241,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listRoutesFilterByPath() {
+    void listRoutesFilterByPath() {
         String domainName = this.nameFactory.getDomainName();
         String instanceName = this.nameFactory.getServiceInstanceName();
         String path = this.nameFactory.getPath();
@@ -274,7 +274,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listServiceBindings() {
+    void listServiceBindings() {
         String applicationName = this.nameFactory.getApplicationName();
         String instanceName = this.nameFactory.getServiceInstanceName();
 
@@ -306,7 +306,7 @@ public final class UserProvidedServicesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void update() {
+    void update() {
         String instanceName = this.nameFactory.getServiceInstanceName();
         String newInstanceName = this.nameFactory.getServiceInstanceName();
 

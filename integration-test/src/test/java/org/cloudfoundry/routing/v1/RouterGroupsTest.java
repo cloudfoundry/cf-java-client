@@ -23,14 +23,14 @@ import org.cloudfoundry.routing.v1.routergroups.ListRouterGroupsResponse;
 import org.cloudfoundry.routing.v1.routergroups.RouterGroup;
 import org.cloudfoundry.routing.v1.routergroups.UpdateRouterGroupRequest;
 import org.cloudfoundry.routing.v1.routergroups.UpdateRouterGroupResponse;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
 
-public final class RouterGroupsTest extends AbstractIntegrationTest {
+final class RouterGroupsTest extends AbstractIntegrationTest {
 
     private static final String DEFAULT_ROUTER_GROUP = "default-tcp";
 
@@ -38,7 +38,7 @@ public final class RouterGroupsTest extends AbstractIntegrationTest {
     private RoutingClient routingClient;
 
     @Test
-    public void list() {
+    void list() {
         this.routingClient.routerGroups()
             .list(ListRouterGroupsRequest.builder()
                 .build())
@@ -52,7 +52,7 @@ public final class RouterGroupsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void update() {
+    void update() {
         getRouterGroupId(this.routingClient, DEFAULT_ROUTER_GROUP)
             .flatMap(routerGroupId -> this.routingClient.routerGroups()
                 .update(UpdateRouterGroupRequest.builder()

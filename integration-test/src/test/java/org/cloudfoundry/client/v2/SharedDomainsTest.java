@@ -29,7 +29,7 @@ import org.cloudfoundry.client.v2.shareddomains.SharedDomainResource;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -38,13 +38,13 @@ import reactor.test.StepVerifier;
 import java.time.Duration;
 import java.util.Optional;
 
-public final class SharedDomainsTest extends AbstractIntegrationTest {
+final class SharedDomainsTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
 
     @Test
-    public void create() {
+    void create() {
         String domainName = this.nameFactory.getDomainName();
 
         this.cloudFoundryClient.sharedDomains()
@@ -61,7 +61,7 @@ public final class SharedDomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void deleteAsyncFalse() {
+    void deleteAsyncFalse() {
         String domainName = this.nameFactory.getDomainName();
 
         getSharedDomainId(this.cloudFoundryClient, domainName)
@@ -78,7 +78,7 @@ public final class SharedDomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void deleteAsyncTrue() {
+    void deleteAsyncTrue() {
         String domainName = this.nameFactory.getDomainName();
 
         getSharedDomainId(this.cloudFoundryClient, domainName)
@@ -96,7 +96,7 @@ public final class SharedDomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         String domainName = this.nameFactory.getDomainName();
 
         getSharedDomainId(this.cloudFoundryClient, domainName)
@@ -113,7 +113,7 @@ public final class SharedDomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         String domainName = this.nameFactory.getDomainName();
 
         getSharedDomainId(this.cloudFoundryClient, domainName)
@@ -128,7 +128,7 @@ public final class SharedDomainsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByName() {
+    void listFilterByName() {
         String domainName = this.nameFactory.getDomainName();
 
         getSharedDomainId(this.cloudFoundryClient, domainName)

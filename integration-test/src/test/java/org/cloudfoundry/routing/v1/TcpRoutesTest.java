@@ -31,7 +31,7 @@ import org.cloudfoundry.routing.v1.tcproutes.ListTcpRoutesResponse;
 import org.cloudfoundry.routing.v1.tcproutes.TcpRoute;
 import org.cloudfoundry.routing.v1.tcproutes.TcpRouteConfiguration;
 import org.cloudfoundry.routing.v1.tcproutes.TcpRouteDeletion;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -39,7 +39,7 @@ import reactor.test.StepVerifier;
 
 import java.time.Duration;
 
-public final class TcpRoutesTest extends AbstractIntegrationTest {
+final class TcpRoutesTest extends AbstractIntegrationTest {
 
     private static final String DEFAULT_ROUTER_GROUP = "default-tcp";
 
@@ -50,7 +50,7 @@ public final class TcpRoutesTest extends AbstractIntegrationTest {
     private RoutingClient routingClient;
 
     @Test
-    public void create() {
+    void create() {
         String backendIp = this.nameFactory.getIpAddress();
         Integer backendPort = this.nameFactory.getPort();
         Integer port = this.nameFactory.getPort();
@@ -78,7 +78,7 @@ public final class TcpRoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         String backendIp = this.nameFactory.getIpAddress();
         Integer backendPort = this.nameFactory.getPort();
         Integer port = this.nameFactory.getPort();
@@ -105,7 +105,7 @@ public final class TcpRoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void events() {
+    void events() {
         String backendIp = this.nameFactory.getIpAddress();
         Integer backendPort = this.nameFactory.getPort();
         Integer port = this.nameFactory.getPort();
@@ -127,7 +127,7 @@ public final class TcpRoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         String backendIp = this.nameFactory.getIpAddress();
         Integer backendPort = this.nameFactory.getPort();
         Integer port = this.nameFactory.getPort();

@@ -33,7 +33,7 @@ import org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainResponse;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -44,7 +44,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
-public final class RouteMappingsTest extends AbstractIntegrationTest {
+final class RouteMappingsTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
@@ -53,7 +53,7 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
     private Mono<String> spaceId;
 
     @Test
-    public void createSharedDomain() {
+    void createSharedDomain() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
@@ -87,7 +87,7 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void deleteAsyncFalse() {
+    void deleteAsyncFalse() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
@@ -106,7 +106,7 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void deleteAsyncTrue() {
+    void deleteAsyncTrue() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
@@ -126,7 +126,7 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
@@ -147,7 +147,7 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByApplicationId() {
+    void listFilterByApplicationId() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
@@ -178,7 +178,7 @@ public final class RouteMappingsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByRouteId() {
+    void listFilterByRouteId() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();

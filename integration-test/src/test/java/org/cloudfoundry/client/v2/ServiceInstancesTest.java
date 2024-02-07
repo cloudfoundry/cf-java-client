@@ -53,7 +53,7 @@ import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.LastOperationUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -66,7 +66,7 @@ import java.util.Collections;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
-public final class ServiceInstancesTest extends AbstractIntegrationTest {
+final class ServiceInstancesTest extends AbstractIntegrationTest {
 
     private static final String DEFAULT_ROUTER_GROUP = "default-tcp";
 
@@ -89,7 +89,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
     private Mono<String> spaceId;
 
     @Test
-    public void bindRoute() {
+    void bindRoute() {
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
@@ -121,7 +121,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void create() {
+    void create() {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         Mono
@@ -144,7 +144,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void createAcceptsIncomplete() {
+    void createAcceptsIncomplete() {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         Mono
@@ -167,7 +167,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         this.spaceId
@@ -185,7 +185,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void deleteAcceptsIncomplete() {
+    void deleteAcceptsIncomplete() {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         this.spaceId
@@ -208,7 +208,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void deleteAcceptsIncompleteAsyncFalse() {
+    void deleteAcceptsIncompleteAsyncFalse() {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         this.spaceId
@@ -231,7 +231,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void deleteAsyncFalse() {
+    void deleteAsyncFalse() {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         this.spaceId
@@ -248,7 +248,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void deletePurge() {
+    void deletePurge() {
         String domainName = this.nameFactory.getDomainName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
@@ -277,7 +277,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void deleteRecursive() {
+    void deleteRecursive() {
         String domainName = this.nameFactory.getDomainName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
@@ -306,7 +306,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         this.spaceId
@@ -323,7 +323,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void getNotFound() {
+    void getNotFound() {
         this.cloudFoundryClient.serviceInstances()
             .get(GetServiceInstanceRequest.builder()
                 .serviceInstanceId("test-service-instance-id")
@@ -334,7 +334,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         this.spaceId
@@ -352,7 +352,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByName() {
+    void listFilterByName() {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         this.spaceId
@@ -371,7 +371,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByOrganizationId() {
+    void listFilterByOrganizationId() {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         Mono
@@ -393,7 +393,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByServiceBindingId() {
+    void listFilterByServiceBindingId() {
         String applicationName = this.nameFactory.getApplicationName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
@@ -417,7 +417,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByServiceKeyId() {
+    void listFilterByServiceKeyId() {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
         String serviceKeyName = this.nameFactory.getServiceKeyName();
 
@@ -438,7 +438,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByServicePlanId() {
+    void listFilterByServicePlanId() {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         Mono
@@ -463,7 +463,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterBySpaceId() {
+    void listFilterBySpaceId() {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         this.spaceId
@@ -483,7 +483,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listRoutes() {
+    void listRoutes() {
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
@@ -516,7 +516,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listRoutesFilterByDomainId() {
+    void listRoutesFilterByDomainId() {
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
@@ -551,7 +551,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listRoutesFilterByHost() {
+    void listRoutesFilterByHost() {
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
@@ -585,7 +585,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listRoutesFilterByPath() {
+    void listRoutesFilterByPath() {
         String domainName = this.nameFactory.getDomainName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
         String path = this.nameFactory.getPath();
@@ -619,7 +619,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listServiceBindings() {
+    void listServiceBindings() {
         String applicationName = this.nameFactory.getApplicationName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
@@ -647,7 +647,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listServiceBindingsFilterByApplicationId() {
+    void listServiceBindingsFilterByApplicationId() {
         String applicationName = this.nameFactory.getApplicationName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
@@ -671,7 +671,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void unbindRoute() {
+    void unbindRoute() {
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
@@ -702,7 +702,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void update() {
+    void update() {
         String oldServiceInstanceName = this.nameFactory.getServiceInstanceName();
         String newServiceInstanceName = this.nameFactory.getServiceInstanceName();
 
@@ -721,7 +721,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void updateEmptyCollections() {
+    void updateEmptyCollections() {
         String oldServiceInstanceName = this.nameFactory.getServiceInstanceName();
         String newServiceInstanceName = this.nameFactory.getServiceInstanceName();
 
@@ -742,7 +742,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_7)
     @Test
-    public void upgrade() {
+    void upgrade() {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         this.spaceId

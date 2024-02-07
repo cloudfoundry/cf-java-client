@@ -44,7 +44,7 @@ import org.cloudfoundry.client.v3.spaces.CreateSpaceResponse;
 import org.cloudfoundry.client.v3.spaces.SpaceRelationships;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -58,7 +58,7 @@ import java.util.Optional;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_1)
-public final class ServiceInstancesTest extends AbstractIntegrationTest {
+final class ServiceInstancesTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
@@ -76,7 +76,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
     private Mono<String> spaceId;
 
     @Test
-    public void createManagedServiceInstance() {
+    void createManagedServiceInstance() {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
         this.spaceId
             .flatMap(spaceId -> createManagedServiceInstanceId(this.cloudFoundryClient, this.serviceBrokerId, serviceInstanceName, this.serviceName, spaceId))
@@ -92,7 +92,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void getUserProvidedServiceCredentials() {
+    void getUserProvidedServiceCredentials() {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
         Map<String, Object> credentials = new HashMap<>();
         credentials.put("foo", "bar");
@@ -111,7 +111,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
         this.spaceId
             .flatMap(spaceId -> createManagedServiceInstanceId(this.cloudFoundryClient, this.serviceBrokerId, serviceInstanceName, this.serviceName, spaceId))
@@ -134,7 +134,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void update() {
+    void update() {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
         this.spaceId
             .flatMap(spaceId -> createManagedServiceInstanceId(this.cloudFoundryClient, this.serviceBrokerId, serviceInstanceName, this.serviceName, spaceId))
@@ -157,7 +157,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
         this.spaceId
             .flatMap(spaceId -> createManagedServiceInstanceId(this.cloudFoundryClient, this.serviceBrokerId, serviceInstanceName, this.serviceName, spaceId))
@@ -174,7 +174,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listSharedSpaces() {
+    void listSharedSpaces() {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -197,7 +197,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void share() {
+    void share() {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
         String spaceName = this.nameFactory.getSpaceName();
 
@@ -225,7 +225,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void unshare() {
+    void unshare() {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
         String spaceName = this.nameFactory.getSpaceName();
 

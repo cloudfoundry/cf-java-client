@@ -30,7 +30,7 @@ import org.cloudfoundry.client.v3.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v3.spaces.CreateSpaceResponse;
 import org.cloudfoundry.client.v3.spaces.SpaceRelationships;
 import org.cloudfoundry.util.PaginationUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -39,7 +39,7 @@ import reactor.test.StepVerifier;
 import java.time.Duration;
 
 @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_8)
-public final class AuditEventsTest extends AbstractIntegrationTest {
+final class AuditEventsTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
@@ -48,7 +48,7 @@ public final class AuditEventsTest extends AbstractIntegrationTest {
     private Mono<String> organizationId;
 
     @Test
-    public void get() {
+    void get() {
         String organizationName = this.nameFactory.getOrganizationName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
@@ -67,7 +67,7 @@ public final class AuditEventsTest extends AbstractIntegrationTest {
     //Note: Basic list() test is omitted as the potential volume of data means it take several minutes, with little benefit over the listFilterBy... tests.
 
     @Test
-    public void lisFilterByOrganization() {
+    void lisFilterByOrganization() {
         String organizationName = this.nameFactory.getOrganizationName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
@@ -84,7 +84,7 @@ public final class AuditEventsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void lisFilterByType() {
+    void lisFilterByType() {
         String organizationName = this.nameFactory.getOrganizationName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
@@ -102,7 +102,7 @@ public final class AuditEventsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterBySpace() {
+    void listFilterBySpace() {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
@@ -120,7 +120,7 @@ public final class AuditEventsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listFilterByTarget() {
+    void listFilterByTarget() {
         String organizationName = this.nameFactory.getOrganizationName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)

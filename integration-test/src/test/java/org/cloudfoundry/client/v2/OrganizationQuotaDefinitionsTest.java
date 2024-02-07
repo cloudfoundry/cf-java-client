@@ -29,7 +29,7 @@ import org.cloudfoundry.client.v2.organizationquotadefinitions.UpdateOrganizatio
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -38,14 +38,14 @@ import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationTest {
+final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationTest {
 
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
 
     @SuppressWarnings("deprecation")
     @Test
-    public void create() {
+    void create() {
         String quotaDefinitionName = this.nameFactory.getQuotaDefinitionName();
 
         this.cloudFoundryClient.organizationQuotaDefinitions()
@@ -78,7 +78,7 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
     }
 
     @Test
-    public void delete() {
+    void delete() {
         String quotaDefinitionName = this.nameFactory.getQuotaDefinitionName();
 
         requestCreateOrganizationQuotaDefinition(this.cloudFoundryClient, quotaDefinitionName)
@@ -97,7 +97,7 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
 
     @SuppressWarnings("deprecation")
     @Test
-    public void get() {
+    void get() {
         String quotaDefinitionName = this.nameFactory.getQuotaDefinitionName();
 
         requestCreateOrganizationQuotaDefinition(this.cloudFoundryClient, quotaDefinitionName)
@@ -127,7 +127,7 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
     }
 
     @Test
-    public void list() {
+    void list() {
         String quotaDefinitionName = this.nameFactory.getQuotaDefinitionName();
 
         requestCreateOrganizationQuotaDefinition(this.cloudFoundryClient, quotaDefinitionName)
@@ -149,7 +149,7 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
 
     @SuppressWarnings("deprecation")
     @Test
-    public void update() {
+    void update() {
         String quotaDefinitionName = this.nameFactory.getQuotaDefinitionName();
 
         requestCreateOrganizationQuotaDefinition(this.cloudFoundryClient, quotaDefinitionName)

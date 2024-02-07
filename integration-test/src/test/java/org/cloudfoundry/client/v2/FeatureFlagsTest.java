@@ -22,7 +22,7 @@ import org.cloudfoundry.client.v2.featureflags.FeatureFlagEntity;
 import org.cloudfoundry.client.v2.featureflags.GetFeatureFlagRequest;
 import org.cloudfoundry.client.v2.featureflags.ListFeatureFlagsRequest;
 import org.cloudfoundry.client.v2.featureflags.SetFeatureFlagRequest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -39,7 +39,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
-public final class FeatureFlagsTest extends AbstractIntegrationTest {
+final class FeatureFlagsTest extends AbstractIntegrationTest {
 
     private static final List<String> coreFeatureFlagNameList = Arrays.asList(
         "app_bits_upload",
@@ -57,7 +57,7 @@ public final class FeatureFlagsTest extends AbstractIntegrationTest {
     private CloudFoundryClient cloudFoundryClient;
 
     @Test
-    public void getEach() {
+    void getEach() {
         Flux
             .fromIterable(coreFeatureFlagNameList)
             .flatMap(flagName -> this.cloudFoundryClient.featureFlags()
@@ -73,7 +73,7 @@ public final class FeatureFlagsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         this.cloudFoundryClient.featureFlags()
             .list(ListFeatureFlagsRequest.builder()
                 .build())
@@ -87,7 +87,7 @@ public final class FeatureFlagsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void setAndResetEach() {
+    void setAndResetEach() {
         Flux.fromIterable(coreFeatureFlagNameList)
             .flatMap(flagName -> this.cloudFoundryClient.featureFlags()
                 .get(GetFeatureFlagRequest.builder()

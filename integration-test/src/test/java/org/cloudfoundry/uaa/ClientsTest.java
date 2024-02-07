@@ -51,7 +51,7 @@ import org.cloudfoundry.uaa.clients.UpdateMetadataResponse;
 import org.cloudfoundry.uaa.clients.UpdateSecretAction;
 import org.cloudfoundry.uaa.clients.UpdateSecretClientAction;
 import org.cloudfoundry.util.PaginationUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -66,7 +66,7 @@ import static org.cloudfoundry.uaa.tokens.GrantType.IMPLICIT;
 import static org.cloudfoundry.uaa.tokens.GrantType.PASSWORD;
 import static org.cloudfoundry.uaa.tokens.GrantType.REFRESH_TOKEN;
 
-public final class ClientsTest extends AbstractIntegrationTest {
+final class ClientsTest extends AbstractIntegrationTest {
 
     @Autowired
     private String clientId;
@@ -75,7 +75,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
     private UaaClient uaaClient;
 
     @Test
-    public void batchChangeSecret() {
+    void batchChangeSecret() {
         String clientId1 = this.nameFactory.getClientId();
         String clientId2 = this.nameFactory.getClientId();
         String clientSecret = this.nameFactory.getClientSecret();
@@ -105,7 +105,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void batchCreate() {
+    void batchCreate() {
         String clientId1 = this.nameFactory.getClientId();
         String clientId2 = this.nameFactory.getClientId();
         String clientSecret = this.nameFactory.getClientSecret();
@@ -143,7 +143,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void batchDelete() {
+    void batchDelete() {
         String clientId1 = this.nameFactory.getClientId();
         String clientId2 = this.nameFactory.getClientId();
         String clientSecret = this.nameFactory.getClientSecret();
@@ -164,7 +164,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void batchUpdate() {
+    void batchUpdate() {
         String clientId1 = this.nameFactory.getClientId();
         String clientId2 = this.nameFactory.getClientId();
         String clientSecret = this.nameFactory.getClientSecret();
@@ -205,7 +205,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(lessThan = CloudFoundryVersion.PCF_2_8)
     @Test
-    public void changeSecret27() {
+    void changeSecret27() {
         String clientId = this.nameFactory.getClientId();
         String newClientSecret = this.nameFactory.getClientSecret();
         String oldClientSecret = this.nameFactory.getClientSecret();
@@ -224,7 +224,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_8)
     @Test
-    public void changeSecret28() {
+    void changeSecret28() {
         String clientId = this.nameFactory.getClientId();
         String newClientSecret = this.nameFactory.getClientSecret();
         String oldClientSecret = this.nameFactory.getClientSecret();
@@ -246,7 +246,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void create() {
+    void create() {
         String clientId = this.nameFactory.getClientId();
         String clientSecret = this.nameFactory.getClientSecret();
 
@@ -271,7 +271,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         String clientId = this.nameFactory.getClientId();
         String clientSecret = this.nameFactory.getClientSecret();
 
@@ -288,7 +288,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         String clientId = this.nameFactory.getClientId();
         String clientSecret = this.nameFactory.getClientSecret();
 
@@ -307,7 +307,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void getMetadata() {
+    void getMetadata() {
         requestUpdateMetadata(this.uaaClient, this.clientId, "http://test.get.url")
             .then(this.uaaClient.clients()
                 .getMetadata(GetMetadataRequest.builder()
@@ -323,7 +323,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         String clientId = this.nameFactory.getClientId();
         String clientSecret = this.nameFactory.getClientSecret();
 
@@ -340,7 +340,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void listMetadatas() {
+    void listMetadatas() {
         requestUpdateMetadata(this.uaaClient, this.clientId, "http://test.list.url")
             .then(this.uaaClient.clients()
                 .listMetadatas(ListMetadatasRequest.builder()
@@ -358,7 +358,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void mixedActions() {
+    void mixedActions() {
         String clientId1 = this.nameFactory.getClientId();
         String clientId2 = this.nameFactory.getClientId();
         String clientSecret = this.nameFactory.getClientSecret();
@@ -405,7 +405,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void update() {
+    void update() {
         String clientId = this.nameFactory.getClientId();
         String clientSecret = this.nameFactory.getClientSecret();
 
@@ -429,7 +429,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void updateMetadata() {
+    void updateMetadata() {
         String appIcon = Base64.getEncoder().encodeToString(new AsciiString("test-image").toByteArray());
 
         this.uaaClient.clients()
