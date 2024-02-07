@@ -64,8 +64,8 @@ public abstract class AbstractIntegrationTest {
 
     @AfterEach
     public final void testExit() {
-         this.logger.debug("<< {} >>", getTestName());
-     }
+        this.logger.debug("<< {} >>", getTestName());
+    }
 
     protected static Mono<byte[]> getBytes(String path) {
         try (InputStream in = new FileInputStream(new File("src/test/resources", path)); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
@@ -83,11 +83,11 @@ public abstract class AbstractIntegrationTest {
     }
 
     protected static <T> Consumer<Tuple2<T, T>> tupleEquality() {
-         return consumer((expected, actual) -> assertThat(actual).isEqualTo(expected));
-     }
+        return consumer((expected, actual) -> assertThat(actual).isEqualTo(expected));
+    }
 
     private String getTestName() {
-         return String.format("%s.%s", this.getClass().getSimpleName(), this.testName);
-     }
+        return String.format("%s.%s", this.getClass().getSimpleName(), this.testName);
+    }
 
 }
