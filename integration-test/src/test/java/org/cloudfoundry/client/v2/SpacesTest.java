@@ -98,8 +98,8 @@ import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -1202,7 +1202,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
     }
 
     //TODO: Await https://github.com/cloudfoundry/cloud_controller_ng/issues/856 for this test to work
-    @Ignore("Await https://github.com/cloudfoundry/cloud_controller_ng/issues/856 for this test to work")
+    @Disabled("Await https://github.com/cloudfoundry/cloud_controller_ng/issues/856 for this test to work")
     @Test
     public void listServicesFilterByServiceBrokerId() {
         Mono

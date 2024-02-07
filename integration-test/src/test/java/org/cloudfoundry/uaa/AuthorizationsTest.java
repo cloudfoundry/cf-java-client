@@ -26,7 +26,7 @@ import org.cloudfoundry.uaa.authorizations.AuthorizeByOpenIdWithIdTokenRequest;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByOpenIdWithImplicitGrantRequest;
 import org.cloudfoundry.uaa.authorizations.GetOpenIdProviderConfigurationRequest;
 import org.cloudfoundry.uaa.authorizations.GetOpenIdProviderConfigurationResponse;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.test.StepVerifier;
 

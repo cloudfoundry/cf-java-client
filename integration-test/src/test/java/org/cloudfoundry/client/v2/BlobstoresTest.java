@@ -20,7 +20,7 @@ import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.blobstores.DeleteBlobstoreBuildpackCachesRequest;
 import org.cloudfoundry.util.JobUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.test.StepVerifier;
 

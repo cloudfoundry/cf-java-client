@@ -37,8 +37,8 @@ import org.cloudfoundry.client.v2.spaces.SpaceEntity;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -215,7 +215,7 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
     }
 
     //TODO: Await https://github.com/cloudfoundry/cf-java-client/issues/643
-    @Ignore("Await https://github.com/cloudfoundry/cf-java-client/issues/643")
+    @Disabled("Await https://github.com/cloudfoundry/cf-java-client/issues/643")
     @Test
     public void listSpacesFilterByDeveloperId() {
 

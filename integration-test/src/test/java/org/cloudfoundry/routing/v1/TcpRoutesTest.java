@@ -31,7 +31,7 @@ import org.cloudfoundry.routing.v1.tcproutes.ListTcpRoutesResponse;
 import org.cloudfoundry.routing.v1.tcproutes.TcpRoute;
 import org.cloudfoundry.routing.v1.tcproutes.TcpRouteConfiguration;
 import org.cloudfoundry.routing.v1.tcproutes.TcpRouteDeletion;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;

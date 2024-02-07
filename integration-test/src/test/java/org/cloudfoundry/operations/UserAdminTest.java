@@ -38,7 +38,7 @@ import org.cloudfoundry.operations.useradmin.UnsetOrganizationRoleRequest;
 import org.cloudfoundry.operations.useradmin.UnsetSpaceRoleRequest;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;

@@ -38,8 +38,8 @@ import org.cloudfoundry.uaa.tokens.RefreshTokenRequest;
 import org.cloudfoundry.uaa.tokens.RefreshTokenResponse;
 import org.cloudfoundry.uaa.tokens.TokenFormat;
 import org.cloudfoundry.uaa.tokens.TokenKey;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -119,7 +119,7 @@ public final class TokensTest extends AbstractIntegrationTest {
     }
 
     //TODO: Ready to Implement - Await https://github.com/cloudfoundry/cf-java-client/issues/862 to get passcode
-    @Ignore("Ready to Implement - Await https://github.com/cloudfoundry/cf-java-client/issues/862 to get passcode")
+    @Disabled("Ready to Implement - Await https://github.com/cloudfoundry/cf-java-client/issues/862 to get passcode")
     @Test
     public void getTokenByOneTimePasscode() {
         this.uaaClient.tokens()

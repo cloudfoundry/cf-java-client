@@ -32,7 +32,7 @@ import org.cloudfoundry.networking.v1.policies.Policy;
 import org.cloudfoundry.networking.v1.policies.Ports;
 import org.cloudfoundry.networking.v1.policies.Source;
 import org.cloudfoundry.util.ResourceUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;

@@ -17,17 +17,18 @@
 package org.cloudfoundry;
 
 import com.github.zafarkhaja.semver.Version;
-import org.junit.Assume;
-import org.junit.rules.MethodRule;
-import org.junit.runners.model.FrameworkMethod;
-import org.junit.runners.model.Statement;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.extension.ConditionEvaluationResult;
+import org.junit.jupiter.api.extension.ExecutionCondition;
+import org.junit.jupiter.api.extension.ExtensionContext;
 import org.springframework.core.annotation.AnnotationUtils;
 
+import java.lang.reflect.AnnotatedElement;
 import java.util.Optional;
 
 import static org.cloudfoundry.CloudFoundryVersion.UNSPECIFIED;
 
-final class CloudFoundryVersionConditionalRule implements MethodRule {
+final class CloudFoundryVersionConditionalRule implements ExecutionCondition {
 
     private final Version server;
 
@@ -36,23 +37,17 @@ final class CloudFoundryVersionConditionalRule implements MethodRule {
     }
 
     @Override
-    public Statement apply(Statement base, FrameworkMethod method, Object target) {
-        return new Statement() {
+    public ConditionEvaluationResult evaluateExecutionCondition(ExtensionContext context) {
+        AnnotatedElement element = context.getElement().orElse(null);
 
-            @Override
-            public void evaluate() throws Throwable {
-                IfCloudFoundryVersion annotation = Optional.ofNullable(AnnotationUtils.findAnnotation(method.getMethod(), IfCloudFoundryVersion.class))
-                    .orElse(AnnotationUtils.findAnnotation(method.getDeclaringClass(), IfCloudFoundryVersion.class));
+        IfCloudFoundryVersion annotation = AnnotationUtils.findAnnotation(element, IfCloudFoundryVersion.class);
 
-                boolean enabled = Optional.ofNullable(annotation)
+        boolean enabled = Optional.ofNullable(annotation)
                     .map(c -> isTestEnabled(c, CloudFoundryVersionConditionalRule.this.server))
                     .orElse(true);
 
-                Assume.assumeTrue(String.format("Cloud Foundry version required by @IfCloudFoundryVersion is not valid for test method [%s].", method.getMethod()), enabled);
-
-                base.evaluate();
-            }
-        };
+        return enabled ? ConditionEvaluationResult.enabled("Test enabled") : ConditionEvaluationResult.disabled(String.format("Cloud Foundry version required by @IfCloudFoundryVersion is not valid for test method [%s].", element));
+        
     }
 
     private static boolean isTestEnabled(IfCloudFoundryVersion condition, Version server) {

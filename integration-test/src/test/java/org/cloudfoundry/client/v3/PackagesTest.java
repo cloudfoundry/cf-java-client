@@ -26,8 +26,8 @@ import org.cloudfoundry.client.v3.packages.GetPackageRequest;
 import org.cloudfoundry.client.v3.packages.Package;
 import org.cloudfoundry.client.v3.packages.PackageType;
 import org.cloudfoundry.client.v3.packages.UploadPackageRequest;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import reactor.core.Exceptions;
@@ -41,7 +41,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.client.v3.packages.PackageState.PROCESSING_UPLOAD;
 import static org.cloudfoundry.client.v3.packages.PackageState.READY;
 
-@Ignore("Until Packages are no longer experimental")
+@Disabled("Until Packages are no longer experimental")
 public final class PackagesTest extends AbstractIntegrationTest {
 
     @Autowired
