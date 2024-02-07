@@ -25,7 +25,7 @@ import org.cloudfoundry.operations.organizationadmin.SetQuotaRequest;
 import org.cloudfoundry.operations.organizationadmin.UpdateQuotaRequest;
 import org.cloudfoundry.operations.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.operations.organizations.OrganizationInfoRequest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;

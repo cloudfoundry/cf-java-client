@@ -24,7 +24,7 @@ import org.cloudfoundry.operations.domains.Domain;
 import org.cloudfoundry.operations.domains.ShareDomainRequest;
 import org.cloudfoundry.operations.domains.UnshareDomainRequest;
 import org.cloudfoundry.operations.organizations.CreateOrganizationRequest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
