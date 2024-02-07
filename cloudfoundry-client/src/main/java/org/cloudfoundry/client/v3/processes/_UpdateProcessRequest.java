@@ -44,6 +44,13 @@ abstract class _UpdateProcessRequest {
     abstract HealthCheck getHealthCheck();
 
     /**
+     * The readiness health check
+     */
+    @JsonProperty("readiness_health_check")
+    @Nullable
+    abstract ReadinessHealthCheck getReadinessHealthCheck();
+
+    /**
      * The process id
      */
     @JsonIgnore

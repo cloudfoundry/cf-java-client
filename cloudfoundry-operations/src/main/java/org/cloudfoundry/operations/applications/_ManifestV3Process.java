@@ -19,6 +19,7 @@ package org.cloudfoundry.operations.applications;
 
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.processes.HealthCheckType;
+import org.cloudfoundry.client.v3.processes.ReadinessHealthCheckType;
 import org.immutables.value.Value;
 
 @Value.Immutable
@@ -53,6 +54,30 @@ abstract class _ManifestV3Process {
      */
     @Nullable
     abstract HealthCheckType getHealthCheckType();
+
+    /**
+     * Type of rediness health check to perform
+     */
+    @Nullable
+    abstract ReadinessHealthCheckType getReadinessHealthCheckType();
+
+    /**
+     * The HTTP rediness health check endpoint
+     */
+    @Nullable
+    abstract String getReadinessHealthCheckHttpEndpoint();
+
+    /**
+     * The timeout in seconds for individual rediness health check requests for http and port health checks
+     */
+    @Nullable
+    abstract Integer getReadinessHealthCheckInvocationTimeout();
+
+    /**
+     * The timeout in seconds for individual rediness health check requests for http and port health checks
+     */
+    @Nullable
+    abstract Integer getReadinessHealthCheckInterval();
 
     /**
      * The number of instances of this process
