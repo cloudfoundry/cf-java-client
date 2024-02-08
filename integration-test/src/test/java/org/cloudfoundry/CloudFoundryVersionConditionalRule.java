@@ -17,7 +17,6 @@
 package org.cloudfoundry;
 
 import com.github.zafarkhaja.semver.Version;
-import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.extension.ConditionEvaluationResult;
 import org.junit.jupiter.api.extension.ExecutionCondition;
 import org.junit.jupiter.api.extension.ExtensionContext;
