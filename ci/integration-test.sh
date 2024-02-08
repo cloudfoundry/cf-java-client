@@ -35,4 +35,4 @@ TEST_ADMIN_CLIENTSECRET=$(jq -n -r --argjson credentials "${UAA_CREDS}" '$creden
 export TEST_ADMIN_CLIENTSECRET
 
 cd cf-java-client
-./mvnw -q -P integration-test test
+./mvnw -P integration-test test
