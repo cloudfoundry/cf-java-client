@@ -14,13 +14,17 @@
 
 package org.cloudfoundry.client.v3.securitygroups;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import org.junit.jupiter.api.Test;
 
 public class GetSecurityGroupRequestTest {
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void noSecurityGroupId() {
-        GetSecurityGroupRequest.builder().build();
+        assertThrows(IllegalStateException.class, () -> {
+            GetSecurityGroupRequest.builder().build();
+        });
     }
 
     @Test

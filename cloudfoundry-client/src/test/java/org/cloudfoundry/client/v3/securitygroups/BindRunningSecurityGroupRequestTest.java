@@ -13,14 +13,18 @@
  */
 package org.cloudfoundry.client.v3.securitygroups;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.cloudfoundry.client.v3.Relationship;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class BindRunningSecurityGroupRequestTest {
 
-        @Test(expected = IllegalStateException.class)
+        @Test
         public void noSecurityGroupId() {
+            assertThrows(IllegalStateException.class, () -> {
                 BindRunningSecurityGroupRequest.builder().build();
+            });
         }
 
         @Test

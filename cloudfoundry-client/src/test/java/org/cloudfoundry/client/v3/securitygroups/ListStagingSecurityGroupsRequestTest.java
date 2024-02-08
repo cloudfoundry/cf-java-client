@@ -13,13 +13,17 @@
  */
 package org.cloudfoundry.client.v3.securitygroups;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import org.junit.jupiter.api.Test;
 
 public class ListStagingSecurityGroupsRequestTest {
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void noSpaceID() {
-        ListStagingSecurityGroupsRequest.builder().build();
+        assertThrows(IllegalStateException.class, () -> {
+            ListStagingSecurityGroupsRequest.builder().build();
+        });
     }
 
     @Test

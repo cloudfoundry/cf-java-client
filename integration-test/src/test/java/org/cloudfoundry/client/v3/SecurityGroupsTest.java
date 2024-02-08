@@ -34,8 +34,8 @@ import org.cloudfoundry.client.v3.securitygroups.ListSecurityGroupsRequest;
 import org.cloudfoundry.client.v3.securitygroups.ListRunningSecurityGroupsRequest;
 import org.cloudfoundry.client.v3.securitygroups.ListStagingSecurityGroupsRequest;
 
-import org.junit.Test;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -55,7 +55,7 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
         private Mono<CreateSecurityGroupResponse> securityGroup;
         private String securityGroupName;
 
-        @Before
+        @BeforeEach
         public void setup() {
                 this.securityGroupName = this.nameFactory.getSecurityGroupName();
 
@@ -203,7 +203,7 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
         }
 
         @Test
-        public void unbindRunnungSecurityGroup() {
+        public void unbindRunningSecurityGroup() {
                 Mono.zip(this.securityGroup, this.spaceId).flatMap(v -> this.cloudFoundryClient
                                 .securityGroupsV3()
                                 .bindRunningSecurityGroup(BindRunningSecurityGroupRequest.builder()

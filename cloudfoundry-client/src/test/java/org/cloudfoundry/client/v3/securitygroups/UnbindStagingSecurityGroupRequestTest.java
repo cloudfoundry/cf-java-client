@@ -13,19 +13,25 @@
  */
 package org.cloudfoundry.client.v3.securitygroups;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import org.junit.jupiter.api.Test;
 
 public class UnbindStagingSecurityGroupRequestTest {
 
-        @Test(expected = IllegalStateException.class)
+        @Test
         public void noSecurityGroupId() {
+            assertThrows(IllegalStateException.class, () -> {
                 UnbindStagingSecurityGroupRequest.builder().build();
+            });
         }
 
-        @Test(expected = IllegalStateException.class)
+        @Test
         public void noSpaceId() {
+            assertThrows(IllegalStateException.class, () -> {
                 UnbindStagingSecurityGroupRequest.builder()
-                                .securityGroupId("b85a788e-671f-4549-814d-e34cdb2f539a").build();
+                        .securityGroupId("b85a788e-671f-4549-814d-e34cdb2f539a").build();
+            });
         }
 
         @Test

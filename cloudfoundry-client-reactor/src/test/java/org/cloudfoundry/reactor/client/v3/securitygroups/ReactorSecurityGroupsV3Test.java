@@ -46,7 +46,7 @@ import org.cloudfoundry.client.v3.securitygroups.UpdateSecurityGroupResponse;
 import org.cloudfoundry.client.v3.securitygroups.GetSecurityGroupResponse;
 import org.cloudfoundry.client.v3.ToManyRelationship;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.Relationship;
