@@ -97,6 +97,7 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
                 this.securityGroup
                                 .flatMap(securityGroup -> this.cloudFoundryClient.securityGroupsV3()
                                                 .update(UpdateSecurityGroupRequest.builder()
+                                                        .globallyEnabled(GloballyEnabled.builder().build())
                                                                 .securityGroupId(securityGroup
                                                                                 .getId())
                                                                 .name(newSecurityGroupName)
