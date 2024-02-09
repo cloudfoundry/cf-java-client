@@ -19,27 +19,35 @@ import org.junit.jupiter.api.Test;
 
 public class UpdateSecurityGroupRequestTest {
 
-        @Test
-        public void noName() {
-            assertThrows(IllegalStateException.class, () -> {
-                UpdateSecurityGroupRequest.builder().build();
-            });
-        }
+    @Test
+    public void noName() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    UpdateSecurityGroupRequest.builder().build();
+                });
+    }
 
-        @Test
-        public void valid() {
-                UpdateSecurityGroupRequest.builder().name("my-group0")
-                                .securityGroupId("b85a788e-671f-4549-814d-e34cdb2f539a")
-                                .globallyEnabled(GloballyEnabled.builder().running(true).build())
-                                .rules(Rule.builder().protocol(Protocol.TCP)
-                                                .destination("10.10.10.0/24").ports("443,80,8080")
-                                                .build())
-                                .rules(Rule.builder().protocol(Protocol.ICMP)
-                                                .destination("10.10.10.0/24")
-                                                .description("Allow ping requests to private services")
-                                                .type(8).code(0).build())
-                                .build();
-
-        }
-
+    @Test
+    public void valid() {
+        UpdateSecurityGroupRequest.builder()
+                .name("my-group0")
+                .securityGroupId("b85a788e-671f-4549-814d-e34cdb2f539a")
+                .globallyEnabled(GloballyEnabled.builder().running(true).build())
+                .rules(
+                        Rule.builder()
+                                .protocol(Protocol.TCP)
+                                .destination("10.10.10.0/24")
+                                .ports("443,80,8080")
+                                .build())
+                .rules(
+                        Rule.builder()
+                                .protocol(Protocol.ICMP)
+                                .destination("10.10.10.0/24")
+                                .description("Allow ping requests to private services")
+                                .type(8)
+                                .code(0)
+                                .build())
+                .build();
+    }
 }

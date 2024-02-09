@@ -16,6 +16,16 @@
 
 package org.cloudfoundry.operations;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.cloudfoundry.operations.routes.Level.ORGANIZATION;
+import static org.cloudfoundry.operations.routes.Level.SPACE;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.time.Duration;
+import java.util.Collections;
+import java.util.Optional;
+import java.util.function.Predicate;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.operations.applications.ApplicationHealthCheck;
 import org.cloudfoundry.operations.applications.PushApplicationRequest;
@@ -38,29 +48,15 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.time.Duration;
-import java.util.Collections;
-import java.util.Optional;
-import java.util.function.Predicate;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.cloudfoundry.operations.routes.Level.ORGANIZATION;
-import static org.cloudfoundry.operations.routes.Level.SPACE;
-
 public final class RoutesTest extends AbstractIntegrationTest {
 
     private static final String DEFAULT_ROUTER_GROUP = "default-tcp";
 
-    @Autowired
-    private CloudFoundryOperations cloudFoundryOperations;
+    @Autowired private CloudFoundryOperations cloudFoundryOperations;
 
-    @Autowired
-    private String organizationName;
+    @Autowired private String organizationName;
 
-    @Autowired
-    private String spaceName;
+    @Autowired private String spaceName;
 
     @Test
     public void checkFalse() {
@@ -68,16 +64,13 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String host = this.nameFactory.getHostName();
         String path = this.nameFactory.getPath();
 
-        this.cloudFoundryOperations.routes()
-            .check(CheckRouteRequest.builder()
-                .domain(domainName)
-                .host(host)
-                .path(path)
-                .build())
-            .as(StepVerifier::create)
-            .expectNext(false)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        this.cloudFoundryOperations
+                .routes()
+                .check(CheckRouteRequest.builder().domain(domainName).host(host).path(path).build())
+                .as(StepVerifier::create)
+                .expectNext(false)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -86,16 +79,25 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String hostName = null;
         String path = this.nameFactory.getPath();
 
-        createDomainAndRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
-            .then(this.cloudFoundryOperations.routes()
-                .check(CheckRouteRequest.builder()
-                    .domain(domainName)
-                    .path(path)
-                    .build()))
-            .as(StepVerifier::create)
-            .expectNext(true)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        createDomainAndRoute(
+                        this.cloudFoundryOperations,
+                        this.organizationName,
+                        this.spaceName,
+                        domainName,
+                        hostName,
+                        path)
+                .then(
+                        this.cloudFoundryOperations
+                                .routes()
+                                .check(
+                                        CheckRouteRequest.builder()
+                                                .domain(domainName)
+                                                .path(path)
+                                                .build()))
+                .as(StepVerifier::create)
+                .expectNext(true)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -104,17 +106,21 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String hostName = this.nameFactory.getHostName();
         String path = this.nameFactory.getPath();
 
-        createSharedDomainAndRoute(this.cloudFoundryOperations, this.spaceName, domainName, hostName, path)
-            .then(this.cloudFoundryOperations.routes()
-                .check(CheckRouteRequest.builder()
-                    .domain(domainName)
-                    .host(hostName)
-                    .path(path)
-                    .build()))
-            .as(StepVerifier::create)
-            .expectNext(true)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        createSharedDomainAndRoute(
+                        this.cloudFoundryOperations, this.spaceName, domainName, hostName, path)
+                .then(
+                        this.cloudFoundryOperations
+                                .routes()
+                                .check(
+                                        CheckRouteRequest.builder()
+                                                .domain(domainName)
+                                                .host(hostName)
+                                                .path(path)
+                                                .build()))
+                .as(StepVerifier::create)
+                .expectNext(true)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -123,17 +129,26 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String hostName = this.nameFactory.getHostName();
         String path = this.nameFactory.getPath();
 
-        createDomainAndRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
-            .then(this.cloudFoundryOperations.routes()
-                .check(CheckRouteRequest.builder()
-                    .domain(domainName)
-                    .host(hostName)
-                    .path(path)
-                    .build()))
-            .as(StepVerifier::create)
-            .expectNext(true)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        createDomainAndRoute(
+                        this.cloudFoundryOperations,
+                        this.organizationName,
+                        this.spaceName,
+                        domainName,
+                        hostName,
+                        path)
+                .then(
+                        this.cloudFoundryOperations
+                                .routes()
+                                .check(
+                                        CheckRouteRequest.builder()
+                                                .domain(domainName)
+                                                .host(hostName)
+                                                .path(path)
+                                                .build()))
+                .as(StepVerifier::create)
+                .expectNext(true)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -142,13 +157,15 @@ public final class RoutesTest extends AbstractIntegrationTest {
         Integer port = this.nameFactory.getPort();
 
         requestCreateSharedDomain(this.cloudFoundryOperations, domainName, DEFAULT_ROUTER_GROUP)
-            .then(requestCreateRoute(this.cloudFoundryOperations, this.spaceName, domainName, port))
-            .thenMany(requestListRoutes(this.cloudFoundryOperations))
-            .filter(response -> domainName.equals(response.getDomain()))
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .then(
+                        requestCreateRoute(
+                                this.cloudFoundryOperations, this.spaceName, domainName, port))
+                .thenMany(requestListRoutes(this.cloudFoundryOperations))
+                .filter(response -> domainName.equals(response.getDomain()))
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -156,13 +173,15 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
 
         requestCreateSharedDomain(this.cloudFoundryOperations, domainName, DEFAULT_ROUTER_GROUP)
-            .then(requestCreateRoute(this.cloudFoundryOperations, this.spaceName, domainName, true))
-            .thenMany(requestListRoutes(this.cloudFoundryOperations))
-            .filter(response -> domainName.equals(response.getDomain()))
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .then(
+                        requestCreateRoute(
+                                this.cloudFoundryOperations, this.spaceName, domainName, true))
+                .thenMany(requestListRoutes(this.cloudFoundryOperations))
+                .filter(response -> domainName.equals(response.getDomain()))
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -171,16 +190,22 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String hostName = this.nameFactory.getHostName();
         String path = this.nameFactory.getPath();
 
-        this.cloudFoundryOperations.routes()
-            .create(CreateRouteRequest.builder()
-                .domain(domainName)
-                .host(hostName)
-                .path(path)
-                .space(this.spaceName)
-                .build())
-            .as(StepVerifier::create)
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Domain %s does not exist", domainName))
-            .verify(Duration.ofMinutes(5));
+        this.cloudFoundryOperations
+                .routes()
+                .create(
+                        CreateRouteRequest.builder()
+                                .domain(domainName)
+                                .host(hostName)
+                                .path(path)
+                                .space(this.spaceName)
+                                .build())
+                .as(StepVerifier::create)
+                .consumeErrorWith(
+                        t ->
+                                assertThat(t)
+                                        .isInstanceOf(IllegalArgumentException.class)
+                                        .hasMessage("Domain %s does not exist", domainName))
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -189,23 +214,35 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String hostName = this.nameFactory.getHostName();
         String path = this.nameFactory.getPath();
 
-        createDomainAndRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
-            .then(this.cloudFoundryOperations.routes()
-                .delete(DeleteRouteRequest.builder()
-                    .domain(domainName)
-                    .host(hostName)
-                    .path(path)
-                    .build()))
-            .then(this.cloudFoundryOperations.routes()
-                .check(CheckRouteRequest.builder()
-                    .domain(domainName)
-                    .host(hostName)
-                    .path(path)
-                    .build()))
-            .as(StepVerifier::create)
-            .expectNext(false)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        createDomainAndRoute(
+                        this.cloudFoundryOperations,
+                        this.organizationName,
+                        this.spaceName,
+                        domainName,
+                        hostName,
+                        path)
+                .then(
+                        this.cloudFoundryOperations
+                                .routes()
+                                .delete(
+                                        DeleteRouteRequest.builder()
+                                                .domain(domainName)
+                                                .host(hostName)
+                                                .path(path)
+                                                .build()))
+                .then(
+                        this.cloudFoundryOperations
+                                .routes()
+                                .check(
+                                        CheckRouteRequest.builder()
+                                                .domain(domainName)
+                                                .host(hostName)
+                                                .path(path)
+                                                .build()))
+                .as(StepVerifier::create)
+                .expectNext(false)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -214,15 +251,21 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String hostName = this.nameFactory.getHostName();
         String path = this.nameFactory.getPath();
 
-        this.cloudFoundryOperations.routes()
-            .delete(DeleteRouteRequest.builder()
-                .domain(domainName)
-                .host(hostName)
-                .path(path)
-                .build())
-            .as(StepVerifier::create)
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Domain %s does not exist", domainName))
-            .verify(Duration.ofMinutes(5));
+        this.cloudFoundryOperations
+                .routes()
+                .delete(
+                        DeleteRouteRequest.builder()
+                                .domain(domainName)
+                                .host(hostName)
+                                .path(path)
+                                .build())
+                .as(StepVerifier::create)
+                .consumeErrorWith(
+                        t ->
+                                assertThat(t)
+                                        .isInstanceOf(IllegalArgumentException.class)
+                                        .hasMessage("Domain %s does not exist", domainName))
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -231,20 +274,31 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String hostName = this.nameFactory.getHostName();
         String path = this.nameFactory.getPath();
 
-        createDomainAndRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
-            .then(this.cloudFoundryOperations.routes()
-                .deleteOrphanedRoutes(DeleteOrphanedRoutesRequest.builder()
-                    .build()))
-            .then(this.cloudFoundryOperations.routes()
-                .check(CheckRouteRequest.builder()
-                    .domain(domainName)
-                    .host(hostName)
-                    .path(path)
-                    .build()))
-            .as(StepVerifier::create)
-            .expectNext(false)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        createDomainAndRoute(
+                        this.cloudFoundryOperations,
+                        this.organizationName,
+                        this.spaceName,
+                        domainName,
+                        hostName,
+                        path)
+                .then(
+                        this.cloudFoundryOperations
+                                .routes()
+                                .deleteOrphanedRoutes(
+                                        DeleteOrphanedRoutesRequest.builder().build()))
+                .then(
+                        this.cloudFoundryOperations
+                                .routes()
+                                .check(
+                                        CheckRouteRequest.builder()
+                                                .domain(domainName)
+                                                .host(hostName)
+                                                .path(path)
+                                                .build()))
+                .as(StepVerifier::create)
+                .expectNext(false)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -252,17 +306,23 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
 
         requestCreateSharedDomain(this.cloudFoundryOperations, domainName, DEFAULT_ROUTER_GROUP)
-            .then(requestCreateRoute(this.cloudFoundryOperations, this.spaceName, domainName, true))
-            .flatMap(port -> this.cloudFoundryOperations.routes()
-                .delete(DeleteRouteRequest.builder()
-                    .domain(domainName)
-                    .port(port)
-                    .build()))
-            .thenMany(requestListRoutes(this.cloudFoundryOperations))
-            .filter(response -> domainName.equals(response.getDomain()))
-            .as(StepVerifier::create)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .then(
+                        requestCreateRoute(
+                                this.cloudFoundryOperations, this.spaceName, domainName, true))
+                .flatMap(
+                        port ->
+                                this.cloudFoundryOperations
+                                        .routes()
+                                        .delete(
+                                                DeleteRouteRequest.builder()
+                                                        .domain(domainName)
+                                                        .port(port)
+                                                        .build()))
+                .thenMany(requestListRoutes(this.cloudFoundryOperations))
+                .filter(response -> domainName.equals(response.getDomain()))
+                .as(StepVerifier::create)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -271,16 +331,22 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String hostName = this.nameFactory.getHostName();
         String path = this.nameFactory.getPath();
 
-        createDomainAndRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
-            .thenMany(this.cloudFoundryOperations.routes()
-                .list(ListRoutesRequest.builder()
-                    .level(ORGANIZATION)
-                    .build()))
-            .filter(filterRoutes(domainName, hostName, path, null))
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        createDomainAndRoute(
+                        this.cloudFoundryOperations,
+                        this.organizationName,
+                        this.spaceName,
+                        domainName,
+                        hostName,
+                        path)
+                .thenMany(
+                        this.cloudFoundryOperations
+                                .routes()
+                                .list(ListRoutesRequest.builder().level(ORGANIZATION).build()))
+                .filter(filterRoutes(domainName, hostName, path, null))
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -290,19 +356,28 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String path = this.nameFactory.getPath();
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
-        createSharedDomainAndRoute(this.cloudFoundryOperations, this.spaceName, domainName, hostName, path)
-            .then(requestCreateUserProvidedServiceInstance(this.cloudFoundryOperations, serviceInstanceName))
-            .then(requestBindRouteServiceInstance(this.cloudFoundryOperations, domainName, hostName, path, serviceInstanceName))
-            .thenMany(this.cloudFoundryOperations.routes()
-                .list(ListRoutesRequest.builder()
-                    .level(SPACE)
-                    .build()))
-            .filter(filterRoutes(domainName, hostName, path, null))
-            .map(Route::getService)
-            .as(StepVerifier::create)
-            .expectNext(serviceInstanceName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        createSharedDomainAndRoute(
+                        this.cloudFoundryOperations, this.spaceName, domainName, hostName, path)
+                .then(
+                        requestCreateUserProvidedServiceInstance(
+                                this.cloudFoundryOperations, serviceInstanceName))
+                .then(
+                        requestBindRouteServiceInstance(
+                                this.cloudFoundryOperations,
+                                domainName,
+                                hostName,
+                                path,
+                                serviceInstanceName))
+                .thenMany(
+                        this.cloudFoundryOperations
+                                .routes()
+                                .list(ListRoutesRequest.builder().level(SPACE).build()))
+                .filter(filterRoutes(domainName, hostName, path, null))
+                .map(Route::getService)
+                .as(StepVerifier::create)
+                .expectNext(serviceInstanceName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -311,16 +386,22 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String hostName = this.nameFactory.getHostName();
         String path = this.nameFactory.getPath();
 
-        createDomainAndRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path)
-            .thenMany(this.cloudFoundryOperations.routes()
-                .list(ListRoutesRequest.builder()
-                    .level(SPACE)
-                    .build()))
-            .filter(filterRoutes(domainName, hostName, path, null))
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        createDomainAndRoute(
+                        this.cloudFoundryOperations,
+                        this.organizationName,
+                        this.spaceName,
+                        domainName,
+                        hostName,
+                        path)
+                .thenMany(
+                        this.cloudFoundryOperations
+                                .routes()
+                                .list(ListRoutesRequest.builder().level(SPACE).build()))
+                .filter(filterRoutes(domainName, hostName, path, null))
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -330,24 +411,35 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String hostName = this.nameFactory.getHostName();
         String path = this.nameFactory.getPath();
 
-        Mono
-            .when(
-                createDomainAndRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path),
-                requestCreateApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, true)
-            )
-            .then(this.cloudFoundryOperations.routes()
-                .map(MapRouteRequest.builder()
-                    .applicationName(applicationName)
-                    .domain(domainName)
-                    .host(hostName)
-                    .path(path)
-                    .build()))
-            .thenMany(requestListRoutes(this.cloudFoundryOperations))
-            .filter(filterRoutes(domainName, hostName, path, applicationName))
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        Mono.when(
+                        createDomainAndRoute(
+                                this.cloudFoundryOperations,
+                                this.organizationName,
+                                this.spaceName,
+                                domainName,
+                                hostName,
+                                path),
+                        requestCreateApplication(
+                                this.cloudFoundryOperations,
+                                new ClassPathResource("test-application.zip").getFile().toPath(),
+                                applicationName,
+                                true))
+                .then(
+                        this.cloudFoundryOperations
+                                .routes()
+                                .map(
+                                        MapRouteRequest.builder()
+                                                .applicationName(applicationName)
+                                                .domain(domainName)
+                                                .host(hostName)
+                                                .path(path)
+                                                .build()))
+                .thenMany(requestListRoutes(this.cloudFoundryOperations))
+                .filter(filterRoutes(domainName, hostName, path, applicationName))
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -357,24 +449,35 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String hostName = null;
         String path = this.nameFactory.getPath();
 
-        Mono
-            .when(
-                createDomainAndRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path),
-                requestCreateApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, true)
-            )
-            .then(this.cloudFoundryOperations.routes()
-                .map(MapRouteRequest.builder()
-                    .applicationName(applicationName)
-                    .domain(domainName)
-                    .host(hostName)
-                    .path(path)
-                    .build()))
-            .thenMany(requestListRoutes(this.cloudFoundryOperations))
-            .filter(filterRoutes(domainName, hostName, path, applicationName))
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        Mono.when(
+                        createDomainAndRoute(
+                                this.cloudFoundryOperations,
+                                this.organizationName,
+                                this.spaceName,
+                                domainName,
+                                hostName,
+                                path),
+                        requestCreateApplication(
+                                this.cloudFoundryOperations,
+                                new ClassPathResource("test-application.zip").getFile().toPath(),
+                                applicationName,
+                                true))
+                .then(
+                        this.cloudFoundryOperations
+                                .routes()
+                                .map(
+                                        MapRouteRequest.builder()
+                                                .applicationName(applicationName)
+                                                .domain(domainName)
+                                                .host(hostName)
+                                                .path(path)
+                                                .build()))
+                .thenMany(requestListRoutes(this.cloudFoundryOperations))
+                .filter(filterRoutes(domainName, hostName, path, applicationName))
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -384,24 +487,35 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String hostName = this.nameFactory.getHostName();
         String path = null;
 
-        Mono
-            .when(
-                createDomainAndRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path),
-                requestCreateApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, true)
-            )
-            .then(this.cloudFoundryOperations.routes()
-                .map(MapRouteRequest.builder()
-                    .applicationName(applicationName)
-                    .domain(domainName)
-                    .host(hostName)
-                    .path(path)
-                    .build()))
-            .thenMany(requestListRoutes(this.cloudFoundryOperations))
-            .filter(filterRoutes(domainName, hostName, path, applicationName))
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        Mono.when(
+                        createDomainAndRoute(
+                                this.cloudFoundryOperations,
+                                this.organizationName,
+                                this.spaceName,
+                                domainName,
+                                hostName,
+                                path),
+                        requestCreateApplication(
+                                this.cloudFoundryOperations,
+                                new ClassPathResource("test-application.zip").getFile().toPath(),
+                                applicationName,
+                                true))
+                .then(
+                        this.cloudFoundryOperations
+                                .routes()
+                                .map(
+                                        MapRouteRequest.builder()
+                                                .applicationName(applicationName)
+                                                .domain(domainName)
+                                                .host(hostName)
+                                                .path(path)
+                                                .build()))
+                .thenMany(requestListRoutes(this.cloudFoundryOperations))
+                .filter(filterRoutes(domainName, hostName, path, applicationName))
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -409,24 +523,30 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
-        Mono
-            .when(
-                createSharedDomainAndTcpRoute(this.cloudFoundryOperations, domainName, this.spaceName),
-                requestCreateApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, true)
-            )
-            .then(this.cloudFoundryOperations.routes()
-                .map(MapRouteRequest.builder()
-                    .applicationName(applicationName)
-                    .domain(domainName)
-                    .build()))
-            .thenMany(requestListRoutes(this.cloudFoundryOperations))
-            .filter(response -> domainName.equals(response.getDomain()))
-            .single()
-            .map(route -> route.getApplications().size())
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        Mono.when(
+                        createSharedDomainAndTcpRoute(
+                                this.cloudFoundryOperations, domainName, this.spaceName),
+                        requestCreateApplication(
+                                this.cloudFoundryOperations,
+                                new ClassPathResource("test-application.zip").getFile().toPath(),
+                                applicationName,
+                                true))
+                .then(
+                        this.cloudFoundryOperations
+                                .routes()
+                                .map(
+                                        MapRouteRequest.builder()
+                                                .applicationName(applicationName)
+                                                .domain(domainName)
+                                                .build()))
+                .thenMany(requestListRoutes(this.cloudFoundryOperations))
+                .filter(response -> domainName.equals(response.getDomain()))
+                .single()
+                .map(route -> route.getApplications().size())
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -434,29 +554,38 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
-        Mono
-            .when(
-                requestCreateSharedDomain(this.cloudFoundryOperations, domainName, DEFAULT_ROUTER_GROUP),
-                requestCreateApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, true)
-            )
-            .then(this.cloudFoundryOperations.routes()
-                .map(MapRouteRequest.builder()
-                    .applicationName(applicationName)
-                    .domain(domainName)
-                    .randomPort(true)
-                    .build()))
-            .then(this.cloudFoundryOperations.routes()
-                .map(MapRouteRequest.builder()
-                    .applicationName(applicationName)
-                    .domain(domainName)
-                    .randomPort(true)
-                    .build()))
-            .thenMany(requestListRoutes(this.cloudFoundryOperations))
-            .filter(response -> domainName.equals(response.getDomain()))
-            .as(StepVerifier::create)
-            .expectNextCount(2)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        Mono.when(
+                        requestCreateSharedDomain(
+                                this.cloudFoundryOperations, domainName, DEFAULT_ROUTER_GROUP),
+                        requestCreateApplication(
+                                this.cloudFoundryOperations,
+                                new ClassPathResource("test-application.zip").getFile().toPath(),
+                                applicationName,
+                                true))
+                .then(
+                        this.cloudFoundryOperations
+                                .routes()
+                                .map(
+                                        MapRouteRequest.builder()
+                                                .applicationName(applicationName)
+                                                .domain(domainName)
+                                                .randomPort(true)
+                                                .build()))
+                .then(
+                        this.cloudFoundryOperations
+                                .routes()
+                                .map(
+                                        MapRouteRequest.builder()
+                                                .applicationName(applicationName)
+                                                .domain(domainName)
+                                                .randomPort(true)
+                                                .build()))
+                .thenMany(requestListRoutes(this.cloudFoundryOperations))
+                .filter(response -> domainName.equals(response.getDomain()))
+                .as(StepVerifier::create)
+                .expectNextCount(2)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -466,24 +595,41 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String hostName = this.nameFactory.getHostName();
         String path = this.nameFactory.getPath();
 
-        Mono
-            .when(
-                createDomainAndRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path),
-                requestCreateApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, true)
-            )
-            .then(requestMapRoute(this.cloudFoundryOperations, applicationName, domainName, hostName, path))
-            .then(this.cloudFoundryOperations.routes()
-                .unmap(UnmapRouteRequest.builder()
-                    .applicationName(applicationName)
-                    .domain(domainName)
-                    .host(hostName)
-                    .path(path)
-                    .build()))
-            .thenMany(requestListRoutes(this.cloudFoundryOperations))
-            .filter(filterRoutes(domainName, hostName, path, applicationName))
-            .as(StepVerifier::create)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        Mono.when(
+                        createDomainAndRoute(
+                                this.cloudFoundryOperations,
+                                this.organizationName,
+                                this.spaceName,
+                                domainName,
+                                hostName,
+                                path),
+                        requestCreateApplication(
+                                this.cloudFoundryOperations,
+                                new ClassPathResource("test-application.zip").getFile().toPath(),
+                                applicationName,
+                                true))
+                .then(
+                        requestMapRoute(
+                                this.cloudFoundryOperations,
+                                applicationName,
+                                domainName,
+                                hostName,
+                                path))
+                .then(
+                        this.cloudFoundryOperations
+                                .routes()
+                                .unmap(
+                                        UnmapRouteRequest.builder()
+                                                .applicationName(applicationName)
+                                                .domain(domainName)
+                                                .host(hostName)
+                                                .path(path)
+                                                .build()))
+                .thenMany(requestListRoutes(this.cloudFoundryOperations))
+                .filter(filterRoutes(domainName, hostName, path, applicationName))
+                .as(StepVerifier::create)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -493,24 +639,41 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String hostName = this.nameFactory.getHostName();
         String path = null;
 
-        Mono
-            .when(
-                createDomainAndRoute(this.cloudFoundryOperations, this.organizationName, this.spaceName, domainName, hostName, path),
-                requestCreateApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, true)
-            )
-            .then(requestMapRoute(this.cloudFoundryOperations, applicationName, domainName, hostName, path))
-            .then(this.cloudFoundryOperations.routes()
-                .unmap(UnmapRouteRequest.builder()
-                    .applicationName(applicationName)
-                    .domain(domainName)
-                    .host(hostName)
-                    .path(path)
-                    .build()))
-            .thenMany(requestListRoutes(this.cloudFoundryOperations))
-            .filter(filterRoutes(domainName, hostName, path, applicationName))
-            .as(StepVerifier::create)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        Mono.when(
+                        createDomainAndRoute(
+                                this.cloudFoundryOperations,
+                                this.organizationName,
+                                this.spaceName,
+                                domainName,
+                                hostName,
+                                path),
+                        requestCreateApplication(
+                                this.cloudFoundryOperations,
+                                new ClassPathResource("test-application.zip").getFile().toPath(),
+                                applicationName,
+                                true))
+                .then(
+                        requestMapRoute(
+                                this.cloudFoundryOperations,
+                                applicationName,
+                                domainName,
+                                hostName,
+                                path))
+                .then(
+                        this.cloudFoundryOperations
+                                .routes()
+                                .unmap(
+                                        UnmapRouteRequest.builder()
+                                                .applicationName(applicationName)
+                                                .domain(domainName)
+                                                .host(hostName)
+                                                .path(path)
+                                                .build()))
+                .thenMany(requestListRoutes(this.cloudFoundryOperations))
+                .filter(filterRoutes(domainName, hostName, path, applicationName))
+                .as(StepVerifier::create)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -518,145 +681,236 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
-        requestCreateApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, true)
-            .then(createSharedDomainAndTcpRoute(this.cloudFoundryOperations, domainName, this.spaceName))
-            .flatMap(port -> requestMapRoute(this.cloudFoundryOperations, applicationName, domainName, port))
-            .flatMap(port -> this.cloudFoundryOperations.routes()
-                .unmap(UnmapRouteRequest.builder()
-                    .applicationName(applicationName)
-                    .domain(domainName)
-                    .port(port)
-                    .build()))
-            .thenMany(requestListRoutes(this.cloudFoundryOperations))
-            .filter(response -> domainName.equals(response.getDomain()))
-            .map(route -> route.getApplications().size())
-            .as(StepVerifier::create)
-            .expectNext(0)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        requestCreateApplication(
+                        this.cloudFoundryOperations,
+                        new ClassPathResource("test-application.zip").getFile().toPath(),
+                        applicationName,
+                        true)
+                .then(
+                        createSharedDomainAndTcpRoute(
+                                this.cloudFoundryOperations, domainName, this.spaceName))
+                .flatMap(
+                        port ->
+                                requestMapRoute(
+                                        this.cloudFoundryOperations,
+                                        applicationName,
+                                        domainName,
+                                        port))
+                .flatMap(
+                        port ->
+                                this.cloudFoundryOperations
+                                        .routes()
+                                        .unmap(
+                                                UnmapRouteRequest.builder()
+                                                        .applicationName(applicationName)
+                                                        .domain(domainName)
+                                                        .port(port)
+                                                        .build()))
+                .thenMany(requestListRoutes(this.cloudFoundryOperations))
+                .filter(response -> domainName.equals(response.getDomain()))
+                .map(route -> route.getApplications().size())
+                .as(StepVerifier::create)
+                .expectNext(0)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
-    private static Mono<Integer> createDomainAndRoute(CloudFoundryOperations cloudFoundryOperations, String organizationName, String spaceName, String domainName, String hostName, String path) {
+    private static Mono<Integer> createDomainAndRoute(
+            CloudFoundryOperations cloudFoundryOperations,
+            String organizationName,
+            String spaceName,
+            String domainName,
+            String hostName,
+            String path) {
         return requestCreateDomain(cloudFoundryOperations, organizationName, domainName)
-            .then(requestCreateRoute(cloudFoundryOperations, spaceName, domainName, hostName, path));
+                .then(
+                        requestCreateRoute(
+                                cloudFoundryOperations, spaceName, domainName, hostName, path));
     }
 
-    private static Mono<Integer> createSharedDomainAndRoute(CloudFoundryOperations cloudFoundryOperations, String spaceName, String domainName, String hostName, String path) {
+    private static Mono<Integer> createSharedDomainAndRoute(
+            CloudFoundryOperations cloudFoundryOperations,
+            String spaceName,
+            String domainName,
+            String hostName,
+            String path) {
         return requestCreateSharedDomain(cloudFoundryOperations, domainName, null)
-            .then(requestCreateRoute(cloudFoundryOperations, spaceName, domainName, hostName, path));
+                .then(
+                        requestCreateRoute(
+                                cloudFoundryOperations, spaceName, domainName, hostName, path));
     }
 
-    private static Mono<Integer> createSharedDomainAndTcpRoute(CloudFoundryOperations cloudFoundryOperations, String domainName, String spaceName) {
+    private static Mono<Integer> createSharedDomainAndTcpRoute(
+            CloudFoundryOperations cloudFoundryOperations, String domainName, String spaceName) {
         return requestCreateSharedDomain(cloudFoundryOperations, domainName, DEFAULT_ROUTER_GROUP)
-            .then(requestCreateRoute(cloudFoundryOperations, spaceName, domainName, true));
+                .then(requestCreateRoute(cloudFoundryOperations, spaceName, domainName, true));
     }
 
-    private static Predicate<Route> filterRoutes(String domainName, String host, String path, String applicationName) {
-        return route -> Optional.ofNullable(domainName).map(route.getDomain()::equals).orElse(true)
-            && Optional.ofNullable(host).map(route.getHost()::equals).orElse(true)
-            && Optional.ofNullable(applicationName).map(Collections::singletonList).map(route.getApplications()::equals).orElse(true)
-            && Optional.ofNullable(path).map(route.getPath()::equals).orElse(true);
+    private static Predicate<Route> filterRoutes(
+            String domainName, String host, String path, String applicationName) {
+        return route ->
+                Optional.ofNullable(domainName).map(route.getDomain()::equals).orElse(true)
+                        && Optional.ofNullable(host).map(route.getHost()::equals).orElse(true)
+                        && Optional.ofNullable(applicationName)
+                                .map(Collections::singletonList)
+                                .map(route.getApplications()::equals)
+                                .orElse(true)
+                        && Optional.ofNullable(path).map(route.getPath()::equals).orElse(true);
     }
 
-    private static Mono<Void> requestBindRouteServiceInstance(CloudFoundryOperations cloudFoundryOperations, String domainName, String hostName, String path, String serviceInstanceName) {
-        return cloudFoundryOperations.services()
-            .bindRoute(BindRouteServiceInstanceRequest.builder()
-                .domainName(domainName)
-                .hostname(hostName)
-                .path(path)
-                .serviceInstanceName(serviceInstanceName)
-                .build());
+    private static Mono<Void> requestBindRouteServiceInstance(
+            CloudFoundryOperations cloudFoundryOperations,
+            String domainName,
+            String hostName,
+            String path,
+            String serviceInstanceName) {
+        return cloudFoundryOperations
+                .services()
+                .bindRoute(
+                        BindRouteServiceInstanceRequest.builder()
+                                .domainName(domainName)
+                                .hostname(hostName)
+                                .path(path)
+                                .serviceInstanceName(serviceInstanceName)
+                                .build());
     }
 
-    private static Mono<Void> requestCreateApplication(CloudFoundryOperations cloudFoundryOperations, Path application, String name, Boolean noStart) {
-        return cloudFoundryOperations.applications()
-            .push(PushApplicationRequest.builder()
-                .path(application)
-                .healthCheckType(ApplicationHealthCheck.PORT)
-                .buildpack("staticfile_buildpack")
-                .diskQuota(512)
-                .memory(64)
-                .name(name)
-                .noStart(noStart)
-                .build());
+    private static Mono<Void> requestCreateApplication(
+            CloudFoundryOperations cloudFoundryOperations,
+            Path application,
+            String name,
+            Boolean noStart) {
+        return cloudFoundryOperations
+                .applications()
+                .push(
+                        PushApplicationRequest.builder()
+                                .path(application)
+                                .healthCheckType(ApplicationHealthCheck.PORT)
+                                .buildpack("staticfile_buildpack")
+                                .diskQuota(512)
+                                .memory(64)
+                                .name(name)
+                                .noStart(noStart)
+                                .build());
     }
 
-    private static Mono<Void> requestCreateDomain(CloudFoundryOperations cloudFoundryOperations, String organizationName, String domainName) {
-        return cloudFoundryOperations.domains()
-            .create(CreateDomainRequest.builder()
-                .domain(domainName)
-                .organization(organizationName)
-                .build());
+    private static Mono<Void> requestCreateDomain(
+            CloudFoundryOperations cloudFoundryOperations,
+            String organizationName,
+            String domainName) {
+        return cloudFoundryOperations
+                .domains()
+                .create(
+                        CreateDomainRequest.builder()
+                                .domain(domainName)
+                                .organization(organizationName)
+                                .build());
     }
 
-    private static Mono<Integer> requestCreateRoute(CloudFoundryOperations cloudFoundryOperations, String spaceName, String domainName, String hostName, String path) {
-        return cloudFoundryOperations.routes()
-            .create(CreateRouteRequest.builder()
-                .domain(domainName)
-                .host(hostName)
-                .path(path)
-                .space(spaceName)
-                .build());
+    private static Mono<Integer> requestCreateRoute(
+            CloudFoundryOperations cloudFoundryOperations,
+            String spaceName,
+            String domainName,
+            String hostName,
+            String path) {
+        return cloudFoundryOperations
+                .routes()
+                .create(
+                        CreateRouteRequest.builder()
+                                .domain(domainName)
+                                .host(hostName)
+                                .path(path)
+                                .space(spaceName)
+                                .build());
     }
 
-    private static Mono<Integer> requestCreateRoute(CloudFoundryOperations cloudFoundryOperations, String spaceName, String domainName, Integer port) {
-        return cloudFoundryOperations.routes()
-            .create(CreateRouteRequest.builder()
-                .domain(domainName)
-                .port(port)
-                .space(spaceName)
-                .build());
+    private static Mono<Integer> requestCreateRoute(
+            CloudFoundryOperations cloudFoundryOperations,
+            String spaceName,
+            String domainName,
+            Integer port) {
+        return cloudFoundryOperations
+                .routes()
+                .create(
+                        CreateRouteRequest.builder()
+                                .domain(domainName)
+                                .port(port)
+                                .space(spaceName)
+                                .build());
     }
 
-    private static Mono<Integer> requestCreateRoute(CloudFoundryOperations cloudFoundryOperations, String spaceName, String domainName, Boolean randomPort) {
-        return cloudFoundryOperations.routes()
-            .create(CreateRouteRequest.builder()
-                .domain(domainName)
-                .randomPort(randomPort)
-                .space(spaceName)
-                .build());
+    private static Mono<Integer> requestCreateRoute(
+            CloudFoundryOperations cloudFoundryOperations,
+            String spaceName,
+            String domainName,
+            Boolean randomPort) {
+        return cloudFoundryOperations
+                .routes()
+                .create(
+                        CreateRouteRequest.builder()
+                                .domain(domainName)
+                                .randomPort(randomPort)
+                                .space(spaceName)
+                                .build());
     }
 
-    private static Mono<Void> requestCreateSharedDomain(CloudFoundryOperations cloudFoundryOperations, String domainName, String routerGroup) {
-        return cloudFoundryOperations.domains()
-            .createShared(CreateSharedDomainRequest.builder()
-                .domain(domainName)
-                .routerGroup(routerGroup)
-                .build());
+    private static Mono<Void> requestCreateSharedDomain(
+            CloudFoundryOperations cloudFoundryOperations, String domainName, String routerGroup) {
+        return cloudFoundryOperations
+                .domains()
+                .createShared(
+                        CreateSharedDomainRequest.builder()
+                                .domain(domainName)
+                                .routerGroup(routerGroup)
+                                .build());
     }
 
-    private static Mono<Void> requestCreateUserProvidedServiceInstance(CloudFoundryOperations cloudFoundryOperations, String name) {
-        return cloudFoundryOperations.services()
-            .createUserProvidedInstance(CreateUserProvidedServiceInstanceRequest.builder()
-                .name(name)
-                .routeServiceUrl("https://test.route.service")
-                .build());
+    private static Mono<Void> requestCreateUserProvidedServiceInstance(
+            CloudFoundryOperations cloudFoundryOperations, String name) {
+        return cloudFoundryOperations
+                .services()
+                .createUserProvidedInstance(
+                        CreateUserProvidedServiceInstanceRequest.builder()
+                                .name(name)
+                                .routeServiceUrl("https://test.route.service")
+                                .build());
     }
 
     private static Flux<Route> requestListRoutes(CloudFoundryOperations cloudFoundryOperations) {
-        return cloudFoundryOperations.routes()
-            .list(ListRoutesRequest.builder()
-                .level(SPACE)
-                .build());
+        return cloudFoundryOperations
+                .routes()
+                .list(ListRoutesRequest.builder().level(SPACE).build());
     }
 
-    private static Mono<Integer> requestMapRoute(CloudFoundryOperations cloudFoundryOperations, String applicationName, String domainName, String hostName, String path) {
-        return cloudFoundryOperations.routes()
-            .map(MapRouteRequest.builder()
-                .applicationName(applicationName)
-                .domain(domainName)
-                .host(hostName)
-                .path(path)
-                .build());
+    private static Mono<Integer> requestMapRoute(
+            CloudFoundryOperations cloudFoundryOperations,
+            String applicationName,
+            String domainName,
+            String hostName,
+            String path) {
+        return cloudFoundryOperations
+                .routes()
+                .map(
+                        MapRouteRequest.builder()
+                                .applicationName(applicationName)
+                                .domain(domainName)
+                                .host(hostName)
+                                .path(path)
+                                .build());
     }
 
-    private static Mono<Integer> requestMapRoute(CloudFoundryOperations cloudFoundryOperations, String applicationName, String domainName, Integer port) {
-        return cloudFoundryOperations.routes()
-            .map(MapRouteRequest.builder()
-                .applicationName(applicationName)
-                .domain(domainName)
-                .port(port)
-                .build());
+    private static Mono<Integer> requestMapRoute(
+            CloudFoundryOperations cloudFoundryOperations,
+            String applicationName,
+            String domainName,
+            Integer port) {
+        return cloudFoundryOperations
+                .routes()
+                .map(
+                        MapRouteRequest.builder()
+                                .applicationName(applicationName)
+                                .domain(domainName)
+                                .port(port)
+                                .build());
     }
-
 }

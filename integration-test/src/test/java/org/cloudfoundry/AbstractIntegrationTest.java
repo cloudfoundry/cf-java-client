@@ -16,6 +16,17 @@
 
 package org.cloudfoundry;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Method;
+import java.util.Optional;
+import java.util.function.Consumer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInfo;
@@ -27,18 +38,6 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Method;
-import java.util.Optional;
-import java.util.function.Consumer;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
-
 @SpringJUnitConfig(classes = IntegrationTestConfiguration.class)
 public abstract class AbstractIntegrationTest {
 
@@ -46,11 +45,9 @@ public abstract class AbstractIntegrationTest {
 
     public String testName;
 
-    @Autowired
-    protected NameFactory nameFactory;
+    @Autowired protected NameFactory nameFactory;
 
-    @Autowired
-    @RegisterExtension
+    @Autowired @RegisterExtension
     public CloudFoundryVersionConditionalRule cloudFoundryVersionConditionalRule;
 
     @BeforeEach
@@ -68,7 +65,8 @@ public abstract class AbstractIntegrationTest {
     }
 
     protected static Mono<byte[]> getBytes(String path) {
-        try (InputStream in = new FileInputStream(new File("src/test/resources", path)); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+        try (InputStream in = new FileInputStream(new File("src/test/resources", path));
+                ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             byte[] buffer = new byte[8192];
             int len;
 
@@ -89,5 +87,4 @@ public abstract class AbstractIntegrationTest {
     private String getTestName() {
         return String.format("%s.%s", this.getClass().getSimpleName(), this.testName);
     }
-
 }

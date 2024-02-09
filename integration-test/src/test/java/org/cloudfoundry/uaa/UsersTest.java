@@ -16,6 +16,9 @@
 
 package org.cloudfoundry.uaa;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.time.Duration;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.CloudFoundryVersion;
 import org.cloudfoundry.IfCloudFoundryVersion;
@@ -49,61 +52,62 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.time.Duration;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 public final class UsersTest extends AbstractIntegrationTest {
 
-    @Autowired
-    private UaaClient uaaClient;
+    @Autowired private UaaClient uaaClient;
 
     @Test
     public void changePassword() {
         String userName = this.nameFactory.getUserName();
 
         requestCreateUser(this.uaaClient, userName)
-            .map(CreateUserResponse::getId)
-            .flatMap(userId -> this.uaaClient.users()
-                .changePassword(ChangeUserPasswordRequest.builder()
-                    .oldPassword("test-password")
-                    .password("test-new-password")
-                    .userId(userId)
-                    .build()))
-            .as(StepVerifier::create)
-            .consumeNextWith(response -> {
-                assertThat(response.getMessage()).isEqualTo("password updated");
-                assertThat(response.getStatus()).isEqualTo("ok");
-            })
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .map(CreateUserResponse::getId)
+                .flatMap(
+                        userId ->
+                                this.uaaClient
+                                        .users()
+                                        .changePassword(
+                                                ChangeUserPasswordRequest.builder()
+                                                        .oldPassword("test-password")
+                                                        .password("test-new-password")
+                                                        .userId(userId)
+                                                        .build()))
+                .as(StepVerifier::create)
+                .consumeNextWith(
+                        response -> {
+                            assertThat(response.getMessage()).isEqualTo("password updated");
+                            assertThat(response.getStatus()).isEqualTo("ok");
+                        })
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void create() {
         String userName = this.nameFactory.getUserName();
 
-        this.uaaClient.users()
-            .create(CreateUserRequest.builder()
-                .email(Email.builder()
-                    .value("test-email")
-                    .primary(true)
-                    .build())
-                .externalId("test-external-id")
-                .name(Name.builder()
-                    .familyName("test-family-name")
-                    .givenName("test-given-name")
-                    .build())
-                .password("test-password")
-                .userName(userName)
-                .build())
-            .as(StepVerifier::create)
-            .consumeNextWith(response -> {
-                assertThat(response.getExternalId()).isEqualTo("test-external-id");
-                assertThat(response.getUserName()).isEqualTo(userName);
-            })
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        this.uaaClient
+                .users()
+                .create(
+                        CreateUserRequest.builder()
+                                .email(Email.builder().value("test-email").primary(true).build())
+                                .externalId("test-external-id")
+                                .name(
+                                        Name.builder()
+                                                .familyName("test-family-name")
+                                                .givenName("test-given-name")
+                                                .build())
+                                .password("test-password")
+                                .userName(userName)
+                                .build())
+                .as(StepVerifier::create)
+                .consumeNextWith(
+                        response -> {
+                            assertThat(response.getExternalId()).isEqualTo("test-external-id");
+                            assertThat(response.getUserName()).isEqualTo(userName);
+                        })
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -111,17 +115,18 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userName = this.nameFactory.getUserName();
 
         createUserId(this.uaaClient, userName)
-            .flatMap(userId -> this.uaaClient.users()
-                .delete(DeleteUserRequest.builder()
-                    .userId(userId)
-                    .build()))
-            .map(DeleteUserResponse::getId)
-            .flatMap(userId -> requestListUsers(this.uaaClient, userId))
-            .map(ListUsersResponse::getTotalResults)
-            .as(StepVerifier::create)
-            .expectNext(0)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        userId ->
+                                this.uaaClient
+                                        .users()
+                                        .delete(DeleteUserRequest.builder().userId(userId).build()))
+                .map(DeleteUserResponse::getId)
+                .flatMap(userId -> requestListUsers(this.uaaClient, userId))
+                .map(ListUsersResponse::getTotalResults)
+                .as(StepVerifier::create)
+                .expectNext(0)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_10)
@@ -130,17 +135,19 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userName = this.nameFactory.getUserName();
 
         createUserId(this.uaaClient, userName)
-            .flatMap(userId -> this.uaaClient.users()
-                .expirePassword(ExpirePasswordRequest.builder()
-                    .passwordChangeRequired(true)
-                    .userId(userId)
-                    .build()))
-            .as(StepVerifier::create)
-            .expectNext(ExpirePasswordResponse.builder()
-                .passwordChangeRequired(true)
-                .build())
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        userId ->
+                                this.uaaClient
+                                        .users()
+                                        .expirePassword(
+                                                ExpirePasswordRequest.builder()
+                                                        .passwordChangeRequired(true)
+                                                        .userId(userId)
+                                                        .build()))
+                .as(StepVerifier::create)
+                .expectNext(ExpirePasswordResponse.builder().passwordChangeRequired(true).build())
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @IfCloudFoundryVersion(equalTo = CloudFoundryVersion.PCF_1_9)
@@ -149,16 +156,19 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userName = this.nameFactory.getUserName();
 
         createUserId(this.uaaClient, userName)
-            .flatMap(userId -> this.uaaClient.users()
-                .expirePassword(ExpirePasswordRequest.builder()
-                    .passwordChangeRequired(true)
-                    .userId(userId)
-                    .build()))
-            .as(StepVerifier::create)
-            .expectNext(ExpirePasswordResponse.builder()
-                .build())
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        userId ->
+                                this.uaaClient
+                                        .users()
+                                        .expirePassword(
+                                                ExpirePasswordRequest.builder()
+                                                        .passwordChangeRequired(true)
+                                                        .userId(userId)
+                                                        .build()))
+                .as(StepVerifier::create)
+                .expectNext(ExpirePasswordResponse.builder().build())
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -166,34 +176,41 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userName = this.nameFactory.getUserName();
 
         createUserId(this.uaaClient, userName)
-            .flatMap(userId -> this.uaaClient.users()
-                .getVerificationLink(GetUserVerificationLinkRequest.builder()
-                    .redirectUri("test-redirect-uri")
-                    .userId(userId)
-                    .build()))
-            .map(GetUserVerificationLinkResponse::getVerifyLink)
-            .as(StepVerifier::create)
-            .consumeNextWith(location -> assertThat(location).contains("/verify_user?code="))
-            .expectComplete();
+                .flatMap(
+                        userId ->
+                                this.uaaClient
+                                        .users()
+                                        .getVerificationLink(
+                                                GetUserVerificationLinkRequest.builder()
+                                                        .redirectUri("test-redirect-uri")
+                                                        .userId(userId)
+                                                        .build()))
+                .map(GetUserVerificationLinkResponse::getVerifyLink)
+                .as(StepVerifier::create)
+                .consumeNextWith(location -> assertThat(location).contains("/verify_user?code="))
+                .expectComplete();
     }
 
     @Test
     public void invite() {
-        this.uaaClient.users()
-            .invite(InviteUsersRequest.builder()
-                .email("test@email.address")
-                .redirectUri("test-redirect-uri")
-                .build())
-            .flatMapIterable(InviteUsersResponse::getNewInvites)
-            .single()
-            .as(StepVerifier::create)
-            .consumeNextWith(invite -> {
-                assertThat(invite.getEmail()).isEqualTo("test@email.address");
-                assertThat(invite.getErrorCode()).isNull();
-                assertThat(invite.getSuccess()).isTrue();
-            })
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        this.uaaClient
+                .users()
+                .invite(
+                        InviteUsersRequest.builder()
+                                .email("test@email.address")
+                                .redirectUri("test-redirect-uri")
+                                .build())
+                .flatMapIterable(InviteUsersResponse::getNewInvites)
+                .single()
+                .as(StepVerifier::create)
+                .consumeNextWith(
+                        invite -> {
+                            assertThat(invite.getEmail()).isEqualTo("test@email.address");
+                            assertThat(invite.getErrorCode()).isNull();
+                            assertThat(invite.getSuccess()).isTrue();
+                        })
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -201,16 +218,22 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userName = this.nameFactory.getUserName();
 
         createUserId(this.uaaClient, userName)
-            .flatMap(userId -> this.uaaClient.users()
-                .list(ListUsersRequest.builder()
-                    .filter(String.format("id eq \"%s\"", userId))
-                    .build()))
-            .flatMapIterable(ListUsersResponse::getResources)
-            .map(User::getUserName)
-            .as(StepVerifier::create)
-            .expectNext(userName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        userId ->
+                                this.uaaClient
+                                        .users()
+                                        .list(
+                                                ListUsersRequest.builder()
+                                                        .filter(
+                                                                String.format(
+                                                                        "id eq \"%s\"", userId))
+                                                        .build()))
+                .flatMapIterable(ListUsersResponse::getResources)
+                .map(User::getUserName)
+                .as(StepVerifier::create)
+                .expectNext(userName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -218,16 +241,22 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userName = this.nameFactory.getUserName();
 
         createUserId(this.uaaClient, userName)
-            .flatMap(userId -> this.uaaClient.users()
-                .lookup(LookupUserIdsRequest.builder()
-                    .filter(String.format("id eq \"%s\"", userId))
-                    .build()))
-            .flatMapIterable(LookupUserIdsResponse::getResources)
-            .map(UserId::getUserName)
-            .as(StepVerifier::create)
-            .expectNext(userName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        userId ->
+                                this.uaaClient
+                                        .users()
+                                        .lookup(
+                                                LookupUserIdsRequest.builder()
+                                                        .filter(
+                                                                String.format(
+                                                                        "id eq \"%s\"", userId))
+                                                        .build()))
+                .flatMapIterable(LookupUserIdsResponse::getResources)
+                .map(UserId::getUserName)
+                .as(StepVerifier::create)
+                .expectNext(userName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -235,38 +264,46 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userName = this.nameFactory.getUserName();
 
         createUserId(this.uaaClient, userName)
-            .flatMap(userId -> this.uaaClient.users()
-                .update(UpdateUserRequest.builder()
-                    .email(Email.builder()
-                        .value("test-email-2")
-                        .primary(true)
-                        .build())
-                    .id(userId)
-                    .name(Name.builder()
-                        .familyName("test-family-name")
-                        .givenName("test-given-name")
-                        .build())
-                    .userName(userName)
-                    .version("0")
-                    .build()))
-            .flatMapMany(response -> Flux.fromIterable(response.getEmail())
-                .map(Email::getValue))
-            .as(StepVerifier::create)
-            .expectNext("test-email-2")
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        userId ->
+                                this.uaaClient
+                                        .users()
+                                        .update(
+                                                UpdateUserRequest.builder()
+                                                        .email(
+                                                                Email.builder()
+                                                                        .value("test-email-2")
+                                                                        .primary(true)
+                                                                        .build())
+                                                        .id(userId)
+                                                        .name(
+                                                                Name.builder()
+                                                                        .familyName(
+                                                                                "test-family-name")
+                                                                        .givenName(
+                                                                                "test-given-name")
+                                                                        .build())
+                                                        .userName(userName)
+                                                        .version("0")
+                                                        .build()))
+                .flatMapMany(
+                        response -> Flux.fromIterable(response.getEmail()).map(Email::getValue))
+                .as(StepVerifier::create)
+                .expectNext("test-email-2")
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void userInfo() {
-        this.uaaClient.users()
-            .userInfo(UserInfoRequest.builder()
-                .build())
-            .map(UserInfoResponse::getName)
-            .as(StepVerifier::create)
-            .expectNext("Test User")
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        this.uaaClient
+                .users()
+                .userInfo(UserInfoRequest.builder().build())
+                .map(UserInfoResponse::getName)
+                .as(StepVerifier::create)
+                .expectNext("Test User")
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -274,44 +311,46 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userName = this.nameFactory.getUserName();
 
         createUserId(this.uaaClient, userName)
-            .flatMap(userId -> this.uaaClient.users()
-                .verify(VerifyUserRequest.builder()
-                    .userId(userId)
-                    .build()))
-            .map(VerifyUserResponse::getUserName)
-            .as(StepVerifier::create)
-            .expectNext(userName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        userId ->
+                                this.uaaClient
+                                        .users()
+                                        .verify(VerifyUserRequest.builder().userId(userId).build()))
+                .map(VerifyUserResponse::getUserName)
+                .as(StepVerifier::create)
+                .expectNext(userName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     private static Mono<String> createUserId(UaaClient uaaClient, String userName) {
-        return requestCreateUser(uaaClient, userName)
-            .map(CreateUserResponse::getId);
+        return requestCreateUser(uaaClient, userName).map(CreateUserResponse::getId);
     }
 
-    private static Mono<CreateUserResponse> requestCreateUser(UaaClient uaaClient, String userName) {
-        return uaaClient.users()
-            .create(CreateUserRequest.builder()
-                .email(Email.builder()
-                    .value("test-email")
-                    .primary(true)
-                    .build())
-                .name(Name.builder()
-                    .familyName("test-family-name")
-                    .givenName("test-given-name")
-                    .build())
-                .password("test-password")
-                .verified(false)
-                .userName(userName)
-                .build());
+    private static Mono<CreateUserResponse> requestCreateUser(
+            UaaClient uaaClient, String userName) {
+        return uaaClient
+                .users()
+                .create(
+                        CreateUserRequest.builder()
+                                .email(Email.builder().value("test-email").primary(true).build())
+                                .name(
+                                        Name.builder()
+                                                .familyName("test-family-name")
+                                                .givenName("test-given-name")
+                                                .build())
+                                .password("test-password")
+                                .verified(false)
+                                .userName(userName)
+                                .build());
     }
 
     private static Mono<ListUsersResponse> requestListUsers(UaaClient uaaClient, String userId) {
-        return uaaClient.users()
-            .list(ListUsersRequest.builder()
-                .filter(String.format("id eq \"%s\"", userId))
-                .build());
+        return uaaClient
+                .users()
+                .list(
+                        ListUsersRequest.builder()
+                                .filter(String.format("id eq \"%s\"", userId))
+                                .build());
     }
-
 }

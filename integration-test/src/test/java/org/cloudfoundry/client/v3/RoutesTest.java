@@ -16,6 +16,11 @@
 
 package org.cloudfoundry.client.v3;
 
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
+
+import java.time.Duration;
+import java.util.Collections;
+import java.util.List;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.CloudFoundryVersion;
 import org.cloudfoundry.IfCloudFoundryVersion;
@@ -54,22 +59,13 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.time.Duration;
-import java.util.Collections;
-import java.util.List;
-
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
-
 public final class RoutesTest extends AbstractIntegrationTest {
 
-    @Autowired
-    private CloudFoundryClient cloudFoundryClient;
+    @Autowired private CloudFoundryClient cloudFoundryClient;
 
-    @Autowired
-    private Mono<String> organizationId;
+    @Autowired private Mono<String> organizationId;
 
-    @Autowired
-    private Mono<String> spaceId;
+    @Autowired private Mono<String> spaceId;
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
     @Test
@@ -77,37 +73,59 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
-            .flatMap(organizationId -> Mono.zip(
-                createDomainId(this.cloudFoundryClient, domainName, organizationId),
-                this.spaceId
-            ))
-            .flatMap(function((domainId, spaceId) ->
-                this.cloudFoundryClient.routesV3()
-                    .create(CreateRouteRequest.builder()
-                        .metadata(Metadata.builder()
-                            .label("test-create-key", "test-create-value")
-                            .build())
-                        .relationships(RouteRelationships.builder()
-                            .domain(ToOneRelationship.builder()
-                                .data(Relationship.builder()
-                                    .id(domainId)
-                                    .build())
-                                .build())
-                            .space(ToOneRelationship.builder()
-                                .data(Relationship.builder()
-                                    .id(spaceId)
-                                    .build())
-                                .build())
-                            .build())
-                        .build())
-                    .thenReturn(domainId)))
-            .flatMapMany(domainId -> requestListRoutes(this.cloudFoundryClient, domainId))
-            .map(RouteResource::getMetadata)
-            .map(Metadata::getLabels)
-            .as(StepVerifier::create)
-            .expectNext(Collections.singletonMap("test-create-key", "test-create-value"))
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                Mono.zip(
+                                        createDomainId(
+                                                this.cloudFoundryClient,
+                                                domainName,
+                                                organizationId),
+                                        this.spaceId))
+                .flatMap(
+                        function(
+                                (domainId, spaceId) ->
+                                        this.cloudFoundryClient
+                                                .routesV3()
+                                                .create(
+                                                        CreateRouteRequest.builder()
+                                                                .metadata(
+                                                                        Metadata.builder()
+                                                                                .label(
+                                                                                        "test-create-key",
+                                                                                        "test-create-value")
+                                                                                .build())
+                                                                .relationships(
+                                                                        RouteRelationships.builder()
+                                                                                .domain(
+                                                                                        ToOneRelationship
+                                                                                                .builder()
+                                                                                                .data(
+                                                                                                        Relationship
+                                                                                                                .builder()
+                                                                                                                .id(
+                                                                                                                        domainId)
+                                                                                                                .build())
+                                                                                                .build())
+                                                                                .space(
+                                                                                        ToOneRelationship
+                                                                                                .builder()
+                                                                                                .data(
+                                                                                                        Relationship
+                                                                                                                .builder()
+                                                                                                                .id(
+                                                                                                                        spaceId)
+                                                                                                                .build())
+                                                                                                .build())
+                                                                                .build())
+                                                                .build())
+                                                .thenReturn(domainId)))
+                .flatMapMany(domainId -> requestListRoutes(this.cloudFoundryClient, domainId))
+                .map(RouteResource::getMetadata)
+                .map(Metadata::getLabels)
+                .as(StepVerifier::create)
+                .expectNext(Collections.singletonMap("test-create-key", "test-create-value"))
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
@@ -116,22 +134,30 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
-            .flatMap(organizationId -> Mono.zip(
-                createDomainId(this.cloudFoundryClient, domainName, organizationId),
-                this.spaceId
-            ))
-            .flatMap(function((domainId, spaceId) -> createRouteId(this.cloudFoundryClient, domainId, "get", spaceId)))
-            .flatMapMany(routeId ->
-                this.cloudFoundryClient.routesV3()
-                    .get(GetRouteRequest.builder()
-                        .routeId(routeId)
-                        .build()))
-            .map(GetRouteResponse::getMetadata)
-            .map(Metadata::getLabels)
-            .as(StepVerifier::create)
-            .expectNext(Collections.singletonMap("test-get-key", "test-get-value"))
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                Mono.zip(
+                                        createDomainId(
+                                                this.cloudFoundryClient,
+                                                domainName,
+                                                organizationId),
+                                        this.spaceId))
+                .flatMap(
+                        function(
+                                (domainId, spaceId) ->
+                                        createRouteId(
+                                                this.cloudFoundryClient, domainId, "get", spaceId)))
+                .flatMapMany(
+                        routeId ->
+                                this.cloudFoundryClient
+                                        .routesV3()
+                                        .get(GetRouteRequest.builder().routeId(routeId).build()))
+                .map(GetRouteResponse::getMetadata)
+                .map(Metadata::getLabels)
+                .as(StepVerifier::create)
+                .expectNext(Collections.singletonMap("test-get-key", "test-get-value"))
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
@@ -142,33 +168,55 @@ public final class RoutesTest extends AbstractIntegrationTest {
         Integer port = this.nameFactory.getPort();
 
         this.organizationId
-            .flatMap(organizationId -> Mono.zip(
-                createDomainId(this.cloudFoundryClient, domainName, organizationId),
-                this.spaceId
-            ))
-            .flatMap(function((domainId, spaceId) -> Mono.zip(
-                createApplicationId(this.cloudFoundryClient, applicationName, spaceId),
-                Mono.just(domainId),
-                createRouteId(this.cloudFoundryClient, domainId, "insertDestinations", spaceId)
-            )))
-            .flatMapMany(function((applicationId, domainId, routeId) -> this.cloudFoundryClient.routesV3()
-                .insertDestinations(InsertRouteDestinationsRequest.builder()
-                    .destination(Destination.builder()
-                        .application(Application.builder()
-                            .applicationId(applicationId)
-                            .build())
-                        .port(port)
-                        .build())
-                    .routeId(routeId)
-                    .build())
-                .thenReturn(domainId)))
-            .flatMap(domainId -> requestListRoutes(this.cloudFoundryClient, domainId))
-            .flatMapIterable(RouteResource::getDestinations)
-            .map(Destination::getPort)
-            .as(StepVerifier::create)
-            .expectNext(port)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                Mono.zip(
+                                        createDomainId(
+                                                this.cloudFoundryClient,
+                                                domainName,
+                                                organizationId),
+                                        this.spaceId))
+                .flatMap(
+                        function(
+                                (domainId, spaceId) ->
+                                        Mono.zip(
+                                                createApplicationId(
+                                                        this.cloudFoundryClient,
+                                                        applicationName,
+                                                        spaceId),
+                                                Mono.just(domainId),
+                                                createRouteId(
+                                                        this.cloudFoundryClient,
+                                                        domainId,
+                                                        "insertDestinations",
+                                                        spaceId))))
+                .flatMapMany(
+                        function(
+                                (applicationId, domainId, routeId) ->
+                                        this.cloudFoundryClient
+                                                .routesV3()
+                                                .insertDestinations(
+                                                        InsertRouteDestinationsRequest.builder()
+                                                                .destination(
+                                                                        Destination.builder()
+                                                                                .application(
+                                                                                        Application
+                                                                                                .builder()
+                                                                                                .applicationId(
+                                                                                                        applicationId)
+                                                                                                .build())
+                                                                                .port(port)
+                                                                                .build())
+                                                                .routeId(routeId)
+                                                                .build())
+                                                .thenReturn(domainId)))
+                .flatMap(domainId -> requestListRoutes(this.cloudFoundryClient, domainId))
+                .flatMapIterable(RouteResource::getDestinations)
+                .map(Destination::getPort)
+                .as(StepVerifier::create)
+                .expectNext(port)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
@@ -177,26 +225,41 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
-            .flatMap(organizationId -> Mono.zip(
-                createDomainId(this.cloudFoundryClient, domainName, organizationId),
-                this.spaceId
-            ))
-            .flatMap(function((domainId, spaceId) -> createRouteId(this.cloudFoundryClient, domainId, "list", spaceId)))
-            .thenMany(PaginationUtils.requestClientV3Resources(page ->
-                this.cloudFoundryClient.routesV3()
-                    .list(ListRoutesRequest.builder()
-                        .page(page)
-                        .build())))
-            .filter(route -> route.getMetadata().getLabels().containsKey("test-list-key"))
-            .map(RouteResource::getMetadata)
-            .map(Metadata::getLabels)
-            .as(StepVerifier::create)
-            .expectNext(Collections.singletonMap("test-list-key", "test-list-value"))
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                Mono.zip(
+                                        createDomainId(
+                                                this.cloudFoundryClient,
+                                                domainName,
+                                                organizationId),
+                                        this.spaceId))
+                .flatMap(
+                        function(
+                                (domainId, spaceId) ->
+                                        createRouteId(
+                                                this.cloudFoundryClient,
+                                                domainId,
+                                                "list",
+                                                spaceId)))
+                .thenMany(
+                        PaginationUtils.requestClientV3Resources(
+                                page ->
+                                        this.cloudFoundryClient
+                                                .routesV3()
+                                                .list(
+                                                        ListRoutesRequest.builder()
+                                                                .page(page)
+                                                                .build())))
+                .filter(route -> route.getMetadata().getLabels().containsKey("test-list-key"))
+                .map(RouteResource::getMetadata)
+                .map(Metadata::getLabels)
+                .as(StepVerifier::create)
+                .expectNext(Collections.singletonMap("test-list-key", "test-list-value"))
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: Test has not been validated
+    // TODO: Test has not been validated
     @IfCloudFoundryVersion(greaterThan = CloudFoundryVersion.PCF_2_9)
     @Test
     public void listByApplicationId() {
@@ -204,28 +267,55 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
-            .flatMap(organizationId -> Mono.zip(
-                createDomainId(this.cloudFoundryClient, domainName, organizationId),
-                this.spaceId
-            ))
-            .flatMap(function((domainId, spaceId) -> Mono.zip(
-                createApplicationId(this.cloudFoundryClient, applicationName, spaceId),
-                createRouteId(this.cloudFoundryClient, domainId, "listByApplicationId", spaceId)
-            )))
-            .flatMapMany(function((applicationId, routeId) -> requestReplaceDestinations(this.cloudFoundryClient, applicationId, routeId)
-                .thenReturn(applicationId)))
-            .flatMap(applicationId -> PaginationUtils.requestClientV3Resources(page ->
-                this.cloudFoundryClient.routesV3()
-                    .list(ListRoutesRequest.builder()
-                        .applicationId(applicationId)
-                        .page(page)
-                        .build())))
-            .map(RouteResource::getMetadata)
-            .map(Metadata::getLabels)
-            .as(StepVerifier::create)
-            .expectNext(Collections.singletonMap("test-listByApplicationId-key", "test-listByApplicationId-value"))
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                Mono.zip(
+                                        createDomainId(
+                                                this.cloudFoundryClient,
+                                                domainName,
+                                                organizationId),
+                                        this.spaceId))
+                .flatMap(
+                        function(
+                                (domainId, spaceId) ->
+                                        Mono.zip(
+                                                createApplicationId(
+                                                        this.cloudFoundryClient,
+                                                        applicationName,
+                                                        spaceId),
+                                                createRouteId(
+                                                        this.cloudFoundryClient,
+                                                        domainId,
+                                                        "listByApplicationId",
+                                                        spaceId))))
+                .flatMapMany(
+                        function(
+                                (applicationId, routeId) ->
+                                        requestReplaceDestinations(
+                                                        this.cloudFoundryClient,
+                                                        applicationId,
+                                                        routeId)
+                                                .thenReturn(applicationId)))
+                .flatMap(
+                        applicationId ->
+                                PaginationUtils.requestClientV3Resources(
+                                        page ->
+                                                this.cloudFoundryClient
+                                                        .routesV3()
+                                                        .list(
+                                                                ListRoutesRequest.builder()
+                                                                        .applicationId(
+                                                                                applicationId)
+                                                                        .page(page)
+                                                                        .build())))
+                .map(RouteResource::getMetadata)
+                .map(Metadata::getLabels)
+                .as(StepVerifier::create)
+                .expectNext(
+                        Collections.singletonMap(
+                                "test-listByApplicationId-key", "test-listByApplicationId-value"))
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
@@ -234,24 +324,42 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
-            .flatMap(organizationId -> Mono.zip(
-                createDomainId(this.cloudFoundryClient, domainName, organizationId),
-                this.spaceId
-            ))
-            .flatMap(function((domainId, spaceId) -> requestCreateRoute(this.cloudFoundryClient, domainId, "listByDomain", spaceId)
-                .thenReturn(domainId)))
-            .flatMapMany(domainId -> PaginationUtils.requestClientV3Resources(page ->
-                this.cloudFoundryClient.routesV3()
-                    .list(ListRoutesRequest.builder()
-                        .domainId(domainId)
-                        .page(page)
-                        .build())))
-            .map(RouteResource::getMetadata)
-            .map(Metadata::getLabels)
-            .as(StepVerifier::create)
-            .expectNext(Collections.singletonMap("test-listByDomain-key", "test-listByDomain-value"))
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                Mono.zip(
+                                        createDomainId(
+                                                this.cloudFoundryClient,
+                                                domainName,
+                                                organizationId),
+                                        this.spaceId))
+                .flatMap(
+                        function(
+                                (domainId, spaceId) ->
+                                        requestCreateRoute(
+                                                        this.cloudFoundryClient,
+                                                        domainId,
+                                                        "listByDomain",
+                                                        spaceId)
+                                                .thenReturn(domainId)))
+                .flatMapMany(
+                        domainId ->
+                                PaginationUtils.requestClientV3Resources(
+                                        page ->
+                                                this.cloudFoundryClient
+                                                        .routesV3()
+                                                        .list(
+                                                                ListRoutesRequest.builder()
+                                                                        .domainId(domainId)
+                                                                        .page(page)
+                                                                        .build())))
+                .map(RouteResource::getMetadata)
+                .map(Metadata::getLabels)
+                .as(StepVerifier::create)
+                .expectNext(
+                        Collections.singletonMap(
+                                "test-listByDomain-key", "test-listByDomain-value"))
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
@@ -261,24 +369,43 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String hostName = this.nameFactory.getHostName();
 
         this.organizationId
-            .flatMap(organizationId -> Mono.zip(
-                createDomainId(this.cloudFoundryClient, domainName, organizationId),
-                this.spaceId
-            ))
-            .flatMap(function((domainId, spaceId) -> requestCreateRoute(this.cloudFoundryClient, domainId, hostName, "listByHost", null, null, spaceId)))
-            .thenMany(PaginationUtils.requestClientV3Resources(page ->
-                this.cloudFoundryClient.routesV3()
-                    .list(ListRoutesRequest.builder()
-                        .host(hostName)
-                        .page(page)
-                        .build())))
-            .filter(route -> route.getMetadata().getLabels().containsKey("test-listByHost-key"))
-            .map(RouteResource::getMetadata)
-            .map(Metadata::getLabels)
-            .as(StepVerifier::create)
-            .expectNext(Collections.singletonMap("test-listByHost-key", "test-listByHost-value"))
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                Mono.zip(
+                                        createDomainId(
+                                                this.cloudFoundryClient,
+                                                domainName,
+                                                organizationId),
+                                        this.spaceId))
+                .flatMap(
+                        function(
+                                (domainId, spaceId) ->
+                                        requestCreateRoute(
+                                                this.cloudFoundryClient,
+                                                domainId,
+                                                hostName,
+                                                "listByHost",
+                                                null,
+                                                null,
+                                                spaceId)))
+                .thenMany(
+                        PaginationUtils.requestClientV3Resources(
+                                page ->
+                                        this.cloudFoundryClient
+                                                .routesV3()
+                                                .list(
+                                                        ListRoutesRequest.builder()
+                                                                .host(hostName)
+                                                                .page(page)
+                                                                .build())))
+                .filter(route -> route.getMetadata().getLabels().containsKey("test-listByHost-key"))
+                .map(RouteResource::getMetadata)
+                .map(Metadata::getLabels)
+                .as(StepVerifier::create)
+                .expectNext(
+                        Collections.singletonMap("test-listByHost-key", "test-listByHost-value"))
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
@@ -288,24 +415,46 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
-            .flatMap(organizationId -> Mono.zip(
-                createDomainId(this.cloudFoundryClient, domainName, organizationId),
-                createSpaceId(this.cloudFoundryClient, organizationId, spaceName)
-            ))
-            .flatMap(function((domainId, spaceId) -> requestCreateRoute(this.cloudFoundryClient, domainId, "listByLabelSelector", spaceId)
-                .thenReturn(domainId)))
-            .flatMapMany(domainId -> PaginationUtils.requestClientV3Resources(page ->
-                this.cloudFoundryClient.routesV3()
-                    .list(ListRoutesRequest.builder()
-                        .labelSelector("test-listByLabelSelector-key=test-listByLabelSelector-value")
-                        .page(page)
-                        .build())))
-            .map(RouteResource::getMetadata)
-            .map(Metadata::getLabels)
-            .as(StepVerifier::create)
-            .expectNext(Collections.singletonMap("test-listByLabelSelector-key", "test-listByLabelSelector-value"))
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                Mono.zip(
+                                        createDomainId(
+                                                this.cloudFoundryClient,
+                                                domainName,
+                                                organizationId),
+                                        createSpaceId(
+                                                this.cloudFoundryClient,
+                                                organizationId,
+                                                spaceName)))
+                .flatMap(
+                        function(
+                                (domainId, spaceId) ->
+                                        requestCreateRoute(
+                                                        this.cloudFoundryClient,
+                                                        domainId,
+                                                        "listByLabelSelector",
+                                                        spaceId)
+                                                .thenReturn(domainId)))
+                .flatMapMany(
+                        domainId ->
+                                PaginationUtils.requestClientV3Resources(
+                                        page ->
+                                                this.cloudFoundryClient
+                                                        .routesV3()
+                                                        .list(
+                                                                ListRoutesRequest.builder()
+                                                                        .labelSelector(
+                                                                                "test-listByLabelSelector-key=test-listByLabelSelector-value")
+                                                                        .page(page)
+                                                                        .build())))
+                .map(RouteResource::getMetadata)
+                .map(Metadata::getLabels)
+                .as(StepVerifier::create)
+                .expectNext(
+                        Collections.singletonMap(
+                                "test-listByLabelSelector-key", "test-listByLabelSelector-value"))
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
@@ -316,25 +465,47 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .flatMap(organizationId -> Mono.zip(
-                createDomainId(this.cloudFoundryClient, domainName, organizationId),
-                Mono.just(organizationId),
-                createSpaceId(this.cloudFoundryClient, organizationId, spaceName)
-            ))
-            .flatMap(function((domainId, organizationId, spaceId) -> requestCreateRoute(this.cloudFoundryClient, domainId, "listByOrganizationId", spaceId)
-                .thenReturn(organizationId)))
-            .flatMapMany(organizationId -> PaginationUtils.requestClientV3Resources(page ->
-                this.cloudFoundryClient.routesV3()
-                    .list(ListRoutesRequest.builder()
-                        .organizationId(organizationId)
-                        .page(page)
-                        .build())))
-            .map(RouteResource::getMetadata)
-            .map(Metadata::getLabels)
-            .as(StepVerifier::create)
-            .expectNext(Collections.singletonMap("test-listByOrganizationId-key", "test-listByOrganizationId-value"))
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                Mono.zip(
+                                        createDomainId(
+                                                this.cloudFoundryClient,
+                                                domainName,
+                                                organizationId),
+                                        Mono.just(organizationId),
+                                        createSpaceId(
+                                                this.cloudFoundryClient,
+                                                organizationId,
+                                                spaceName)))
+                .flatMap(
+                        function(
+                                (domainId, organizationId, spaceId) ->
+                                        requestCreateRoute(
+                                                        this.cloudFoundryClient,
+                                                        domainId,
+                                                        "listByOrganizationId",
+                                                        spaceId)
+                                                .thenReturn(organizationId)))
+                .flatMapMany(
+                        organizationId ->
+                                PaginationUtils.requestClientV3Resources(
+                                        page ->
+                                                this.cloudFoundryClient
+                                                        .routesV3()
+                                                        .list(
+                                                                ListRoutesRequest.builder()
+                                                                        .organizationId(
+                                                                                organizationId)
+                                                                        .page(page)
+                                                                        .build())))
+                .map(RouteResource::getMetadata)
+                .map(Metadata::getLabels)
+                .as(StepVerifier::create)
+                .expectNext(
+                        Collections.singletonMap(
+                                "test-listByOrganizationId-key", "test-listByOrganizationId-value"))
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
@@ -344,24 +515,43 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String path = this.nameFactory.getPath();
 
         this.organizationId
-            .flatMap(organizationId -> Mono.zip(
-                createDomainId(this.cloudFoundryClient, domainName, organizationId),
-                this.spaceId
-            ))
-            .flatMap(function((domainId, spaceId) -> requestCreateRoute(this.cloudFoundryClient, domainId, null, "listByPath", path, null, spaceId)))
-            .thenMany(PaginationUtils.requestClientV3Resources(page ->
-                this.cloudFoundryClient.routesV3()
-                    .list(ListRoutesRequest.builder()
-                        .path(path)
-                        .page(page)
-                        .build())))
-            .filter(route -> route.getMetadata().getLabels().containsKey("test-listByPath-key"))
-            .map(RouteResource::getMetadata)
-            .map(Metadata::getLabels)
-            .as(StepVerifier::create)
-            .expectNext(Collections.singletonMap("test-listByPath-key", "test-listByPath-value"))
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                Mono.zip(
+                                        createDomainId(
+                                                this.cloudFoundryClient,
+                                                domainName,
+                                                organizationId),
+                                        this.spaceId))
+                .flatMap(
+                        function(
+                                (domainId, spaceId) ->
+                                        requestCreateRoute(
+                                                this.cloudFoundryClient,
+                                                domainId,
+                                                null,
+                                                "listByPath",
+                                                path,
+                                                null,
+                                                spaceId)))
+                .thenMany(
+                        PaginationUtils.requestClientV3Resources(
+                                page ->
+                                        this.cloudFoundryClient
+                                                .routesV3()
+                                                .list(
+                                                        ListRoutesRequest.builder()
+                                                                .path(path)
+                                                                .page(page)
+                                                                .build())))
+                .filter(route -> route.getMetadata().getLabels().containsKey("test-listByPath-key"))
+                .map(RouteResource::getMetadata)
+                .map(Metadata::getLabels)
+                .as(StepVerifier::create)
+                .expectNext(
+                        Collections.singletonMap("test-listByPath-key", "test-listByPath-value"))
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
@@ -371,25 +561,50 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String spaceName = this.nameFactory.getSpaceName();
 
         this.organizationId
-            .flatMap(organizationId -> Mono.zip(
-                createDomainId(this.cloudFoundryClient, domainName, organizationId),
-                createSpaceId(this.cloudFoundryClient, organizationId, spaceName)
-            ))
-            .flatMap(function((domainId, spaceId) -> createRouteId(this.cloudFoundryClient, domainId, "listBySpaceId", spaceId)
-                .thenReturn(spaceId)))
-            .flatMapMany(spaceId -> PaginationUtils.requestClientV3Resources(page ->
-                this.cloudFoundryClient.routesV3()
-                    .list(ListRoutesRequest.builder()
-                        .page(page)
-                        .spaceId(spaceId)
-                        .build())))
-            .filter(route -> route.getMetadata().getLabels().containsKey("test-listBySpaceId-key"))
-            .map(RouteResource::getMetadata)
-            .map(Metadata::getLabels)
-            .as(StepVerifier::create)
-            .expectNext(Collections.singletonMap("test-listBySpaceId-key", "test-listBySpaceId-value"))
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                Mono.zip(
+                                        createDomainId(
+                                                this.cloudFoundryClient,
+                                                domainName,
+                                                organizationId),
+                                        createSpaceId(
+                                                this.cloudFoundryClient,
+                                                organizationId,
+                                                spaceName)))
+                .flatMap(
+                        function(
+                                (domainId, spaceId) ->
+                                        createRouteId(
+                                                        this.cloudFoundryClient,
+                                                        domainId,
+                                                        "listBySpaceId",
+                                                        spaceId)
+                                                .thenReturn(spaceId)))
+                .flatMapMany(
+                        spaceId ->
+                                PaginationUtils.requestClientV3Resources(
+                                        page ->
+                                                this.cloudFoundryClient
+                                                        .routesV3()
+                                                        .list(
+                                                                ListRoutesRequest.builder()
+                                                                        .page(page)
+                                                                        .spaceId(spaceId)
+                                                                        .build())))
+                .filter(
+                        route ->
+                                route.getMetadata()
+                                        .getLabels()
+                                        .containsKey("test-listBySpaceId-key"))
+                .map(RouteResource::getMetadata)
+                .map(Metadata::getLabels)
+                .as(StepVerifier::create)
+                .expectNext(
+                        Collections.singletonMap(
+                                "test-listBySpaceId-key", "test-listBySpaceId-value"))
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
@@ -399,32 +614,60 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
-            .flatMap(organizationId -> Mono.zip(
-                createDomainId(this.cloudFoundryClient, domainName, organizationId),
-                this.spaceId
-            ))
-            .flatMap(function((domainId, spaceId) -> Mono.zip(
-                createApplicationId(this.cloudFoundryClient, applicationName, spaceId),
-                Mono.just(domainId),
-                createRouteId(this.cloudFoundryClient, domainId, "removeDestinations", spaceId)
-            )))
-            .flatMapMany(function((applicationId, domainId, routeId) -> Mono.zip(
-                Mono.just(applicationId),
-                createDestinationId(this.cloudFoundryClient, applicationId, routeId),
-                Mono.just(routeId)
-            )))
-            .flatMap(function((applicationId, ignore, routeId) -> Mono.zip(
-                Mono.just(applicationId),
-                this.cloudFoundryClient.routesV3()
-                    .listDestinations(ListRouteDestinationsRequest.builder()
-                        .routeId(routeId)
-                        .build())
-                    .map(response -> response.getDestinations().get(0).getApplication().getApplicationId()))
-            ))
-            .as(StepVerifier::create)
-            .consumeNextWith(tupleEquality())
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                Mono.zip(
+                                        createDomainId(
+                                                this.cloudFoundryClient,
+                                                domainName,
+                                                organizationId),
+                                        this.spaceId))
+                .flatMap(
+                        function(
+                                (domainId, spaceId) ->
+                                        Mono.zip(
+                                                createApplicationId(
+                                                        this.cloudFoundryClient,
+                                                        applicationName,
+                                                        spaceId),
+                                                Mono.just(domainId),
+                                                createRouteId(
+                                                        this.cloudFoundryClient,
+                                                        domainId,
+                                                        "removeDestinations",
+                                                        spaceId))))
+                .flatMapMany(
+                        function(
+                                (applicationId, domainId, routeId) ->
+                                        Mono.zip(
+                                                Mono.just(applicationId),
+                                                createDestinationId(
+                                                        this.cloudFoundryClient,
+                                                        applicationId,
+                                                        routeId),
+                                                Mono.just(routeId))))
+                .flatMap(
+                        function(
+                                (applicationId, ignore, routeId) ->
+                                        Mono.zip(
+                                                Mono.just(applicationId),
+                                                this.cloudFoundryClient
+                                                        .routesV3()
+                                                        .listDestinations(
+                                                                ListRouteDestinationsRequest
+                                                                        .builder()
+                                                                        .routeId(routeId)
+                                                                        .build())
+                                                        .map(
+                                                                response ->
+                                                                        response.getDestinations()
+                                                                                .get(0)
+                                                                                .getApplication()
+                                                                                .getApplicationId()))))
+                .as(StepVerifier::create)
+                .consumeNextWith(tupleEquality())
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
@@ -434,33 +677,61 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
-            .flatMap(organizationId -> Mono.zip(
-                createDomainId(this.cloudFoundryClient, domainName, organizationId),
-                this.spaceId
-            ))
-            .flatMap(function((domainId, spaceId) -> Mono.zip(
-                createApplicationId(this.cloudFoundryClient, applicationName, spaceId),
-                Mono.just(domainId),
-                createRouteId(this.cloudFoundryClient, domainId, "removeDestinations", spaceId)
-            )))
-            .flatMapMany(function((applicationId, domainId, routeId) -> Mono.zip(
-                Mono.just(applicationId),
-                createDestinationId(this.cloudFoundryClient, applicationId, routeId),
-                Mono.just(routeId)
-            )))
-            .flatMap(function((applicationId, destinationId, routeId) -> Mono.zip(
-                Mono.just(destinationId),
-                this.cloudFoundryClient.routesV3()
-                    .listDestinations(ListRouteDestinationsRequest.builder()
-                        .applicationId(applicationId)
-                        .routeId(routeId)
-                        .build())
-                    .map(response -> response.getDestinations().get(0).getDestinationId()))
-            ))
-            .as(StepVerifier::create)
-            .consumeNextWith(tupleEquality())
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                Mono.zip(
+                                        createDomainId(
+                                                this.cloudFoundryClient,
+                                                domainName,
+                                                organizationId),
+                                        this.spaceId))
+                .flatMap(
+                        function(
+                                (domainId, spaceId) ->
+                                        Mono.zip(
+                                                createApplicationId(
+                                                        this.cloudFoundryClient,
+                                                        applicationName,
+                                                        spaceId),
+                                                Mono.just(domainId),
+                                                createRouteId(
+                                                        this.cloudFoundryClient,
+                                                        domainId,
+                                                        "removeDestinations",
+                                                        spaceId))))
+                .flatMapMany(
+                        function(
+                                (applicationId, domainId, routeId) ->
+                                        Mono.zip(
+                                                Mono.just(applicationId),
+                                                createDestinationId(
+                                                        this.cloudFoundryClient,
+                                                        applicationId,
+                                                        routeId),
+                                                Mono.just(routeId))))
+                .flatMap(
+                        function(
+                                (applicationId, destinationId, routeId) ->
+                                        Mono.zip(
+                                                Mono.just(destinationId),
+                                                this.cloudFoundryClient
+                                                        .routesV3()
+                                                        .listDestinations(
+                                                                ListRouteDestinationsRequest
+                                                                        .builder()
+                                                                        .applicationId(
+                                                                                applicationId)
+                                                                        .routeId(routeId)
+                                                                        .build())
+                                                        .map(
+                                                                response ->
+                                                                        response.getDestinations()
+                                                                                .get(0)
+                                                                                .getDestinationId()))))
+                .as(StepVerifier::create)
+                .consumeNextWith(tupleEquality())
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
@@ -470,33 +741,62 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
-            .flatMap(organizationId -> Mono.zip(
-                createDomainId(this.cloudFoundryClient, domainName, organizationId),
-                this.spaceId
-            ))
-            .flatMap(function((domainId, spaceId) -> Mono.zip(
-                createApplicationId(this.cloudFoundryClient, applicationName, spaceId),
-                Mono.just(domainId),
-                createRouteId(this.cloudFoundryClient, domainId, "removeDestinations", spaceId)
-            )))
-            .flatMapMany(function((applicationId, domainId, routeId) -> Mono.zip(
-                Mono.just(applicationId),
-                createDestinationId(this.cloudFoundryClient, applicationId, routeId),
-                Mono.just(routeId)
-            )))
-            .flatMap(function((applicationId, destinationId, routeId) -> Mono.zip(
-                Mono.just(applicationId),
-                this.cloudFoundryClient.routesV3()
-                    .listDestinations(ListRouteDestinationsRequest.builder()
-                        .destinationId(destinationId)
-                        .routeId(routeId)
-                        .build())
-                    .map(response -> response.getDestinations().get(0).getApplication().getApplicationId()))
-            ))
-            .as(StepVerifier::create)
-            .consumeNextWith(tupleEquality())
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                Mono.zip(
+                                        createDomainId(
+                                                this.cloudFoundryClient,
+                                                domainName,
+                                                organizationId),
+                                        this.spaceId))
+                .flatMap(
+                        function(
+                                (domainId, spaceId) ->
+                                        Mono.zip(
+                                                createApplicationId(
+                                                        this.cloudFoundryClient,
+                                                        applicationName,
+                                                        spaceId),
+                                                Mono.just(domainId),
+                                                createRouteId(
+                                                        this.cloudFoundryClient,
+                                                        domainId,
+                                                        "removeDestinations",
+                                                        spaceId))))
+                .flatMapMany(
+                        function(
+                                (applicationId, domainId, routeId) ->
+                                        Mono.zip(
+                                                Mono.just(applicationId),
+                                                createDestinationId(
+                                                        this.cloudFoundryClient,
+                                                        applicationId,
+                                                        routeId),
+                                                Mono.just(routeId))))
+                .flatMap(
+                        function(
+                                (applicationId, destinationId, routeId) ->
+                                        Mono.zip(
+                                                Mono.just(applicationId),
+                                                this.cloudFoundryClient
+                                                        .routesV3()
+                                                        .listDestinations(
+                                                                ListRouteDestinationsRequest
+                                                                        .builder()
+                                                                        .destinationId(
+                                                                                destinationId)
+                                                                        .routeId(routeId)
+                                                                        .build())
+                                                        .map(
+                                                                response ->
+                                                                        response.getDestinations()
+                                                                                .get(0)
+                                                                                .getApplication()
+                                                                                .getApplicationId()))))
+                .as(StepVerifier::create)
+                .consumeNextWith(tupleEquality())
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
@@ -506,31 +806,54 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
-            .flatMap(organizationId -> Mono.zip(
-                createDomainId(this.cloudFoundryClient, domainName, organizationId),
-                this.spaceId
-            ))
-            .flatMap(function((domainId, spaceId) -> Mono.zip(
-                createApplicationId(this.cloudFoundryClient, applicationName, spaceId),
-                Mono.just(domainId),
-                createRouteId(this.cloudFoundryClient, domainId, "removeDestinations", spaceId)
-            )))
-            .flatMapMany(function((applicationId, domainId, routeId) -> Mono.zip(
-                createDestinationId(this.cloudFoundryClient, applicationId, routeId),
-                Mono.just(routeId)
-            )))
-            .flatMap(function((destinationId, routeId) -> this.cloudFoundryClient.routesV3()
-                .removeDestinations(RemoveRouteDestinationsRequest.builder()
-                    .destinationId(destinationId)
-                    .routeId(routeId)
-                    .build())
-                .thenReturn(routeId)))
-            .flatMap(routeId -> getDestinations(this.cloudFoundryClient, routeId))
-            .map(List::size)
-            .as(StepVerifier::create)
-            .expectNext(0)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                Mono.zip(
+                                        createDomainId(
+                                                this.cloudFoundryClient,
+                                                domainName,
+                                                organizationId),
+                                        this.spaceId))
+                .flatMap(
+                        function(
+                                (domainId, spaceId) ->
+                                        Mono.zip(
+                                                createApplicationId(
+                                                        this.cloudFoundryClient,
+                                                        applicationName,
+                                                        spaceId),
+                                                Mono.just(domainId),
+                                                createRouteId(
+                                                        this.cloudFoundryClient,
+                                                        domainId,
+                                                        "removeDestinations",
+                                                        spaceId))))
+                .flatMapMany(
+                        function(
+                                (applicationId, domainId, routeId) ->
+                                        Mono.zip(
+                                                createDestinationId(
+                                                        this.cloudFoundryClient,
+                                                        applicationId,
+                                                        routeId),
+                                                Mono.just(routeId))))
+                .flatMap(
+                        function(
+                                (destinationId, routeId) ->
+                                        this.cloudFoundryClient
+                                                .routesV3()
+                                                .removeDestinations(
+                                                        RemoveRouteDestinationsRequest.builder()
+                                                                .destinationId(destinationId)
+                                                                .routeId(routeId)
+                                                                .build())
+                                                .thenReturn(routeId)))
+                .flatMap(routeId -> getDestinations(this.cloudFoundryClient, routeId))
+                .map(List::size)
+                .as(StepVerifier::create)
+                .expectNext(0)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
@@ -541,33 +864,55 @@ public final class RoutesTest extends AbstractIntegrationTest {
         Integer port = this.nameFactory.getPort();
 
         this.organizationId
-            .flatMap(organizationId -> Mono.zip(
-                createDomainId(this.cloudFoundryClient, domainName, organizationId),
-                this.spaceId
-            ))
-            .flatMap(function((domainId, spaceId) -> Mono.zip(
-                createApplicationId(this.cloudFoundryClient, applicationName, spaceId),
-                Mono.just(domainId),
-                createRouteId(this.cloudFoundryClient, domainId, "insertDestinations", spaceId)
-            )))
-            .flatMapMany(function((applicationId, domainId, routeId) -> this.cloudFoundryClient.routesV3()
-                .replaceDestinations(ReplaceRouteDestinationsRequest.builder()
-                    .destination(Destination.builder()
-                        .application(Application.builder()
-                            .applicationId(applicationId)
-                            .build())
-                        .port(port)
-                        .build())
-                    .routeId(routeId)
-                    .build())
-                .thenReturn(domainId)))
-            .flatMap(domainId -> requestListRoutes(this.cloudFoundryClient, domainId))
-            .flatMapIterable(RouteResource::getDestinations)
-            .map(Destination::getPort)
-            .as(StepVerifier::create)
-            .expectNext(port)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                Mono.zip(
+                                        createDomainId(
+                                                this.cloudFoundryClient,
+                                                domainName,
+                                                organizationId),
+                                        this.spaceId))
+                .flatMap(
+                        function(
+                                (domainId, spaceId) ->
+                                        Mono.zip(
+                                                createApplicationId(
+                                                        this.cloudFoundryClient,
+                                                        applicationName,
+                                                        spaceId),
+                                                Mono.just(domainId),
+                                                createRouteId(
+                                                        this.cloudFoundryClient,
+                                                        domainId,
+                                                        "insertDestinations",
+                                                        spaceId))))
+                .flatMapMany(
+                        function(
+                                (applicationId, domainId, routeId) ->
+                                        this.cloudFoundryClient
+                                                .routesV3()
+                                                .replaceDestinations(
+                                                        ReplaceRouteDestinationsRequest.builder()
+                                                                .destination(
+                                                                        Destination.builder()
+                                                                                .application(
+                                                                                        Application
+                                                                                                .builder()
+                                                                                                .applicationId(
+                                                                                                        applicationId)
+                                                                                                .build())
+                                                                                .port(port)
+                                                                                .build())
+                                                                .routeId(routeId)
+                                                                .build())
+                                                .thenReturn(domainId)))
+                .flatMap(domainId -> requestListRoutes(this.cloudFoundryClient, domainId))
+                .flatMapIterable(RouteResource::getDestinations)
+                .map(Destination::getPort)
+                .as(StepVerifier::create)
+                .expectNext(port)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
@@ -576,195 +921,266 @@ public final class RoutesTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
 
         this.organizationId
-            .flatMap(organizationId -> Mono.zip(
-                createDomainId(this.cloudFoundryClient, domainName, organizationId),
-                this.spaceId
-            ))
-            .flatMap(function((domainId, spaceId) -> Mono.zip(
-                Mono.just(domainId),
-                createRouteId(this.cloudFoundryClient, domainId, "update", spaceId))
-            ))
-            .delayUntil(function((domainId, routeId) ->
-                this.cloudFoundryClient.routesV3()
-                    .update(UpdateRouteRequest.builder()
-                        .routeId(routeId)
-                        .metadata(Metadata.builder()
-                            .label("test-update-key", "test-update-value")
-                            .build())
-                        .build())))
-            .flatMapMany(function((domainId, ignore) -> requestListRoutes(this.cloudFoundryClient, domainId)))
-            .map(RouteResource::getMetadata)
-            .map(Metadata::getLabels)
-            .as(StepVerifier::create)
-            .expectNext(Collections.singletonMap("test-update-key", "test-update-value"))
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                Mono.zip(
+                                        createDomainId(
+                                                this.cloudFoundryClient,
+                                                domainName,
+                                                organizationId),
+                                        this.spaceId))
+                .flatMap(
+                        function(
+                                (domainId, spaceId) ->
+                                        Mono.zip(
+                                                Mono.just(domainId),
+                                                createRouteId(
+                                                        this.cloudFoundryClient,
+                                                        domainId,
+                                                        "update",
+                                                        spaceId))))
+                .delayUntil(
+                        function(
+                                (domainId, routeId) ->
+                                        this.cloudFoundryClient
+                                                .routesV3()
+                                                .update(
+                                                        UpdateRouteRequest.builder()
+                                                                .routeId(routeId)
+                                                                .metadata(
+                                                                        Metadata.builder()
+                                                                                .label(
+                                                                                        "test-update-key",
+                                                                                        "test-update-value")
+                                                                                .build())
+                                                                .build())))
+                .flatMapMany(
+                        function(
+                                (domainId, ignore) ->
+                                        requestListRoutes(this.cloudFoundryClient, domainId)))
+                .map(RouteResource::getMetadata)
+                .map(Metadata::getLabels)
+                .as(StepVerifier::create)
+                .expectNext(Collections.singletonMap("test-update-key", "test-update-value"))
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
-    private static Mono<String> createApplicationId(CloudFoundryClient cloudFoundryClient, String applicationName, String spaceId) {
+    private static Mono<String> createApplicationId(
+            CloudFoundryClient cloudFoundryClient, String applicationName, String spaceId) {
         return requestCreateApplication(cloudFoundryClient, applicationName, spaceId)
-            .map(CreateApplicationResponse::getId);
+                .map(CreateApplicationResponse::getId);
     }
 
-    private static Mono<String> createDestinationId(CloudFoundryClient cloudFoundryClient, String applicationId, String routeId) {
+    private static Mono<String> createDestinationId(
+            CloudFoundryClient cloudFoundryClient, String applicationId, String routeId) {
         return requestReplaceDestinations(cloudFoundryClient, applicationId, routeId)
-            .flatMapIterable(ReplaceRouteDestinationsResponse::getDestinations)
-            .single()
-            .map(Destination::getDestinationId);
+                .flatMapIterable(ReplaceRouteDestinationsResponse::getDestinations)
+                .single()
+                .map(Destination::getDestinationId);
     }
 
-    private static Mono<String> createDomainId(CloudFoundryClient cloudFoundryClient, String domainName, String organizationId) {
+    private static Mono<String> createDomainId(
+            CloudFoundryClient cloudFoundryClient, String domainName, String organizationId) {
         return requestCreateDomain(cloudFoundryClient, domainName, organizationId)
-            .map(CreateDomainResponse::getId);
+                .map(CreateDomainResponse::getId);
     }
 
-    private static Mono<String> createOrganizationId(CloudFoundryClient cloudFoundryClient, String organizationName) {
+    private static Mono<String> createOrganizationId(
+            CloudFoundryClient cloudFoundryClient, String organizationName) {
         return requestCreateOrganization(cloudFoundryClient, organizationName)
-            .map(CreateOrganizationResponse::getId);
+                .map(CreateOrganizationResponse::getId);
     }
 
-    private static Mono<String> createRouteId(CloudFoundryClient cloudFoundryClient, String domainId, String label, String spaceId) {
+    private static Mono<String> createRouteId(
+            CloudFoundryClient cloudFoundryClient, String domainId, String label, String spaceId) {
         return requestCreateRoute(cloudFoundryClient, domainId, label, spaceId)
-            .map(CreateRouteResponse::getId);
+                .map(CreateRouteResponse::getId);
     }
 
-    private static Mono<List<Destination>> getDestinations(CloudFoundryClient cloudFoundryClient, String routeId) {
+    private static Mono<List<Destination>> getDestinations(
+            CloudFoundryClient cloudFoundryClient, String routeId) {
         return requestListDestinations(cloudFoundryClient, routeId)
-            .map(ListRouteDestinationsResponse::getDestinations);
+                .map(ListRouteDestinationsResponse::getDestinations);
     }
 
-    private static Mono<CreateApplicationResponse> requestCreateApplication(CloudFoundryClient cloudFoundryClient, String applicationName, String spaceId) {
-        return cloudFoundryClient.applicationsV3()
-            .create(CreateApplicationRequest.builder()
-                .name(applicationName)
-                .relationships(ApplicationRelationships.builder()
-                    .space(ToOneRelationship.builder()
-                        .data(Relationship.builder()
-                            .id(spaceId)
-                            .build())
-                        .build())
-                    .build())
-                .build());
+    private static Mono<CreateApplicationResponse> requestCreateApplication(
+            CloudFoundryClient cloudFoundryClient, String applicationName, String spaceId) {
+        return cloudFoundryClient
+                .applicationsV3()
+                .create(
+                        CreateApplicationRequest.builder()
+                                .name(applicationName)
+                                .relationships(
+                                        ApplicationRelationships.builder()
+                                                .space(
+                                                        ToOneRelationship.builder()
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id(spaceId)
+                                                                                .build())
+                                                                .build())
+                                                .build())
+                                .build());
     }
 
-    private static Mono<CreateDomainResponse> requestCreateDomain(CloudFoundryClient cloudFoundryClient, String domainName, String organizationId) {
-        return cloudFoundryClient.domainsV3()
-            .create(CreateDomainRequest.builder()
-                .internal(false)
-                .name(domainName)
-                .relationships(DomainRelationships.builder()
-                    .organization(ToOneRelationship.builder()
-                        .data(Relationship.builder()
-                            .id(organizationId)
-                            .build())
-                        .build())
-                    .build())
-                .build());
+    private static Mono<CreateDomainResponse> requestCreateDomain(
+            CloudFoundryClient cloudFoundryClient, String domainName, String organizationId) {
+        return cloudFoundryClient
+                .domainsV3()
+                .create(
+                        CreateDomainRequest.builder()
+                                .internal(false)
+                                .name(domainName)
+                                .relationships(
+                                        DomainRelationships.builder()
+                                                .organization(
+                                                        ToOneRelationship.builder()
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id(organizationId)
+                                                                                .build())
+                                                                .build())
+                                                .build())
+                                .build());
     }
 
-    private static Mono<CreateOrganizationResponse> requestCreateOrganization(CloudFoundryClient cloudFoundryClient, String organizationName) {
-        return cloudFoundryClient.organizationsV3()
-            .create(CreateOrganizationRequest.builder()
-                .name(organizationName)
-                .build());
+    private static Mono<CreateOrganizationResponse> requestCreateOrganization(
+            CloudFoundryClient cloudFoundryClient, String organizationName) {
+        return cloudFoundryClient
+                .organizationsV3()
+                .create(CreateOrganizationRequest.builder().name(organizationName).build());
     }
 
-    private static Mono<CreateRouteResponse> requestCreateRoute(CloudFoundryClient cloudFoundryClient, String domainId, String host, String label, String path, Integer port, String spaceId) {
+    private static Mono<CreateRouteResponse> requestCreateRoute(
+            CloudFoundryClient cloudFoundryClient,
+            String domainId,
+            String host,
+            String label,
+            String path,
+            Integer port,
+            String spaceId) {
         String key = String.format("test-%s-key", label);
         String value = String.format("test-%s-value", label);
 
-        return cloudFoundryClient.routesV3()
-            .create(CreateRouteRequest.builder()
-                .host(host)
-                .metadata(Metadata.builder()
-                    .label(key, value)
-                    .build())
-                .path(path)
-                .port(port)
-                .relationships(RouteRelationships.builder()
-                    .domain(ToOneRelationship.builder()
-                        .data(Relationship.builder()
-                            .id(domainId)
-                            .build())
-                        .build())
-                    .space(ToOneRelationship.builder()
-                        .data(Relationship.builder()
-                            .id(spaceId)
-                            .build())
-                        .build())
-                    .build())
-                .build());
+        return cloudFoundryClient
+                .routesV3()
+                .create(
+                        CreateRouteRequest.builder()
+                                .host(host)
+                                .metadata(Metadata.builder().label(key, value).build())
+                                .path(path)
+                                .port(port)
+                                .relationships(
+                                        RouteRelationships.builder()
+                                                .domain(
+                                                        ToOneRelationship.builder()
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id(domainId)
+                                                                                .build())
+                                                                .build())
+                                                .space(
+                                                        ToOneRelationship.builder()
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id(spaceId)
+                                                                                .build())
+                                                                .build())
+                                                .build())
+                                .build());
     }
 
-    private static Mono<CreateRouteResponse> requestCreateRoute(CloudFoundryClient cloudFoundryClient, String domainId, String label, String spaceId) {
+    private static Mono<CreateRouteResponse> requestCreateRoute(
+            CloudFoundryClient cloudFoundryClient, String domainId, String label, String spaceId) {
         String key = String.format("test-%s-key", label);
         String value = String.format("test-%s-value", label);
 
-        return cloudFoundryClient.routesV3()
-            .create(CreateRouteRequest.builder()
-                .metadata(Metadata.builder()
-                    .label(key, value)
-                    .build())
-                .relationships(RouteRelationships.builder()
-                    .domain(ToOneRelationship.builder()
-                        .data(Relationship.builder()
-                            .id(domainId)
-                            .build())
-                        .build())
-                    .space(ToOneRelationship.builder()
-                        .data(Relationship.builder()
-                            .id(spaceId)
-                            .build())
-                        .build())
-                    .build())
-                .build());
+        return cloudFoundryClient
+                .routesV3()
+                .create(
+                        CreateRouteRequest.builder()
+                                .metadata(Metadata.builder().label(key, value).build())
+                                .relationships(
+                                        RouteRelationships.builder()
+                                                .domain(
+                                                        ToOneRelationship.builder()
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id(domainId)
+                                                                                .build())
+                                                                .build())
+                                                .space(
+                                                        ToOneRelationship.builder()
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id(spaceId)
+                                                                                .build())
+                                                                .build())
+                                                .build())
+                                .build());
     }
 
-    private static Mono<CreateSpaceResponse> requestCreateSpace(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceName) {
-        return cloudFoundryClient.spacesV3()
-            .create(CreateSpaceRequest.builder()
-                .name(spaceName)
-                .relationships(SpaceRelationships.builder()
-                    .organization(ToOneRelationship.builder()
-                        .data(Relationship.builder()
-                            .id(organizationId)
-                            .build())
-                        .build())
-                    .build())
-                .build());
+    private static Mono<CreateSpaceResponse> requestCreateSpace(
+            CloudFoundryClient cloudFoundryClient, String organizationId, String spaceName) {
+        return cloudFoundryClient
+                .spacesV3()
+                .create(
+                        CreateSpaceRequest.builder()
+                                .name(spaceName)
+                                .relationships(
+                                        SpaceRelationships.builder()
+                                                .organization(
+                                                        ToOneRelationship.builder()
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id(organizationId)
+                                                                                .build())
+                                                                .build())
+                                                .build())
+                                .build());
     }
 
-    private static Mono<ListRouteDestinationsResponse> requestListDestinations(CloudFoundryClient cloudFoundryClient, String routeId) {
-        return cloudFoundryClient.routesV3()
-            .listDestinations(ListRouteDestinationsRequest.builder()
-                .routeId(routeId)
-                .build());
+    private static Mono<ListRouteDestinationsResponse> requestListDestinations(
+            CloudFoundryClient cloudFoundryClient, String routeId) {
+        return cloudFoundryClient
+                .routesV3()
+                .listDestinations(ListRouteDestinationsRequest.builder().routeId(routeId).build());
     }
 
-    private static Flux<RouteResource> requestListRoutes(CloudFoundryClient cloudFoundryClient, String domainId) {
-        return PaginationUtils.requestClientV3Resources(page ->
-            cloudFoundryClient.routesV3()
-                .list(ListRoutesRequest.builder()
-                    .domainId(domainId)
-                    .page(page)
-                    .build()));
+    private static Flux<RouteResource> requestListRoutes(
+            CloudFoundryClient cloudFoundryClient, String domainId) {
+        return PaginationUtils.requestClientV3Resources(
+                page ->
+                        cloudFoundryClient
+                                .routesV3()
+                                .list(
+                                        ListRoutesRequest.builder()
+                                                .domainId(domainId)
+                                                .page(page)
+                                                .build()));
     }
 
-    private static Mono<ReplaceRouteDestinationsResponse> requestReplaceDestinations(CloudFoundryClient cloudFoundryClient, String applicationId, String routeId) {
-        return cloudFoundryClient.routesV3()
-            .replaceDestinations(ReplaceRouteDestinationsRequest.builder()
-                .destination(Destination.builder()
-                    .application(Application.builder()
-                        .applicationId(applicationId)
-                        .build())
-                    .build())
-                .routeId(routeId)
-                .build());
+    private static Mono<ReplaceRouteDestinationsResponse> requestReplaceDestinations(
+            CloudFoundryClient cloudFoundryClient, String applicationId, String routeId) {
+        return cloudFoundryClient
+                .routesV3()
+                .replaceDestinations(
+                        ReplaceRouteDestinationsRequest.builder()
+                                .destination(
+                                        Destination.builder()
+                                                .application(
+                                                        Application.builder()
+                                                                .applicationId(applicationId)
+                                                                .build())
+                                                .build())
+                                .routeId(routeId)
+                                .build());
     }
 
-    private Mono<String> createSpaceId(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceName) {
+    private Mono<String> createSpaceId(
+            CloudFoundryClient cloudFoundryClient, String organizationId, String spaceName) {
         return requestCreateSpace(cloudFoundryClient, organizationId, spaceName)
-            .map(CreateSpaceResponse::getId);
+                .map(CreateSpaceResponse::getId);
     }
-
 }

@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.operations;
 
+import java.time.Duration;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.CloudFoundryVersion;
 import org.cloudfoundry.IfCloudFoundryVersion;
@@ -33,18 +34,13 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.time.Duration;
-
 public final class NetworkPoliciesTest extends AbstractIntegrationTest {
 
-    @Autowired
-    private CloudFoundryClient cloudFoundryClient;
+    @Autowired private CloudFoundryClient cloudFoundryClient;
 
-    @Autowired
-    private CloudFoundryOperations cloudFoundryOperations;
+    @Autowired private CloudFoundryOperations cloudFoundryOperations;
 
-    @Autowired
-    private Mono<String> spaceId;
+    @Autowired private Mono<String> spaceId;
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_12)
     @Test
@@ -54,22 +50,34 @@ public final class NetworkPoliciesTest extends AbstractIntegrationTest {
         Integer port = this.nameFactory.getPort();
 
         this.spaceId
-            .flatMapMany(spaceId -> Mono.zip(
-                createApplicationId(this.cloudFoundryClient, destinationApplicationName, spaceId),
-                createApplicationId(this.cloudFoundryClient, sourceApplicationName, spaceId)
-            ))
-            .thenMany(this.cloudFoundryOperations.networkPolicies()
-                .add(AddNetworkPolicyRequest.builder()
-                    .destination(destinationApplicationName)
-                    .source(sourceApplicationName)
-                    .startPort(port)
-                    .build()))
-            .thenMany(requestListNetworkPolicies(this.cloudFoundryOperations, sourceApplicationName))
-            .map(Policy::getDestination)
-            .as(StepVerifier::create)
-            .expectNext(destinationApplicationName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMapMany(
+                        spaceId ->
+                                Mono.zip(
+                                        createApplicationId(
+                                                this.cloudFoundryClient,
+                                                destinationApplicationName,
+                                                spaceId),
+                                        createApplicationId(
+                                                this.cloudFoundryClient,
+                                                sourceApplicationName,
+                                                spaceId)))
+                .thenMany(
+                        this.cloudFoundryOperations
+                                .networkPolicies()
+                                .add(
+                                        AddNetworkPolicyRequest.builder()
+                                                .destination(destinationApplicationName)
+                                                .source(sourceApplicationName)
+                                                .startPort(port)
+                                                .build()))
+                .thenMany(
+                        requestListNetworkPolicies(
+                                this.cloudFoundryOperations, sourceApplicationName))
+                .map(Policy::getDestination)
+                .as(StepVerifier::create)
+                .expectNext(destinationApplicationName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_12)
@@ -80,20 +88,35 @@ public final class NetworkPoliciesTest extends AbstractIntegrationTest {
         Integer port = this.nameFactory.getPort();
 
         this.spaceId
-            .flatMapMany(spaceId -> Mono.zip(
-                createApplicationId(this.cloudFoundryClient, destinationApplicationName, spaceId),
-                createApplicationId(this.cloudFoundryClient, sourceApplicationName, spaceId)
-            ))
-            .thenMany(requestAddNetworkPolicy(this.cloudFoundryOperations, destinationApplicationName, port, sourceApplicationName))
-            .thenMany(this.cloudFoundryOperations.networkPolicies()
-                .list(ListNetworkPoliciesRequest.builder()
-                    .source(sourceApplicationName)
-                    .build()))
-            .map(Policy::getStartPort)
-            .as(StepVerifier::create)
-            .expectNext(port)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMapMany(
+                        spaceId ->
+                                Mono.zip(
+                                        createApplicationId(
+                                                this.cloudFoundryClient,
+                                                destinationApplicationName,
+                                                spaceId),
+                                        createApplicationId(
+                                                this.cloudFoundryClient,
+                                                sourceApplicationName,
+                                                spaceId)))
+                .thenMany(
+                        requestAddNetworkPolicy(
+                                this.cloudFoundryOperations,
+                                destinationApplicationName,
+                                port,
+                                sourceApplicationName))
+                .thenMany(
+                        this.cloudFoundryOperations
+                                .networkPolicies()
+                                .list(
+                                        ListNetworkPoliciesRequest.builder()
+                                                .source(sourceApplicationName)
+                                                .build()))
+                .map(Policy::getStartPort)
+                .as(StepVerifier::create)
+                .expectNext(port)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_12)
@@ -104,56 +127,82 @@ public final class NetworkPoliciesTest extends AbstractIntegrationTest {
         Integer port = this.nameFactory.getPort();
 
         this.spaceId
-            .flatMapMany(spaceId -> Mono.zip(
-                createApplicationId(this.cloudFoundryClient, destinationApplicationName, spaceId),
-                createApplicationId(this.cloudFoundryClient, sourceApplicationName, spaceId)
-            ))
-            .thenMany(requestAddNetworkPolicy(this.cloudFoundryOperations, destinationApplicationName, port, sourceApplicationName))
-            .thenMany(this.cloudFoundryOperations.networkPolicies()
-                .remove(RemoveNetworkPolicyRequest.builder()
-                    .destination(destinationApplicationName)
-                    .source(sourceApplicationName)
-                    .startPort(port)
-                    .protocol("tcp")
-                    .build()))
-            .thenMany(requestListNetworkPolicies(this.cloudFoundryOperations, sourceApplicationName))
-            .map(Policy::getStartPort)
-            .as(StepVerifier::create)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMapMany(
+                        spaceId ->
+                                Mono.zip(
+                                        createApplicationId(
+                                                this.cloudFoundryClient,
+                                                destinationApplicationName,
+                                                spaceId),
+                                        createApplicationId(
+                                                this.cloudFoundryClient,
+                                                sourceApplicationName,
+                                                spaceId)))
+                .thenMany(
+                        requestAddNetworkPolicy(
+                                this.cloudFoundryOperations,
+                                destinationApplicationName,
+                                port,
+                                sourceApplicationName))
+                .thenMany(
+                        this.cloudFoundryOperations
+                                .networkPolicies()
+                                .remove(
+                                        RemoveNetworkPolicyRequest.builder()
+                                                .destination(destinationApplicationName)
+                                                .source(sourceApplicationName)
+                                                .startPort(port)
+                                                .protocol("tcp")
+                                                .build()))
+                .thenMany(
+                        requestListNetworkPolicies(
+                                this.cloudFoundryOperations, sourceApplicationName))
+                .map(Policy::getStartPort)
+                .as(StepVerifier::create)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
-    private static Mono<String> createApplicationId(CloudFoundryClient cloudFoundryClient, String applicationName, String spaceId) {
+    private static Mono<String> createApplicationId(
+            CloudFoundryClient cloudFoundryClient, String applicationName, String spaceId) {
         return requestCreateApplication(cloudFoundryClient, spaceId, applicationName)
-            .map(ResourceUtils::getId);
+                .map(ResourceUtils::getId);
     }
 
-    private static Flux<Void> requestAddNetworkPolicy(CloudFoundryOperations cloudFoundryOperations, String destinationApplicationName, Integer port, String sourceApplicationName) {
-        return cloudFoundryOperations.networkPolicies()
-            .add(AddNetworkPolicyRequest.builder()
-                .destination(destinationApplicationName)
-                .startPort(port)
-                .source(sourceApplicationName)
-                .build());
+    private static Flux<Void> requestAddNetworkPolicy(
+            CloudFoundryOperations cloudFoundryOperations,
+            String destinationApplicationName,
+            Integer port,
+            String sourceApplicationName) {
+        return cloudFoundryOperations
+                .networkPolicies()
+                .add(
+                        AddNetworkPolicyRequest.builder()
+                                .destination(destinationApplicationName)
+                                .startPort(port)
+                                .source(sourceApplicationName)
+                                .build());
     }
 
-    private static Mono<CreateApplicationResponse> requestCreateApplication(CloudFoundryClient cloudFoundryClient, String spaceId, String applicationName) {
-        return cloudFoundryClient.applicationsV2()
-            .create(CreateApplicationRequest.builder()
-                .buildpack("staticfile_buildpack")
-                .diego(true)
-                .diskQuota(512)
-                .memory(64)
-                .name(applicationName)
-                .spaceId(spaceId)
-                .build());
+    private static Mono<CreateApplicationResponse> requestCreateApplication(
+            CloudFoundryClient cloudFoundryClient, String spaceId, String applicationName) {
+        return cloudFoundryClient
+                .applicationsV2()
+                .create(
+                        CreateApplicationRequest.builder()
+                                .buildpack("staticfile_buildpack")
+                                .diego(true)
+                                .diskQuota(512)
+                                .memory(64)
+                                .name(applicationName)
+                                .spaceId(spaceId)
+                                .build());
     }
 
-    private static Flux<Policy> requestListNetworkPolicies(CloudFoundryOperations cloudFoundryOperations, String sourceApplicationName) {
-        return cloudFoundryOperations.networkPolicies()
-            .list(ListNetworkPoliciesRequest.builder()
-                .source(sourceApplicationName)
-                .build());
+    private static Flux<Policy> requestListNetworkPolicies(
+            CloudFoundryOperations cloudFoundryOperations, String sourceApplicationName) {
+        return cloudFoundryOperations
+                .networkPolicies()
+                .list(ListNetworkPoliciesRequest.builder().source(sourceApplicationName).build());
     }
-
 }

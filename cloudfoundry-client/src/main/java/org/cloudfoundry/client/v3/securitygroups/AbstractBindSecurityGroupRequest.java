@@ -14,11 +14,11 @@
 
 package org.cloudfoundry.client.v3.securitygroups;
 
-import java.util.List;
-import org.cloudfoundry.client.v3.Relationship;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import java.util.List;
+import org.cloudfoundry.client.v3.Relationship;
 
 @JsonSerialize
 public abstract class AbstractBindSecurityGroupRequest {

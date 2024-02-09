@@ -78,7 +78,8 @@ public interface SecurityGroupsV3 {
      * @param request the Bind Staging Security Group request
      * @return the response from the Bind Staging Security Group request
      */
-    Mono<BindStagingSecurityGroupResponse> bindStagingSecurityGroup(BindStagingSecurityGroupRequest request);
+    Mono<BindStagingSecurityGroupResponse> bindStagingSecurityGroup(
+            BindStagingSecurityGroupRequest request);
 
     /**
      * Makes the <a href=
@@ -88,7 +89,8 @@ public interface SecurityGroupsV3 {
      * @param request the Bind Running Security Group request
      * @return the response from the Bind Running Security Group request
      */
-    Mono<BindRunningSecurityGroupResponse> bindRunningSecurityGroup(BindRunningSecurityGroupRequest request);
+    Mono<BindRunningSecurityGroupResponse> bindRunningSecurityGroup(
+            BindRunningSecurityGroupRequest request);
 
     /**
      * Makes the <a href=

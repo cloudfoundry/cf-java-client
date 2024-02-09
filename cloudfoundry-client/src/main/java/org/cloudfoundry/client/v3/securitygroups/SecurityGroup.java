@@ -16,8 +16,8 @@ package org.cloudfoundry.client.v3.securitygroups;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.client.v3.Resource;
 import java.util.List;
+import org.cloudfoundry.client.v3.Resource;
 
 /**
  * The entity response payload for the Security Group resource
@@ -48,5 +48,4 @@ public abstract class SecurityGroup extends Resource {
      */
     @JsonProperty("relationships")
     abstract Relationships getRelationships();
-
 }

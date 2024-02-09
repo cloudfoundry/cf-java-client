@@ -21,5 +21,4 @@ public class ListSecurityGroupsRequestTest {
     public void valid() {
         ListSecurityGroupsRequest.builder().build();
     }
-
 }

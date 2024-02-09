@@ -16,13 +16,12 @@
 
 package org.cloudfoundry;
 
-import reactor.core.Exceptions;
-
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
+import reactor.core.Exceptions;
 
 final class RandomNameFactory implements NameFactory {
 
@@ -41,7 +40,11 @@ final class RandomNameFactory implements NameFactory {
     @Override
     public String getIpAddress() {
         try {
-            return InetAddress.getByName(String.format("169.254.%d.%d", 1 + this.random.nextInt(254), this.random.nextInt(256))).getHostAddress();
+            return InetAddress.getByName(
+                            String.format(
+                                    "169.254.%d.%d",
+                                    1 + this.random.nextInt(254), this.random.nextInt(256)))
+                    .getHostAddress();
         } catch (UnknownHostException e) {
             throw Exceptions.propagate(e);
         }
@@ -81,5 +84,4 @@ final class RandomNameFactory implements NameFactory {
     public boolean isPort(int candidate) {
         return candidate >= PORT_MINIMUM && candidate <= PORT_MAXIMUM;
     }
-
 }

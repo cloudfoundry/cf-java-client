@@ -20,18 +20,20 @@ import org.junit.jupiter.api.Test;
 
 public class BindRunningSecurityGroupRequestTest {
 
-        @Test
-        public void noSecurityGroupId() {
-            assertThrows(IllegalStateException.class, () -> {
-                BindRunningSecurityGroupRequest.builder().build();
-            });
-        }
+    @Test
+    public void noSecurityGroupId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    BindRunningSecurityGroupRequest.builder().build();
+                });
+    }
 
-        @Test
-        public void valid() {
-                BindRunningSecurityGroupRequest.builder()
-                                .securityGroupId("b85a788e-671f-4549-814d-e34cdb2f539a")
-                                .boundSpaces(Relationship.builder().id("space-guid-1").build())
-                                .build();
-        }
+    @Test
+    public void valid() {
+        BindRunningSecurityGroupRequest.builder()
+                .securityGroupId("b85a788e-671f-4549-814d-e34cdb2f539a")
+                .boundSpaces(Relationship.builder().id("space-guid-1").build())
+                .build();
+    }
 }

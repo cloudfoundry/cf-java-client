@@ -16,11 +16,17 @@
 
 package org.cloudfoundry.client.v3;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.cloudfoundry.client.v3.packages.PackageState.PROCESSING_UPLOAD;
+import static org.cloudfoundry.client.v3.packages.PackageState.READY;
+
+import java.io.IOException;
+import java.time.Duration;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v3.applications.Application;
-import org.cloudfoundry.client.v3.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v3.applications.ApplicationRelationships;
+import org.cloudfoundry.client.v3.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v3.packages.CreatePackageRequest;
 import org.cloudfoundry.client.v3.packages.GetPackageRequest;
 import org.cloudfoundry.client.v3.packages.Package;
@@ -34,65 +40,80 @@ import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.io.IOException;
-import java.time.Duration;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.cloudfoundry.client.v3.packages.PackageState.PROCESSING_UPLOAD;
-import static org.cloudfoundry.client.v3.packages.PackageState.READY;
-
 @Disabled("Until Packages are no longer experimental")
 public final class PackagesTest extends AbstractIntegrationTest {
 
-    @Autowired
-    private CloudFoundryClient cloudFoundryClient;
+    @Autowired private CloudFoundryClient cloudFoundryClient;
 
-    @Autowired
-    private Mono<String> spaceId;
+    @Autowired private Mono<String> spaceId;
 
     @Test
     public void upload() {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
-            .flatMap(spaceId -> this.cloudFoundryClient.applicationsV3()
-                .create(CreateApplicationRequest.builder()
-                    .name(applicationName)
-                    .relationships(ApplicationRelationships.builder()
-                        .space(ToOneRelationship.builder()
-                            .data(Relationship.builder()
-                                .id(spaceId)
-                                .build())
-                            .build())
-                        .build())
-                    .build()))
-            .map(Application::getId)
-            .flatMap(applicationId -> this.cloudFoundryClient.packages()
-                .create(CreatePackageRequest.builder()
-                    .type(PackageType.BITS)
-                    .build()))
-            .map(Package::getId)
-            .flatMap(packageId -> {
-                try {
-                    return this.cloudFoundryClient.packages()
-                        .upload(UploadPackageRequest.builder()
-                            .packageId(packageId)
-                            .bits(new ClassPathResource("test-application.zip").getFile().toPath())
-                            .build());
-                } catch (IOException e) {
-                    throw Exceptions.propagate(e);
-                }
-            })
-            .map(Package::getId)
-            .flatMap(packageId -> this.cloudFoundryClient.packages()
-                .get(GetPackageRequest.builder()
-                    .packageId(packageId)
-                    .build()))
-            .map(Package::getState)
-            .as(StepVerifier::create)
-            .consumeNextWith(state -> assertThat(state).isIn(PROCESSING_UPLOAD, READY))
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        spaceId ->
+                                this.cloudFoundryClient
+                                        .applicationsV3()
+                                        .create(
+                                                CreateApplicationRequest.builder()
+                                                        .name(applicationName)
+                                                        .relationships(
+                                                                ApplicationRelationships.builder()
+                                                                        .space(
+                                                                                ToOneRelationship
+                                                                                        .builder()
+                                                                                        .data(
+                                                                                                Relationship
+                                                                                                        .builder()
+                                                                                                        .id(
+                                                                                                                spaceId)
+                                                                                                        .build())
+                                                                                        .build())
+                                                                        .build())
+                                                        .build()))
+                .map(Application::getId)
+                .flatMap(
+                        applicationId ->
+                                this.cloudFoundryClient
+                                        .packages()
+                                        .create(
+                                                CreatePackageRequest.builder()
+                                                        .type(PackageType.BITS)
+                                                        .build()))
+                .map(Package::getId)
+                .flatMap(
+                        packageId -> {
+                            try {
+                                return this.cloudFoundryClient
+                                        .packages()
+                                        .upload(
+                                                UploadPackageRequest.builder()
+                                                        .packageId(packageId)
+                                                        .bits(
+                                                                new ClassPathResource(
+                                                                                "test-application.zip")
+                                                                        .getFile()
+                                                                        .toPath())
+                                                        .build());
+                            } catch (IOException e) {
+                                throw Exceptions.propagate(e);
+                            }
+                        })
+                .map(Package::getId)
+                .flatMap(
+                        packageId ->
+                                this.cloudFoundryClient
+                                        .packages()
+                                        .get(
+                                                GetPackageRequest.builder()
+                                                        .packageId(packageId)
+                                                        .build()))
+                .map(Package::getState)
+                .as(StepVerifier::create)
+                .consumeNextWith(state -> assertThat(state).isIn(PROCESSING_UPLOAD, READY))
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
-
 }

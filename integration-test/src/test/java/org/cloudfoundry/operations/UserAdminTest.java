@@ -16,6 +16,9 @@
 
 package org.cloudfoundry.operations;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.time.Duration;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationAuditorsRequest;
@@ -44,33 +47,31 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.time.Duration;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 public final class UserAdminTest extends AbstractIntegrationTest {
 
-    @Autowired
-    private CloudFoundryClient cloudFoundryClient;
+    @Autowired private CloudFoundryClient cloudFoundryClient;
 
-    @Autowired
-    private CloudFoundryOperations cloudFoundryOperations;
+    @Autowired private CloudFoundryOperations cloudFoundryOperations;
 
     @Test
     public void create() {
         String username = this.nameFactory.getUserName();
 
-        this.cloudFoundryOperations.userAdmin()
-            .create(CreateUserRequest.builder()
-                .password("test-password")
-                .username(username)
-                .build())
-            .thenMany(requestListUsers(this.cloudFoundryClient))
-            .filter(response -> username.equals(ResourceUtils.getEntity(response).getUsername()))
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        this.cloudFoundryOperations
+                .userAdmin()
+                .create(
+                        CreateUserRequest.builder()
+                                .password("test-password")
+                                .username(username)
+                                .build())
+                .thenMany(requestListUsers(this.cloudFoundryClient))
+                .filter(
+                        response ->
+                                username.equals(ResourceUtils.getEntity(response).getUsername()))
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -78,10 +79,14 @@ public final class UserAdminTest extends AbstractIntegrationTest {
         String username = this.nameFactory.getUserName();
 
         createUser(this.cloudFoundryOperations, username)
-            .then(createUser(this.cloudFoundryOperations, username))
-            .as(StepVerifier::create)
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("User %s already exists", username))
-            .verify(Duration.ofMinutes(5));
+                .then(createUser(this.cloudFoundryOperations, username))
+                .as(StepVerifier::create)
+                .consumeErrorWith(
+                        t ->
+                                assertThat(t)
+                                        .isInstanceOf(IllegalArgumentException.class)
+                                        .hasMessage("User %s already exists", username))
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -89,26 +94,31 @@ public final class UserAdminTest extends AbstractIntegrationTest {
         String username = this.nameFactory.getUserName();
 
         createUser(this.cloudFoundryOperations, username)
-            .then(this.cloudFoundryOperations.userAdmin()
-                .delete(DeleteUserRequest.builder()
-                    .username(username)
-                    .build()))
-            .thenMany(requestListUsers(this.cloudFoundryClient))
-            .filter(response -> username.equals(ResourceUtils.getEntity(response).getUsername()))
-            .as(StepVerifier::create)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .then(
+                        this.cloudFoundryOperations
+                                .userAdmin()
+                                .delete(DeleteUserRequest.builder().username(username).build()))
+                .thenMany(requestListUsers(this.cloudFoundryClient))
+                .filter(
+                        response ->
+                                username.equals(ResourceUtils.getEntity(response).getUsername()))
+                .as(StepVerifier::create)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void deleteNotFound() {
-        this.cloudFoundryOperations.userAdmin()
-            .delete(DeleteUserRequest.builder()
-                .username("not-found")
-                .build())
-            .as(StepVerifier::create)
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("User not-found does not exist"))
-            .verify(Duration.ofMinutes(5));
+        this.cloudFoundryOperations
+                .userAdmin()
+                .delete(DeleteUserRequest.builder().username("not-found").build())
+                .as(StepVerifier::create)
+                .consumeErrorWith(
+                        t ->
+                                assertThat(t)
+                                        .isInstanceOf(IllegalArgumentException.class)
+                                        .hasMessage("User not-found does not exist"))
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -117,19 +127,26 @@ public final class UserAdminTest extends AbstractIntegrationTest {
         String username = this.nameFactory.getUserName();
 
         Mono.when(
-            createUser(this.cloudFoundryOperations, username),
-            createOrganization(this.cloudFoundryOperations, organizationName)
-        )
-            .then(setOrganizationRole(this.cloudFoundryOperations, organizationName, OrganizationRole.BILLING_MANAGER, username))
-            .then(this.cloudFoundryOperations.userAdmin()
-                .listOrganizationUsers(ListOrganizationUsersRequest.builder()
-                    .organizationName(organizationName)
-                    .build()))
-            .flatMapIterable(OrganizationUsers::getBillingManagers)
-            .as(StepVerifier::create)
-            .expectNext(username)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                        createUser(this.cloudFoundryOperations, username),
+                        createOrganization(this.cloudFoundryOperations, organizationName))
+                .then(
+                        setOrganizationRole(
+                                this.cloudFoundryOperations,
+                                organizationName,
+                                OrganizationRole.BILLING_MANAGER,
+                                username))
+                .then(
+                        this.cloudFoundryOperations
+                                .userAdmin()
+                                .listOrganizationUsers(
+                                        ListOrganizationUsersRequest.builder()
+                                                .organizationName(organizationName)
+                                                .build()))
+                .flatMapIterable(OrganizationUsers::getBillingManagers)
+                .as(StepVerifier::create)
+                .expectNext(username)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -139,21 +156,29 @@ public final class UserAdminTest extends AbstractIntegrationTest {
         String username = this.nameFactory.getUserName();
 
         Mono.when(
-            createUser(this.cloudFoundryOperations, username),
-            createOrganization(this.cloudFoundryOperations, organizationName)
-        )
-            .then(createSpace(this.cloudFoundryOperations, organizationName, spaceName))
-            .then(setSpaceRole(this.cloudFoundryOperations, organizationName, spaceName, SpaceRole.AUDITOR, username))
-            .then(this.cloudFoundryOperations.userAdmin()
-                .listSpaceUsers(ListSpaceUsersRequest.builder()
-                    .organizationName(organizationName)
-                    .spaceName(spaceName)
-                    .build()))
-            .flatMapIterable(SpaceUsers::getAuditors)
-            .as(StepVerifier::create)
-            .expectNext(username)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                        createUser(this.cloudFoundryOperations, username),
+                        createOrganization(this.cloudFoundryOperations, organizationName))
+                .then(createSpace(this.cloudFoundryOperations, organizationName, spaceName))
+                .then(
+                        setSpaceRole(
+                                this.cloudFoundryOperations,
+                                organizationName,
+                                spaceName,
+                                SpaceRole.AUDITOR,
+                                username))
+                .then(
+                        this.cloudFoundryOperations
+                                .userAdmin()
+                                .listSpaceUsers(
+                                        ListSpaceUsersRequest.builder()
+                                                .organizationName(organizationName)
+                                                .spaceName(spaceName)
+                                                .build()))
+                .flatMapIterable(SpaceUsers::getAuditors)
+                .as(StepVerifier::create)
+                .expectNext(username)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -162,22 +187,27 @@ public final class UserAdminTest extends AbstractIntegrationTest {
         String username = this.nameFactory.getUserName();
 
         Mono.when(
-            createUser(this.cloudFoundryOperations, username),
-            createOrganization(this.cloudFoundryOperations, organizationName)
-        )
-            .then(this.cloudFoundryOperations.userAdmin()
-                .setOrganizationRole(SetOrganizationRoleRequest.builder()
-                    .organizationName(organizationName)
-                    .organizationRole(OrganizationRole.AUDITOR)
-                    .username(username)
-                    .build()))
-            .thenMany(getOrganizationId(this.cloudFoundryClient, organizationName))
-            .flatMap(organizationId -> requestListOrganizationAuditors(this.cloudFoundryClient, organizationId))
-            .map(resource -> ResourceUtils.getEntity(resource).getUsername())
-            .as(StepVerifier::create)
-            .expectNext(username)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                        createUser(this.cloudFoundryOperations, username),
+                        createOrganization(this.cloudFoundryOperations, organizationName))
+                .then(
+                        this.cloudFoundryOperations
+                                .userAdmin()
+                                .setOrganizationRole(
+                                        SetOrganizationRoleRequest.builder()
+                                                .organizationName(organizationName)
+                                                .organizationRole(OrganizationRole.AUDITOR)
+                                                .username(username)
+                                                .build()))
+                .thenMany(getOrganizationId(this.cloudFoundryClient, organizationName))
+                .flatMap(
+                        organizationId ->
+                                requestListOrganizationAuditors(
+                                        this.cloudFoundryClient, organizationId))
+                .map(resource -> ResourceUtils.getEntity(resource).getUsername())
+                .as(StepVerifier::create)
+                .expectNext(username)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -187,23 +217,25 @@ public final class UserAdminTest extends AbstractIntegrationTest {
         String username = this.nameFactory.getUserName();
 
         Mono.when(
-            createUser(this.cloudFoundryOperations, username),
-            createOrganization(this.cloudFoundryOperations, organizationName)
-        )
-            .then(createSpace(this.cloudFoundryOperations, organizationName, spaceName))
-            .then(this.cloudFoundryOperations.userAdmin()
-                .setSpaceRole(SetSpaceRoleRequest.builder()
-                    .organizationName(organizationName)
-                    .spaceName(spaceName)
-                    .spaceRole(SpaceRole.AUDITOR)
-                    .username(username)
-                    .build()))
-            .thenMany(listSpaceUsers(this.cloudFoundryOperations, organizationName, spaceName))
-            .flatMapIterable(SpaceUsers::getAuditors)
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                        createUser(this.cloudFoundryOperations, username),
+                        createOrganization(this.cloudFoundryOperations, organizationName))
+                .then(createSpace(this.cloudFoundryOperations, organizationName, spaceName))
+                .then(
+                        this.cloudFoundryOperations
+                                .userAdmin()
+                                .setSpaceRole(
+                                        SetSpaceRoleRequest.builder()
+                                                .organizationName(organizationName)
+                                                .spaceName(spaceName)
+                                                .spaceRole(SpaceRole.AUDITOR)
+                                                .username(username)
+                                                .build()))
+                .thenMany(listSpaceUsers(this.cloudFoundryOperations, organizationName, spaceName))
+                .flatMapIterable(SpaceUsers::getAuditors)
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -212,22 +244,29 @@ public final class UserAdminTest extends AbstractIntegrationTest {
         String username = this.nameFactory.getUserName();
 
         Mono.when(
-            createUser(this.cloudFoundryOperations, username),
-            createOrganization(this.cloudFoundryOperations, organizationName)
-        )
-            .then(setOrganizationRole(this.cloudFoundryOperations, organizationName, OrganizationRole.MANAGER, username))
-            .then(this.cloudFoundryOperations.userAdmin()
-                .unsetOrganizationRole(UnsetOrganizationRoleRequest.builder()
-                    .organizationName(organizationName)
-                    .organizationRole(OrganizationRole.MANAGER)
-                    .username(username)
-                    .build()))
-            .thenMany(listOrganizationUsers(this.cloudFoundryOperations, organizationName))
-            .flatMapIterable(OrganizationUsers::getManagers)
-            .filter(username::equals)
-            .as(StepVerifier::create)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                        createUser(this.cloudFoundryOperations, username),
+                        createOrganization(this.cloudFoundryOperations, organizationName))
+                .then(
+                        setOrganizationRole(
+                                this.cloudFoundryOperations,
+                                organizationName,
+                                OrganizationRole.MANAGER,
+                                username))
+                .then(
+                        this.cloudFoundryOperations
+                                .userAdmin()
+                                .unsetOrganizationRole(
+                                        UnsetOrganizationRoleRequest.builder()
+                                                .organizationName(organizationName)
+                                                .organizationRole(OrganizationRole.MANAGER)
+                                                .username(username)
+                                                .build()))
+                .thenMany(listOrganizationUsers(this.cloudFoundryOperations, organizationName))
+                .flatMapIterable(OrganizationUsers::getManagers)
+                .filter(username::equals)
+                .as(StepVerifier::create)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -237,106 +276,156 @@ public final class UserAdminTest extends AbstractIntegrationTest {
         String username = this.nameFactory.getUserName();
 
         Mono.when(
-            createUser(this.cloudFoundryOperations, username),
-            createOrganization(this.cloudFoundryOperations, organizationName)
-        )
-            .then(createSpace(this.cloudFoundryOperations, organizationName, spaceName))
-            .then(setSpaceRole(this.cloudFoundryOperations, organizationName, spaceName, SpaceRole.MANAGER, username))
-            .then(this.cloudFoundryOperations.userAdmin()
-                .unsetSpaceRole(UnsetSpaceRoleRequest.builder()
-                    .organizationName(organizationName)
-                    .spaceName(spaceName)
-                    .spaceRole(SpaceRole.MANAGER)
-                    .username(username)
-                    .build()))
-            .thenMany(listSpaceUsers(this.cloudFoundryOperations, organizationName, spaceName))
-            .flatMapIterable(SpaceUsers::getManagers)
-            .filter(username::equals)
-            .as(StepVerifier::create)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                        createUser(this.cloudFoundryOperations, username),
+                        createOrganization(this.cloudFoundryOperations, organizationName))
+                .then(createSpace(this.cloudFoundryOperations, organizationName, spaceName))
+                .then(
+                        setSpaceRole(
+                                this.cloudFoundryOperations,
+                                organizationName,
+                                spaceName,
+                                SpaceRole.MANAGER,
+                                username))
+                .then(
+                        this.cloudFoundryOperations
+                                .userAdmin()
+                                .unsetSpaceRole(
+                                        UnsetSpaceRoleRequest.builder()
+                                                .organizationName(organizationName)
+                                                .spaceName(spaceName)
+                                                .spaceRole(SpaceRole.MANAGER)
+                                                .username(username)
+                                                .build()))
+                .thenMany(listSpaceUsers(this.cloudFoundryOperations, organizationName, spaceName))
+                .flatMapIterable(SpaceUsers::getManagers)
+                .filter(username::equals)
+                .as(StepVerifier::create)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
-    private static Mono<Void> createOrganization(CloudFoundryOperations cloudFoundryOperations, String organizationName) {
-        return cloudFoundryOperations.organizations()
-            .create(CreateOrganizationRequest.builder()
-                .organizationName(organizationName)
-                .build());
+    private static Mono<Void> createOrganization(
+            CloudFoundryOperations cloudFoundryOperations, String organizationName) {
+        return cloudFoundryOperations
+                .organizations()
+                .create(
+                        CreateOrganizationRequest.builder()
+                                .organizationName(organizationName)
+                                .build());
     }
 
-    private static Mono<Void> createSpace(CloudFoundryOperations cloudFoundryOperations, String organizationName, String spaceName) {
-        return cloudFoundryOperations.spaces()
-            .create(CreateSpaceRequest.builder()
-                .name(spaceName)
-                .organization(organizationName)
-                .build());
+    private static Mono<Void> createSpace(
+            CloudFoundryOperations cloudFoundryOperations,
+            String organizationName,
+            String spaceName) {
+        return cloudFoundryOperations
+                .spaces()
+                .create(
+                        CreateSpaceRequest.builder()
+                                .name(spaceName)
+                                .organization(organizationName)
+                                .build());
     }
 
-    private static Mono<Void> createUser(CloudFoundryOperations cloudFoundryOperations, String username) {
-        return cloudFoundryOperations.userAdmin()
-            .create(CreateUserRequest.builder()
-                .password("test-password")
-                .username(username)
-                .build());
+    private static Mono<Void> createUser(
+            CloudFoundryOperations cloudFoundryOperations, String username) {
+        return cloudFoundryOperations
+                .userAdmin()
+                .create(
+                        CreateUserRequest.builder()
+                                .password("test-password")
+                                .username(username)
+                                .build());
     }
 
-    private static Mono<String> getOrganizationId(CloudFoundryClient cloudFoundryClient, String organizationName) {
-        return PaginationUtils.requestClientV2Resources(page -> cloudFoundryClient.organizations()
-            .list(ListOrganizationsRequest.builder()
-                .page(page)
-                .build()))
-            .filter(r -> organizationName.equals(ResourceUtils.getEntity(r).getName()))
-            .map(ResourceUtils::getId)
-            .singleOrEmpty();
+    private static Mono<String> getOrganizationId(
+            CloudFoundryClient cloudFoundryClient, String organizationName) {
+        return PaginationUtils.requestClientV2Resources(
+                        page ->
+                                cloudFoundryClient
+                                        .organizations()
+                                        .list(
+                                                ListOrganizationsRequest.builder()
+                                                        .page(page)
+                                                        .build()))
+                .filter(r -> organizationName.equals(ResourceUtils.getEntity(r).getName()))
+                .map(ResourceUtils::getId)
+                .singleOrEmpty();
     }
 
-    private static Mono<OrganizationUsers> listOrganizationUsers(CloudFoundryOperations cloudFoundryOperations, String organizationName) {
-        return cloudFoundryOperations.userAdmin()
-            .listOrganizationUsers(ListOrganizationUsersRequest.builder()
-                .organizationName(organizationName)
-                .build());
+    private static Mono<OrganizationUsers> listOrganizationUsers(
+            CloudFoundryOperations cloudFoundryOperations, String organizationName) {
+        return cloudFoundryOperations
+                .userAdmin()
+                .listOrganizationUsers(
+                        ListOrganizationUsersRequest.builder()
+                                .organizationName(organizationName)
+                                .build());
     }
 
-    private static Mono<SpaceUsers> listSpaceUsers(CloudFoundryOperations cloudFoundryOperations, String organizationName, String spaceName) {
-        return cloudFoundryOperations.userAdmin()
-            .listSpaceUsers(ListSpaceUsersRequest.builder()
-                .organizationName(organizationName)
-                .spaceName(spaceName)
-                .build());
+    private static Mono<SpaceUsers> listSpaceUsers(
+            CloudFoundryOperations cloudFoundryOperations,
+            String organizationName,
+            String spaceName) {
+        return cloudFoundryOperations
+                .userAdmin()
+                .listSpaceUsers(
+                        ListSpaceUsersRequest.builder()
+                                .organizationName(organizationName)
+                                .spaceName(spaceName)
+                                .build());
     }
 
-    private static Flux<UserResource> requestListOrganizationAuditors(CloudFoundryClient cloudFoundryClient, String organizationId) {
-        return PaginationUtils.requestClientV2Resources(page -> cloudFoundryClient.organizations()
-            .listAuditors(ListOrganizationAuditorsRequest.builder()
-                .organizationId(organizationId)
-                .page(page)
-                .build()));
+    private static Flux<UserResource> requestListOrganizationAuditors(
+            CloudFoundryClient cloudFoundryClient, String organizationId) {
+        return PaginationUtils.requestClientV2Resources(
+                page ->
+                        cloudFoundryClient
+                                .organizations()
+                                .listAuditors(
+                                        ListOrganizationAuditorsRequest.builder()
+                                                .organizationId(organizationId)
+                                                .page(page)
+                                                .build()));
     }
 
     private static Flux<UserResource> requestListUsers(CloudFoundryClient cloudFoundryClient) {
-        return PaginationUtils.requestClientV2Resources(page -> cloudFoundryClient.users()
-            .list(ListUsersRequest.builder()
-                .page(page)
-                .build()));
+        return PaginationUtils.requestClientV2Resources(
+                page ->
+                        cloudFoundryClient
+                                .users()
+                                .list(ListUsersRequest.builder().page(page).build()));
     }
 
-    private static Mono<Void> setOrganizationRole(CloudFoundryOperations cloudFoundryOperations, String organizationName, OrganizationRole organizationRole, String username) {
-        return cloudFoundryOperations.userAdmin()
-            .setOrganizationRole(SetOrganizationRoleRequest.builder()
-                .organizationName(organizationName)
-                .organizationRole(organizationRole)
-                .username(username)
-                .build());
+    private static Mono<Void> setOrganizationRole(
+            CloudFoundryOperations cloudFoundryOperations,
+            String organizationName,
+            OrganizationRole organizationRole,
+            String username) {
+        return cloudFoundryOperations
+                .userAdmin()
+                .setOrganizationRole(
+                        SetOrganizationRoleRequest.builder()
+                                .organizationName(organizationName)
+                                .organizationRole(organizationRole)
+                                .username(username)
+                                .build());
     }
 
-    private static Mono<Void> setSpaceRole(CloudFoundryOperations cloudFoundryOperations, String organizationName, String spaceName, SpaceRole spaceRole, String username) {
-        return cloudFoundryOperations.userAdmin()
-            .setSpaceRole(SetSpaceRoleRequest.builder()
-                .organizationName(organizationName)
-                .spaceName(spaceName)
-                .spaceRole(spaceRole)
-                .username(username)
-                .build());
+    private static Mono<Void> setSpaceRole(
+            CloudFoundryOperations cloudFoundryOperations,
+            String organizationName,
+            String spaceName,
+            SpaceRole spaceRole,
+            String username) {
+        return cloudFoundryOperations
+                .userAdmin()
+                .setSpaceRole(
+                        SetSpaceRoleRequest.builder()
+                                .organizationName(organizationName)
+                                .spaceName(spaceName)
+                                .spaceRole(spaceRole)
+                                .username(username)
+                                .build());
     }
-
 }

@@ -16,6 +16,13 @@
 
 package org.cloudfoundry.client.v3;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.cloudfoundry.ServiceBrokerUtils.createServiceBroker;
+import static org.cloudfoundry.ServiceBrokerUtils.deleteServiceBroker;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.time.Duration;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.ApplicationUtils;
 import org.cloudfoundry.CloudFoundryVersion;
@@ -41,28 +48,16 @@ import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.time.Duration;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.cloudfoundry.ServiceBrokerUtils.createServiceBroker;
-import static org.cloudfoundry.ServiceBrokerUtils.deleteServiceBroker;
-
 @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_10)
 public final class ServiceBrokersTest extends AbstractIntegrationTest {
 
-    @Autowired
-    private CloudFoundryClient cloudFoundryClient;
+    @Autowired private CloudFoundryClient cloudFoundryClient;
 
-    @Autowired
-    private Mono<String> organizationId;
+    @Autowired private Mono<String> organizationId;
 
-    @Autowired
-    private Mono<String> serviceBrokerId;
+    @Autowired private Mono<String> serviceBrokerId;
 
-    @Autowired
-    private String serviceBrokerName;
+    @Autowired private String serviceBrokerName;
 
     @Test
     public void create() {
@@ -78,42 +73,69 @@ public final class ServiceBrokersTest extends AbstractIntegrationTest {
             throw Exceptions.propagate(e);
         }
 
-        ApplicationUtils.ApplicationMetadata applicationMetadata = this.organizationId
-            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .flatMap(spaceId -> ServiceBrokerUtils.pushServiceBrokerApplication(this.cloudFoundryClient, application, this.nameFactory, planName, serviceName, spaceId))
-            .block(Duration.ofMinutes(5));
+        ApplicationUtils.ApplicationMetadata applicationMetadata =
+                this.organizationId
+                        .flatMap(
+                                organizationId ->
+                                        createSpaceId(
+                                                this.cloudFoundryClient, organizationId, spaceName))
+                        .flatMap(
+                                spaceId ->
+                                        ServiceBrokerUtils.pushServiceBrokerApplication(
+                                                this.cloudFoundryClient,
+                                                application,
+                                                this.nameFactory,
+                                                planName,
+                                                serviceName,
+                                                spaceId))
+                        .block(Duration.ofMinutes(5));
 
-        this.cloudFoundryClient.serviceBrokersV3()
-            .create(CreateServiceBrokerRequest.builder()
-        	.authentication(BasicAuthentication.builder()
-        	        .password("test-authentication-password")
-        	        .username("test-authentication-username")
-        	.build())
-                .url(applicationMetadata.uri)
-                .name(serviceBrokerName)
-                .relationships(ServiceBrokerRelationships.builder()
-                        .space(ToOneRelationship.builder()
-                        	.data(Relationship.builder()
-                        		.id(applicationMetadata.spaceId)
-                        		.build())
-                        	.build())
-                        .build())
-                .build())
-            .flatMap(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job))
-            .then(PaginationUtils
-                .requestClientV3Resources(page -> this.cloudFoundryClient.serviceBrokersV3()
-                    .list(ListServiceBrokersRequest.builder()
-                        .name(serviceBrokerName)
-                        .page(page)
-                        .build()))
-                .singleOrEmpty())
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        this.cloudFoundryClient
+                .serviceBrokersV3()
+                .create(
+                        CreateServiceBrokerRequest.builder()
+                                .authentication(
+                                        BasicAuthentication.builder()
+                                                .password("test-authentication-password")
+                                                .username("test-authentication-username")
+                                                .build())
+                                .url(applicationMetadata.uri)
+                                .name(serviceBrokerName)
+                                .relationships(
+                                        ServiceBrokerRelationships.builder()
+                                                .space(
+                                                        ToOneRelationship.builder()
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id(
+                                                                                        applicationMetadata
+                                                                                                .spaceId)
+                                                                                .build())
+                                                                .build())
+                                                .build())
+                                .build())
+                .flatMap(
+                        job ->
+                                JobUtils.waitForCompletion(
+                                        this.cloudFoundryClient, Duration.ofMinutes(5), job))
+                .then(
+                        PaginationUtils.requestClientV3Resources(
+                                        page ->
+                                                this.cloudFoundryClient
+                                                        .serviceBrokersV3()
+                                                        .list(
+                                                                ListServiceBrokersRequest.builder()
+                                                                        .name(serviceBrokerName)
+                                                                        .page(page)
+                                                                        .build()))
+                                .singleOrEmpty())
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
 
         deleteServiceBroker(this.cloudFoundryClient, applicationMetadata.applicationId)
-            .block(Duration.ofMinutes(5));
+                .block(Duration.ofMinutes(5));
     }
 
     @Test
@@ -123,56 +145,90 @@ public final class ServiceBrokersTest extends AbstractIntegrationTest {
         String serviceName = this.nameFactory.getServiceName();
         String spaceName = this.nameFactory.getSpaceName();
 
-        ServiceBrokerUtils.ServiceBrokerMetadata serviceBrokerMetadata = this.organizationId
-            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .flatMap(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, true))
-            .block(Duration.ofMinutes(5));
+        ServiceBrokerUtils.ServiceBrokerMetadata serviceBrokerMetadata =
+                this.organizationId
+                        .flatMap(
+                                organizationId ->
+                                        createSpaceId(
+                                                this.cloudFoundryClient, organizationId, spaceName))
+                        .flatMap(
+                                spaceId ->
+                                        createServiceBroker(
+                                                this.cloudFoundryClient,
+                                                this.nameFactory,
+                                                planName,
+                                                serviceBrokerName,
+                                                serviceName,
+                                                spaceId,
+                                                true))
+                        .block(Duration.ofMinutes(5));
 
-        this.cloudFoundryClient.serviceBrokersV3()
-            .delete(DeleteServiceBrokerRequest.builder()
-                .serviceBrokerId(serviceBrokerMetadata.serviceBrokerId)
-                .build())
-            .flatMap(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job))
-            .then(PaginationUtils
-                .requestClientV3Resources(page -> this.cloudFoundryClient.serviceBrokersV3()
-                    .list(ListServiceBrokersRequest.builder()
-                        .name(serviceBrokerName)
-                        .page(page)
-                        .build()))
-                .singleOrEmpty())
-            .as(StepVerifier::create)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        this.cloudFoundryClient
+                .serviceBrokersV3()
+                .delete(
+                        DeleteServiceBrokerRequest.builder()
+                                .serviceBrokerId(serviceBrokerMetadata.serviceBrokerId)
+                                .build())
+                .flatMap(
+                        job ->
+                                JobUtils.waitForCompletion(
+                                        this.cloudFoundryClient, Duration.ofMinutes(5), job))
+                .then(
+                        PaginationUtils.requestClientV3Resources(
+                                        page ->
+                                                this.cloudFoundryClient
+                                                        .serviceBrokersV3()
+                                                        .list(
+                                                                ListServiceBrokersRequest.builder()
+                                                                        .name(serviceBrokerName)
+                                                                        .page(page)
+                                                                        .build()))
+                                .singleOrEmpty())
+                .as(StepVerifier::create)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
 
-        deleteServiceBroker(this.cloudFoundryClient, serviceBrokerMetadata.applicationMetadata.applicationId)
-            .block(Duration.ofMinutes(5));
+        deleteServiceBroker(
+                        this.cloudFoundryClient,
+                        serviceBrokerMetadata.applicationMetadata.applicationId)
+                .block(Duration.ofMinutes(5));
     }
 
     @Test
     public void get() {
         this.serviceBrokerId
-            .flatMap(serviceBrokerId -> this.cloudFoundryClient.serviceBrokersV3()
-                .get(GetServiceBrokerRequest.builder()
-                    .serviceBrokerId(serviceBrokerId)
-                    .build()))
-            .as(StepVerifier::create)
-            .assertNext(serviceBroker -> assertThat(serviceBroker.getName()).isEqualTo(this.serviceBrokerName))
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        serviceBrokerId ->
+                                this.cloudFoundryClient
+                                        .serviceBrokersV3()
+                                        .get(
+                                                GetServiceBrokerRequest.builder()
+                                                        .serviceBrokerId(serviceBrokerId)
+                                                        .build()))
+                .as(StepVerifier::create)
+                .assertNext(
+                        serviceBroker ->
+                                assertThat(serviceBroker.getName())
+                                        .isEqualTo(this.serviceBrokerName))
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void list() {
-        PaginationUtils
-            .requestClientV3Resources(page -> this.cloudFoundryClient.serviceBrokersV3()
-                .list(ListServiceBrokersRequest.builder()
-                    .name(this.serviceBrokerName)
-                    .page(page)
-                    .build()))
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        PaginationUtils.requestClientV3Resources(
+                        page ->
+                                this.cloudFoundryClient
+                                        .serviceBrokersV3()
+                                        .list(
+                                                ListServiceBrokersRequest.builder()
+                                                        .name(this.serviceBrokerName)
+                                                        .page(page)
+                                                        .build()))
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -183,33 +239,57 @@ public final class ServiceBrokersTest extends AbstractIntegrationTest {
         String serviceName = this.nameFactory.getServiceName();
         String spaceName = this.nameFactory.getSpaceName();
 
-        ServiceBrokerUtils.ServiceBrokerMetadata serviceBrokerMetadata = this.organizationId
-            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .flatMap(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName1, serviceName, spaceId, true))
-            .block(Duration.ofMinutes(5));
+        ServiceBrokerUtils.ServiceBrokerMetadata serviceBrokerMetadata =
+                this.organizationId
+                        .flatMap(
+                                organizationId ->
+                                        createSpaceId(
+                                                this.cloudFoundryClient, organizationId, spaceName))
+                        .flatMap(
+                                spaceId ->
+                                        createServiceBroker(
+                                                this.cloudFoundryClient,
+                                                this.nameFactory,
+                                                planName,
+                                                serviceBrokerName1,
+                                                serviceName,
+                                                spaceId,
+                                                true))
+                        .block(Duration.ofMinutes(5));
 
-        this.cloudFoundryClient.serviceBrokersV3()
-            .update(UpdateServiceBrokerRequest.builder()
-                .serviceBrokerId(serviceBrokerMetadata.serviceBrokerId)
-                .name(serviceBrokerName2)
-                .build())
-            .filter(responseUpdate -> responseUpdate.jobId().isPresent())
-            .map(responseUpdate -> responseUpdate.jobId().get())
-            .flatMap(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job))
-            .then(PaginationUtils
-                .requestClientV3Resources(page -> this.cloudFoundryClient.serviceBrokersV3()
-                    .list(ListServiceBrokersRequest.builder()
-                        .name(serviceBrokerName2)
-                        .page(page)
-                        .build()))
-                .singleOrEmpty())
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        this.cloudFoundryClient
+                .serviceBrokersV3()
+                .update(
+                        UpdateServiceBrokerRequest.builder()
+                                .serviceBrokerId(serviceBrokerMetadata.serviceBrokerId)
+                                .name(serviceBrokerName2)
+                                .build())
+                .filter(responseUpdate -> responseUpdate.jobId().isPresent())
+                .map(responseUpdate -> responseUpdate.jobId().get())
+                .flatMap(
+                        job ->
+                                JobUtils.waitForCompletion(
+                                        this.cloudFoundryClient, Duration.ofMinutes(5), job))
+                .then(
+                        PaginationUtils.requestClientV3Resources(
+                                        page ->
+                                                this.cloudFoundryClient
+                                                        .serviceBrokersV3()
+                                                        .list(
+                                                                ListServiceBrokersRequest.builder()
+                                                                        .name(serviceBrokerName2)
+                                                                        .page(page)
+                                                                        .build()))
+                                .singleOrEmpty())
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
 
-        deleteServiceBroker(this.cloudFoundryClient, serviceBrokerMetadata.applicationMetadata.applicationId)
-            .block(Duration.ofMinutes(5));
+        deleteServiceBroker(
+                        this.cloudFoundryClient,
+                        serviceBrokerMetadata.applicationMetadata.applicationId)
+                .block(Duration.ofMinutes(5));
     }
 
     @Test
@@ -219,53 +299,83 @@ public final class ServiceBrokersTest extends AbstractIntegrationTest {
         String serviceName = this.nameFactory.getServiceName();
         String spaceName = this.nameFactory.getSpaceName();
 
-        ServiceBrokerUtils.ServiceBrokerMetadata serviceBrokerMetadata = this.organizationId
-            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .flatMap(spaceId -> createServiceBroker(this.cloudFoundryClient, this.nameFactory, planName, serviceBrokerName, serviceName, spaceId, true))
-            .block(Duration.ofMinutes(5));
+        ServiceBrokerUtils.ServiceBrokerMetadata serviceBrokerMetadata =
+                this.organizationId
+                        .flatMap(
+                                organizationId ->
+                                        createSpaceId(
+                                                this.cloudFoundryClient, organizationId, spaceName))
+                        .flatMap(
+                                spaceId ->
+                                        createServiceBroker(
+                                                this.cloudFoundryClient,
+                                                this.nameFactory,
+                                                planName,
+                                                serviceBrokerName,
+                                                serviceName,
+                                                spaceId,
+                                                true))
+                        .block(Duration.ofMinutes(5));
 
-        this.cloudFoundryClient.serviceBrokersV3()
-            .update(UpdateServiceBrokerRequest.builder()
-                .serviceBrokerId(serviceBrokerMetadata.serviceBrokerId)
-                .metadata(Metadata.builder().label("type", "dev").build())
-                .build())
-            .filter(responseUpdate -> responseUpdate.jobId().isPresent())
-            .map(responseUpdate -> responseUpdate.jobId().get())
-            .flatMap(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job))
-            .then(PaginationUtils
-                .requestClientV3Resources(page -> this.cloudFoundryClient.serviceBrokersV3()
-                    .list(ListServiceBrokersRequest.builder()
-                        .labelSelector("type=dev")
-                        .name(serviceBrokerName)
-                        .page(page)
-                        .build()))
-                .singleOrEmpty())
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
-
-        deleteServiceBroker(this.cloudFoundryClient, serviceBrokerMetadata.applicationMetadata.applicationId)
-            .block(Duration.ofMinutes(5));
-    }
-
-    private static Mono<String> createSpaceId(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceName) {
-        return requestCreateSpace(cloudFoundryClient, organizationId, spaceName)
-            .map(CreateSpaceResponse::getId);
-    }
-
-    private static Mono<CreateSpaceResponse> requestCreateSpace(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceName) {
-        return cloudFoundryClient.spacesV3()
-            .create(CreateSpaceRequest.builder()
-                .name(spaceName)
-                .relationships(SpaceRelationships.builder()
-                        .organization(ToOneRelationship.builder()
-                            .data(Relationship.builder()
-                                .id(organizationId)
+        this.cloudFoundryClient
+                .serviceBrokersV3()
+                .update(
+                        UpdateServiceBrokerRequest.builder()
+                                .serviceBrokerId(serviceBrokerMetadata.serviceBrokerId)
+                                .metadata(Metadata.builder().label("type", "dev").build())
                                 .build())
-                            .build())
-                        .build())
-                .build());
+                .filter(responseUpdate -> responseUpdate.jobId().isPresent())
+                .map(responseUpdate -> responseUpdate.jobId().get())
+                .flatMap(
+                        job ->
+                                JobUtils.waitForCompletion(
+                                        this.cloudFoundryClient, Duration.ofMinutes(5), job))
+                .then(
+                        PaginationUtils.requestClientV3Resources(
+                                        page ->
+                                                this.cloudFoundryClient
+                                                        .serviceBrokersV3()
+                                                        .list(
+                                                                ListServiceBrokersRequest.builder()
+                                                                        .labelSelector("type=dev")
+                                                                        .name(serviceBrokerName)
+                                                                        .page(page)
+                                                                        .build()))
+                                .singleOrEmpty())
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
+
+        deleteServiceBroker(
+                        this.cloudFoundryClient,
+                        serviceBrokerMetadata.applicationMetadata.applicationId)
+                .block(Duration.ofMinutes(5));
     }
 
+    private static Mono<String> createSpaceId(
+            CloudFoundryClient cloudFoundryClient, String organizationId, String spaceName) {
+        return requestCreateSpace(cloudFoundryClient, organizationId, spaceName)
+                .map(CreateSpaceResponse::getId);
+    }
+
+    private static Mono<CreateSpaceResponse> requestCreateSpace(
+            CloudFoundryClient cloudFoundryClient, String organizationId, String spaceName) {
+        return cloudFoundryClient
+                .spacesV3()
+                .create(
+                        CreateSpaceRequest.builder()
+                                .name(spaceName)
+                                .relationships(
+                                        SpaceRelationships.builder()
+                                                .organization(
+                                                        ToOneRelationship.builder()
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id(organizationId)
+                                                                                .build())
+                                                                .build())
+                                                .build())
+                                .build());
+    }
 }

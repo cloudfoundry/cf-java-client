@@ -16,6 +16,9 @@
 
 package org.cloudfoundry.client.v3;
 
+import static org.cloudfoundry.client.v3.roles.RoleType.ORGANIZATION_USER;
+
+import java.time.Duration;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.CloudFoundryVersion;
 import org.cloudfoundry.IfCloudFoundryVersion;
@@ -37,15 +40,10 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.time.Duration;
-
-import static org.cloudfoundry.client.v3.roles.RoleType.ORGANIZATION_USER;
-
 @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
 public final class RolesTest extends AbstractIntegrationTest {
 
-    @Autowired
-    private CloudFoundryClient cloudFoundryClient;
+    @Autowired private CloudFoundryClient cloudFoundryClient;
 
     @Test
     public void create() {
@@ -53,37 +51,62 @@ public final class RolesTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .flatMap(organizationId -> this.cloudFoundryClient.rolesV3()
-                .create(CreateRoleRequest.builder()
-                    .relationships(RoleRelationships.builder()
-                        .organization(ToOneRelationship.builder()
-                            .data(Relationship.builder()
-                                .id(organizationId)
-                                .build())
-                            .build())
-                        .user(ToOneRelationship.builder()
-                            .data(Relationship.builder()
-                                .id(userId)
-                                .build())
-                            .build())
-                        .build())
-                    .type(ORGANIZATION_USER)
-                    .build())
-                .thenReturn(organizationId))
-            .flatMapMany(organizationId -> requestListRoles(this.cloudFoundryClient)
-                .map(RoleResource::getRelationships)
-                .filter(relationship -> {
-                    if (relationship.getOrganization().getData() != null) {
-                        return organizationId.equals(relationship.getOrganization().getData().getId());
-                    } else {
-                        return false;
-                    }
-                })
-                .map(relationship -> relationship.getUser().getData().getId()))
-            .as(StepVerifier::create)
-            .expectNext(userId)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                this.cloudFoundryClient
+                                        .rolesV3()
+                                        .create(
+                                                CreateRoleRequest.builder()
+                                                        .relationships(
+                                                                RoleRelationships.builder()
+                                                                        .organization(
+                                                                                ToOneRelationship
+                                                                                        .builder()
+                                                                                        .data(
+                                                                                                Relationship
+                                                                                                        .builder()
+                                                                                                        .id(
+                                                                                                                organizationId)
+                                                                                                        .build())
+                                                                                        .build())
+                                                                        .user(
+                                                                                ToOneRelationship
+                                                                                        .builder()
+                                                                                        .data(
+                                                                                                Relationship
+                                                                                                        .builder()
+                                                                                                        .id(
+                                                                                                                userId)
+                                                                                                        .build())
+                                                                                        .build())
+                                                                        .build())
+                                                        .type(ORGANIZATION_USER)
+                                                        .build())
+                                        .thenReturn(organizationId))
+                .flatMapMany(
+                        organizationId ->
+                                requestListRoles(this.cloudFoundryClient)
+                                        .map(RoleResource::getRelationships)
+                                        .filter(
+                                                relationship -> {
+                                                    if (relationship.getOrganization().getData()
+                                                            != null) {
+                                                        return organizationId.equals(
+                                                                relationship
+                                                                        .getOrganization()
+                                                                        .getData()
+                                                                        .getId());
+                                                    } else {
+                                                        return false;
+                                                    }
+                                                })
+                                        .map(
+                                                relationship ->
+                                                        relationship.getUser().getData().getId()))
+                .as(StepVerifier::create)
+                .expectNext(userId)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -92,18 +115,29 @@ public final class RolesTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .flatMap(organizationId -> requestCreateOrganizationRelationship(this.cloudFoundryClient, organizationId, userId)
-                .map(CreateRoleResponse::getId))
-            .delayUntil(roleId -> this.cloudFoundryClient.rolesV3()
-                .delete(DeleteRoleRequest.builder()
-                    .roleId(roleId)
-                    .build())
-                .flatMap(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job)))
-            .flatMapMany(roleId -> requestListRoles(this.cloudFoundryClient)
-                .filter(resource -> roleId.equals(resource.getId())))
-            .as(StepVerifier::create)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                requestCreateOrganizationRelationship(
+                                                this.cloudFoundryClient, organizationId, userId)
+                                        .map(CreateRoleResponse::getId))
+                .delayUntil(
+                        roleId ->
+                                this.cloudFoundryClient
+                                        .rolesV3()
+                                        .delete(DeleteRoleRequest.builder().roleId(roleId).build())
+                                        .flatMap(
+                                                job ->
+                                                        JobUtils.waitForCompletion(
+                                                                this.cloudFoundryClient,
+                                                                Duration.ofMinutes(5),
+                                                                job)))
+                .flatMapMany(
+                        roleId ->
+                                requestListRoles(this.cloudFoundryClient)
+                                        .filter(resource -> roleId.equals(resource.getId())))
+                .as(StepVerifier::create)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -112,17 +146,26 @@ public final class RolesTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .flatMap(organizationId -> requestCreateOrganizationRelationship(this.cloudFoundryClient, organizationId, userId)
-                .map(CreateRoleResponse::getId))
-            .flatMap(roleId -> this.cloudFoundryClient.rolesV3()
-                .get(GetRoleRequest.builder()
-                    .roleId(roleId)
-                    .build())
-                .map(response -> response.getRelationships().getUser().getData().getId()))
-            .as(StepVerifier::create)
-            .expectNext(userId)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                requestCreateOrganizationRelationship(
+                                                this.cloudFoundryClient, organizationId, userId)
+                                        .map(CreateRoleResponse::getId))
+                .flatMap(
+                        roleId ->
+                                this.cloudFoundryClient
+                                        .rolesV3()
+                                        .get(GetRoleRequest.builder().roleId(roleId).build())
+                                        .map(
+                                                response ->
+                                                        response.getRelationships()
+                                                                .getUser()
+                                                                .getData()
+                                                                .getId()))
+                .as(StepVerifier::create)
+                .expectNext(userId)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -131,58 +174,79 @@ public final class RolesTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .flatMap(organizationId -> requestCreateOrganizationRelationship(this.cloudFoundryClient, organizationId, userId)
-                .map(CreateRoleResponse::getId))
-            .flatMapMany(roleId -> PaginationUtils.requestClientV3Resources(page ->
-                this.cloudFoundryClient.rolesV3()
-                    .list(ListRolesRequest.builder()
-                        .roleId(roleId)
-                        .page(page)
-                        .build()))
-                .map(resource -> resource.getRelationships().getUser().getData().getId()))
-            .as(StepVerifier::create)
-            .expectNext(userId)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                requestCreateOrganizationRelationship(
+                                                this.cloudFoundryClient, organizationId, userId)
+                                        .map(CreateRoleResponse::getId))
+                .flatMapMany(
+                        roleId ->
+                                PaginationUtils.requestClientV3Resources(
+                                                page ->
+                                                        this.cloudFoundryClient
+                                                                .rolesV3()
+                                                                .list(
+                                                                        ListRolesRequest.builder()
+                                                                                .roleId(roleId)
+                                                                                .page(page)
+                                                                                .build()))
+                                        .map(
+                                                resource ->
+                                                        resource.getRelationships()
+                                                                .getUser()
+                                                                .getData()
+                                                                .getId()))
+                .as(StepVerifier::create)
+                .expectNext(userId)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
-    private static Mono<String> createOrganizationId(CloudFoundryClient cloudFoundryClient, String organizationName) {
+    private static Mono<String> createOrganizationId(
+            CloudFoundryClient cloudFoundryClient, String organizationName) {
         return requestCreateOrganization(cloudFoundryClient, organizationName)
-            .map(CreateOrganizationResponse::getId);
+                .map(CreateOrganizationResponse::getId);
     }
 
-    private static Mono<CreateOrganizationResponse> requestCreateOrganization(CloudFoundryClient cloudFoundryClient, String organizationName) {
-        return cloudFoundryClient.organizationsV3()
-            .create(CreateOrganizationRequest.builder()
-                .name(organizationName)
-                .build());
+    private static Mono<CreateOrganizationResponse> requestCreateOrganization(
+            CloudFoundryClient cloudFoundryClient, String organizationName) {
+        return cloudFoundryClient
+                .organizationsV3()
+                .create(CreateOrganizationRequest.builder().name(organizationName).build());
     }
 
-    private static Mono<CreateRoleResponse> requestCreateOrganizationRelationship(CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
-        return cloudFoundryClient.rolesV3()
-            .create(CreateRoleRequest.builder()
-                .relationships(RoleRelationships.builder()
-                    .organization(ToOneRelationship.builder()
-                        .data(Relationship.builder()
-                            .id(organizationId)
-                            .build())
-                        .build())
-                    .user(ToOneRelationship.builder()
-                        .data(Relationship.builder()
-                            .id(userId)
-                            .build())
-                        .build())
-                    .build())
-                .type(ORGANIZATION_USER)
-                .build());
+    private static Mono<CreateRoleResponse> requestCreateOrganizationRelationship(
+            CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
+        return cloudFoundryClient
+                .rolesV3()
+                .create(
+                        CreateRoleRequest.builder()
+                                .relationships(
+                                        RoleRelationships.builder()
+                                                .organization(
+                                                        ToOneRelationship.builder()
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id(organizationId)
+                                                                                .build())
+                                                                .build())
+                                                .user(
+                                                        ToOneRelationship.builder()
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id(userId)
+                                                                                .build())
+                                                                .build())
+                                                .build())
+                                .type(ORGANIZATION_USER)
+                                .build());
     }
 
     private static Flux<RoleResource> requestListRoles(CloudFoundryClient cloudFoundryClient) {
-        return PaginationUtils.requestClientV3Resources(page ->
-            cloudFoundryClient.rolesV3()
-                .list(ListRolesRequest.builder()
-                    .page(page)
-                    .build()));
+        return PaginationUtils.requestClientV3Resources(
+                page ->
+                        cloudFoundryClient
+                                .rolesV3()
+                                .list(ListRolesRequest.builder().page(page).build()));
     }
-
 }

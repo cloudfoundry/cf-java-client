@@ -16,6 +16,12 @@
 
 package org.cloudfoundry.client.v3;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.cloudfoundry.util.DelayUtils.exponentialBackOff;
+
+import java.io.IOException;
+import java.time.Duration;
+import java.util.EnumSet;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.CloudFoundryVersion;
 import org.cloudfoundry.IfCloudFoundryVersion;
@@ -42,82 +48,124 @@ import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.io.IOException;
-import java.time.Duration;
-import java.util.EnumSet;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.cloudfoundry.util.DelayUtils.exponentialBackOff;
-
 public class ResourceMatchTest extends AbstractIntegrationTest {
 
-    @Autowired
-    private CloudFoundryClient cloudFoundryClient;
+    @Autowired private CloudFoundryClient cloudFoundryClient;
 
-    @Autowired
-    private Mono<String> spaceId;
+    @Autowired private Mono<String> spaceId;
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
     @Test
-    @Disabled("Cloud Controller is configured not to cache resource smaller than 4k - Find a better way to test this")
+    @Disabled(
+            "Cloud Controller is configured not to cache resource smaller than 4k - Find a better"
+                    + " way to test this")
     public void upload() throws IOException {
         createAndUploadPackage()
-            .flatMap(this::waitForReady)
-            .then(ResourceMatchingUtilsV3.getMatchedResources(this.cloudFoundryClient, new ClassPathResource("test-application.zip").getFile().toPath()))
-            .as(StepVerifier::create)
-            .consumeNextWith(matchedResources -> assertThat(matchedResources).isNotEmpty())
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(this::waitForReady)
+                .then(
+                        ResourceMatchingUtilsV3.getMatchedResources(
+                                this.cloudFoundryClient,
+                                new ClassPathResource("test-application.zip").getFile().toPath()))
+                .as(StepVerifier::create)
+                .consumeNextWith(matchedResources -> assertThat(matchedResources).isNotEmpty())
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     private Mono<String> createAndUploadPackage() {
         String applicationName = this.nameFactory.getApplicationName();
 
         return this.spaceId
-            .flatMap(spaceId -> this.cloudFoundryClient.applicationsV3()
-                .create(CreateApplicationRequest.builder()
-                    .name(applicationName)
-                    .relationships(ApplicationRelationships.builder()
-                        .space(ToOneRelationship.builder()
-                            .data(Relationship.builder()
-                                .id(spaceId)
-                                .build())
-                            .build())
-                        .build())
-                    .build()))
-            .map(Application::getId)
-            .flatMap(applicationId -> this.cloudFoundryClient.packages()
-                .create(CreatePackageRequest.builder()
-                    .type(PackageType.BITS)
-                    .relationships(PackageRelationships.builder()
-                        .application(ToOneRelationship.builder()
-                            .data(Relationship.builder()
-                                .id(applicationId)
-                                .build())
-                            .build())
-                        .build())
-                    .build()))
-            .map(Package::getId)
-            .flatMap(packageId -> {
-                try {
-                    return this.cloudFoundryClient.packages()
-                        .upload(UploadPackageRequest.builder()
-                            .packageId(packageId)
-                            .bits(new ClassPathResource("test-application.zip").getFile().toPath())
-                            .build());
-                } catch (IOException e) {
-                    return Mono.error(Exceptions.propagate(e));
-                }
-            })
-            .map(Package::getId);
+                .flatMap(
+                        spaceId ->
+                                this.cloudFoundryClient
+                                        .applicationsV3()
+                                        .create(
+                                                CreateApplicationRequest.builder()
+                                                        .name(applicationName)
+                                                        .relationships(
+                                                                ApplicationRelationships.builder()
+                                                                        .space(
+                                                                                ToOneRelationship
+                                                                                        .builder()
+                                                                                        .data(
+                                                                                                Relationship
+                                                                                                        .builder()
+                                                                                                        .id(
+                                                                                                                spaceId)
+                                                                                                        .build())
+                                                                                        .build())
+                                                                        .build())
+                                                        .build()))
+                .map(Application::getId)
+                .flatMap(
+                        applicationId ->
+                                this.cloudFoundryClient
+                                        .packages()
+                                        .create(
+                                                CreatePackageRequest.builder()
+                                                        .type(PackageType.BITS)
+                                                        .relationships(
+                                                                PackageRelationships.builder()
+                                                                        .application(
+                                                                                ToOneRelationship
+                                                                                        .builder()
+                                                                                        .data(
+                                                                                                Relationship
+                                                                                                        .builder()
+                                                                                                        .id(
+                                                                                                                applicationId)
+                                                                                                        .build())
+                                                                                        .build())
+                                                                        .build())
+                                                        .build()))
+                .map(Package::getId)
+                .flatMap(
+                        packageId -> {
+                            try {
+                                return this.cloudFoundryClient
+                                        .packages()
+                                        .upload(
+                                                UploadPackageRequest.builder()
+                                                        .packageId(packageId)
+                                                        .bits(
+                                                                new ClassPathResource(
+                                                                                "test-application.zip")
+                                                                        .getFile()
+                                                                        .toPath())
+                                                        .build());
+                            } catch (IOException e) {
+                                return Mono.error(Exceptions.propagate(e));
+                            }
+                        })
+                .map(Package::getId);
     }
 
     private Mono<GetPackageResponse> waitForReady(String packageId) {
-        return this.cloudFoundryClient.packages().get(GetPackageRequest.builder().packageId(packageId).build())
-            .filter(packageResponse -> EnumSet.of(PackageState.READY, PackageState.FAILED, PackageState.EXPIRED).contains(packageResponse.getState()))
-            .repeatWhenEmpty(exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)))
-            .filter(packageResponse -> packageResponse.getState() == PackageState.READY)
-            .switchIfEmpty(ExceptionUtils.illegalState("Package %s failed upload processing", packageId))
-            .onErrorResume(DelayTimeoutException.class, t -> ExceptionUtils.illegalState("Package %s timed out during upload processing", packageId));
+        return this.cloudFoundryClient
+                .packages()
+                .get(GetPackageRequest.builder().packageId(packageId).build())
+                .filter(
+                        packageResponse ->
+                                EnumSet.of(
+                                                PackageState.READY,
+                                                PackageState.FAILED,
+                                                PackageState.EXPIRED)
+                                        .contains(packageResponse.getState()))
+                .repeatWhenEmpty(
+                        exponentialBackOff(
+                                Duration.ofSeconds(1),
+                                Duration.ofSeconds(15),
+                                Duration.ofMinutes(5)))
+                .filter(packageResponse -> packageResponse.getState() == PackageState.READY)
+                .switchIfEmpty(
+                        ExceptionUtils.illegalState(
+                                "Package %s failed upload processing", packageId))
+                .onErrorResume(
+                        DelayTimeoutException.class,
+                        t ->
+                                ExceptionUtils.illegalState(
+                                        "Package %s timed out during upload processing",
+                                        packageId));
     }
 }

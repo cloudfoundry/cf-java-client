@@ -22,9 +22,10 @@ public class CreateSecurityGroupRequestTest {
 
     @Test
     public void noName() {
-        assertThrows(IllegalStateException.class, () -> {
-            CreateSecurityGroupRequest.builder().rule(Rule.builder().build()).build();
-        });
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    CreateSecurityGroupRequest.builder().rule(Rule.builder().build()).build();
+                });
     }
-
 }

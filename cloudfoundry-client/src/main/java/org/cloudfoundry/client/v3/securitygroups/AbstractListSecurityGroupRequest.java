@@ -13,12 +13,11 @@
  */
 package org.cloudfoundry.client.v3.securitygroups;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.List;
-
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v2.PaginatedRequest;
 import org.cloudfoundry.client.v3.FilterParameter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public abstract class AbstractListSecurityGroupRequest extends PaginatedRequest {
 
@@ -41,5 +40,4 @@ public abstract class AbstractListSecurityGroupRequest extends PaginatedRequest 
     @FilterParameter("names")
     @Nullable
     abstract List<String> getNames();
-
 }

@@ -16,6 +16,11 @@
 
 package org.cloudfoundry.client.v3;
 
+import static org.cloudfoundry.client.v3.tasks.TaskState.RUNNING;
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
+
+import java.io.IOException;
+import java.time.Duration;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.CloudFoundryVersion;
 import org.cloudfoundry.IfCloudFoundryVersion;
@@ -44,40 +49,38 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.io.IOException;
-import java.time.Duration;
-
-import static org.cloudfoundry.client.v3.tasks.TaskState.RUNNING;
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
-
 @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_12)
 public final class TasksTest extends AbstractIntegrationTest {
 
-    @Autowired
-    private CloudFoundryClient cloudFoundryClient;
+    @Autowired private CloudFoundryClient cloudFoundryClient;
 
-    @Autowired
-    private CloudFoundryOperations cloudFoundryOperations;
+    @Autowired private CloudFoundryOperations cloudFoundryOperations;
 
     @Test
     public void cancel() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, applicationName)
-            .then(getApplicationId(this.cloudFoundryClient, applicationName))
-            .flatMap(applicationId -> Mono.zip(
-                Mono.just(applicationId),
-                getDropletId(this.cloudFoundryClient, applicationId)))
-            .flatMap(function((applicationId, dropletId) -> createTaskId(this.cloudFoundryClient, applicationId)))
-            .flatMap(taskId -> this.cloudFoundryClient.tasks()
-                .cancel(CancelTaskRequest.builder()
-                    .taskId(taskId)
-                    .build())
-                .map(CancelTaskResponse::getState))
-            .as(StepVerifier::create)
-            .expectNext(TaskState.CANCELING)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .then(getApplicationId(this.cloudFoundryClient, applicationName))
+                .flatMap(
+                        applicationId ->
+                                Mono.zip(
+                                        Mono.just(applicationId),
+                                        getDropletId(this.cloudFoundryClient, applicationId)))
+                .flatMap(
+                        function(
+                                (applicationId, dropletId) ->
+                                        createTaskId(this.cloudFoundryClient, applicationId)))
+                .flatMap(
+                        taskId ->
+                                this.cloudFoundryClient
+                                        .tasks()
+                                        .cancel(CancelTaskRequest.builder().taskId(taskId).build())
+                                        .map(CancelTaskResponse::getState))
+                .as(StepVerifier::create)
+                .expectNext(TaskState.CANCELING)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -85,22 +88,27 @@ public final class TasksTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, applicationName)
-            .then(getApplicationId(this.cloudFoundryClient, applicationName))
-            .delayUntil(applicationId -> getDropletId(this.cloudFoundryClient, applicationId))
-            .flatMap(applicationId -> this.cloudFoundryClient.tasks()
-                .create(CreateTaskRequest.builder()
-                    .applicationId(applicationId)
-                    .command("ls")
-                    .diskInMb(129)
-                    .memoryInMb(129)
-                    .build()))
-            .thenMany(requestListTasks(this.cloudFoundryClient)
-                .filter(task -> 129 == task.getMemoryInMb())
-                .map(TaskResource::getDiskInMb))
-            .as(StepVerifier::create)
-            .expectNext(129)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .then(getApplicationId(this.cloudFoundryClient, applicationName))
+                .delayUntil(applicationId -> getDropletId(this.cloudFoundryClient, applicationId))
+                .flatMap(
+                        applicationId ->
+                                this.cloudFoundryClient
+                                        .tasks()
+                                        .create(
+                                                CreateTaskRequest.builder()
+                                                        .applicationId(applicationId)
+                                                        .command("ls")
+                                                        .diskInMb(129)
+                                                        .memoryInMb(129)
+                                                        .build()))
+                .thenMany(
+                        requestListTasks(this.cloudFoundryClient)
+                                .filter(task -> 129 == task.getMemoryInMb())
+                                .map(TaskResource::getDiskInMb))
+                .as(StepVerifier::create)
+                .expectNext(129)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -108,20 +116,26 @@ public final class TasksTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, applicationName)
-            .then(getApplicationId(this.cloudFoundryClient, applicationName))
-            .flatMap(applicationId -> Mono.zip(
-                Mono.just(applicationId),
-                getDropletId(this.cloudFoundryClient, applicationId)))
-            .flatMap(function((applicationId, dropletId) -> createTaskId(this.cloudFoundryClient, applicationId)))
-            .flatMap(taskId -> this.cloudFoundryClient.tasks()
-                .get(GetTaskRequest.builder()
-                    .taskId(taskId)
-                    .build())
-                .map(GetTaskResponse::getCommand))
-            .as(StepVerifier::create)
-            .expectNext("ls")
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .then(getApplicationId(this.cloudFoundryClient, applicationName))
+                .flatMap(
+                        applicationId ->
+                                Mono.zip(
+                                        Mono.just(applicationId),
+                                        getDropletId(this.cloudFoundryClient, applicationId)))
+                .flatMap(
+                        function(
+                                (applicationId, dropletId) ->
+                                        createTaskId(this.cloudFoundryClient, applicationId)))
+                .flatMap(
+                        taskId ->
+                                this.cloudFoundryClient
+                                        .tasks()
+                                        .get(GetTaskRequest.builder().taskId(taskId).build())
+                                        .map(GetTaskResponse::getCommand))
+                .as(StepVerifier::create)
+                .expectNext("ls")
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -129,22 +143,32 @@ public final class TasksTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, applicationName)
-            .then(getApplicationId(this.cloudFoundryClient, applicationName))
-            .flatMap(applicationId -> Mono.zip(
-                Mono.just(applicationId),
-                getDropletId(this.cloudFoundryClient, applicationId)))
-            .flatMap(function((applicationId, dropletId) -> requestCreateTask(this.cloudFoundryClient, applicationId)
-                .thenReturn(dropletId)))
-            .flatMapMany(dropletId -> PaginationUtils.
-                requestClientV3Resources(page -> this.cloudFoundryClient.tasks()
-                    .list(ListTasksRequest.builder()
-                        .page(page)
-                        .build()))
-                .filter(task -> dropletId.equals(task.getDropletId())))
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .then(getApplicationId(this.cloudFoundryClient, applicationName))
+                .flatMap(
+                        applicationId ->
+                                Mono.zip(
+                                        Mono.just(applicationId),
+                                        getDropletId(this.cloudFoundryClient, applicationId)))
+                .flatMap(
+                        function(
+                                (applicationId, dropletId) ->
+                                        requestCreateTask(this.cloudFoundryClient, applicationId)
+                                                .thenReturn(dropletId)))
+                .flatMapMany(
+                        dropletId ->
+                                PaginationUtils.requestClientV3Resources(
+                                                page ->
+                                                        this.cloudFoundryClient
+                                                                .tasks()
+                                                                .list(
+                                                                        ListTasksRequest.builder()
+                                                                                .page(page)
+                                                                                .build()))
+                                        .filter(task -> dropletId.equals(task.getDropletId())))
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -152,22 +176,38 @@ public final class TasksTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, applicationName)
-            .then(getApplicationId(this.cloudFoundryClient, applicationName))
-            .flatMap(applicationId -> Mono.zip(
-                Mono.just(applicationId),
-                getDropletId(this.cloudFoundryClient, applicationId)))
-            .delayUntil(function((applicationId, dropletId) -> requestCreateTask(this.cloudFoundryClient, applicationId)))
-            .flatMapMany(function((applicationId, dropletId) -> PaginationUtils.
-                requestClientV3Resources(page -> this.cloudFoundryClient.tasks()
-                    .list(ListTasksRequest.builder()
-                        .applicationId(applicationId)
-                        .page(page)
-                        .build()))
-                .filter(task -> dropletId.equals(task.getDropletId()))))
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .then(getApplicationId(this.cloudFoundryClient, applicationName))
+                .flatMap(
+                        applicationId ->
+                                Mono.zip(
+                                        Mono.just(applicationId),
+                                        getDropletId(this.cloudFoundryClient, applicationId)))
+                .delayUntil(
+                        function(
+                                (applicationId, dropletId) ->
+                                        requestCreateTask(this.cloudFoundryClient, applicationId)))
+                .flatMapMany(
+                        function(
+                                (applicationId, dropletId) ->
+                                        PaginationUtils.requestClientV3Resources(
+                                                        page ->
+                                                                this.cloudFoundryClient
+                                                                        .tasks()
+                                                                        .list(
+                                                                                ListTasksRequest
+                                                                                        .builder()
+                                                                                        .applicationId(
+                                                                                                applicationId)
+                                                                                        .page(page)
+                                                                                        .build()))
+                                                .filter(
+                                                        task ->
+                                                                dropletId.equals(
+                                                                        task.getDropletId()))))
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -175,22 +215,32 @@ public final class TasksTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, applicationName)
-            .then(getApplicationId(this.cloudFoundryClient, applicationName))
-            .flatMap(applicationId -> Mono.zip(
-                Mono.just(applicationId),
-                getDropletId(this.cloudFoundryClient, applicationId)))
-            .flatMap(function((applicationId, dropletId) -> createTaskId(this.cloudFoundryClient, applicationId)))
-            .flatMap(taskId -> getTaskName(this.cloudFoundryClient, taskId))
-            .flatMapMany(taskName -> PaginationUtils.
-                requestClientV3Resources(page -> this.cloudFoundryClient.tasks()
-                    .list(ListTasksRequest.builder()
-                        .name(taskName)
-                        .page(page)
-                        .build())))
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .then(getApplicationId(this.cloudFoundryClient, applicationName))
+                .flatMap(
+                        applicationId ->
+                                Mono.zip(
+                                        Mono.just(applicationId),
+                                        getDropletId(this.cloudFoundryClient, applicationId)))
+                .flatMap(
+                        function(
+                                (applicationId, dropletId) ->
+                                        createTaskId(this.cloudFoundryClient, applicationId)))
+                .flatMap(taskId -> getTaskName(this.cloudFoundryClient, taskId))
+                .flatMapMany(
+                        taskName ->
+                                PaginationUtils.requestClientV3Resources(
+                                        page ->
+                                                this.cloudFoundryClient
+                                                        .tasks()
+                                                        .list(
+                                                                ListTasksRequest.builder()
+                                                                        .name(taskName)
+                                                                        .page(page)
+                                                                        .build())))
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -198,84 +248,109 @@ public final class TasksTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
 
         createApplication(this.cloudFoundryOperations, applicationName)
-            .then(getApplicationId(this.cloudFoundryClient, applicationName))
-            .flatMap(applicationId -> Mono.zip(
-                Mono.just(applicationId),
-                getDropletId(this.cloudFoundryClient, applicationId)))
-            .flatMap(function((applicationId, dropletId) -> requestCreateTask(this.cloudFoundryClient, applicationId)
-                .thenReturn(dropletId)))
-            .flatMapMany(dropletId -> PaginationUtils.
-                requestClientV3Resources(page -> this.cloudFoundryClient.tasks()
-                    .list(ListTasksRequest.builder()
-                        .state(RUNNING)
-                        .page(page)
-                        .build()))
-                .filter(task -> dropletId.equals(task.getDropletId())))
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .then(getApplicationId(this.cloudFoundryClient, applicationName))
+                .flatMap(
+                        applicationId ->
+                                Mono.zip(
+                                        Mono.just(applicationId),
+                                        getDropletId(this.cloudFoundryClient, applicationId)))
+                .flatMap(
+                        function(
+                                (applicationId, dropletId) ->
+                                        requestCreateTask(this.cloudFoundryClient, applicationId)
+                                                .thenReturn(dropletId)))
+                .flatMapMany(
+                        dropletId ->
+                                PaginationUtils.requestClientV3Resources(
+                                                page ->
+                                                        this.cloudFoundryClient
+                                                                .tasks()
+                                                                .list(
+                                                                        ListTasksRequest.builder()
+                                                                                .state(RUNNING)
+                                                                                .page(page)
+                                                                                .build()))
+                                        .filter(task -> dropletId.equals(task.getDropletId())))
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
-    private static Mono<Void> createApplication(CloudFoundryOperations cloudFoundryOperations, String name) throws IOException {
-        return cloudFoundryOperations.applications()
-            .push(PushApplicationRequest.builder()
-                .path(new ClassPathResource("test-application.zip").getFile().toPath())
-                .buildpack("staticfile_buildpack")
-                .diskQuota(256)
-                .healthCheckType(ApplicationHealthCheck.PORT)
-                .memory(64)
-                .name(name)
-                .noStart(false)
-                .build());
+    private static Mono<Void> createApplication(
+            CloudFoundryOperations cloudFoundryOperations, String name) throws IOException {
+        return cloudFoundryOperations
+                .applications()
+                .push(
+                        PushApplicationRequest.builder()
+                                .path(
+                                        new ClassPathResource("test-application.zip")
+                                                .getFile()
+                                                .toPath())
+                                .buildpack("staticfile_buildpack")
+                                .diskQuota(256)
+                                .healthCheckType(ApplicationHealthCheck.PORT)
+                                .memory(64)
+                                .name(name)
+                                .noStart(false)
+                                .build());
     }
 
-    private static Mono<String> createTaskId(CloudFoundryClient cloudFoundryClient, String applicationId) {
-        return requestCreateTask(cloudFoundryClient, applicationId)
-            .map(CreateTaskResponse::getId);
+    private static Mono<String> createTaskId(
+            CloudFoundryClient cloudFoundryClient, String applicationId) {
+        return requestCreateTask(cloudFoundryClient, applicationId).map(CreateTaskResponse::getId);
     }
 
-    private static Mono<String> getApplicationId(CloudFoundryClient cloudFoundryClient, String applicationName) {
-        return PaginationUtils.requestClientV3Resources(page -> cloudFoundryClient.applicationsV3()
-            .list(ListApplicationsRequest.builder()
-                .name(applicationName)
-                .build()))
-            .single()
-            .map(ApplicationResource::getId);
+    private static Mono<String> getApplicationId(
+            CloudFoundryClient cloudFoundryClient, String applicationName) {
+        return PaginationUtils.requestClientV3Resources(
+                        page ->
+                                cloudFoundryClient
+                                        .applicationsV3()
+                                        .list(
+                                                ListApplicationsRequest.builder()
+                                                        .name(applicationName)
+                                                        .build()))
+                .single()
+                .map(ApplicationResource::getId);
     }
 
-    private static Mono<String> getDropletId(CloudFoundryClient cloudFoundryClient, String applicationId) {
-        return cloudFoundryClient.applicationsV3()
-            .getCurrentDroplet(GetApplicationCurrentDropletRequest.builder()
-                .applicationId(applicationId)
-                .build())
-            .map(GetApplicationCurrentDropletResponse::getId);
+    private static Mono<String> getDropletId(
+            CloudFoundryClient cloudFoundryClient, String applicationId) {
+        return cloudFoundryClient
+                .applicationsV3()
+                .getCurrentDroplet(
+                        GetApplicationCurrentDropletRequest.builder()
+                                .applicationId(applicationId)
+                                .build())
+                .map(GetApplicationCurrentDropletResponse::getId);
     }
 
     private static Mono<String> getTaskName(CloudFoundryClient cloudFoundryClient, String taskId) {
-        return cloudFoundryClient.tasks()
-            .get(GetTaskRequest.builder()
-                .taskId(taskId)
-                .build())
-            .map(GetTaskResponse::getName);
+        return cloudFoundryClient
+                .tasks()
+                .get(GetTaskRequest.builder().taskId(taskId).build())
+                .map(GetTaskResponse::getName);
     }
 
-    private static Mono<CreateTaskResponse> requestCreateTask(CloudFoundryClient cloudFoundryClient, String applicationId) {
-        return cloudFoundryClient.tasks()
-            .create(CreateTaskRequest.builder()
-                .applicationId(applicationId)
-                .command("ls")
-                .diskInMb(64)
-                .memoryInMb(67)
-                .build());
+    private static Mono<CreateTaskResponse> requestCreateTask(
+            CloudFoundryClient cloudFoundryClient, String applicationId) {
+        return cloudFoundryClient
+                .tasks()
+                .create(
+                        CreateTaskRequest.builder()
+                                .applicationId(applicationId)
+                                .command("ls")
+                                .diskInMb(64)
+                                .memoryInMb(67)
+                                .build());
     }
 
     private static Flux<TaskResource> requestListTasks(CloudFoundryClient cloudFoundryClient) {
-        return PaginationUtils.
-            requestClientV3Resources(page -> cloudFoundryClient.tasks()
-                .list(ListTasksRequest.builder()
-                    .page(page)
-                    .build()));
+        return PaginationUtils.requestClientV3Resources(
+                page ->
+                        cloudFoundryClient
+                                .tasks()
+                                .list(ListTasksRequest.builder().page(page).build()));
     }
-
 }

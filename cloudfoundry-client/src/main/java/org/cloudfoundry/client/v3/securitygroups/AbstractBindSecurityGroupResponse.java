@@ -14,15 +14,13 @@
 
 package org.cloudfoundry.client.v3.securitygroups;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.List;
 import java.util.Map;
 import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.Relationship;
-
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 @JsonDeserialize
 public abstract class AbstractBindSecurityGroupResponse {

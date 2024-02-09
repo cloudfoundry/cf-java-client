@@ -16,7 +16,15 @@
 
 package org.cloudfoundry.uaa;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.cloudfoundry.uaa.tokens.GrantType.CLIENT_CREDENTIALS;
+import static org.cloudfoundry.uaa.tokens.GrantType.IMPLICIT;
+import static org.cloudfoundry.uaa.tokens.GrantType.PASSWORD;
+import static org.cloudfoundry.uaa.tokens.GrantType.REFRESH_TOKEN;
+
 import io.netty.util.AsciiString;
+import java.time.Duration;
+import java.util.Base64;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.CloudFoundryVersion;
 import org.cloudfoundry.IfCloudFoundryVersion;
@@ -57,22 +65,11 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.time.Duration;
-import java.util.Base64;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.cloudfoundry.uaa.tokens.GrantType.CLIENT_CREDENTIALS;
-import static org.cloudfoundry.uaa.tokens.GrantType.IMPLICIT;
-import static org.cloudfoundry.uaa.tokens.GrantType.PASSWORD;
-import static org.cloudfoundry.uaa.tokens.GrantType.REFRESH_TOKEN;
-
 public final class ClientsTest extends AbstractIntegrationTest {
 
-    @Autowired
-    private String clientId;
+    @Autowired private String clientId;
 
-    @Autowired
-    private UaaClient uaaClient;
+    @Autowired private UaaClient uaaClient;
 
     @Test
     public void batchChangeSecret() {
@@ -83,25 +80,29 @@ public final class ClientsTest extends AbstractIntegrationTest {
         String newClientSecret2 = this.nameFactory.getClientSecret();
 
         requestCreateClient(this.uaaClient, clientId1, clientSecret)
-            .then(requestCreateClient(this.uaaClient, clientId2, clientSecret))
-            .then(this.uaaClient.clients()
-                .batchChangeSecret(BatchChangeSecretRequest.builder()
-                    .changeSecrets(ChangeSecret.builder()
-                            .clientId(clientId1)
-                            .oldSecret(clientSecret)
-                            .secret(newClientSecret1)
-                            .build(),
-                        ChangeSecret.builder()
-                            .clientId(clientId2)
-                            .oldSecret(clientSecret)
-                            .secret(newClientSecret2)
-                            .build())
-                    .build()))
-            .flatMapIterable(BatchChangeSecretResponse::getClients)
-            .as(StepVerifier::create)
-            .expectNextCount(2)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .then(requestCreateClient(this.uaaClient, clientId2, clientSecret))
+                .then(
+                        this.uaaClient
+                                .clients()
+                                .batchChangeSecret(
+                                        BatchChangeSecretRequest.builder()
+                                                .changeSecrets(
+                                                        ChangeSecret.builder()
+                                                                .clientId(clientId1)
+                                                                .oldSecret(clientSecret)
+                                                                .secret(newClientSecret1)
+                                                                .build(),
+                                                        ChangeSecret.builder()
+                                                                .clientId(clientId2)
+                                                                .oldSecret(clientSecret)
+                                                                .secret(newClientSecret2)
+                                                                .build())
+                                                .build()))
+                .flatMapIterable(BatchChangeSecretResponse::getClients)
+                .as(StepVerifier::create)
+                .expectNextCount(2)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -110,36 +111,43 @@ public final class ClientsTest extends AbstractIntegrationTest {
         String clientId2 = this.nameFactory.getClientId();
         String clientSecret = this.nameFactory.getClientSecret();
 
-        this.uaaClient.clients()
-            .batchCreate(BatchCreateClientsRequest.builder()
-                .client(CreateClient.builder()
-                    .approvalsDeleted(true)
-                    .authorizedGrantType(PASSWORD)
-                    .clientId(clientId1)
-                    .clientSecret(clientSecret)
-                    .scopes("client.read", "client.write")
-                    .tokenSalt("test-token-salt")
-                    .build())
-                .client(CreateClient.builder()
-                    .approvalsDeleted(true)
-                    .authorizedGrantTypes(PASSWORD, REFRESH_TOKEN)
-                    .clientId(clientId2)
-                    .clientSecret(clientSecret)
-                    .scope("client.write")
-                    .tokenSalt("filtered-test-token-salt")
-                    .build())
-                .build())
-            .flatMapIterable(BatchCreateClientsResponse::getClients)
-            .filter(client -> clientId1.equals(client.getClientId()))
-            .as(StepVerifier::create)
-            .consumeNextWith(response -> {
-                assertThat(response.getAuthorizedGrantTypes()).containsExactly(PASSWORD, REFRESH_TOKEN);
-                assertThat(response.getClientId()).isEqualTo(clientId1);
-                assertThat(response.getScopes()).containsExactly("client.read", "client.write");
-                assertThat(response.getTokenSalt()).isEqualTo("test-token-salt");
-            })
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        this.uaaClient
+                .clients()
+                .batchCreate(
+                        BatchCreateClientsRequest.builder()
+                                .client(
+                                        CreateClient.builder()
+                                                .approvalsDeleted(true)
+                                                .authorizedGrantType(PASSWORD)
+                                                .clientId(clientId1)
+                                                .clientSecret(clientSecret)
+                                                .scopes("client.read", "client.write")
+                                                .tokenSalt("test-token-salt")
+                                                .build())
+                                .client(
+                                        CreateClient.builder()
+                                                .approvalsDeleted(true)
+                                                .authorizedGrantTypes(PASSWORD, REFRESH_TOKEN)
+                                                .clientId(clientId2)
+                                                .clientSecret(clientSecret)
+                                                .scope("client.write")
+                                                .tokenSalt("filtered-test-token-salt")
+                                                .build())
+                                .build())
+                .flatMapIterable(BatchCreateClientsResponse::getClients)
+                .filter(client -> clientId1.equals(client.getClientId()))
+                .as(StepVerifier::create)
+                .consumeNextWith(
+                        response -> {
+                            assertThat(response.getAuthorizedGrantTypes())
+                                    .containsExactly(PASSWORD, REFRESH_TOKEN);
+                            assertThat(response.getClientId()).isEqualTo(clientId1);
+                            assertThat(response.getScopes())
+                                    .containsExactly("client.read", "client.write");
+                            assertThat(response.getTokenSalt()).isEqualTo("test-token-salt");
+                        })
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -149,18 +157,25 @@ public final class ClientsTest extends AbstractIntegrationTest {
         String clientSecret = this.nameFactory.getClientSecret();
 
         batchCreateClients(this.uaaClient, clientId1, clientId2, clientSecret)
-            .flatMapIterable(BatchCreateClientsResponse::getClients)
-            .map(Client::getClientId)
-            .collectList()
-            .flatMap(clientIds -> this.uaaClient.clients()
-                .batchDelete(BatchDeleteClientsRequest.builder()
-                    .clientIds(clientIds)
-                    .build()))
-            .thenMany(requestListClients(this.uaaClient))
-            .filter(client -> clientId1.equals(client.getClientId()) || clientId2.equals(client.getClientId()))
-            .as(StepVerifier::create)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMapIterable(BatchCreateClientsResponse::getClients)
+                .map(Client::getClientId)
+                .collectList()
+                .flatMap(
+                        clientIds ->
+                                this.uaaClient
+                                        .clients()
+                                        .batchDelete(
+                                                BatchDeleteClientsRequest.builder()
+                                                        .clientIds(clientIds)
+                                                        .build()))
+                .thenMany(requestListClients(this.uaaClient))
+                .filter(
+                        client ->
+                                clientId1.equals(client.getClientId())
+                                        || clientId2.equals(client.getClientId()))
+                .as(StepVerifier::create)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -170,37 +185,50 @@ public final class ClientsTest extends AbstractIntegrationTest {
         String clientSecret = this.nameFactory.getClientSecret();
 
         requestCreateClient(this.uaaClient, clientId1, clientSecret)
-            .then(requestCreateClient(this.uaaClient, clientId2, clientSecret))
-            .then(this.uaaClient.clients()
-                .batchUpdate(BatchUpdateClientsRequest.builder()
-                    .clients(UpdateClient.builder()
-                            .authorizedGrantTypes(CLIENT_CREDENTIALS, IMPLICIT)
-                            .clientId(clientId1)
-                            .name("test-name")
-                            .scopes("client.read", "client.write")
-                            .redirectUriPattern("https://test.com/*")
-                            .tokenSalt("test-token-salt")
-                            .build(),
-                        UpdateClient.builder()
-                            .authorizedGrantType(PASSWORD)
-                            .clientId(clientId2)
-                            .name("filtered-test-name")
-                            .scope("client.write")
-                            .tokenSalt("filtered-test-token-salt")
-                            .build())
-                    .build()))
-            .flatMapIterable(BatchUpdateClientsResponse::getClients)
-            .filter(client -> clientId1.equals(client.getClientId()))
-            .as(StepVerifier::create)
-            .consumeNextWith(response -> {
-                assertThat(response.getAuthorizedGrantTypes()).containsExactly(IMPLICIT, CLIENT_CREDENTIALS);
-                assertThat(response.getClientId()).isEqualTo(clientId1);
-                assertThat(response.getName()).isEqualTo("test-name");
-                assertThat(response.getScopes()).containsExactly("client.read", "client.write");
-                assertThat(response.getTokenSalt()).isEqualTo("test-token-salt");
-            })
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .then(requestCreateClient(this.uaaClient, clientId2, clientSecret))
+                .then(
+                        this.uaaClient
+                                .clients()
+                                .batchUpdate(
+                                        BatchUpdateClientsRequest.builder()
+                                                .clients(
+                                                        UpdateClient.builder()
+                                                                .authorizedGrantTypes(
+                                                                        CLIENT_CREDENTIALS,
+                                                                        IMPLICIT)
+                                                                .clientId(clientId1)
+                                                                .name("test-name")
+                                                                .scopes(
+                                                                        "client.read",
+                                                                        "client.write")
+                                                                .redirectUriPattern(
+                                                                        "https://test.com/*")
+                                                                .tokenSalt("test-token-salt")
+                                                                .build(),
+                                                        UpdateClient.builder()
+                                                                .authorizedGrantType(PASSWORD)
+                                                                .clientId(clientId2)
+                                                                .name("filtered-test-name")
+                                                                .scope("client.write")
+                                                                .tokenSalt(
+                                                                        "filtered-test-token-salt")
+                                                                .build())
+                                                .build()))
+                .flatMapIterable(BatchUpdateClientsResponse::getClients)
+                .filter(client -> clientId1.equals(client.getClientId()))
+                .as(StepVerifier::create)
+                .consumeNextWith(
+                        response -> {
+                            assertThat(response.getAuthorizedGrantTypes())
+                                    .containsExactly(IMPLICIT, CLIENT_CREDENTIALS);
+                            assertThat(response.getClientId()).isEqualTo(clientId1);
+                            assertThat(response.getName()).isEqualTo("test-name");
+                            assertThat(response.getScopes())
+                                    .containsExactly("client.read", "client.write");
+                            assertThat(response.getTokenSalt()).isEqualTo("test-token-salt");
+                        })
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @IfCloudFoundryVersion(lessThan = CloudFoundryVersion.PCF_2_8)
@@ -211,15 +239,24 @@ public final class ClientsTest extends AbstractIntegrationTest {
         String oldClientSecret = this.nameFactory.getClientSecret();
 
         requestCreateClient(this.uaaClient, clientId, oldClientSecret)
-            .then(this.uaaClient.clients()
-                .changeSecret(ChangeSecretRequest.builder()
-                    .clientId(clientId)
-                    .oldSecret(oldClientSecret)
-                    .secret(newClientSecret)
-                    .build()))
-            .as(StepVerifier::create)
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(UaaException.class).hasMessage("invalid_client: Only a client can change client secret"))
-            .verify(Duration.ofMinutes(5));
+                .then(
+                        this.uaaClient
+                                .clients()
+                                .changeSecret(
+                                        ChangeSecretRequest.builder()
+                                                .clientId(clientId)
+                                                .oldSecret(oldClientSecret)
+                                                .secret(newClientSecret)
+                                                .build()))
+                .as(StepVerifier::create)
+                .consumeErrorWith(
+                        t ->
+                                assertThat(t)
+                                        .isInstanceOf(UaaException.class)
+                                        .hasMessage(
+                                                "invalid_client: Only a client can change client"
+                                                        + " secret"))
+                .verify(Duration.ofMinutes(5));
     }
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_8)
@@ -230,19 +267,23 @@ public final class ClientsTest extends AbstractIntegrationTest {
         String oldClientSecret = this.nameFactory.getClientSecret();
 
         requestCreateClient(this.uaaClient, clientId, oldClientSecret)
-            .then(this.uaaClient.clients()
-                .changeSecret(ChangeSecretRequest.builder()
-                    .clientId(clientId)
-                    .oldSecret(oldClientSecret)
-                    .secret(newClientSecret)
-                    .build()))
-            .as(StepVerifier::create)
-            .assertNext(response -> {
-                assertThat(response.getMessage()).isEqualTo("secret updated");
-                assertThat(response.getStatus()).isEqualTo("ok");
-            })
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .then(
+                        this.uaaClient
+                                .clients()
+                                .changeSecret(
+                                        ChangeSecretRequest.builder()
+                                                .clientId(clientId)
+                                                .oldSecret(oldClientSecret)
+                                                .secret(newClientSecret)
+                                                .build()))
+                .as(StepVerifier::create)
+                .assertNext(
+                        response -> {
+                            assertThat(response.getMessage()).isEqualTo("secret updated");
+                            assertThat(response.getStatus()).isEqualTo("ok");
+                        })
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -250,24 +291,29 @@ public final class ClientsTest extends AbstractIntegrationTest {
         String clientId = this.nameFactory.getClientId();
         String clientSecret = this.nameFactory.getClientSecret();
 
-        this.uaaClient.clients()
-            .create(CreateClientRequest.builder()
-                .approvalsDeleted(true)
-                .authorizedGrantType(PASSWORD)
-                .clientId(clientId)
-                .clientSecret(clientSecret)
-                .scopes("client.read", "client.write")
-                .tokenSalt("test-token-salt")
-                .build())
-            .as(StepVerifier::create)
-            .consumeNextWith(response -> {
-                assertThat(response.getAuthorizedGrantTypes()).containsExactly(PASSWORD, REFRESH_TOKEN);
-                assertThat(response.getClientId()).isEqualTo(clientId);
-                assertThat(response.getScopes()).containsExactly("client.read", "client.write");
-                assertThat(response.getTokenSalt()).isEqualTo("test-token-salt");
-            })
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        this.uaaClient
+                .clients()
+                .create(
+                        CreateClientRequest.builder()
+                                .approvalsDeleted(true)
+                                .authorizedGrantType(PASSWORD)
+                                .clientId(clientId)
+                                .clientSecret(clientSecret)
+                                .scopes("client.read", "client.write")
+                                .tokenSalt("test-token-salt")
+                                .build())
+                .as(StepVerifier::create)
+                .consumeNextWith(
+                        response -> {
+                            assertThat(response.getAuthorizedGrantTypes())
+                                    .containsExactly(PASSWORD, REFRESH_TOKEN);
+                            assertThat(response.getClientId()).isEqualTo(clientId);
+                            assertThat(response.getScopes())
+                                    .containsExactly("client.read", "client.write");
+                            assertThat(response.getTokenSalt()).isEqualTo("test-token-salt");
+                        })
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -276,15 +322,15 @@ public final class ClientsTest extends AbstractIntegrationTest {
         String clientSecret = this.nameFactory.getClientSecret();
 
         requestCreateClient(this.uaaClient, clientId, clientSecret)
-            .then(this.uaaClient.clients()
-                .delete(DeleteClientRequest.builder()
-                    .clientId(clientId)
-                    .build()))
-            .thenMany(requestListClients(this.uaaClient))
-            .filter(client -> clientId.equals(client.getClientId()))
-            .as(StepVerifier::create)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .then(
+                        this.uaaClient
+                                .clients()
+                                .delete(DeleteClientRequest.builder().clientId(clientId).build()))
+                .thenMany(requestListClients(this.uaaClient))
+                .filter(client -> clientId.equals(client.getClientId()))
+                .as(StepVerifier::create)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -293,33 +339,39 @@ public final class ClientsTest extends AbstractIntegrationTest {
         String clientSecret = this.nameFactory.getClientSecret();
 
         requestCreateClient(this.uaaClient, clientId, clientSecret)
-            .then(this.uaaClient.clients()
-                .get(GetClientRequest.builder()
-                    .clientId(clientId)
-                    .build()))
-            .as(StepVerifier::create)
-            .consumeNextWith(response -> {
-                assertThat(response.getAuthorizedGrantTypes()).containsExactly(PASSWORD, REFRESH_TOKEN);
-                assertThat(response.getClientId()).isEqualTo(clientId);
-            })
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .then(
+                        this.uaaClient
+                                .clients()
+                                .get(GetClientRequest.builder().clientId(clientId).build()))
+                .as(StepVerifier::create)
+                .consumeNextWith(
+                        response -> {
+                            assertThat(response.getAuthorizedGrantTypes())
+                                    .containsExactly(PASSWORD, REFRESH_TOKEN);
+                            assertThat(response.getClientId()).isEqualTo(clientId);
+                        })
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void getMetadata() {
         requestUpdateMetadata(this.uaaClient, this.clientId, "http://test.get.url")
-            .then(this.uaaClient.clients()
-                .getMetadata(GetMetadataRequest.builder()
-                    .clientId(this.clientId)
-                    .build()))
-            .as(StepVerifier::create)
-            .consumeNextWith(metadata -> {
-                assertThat(metadata.getAppLaunchUrl()).isEqualTo("http://test.get.url");
-                assertThat(metadata.getClientId()).isEqualTo(this.clientId);
-            })
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .then(
+                        this.uaaClient
+                                .clients()
+                                .getMetadata(
+                                        GetMetadataRequest.builder()
+                                                .clientId(this.clientId)
+                                                .build()))
+                .as(StepVerifier::create)
+                .consumeNextWith(
+                        metadata -> {
+                            assertThat(metadata.getAppLaunchUrl()).isEqualTo("http://test.get.url");
+                            assertThat(metadata.getClientId()).isEqualTo(this.clientId);
+                        })
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -328,33 +380,41 @@ public final class ClientsTest extends AbstractIntegrationTest {
         String clientSecret = this.nameFactory.getClientSecret();
 
         requestCreateClient(this.uaaClient, clientId, clientSecret)
-            .thenMany(PaginationUtils.requestUaaResources(startIndex -> this.uaaClient.clients()
-                .list(ListClientsRequest.builder()
-                    .startIndex(startIndex)
-                    .build())))
-            .filter(client -> clientId.equals(client.getClientId()))
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .thenMany(
+                        PaginationUtils.requestUaaResources(
+                                startIndex ->
+                                        this.uaaClient
+                                                .clients()
+                                                .list(
+                                                        ListClientsRequest.builder()
+                                                                .startIndex(startIndex)
+                                                                .build())))
+                .filter(client -> clientId.equals(client.getClientId()))
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void listMetadatas() {
         requestUpdateMetadata(this.uaaClient, this.clientId, "http://test.list.url")
-            .then(this.uaaClient.clients()
-                .listMetadatas(ListMetadatasRequest.builder()
-                    .build()))
-            .flatMapIterable(ListMetadatasResponse::getMetadatas)
-            .filter(metadata -> this.clientId.equals(metadata.getClientId()))
-            .single()
-            .as(StepVerifier::create)
-            .consumeNextWith(metadata -> {
-                assertThat(metadata.getAppLaunchUrl()).isEqualTo("http://test.list.url");
-                assertThat(metadata.getClientId()).isEqualTo(this.clientId);
-            })
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .then(
+                        this.uaaClient
+                                .clients()
+                                .listMetadatas(ListMetadatasRequest.builder().build()))
+                .flatMapIterable(ListMetadatasResponse::getMetadatas)
+                .filter(metadata -> this.clientId.equals(metadata.getClientId()))
+                .single()
+                .as(StepVerifier::create)
+                .consumeNextWith(
+                        metadata -> {
+                            assertThat(metadata.getAppLaunchUrl())
+                                    .isEqualTo("http://test.list.url");
+                            assertThat(metadata.getClientId()).isEqualTo(this.clientId);
+                        })
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -364,44 +424,49 @@ public final class ClientsTest extends AbstractIntegrationTest {
         String clientSecret = this.nameFactory.getClientSecret();
         String newClientSecret = this.nameFactory.getClientSecret();
 
-        this.uaaClient.clients()
-            .mixedActions(MixedActionsRequest.builder()
-                .action(CreateClientAction.builder()
-                    .authorizedGrantType(PASSWORD)
-                    .clientId(clientId1)
-                    .clientSecret(clientSecret)
-                    .name("test-name-old")
-                    .build())
-                .action(CreateClientAction.builder()
-                    .authorizedGrantType(PASSWORD)
-                    .clientId(clientId2)
-                    .clientSecret(clientSecret)
-                    .build())
-                .action(UpdateClientAction.builder()
-                    .authorizedGrantType(PASSWORD)
-                    .clientId(clientId1)
-                    .name("test-name-temporary")
-                    .build())
-                .action(UpdateSecretAction.builder()
-                    .clientId(clientId2)
-                    .secret(newClientSecret)
-                    .build())
-                .action(DeleteClientAction.builder()
-                    .clientId(clientId2)
-                    .build())
-                .action(UpdateSecretClientAction.builder()
-                    .authorizedGrantType(PASSWORD)
-                    .name("test-name-new")
-                    .clientId(clientId1)
-                    .secret(newClientSecret)
-                    .build())
-                .build())
-            .thenMany(requestListClients(this.uaaClient))
-            .filter(client -> clientId1.equals(client.getClientId()))
-            .as(StepVerifier::create)
-            .consumeNextWith(client -> assertThat(client.getName()).isEqualTo("test-name-new"))
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        this.uaaClient
+                .clients()
+                .mixedActions(
+                        MixedActionsRequest.builder()
+                                .action(
+                                        CreateClientAction.builder()
+                                                .authorizedGrantType(PASSWORD)
+                                                .clientId(clientId1)
+                                                .clientSecret(clientSecret)
+                                                .name("test-name-old")
+                                                .build())
+                                .action(
+                                        CreateClientAction.builder()
+                                                .authorizedGrantType(PASSWORD)
+                                                .clientId(clientId2)
+                                                .clientSecret(clientSecret)
+                                                .build())
+                                .action(
+                                        UpdateClientAction.builder()
+                                                .authorizedGrantType(PASSWORD)
+                                                .clientId(clientId1)
+                                                .name("test-name-temporary")
+                                                .build())
+                                .action(
+                                        UpdateSecretAction.builder()
+                                                .clientId(clientId2)
+                                                .secret(newClientSecret)
+                                                .build())
+                                .action(DeleteClientAction.builder().clientId(clientId2).build())
+                                .action(
+                                        UpdateSecretClientAction.builder()
+                                                .authorizedGrantType(PASSWORD)
+                                                .name("test-name-new")
+                                                .clientId(clientId1)
+                                                .secret(newClientSecret)
+                                                .build())
+                                .build())
+                .thenMany(requestListClients(this.uaaClient))
+                .filter(client -> clientId1.equals(client.getClientId()))
+                .as(StepVerifier::create)
+                .consumeNextWith(client -> assertThat(client.getName()).isEqualTo("test-name-new"))
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -410,102 +475,121 @@ public final class ClientsTest extends AbstractIntegrationTest {
         String clientSecret = this.nameFactory.getClientSecret();
 
         requestCreateClient(this.uaaClient, clientId, clientSecret)
-            .then(this.uaaClient.clients()
-                .update(UpdateClientRequest.builder()
-                    .authorizedGrantType(CLIENT_CREDENTIALS)
-                    .clientId(clientId)
-                    .name("test-name")
-                    .build()))
-            .thenMany(requestListClients(this.uaaClient))
-            .filter(client -> clientId.equals(client.getClientId()))
-            .as(StepVerifier::create)
-            .consumeNextWith(response -> {
-                assertThat(response.getAuthorizedGrantTypes()).containsExactly(CLIENT_CREDENTIALS);
-                assertThat(response.getClientId()).isEqualTo(clientId);
-                assertThat(response.getName()).isEqualTo("test-name");
-            })
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .then(
+                        this.uaaClient
+                                .clients()
+                                .update(
+                                        UpdateClientRequest.builder()
+                                                .authorizedGrantType(CLIENT_CREDENTIALS)
+                                                .clientId(clientId)
+                                                .name("test-name")
+                                                .build()))
+                .thenMany(requestListClients(this.uaaClient))
+                .filter(client -> clientId.equals(client.getClientId()))
+                .as(StepVerifier::create)
+                .consumeNextWith(
+                        response -> {
+                            assertThat(response.getAuthorizedGrantTypes())
+                                    .containsExactly(CLIENT_CREDENTIALS);
+                            assertThat(response.getClientId()).isEqualTo(clientId);
+                            assertThat(response.getName()).isEqualTo("test-name");
+                        })
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void updateMetadata() {
-        String appIcon = Base64.getEncoder().encodeToString(new AsciiString("test-image").toByteArray());
+        String appIcon =
+                Base64.getEncoder().encodeToString(new AsciiString("test-image").toByteArray());
 
-        this.uaaClient.clients()
-            .updateMetadata(UpdateMetadataRequest.builder()
-                .appIcon(appIcon)
-                .appLaunchUrl("http://test.app.launch.url")
-                .clientId(this.clientId)
-                .showOnHomePage(true)
-                .clientName("test-name")
-                .build())
-            .then(requestGetMetadata(this.uaaClient, this.clientId))
-            .as(StepVerifier::create)
-            .consumeNextWith(metadata -> {
-                assertThat(metadata.getAppIcon()).isEqualTo(appIcon);
-                assertThat(metadata.getAppLaunchUrl()).isEqualTo("http://test.app.launch.url");
-                assertThat(metadata.getClientId()).isEqualTo(this.clientId);
-                assertThat(metadata.getClientName()).isEqualTo("test-name");
-                assertThat(metadata.getShowOnHomePage()).isTrue();
-            })
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        this.uaaClient
+                .clients()
+                .updateMetadata(
+                        UpdateMetadataRequest.builder()
+                                .appIcon(appIcon)
+                                .appLaunchUrl("http://test.app.launch.url")
+                                .clientId(this.clientId)
+                                .showOnHomePage(true)
+                                .clientName("test-name")
+                                .build())
+                .then(requestGetMetadata(this.uaaClient, this.clientId))
+                .as(StepVerifier::create)
+                .consumeNextWith(
+                        metadata -> {
+                            assertThat(metadata.getAppIcon()).isEqualTo(appIcon);
+                            assertThat(metadata.getAppLaunchUrl())
+                                    .isEqualTo("http://test.app.launch.url");
+                            assertThat(metadata.getClientId()).isEqualTo(this.clientId);
+                            assertThat(metadata.getClientName()).isEqualTo("test-name");
+                            assertThat(metadata.getShowOnHomePage()).isTrue();
+                        })
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
-    private static Mono<BatchCreateClientsResponse> batchCreateClients(UaaClient uaaClient, String clientId1, String clientId2, String clientSecret) {
-        return uaaClient.clients()
-            .batchCreate(BatchCreateClientsRequest.builder()
-                .client(CreateClient.builder()
-                    .approvalsDeleted(true)
-                    .authorizedGrantType(PASSWORD)
-                    .clientId(clientId1)
-                    .clientSecret(clientSecret)
-                    .scopes("client.read", "client.write")
-                    .tokenSalt("test-token-salt")
-                    .build())
-                .client(CreateClient.builder()
-                    .approvalsDeleted(true)
-                    .authorizedGrantTypes(PASSWORD, REFRESH_TOKEN)
-                    .clientId(clientId2)
-                    .clientSecret(clientSecret)
-                    .scope("client.write")
-                    .tokenSalt("alternate-test-token-salt")
-                    .build())
-                .build());
+    private static Mono<BatchCreateClientsResponse> batchCreateClients(
+            UaaClient uaaClient, String clientId1, String clientId2, String clientSecret) {
+        return uaaClient
+                .clients()
+                .batchCreate(
+                        BatchCreateClientsRequest.builder()
+                                .client(
+                                        CreateClient.builder()
+                                                .approvalsDeleted(true)
+                                                .authorizedGrantType(PASSWORD)
+                                                .clientId(clientId1)
+                                                .clientSecret(clientSecret)
+                                                .scopes("client.read", "client.write")
+                                                .tokenSalt("test-token-salt")
+                                                .build())
+                                .client(
+                                        CreateClient.builder()
+                                                .approvalsDeleted(true)
+                                                .authorizedGrantTypes(PASSWORD, REFRESH_TOKEN)
+                                                .clientId(clientId2)
+                                                .clientSecret(clientSecret)
+                                                .scope("client.write")
+                                                .tokenSalt("alternate-test-token-salt")
+                                                .build())
+                                .build());
     }
 
-    private static Mono<CreateClientResponse> requestCreateClient(UaaClient uaaClient, String clientId, String clientSecret) {
-        return uaaClient.clients()
-            .create(CreateClientRequest.builder()
-                .authorizedGrantType(PASSWORD)
-                .clientId(clientId)
-                .clientSecret(clientSecret)
-                .build());
+    private static Mono<CreateClientResponse> requestCreateClient(
+            UaaClient uaaClient, String clientId, String clientSecret) {
+        return uaaClient
+                .clients()
+                .create(
+                        CreateClientRequest.builder()
+                                .authorizedGrantType(PASSWORD)
+                                .clientId(clientId)
+                                .clientSecret(clientSecret)
+                                .build());
     }
 
-    private static Mono<GetMetadataResponse> requestGetMetadata(UaaClient uaaClient, String clientId) {
-        return uaaClient.clients()
-            .getMetadata(GetMetadataRequest.builder()
-                .clientId(clientId)
-                .build());
+    private static Mono<GetMetadataResponse> requestGetMetadata(
+            UaaClient uaaClient, String clientId) {
+        return uaaClient
+                .clients()
+                .getMetadata(GetMetadataRequest.builder().clientId(clientId).build());
     }
 
     private static Flux<Client> requestListClients(UaaClient uaaClient) {
-        return PaginationUtils
-            .requestUaaResources(startIndex -> uaaClient.clients()
-                .list(ListClientsRequest.builder()
-                    .startIndex(startIndex)
-                    .build()));
-
+        return PaginationUtils.requestUaaResources(
+                startIndex ->
+                        uaaClient
+                                .clients()
+                                .list(ListClientsRequest.builder().startIndex(startIndex).build()));
     }
 
-    private static Mono<UpdateMetadataResponse> requestUpdateMetadata(UaaClient uaaClient, String clientId, String appLaunchUrl) {
-        return uaaClient.clients()
-            .updateMetadata(UpdateMetadataRequest.builder()
-                .appLaunchUrl(appLaunchUrl)
-                .clientId(clientId)
-                .build());
+    private static Mono<UpdateMetadataResponse> requestUpdateMetadata(
+            UaaClient uaaClient, String clientId, String appLaunchUrl) {
+        return uaaClient
+                .clients()
+                .updateMetadata(
+                        UpdateMetadataRequest.builder()
+                                .appLaunchUrl(appLaunchUrl)
+                                .clientId(clientId)
+                                .build());
     }
-
 }

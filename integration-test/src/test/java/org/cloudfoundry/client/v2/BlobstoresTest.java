@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.client.v2;
 
+import java.time.Duration;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.blobstores.DeleteBlobstoreBuildpackCachesRequest;
@@ -24,22 +25,21 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.test.StepVerifier;
 
-import java.time.Duration;
-
 public final class BlobstoresTest extends AbstractIntegrationTest {
 
-    @Autowired
-    private CloudFoundryClient cloudFoundryClient;
+    @Autowired private CloudFoundryClient cloudFoundryClient;
 
     @Test
     public void delete() {
-        this.cloudFoundryClient.blobstores()
-            .deleteBuildpackCaches(DeleteBlobstoreBuildpackCachesRequest.builder()
-                .build())
-            .flatMap(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job))
-            .as(StepVerifier::create)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        this.cloudFoundryClient
+                .blobstores()
+                .deleteBuildpackCaches(DeleteBlobstoreBuildpackCachesRequest.builder().build())
+                .flatMap(
+                        job ->
+                                JobUtils.waitForCompletion(
+                                        this.cloudFoundryClient, Duration.ofMinutes(5), job))
+                .as(StepVerifier::create)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
-
 }

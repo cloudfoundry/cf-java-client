@@ -16,6 +16,9 @@
 
 package org.cloudfoundry.operations;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.time.Duration;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.operations.organizationadmin.CreateQuotaRequest;
 import org.cloudfoundry.operations.organizationadmin.DeleteQuotaRequest;
@@ -30,33 +33,31 @@ import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.time.Duration;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 public final class OrganizationAdminTest extends AbstractIntegrationTest {
 
-    @Autowired
-    private CloudFoundryOperations cloudFoundryOperations;
+    @Autowired private CloudFoundryOperations cloudFoundryOperations;
 
     @Test
     public void createQuota() {
         String quotaName = this.nameFactory.getQuotaDefinitionName();
 
-        this.cloudFoundryOperations.organizationAdmin()
-            .createQuota(CreateQuotaRequest.builder()
-                .applicationInstanceLimit(9)
-                .allowPaidServicePlans(false)
-                .instanceMemoryLimit(64)
-                .memoryLimit(512)
-                .name(quotaName)
-                .build())
-            .then(requestGetQuota(this.cloudFoundryOperations, quotaName)
-                .map(OrganizationQuota::getInstanceMemoryLimit))
-            .as(StepVerifier::create)
-            .expectNext(64)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        this.cloudFoundryOperations
+                .organizationAdmin()
+                .createQuota(
+                        CreateQuotaRequest.builder()
+                                .applicationInstanceLimit(9)
+                                .allowPaidServicePlans(false)
+                                .instanceMemoryLimit(64)
+                                .memoryLimit(512)
+                                .name(quotaName)
+                                .build())
+                .then(
+                        requestGetQuota(this.cloudFoundryOperations, quotaName)
+                                .map(OrganizationQuota::getInstanceMemoryLimit))
+                .as(StepVerifier::create)
+                .expectNext(64)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -64,14 +65,18 @@ public final class OrganizationAdminTest extends AbstractIntegrationTest {
         String quotaName = this.nameFactory.getQuotaDefinitionName();
 
         requestCreateQuota(this.cloudFoundryOperations, quotaName)
-            .then(this.cloudFoundryOperations.organizationAdmin()
-                .deleteQuota(DeleteQuotaRequest.builder()
-                    .name(quotaName)
-                    .build()))
-            .then(requestGetQuota(this.cloudFoundryOperations, quotaName))
-            .as(StepVerifier::create)
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Quota %s does not exist", quotaName))
-            .verify(Duration.ofMinutes(5));
+                .then(
+                        this.cloudFoundryOperations
+                                .organizationAdmin()
+                                .deleteQuota(DeleteQuotaRequest.builder().name(quotaName).build()))
+                .then(requestGetQuota(this.cloudFoundryOperations, quotaName))
+                .as(StepVerifier::create)
+                .consumeErrorWith(
+                        t ->
+                                assertThat(t)
+                                        .isInstanceOf(IllegalArgumentException.class)
+                                        .hasMessage("Quota %s does not exist", quotaName))
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -79,15 +84,15 @@ public final class OrganizationAdminTest extends AbstractIntegrationTest {
         String quotaName = this.nameFactory.getQuotaDefinitionName();
 
         requestCreateQuota(this.cloudFoundryOperations, quotaName)
-            .then(this.cloudFoundryOperations.organizationAdmin()
-                .getQuota(GetQuotaRequest.builder()
-                    .name(quotaName)
-                    .build())
-                .map(OrganizationQuota::getApplicationInstanceLimit))
-            .as(StepVerifier::create)
-            .expectNext(9)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .then(
+                        this.cloudFoundryOperations
+                                .organizationAdmin()
+                                .getQuota(GetQuotaRequest.builder().name(quotaName).build())
+                                .map(OrganizationQuota::getApplicationInstanceLimit))
+                .as(StepVerifier::create)
+                .expectNext(9)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -95,14 +100,13 @@ public final class OrganizationAdminTest extends AbstractIntegrationTest {
         String quotaName = this.nameFactory.getQuotaDefinitionName();
 
         requestCreateQuota(this.cloudFoundryOperations, quotaName)
-            .thenMany(this.cloudFoundryOperations.organizationAdmin()
-                .listQuotas())
-            .filter(quota -> quotaName.equals(quota.getName()))
-            .map(OrganizationQuota::getTotalReservedRoutePorts)
-            .as(StepVerifier::create)
-            .expectNext(4)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .thenMany(this.cloudFoundryOperations.organizationAdmin().listQuotas())
+                .filter(quota -> quotaName.equals(quota.getName()))
+                .map(OrganizationQuota::getTotalReservedRoutePorts)
+                .as(StepVerifier::create)
+                .expectNext(4)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -111,23 +115,28 @@ public final class OrganizationAdminTest extends AbstractIntegrationTest {
         String quotaName = this.nameFactory.getQuotaDefinitionName();
 
         Mono.when(
-            requestCreateOrganization(this.cloudFoundryOperations, organizationName),
-            requestCreateQuota(this.cloudFoundryOperations, quotaName)
-        )
-            .then(this.cloudFoundryOperations.organizationAdmin()
-                .setQuota(SetQuotaRequest.builder()
-                    .organizationName(organizationName)
-                    .quotaName(quotaName)
-                    .build()))
-            .then(this.cloudFoundryOperations.organizations()
-                .get(OrganizationInfoRequest.builder()
-                    .name(organizationName)
-                    .build())
-                .map(organization -> organization.getQuota().getName()))
-            .as(StepVerifier::create)
-            .expectNext(quotaName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                        requestCreateOrganization(this.cloudFoundryOperations, organizationName),
+                        requestCreateQuota(this.cloudFoundryOperations, quotaName))
+                .then(
+                        this.cloudFoundryOperations
+                                .organizationAdmin()
+                                .setQuota(
+                                        SetQuotaRequest.builder()
+                                                .organizationName(organizationName)
+                                                .quotaName(quotaName)
+                                                .build()))
+                .then(
+                        this.cloudFoundryOperations
+                                .organizations()
+                                .get(
+                                        OrganizationInfoRequest.builder()
+                                                .name(organizationName)
+                                                .build())
+                                .map(organization -> organization.getQuota().getName()))
+                .as(StepVerifier::create)
+                .expectNext(quotaName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -135,45 +144,54 @@ public final class OrganizationAdminTest extends AbstractIntegrationTest {
         String quotaName = this.nameFactory.getQuotaDefinitionName();
 
         requestCreateQuota(this.cloudFoundryOperations, quotaName)
-            .then(this.cloudFoundryOperations.organizationAdmin()
-                .updateQuota(UpdateQuotaRequest.builder()
-                    .name(quotaName)
-                    .memoryLimit(513)
-                    .build()))
-            .then(requestGetQuota(this.cloudFoundryOperations, quotaName)
-                .map(OrganizationQuota::getMemoryLimit))
-            .as(StepVerifier::create)
-            .expectNext(513)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .then(
+                        this.cloudFoundryOperations
+                                .organizationAdmin()
+                                .updateQuota(
+                                        UpdateQuotaRequest.builder()
+                                                .name(quotaName)
+                                                .memoryLimit(513)
+                                                .build()))
+                .then(
+                        requestGetQuota(this.cloudFoundryOperations, quotaName)
+                                .map(OrganizationQuota::getMemoryLimit))
+                .as(StepVerifier::create)
+                .expectNext(513)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
-    private static Mono<Void> requestCreateOrganization(CloudFoundryOperations cloudFoundryOperations, String organizationName) {
-        return cloudFoundryOperations.organizations()
-            .create(CreateOrganizationRequest.builder()
-                .organizationName(organizationName)
-                .build());
+    private static Mono<Void> requestCreateOrganization(
+            CloudFoundryOperations cloudFoundryOperations, String organizationName) {
+        return cloudFoundryOperations
+                .organizations()
+                .create(
+                        CreateOrganizationRequest.builder()
+                                .organizationName(organizationName)
+                                .build());
     }
 
-    private static Mono<OrganizationQuota> requestCreateQuota(CloudFoundryOperations cloudFoundryOperations, String quotaName) {
-        return cloudFoundryOperations.organizationAdmin()
-            .createQuota(CreateQuotaRequest.builder()
-                .applicationInstanceLimit(9)
-                .allowPaidServicePlans(false)
-                .instanceMemoryLimit(64)
-                .memoryLimit(512)
-                .totalReservedRoutePorts(4)
-                .totalRoutes(9)
-                .totalServices(9)
-                .name(quotaName)
-                .build());
+    private static Mono<OrganizationQuota> requestCreateQuota(
+            CloudFoundryOperations cloudFoundryOperations, String quotaName) {
+        return cloudFoundryOperations
+                .organizationAdmin()
+                .createQuota(
+                        CreateQuotaRequest.builder()
+                                .applicationInstanceLimit(9)
+                                .allowPaidServicePlans(false)
+                                .instanceMemoryLimit(64)
+                                .memoryLimit(512)
+                                .totalReservedRoutePorts(4)
+                                .totalRoutes(9)
+                                .totalServices(9)
+                                .name(quotaName)
+                                .build());
     }
 
-    private static Mono<OrganizationQuota> requestGetQuota(CloudFoundryOperations cloudFoundryOperations, String quotaName) {
-        return cloudFoundryOperations.organizationAdmin()
-            .getQuota(GetQuotaRequest.builder()
-                .name(quotaName)
-                .build());
+    private static Mono<OrganizationQuota> requestGetQuota(
+            CloudFoundryOperations cloudFoundryOperations, String quotaName) {
+        return cloudFoundryOperations
+                .organizationAdmin()
+                .getQuota(GetQuotaRequest.builder().name(quotaName).build());
     }
-
 }

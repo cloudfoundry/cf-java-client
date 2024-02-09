@@ -16,8 +16,8 @@
 
 package org.cloudfoundry.client;
 
-import reactor.core.Exceptions;
-import reactor.util.function.Tuple2;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -29,32 +29,35 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
+import reactor.core.Exceptions;
+import reactor.util.function.Tuple2;
 
 public final class ZipExpectations {
 
     public static Consumer<Tuple2<byte[], byte[]>> zipEquality() {
-        return consumer((expected, actual) -> {
-            List<Entry> expectedEntries = entries(expected);
-            List<Entry> actualEntries = entries(expected);
+        return consumer(
+                (expected, actual) -> {
+                    List<Entry> expectedEntries = entries(expected);
+                    List<Entry> actualEntries = entries(expected);
 
-            assertThat(expectedEntries).hasSameSizeAs(actualEntries);
+                    assertThat(expectedEntries).hasSameSizeAs(actualEntries);
 
-            Iterator<Entry> expectedIterator = expectedEntries.iterator();
+                    Iterator<Entry> expectedIterator = expectedEntries.iterator();
 
-            for (Entry actualEntry : actualEntries) {
-                assertThat(actualEntry).usingRecursiveComparison().isEqualTo(expectedIterator.next());
-            }
-        });
+                    for (Entry actualEntry : actualEntries) {
+                        assertThat(actualEntry)
+                                .usingRecursiveComparison()
+                                .isEqualTo(expectedIterator.next());
+                    }
+                });
     }
 
     private static byte[] content(InputStream in, int length) throws IOException {
         byte[] content = new byte[length];
         int read = in.read(content, 0, length);
         if (read != length) {
-            throw new IllegalStateException(String.format("expected read: %d; actual read: %d", length, read));
+            throw new IllegalStateException(
+                    String.format("expected read: %d; actual read: %d", length, read));
         }
         return content;
     }
@@ -65,7 +68,14 @@ public final class ZipExpectations {
         try (ZipInputStream in = new ZipInputStream(new ByteArrayInputStream(bytes))) {
             ZipEntry entry;
             while ((entry = in.getNextEntry()) != null) {
-                entries.add(new Entry(entry.getCompressedSize(), content(in, (int) entry.getSize()), entry.getCrc(), entry.isDirectory(), entry.getName(), entry.getSize()));
+                entries.add(
+                        new Entry(
+                                entry.getCompressedSize(),
+                                content(in, (int) entry.getSize()),
+                                entry.getCrc(),
+                                entry.isDirectory(),
+                                entry.getName(),
+                                entry.getSize()));
                 in.closeEntry();
             }
         } catch (IOException e) {
@@ -90,7 +100,13 @@ public final class ZipExpectations {
 
         private final long size;
 
-        private Entry(long compressedSize, byte[] contents, long crc, boolean directory, String name, long size) {
+        private Entry(
+                long compressedSize,
+                byte[] contents,
+                long crc,
+                boolean directory,
+                String name,
+                long size) {
             this.compressedSize = compressedSize;
             this.contents = contents;
             this.crc = crc;
@@ -103,6 +119,5 @@ public final class ZipExpectations {
         public int compareTo(Entry o) {
             return this.name.compareTo(o.name);
         }
-
     }
 }

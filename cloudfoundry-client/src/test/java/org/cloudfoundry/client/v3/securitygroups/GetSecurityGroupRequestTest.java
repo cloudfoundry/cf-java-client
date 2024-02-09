@@ -22,14 +22,17 @@ public class GetSecurityGroupRequestTest {
 
     @Test
     public void noSecurityGroupId() {
-        assertThrows(IllegalStateException.class, () -> {
-            GetSecurityGroupRequest.builder().build();
-        });
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    GetSecurityGroupRequest.builder().build();
+                });
     }
 
     @Test
     public void valid() {
-        GetSecurityGroupRequest.builder().securityGroupId("b85a788e-671f-4549-814d-e34cdb2f539a")
+        GetSecurityGroupRequest.builder()
+                .securityGroupId("b85a788e-671f-4549-814d-e34cdb2f539a")
                 .build();
     }
 }

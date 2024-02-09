@@ -73,5 +73,4 @@ public enum Protocol {
     public String toString() {
         return getValue();
     }
-
 }

@@ -21,14 +21,17 @@ public class DeleteSecurityGroupRequestTest {
 
     @Test
     public void noSecurityGroupId() {
-        assertThrows(IllegalStateException.class, () -> {
-            DeleteSecurityGroupRequest.builder().build();
-        });
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    DeleteSecurityGroupRequest.builder().build();
+                });
     }
 
     @Test
     public void valid() {
-        DeleteSecurityGroupRequest.builder().securityGroupId("b85a788e-671f-4549-814d-e34cdb2f539a")
+        DeleteSecurityGroupRequest.builder()
+                .securityGroupId("b85a788e-671f-4549-814d-e34cdb2f539a")
                 .build();
     }
 }

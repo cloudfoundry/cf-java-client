@@ -16,14 +16,14 @@
 
 package org.cloudfoundry;
 
+import static org.cloudfoundry.CloudFoundryVersion.UNSPECIFIED;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-
-import static org.cloudfoundry.CloudFoundryVersion.UNSPECIFIED;
 
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
@@ -40,5 +40,4 @@ public @interface IfCloudFoundryVersion {
     CloudFoundryVersion lessThan() default UNSPECIFIED;
 
     CloudFoundryVersion lessThanOrEqualTo() default UNSPECIFIED;
-
 }

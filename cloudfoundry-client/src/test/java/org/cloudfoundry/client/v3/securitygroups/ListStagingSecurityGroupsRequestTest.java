@@ -21,14 +21,15 @@ public class ListStagingSecurityGroupsRequestTest {
 
     @Test
     public void noSpaceID() {
-        assertThrows(IllegalStateException.class, () -> {
-            ListStagingSecurityGroupsRequest.builder().build();
-        });
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    ListStagingSecurityGroupsRequest.builder().build();
+                });
     }
 
     @Test
     public void valid() {
         ListStagingSecurityGroupsRequest.builder().spaceId("space-giud1").build();
     }
-
 }
