@@ -1491,10 +1491,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
@@ -1544,10 +1541,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
@@ -1615,10 +1609,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
@@ -1688,10 +1679,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
@@ -1767,10 +1755,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
@@ -1826,10 +1811,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
@@ -1908,10 +1890,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
@@ -1991,10 +1970,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
@@ -2059,10 +2035,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
@@ -2136,10 +2109,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
@@ -2202,10 +2172,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
@@ -2260,10 +2227,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
@@ -2305,10 +2269,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
@@ -2352,10 +2313,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
@@ -2414,10 +2372,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
@@ -2483,10 +2438,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
@@ -2543,10 +2495,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
@@ -2597,10 +2546,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
@@ -2654,10 +2600,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
@@ -2717,10 +2660,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
@@ -2788,10 +2728,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
@@ -2854,10 +2791,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
@@ -2919,10 +2853,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
@@ -2989,10 +2920,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
@@ -3053,10 +2981,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
@@ -3116,10 +3041,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
@@ -3189,10 +3111,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",

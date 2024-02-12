@@ -179,10 +179,11 @@ public final class FileUtils {
      * @return a {@link String} representation of the permissions
      */
     public static String permissions(int mode) {
-        return Integer.toOctalString(mode == 0 ?
-            DEFAULT_PERMISSIONS :
-            mode & 07777 // only use permission bits, not the file type
-        );
+        return Integer.toOctalString(
+                mode == 0
+                        ? DEFAULT_PERMISSIONS
+                        : mode & 07777 // only use permission bits, not the file type
+                );
     }
 
     /**
