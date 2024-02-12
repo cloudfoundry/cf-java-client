@@ -16,6 +16,9 @@
 
 package org.cloudfoundry.client.v3;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.time.Duration;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v3.buildpacks.BuildpackResource;
@@ -29,38 +32,37 @@ import org.cloudfoundry.client.v3.buildpacks.UpdateBuildpackRequest;
 import org.cloudfoundry.client.v3.buildpacks.UploadBuildpackRequest;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.time.Duration;
-
 public final class BuildpacksTest extends AbstractIntegrationTest {
 
-    @Autowired
-    private CloudFoundryClient cloudFoundryClient;
+    @Autowired private CloudFoundryClient cloudFoundryClient;
 
     @Test
     public void create() {
         String buildpackName = this.nameFactory.getBuildpackName();
 
-        this.cloudFoundryClient.buildpacksV3()
-            .create(CreateBuildpackRequest.builder()
-                .enabled(false)
-                .locked(true)
-                .name(buildpackName)
-                .position(2)
-                .build())
-            .thenMany(requestListBuildpacks(this.cloudFoundryClient, buildpackName)
-                .map(BuildpackResource::getName))
-            .as(StepVerifier::create)
-            .expectNext(buildpackName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        this.cloudFoundryClient
+                .buildpacksV3()
+                .create(
+                        CreateBuildpackRequest.builder()
+                                .enabled(false)
+                                .locked(true)
+                                .name(buildpackName)
+                                .position(2)
+                                .build())
+                .thenMany(
+                        requestListBuildpacks(this.cloudFoundryClient, buildpackName)
+                                .map(BuildpackResource::getName))
+                .as(StepVerifier::create)
+                .expectNext(buildpackName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -68,15 +70,24 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
         String buildpackName = this.nameFactory.getBuildpackName();
 
         createBuildpackId(this.cloudFoundryClient, buildpackName)
-            .flatMap(buildpackId -> this.cloudFoundryClient.buildpacksV3()
-                .delete(DeleteBuildpackRequest.builder()
-                    .buildpackId(buildpackId)
-                    .build())
-                .flatMap(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job)))
-            .thenMany(requestListBuildpacks(this.cloudFoundryClient, buildpackName))
-            .as(StepVerifier::create)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        buildpackId ->
+                                this.cloudFoundryClient
+                                        .buildpacksV3()
+                                        .delete(
+                                                DeleteBuildpackRequest.builder()
+                                                        .buildpackId(buildpackId)
+                                                        .build())
+                                        .flatMap(
+                                                job ->
+                                                        JobUtils.waitForCompletion(
+                                                                this.cloudFoundryClient,
+                                                                Duration.ofMinutes(5),
+                                                                job)))
+                .thenMany(requestListBuildpacks(this.cloudFoundryClient, buildpackName))
+                .as(StepVerifier::create)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -84,15 +95,19 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
         String buildpackName = this.nameFactory.getBuildpackName();
 
         createBuildpackId(this.cloudFoundryClient, buildpackName)
-            .flatMap(buildpackId -> this.cloudFoundryClient.buildpacksV3()
-                .get(GetBuildpackRequest.builder()
-                    .buildpackId(buildpackId)
-                    .build()))
-            .map(GetBuildpackResponse::getName)
-            .as(StepVerifier::create)
-            .expectNext(buildpackName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        buildpackId ->
+                                this.cloudFoundryClient
+                                        .buildpacksV3()
+                                        .get(
+                                                GetBuildpackRequest.builder()
+                                                        .buildpackId(buildpackId)
+                                                        .build()))
+                .map(GetBuildpackResponse::getName)
+                .as(StepVerifier::create)
+                .expectNext(buildpackName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -100,17 +115,25 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
         String buildpackName = this.nameFactory.getBuildpackName();
 
         createBuildpackId(this.cloudFoundryClient, buildpackName)
-            .flatMapMany(buildpackId -> PaginationUtils.requestClientV3Resources(page ->
-                this.cloudFoundryClient.buildpacksV3()
-                    .list(ListBuildpacksRequest.builder()
-                        .page(page)
-                        .build()))
-                .filter(resource -> buildpackName.equals(resource.getName()))
-                .map(BuildpackResource::getPosition))
-            .as(StepVerifier::create)
-            .expectNext(3)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMapMany(
+                        buildpackId ->
+                                PaginationUtils.requestClientV3Resources(
+                                                page ->
+                                                        this.cloudFoundryClient
+                                                                .buildpacksV3()
+                                                                .list(
+                                                                        ListBuildpacksRequest
+                                                                                .builder()
+                                                                                .page(page)
+                                                                                .build()))
+                                        .filter(
+                                                resource ->
+                                                        buildpackName.equals(resource.getName()))
+                                        .map(BuildpackResource::getPosition))
+                .as(StepVerifier::create)
+                .expectNext(3)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -118,17 +141,22 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
         String buildpackName = this.nameFactory.getBuildpackName();
 
         createBuildpackId(this.cloudFoundryClient, buildpackName)
-            .flatMapMany(buildpackId -> PaginationUtils.requestClientV3Resources(page ->
-                this.cloudFoundryClient.buildpacksV3()
-                    .list(ListBuildpacksRequest.builder()
-                        .name(buildpackName)
-                        .page(page)
-                        .build())))
-            .map(BuildpackResource::getName)
-            .as(StepVerifier::create)
-            .expectNext(buildpackName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMapMany(
+                        buildpackId ->
+                                PaginationUtils.requestClientV3Resources(
+                                        page ->
+                                                this.cloudFoundryClient
+                                                        .buildpacksV3()
+                                                        .list(
+                                                                ListBuildpacksRequest.builder()
+                                                                        .name(buildpackName)
+                                                                        .page(page)
+                                                                        .build())))
+                .map(BuildpackResource::getName)
+                .as(StepVerifier::create)
+                .expectNext(buildpackName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -136,19 +164,24 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
         String buildpackName = this.nameFactory.getBuildpackName();
 
         createBuildpackId(this.cloudFoundryClient, buildpackName)
-            .flatMap(buildpackId -> this.cloudFoundryClient.buildpacksV3()
-                .update(UpdateBuildpackRequest.builder()
-                    .buildpackId(buildpackId)
-                    .enabled(true)
-                    .locked(true)
-                    .position(4)
-                    .build()))
-            .thenMany(requestListBuildpacks(this.cloudFoundryClient, buildpackName)
-                .map(BuildpackResource::getPosition))
-            .as(StepVerifier::create)
-            .expectNext(4)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        buildpackId ->
+                                this.cloudFoundryClient
+                                        .buildpacksV3()
+                                        .update(
+                                                UpdateBuildpackRequest.builder()
+                                                        .buildpackId(buildpackId)
+                                                        .enabled(true)
+                                                        .locked(true)
+                                                        .position(4)
+                                                        .build()))
+                .thenMany(
+                        requestListBuildpacks(this.cloudFoundryClient, buildpackName)
+                                .map(BuildpackResource::getPosition))
+                .as(StepVerifier::create)
+                .expectNext(4)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -157,17 +190,22 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
         String buildpackName = this.nameFactory.getBuildpackName();
 
         createBuildpackId(this.cloudFoundryClient, buildpackName)
-            .flatMap(buildpackId -> this.cloudFoundryClient.buildpacksV3()
-                .upload(UploadBuildpackRequest.builder()
-                    .bits(buildpack)
-                    .buildpackId(buildpackId)
-                    .build()))
-            .thenMany(requestListBuildpacks(this.cloudFoundryClient, buildpackName)
-                .map(BuildpackResource::getName))
-            .as(StepVerifier::create)
-            .expectNext(buildpackName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        buildpackId ->
+                                this.cloudFoundryClient
+                                        .buildpacksV3()
+                                        .upload(
+                                                UploadBuildpackRequest.builder()
+                                                        .bits(buildpack)
+                                                        .buildpackId(buildpackId)
+                                                        .build()))
+                .thenMany(
+                        requestListBuildpacks(this.cloudFoundryClient, buildpackName)
+                                .map(BuildpackResource::getName))
+                .as(StepVerifier::create)
+                .expectNext(buildpackName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -176,42 +214,54 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
         String buildpackName = this.nameFactory.getBuildpackName();
 
         createBuildpackId(this.cloudFoundryClient, buildpackName)
-            .flatMap(buildpackId -> this.cloudFoundryClient.buildpacksV3()
-                .upload(UploadBuildpackRequest.builder()
-                    .bits(buildpack)
-                    .buildpackId(buildpackId)
-                    .build()))
-            .thenMany(requestListBuildpacks(this.cloudFoundryClient, buildpackName)
-                .map(BuildpackResource::getName))
-            .as(StepVerifier::create)
-            .expectNext(buildpackName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        buildpackId ->
+                                this.cloudFoundryClient
+                                        .buildpacksV3()
+                                        .upload(
+                                                UploadBuildpackRequest.builder()
+                                                        .bits(buildpack)
+                                                        .buildpackId(buildpackId)
+                                                        .build()))
+                .thenMany(
+                        requestListBuildpacks(this.cloudFoundryClient, buildpackName)
+                                .map(BuildpackResource::getName))
+                .as(StepVerifier::create)
+                .expectNext(buildpackName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
-    private static Mono<String> createBuildpackId(CloudFoundryClient cloudFoundryClient, String buildpackName) {
+    private static Mono<String> createBuildpackId(
+            CloudFoundryClient cloudFoundryClient, String buildpackName) {
         return requestCreateBuildpack(cloudFoundryClient, buildpackName)
-            .map(CreateBuildpackResponse::getId);
+                .map(CreateBuildpackResponse::getId);
     }
 
-    private static Mono<CreateBuildpackResponse> requestCreateBuildpack(CloudFoundryClient cloudFoundryClient, String buildpackName) {
-        return cloudFoundryClient.buildpacksV3()
-            .create(CreateBuildpackRequest.builder()
-                .enabled(false)
-                .locked(false)
-                .name(buildpackName)
-                .position(3)
-                .stack("cflinuxfs3")
-                .build());
+    private static Mono<CreateBuildpackResponse> requestCreateBuildpack(
+            CloudFoundryClient cloudFoundryClient, String buildpackName) {
+        return cloudFoundryClient
+                .buildpacksV3()
+                .create(
+                        CreateBuildpackRequest.builder()
+                                .enabled(false)
+                                .locked(false)
+                                .name(buildpackName)
+                                .position(3)
+                                .stack("cflinuxfs3")
+                                .build());
     }
 
-    private static Flux<BuildpackResource> requestListBuildpacks(CloudFoundryClient cloudFoundryClient, String buildpackName) {
-        return PaginationUtils.requestClientV3Resources(page ->
-            cloudFoundryClient.buildpacksV3()
-                .list(ListBuildpacksRequest.builder()
-                    .name(buildpackName)
-                    .page(page)
-                    .build()));
+    private static Flux<BuildpackResource> requestListBuildpacks(
+            CloudFoundryClient cloudFoundryClient, String buildpackName) {
+        return PaginationUtils.requestClientV3Resources(
+                page ->
+                        cloudFoundryClient
+                                .buildpacksV3()
+                                .list(
+                                        ListBuildpacksRequest.builder()
+                                                .name(buildpackName)
+                                                .page(page)
+                                                .build()));
     }
-
 }

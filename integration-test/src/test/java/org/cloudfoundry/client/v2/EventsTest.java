@@ -16,159 +16,191 @@
 
 package org.cloudfoundry.client.v2;
 
+import java.time.Duration;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.events.EventResource;
 import org.cloudfoundry.client.v2.events.GetEventRequest;
 import org.cloudfoundry.client.v2.events.ListEventsRequest;
 import org.cloudfoundry.util.ResourceUtils;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.time.Duration;
-
 public final class EventsTest extends AbstractIntegrationTest {
 
-    @Autowired
-    private CloudFoundryClient cloudFoundryClient;
+    @Autowired private CloudFoundryClient cloudFoundryClient;
 
     @Test
     public void get() {
         getFirstEvent(this.cloudFoundryClient)
-            .flatMap(resource -> Mono.zip(
-                Mono.just(resource)
-                    .map(ResourceUtils::getId),
-                this.cloudFoundryClient.events()
-                    .get(GetEventRequest.builder()
-                        .eventId(ResourceUtils.getId(resource))
-                        .build())
-                    .map(ResourceUtils::getId)
-            ))
-            .as(StepVerifier::create)
-            .consumeNextWith(tupleEquality())
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        resource ->
+                                Mono.zip(
+                                        Mono.just(resource).map(ResourceUtils::getId),
+                                        this.cloudFoundryClient
+                                                .events()
+                                                .get(
+                                                        GetEventRequest.builder()
+                                                                .eventId(
+                                                                        ResourceUtils.getId(
+                                                                                resource))
+                                                                .build())
+                                                .map(ResourceUtils::getId)))
+                .as(StepVerifier::create)
+                .consumeNextWith(tupleEquality())
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void list() {
         getFirstEvent(this.cloudFoundryClient)
-            .flatMap(resource -> Mono.zip(
-                Mono.just(resource),
-                this.cloudFoundryClient.events()
-                    .list(ListEventsRequest.builder()
-                        .build())
-                    .flatMapMany(ResourceUtils::getResources)
-                    .next()
-            ))
-            .as(StepVerifier::create)
-            .consumeNextWith(tupleEquality())
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        resource ->
+                                Mono.zip(
+                                        Mono.just(resource),
+                                        this.cloudFoundryClient
+                                                .events()
+                                                .list(ListEventsRequest.builder().build())
+                                                .flatMapMany(ResourceUtils::getResources)
+                                                .next()))
+                .as(StepVerifier::create)
+                .consumeNextWith(tupleEquality())
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void listFilterByActee() {
         getFirstEvent(this.cloudFoundryClient)
-            .flatMap(resource -> Mono.zip(
-                Mono.just(resource),
-                this.cloudFoundryClient.events()
-                    .list(ListEventsRequest.builder()
-                        .actee(ResourceUtils.getEntity(resource).getActee())
-                        .build())
-                    .flatMapMany(ResourceUtils::getResources)
-                    .next()
-            ))
-            .as(StepVerifier::create)
-            .consumeNextWith(tupleEquality())
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        resource ->
+                                Mono.zip(
+                                        Mono.just(resource),
+                                        this.cloudFoundryClient
+                                                .events()
+                                                .list(
+                                                        ListEventsRequest.builder()
+                                                                .actee(
+                                                                        ResourceUtils.getEntity(
+                                                                                        resource)
+                                                                                .getActee())
+                                                                .build())
+                                                .flatMapMany(ResourceUtils::getResources)
+                                                .next()))
+                .as(StepVerifier::create)
+                .consumeNextWith(tupleEquality())
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void listFilterByOrganizationId() {
         getFirstEvent(this.cloudFoundryClient)
-            .flatMap(resource -> Mono.zip(
-                Mono.just(resource),
-                this.cloudFoundryClient.events()
-                    .list(ListEventsRequest.builder()
-                        .organizationId(ResourceUtils.getEntity(resource).getOrganizationId())
-                        .build())
-                    .flatMapMany(ResourceUtils::getResources)
-                    .next()
-            ))
-            .as(StepVerifier::create)
-            .consumeNextWith(tupleEquality())
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        resource ->
+                                Mono.zip(
+                                        Mono.just(resource),
+                                        this.cloudFoundryClient
+                                                .events()
+                                                .list(
+                                                        ListEventsRequest.builder()
+                                                                .organizationId(
+                                                                        ResourceUtils.getEntity(
+                                                                                        resource)
+                                                                                .getOrganizationId())
+                                                                .build())
+                                                .flatMapMany(ResourceUtils::getResources)
+                                                .next()))
+                .as(StepVerifier::create)
+                .consumeNextWith(tupleEquality())
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void listFilterBySpaceId() {
         getFirstEvent(this.cloudFoundryClient)
-            .flatMap(resource -> Mono.zip(
-                Mono.just(resource),
-                this.cloudFoundryClient.events()
-                    .list(ListEventsRequest.builder()
-                        .spaceId(ResourceUtils.getEntity(resource).getSpaceId())
-                        .build())
-                    .flatMapMany(ResourceUtils::getResources)
-                    .next()
-            ))
-            .as(StepVerifier::create)
-            .consumeNextWith(tupleEquality())
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        resource ->
+                                Mono.zip(
+                                        Mono.just(resource),
+                                        this.cloudFoundryClient
+                                                .events()
+                                                .list(
+                                                        ListEventsRequest.builder()
+                                                                .spaceId(
+                                                                        ResourceUtils.getEntity(
+                                                                                        resource)
+                                                                                .getSpaceId())
+                                                                .build())
+                                                .flatMapMany(ResourceUtils::getResources)
+                                                .next()))
+                .as(StepVerifier::create)
+                .consumeNextWith(tupleEquality())
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void listFilterByTimestamp() {
         getFirstEvent(this.cloudFoundryClient)
-            .flatMap(resource -> Mono.zip(
-                Mono.just(resource),
-                this.cloudFoundryClient.events()
-                    .list(ListEventsRequest.builder()
-                        .timestamp(ResourceUtils.getEntity(resource).getTimestamp())
-                        .build())
-                    .flatMapMany(ResourceUtils::getResources)
-                    .next()
-            ))
-            .as(StepVerifier::create)
-            .consumeNextWith(tupleEquality())
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        resource ->
+                                Mono.zip(
+                                        Mono.just(resource),
+                                        this.cloudFoundryClient
+                                                .events()
+                                                .list(
+                                                        ListEventsRequest.builder()
+                                                                .timestamp(
+                                                                        ResourceUtils.getEntity(
+                                                                                        resource)
+                                                                                .getTimestamp())
+                                                                .build())
+                                                .flatMapMany(ResourceUtils::getResources)
+                                                .next()))
+                .as(StepVerifier::create)
+                .consumeNextWith(tupleEquality())
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void listFilterByType() {
         getFirstEvent(this.cloudFoundryClient)
-            .flatMap(resource -> Mono.zip(
-                Mono.just(resource),
-                this.cloudFoundryClient.events()
-                    .list(ListEventsRequest.builder()
-                        .type(ResourceUtils.getEntity(resource).getType())
-                        .build())
-                    .flatMapMany(ResourceUtils::getResources)
-                    .next()
-            ))
-            .as(StepVerifier::create)
-            .consumeNextWith(tupleEquality())
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        resource ->
+                                Mono.zip(
+                                        Mono.just(resource),
+                                        this.cloudFoundryClient
+                                                .events()
+                                                .list(
+                                                        ListEventsRequest.builder()
+                                                                .type(
+                                                                        ResourceUtils.getEntity(
+                                                                                        resource)
+                                                                                .getType())
+                                                                .build())
+                                                .flatMapMany(ResourceUtils::getResources)
+                                                .next()))
+                .as(StepVerifier::create)
+                .consumeNextWith(tupleEquality())
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     private static Mono<EventResource> getFirstEvent(CloudFoundryClient cloudFoundryClient) {
-        return listEvents(cloudFoundryClient)
-            .next();
+        return listEvents(cloudFoundryClient).next();
     }
 
     private static Flux<EventResource> listEvents(CloudFoundryClient cloudFoundryClient) {
-        return cloudFoundryClient.events()
-            .list(ListEventsRequest.builder()
-                .build())
-            .flatMapMany(ResourceUtils::getResources);
+        return cloudFoundryClient
+                .events()
+                .list(ListEventsRequest.builder().build())
+                .flatMapMany(ResourceUtils::getResources);
     }
-
 }

@@ -16,6 +16,9 @@
 
 package org.cloudfoundry.client.v2;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.time.Duration;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.stacks.CreateStackRequest;
@@ -28,38 +31,35 @@ import org.cloudfoundry.client.v2.stacks.StackResource;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.time.Duration;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 public final class StacksTest extends AbstractIntegrationTest {
 
-    @Autowired
-    private CloudFoundryClient cloudFoundryClient;
+    @Autowired private CloudFoundryClient cloudFoundryClient;
 
-    @Autowired
-    private String stackName;
+    @Autowired private String stackName;
 
     @Test
     public void create() {
         String stackName = this.nameFactory.getStackName();
 
-        this.cloudFoundryClient.stacks()
-            .create(CreateStackRequest.builder()
-                .description("Test stack description")
-                .name(stackName)
-                .build())
-            .thenMany(requestListStacks(this.cloudFoundryClient, stackName))
-            .map(response -> ResourceUtils.getEntity(response).getDescription())
-            .as(StepVerifier::create)
-            .expectNext("Test stack description")
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        this.cloudFoundryClient
+                .stacks()
+                .create(
+                        CreateStackRequest.builder()
+                                .description("Test stack description")
+                                .name(stackName)
+                                .build())
+                .thenMany(requestListStacks(this.cloudFoundryClient, stackName))
+                .map(response -> ResourceUtils.getEntity(response).getDescription())
+                .as(StepVerifier::create)
+                .expectNext("Test stack description")
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -67,15 +67,25 @@ public final class StacksTest extends AbstractIntegrationTest {
         String stackName = this.nameFactory.getStackName();
 
         createStackId(this.cloudFoundryClient, stackName)
-            .delayUntil(stackId -> this.cloudFoundryClient.stacks()
-                .delete(DeleteStackRequest.builder()
-                    .async(false)
-                    .stackId(stackId)
-                    .build()))
-            .flatMap(stackId -> requestGetStack(this.cloudFoundryClient, stackId))
-            .as(StepVerifier::create)
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class).hasMessageMatching("CF-StackNotFound\\([0-9]+\\): The stack could not be found: .*"))
-            .verify(Duration.ofMinutes(5));
+                .delayUntil(
+                        stackId ->
+                                this.cloudFoundryClient
+                                        .stacks()
+                                        .delete(
+                                                DeleteStackRequest.builder()
+                                                        .async(false)
+                                                        .stackId(stackId)
+                                                        .build()))
+                .flatMap(stackId -> requestGetStack(this.cloudFoundryClient, stackId))
+                .as(StepVerifier::create)
+                .consumeErrorWith(
+                        t ->
+                                assertThat(t)
+                                        .isInstanceOf(ClientV2Exception.class)
+                                        .hasMessageMatching(
+                                                "CF-StackNotFound\\([0-9]+\\): The stack could not"
+                                                        + " be found: .*"))
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -83,96 +93,126 @@ public final class StacksTest extends AbstractIntegrationTest {
         String stackName = this.nameFactory.getStackName();
 
         createStackId(this.cloudFoundryClient, stackName)
-            .delayUntil(stackId -> this.cloudFoundryClient.stacks()
-                .delete(DeleteStackRequest.builder()
-                    .async(true)
-                    .stackId(stackId)
-                    .build())
-                .flatMap(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job)))
-            .flatMap(stackId -> requestGetStack(this.cloudFoundryClient, stackId))
-            .as(StepVerifier::create)
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class).hasMessageMatching("CF-StackNotFound\\([0-9]+\\): The stack could not be found: .*"))
-            .verify(Duration.ofMinutes(5));
+                .delayUntil(
+                        stackId ->
+                                this.cloudFoundryClient
+                                        .stacks()
+                                        .delete(
+                                                DeleteStackRequest.builder()
+                                                        .async(true)
+                                                        .stackId(stackId)
+                                                        .build())
+                                        .flatMap(
+                                                job ->
+                                                        JobUtils.waitForCompletion(
+                                                                this.cloudFoundryClient,
+                                                                Duration.ofMinutes(5),
+                                                                job)))
+                .flatMap(stackId -> requestGetStack(this.cloudFoundryClient, stackId))
+                .as(StepVerifier::create)
+                .consumeErrorWith(
+                        t ->
+                                assertThat(t)
+                                        .isInstanceOf(ClientV2Exception.class)
+                                        .hasMessageMatching(
+                                                "CF-StackNotFound\\([0-9]+\\): The stack could not"
+                                                        + " be found: .*"))
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void get() {
         getStackId(this.cloudFoundryClient, this.stackName)
-            .flatMap(stackId -> this.cloudFoundryClient.stacks()
-                .get(GetStackRequest.builder()
-                    .stackId(stackId)
-                    .build()))
-            .map(resource -> resource.getEntity().getName())
-            .as(StepVerifier::create)
-            .expectNext(this.stackName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        stackId ->
+                                this.cloudFoundryClient
+                                        .stacks()
+                                        .get(GetStackRequest.builder().stackId(stackId).build()))
+                .map(resource -> resource.getEntity().getName())
+                .as(StepVerifier::create)
+                .expectNext(this.stackName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void list() {
         getStackId(this.cloudFoundryClient, this.stackName)
-            .flatMapMany(stackId -> PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.stacks()
-                    .list(ListStacksRequest.builder()
-                        .page(page)
-                        .build()))
-                .filter(resource -> ResourceUtils.getId(resource).equals(stackId)))
-            .map(resource -> resource.getEntity().getName())
-            .as(StepVerifier::create)
-            .expectNext(this.stackName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMapMany(
+                        stackId ->
+                                PaginationUtils.requestClientV2Resources(
+                                                page ->
+                                                        this.cloudFoundryClient
+                                                                .stacks()
+                                                                .list(
+                                                                        ListStacksRequest.builder()
+                                                                                .page(page)
+                                                                                .build()))
+                                        .filter(
+                                                resource ->
+                                                        ResourceUtils.getId(resource)
+                                                                .equals(stackId)))
+                .map(resource -> resource.getEntity().getName())
+                .as(StepVerifier::create)
+                .expectNext(this.stackName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void listFilterByName() {
-        PaginationUtils
-            .requestClientV2Resources(page -> this.cloudFoundryClient.stacks()
-                .list(ListStacksRequest.builder()
-                    .name(this.stackName)
-                    .page(page)
-                    .build()))
-            .map(resource -> resource.getEntity().getName())
-            .as(StepVerifier::create)
-            .expectNext(this.stackName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        PaginationUtils.requestClientV2Resources(
+                        page ->
+                                this.cloudFoundryClient
+                                        .stacks()
+                                        .list(
+                                                ListStacksRequest.builder()
+                                                        .name(this.stackName)
+                                                        .page(page)
+                                                        .build()))
+                .map(resource -> resource.getEntity().getName())
+                .as(StepVerifier::create)
+                .expectNext(this.stackName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
-    private static Mono<String> createStackId(CloudFoundryClient cloudFoundryClient, String stackName) {
-        return requestCreateStack(cloudFoundryClient, stackName)
-            .map(ResourceUtils::getId);
+    private static Mono<String> createStackId(
+            CloudFoundryClient cloudFoundryClient, String stackName) {
+        return requestCreateStack(cloudFoundryClient, stackName).map(ResourceUtils::getId);
     }
 
-    private static Mono<String> getStackId(CloudFoundryClient cloudFoundryClient, String stackName) {
-        return requestListStacks(cloudFoundryClient, stackName)
-            .single()
-            .map(ResourceUtils::getId);
+    private static Mono<String> getStackId(
+            CloudFoundryClient cloudFoundryClient, String stackName) {
+        return requestListStacks(cloudFoundryClient, stackName).single().map(ResourceUtils::getId);
     }
 
-    private static Mono<CreateStackResponse> requestCreateStack(CloudFoundryClient cloudFoundryClient, String stackName) {
-        return cloudFoundryClient.stacks()
-            .create(CreateStackRequest.builder()
-                .description("Test stack description")
-                .name(stackName)
-                .build());
+    private static Mono<CreateStackResponse> requestCreateStack(
+            CloudFoundryClient cloudFoundryClient, String stackName) {
+        return cloudFoundryClient
+                .stacks()
+                .create(
+                        CreateStackRequest.builder()
+                                .description("Test stack description")
+                                .name(stackName)
+                                .build());
     }
 
-    private static Mono<GetStackResponse> requestGetStack(CloudFoundryClient cloudFoundryClient, String stackId) {
-        return cloudFoundryClient.stacks()
-            .get(GetStackRequest.builder()
-                .stackId(stackId)
-                .build());
+    private static Mono<GetStackResponse> requestGetStack(
+            CloudFoundryClient cloudFoundryClient, String stackId) {
+        return cloudFoundryClient.stacks().get(GetStackRequest.builder().stackId(stackId).build());
     }
 
-    private static Flux<StackResource> requestListStacks(CloudFoundryClient cloudFoundryClient, String stackName) {
-        return PaginationUtils
-            .requestClientV2Resources(page -> cloudFoundryClient.stacks()
-                .list(ListStacksRequest.builder()
-                    .name(stackName)
-                    .page(page)
-                    .build()));
+    private static Flux<StackResource> requestListStacks(
+            CloudFoundryClient cloudFoundryClient, String stackName) {
+        return PaginationUtils.requestClientV2Resources(
+                page ->
+                        cloudFoundryClient
+                                .stacks()
+                                .list(
+                                        ListStacksRequest.builder()
+                                                .name(stackName)
+                                                .page(page)
+                                                .build()));
     }
-
 }

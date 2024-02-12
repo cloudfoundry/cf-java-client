@@ -16,6 +16,10 @@
 
 package org.cloudfoundry.uaa;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.time.Duration;
+import java.util.function.Consumer;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByAuthorizationCodeGrantApiRequest;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByAuthorizationCodeGrantBrowserRequest;
@@ -26,129 +30,137 @@ import org.cloudfoundry.uaa.authorizations.AuthorizeByOpenIdWithIdTokenRequest;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByOpenIdWithImplicitGrantRequest;
 import org.cloudfoundry.uaa.authorizations.GetOpenIdProviderConfigurationRequest;
 import org.cloudfoundry.uaa.authorizations.GetOpenIdProviderConfigurationResponse;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.test.StepVerifier;
 
-import java.time.Duration;
-import java.util.function.Consumer;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 public final class AuthorizationsTest extends AbstractIntegrationTest {
 
-    @Autowired
-    private String clientId;
+    @Autowired private String clientId;
 
-    @Autowired
-    private UaaClient uaaClient;
+    @Autowired private UaaClient uaaClient;
 
     @Test
     public void authorizeByAuthorizationCodeGrantApi() {
-        this.uaaClient.authorizations()
-            .authorizationCodeGrantApi(AuthorizeByAuthorizationCodeGrantApiRequest.builder()
-                .clientId(this.clientId)
-                .build())
-            .as(StepVerifier::create)
-            .consumeNextWith(actual -> assertThat(actual.length()).isGreaterThanOrEqualTo(6))
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        this.uaaClient
+                .authorizations()
+                .authorizationCodeGrantApi(
+                        AuthorizeByAuthorizationCodeGrantApiRequest.builder()
+                                .clientId(this.clientId)
+                                .build())
+                .as(StepVerifier::create)
+                .consumeNextWith(actual -> assertThat(actual.length()).isGreaterThanOrEqualTo(6))
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void authorizeByAuthorizationCodeGrantBrowser() {
-        this.uaaClient.authorizations()
-            .authorizationCodeGrantBrowser(AuthorizeByAuthorizationCodeGrantBrowserRequest.builder()
-                .clientId(this.clientId)
-                .redirectUri("http://redirect.to/app")
-                .build())
-            .as(StepVerifier::create)
-            .consumeNextWith(startsWithExpectation("https://uaa."))
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        this.uaaClient
+                .authorizations()
+                .authorizationCodeGrantBrowser(
+                        AuthorizeByAuthorizationCodeGrantBrowserRequest.builder()
+                                .clientId(this.clientId)
+                                .redirectUri("http://redirect.to/app")
+                                .build())
+                .as(StepVerifier::create)
+                .consumeNextWith(startsWithExpectation("https://uaa."))
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void authorizeByAuthorizationCodeGrantHybrid() {
-        this.uaaClient.authorizations()
-            .authorizationCodeGrantHybrid(AuthorizeByAuthorizationCodeGrantHybridRequest.builder()
-                .clientId(this.clientId)
-                .redirectUri("http://redirect.to/app")
-                .build())
-            .as(StepVerifier::create)
-            .consumeNextWith(startsWithExpectation("https://uaa."))
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        this.uaaClient
+                .authorizations()
+                .authorizationCodeGrantHybrid(
+                        AuthorizeByAuthorizationCodeGrantHybridRequest.builder()
+                                .clientId(this.clientId)
+                                .redirectUri("http://redirect.to/app")
+                                .build())
+                .as(StepVerifier::create)
+                .consumeNextWith(startsWithExpectation("https://uaa."))
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void authorizeByImplicitGrantBrowser() {
-        this.uaaClient.authorizations()
-            .implicitGrantBrowser(AuthorizeByImplicitGrantBrowserRequest.builder()
-                .clientId(this.clientId)
-                .redirectUri("http://redirect.to/app")
-                .build())
-            .as(StepVerifier::create)
-            .consumeNextWith(startsWithExpectation("https://uaa."))
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        this.uaaClient
+                .authorizations()
+                .implicitGrantBrowser(
+                        AuthorizeByImplicitGrantBrowserRequest.builder()
+                                .clientId(this.clientId)
+                                .redirectUri("http://redirect.to/app")
+                                .build())
+                .as(StepVerifier::create)
+                .consumeNextWith(startsWithExpectation("https://uaa."))
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void authorizeByOpenIdWithAuthorizationCodeGrant() {
-        this.uaaClient.authorizations()
-            .openIdWithAuthorizationCodeAndIdToken(AuthorizeByOpenIdWithAuthorizationCodeGrantRequest.builder()
-                .clientId("app")
-                .redirectUri("http://redirect.to/app")
-                .scope("openid")
-                .build())
-            .as(StepVerifier::create)
-            .consumeNextWith(startsWithExpectation("https://uaa."))
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        this.uaaClient
+                .authorizations()
+                .openIdWithAuthorizationCodeAndIdToken(
+                        AuthorizeByOpenIdWithAuthorizationCodeGrantRequest.builder()
+                                .clientId("app")
+                                .redirectUri("http://redirect.to/app")
+                                .scope("openid")
+                                .build())
+                .as(StepVerifier::create)
+                .consumeNextWith(startsWithExpectation("https://uaa."))
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void authorizeByOpenIdWithIdToken() {
-        this.uaaClient.authorizations()
-            .openIdWithIdToken(AuthorizeByOpenIdWithIdTokenRequest.builder()
-                .clientId("app")
-                .redirectUri("http://redirect.to/app")
-                .scope("open-id")
-                .build())
-            .as(StepVerifier::create)
-            .consumeNextWith(startsWithExpectation("https://uaa."))
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        this.uaaClient
+                .authorizations()
+                .openIdWithIdToken(
+                        AuthorizeByOpenIdWithIdTokenRequest.builder()
+                                .clientId("app")
+                                .redirectUri("http://redirect.to/app")
+                                .scope("open-id")
+                                .build())
+                .as(StepVerifier::create)
+                .consumeNextWith(startsWithExpectation("https://uaa."))
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void authorizeByOpenIdWithImplicitGrant() {
-        this.uaaClient.authorizations()
-            .openIdWithTokenAndIdToken(AuthorizeByOpenIdWithImplicitGrantRequest.builder()
-                .clientId("app")
-                .redirectUri("http://redirect.to/app")
-                .scope("openid")
-                .build())
-            .as(StepVerifier::create)
-            .consumeNextWith(startsWithExpectation("https://uaa."))
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        this.uaaClient
+                .authorizations()
+                .openIdWithTokenAndIdToken(
+                        AuthorizeByOpenIdWithImplicitGrantRequest.builder()
+                                .clientId("app")
+                                .redirectUri("http://redirect.to/app")
+                                .scope("openid")
+                                .build())
+                .as(StepVerifier::create)
+                .consumeNextWith(startsWithExpectation("https://uaa."))
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void openIdProviderConfiguration() {
-        this.uaaClient.authorizations()
-            .getOpenIdProviderConfiguration(GetOpenIdProviderConfigurationRequest.builder()
-                .build())
-            .map(GetOpenIdProviderConfigurationResponse::getServiceDocumentation)
-            .as(StepVerifier::create)
-            .expectNext("http://docs.cloudfoundry.org/api/uaa/")
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        this.uaaClient
+                .authorizations()
+                .getOpenIdProviderConfiguration(
+                        GetOpenIdProviderConfigurationRequest.builder().build())
+                .map(GetOpenIdProviderConfigurationResponse::getServiceDocumentation)
+                .as(StepVerifier::create)
+                .expectNext("http://docs.cloudfoundry.org/api/uaa/")
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     private static Consumer<String> startsWithExpectation(String prefix) {
         return actual -> assertThat(actual).startsWith(prefix);
     }
-
 }

@@ -16,6 +16,9 @@
 
 package org.cloudfoundry.client.v2;
 
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
+
+import java.time.Duration;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
@@ -70,25 +73,20 @@ import org.cloudfoundry.client.v2.users.UserResource;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import reactor.util.function.Tuples;
 
-import java.time.Duration;
-
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
-
 public final class UsersTest extends AbstractIntegrationTest {
 
     private static final String STATUS_FILTER = "active";
 
-    @Autowired
-    private CloudFoundryClient cloudFoundryClient;
+    @Autowired private CloudFoundryClient cloudFoundryClient;
 
-    @Autowired
-    private Mono<String> organizationId;
+    @Autowired private Mono<String> organizationId;
 
     @Test
     public void associateAuditedOrganization() {
@@ -96,21 +94,34 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .flatMap(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
-                .then(requestAssociateOrganizationAuditor(this.cloudFoundryClient, organizationId, userId))
-                .then(this.cloudFoundryClient.users()
-                    .associateAuditedOrganization(AssociateUserAuditedOrganizationRequest.builder()
-                        .auditedOrganizationId(organizationId)
-                        .userId(userId)
-                        .build())))
-            .then(requestSummaryUser(this.cloudFoundryClient, userId)
-                .flatMapIterable(response -> response.getEntity().getAuditedOrganizations())
-                .map(resource -> resource.getEntity().getName())
-                .single())
-            .as(StepVerifier::create)
-            .expectNext(organizationName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                requestCreateUser(this.cloudFoundryClient, userId)
+                                        .then(
+                                                requestAssociateOrganizationAuditor(
+                                                        this.cloudFoundryClient,
+                                                        organizationId,
+                                                        userId))
+                                        .then(
+                                                this.cloudFoundryClient
+                                                        .users()
+                                                        .associateAuditedOrganization(
+                                                                AssociateUserAuditedOrganizationRequest
+                                                                        .builder()
+                                                                        .auditedOrganizationId(
+                                                                                organizationId)
+                                                                        .userId(userId)
+                                                                        .build())))
+                .then(
+                        requestSummaryUser(this.cloudFoundryClient, userId)
+                                .flatMapIterable(
+                                        response -> response.getEntity().getAuditedOrganizations())
+                                .map(resource -> resource.getEntity().getName())
+                                .single())
+                .as(StepVerifier::create)
+                .expectNext(organizationName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -119,20 +130,28 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         this.organizationId
-            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .flatMap(spaceId -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
-                .then(this.cloudFoundryClient.users()
-                    .associateAuditedSpace(AssociateUserAuditedSpaceRequest.builder()
-                        .auditedSpaceId(spaceId)
-                        .userId(userId)
-                        .build())))
-            .then(requestSummaryUser(this.cloudFoundryClient, userId))
-            .flatMapIterable(response -> response.getEntity().getAuditedSpaces())
-            .map(space -> space.getEntity().getName())
-            .as(StepVerifier::create)
-            .expectNext(spaceName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+                .flatMap(
+                        spaceId ->
+                                requestCreateUser(this.cloudFoundryClient, spaceId, userId)
+                                        .then(
+                                                this.cloudFoundryClient
+                                                        .users()
+                                                        .associateAuditedSpace(
+                                                                AssociateUserAuditedSpaceRequest
+                                                                        .builder()
+                                                                        .auditedSpaceId(spaceId)
+                                                                        .userId(userId)
+                                                                        .build())))
+                .then(requestSummaryUser(this.cloudFoundryClient, userId))
+                .flatMapIterable(response -> response.getEntity().getAuditedSpaces())
+                .map(space -> space.getEntity().getName())
+                .as(StepVerifier::create)
+                .expectNext(spaceName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -141,21 +160,36 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .flatMap(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
-                .then(requestAssociateOrganizationBillingManager(this.cloudFoundryClient, organizationId, userId))
-                .then(this.cloudFoundryClient.users()
-                    .associateBillingManagedOrganization(AssociateUserBillingManagedOrganizationRequest.builder()
-                        .billingManagedOrganizationId(organizationId)
-                        .userId(userId)
-                        .build())))
-            .then(requestSummaryUser(this.cloudFoundryClient, userId)
-                .flatMapIterable(response -> response.getEntity().getBillingManagedOrganizations())
-                .map(resource -> resource.getEntity().getName())
-                .single())
-            .as(StepVerifier::create)
-            .expectNext(organizationName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                requestCreateUser(this.cloudFoundryClient, userId)
+                                        .then(
+                                                requestAssociateOrganizationBillingManager(
+                                                        this.cloudFoundryClient,
+                                                        organizationId,
+                                                        userId))
+                                        .then(
+                                                this.cloudFoundryClient
+                                                        .users()
+                                                        .associateBillingManagedOrganization(
+                                                                AssociateUserBillingManagedOrganizationRequest
+                                                                        .builder()
+                                                                        .billingManagedOrganizationId(
+                                                                                organizationId)
+                                                                        .userId(userId)
+                                                                        .build())))
+                .then(
+                        requestSummaryUser(this.cloudFoundryClient, userId)
+                                .flatMapIterable(
+                                        response ->
+                                                response.getEntity()
+                                                        .getBillingManagedOrganizations())
+                                .map(resource -> resource.getEntity().getName())
+                                .single())
+                .as(StepVerifier::create)
+                .expectNext(organizationName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -164,21 +198,34 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .flatMap(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
-                .then(requestAssociateOrganizationManager(this.cloudFoundryClient, organizationId, userId))
-                .then(this.cloudFoundryClient.users()
-                    .associateManagedOrganization(AssociateUserManagedOrganizationRequest.builder()
-                        .managedOrganizationId(organizationId)
-                        .userId(userId)
-                        .build())))
-            .then(requestSummaryUser(this.cloudFoundryClient, userId)
-                .flatMapIterable(response -> response.getEntity().getManagedOrganizations())
-                .map(resource -> resource.getEntity().getName())
-                .single())
-            .as(StepVerifier::create)
-            .expectNext(organizationName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                requestCreateUser(this.cloudFoundryClient, userId)
+                                        .then(
+                                                requestAssociateOrganizationManager(
+                                                        this.cloudFoundryClient,
+                                                        organizationId,
+                                                        userId))
+                                        .then(
+                                                this.cloudFoundryClient
+                                                        .users()
+                                                        .associateManagedOrganization(
+                                                                AssociateUserManagedOrganizationRequest
+                                                                        .builder()
+                                                                        .managedOrganizationId(
+                                                                                organizationId)
+                                                                        .userId(userId)
+                                                                        .build())))
+                .then(
+                        requestSummaryUser(this.cloudFoundryClient, userId)
+                                .flatMapIterable(
+                                        response -> response.getEntity().getManagedOrganizations())
+                                .map(resource -> resource.getEntity().getName())
+                                .single())
+                .as(StepVerifier::create)
+                .expectNext(organizationName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -187,20 +234,28 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         this.organizationId
-            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .flatMap(spaceId -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
-                .then(this.cloudFoundryClient.users()
-                    .associateManagedSpace(AssociateUserManagedSpaceRequest.builder()
-                        .managedSpaceId(spaceId)
-                        .userId(userId)
-                        .build())))
-            .then(requestSummaryUser(this.cloudFoundryClient, userId))
-            .flatMapIterable(response -> response.getEntity().getManagedSpaces())
-            .map(space -> space.getEntity().getName())
-            .as(StepVerifier::create)
-            .expectNext(spaceName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+                .flatMap(
+                        spaceId ->
+                                requestCreateUser(this.cloudFoundryClient, spaceId, userId)
+                                        .then(
+                                                this.cloudFoundryClient
+                                                        .users()
+                                                        .associateManagedSpace(
+                                                                AssociateUserManagedSpaceRequest
+                                                                        .builder()
+                                                                        .managedSpaceId(spaceId)
+                                                                        .userId(userId)
+                                                                        .build())))
+                .then(requestSummaryUser(this.cloudFoundryClient, userId))
+                .flatMapIterable(response -> response.getEntity().getManagedSpaces())
+                .map(space -> space.getEntity().getName())
+                .as(StepVerifier::create)
+                .expectNext(spaceName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -209,20 +264,29 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .flatMap(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
-                .then(this.cloudFoundryClient.users()
-                    .associateOrganization(AssociateUserOrganizationRequest.builder()
-                        .organizationId(organizationId)
-                        .userId(userId)
-                        .build())))
-            .then(requestSummaryUser(this.cloudFoundryClient, userId)
-                .flatMapIterable(response -> response.getEntity().getOrganizations())
-                .map(resource -> resource.getEntity().getName())
-                .single())
-            .as(StepVerifier::create)
-            .expectNext(organizationName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                requestCreateUser(this.cloudFoundryClient, userId)
+                                        .then(
+                                                this.cloudFoundryClient
+                                                        .users()
+                                                        .associateOrganization(
+                                                                AssociateUserOrganizationRequest
+                                                                        .builder()
+                                                                        .organizationId(
+                                                                                organizationId)
+                                                                        .userId(userId)
+                                                                        .build())))
+                .then(
+                        requestSummaryUser(this.cloudFoundryClient, userId)
+                                .flatMapIterable(
+                                        response -> response.getEntity().getOrganizations())
+                                .map(resource -> resource.getEntity().getName())
+                                .single())
+                .as(StepVerifier::create)
+                .expectNext(organizationName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -231,20 +295,27 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         this.organizationId
-            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .flatMap(spaceId -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
-                .then(this.cloudFoundryClient.users()
-                    .associateSpace(AssociateUserSpaceRequest.builder()
-                        .spaceId(spaceId)
-                        .userId(userId)
-                        .build())))
-            .then(requestSummaryUser(this.cloudFoundryClient, userId))
-            .flatMapIterable(response -> response.getEntity().getSpaces())
-            .map(space -> space.getEntity().getName())
-            .as(StepVerifier::create)
-            .expectNext(spaceName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+                .flatMap(
+                        spaceId ->
+                                requestCreateUser(this.cloudFoundryClient, spaceId, userId)
+                                        .then(
+                                                this.cloudFoundryClient
+                                                        .users()
+                                                        .associateSpace(
+                                                                AssociateUserSpaceRequest.builder()
+                                                                        .spaceId(spaceId)
+                                                                        .userId(userId)
+                                                                        .build())))
+                .then(requestSummaryUser(this.cloudFoundryClient, userId))
+                .flatMapIterable(response -> response.getEntity().getSpaces())
+                .map(space -> space.getEntity().getName())
+                .as(StepVerifier::create)
+                .expectNext(spaceName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -253,18 +324,24 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         this.organizationId
-            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .flatMap(spaceId -> this.cloudFoundryClient.users()
-                .create(CreateUserRequest.builder()
-                    .defaultSpaceId(spaceId)
-                    .uaaId(userId)
-                    .build()))
-            .thenMany(requestListUsers(this.cloudFoundryClient))
-            .filter(resource -> userId.equals(resource.getMetadata().getId()))
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+                .flatMap(
+                        spaceId ->
+                                this.cloudFoundryClient
+                                        .users()
+                                        .create(
+                                                CreateUserRequest.builder()
+                                                        .defaultSpaceId(spaceId)
+                                                        .uaaId(userId)
+                                                        .build()))
+                .thenMany(requestListUsers(this.cloudFoundryClient))
+                .filter(resource -> userId.equals(resource.getMetadata().getId()))
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -272,17 +349,25 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         requestCreateUser(this.cloudFoundryClient, userId)
-            .then(this.cloudFoundryClient.users()
-                .delete(DeleteUserRequest.builder()
-                    .async(true)
-                    .userId(userId)
-                    .build())
-                .flatMap(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job)))
-            .thenMany(requestListUsers(this.cloudFoundryClient))
-            .filter(resource -> userId.equals(resource.getMetadata().getId()))
-            .as(StepVerifier::create)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .then(
+                        this.cloudFoundryClient
+                                .users()
+                                .delete(
+                                        DeleteUserRequest.builder()
+                                                .async(true)
+                                                .userId(userId)
+                                                .build())
+                                .flatMap(
+                                        job ->
+                                                JobUtils.waitForCompletion(
+                                                        this.cloudFoundryClient,
+                                                        Duration.ofMinutes(5),
+                                                        job)))
+                .thenMany(requestListUsers(this.cloudFoundryClient))
+                .filter(resource -> userId.equals(resource.getMetadata().getId()))
+                .as(StepVerifier::create)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -290,17 +375,20 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         requestCreateUser(this.cloudFoundryClient, userId)
-            .then(this.cloudFoundryClient.users()
-                .delete(DeleteUserRequest.builder()
-                    .async(false)
-                    .userId(userId)
-                    .build()))
-            .thenMany(requestListUsers(this.cloudFoundryClient))
-            .filter(resource -> userId.equals(resource.getMetadata().getId()))
-            .map(ResourceUtils::getId)
-            .as(StepVerifier::create)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .then(
+                        this.cloudFoundryClient
+                                .users()
+                                .delete(
+                                        DeleteUserRequest.builder()
+                                                .async(false)
+                                                .userId(userId)
+                                                .build()))
+                .thenMany(requestListUsers(this.cloudFoundryClient))
+                .filter(resource -> userId.equals(resource.getMetadata().getId()))
+                .map(ResourceUtils::getId)
+                .as(StepVerifier::create)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -309,17 +397,29 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         this.organizationId
-            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .flatMap(spaceId -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
-                .then(this.cloudFoundryClient.users()
-                    .get(GetUserRequest.builder()
-                        .userId(userId)
-                        .build())
-                    .map(response -> Tuples.of(spaceId, response.getEntity().getDefaultSpaceId()))))
-            .as(StepVerifier::create)
-            .consumeNextWith(tupleEquality())
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+                .flatMap(
+                        spaceId ->
+                                requestCreateUser(this.cloudFoundryClient, spaceId, userId)
+                                        .then(
+                                                this.cloudFoundryClient
+                                                        .users()
+                                                        .get(
+                                                                GetUserRequest.builder()
+                                                                        .userId(userId)
+                                                                        .build())
+                                                        .map(
+                                                                response ->
+                                                                        Tuples.of(
+                                                                                spaceId,
+                                                                                response.getEntity()
+                                                                                        .getDefaultSpaceId()))))
+                .as(StepVerifier::create)
+                .consumeNextWith(tupleEquality())
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -327,17 +427,20 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         requestCreateUser(this.cloudFoundryClient, userId)
-            .thenMany(PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                    .list(ListUsersRequest.builder()
-                        .page(page)
-                        .build())))
-            .filter(resource -> userId.equals(resource.getMetadata().getId()))
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
-
+                .thenMany(
+                        PaginationUtils.requestClientV2Resources(
+                                page ->
+                                        this.cloudFoundryClient
+                                                .users()
+                                                .list(
+                                                        ListUsersRequest.builder()
+                                                                .page(page)
+                                                                .build())))
+                .filter(resource -> userId.equals(resource.getMetadata().getId()))
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -346,19 +449,27 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .delayUntil(organizationId -> requestCreateUser(this.cloudFoundryClient, userId))
-            .flatMap(organizationId -> associateAuditorOrganization(this.cloudFoundryClient, organizationId, userId))
-            .thenMany(PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                    .listAuditedOrganizations(ListUserAuditedOrganizationsRequest.builder()
-                        .page(page)
-                        .userId(userId)
-                        .build())))
-            .map(resource -> resource.getEntity().getName())
-            .as(StepVerifier::create)
-            .expectNext(organizationName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .delayUntil(organizationId -> requestCreateUser(this.cloudFoundryClient, userId))
+                .flatMap(
+                        organizationId ->
+                                associateAuditorOrganization(
+                                        this.cloudFoundryClient, organizationId, userId))
+                .thenMany(
+                        PaginationUtils.requestClientV2Resources(
+                                page ->
+                                        this.cloudFoundryClient
+                                                .users()
+                                                .listAuditedOrganizations(
+                                                        ListUserAuditedOrganizationsRequest
+                                                                .builder()
+                                                                .page(page)
+                                                                .userId(userId)
+                                                                .build())))
+                .map(resource -> resource.getEntity().getName())
+                .as(StepVerifier::create)
+                .expectNext(organizationName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -367,20 +478,28 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .delayUntil(organizationId -> requestCreateUser(this.cloudFoundryClient, userId))
-            .flatMap(organizationId -> associateAuditorOrganization(this.cloudFoundryClient, organizationId, userId))
-            .thenMany(PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                    .listAuditedOrganizations(ListUserAuditedOrganizationsRequest.builder()
-                        .auditorId(userId)
-                        .page(page)
-                        .userId(userId)
-                        .build())))
-            .map(resource -> resource.getEntity().getName())
-            .as(StepVerifier::create)
-            .expectNext(organizationName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .delayUntil(organizationId -> requestCreateUser(this.cloudFoundryClient, userId))
+                .flatMap(
+                        organizationId ->
+                                associateAuditorOrganization(
+                                        this.cloudFoundryClient, organizationId, userId))
+                .thenMany(
+                        PaginationUtils.requestClientV2Resources(
+                                page ->
+                                        this.cloudFoundryClient
+                                                .users()
+                                                .listAuditedOrganizations(
+                                                        ListUserAuditedOrganizationsRequest
+                                                                .builder()
+                                                                .auditorId(userId)
+                                                                .page(page)
+                                                                .userId(userId)
+                                                                .build())))
+                .map(resource -> resource.getEntity().getName())
+                .as(StepVerifier::create)
+                .expectNext(organizationName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -389,22 +508,31 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .delayUntil(organizationId -> requestCreateUser(this.cloudFoundryClient, userId))
-            .flatMap(organizationId -> Mono.zip(
-                associateBillingManagerOrganization(this.cloudFoundryClient, organizationId, userId),
-                associateAuditorOrganization(this.cloudFoundryClient, organizationId, userId)))
-            .thenMany(PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                    .listAuditedOrganizations(ListUserAuditedOrganizationsRequest.builder()
-                        .billingManagerId(userId)
-                        .page(page)
-                        .userId(userId)
-                        .build())))
-            .map(resource -> resource.getEntity().getName())
-            .as(StepVerifier::create)
-            .expectNext(organizationName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .delayUntil(organizationId -> requestCreateUser(this.cloudFoundryClient, userId))
+                .flatMap(
+                        organizationId ->
+                                Mono.zip(
+                                        associateBillingManagerOrganization(
+                                                this.cloudFoundryClient, organizationId, userId),
+                                        associateAuditorOrganization(
+                                                this.cloudFoundryClient, organizationId, userId)))
+                .thenMany(
+                        PaginationUtils.requestClientV2Resources(
+                                page ->
+                                        this.cloudFoundryClient
+                                                .users()
+                                                .listAuditedOrganizations(
+                                                        ListUserAuditedOrganizationsRequest
+                                                                .builder()
+                                                                .billingManagerId(userId)
+                                                                .page(page)
+                                                                .userId(userId)
+                                                                .build())))
+                .map(resource -> resource.getEntity().getName())
+                .as(StepVerifier::create)
+                .expectNext(organizationName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -413,22 +541,31 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .delayUntil(organizationId -> requestCreateUser(this.cloudFoundryClient, userId))
-            .flatMap(organizationId -> Mono.zip(
-                associateAuditorOrganization(this.cloudFoundryClient, organizationId, userId),
-                associateManagerOrganization(this.cloudFoundryClient, organizationId, userId)))
-            .thenMany(PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                    .listAuditedOrganizations(ListUserAuditedOrganizationsRequest.builder()
-                        .managerId(userId)
-                        .page(page)
-                        .userId(userId)
-                        .build())))
-            .map(resource -> resource.getEntity().getName())
-            .as(StepVerifier::create)
-            .expectNext(organizationName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .delayUntil(organizationId -> requestCreateUser(this.cloudFoundryClient, userId))
+                .flatMap(
+                        organizationId ->
+                                Mono.zip(
+                                        associateAuditorOrganization(
+                                                this.cloudFoundryClient, organizationId, userId),
+                                        associateManagerOrganization(
+                                                this.cloudFoundryClient, organizationId, userId)))
+                .thenMany(
+                        PaginationUtils.requestClientV2Resources(
+                                page ->
+                                        this.cloudFoundryClient
+                                                .users()
+                                                .listAuditedOrganizations(
+                                                        ListUserAuditedOrganizationsRequest
+                                                                .builder()
+                                                                .managerId(userId)
+                                                                .page(page)
+                                                                .userId(userId)
+                                                                .build())))
+                .map(resource -> resource.getEntity().getName())
+                .as(StepVerifier::create)
+                .expectNext(organizationName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -437,20 +574,31 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .flatMap(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
-                .then(associateAuditorOrganization(this.cloudFoundryClient, organizationId, userId)))
-            .thenMany(PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                    .listAuditedOrganizations(ListUserAuditedOrganizationsRequest.builder()
-                        .name(organizationName)
-                        .page(page)
-                        .userId(userId)
-                        .build())))
-            .map(resource -> resource.getEntity().getName())
-            .as(StepVerifier::create)
-            .expectNext(organizationName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                requestCreateUser(this.cloudFoundryClient, userId)
+                                        .then(
+                                                associateAuditorOrganization(
+                                                        this.cloudFoundryClient,
+                                                        organizationId,
+                                                        userId)))
+                .thenMany(
+                        PaginationUtils.requestClientV2Resources(
+                                page ->
+                                        this.cloudFoundryClient
+                                                .users()
+                                                .listAuditedOrganizations(
+                                                        ListUserAuditedOrganizationsRequest
+                                                                .builder()
+                                                                .name(organizationName)
+                                                                .page(page)
+                                                                .userId(userId)
+                                                                .build())))
+                .map(resource -> resource.getEntity().getName())
+                .as(StepVerifier::create)
+                .expectNext(organizationName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -460,24 +608,42 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .flatMap(organizationId -> Mono.zip(
-                Mono.just(organizationId),
-                createSpaceId(this.cloudFoundryClient, organizationId, spaceName)))
-            .flatMap(function((organizationId, spaceId) -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
-                .then(associateAuditorOrganization(this.cloudFoundryClient, organizationId, userId))
-                .thenReturn(spaceId)))
-            .flatMapMany(spaceId -> PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                    .listAuditedOrganizations(ListUserAuditedOrganizationsRequest.builder()
-                        .page(page)
-                        .spaceId(spaceId)
-                        .userId(userId)
-                        .build())))
-            .map(resource -> resource.getEntity().getName())
-            .as(StepVerifier::create)
-            .expectNext(organizationName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                Mono.zip(
+                                        Mono.just(organizationId),
+                                        createSpaceId(
+                                                this.cloudFoundryClient,
+                                                organizationId,
+                                                spaceName)))
+                .flatMap(
+                        function(
+                                (organizationId, spaceId) ->
+                                        requestCreateUser(this.cloudFoundryClient, spaceId, userId)
+                                                .then(
+                                                        associateAuditorOrganization(
+                                                                this.cloudFoundryClient,
+                                                                organizationId,
+                                                                userId))
+                                                .thenReturn(spaceId)))
+                .flatMapMany(
+                        spaceId ->
+                                PaginationUtils.requestClientV2Resources(
+                                        page ->
+                                                this.cloudFoundryClient
+                                                        .users()
+                                                        .listAuditedOrganizations(
+                                                                ListUserAuditedOrganizationsRequest
+                                                                        .builder()
+                                                                        .page(page)
+                                                                        .spaceId(spaceId)
+                                                                        .userId(userId)
+                                                                        .build())))
+                .map(resource -> resource.getEntity().getName())
+                .as(StepVerifier::create)
+                .expectNext(organizationName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -486,20 +652,31 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .flatMap(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
-                .then(associateAuditorOrganization(this.cloudFoundryClient, organizationId, userId)))
-            .thenMany(PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                    .listAuditedOrganizations(ListUserAuditedOrganizationsRequest.builder()
-                        .page(page)
-                        .status(STATUS_FILTER)
-                        .userId(userId)
-                        .build())))
-            .map(resource -> resource.getEntity().getName())
-            .as(StepVerifier::create)
-            .expectNext(organizationName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                requestCreateUser(this.cloudFoundryClient, userId)
+                                        .then(
+                                                associateAuditorOrganization(
+                                                        this.cloudFoundryClient,
+                                                        organizationId,
+                                                        userId)))
+                .thenMany(
+                        PaginationUtils.requestClientV2Resources(
+                                page ->
+                                        this.cloudFoundryClient
+                                                .users()
+                                                .listAuditedOrganizations(
+                                                        ListUserAuditedOrganizationsRequest
+                                                                .builder()
+                                                                .page(page)
+                                                                .status(STATUS_FILTER)
+                                                                .userId(userId)
+                                                                .build())))
+                .map(resource -> resource.getEntity().getName())
+                .as(StepVerifier::create)
+                .expectNext(organizationName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -508,19 +685,29 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         this.organizationId
-            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .flatMap(spaceId -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
-                .then(requestAssociateAuditedSpace(this.cloudFoundryClient, spaceId, userId)))
-            .thenMany(PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                    .listAuditedSpaces(ListUserAuditedSpacesRequest.builder()
-                        .page(page)
-                        .userId(userId)
-                        .build())))
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+                .flatMap(
+                        spaceId ->
+                                requestCreateUser(this.cloudFoundryClient, spaceId, userId)
+                                        .then(
+                                                requestAssociateAuditedSpace(
+                                                        this.cloudFoundryClient, spaceId, userId)))
+                .thenMany(
+                        PaginationUtils.requestClientV2Resources(
+                                page ->
+                                        this.cloudFoundryClient
+                                                .users()
+                                                .listAuditedSpaces(
+                                                        ListUserAuditedSpacesRequest.builder()
+                                                                .page(page)
+                                                                .userId(userId)
+                                                                .build())))
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -530,23 +717,39 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         this.organizationId
-            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .flatMap(spaceId -> Mono.zip(
-                getApplicationId(this.cloudFoundryClient, applicationName, spaceId),
-                requestCreateUser(this.cloudFoundryClient, spaceId, userId)
-                    .then(requestAssociateAuditedSpace(this.cloudFoundryClient, spaceId, userId)))
-            )
-            .flatMapMany(function((applicationId, ignore) -> PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                    .listAuditedSpaces(ListUserAuditedSpacesRequest.builder()
-                        .applicationId(applicationId)
-                        .page(page)
-                        .userId(userId)
-                        .build()))))
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+                .flatMap(
+                        spaceId ->
+                                Mono.zip(
+                                        getApplicationId(
+                                                this.cloudFoundryClient, applicationName, spaceId),
+                                        requestCreateUser(this.cloudFoundryClient, spaceId, userId)
+                                                .then(
+                                                        requestAssociateAuditedSpace(
+                                                                this.cloudFoundryClient,
+                                                                spaceId,
+                                                                userId))))
+                .flatMapMany(
+                        function(
+                                (applicationId, ignore) ->
+                                        PaginationUtils.requestClientV2Resources(
+                                                page ->
+                                                        this.cloudFoundryClient
+                                                                .users()
+                                                                .listAuditedSpaces(
+                                                                        ListUserAuditedSpacesRequest
+                                                                                .builder()
+                                                                                .applicationId(
+                                                                                        applicationId)
+                                                                                .page(page)
+                                                                                .userId(userId)
+                                                                                .build()))))
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -555,23 +758,37 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         this.organizationId
-            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .flatMap(spaceId -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
-                .then(Mono.zip(
-                    requestAssociateSpace(this.cloudFoundryClient, spaceId, userId),
-                    requestAssociateAuditedSpace(this.cloudFoundryClient, spaceId, userId))
-                ))
-            .thenMany(PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                    .listAuditedSpaces(ListUserAuditedSpacesRequest.builder()
-                        .developerId(userId)
-                        .page(page)
-                        .userId(userId)
-                        .build())))
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+                .flatMap(
+                        spaceId ->
+                                requestCreateUser(this.cloudFoundryClient, spaceId, userId)
+                                        .then(
+                                                Mono.zip(
+                                                        requestAssociateSpace(
+                                                                this.cloudFoundryClient,
+                                                                spaceId,
+                                                                userId),
+                                                        requestAssociateAuditedSpace(
+                                                                this.cloudFoundryClient,
+                                                                spaceId,
+                                                                userId))))
+                .thenMany(
+                        PaginationUtils.requestClientV2Resources(
+                                page ->
+                                        this.cloudFoundryClient
+                                                .users()
+                                                .listAuditedSpaces(
+                                                        ListUserAuditedSpacesRequest.builder()
+                                                                .developerId(userId)
+                                                                .page(page)
+                                                                .userId(userId)
+                                                                .build())))
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -580,20 +797,30 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         this.organizationId
-            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .flatMap(spaceId -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
-                .then(requestAssociateAuditedSpace(this.cloudFoundryClient, spaceId, userId)))
-            .thenMany(PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                    .listAuditedSpaces(ListUserAuditedSpacesRequest.builder()
-                        .name(spaceName)
-                        .page(page)
-                        .userId(userId)
-                        .build())))
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+                .flatMap(
+                        spaceId ->
+                                requestCreateUser(this.cloudFoundryClient, spaceId, userId)
+                                        .then(
+                                                requestAssociateAuditedSpace(
+                                                        this.cloudFoundryClient, spaceId, userId)))
+                .thenMany(
+                        PaginationUtils.requestClientV2Resources(
+                                page ->
+                                        this.cloudFoundryClient
+                                                .users()
+                                                .listAuditedSpaces(
+                                                        ListUserAuditedSpacesRequest.builder()
+                                                                .name(spaceName)
+                                                                .page(page)
+                                                                .userId(userId)
+                                                                .build())))
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -602,24 +829,42 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         this.organizationId
-            .flatMap(organizationId -> Mono.zip(
-                Mono.just(organizationId),
-                createSpaceId(this.cloudFoundryClient, organizationId, spaceName)
-            ))
-            .flatMap(function((organizationId, spaceId) -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
-                .then(requestAssociateAuditedSpace(this.cloudFoundryClient, spaceId, userId))
-                .thenReturn(organizationId)))
-            .flatMapMany(organizationId -> PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                    .listAuditedSpaces(ListUserAuditedSpacesRequest.builder()
-                        .organizationId(organizationId)
-                        .page(page)
-                        .userId(userId)
-                        .build())))
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                Mono.zip(
+                                        Mono.just(organizationId),
+                                        createSpaceId(
+                                                this.cloudFoundryClient,
+                                                organizationId,
+                                                spaceName)))
+                .flatMap(
+                        function(
+                                (organizationId, spaceId) ->
+                                        requestCreateUser(this.cloudFoundryClient, spaceId, userId)
+                                                .then(
+                                                        requestAssociateAuditedSpace(
+                                                                this.cloudFoundryClient,
+                                                                spaceId,
+                                                                userId))
+                                                .thenReturn(organizationId)))
+                .flatMapMany(
+                        organizationId ->
+                                PaginationUtils.requestClientV2Resources(
+                                        page ->
+                                                this.cloudFoundryClient
+                                                        .users()
+                                                        .listAuditedSpaces(
+                                                                ListUserAuditedSpacesRequest
+                                                                        .builder()
+                                                                        .organizationId(
+                                                                                organizationId)
+                                                                        .page(page)
+                                                                        .userId(userId)
+                                                                        .build())))
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -628,19 +873,27 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .delayUntil(organizationId -> requestCreateUser(this.cloudFoundryClient, userId))
-            .flatMap(organizationId -> associateBillingManagerOrganization(this.cloudFoundryClient, organizationId, userId))
-            .thenMany(PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                    .listBillingManagedOrganizations(ListUserBillingManagedOrganizationsRequest.builder()
-                        .page(page)
-                        .userId(userId)
-                        .build())))
-            .map(resource -> resource.getEntity().getName())
-            .as(StepVerifier::create)
-            .expectNext(organizationName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .delayUntil(organizationId -> requestCreateUser(this.cloudFoundryClient, userId))
+                .flatMap(
+                        organizationId ->
+                                associateBillingManagerOrganization(
+                                        this.cloudFoundryClient, organizationId, userId))
+                .thenMany(
+                        PaginationUtils.requestClientV2Resources(
+                                page ->
+                                        this.cloudFoundryClient
+                                                .users()
+                                                .listBillingManagedOrganizations(
+                                                        ListUserBillingManagedOrganizationsRequest
+                                                                .builder()
+                                                                .page(page)
+                                                                .userId(userId)
+                                                                .build())))
+                .map(resource -> resource.getEntity().getName())
+                .as(StepVerifier::create)
+                .expectNext(organizationName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -649,22 +902,31 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .delayUntil(organizationId -> requestCreateUser(this.cloudFoundryClient, userId))
-            .flatMap(organizationId -> Mono.zip(
-                associateBillingManagerOrganization(this.cloudFoundryClient, organizationId, userId),
-                associateAuditorOrganization(this.cloudFoundryClient, organizationId, userId)))
-            .thenMany(PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                    .listBillingManagedOrganizations(ListUserBillingManagedOrganizationsRequest.builder()
-                        .auditorId(userId)
-                        .page(page)
-                        .userId(userId)
-                        .build())))
-            .map(resource -> resource.getEntity().getName())
-            .as(StepVerifier::create)
-            .expectNext(organizationName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .delayUntil(organizationId -> requestCreateUser(this.cloudFoundryClient, userId))
+                .flatMap(
+                        organizationId ->
+                                Mono.zip(
+                                        associateBillingManagerOrganization(
+                                                this.cloudFoundryClient, organizationId, userId),
+                                        associateAuditorOrganization(
+                                                this.cloudFoundryClient, organizationId, userId)))
+                .thenMany(
+                        PaginationUtils.requestClientV2Resources(
+                                page ->
+                                        this.cloudFoundryClient
+                                                .users()
+                                                .listBillingManagedOrganizations(
+                                                        ListUserBillingManagedOrganizationsRequest
+                                                                .builder()
+                                                                .auditorId(userId)
+                                                                .page(page)
+                                                                .userId(userId)
+                                                                .build())))
+                .map(resource -> resource.getEntity().getName())
+                .as(StepVerifier::create)
+                .expectNext(organizationName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -673,20 +935,28 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .delayUntil(organizationId -> requestCreateUser(this.cloudFoundryClient, userId))
-            .flatMap(organizationId -> associateBillingManagerOrganization(this.cloudFoundryClient, organizationId, userId))
-            .thenMany(PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                    .listBillingManagedOrganizations(ListUserBillingManagedOrganizationsRequest.builder()
-                        .billingManagerId(userId)
-                        .page(page)
-                        .userId(userId)
-                        .build())))
-            .map(resource -> resource.getEntity().getName())
-            .as(StepVerifier::create)
-            .expectNext(organizationName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .delayUntil(organizationId -> requestCreateUser(this.cloudFoundryClient, userId))
+                .flatMap(
+                        organizationId ->
+                                associateBillingManagerOrganization(
+                                        this.cloudFoundryClient, organizationId, userId))
+                .thenMany(
+                        PaginationUtils.requestClientV2Resources(
+                                page ->
+                                        this.cloudFoundryClient
+                                                .users()
+                                                .listBillingManagedOrganizations(
+                                                        ListUserBillingManagedOrganizationsRequest
+                                                                .builder()
+                                                                .billingManagerId(userId)
+                                                                .page(page)
+                                                                .userId(userId)
+                                                                .build())))
+                .map(resource -> resource.getEntity().getName())
+                .as(StepVerifier::create)
+                .expectNext(organizationName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -695,22 +965,31 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .delayUntil(organizationId -> requestCreateUser(this.cloudFoundryClient, userId))
-            .flatMap(organizationId -> Mono.zip(
-                associateBillingManagerOrganization(this.cloudFoundryClient, organizationId, userId),
-                associateManagerOrganization(this.cloudFoundryClient, organizationId, userId)))
-            .thenMany(PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                    .listBillingManagedOrganizations(ListUserBillingManagedOrganizationsRequest.builder()
-                        .managerId(userId)
-                        .page(page)
-                        .userId(userId)
-                        .build())))
-            .map(resource -> resource.getEntity().getName())
-            .as(StepVerifier::create)
-            .expectNext(organizationName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .delayUntil(organizationId -> requestCreateUser(this.cloudFoundryClient, userId))
+                .flatMap(
+                        organizationId ->
+                                Mono.zip(
+                                        associateBillingManagerOrganization(
+                                                this.cloudFoundryClient, organizationId, userId),
+                                        associateManagerOrganization(
+                                                this.cloudFoundryClient, organizationId, userId)))
+                .thenMany(
+                        PaginationUtils.requestClientV2Resources(
+                                page ->
+                                        this.cloudFoundryClient
+                                                .users()
+                                                .listBillingManagedOrganizations(
+                                                        ListUserBillingManagedOrganizationsRequest
+                                                                .builder()
+                                                                .managerId(userId)
+                                                                .page(page)
+                                                                .userId(userId)
+                                                                .build())))
+                .map(resource -> resource.getEntity().getName())
+                .as(StepVerifier::create)
+                .expectNext(organizationName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -719,20 +998,31 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .flatMap(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
-                .then(associateBillingManagerOrganization(this.cloudFoundryClient, organizationId, userId)))
-            .thenMany(PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                    .listBillingManagedOrganizations(ListUserBillingManagedOrganizationsRequest.builder()
-                        .name(organizationName)
-                        .page(page)
-                        .userId(userId)
-                        .build())))
-            .map(resource -> resource.getEntity().getName())
-            .as(StepVerifier::create)
-            .expectNext(organizationName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                requestCreateUser(this.cloudFoundryClient, userId)
+                                        .then(
+                                                associateBillingManagerOrganization(
+                                                        this.cloudFoundryClient,
+                                                        organizationId,
+                                                        userId)))
+                .thenMany(
+                        PaginationUtils.requestClientV2Resources(
+                                page ->
+                                        this.cloudFoundryClient
+                                                .users()
+                                                .listBillingManagedOrganizations(
+                                                        ListUserBillingManagedOrganizationsRequest
+                                                                .builder()
+                                                                .name(organizationName)
+                                                                .page(page)
+                                                                .userId(userId)
+                                                                .build())))
+                .map(resource -> resource.getEntity().getName())
+                .as(StepVerifier::create)
+                .expectNext(organizationName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -742,24 +1032,42 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .flatMap(organizationId -> Mono.zip(
-                Mono.just(organizationId),
-                createSpaceId(this.cloudFoundryClient, organizationId, spaceName)))
-            .flatMap(function((organizationId, spaceId) -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
-                .then(associateBillingManagerOrganization(this.cloudFoundryClient, organizationId, userId))
-                .thenReturn(spaceId)))
-            .flatMapMany(spaceId -> PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                    .listBillingManagedOrganizations(ListUserBillingManagedOrganizationsRequest.builder()
-                        .page(page)
-                        .spaceId(spaceId)
-                        .userId(userId)
-                        .build())))
-            .map(resource -> resource.getEntity().getName())
-            .as(StepVerifier::create)
-            .expectNext(organizationName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                Mono.zip(
+                                        Mono.just(organizationId),
+                                        createSpaceId(
+                                                this.cloudFoundryClient,
+                                                organizationId,
+                                                spaceName)))
+                .flatMap(
+                        function(
+                                (organizationId, spaceId) ->
+                                        requestCreateUser(this.cloudFoundryClient, spaceId, userId)
+                                                .then(
+                                                        associateBillingManagerOrganization(
+                                                                this.cloudFoundryClient,
+                                                                organizationId,
+                                                                userId))
+                                                .thenReturn(spaceId)))
+                .flatMapMany(
+                        spaceId ->
+                                PaginationUtils.requestClientV2Resources(
+                                        page ->
+                                                this.cloudFoundryClient
+                                                        .users()
+                                                        .listBillingManagedOrganizations(
+                                                                ListUserBillingManagedOrganizationsRequest
+                                                                        .builder()
+                                                                        .page(page)
+                                                                        .spaceId(spaceId)
+                                                                        .userId(userId)
+                                                                        .build())))
+                .map(resource -> resource.getEntity().getName())
+                .as(StepVerifier::create)
+                .expectNext(organizationName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -768,20 +1076,31 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .flatMap(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
-                .then(associateBillingManagerOrganization(this.cloudFoundryClient, organizationId, userId)))
-            .thenMany(PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                    .listBillingManagedOrganizations(ListUserBillingManagedOrganizationsRequest.builder()
-                        .page(page)
-                        .status(STATUS_FILTER)
-                        .userId(userId)
-                        .build())))
-            .map(resource -> resource.getEntity().getName())
-            .as(StepVerifier::create)
-            .expectNext(organizationName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                requestCreateUser(this.cloudFoundryClient, userId)
+                                        .then(
+                                                associateBillingManagerOrganization(
+                                                        this.cloudFoundryClient,
+                                                        organizationId,
+                                                        userId)))
+                .thenMany(
+                        PaginationUtils.requestClientV2Resources(
+                                page ->
+                                        this.cloudFoundryClient
+                                                .users()
+                                                .listBillingManagedOrganizations(
+                                                        ListUserBillingManagedOrganizationsRequest
+                                                                .builder()
+                                                                .page(page)
+                                                                .status(STATUS_FILTER)
+                                                                .userId(userId)
+                                                                .build())))
+                .map(resource -> resource.getEntity().getName())
+                .as(StepVerifier::create)
+                .expectNext(organizationName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -789,19 +1108,28 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         this.organizationId
-            .delayUntil(organizationId -> requestCreateUser(this.cloudFoundryClient, userId))
-            .delayUntil(organizationId -> requestAssociateOrganization(this.cloudFoundryClient, organizationId, userId))
-            .flatMapMany(organizationId -> PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                    .list(ListUsersRequest.builder()
-                        .organizationId(organizationId)
-                        .page(page)
-                        .build())))
-            .filter(resource -> userId.equals(resource.getMetadata().getId()))
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .delayUntil(organizationId -> requestCreateUser(this.cloudFoundryClient, userId))
+                .delayUntil(
+                        organizationId ->
+                                requestAssociateOrganization(
+                                        this.cloudFoundryClient, organizationId, userId))
+                .flatMapMany(
+                        organizationId ->
+                                PaginationUtils.requestClientV2Resources(
+                                        page ->
+                                                this.cloudFoundryClient
+                                                        .users()
+                                                        .list(
+                                                                ListUsersRequest.builder()
+                                                                        .organizationId(
+                                                                                organizationId)
+                                                                        .page(page)
+                                                                        .build())))
+                .filter(resource -> userId.equals(resource.getMetadata().getId()))
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -810,20 +1138,28 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         this.organizationId
-            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .delayUntil(spaceId -> requestCreateUser(this.cloudFoundryClient, spaceId, userId))
-            .delayUntil(spaceId -> requestAssociateSpace(this.cloudFoundryClient, spaceId, userId))
-            .flatMapMany(spaceId -> PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                    .list(ListUsersRequest.builder()
-                        .page(page)
-                        .spaceId(spaceId)
-                        .build())))
-            .filter(resource -> userId.equals(resource.getMetadata().getId()))
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+                .delayUntil(spaceId -> requestCreateUser(this.cloudFoundryClient, spaceId, userId))
+                .delayUntil(
+                        spaceId -> requestAssociateSpace(this.cloudFoundryClient, spaceId, userId))
+                .flatMapMany(
+                        spaceId ->
+                                PaginationUtils.requestClientV2Resources(
+                                        page ->
+                                                this.cloudFoundryClient
+                                                        .users()
+                                                        .list(
+                                                                ListUsersRequest.builder()
+                                                                        .page(page)
+                                                                        .spaceId(spaceId)
+                                                                        .build())))
+                .filter(resource -> userId.equals(resource.getMetadata().getId()))
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -832,19 +1168,27 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .delayUntil(organizationId -> requestCreateUser(this.cloudFoundryClient, userId))
-            .flatMap(organizationId -> associateManagerOrganization(this.cloudFoundryClient, organizationId, userId))
-            .thenMany(PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                    .listManagedOrganizations(ListUserManagedOrganizationsRequest.builder()
-                        .page(page)
-                        .userId(userId)
-                        .build())))
-            .map(resource -> resource.getEntity().getName())
-            .as(StepVerifier::create)
-            .expectNext(organizationName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .delayUntil(organizationId -> requestCreateUser(this.cloudFoundryClient, userId))
+                .flatMap(
+                        organizationId ->
+                                associateManagerOrganization(
+                                        this.cloudFoundryClient, organizationId, userId))
+                .thenMany(
+                        PaginationUtils.requestClientV2Resources(
+                                page ->
+                                        this.cloudFoundryClient
+                                                .users()
+                                                .listManagedOrganizations(
+                                                        ListUserManagedOrganizationsRequest
+                                                                .builder()
+                                                                .page(page)
+                                                                .userId(userId)
+                                                                .build())))
+                .map(resource -> resource.getEntity().getName())
+                .as(StepVerifier::create)
+                .expectNext(organizationName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -853,22 +1197,31 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .delayUntil(organizationId -> requestCreateUser(this.cloudFoundryClient, userId))
-            .flatMap(organizationId -> Mono.zip(
-                associateAuditorOrganization(this.cloudFoundryClient, organizationId, userId),
-                associateManagerOrganization(this.cloudFoundryClient, organizationId, userId)))
-            .thenMany(PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                    .listManagedOrganizations(ListUserManagedOrganizationsRequest.builder()
-                        .auditorId(userId)
-                        .page(page)
-                        .userId(userId)
-                        .build())))
-            .map(resource -> resource.getEntity().getName())
-            .as(StepVerifier::create)
-            .expectNext(organizationName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .delayUntil(organizationId -> requestCreateUser(this.cloudFoundryClient, userId))
+                .flatMap(
+                        organizationId ->
+                                Mono.zip(
+                                        associateAuditorOrganization(
+                                                this.cloudFoundryClient, organizationId, userId),
+                                        associateManagerOrganization(
+                                                this.cloudFoundryClient, organizationId, userId)))
+                .thenMany(
+                        PaginationUtils.requestClientV2Resources(
+                                page ->
+                                        this.cloudFoundryClient
+                                                .users()
+                                                .listManagedOrganizations(
+                                                        ListUserManagedOrganizationsRequest
+                                                                .builder()
+                                                                .auditorId(userId)
+                                                                .page(page)
+                                                                .userId(userId)
+                                                                .build())))
+                .map(resource -> resource.getEntity().getName())
+                .as(StepVerifier::create)
+                .expectNext(organizationName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -877,22 +1230,31 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .delayUntil(organizationId -> requestCreateUser(this.cloudFoundryClient, userId))
-            .flatMap(organizationId -> Mono.zip(
-                associateBillingManagerOrganization(this.cloudFoundryClient, organizationId, userId),
-                associateManagerOrganization(this.cloudFoundryClient, organizationId, userId)))
-            .thenMany(PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                    .listManagedOrganizations(ListUserManagedOrganizationsRequest.builder()
-                        .billingManagerId(userId)
-                        .page(page)
-                        .userId(userId)
-                        .build())))
-            .map(resource -> resource.getEntity().getName())
-            .as(StepVerifier::create)
-            .expectNext(organizationName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .delayUntil(organizationId -> requestCreateUser(this.cloudFoundryClient, userId))
+                .flatMap(
+                        organizationId ->
+                                Mono.zip(
+                                        associateBillingManagerOrganization(
+                                                this.cloudFoundryClient, organizationId, userId),
+                                        associateManagerOrganization(
+                                                this.cloudFoundryClient, organizationId, userId)))
+                .thenMany(
+                        PaginationUtils.requestClientV2Resources(
+                                page ->
+                                        this.cloudFoundryClient
+                                                .users()
+                                                .listManagedOrganizations(
+                                                        ListUserManagedOrganizationsRequest
+                                                                .builder()
+                                                                .billingManagerId(userId)
+                                                                .page(page)
+                                                                .userId(userId)
+                                                                .build())))
+                .map(resource -> resource.getEntity().getName())
+                .as(StepVerifier::create)
+                .expectNext(organizationName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -901,20 +1263,28 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .delayUntil(organizationId -> requestCreateUser(this.cloudFoundryClient, userId))
-            .flatMap(organizationId -> associateManagerOrganization(this.cloudFoundryClient, organizationId, userId))
-            .thenMany(PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                    .listManagedOrganizations(ListUserManagedOrganizationsRequest.builder()
-                        .managerId(userId)
-                        .page(page)
-                        .userId(userId)
-                        .build())))
-            .map(resource -> resource.getEntity().getName())
-            .as(StepVerifier::create)
-            .expectNext(organizationName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .delayUntil(organizationId -> requestCreateUser(this.cloudFoundryClient, userId))
+                .flatMap(
+                        organizationId ->
+                                associateManagerOrganization(
+                                        this.cloudFoundryClient, organizationId, userId))
+                .thenMany(
+                        PaginationUtils.requestClientV2Resources(
+                                page ->
+                                        this.cloudFoundryClient
+                                                .users()
+                                                .listManagedOrganizations(
+                                                        ListUserManagedOrganizationsRequest
+                                                                .builder()
+                                                                .managerId(userId)
+                                                                .page(page)
+                                                                .userId(userId)
+                                                                .build())))
+                .map(resource -> resource.getEntity().getName())
+                .as(StepVerifier::create)
+                .expectNext(organizationName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -923,20 +1293,31 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .flatMap(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
-                .then(associateManagerOrganization(this.cloudFoundryClient, organizationId, userId)))
-            .thenMany(PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                    .listManagedOrganizations(ListUserManagedOrganizationsRequest.builder()
-                        .name(organizationName)
-                        .page(page)
-                        .userId(userId)
-                        .build())))
-            .map(resource -> resource.getEntity().getName())
-            .as(StepVerifier::create)
-            .expectNext(organizationName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                requestCreateUser(this.cloudFoundryClient, userId)
+                                        .then(
+                                                associateManagerOrganization(
+                                                        this.cloudFoundryClient,
+                                                        organizationId,
+                                                        userId)))
+                .thenMany(
+                        PaginationUtils.requestClientV2Resources(
+                                page ->
+                                        this.cloudFoundryClient
+                                                .users()
+                                                .listManagedOrganizations(
+                                                        ListUserManagedOrganizationsRequest
+                                                                .builder()
+                                                                .name(organizationName)
+                                                                .page(page)
+                                                                .userId(userId)
+                                                                .build())))
+                .map(resource -> resource.getEntity().getName())
+                .as(StepVerifier::create)
+                .expectNext(organizationName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -946,24 +1327,42 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .flatMap(organizationId -> Mono.zip(
-                Mono.just(organizationId),
-                createSpaceId(this.cloudFoundryClient, organizationId, spaceName)))
-            .flatMap(function((organizationId, spaceId) -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
-                .then(associateManagerOrganization(this.cloudFoundryClient, organizationId, userId))
-                .thenReturn(spaceId)))
-            .flatMapMany(spaceId -> PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                    .listManagedOrganizations(ListUserManagedOrganizationsRequest.builder()
-                        .page(page)
-                        .spaceId(spaceId)
-                        .userId(userId)
-                        .build())))
-            .map(resource -> resource.getEntity().getName())
-            .as(StepVerifier::create)
-            .expectNext(organizationName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                Mono.zip(
+                                        Mono.just(organizationId),
+                                        createSpaceId(
+                                                this.cloudFoundryClient,
+                                                organizationId,
+                                                spaceName)))
+                .flatMap(
+                        function(
+                                (organizationId, spaceId) ->
+                                        requestCreateUser(this.cloudFoundryClient, spaceId, userId)
+                                                .then(
+                                                        associateManagerOrganization(
+                                                                this.cloudFoundryClient,
+                                                                organizationId,
+                                                                userId))
+                                                .thenReturn(spaceId)))
+                .flatMapMany(
+                        spaceId ->
+                                PaginationUtils.requestClientV2Resources(
+                                        page ->
+                                                this.cloudFoundryClient
+                                                        .users()
+                                                        .listManagedOrganizations(
+                                                                ListUserManagedOrganizationsRequest
+                                                                        .builder()
+                                                                        .page(page)
+                                                                        .spaceId(spaceId)
+                                                                        .userId(userId)
+                                                                        .build())))
+                .map(resource -> resource.getEntity().getName())
+                .as(StepVerifier::create)
+                .expectNext(organizationName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -972,20 +1371,31 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .flatMap(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
-                .then(associateManagerOrganization(this.cloudFoundryClient, organizationId, userId)))
-            .thenMany(PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                    .listManagedOrganizations(ListUserManagedOrganizationsRequest.builder()
-                        .page(page)
-                        .status(STATUS_FILTER)
-                        .userId(userId)
-                        .build())))
-            .map(resource -> resource.getEntity().getName())
-            .as(StepVerifier::create)
-            .expectNext(organizationName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                requestCreateUser(this.cloudFoundryClient, userId)
+                                        .then(
+                                                associateManagerOrganization(
+                                                        this.cloudFoundryClient,
+                                                        organizationId,
+                                                        userId)))
+                .thenMany(
+                        PaginationUtils.requestClientV2Resources(
+                                page ->
+                                        this.cloudFoundryClient
+                                                .users()
+                                                .listManagedOrganizations(
+                                                        ListUserManagedOrganizationsRequest
+                                                                .builder()
+                                                                .page(page)
+                                                                .status(STATUS_FILTER)
+                                                                .userId(userId)
+                                                                .build())))
+                .map(resource -> resource.getEntity().getName())
+                .as(StepVerifier::create)
+                .expectNext(organizationName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -994,19 +1404,29 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         this.organizationId
-            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .flatMap(spaceId -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
-                .then(requestAssociateManagedSpace(this.cloudFoundryClient, spaceId, userId)))
-            .thenMany(PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                    .listManagedSpaces(ListUserManagedSpacesRequest.builder()
-                        .page(page)
-                        .userId(userId)
-                        .build())))
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+                .flatMap(
+                        spaceId ->
+                                requestCreateUser(this.cloudFoundryClient, spaceId, userId)
+                                        .then(
+                                                requestAssociateManagedSpace(
+                                                        this.cloudFoundryClient, spaceId, userId)))
+                .thenMany(
+                        PaginationUtils.requestClientV2Resources(
+                                page ->
+                                        this.cloudFoundryClient
+                                                .users()
+                                                .listManagedSpaces(
+                                                        ListUserManagedSpacesRequest.builder()
+                                                                .page(page)
+                                                                .userId(userId)
+                                                                .build())))
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -1016,23 +1436,39 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         this.organizationId
-            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .flatMap(spaceId -> Mono.zip(
-                getApplicationId(this.cloudFoundryClient, applicationName, spaceId),
-                requestCreateUser(this.cloudFoundryClient, spaceId, userId)
-                    .then(requestAssociateManagedSpace(this.cloudFoundryClient, spaceId, userId)))
-            )
-            .flatMapMany(function((applicationId, ignore) -> PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                    .listManagedSpaces(ListUserManagedSpacesRequest.builder()
-                        .applicationId(applicationId)
-                        .page(page)
-                        .userId(userId)
-                        .build()))))
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+                .flatMap(
+                        spaceId ->
+                                Mono.zip(
+                                        getApplicationId(
+                                                this.cloudFoundryClient, applicationName, spaceId),
+                                        requestCreateUser(this.cloudFoundryClient, spaceId, userId)
+                                                .then(
+                                                        requestAssociateManagedSpace(
+                                                                this.cloudFoundryClient,
+                                                                spaceId,
+                                                                userId))))
+                .flatMapMany(
+                        function(
+                                (applicationId, ignore) ->
+                                        PaginationUtils.requestClientV2Resources(
+                                                page ->
+                                                        this.cloudFoundryClient
+                                                                .users()
+                                                                .listManagedSpaces(
+                                                                        ListUserManagedSpacesRequest
+                                                                                .builder()
+                                                                                .applicationId(
+                                                                                        applicationId)
+                                                                                .page(page)
+                                                                                .userId(userId)
+                                                                                .build()))))
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -1041,23 +1477,37 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         this.organizationId
-            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .flatMap(spaceId -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
-                .then(Mono.zip(
-                    requestAssociateSpace(this.cloudFoundryClient, spaceId, userId),
-                    requestAssociateManagedSpace(this.cloudFoundryClient, spaceId, userId))
-                ))
-            .thenMany(PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                    .listManagedSpaces(ListUserManagedSpacesRequest.builder()
-                        .developerId(userId)
-                        .page(page)
-                        .userId(userId)
-                        .build())))
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+                .flatMap(
+                        spaceId ->
+                                requestCreateUser(this.cloudFoundryClient, spaceId, userId)
+                                        .then(
+                                                Mono.zip(
+                                                        requestAssociateSpace(
+                                                                this.cloudFoundryClient,
+                                                                spaceId,
+                                                                userId),
+                                                        requestAssociateManagedSpace(
+                                                                this.cloudFoundryClient,
+                                                                spaceId,
+                                                                userId))))
+                .thenMany(
+                        PaginationUtils.requestClientV2Resources(
+                                page ->
+                                        this.cloudFoundryClient
+                                                .users()
+                                                .listManagedSpaces(
+                                                        ListUserManagedSpacesRequest.builder()
+                                                                .developerId(userId)
+                                                                .page(page)
+                                                                .userId(userId)
+                                                                .build())))
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -1066,20 +1516,30 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         this.organizationId
-            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .flatMap(spaceId -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
-                .then(requestAssociateManagedSpace(this.cloudFoundryClient, spaceId, userId)))
-            .thenMany(PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                    .listManagedSpaces(ListUserManagedSpacesRequest.builder()
-                        .name(spaceName)
-                        .page(page)
-                        .userId(userId)
-                        .build())))
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+                .flatMap(
+                        spaceId ->
+                                requestCreateUser(this.cloudFoundryClient, spaceId, userId)
+                                        .then(
+                                                requestAssociateManagedSpace(
+                                                        this.cloudFoundryClient, spaceId, userId)))
+                .thenMany(
+                        PaginationUtils.requestClientV2Resources(
+                                page ->
+                                        this.cloudFoundryClient
+                                                .users()
+                                                .listManagedSpaces(
+                                                        ListUserManagedSpacesRequest.builder()
+                                                                .name(spaceName)
+                                                                .page(page)
+                                                                .userId(userId)
+                                                                .build())))
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -1088,24 +1548,42 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         this.organizationId
-            .flatMap(organizationId -> Mono.zip(
-                Mono.just(organizationId),
-                createSpaceId(this.cloudFoundryClient, organizationId, spaceName)
-            ))
-            .flatMap(function((organizationId, spaceId) -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
-                .then(requestAssociateManagedSpace(this.cloudFoundryClient, spaceId, userId))
-                .thenReturn(organizationId)))
-            .flatMapMany(organizationId -> PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                    .listManagedSpaces(ListUserManagedSpacesRequest.builder()
-                        .organizationId(organizationId)
-                        .page(page)
-                        .userId(userId)
-                        .build())))
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                Mono.zip(
+                                        Mono.just(organizationId),
+                                        createSpaceId(
+                                                this.cloudFoundryClient,
+                                                organizationId,
+                                                spaceName)))
+                .flatMap(
+                        function(
+                                (organizationId, spaceId) ->
+                                        requestCreateUser(this.cloudFoundryClient, spaceId, userId)
+                                                .then(
+                                                        requestAssociateManagedSpace(
+                                                                this.cloudFoundryClient,
+                                                                spaceId,
+                                                                userId))
+                                                .thenReturn(organizationId)))
+                .flatMapMany(
+                        organizationId ->
+                                PaginationUtils.requestClientV2Resources(
+                                        page ->
+                                                this.cloudFoundryClient
+                                                        .users()
+                                                        .listManagedSpaces(
+                                                                ListUserManagedSpacesRequest
+                                                                        .builder()
+                                                                        .organizationId(
+                                                                                organizationId)
+                                                                        .page(page)
+                                                                        .userId(userId)
+                                                                        .build())))
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -1114,19 +1592,26 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .delayUntil(organizationId -> requestCreateUser(this.cloudFoundryClient, userId))
-            .flatMap(organizationId -> requestAssociateOrganization(this.cloudFoundryClient, organizationId, userId))
-            .thenMany(PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                    .listOrganizations(ListUserOrganizationsRequest.builder()
-                        .page(page)
-                        .userId(userId)
-                        .build())))
-            .map(resource -> resource.getEntity().getName())
-            .as(StepVerifier::create)
-            .expectNext(organizationName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .delayUntil(organizationId -> requestCreateUser(this.cloudFoundryClient, userId))
+                .flatMap(
+                        organizationId ->
+                                requestAssociateOrganization(
+                                        this.cloudFoundryClient, organizationId, userId))
+                .thenMany(
+                        PaginationUtils.requestClientV2Resources(
+                                page ->
+                                        this.cloudFoundryClient
+                                                .users()
+                                                .listOrganizations(
+                                                        ListUserOrganizationsRequest.builder()
+                                                                .page(page)
+                                                                .userId(userId)
+                                                                .build())))
+                .map(resource -> resource.getEntity().getName())
+                .as(StepVerifier::create)
+                .expectNext(organizationName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -1135,22 +1620,35 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .flatMap(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
-                .then(Mono.zip(
-                    requestAssociateOrganization(this.cloudFoundryClient, organizationId, userId),
-                    associateAuditorOrganization(this.cloudFoundryClient, organizationId, userId))))
-            .thenMany(PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                    .listOrganizations(ListUserOrganizationsRequest.builder()
-                        .auditorId(userId)
-                        .page(page)
-                        .userId(userId)
-                        .build())))
-            .map(resource -> resource.getEntity().getName())
-            .as(StepVerifier::create)
-            .expectNext(organizationName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                requestCreateUser(this.cloudFoundryClient, userId)
+                                        .then(
+                                                Mono.zip(
+                                                        requestAssociateOrganization(
+                                                                this.cloudFoundryClient,
+                                                                organizationId,
+                                                                userId),
+                                                        associateAuditorOrganization(
+                                                                this.cloudFoundryClient,
+                                                                organizationId,
+                                                                userId))))
+                .thenMany(
+                        PaginationUtils.requestClientV2Resources(
+                                page ->
+                                        this.cloudFoundryClient
+                                                .users()
+                                                .listOrganizations(
+                                                        ListUserOrganizationsRequest.builder()
+                                                                .auditorId(userId)
+                                                                .page(page)
+                                                                .userId(userId)
+                                                                .build())))
+                .map(resource -> resource.getEntity().getName())
+                .as(StepVerifier::create)
+                .expectNext(organizationName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -1159,22 +1657,35 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .flatMap(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
-                .then(Mono.zip(
-                    requestAssociateOrganization(this.cloudFoundryClient, organizationId, userId),
-                    associateBillingManagerOrganization(this.cloudFoundryClient, organizationId, userId))))
-            .thenMany(PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                    .listOrganizations(ListUserOrganizationsRequest.builder()
-                        .billingManagerId(userId)
-                        .page(page)
-                        .userId(userId)
-                        .build())))
-            .map(resource -> resource.getEntity().getName())
-            .as(StepVerifier::create)
-            .expectNext(organizationName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                requestCreateUser(this.cloudFoundryClient, userId)
+                                        .then(
+                                                Mono.zip(
+                                                        requestAssociateOrganization(
+                                                                this.cloudFoundryClient,
+                                                                organizationId,
+                                                                userId),
+                                                        associateBillingManagerOrganization(
+                                                                this.cloudFoundryClient,
+                                                                organizationId,
+                                                                userId))))
+                .thenMany(
+                        PaginationUtils.requestClientV2Resources(
+                                page ->
+                                        this.cloudFoundryClient
+                                                .users()
+                                                .listOrganizations(
+                                                        ListUserOrganizationsRequest.builder()
+                                                                .billingManagerId(userId)
+                                                                .page(page)
+                                                                .userId(userId)
+                                                                .build())))
+                .map(resource -> resource.getEntity().getName())
+                .as(StepVerifier::create)
+                .expectNext(organizationName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -1183,22 +1694,35 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .flatMap(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
-                .then(Mono.zip(
-                    requestAssociateOrganization(this.cloudFoundryClient, organizationId, userId),
-                    associateManagerOrganization(this.cloudFoundryClient, organizationId, userId))))
-            .thenMany(PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                    .listOrganizations(ListUserOrganizationsRequest.builder()
-                        .managerId(userId)
-                        .page(page)
-                        .userId(userId)
-                        .build())))
-            .map(resource -> resource.getEntity().getName())
-            .as(StepVerifier::create)
-            .expectNext(organizationName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                requestCreateUser(this.cloudFoundryClient, userId)
+                                        .then(
+                                                Mono.zip(
+                                                        requestAssociateOrganization(
+                                                                this.cloudFoundryClient,
+                                                                organizationId,
+                                                                userId),
+                                                        associateManagerOrganization(
+                                                                this.cloudFoundryClient,
+                                                                organizationId,
+                                                                userId))))
+                .thenMany(
+                        PaginationUtils.requestClientV2Resources(
+                                page ->
+                                        this.cloudFoundryClient
+                                                .users()
+                                                .listOrganizations(
+                                                        ListUserOrganizationsRequest.builder()
+                                                                .managerId(userId)
+                                                                .page(page)
+                                                                .userId(userId)
+                                                                .build())))
+                .map(resource -> resource.getEntity().getName())
+                .as(StepVerifier::create)
+                .expectNext(organizationName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -1207,20 +1731,30 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .flatMap(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
-                .then(requestAssociateOrganization(this.cloudFoundryClient, organizationId, userId)))
-            .thenMany(PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                    .listOrganizations(ListUserOrganizationsRequest.builder()
-                        .name(organizationName)
-                        .page(page)
-                        .userId(userId)
-                        .build())))
-            .map(resource -> resource.getEntity().getName())
-            .as(StepVerifier::create)
-            .expectNext(organizationName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                requestCreateUser(this.cloudFoundryClient, userId)
+                                        .then(
+                                                requestAssociateOrganization(
+                                                        this.cloudFoundryClient,
+                                                        organizationId,
+                                                        userId)))
+                .thenMany(
+                        PaginationUtils.requestClientV2Resources(
+                                page ->
+                                        this.cloudFoundryClient
+                                                .users()
+                                                .listOrganizations(
+                                                        ListUserOrganizationsRequest.builder()
+                                                                .name(organizationName)
+                                                                .page(page)
+                                                                .userId(userId)
+                                                                .build())))
+                .map(resource -> resource.getEntity().getName())
+                .as(StepVerifier::create)
+                .expectNext(organizationName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -1230,24 +1764,42 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .flatMap(organizationId -> Mono.zip(
-                Mono.just(organizationId),
-                createSpaceId(this.cloudFoundryClient, organizationId, spaceName)))
-            .flatMap(function((organizationId, spaceId) -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
-                .then(requestAssociateOrganization(this.cloudFoundryClient, organizationId, userId))
-                .thenReturn(spaceId)))
-            .flatMapMany(spaceId -> PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                    .listOrganizations(ListUserOrganizationsRequest.builder()
-                        .page(page)
-                        .spaceId(spaceId)
-                        .userId(userId)
-                        .build())))
-            .map(resource -> resource.getEntity().getName())
-            .as(StepVerifier::create)
-            .expectNext(organizationName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                Mono.zip(
+                                        Mono.just(organizationId),
+                                        createSpaceId(
+                                                this.cloudFoundryClient,
+                                                organizationId,
+                                                spaceName)))
+                .flatMap(
+                        function(
+                                (organizationId, spaceId) ->
+                                        requestCreateUser(this.cloudFoundryClient, spaceId, userId)
+                                                .then(
+                                                        requestAssociateOrganization(
+                                                                this.cloudFoundryClient,
+                                                                organizationId,
+                                                                userId))
+                                                .thenReturn(spaceId)))
+                .flatMapMany(
+                        spaceId ->
+                                PaginationUtils.requestClientV2Resources(
+                                        page ->
+                                                this.cloudFoundryClient
+                                                        .users()
+                                                        .listOrganizations(
+                                                                ListUserOrganizationsRequest
+                                                                        .builder()
+                                                                        .page(page)
+                                                                        .spaceId(spaceId)
+                                                                        .userId(userId)
+                                                                        .build())))
+                .map(resource -> resource.getEntity().getName())
+                .as(StepVerifier::create)
+                .expectNext(organizationName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -1256,20 +1808,30 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .flatMap(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
-                .then(requestAssociateOrganization(this.cloudFoundryClient, organizationId, userId)))
-            .thenMany(PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                    .listOrganizations(ListUserOrganizationsRequest.builder()
-                        .page(page)
-                        .status(STATUS_FILTER)
-                        .userId(userId)
-                        .build())))
-            .map(resource -> resource.getEntity().getName())
-            .as(StepVerifier::create)
-            .expectNext(organizationName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                requestCreateUser(this.cloudFoundryClient, userId)
+                                        .then(
+                                                requestAssociateOrganization(
+                                                        this.cloudFoundryClient,
+                                                        organizationId,
+                                                        userId)))
+                .thenMany(
+                        PaginationUtils.requestClientV2Resources(
+                                page ->
+                                        this.cloudFoundryClient
+                                                .users()
+                                                .listOrganizations(
+                                                        ListUserOrganizationsRequest.builder()
+                                                                .page(page)
+                                                                .status(STATUS_FILTER)
+                                                                .userId(userId)
+                                                                .build())))
+                .map(resource -> resource.getEntity().getName())
+                .as(StepVerifier::create)
+                .expectNext(organizationName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -1278,19 +1840,29 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         this.organizationId
-            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .flatMap(spaceId -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
-                .then(requestAssociateSpace(this.cloudFoundryClient, spaceId, userId)))
-            .thenMany(PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                    .listSpaces(ListUserSpacesRequest.builder()
-                        .page(page)
-                        .userId(userId)
-                        .build())))
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+                .flatMap(
+                        spaceId ->
+                                requestCreateUser(this.cloudFoundryClient, spaceId, userId)
+                                        .then(
+                                                requestAssociateSpace(
+                                                        this.cloudFoundryClient, spaceId, userId)))
+                .thenMany(
+                        PaginationUtils.requestClientV2Resources(
+                                page ->
+                                        this.cloudFoundryClient
+                                                .users()
+                                                .listSpaces(
+                                                        ListUserSpacesRequest.builder()
+                                                                .page(page)
+                                                                .userId(userId)
+                                                                .build())))
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -1300,23 +1872,39 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         this.organizationId
-            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .flatMap(spaceId -> Mono.zip(
-                getApplicationId(this.cloudFoundryClient, applicationName, spaceId),
-                requestCreateUser(this.cloudFoundryClient, spaceId, userId)
-                    .then(requestAssociateSpace(this.cloudFoundryClient, spaceId, userId)))
-            )
-            .flatMapMany(function((applicationId, ignore) -> PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                    .listSpaces(ListUserSpacesRequest.builder()
-                        .applicationId(applicationId)
-                        .page(page)
-                        .userId(userId)
-                        .build()))))
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+                .flatMap(
+                        spaceId ->
+                                Mono.zip(
+                                        getApplicationId(
+                                                this.cloudFoundryClient, applicationName, spaceId),
+                                        requestCreateUser(this.cloudFoundryClient, spaceId, userId)
+                                                .then(
+                                                        requestAssociateSpace(
+                                                                this.cloudFoundryClient,
+                                                                spaceId,
+                                                                userId))))
+                .flatMapMany(
+                        function(
+                                (applicationId, ignore) ->
+                                        PaginationUtils.requestClientV2Resources(
+                                                page ->
+                                                        this.cloudFoundryClient
+                                                                .users()
+                                                                .listSpaces(
+                                                                        ListUserSpacesRequest
+                                                                                .builder()
+                                                                                .applicationId(
+                                                                                        applicationId)
+                                                                                .page(page)
+                                                                                .userId(userId)
+                                                                                .build()))))
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -1325,21 +1913,31 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         this.organizationId
-            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .flatMap(spaceId -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
-                .then(requestAssociateSpace(this.cloudFoundryClient, spaceId, userId)))
-            .thenMany(PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                    .listSpaces(ListUserSpacesRequest.builder()
-                        .developerId(userId)
-                        .page(page)
-                        .userId(userId)
-                        .build())))
-            .map(resource -> resource.getEntity().getName())
-            .as(StepVerifier::create)
-            .expectNext(spaceName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+                .flatMap(
+                        spaceId ->
+                                requestCreateUser(this.cloudFoundryClient, spaceId, userId)
+                                        .then(
+                                                requestAssociateSpace(
+                                                        this.cloudFoundryClient, spaceId, userId)))
+                .thenMany(
+                        PaginationUtils.requestClientV2Resources(
+                                page ->
+                                        this.cloudFoundryClient
+                                                .users()
+                                                .listSpaces(
+                                                        ListUserSpacesRequest.builder()
+                                                                .developerId(userId)
+                                                                .page(page)
+                                                                .userId(userId)
+                                                                .build())))
+                .map(resource -> resource.getEntity().getName())
+                .as(StepVerifier::create)
+                .expectNext(spaceName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -1348,21 +1946,31 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         this.organizationId
-            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .flatMap(spaceId -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
-                .then(requestAssociateSpace(this.cloudFoundryClient, spaceId, userId)))
-            .thenMany(PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                    .listSpaces(ListUserSpacesRequest.builder()
-                        .name(spaceName)
-                        .page(page)
-                        .userId(userId)
-                        .build())))
-            .map(resource -> resource.getEntity().getName())
-            .as(StepVerifier::create)
-            .expectNext(spaceName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+                .flatMap(
+                        spaceId ->
+                                requestCreateUser(this.cloudFoundryClient, spaceId, userId)
+                                        .then(
+                                                requestAssociateSpace(
+                                                        this.cloudFoundryClient, spaceId, userId)))
+                .thenMany(
+                        PaginationUtils.requestClientV2Resources(
+                                page ->
+                                        this.cloudFoundryClient
+                                                .users()
+                                                .listSpaces(
+                                                        ListUserSpacesRequest.builder()
+                                                                .name(spaceName)
+                                                                .page(page)
+                                                                .userId(userId)
+                                                                .build())))
+                .map(resource -> resource.getEntity().getName())
+                .as(StepVerifier::create)
+                .expectNext(spaceName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -1371,25 +1979,42 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         this.organizationId
-            .flatMap(organizationId -> Mono.zip(
-                Mono.just(organizationId),
-                createSpaceId(this.cloudFoundryClient, organizationId, spaceName)
-            ))
-            .flatMap(function((organizationId, spaceId) -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
-                .then(requestAssociateSpace(this.cloudFoundryClient, spaceId, userId))
-                .thenReturn(organizationId)))
-            .flatMapMany(organizationId -> PaginationUtils
-                .requestClientV2Resources(page -> this.cloudFoundryClient.users()
-                    .listSpaces(ListUserSpacesRequest.builder()
-                        .organizationId(organizationId)
-                        .page(page)
-                        .userId(userId)
-                        .build())))
-            .map(resource -> resource.getEntity().getName())
-            .as(StepVerifier::create)
-            .expectNext(spaceName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                Mono.zip(
+                                        Mono.just(organizationId),
+                                        createSpaceId(
+                                                this.cloudFoundryClient,
+                                                organizationId,
+                                                spaceName)))
+                .flatMap(
+                        function(
+                                (organizationId, spaceId) ->
+                                        requestCreateUser(this.cloudFoundryClient, spaceId, userId)
+                                                .then(
+                                                        requestAssociateSpace(
+                                                                this.cloudFoundryClient,
+                                                                spaceId,
+                                                                userId))
+                                                .thenReturn(organizationId)))
+                .flatMapMany(
+                        organizationId ->
+                                PaginationUtils.requestClientV2Resources(
+                                        page ->
+                                                this.cloudFoundryClient
+                                                        .users()
+                                                        .listSpaces(
+                                                                ListUserSpacesRequest.builder()
+                                                                        .organizationId(
+                                                                                organizationId)
+                                                                        .page(page)
+                                                                        .userId(userId)
+                                                                        .build())))
+                .map(resource -> resource.getEntity().getName())
+                .as(StepVerifier::create)
+                .expectNext(spaceName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -1397,19 +2022,33 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         this.organizationId
-            .delayUntil(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
-                .then(requestAssociateOrganizationAuditor(this.cloudFoundryClient, organizationId, userId))
-                .then(requestAssociateAuditedOrganization(this.cloudFoundryClient, organizationId, userId)))
-            .flatMap(organizationId -> this.cloudFoundryClient.users()
-                .removeAuditedOrganization(RemoveUserAuditedOrganizationRequest.builder()
-                    .auditedOrganizationId(organizationId)
-                    .userId(userId)
-                    .build()))
-            .then(requestSummaryUser(this.cloudFoundryClient, userId))
-            .flatMapIterable(response -> response.getEntity().getAuditedOrganizations())
-            .as(StepVerifier::create)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .delayUntil(
+                        organizationId ->
+                                requestCreateUser(this.cloudFoundryClient, userId)
+                                        .then(
+                                                requestAssociateOrganizationAuditor(
+                                                        this.cloudFoundryClient,
+                                                        organizationId,
+                                                        userId))
+                                        .then(
+                                                requestAssociateAuditedOrganization(
+                                                        this.cloudFoundryClient,
+                                                        organizationId,
+                                                        userId)))
+                .flatMap(
+                        organizationId ->
+                                this.cloudFoundryClient
+                                        .users()
+                                        .removeAuditedOrganization(
+                                                RemoveUserAuditedOrganizationRequest.builder()
+                                                        .auditedOrganizationId(organizationId)
+                                                        .userId(userId)
+                                                        .build()))
+                .then(requestSummaryUser(this.cloudFoundryClient, userId))
+                .flatMapIterable(response -> response.getEntity().getAuditedOrganizations())
+                .as(StepVerifier::create)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -1418,19 +2057,29 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         this.organizationId
-            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .flatMap(spaceId -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
-                .then(requestAssociateAuditedSpace(this.cloudFoundryClient, spaceId, userId))
-                .then(this.cloudFoundryClient.users()
-                    .removeAuditedSpace(RemoveUserAuditedSpaceRequest.builder()
-                        .auditedSpaceId(spaceId)
-                        .userId(userId)
-                        .build())))
-            .then(requestSummaryUser(this.cloudFoundryClient, userId))
-            .flatMapIterable(response -> response.getEntity().getAuditedSpaces())
-            .as(StepVerifier::create)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+                .flatMap(
+                        spaceId ->
+                                requestCreateUser(this.cloudFoundryClient, spaceId, userId)
+                                        .then(
+                                                requestAssociateAuditedSpace(
+                                                        this.cloudFoundryClient, spaceId, userId))
+                                        .then(
+                                                this.cloudFoundryClient
+                                                        .users()
+                                                        .removeAuditedSpace(
+                                                                RemoveUserAuditedSpaceRequest
+                                                                        .builder()
+                                                                        .auditedSpaceId(spaceId)
+                                                                        .userId(userId)
+                                                                        .build())))
+                .then(requestSummaryUser(this.cloudFoundryClient, userId))
+                .flatMapIterable(response -> response.getEntity().getAuditedSpaces())
+                .as(StepVerifier::create)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -1438,19 +2087,35 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         this.organizationId
-            .delayUntil(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
-                .then(requestAssociateOrganizationBillingManager(this.cloudFoundryClient, organizationId, userId))
-                .then(requestAssociateBillingManagedOrganization(this.cloudFoundryClient, organizationId, userId)))
-            .flatMap(organizationId -> this.cloudFoundryClient.users()
-                .removeBillingManagedOrganization(RemoveUserBillingManagedOrganizationRequest.builder()
-                    .billingManagedOrganizationId(organizationId)
-                    .userId(userId)
-                    .build()))
-            .then(requestSummaryUser(this.cloudFoundryClient, userId))
-            .flatMapIterable(response -> response.getEntity().getBillingManagedOrganizations())
-            .as(StepVerifier::create)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .delayUntil(
+                        organizationId ->
+                                requestCreateUser(this.cloudFoundryClient, userId)
+                                        .then(
+                                                requestAssociateOrganizationBillingManager(
+                                                        this.cloudFoundryClient,
+                                                        organizationId,
+                                                        userId))
+                                        .then(
+                                                requestAssociateBillingManagedOrganization(
+                                                        this.cloudFoundryClient,
+                                                        organizationId,
+                                                        userId)))
+                .flatMap(
+                        organizationId ->
+                                this.cloudFoundryClient
+                                        .users()
+                                        .removeBillingManagedOrganization(
+                                                RemoveUserBillingManagedOrganizationRequest
+                                                        .builder()
+                                                        .billingManagedOrganizationId(
+                                                                organizationId)
+                                                        .userId(userId)
+                                                        .build()))
+                .then(requestSummaryUser(this.cloudFoundryClient, userId))
+                .flatMapIterable(response -> response.getEntity().getBillingManagedOrganizations())
+                .as(StepVerifier::create)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -1458,19 +2123,33 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         this.organizationId
-            .delayUntil(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
-                .then(requestAssociateOrganizationManager(this.cloudFoundryClient, organizationId, userId))
-                .then(requestAssociateManagedOrganization(this.cloudFoundryClient, organizationId, userId)))
-            .flatMap(organizationId -> this.cloudFoundryClient.users()
-                .removeManagedOrganization(RemoveUserManagedOrganizationRequest.builder()
-                    .managedOrganizationId(organizationId)
-                    .userId(userId)
-                    .build()))
-            .then(requestSummaryUser(this.cloudFoundryClient, userId))
-            .flatMapIterable(response -> response.getEntity().getManagedOrganizations())
-            .as(StepVerifier::create)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .delayUntil(
+                        organizationId ->
+                                requestCreateUser(this.cloudFoundryClient, userId)
+                                        .then(
+                                                requestAssociateOrganizationManager(
+                                                        this.cloudFoundryClient,
+                                                        organizationId,
+                                                        userId))
+                                        .then(
+                                                requestAssociateManagedOrganization(
+                                                        this.cloudFoundryClient,
+                                                        organizationId,
+                                                        userId)))
+                .flatMap(
+                        organizationId ->
+                                this.cloudFoundryClient
+                                        .users()
+                                        .removeManagedOrganization(
+                                                RemoveUserManagedOrganizationRequest.builder()
+                                                        .managedOrganizationId(organizationId)
+                                                        .userId(userId)
+                                                        .build()))
+                .then(requestSummaryUser(this.cloudFoundryClient, userId))
+                .flatMapIterable(response -> response.getEntity().getManagedOrganizations())
+                .as(StepVerifier::create)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -1479,19 +2158,29 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         this.organizationId
-            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .flatMap(spaceId -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
-                .then(requestAssociateManagedSpace(this.cloudFoundryClient, spaceId, userId))
-                .then(this.cloudFoundryClient.users()
-                    .removeManagedSpace(RemoveUserManagedSpaceRequest.builder()
-                        .managedSpaceId(spaceId)
-                        .userId(userId)
-                        .build())))
-            .then(requestSummaryUser(this.cloudFoundryClient, userId))
-            .flatMapIterable(response -> response.getEntity().getManagedSpaces())
-            .as(StepVerifier::create)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+                .flatMap(
+                        spaceId ->
+                                requestCreateUser(this.cloudFoundryClient, spaceId, userId)
+                                        .then(
+                                                requestAssociateManagedSpace(
+                                                        this.cloudFoundryClient, spaceId, userId))
+                                        .then(
+                                                this.cloudFoundryClient
+                                                        .users()
+                                                        .removeManagedSpace(
+                                                                RemoveUserManagedSpaceRequest
+                                                                        .builder()
+                                                                        .managedSpaceId(spaceId)
+                                                                        .userId(userId)
+                                                                        .build())))
+                .then(requestSummaryUser(this.cloudFoundryClient, userId))
+                .flatMapIterable(response -> response.getEntity().getManagedSpaces())
+                .as(StepVerifier::create)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -1499,18 +2188,28 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         this.organizationId
-            .delayUntil(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
-                .then(requestAssociateOrganization(this.cloudFoundryClient, organizationId, userId)))
-            .flatMap(organizationId -> this.cloudFoundryClient.users()
-                .removeOrganization(RemoveUserOrganizationRequest.builder()
-                    .organizationId(organizationId)
-                    .userId(userId)
-                    .build()))
-            .then(requestSummaryUser(this.cloudFoundryClient, userId))
-            .flatMapIterable(response -> response.getEntity().getOrganizations())
-            .as(StepVerifier::create)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .delayUntil(
+                        organizationId ->
+                                requestCreateUser(this.cloudFoundryClient, userId)
+                                        .then(
+                                                requestAssociateOrganization(
+                                                        this.cloudFoundryClient,
+                                                        organizationId,
+                                                        userId)))
+                .flatMap(
+                        organizationId ->
+                                this.cloudFoundryClient
+                                        .users()
+                                        .removeOrganization(
+                                                RemoveUserOrganizationRequest.builder()
+                                                        .organizationId(organizationId)
+                                                        .userId(userId)
+                                                        .build()))
+                .then(requestSummaryUser(this.cloudFoundryClient, userId))
+                .flatMapIterable(response -> response.getEntity().getOrganizations())
+                .as(StepVerifier::create)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -1519,19 +2218,28 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         this.organizationId
-            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .flatMap(spaceId -> requestCreateUser(this.cloudFoundryClient, spaceId, userId)
-                .then(requestAssociateSpace(this.cloudFoundryClient, spaceId, userId))
-                .then(this.cloudFoundryClient.users()
-                    .removeSpace(RemoveUserSpaceRequest.builder()
-                        .spaceId(spaceId)
-                        .userId(userId)
-                        .build())))
-            .then(requestSummaryUser(this.cloudFoundryClient, userId))
-            .flatMapIterable(response -> response.getEntity().getSpaces())
-            .as(StepVerifier::create)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+                .flatMap(
+                        spaceId ->
+                                requestCreateUser(this.cloudFoundryClient, spaceId, userId)
+                                        .then(
+                                                requestAssociateSpace(
+                                                        this.cloudFoundryClient, spaceId, userId))
+                                        .then(
+                                                this.cloudFoundryClient
+                                                        .users()
+                                                        .removeSpace(
+                                                                RemoveUserSpaceRequest.builder()
+                                                                        .spaceId(spaceId)
+                                                                        .userId(userId)
+                                                                        .build())))
+                .then(requestSummaryUser(this.cloudFoundryClient, userId))
+                .flatMapIterable(response -> response.getEntity().getSpaces())
+                .as(StepVerifier::create)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -1540,17 +2248,23 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         createOrganizationId(this.cloudFoundryClient, organizationName)
-            .flatMap(organizationId -> requestCreateUser(this.cloudFoundryClient, userId)
-                .then(requestAssociateOrganization(this.cloudFoundryClient, organizationId, userId)))
-            .then(this.cloudFoundryClient.users()
-                .summary(SummaryUserRequest.builder()
-                    .userId(userId)
-                    .build()))
-            .map(response -> ResourceUtils.getEntity(response).getOrganizations())
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                requestCreateUser(this.cloudFoundryClient, userId)
+                                        .then(
+                                                requestAssociateOrganization(
+                                                        this.cloudFoundryClient,
+                                                        organizationId,
+                                                        userId)))
+                .then(
+                        this.cloudFoundryClient
+                                .users()
+                                .summary(SummaryUserRequest.builder().userId(userId).build()))
+                .map(response -> ResourceUtils.getEntity(response).getOrganizations())
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -1559,183 +2273,248 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         this.organizationId
-            .flatMap(organizationId -> createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
-            .delayUntil(spaceId -> requestCreateUser(this.cloudFoundryClient, userId))
-            .delayUntil(spaceId -> this.cloudFoundryClient.users()
-                .update(UpdateUserRequest.builder()
-                    .defaultSpaceId(spaceId)
-                    .userId(userId)
-                    .build()))
-            .flatMapMany(spaceId -> requestListUsers(this.cloudFoundryClient)
-                .filter(resource -> spaceId.equals(resource.getEntity().getDefaultSpaceId())))
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        organizationId ->
+                                createSpaceId(this.cloudFoundryClient, organizationId, spaceName))
+                .delayUntil(spaceId -> requestCreateUser(this.cloudFoundryClient, userId))
+                .delayUntil(
+                        spaceId ->
+                                this.cloudFoundryClient
+                                        .users()
+                                        .update(
+                                                UpdateUserRequest.builder()
+                                                        .defaultSpaceId(spaceId)
+                                                        .userId(userId)
+                                                        .build()))
+                .flatMapMany(
+                        spaceId ->
+                                requestListUsers(this.cloudFoundryClient)
+                                        .filter(
+                                                resource ->
+                                                        spaceId.equals(
+                                                                resource.getEntity()
+                                                                        .getDefaultSpaceId())))
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
-    private static Mono<AssociateUserAuditedOrganizationResponse> associateAuditorOrganization(CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
+    private static Mono<AssociateUserAuditedOrganizationResponse> associateAuditorOrganization(
+            CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
         return requestAssociateOrganizationAuditor(cloudFoundryClient, organizationId, userId)
-            .then(requestAssociateAuditedOrganization(cloudFoundryClient, organizationId, userId));
+                .then(
+                        requestAssociateAuditedOrganization(
+                                cloudFoundryClient, organizationId, userId));
     }
 
-    private static Mono<AssociateUserBillingManagedOrganizationResponse> associateBillingManagerOrganization(CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
-        return requestAssociateOrganizationBillingManager(cloudFoundryClient, organizationId, userId)
-            .then(requestAssociateBillingManagedOrganization(cloudFoundryClient, organizationId, userId));
+    private static Mono<AssociateUserBillingManagedOrganizationResponse>
+            associateBillingManagerOrganization(
+                    CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
+        return requestAssociateOrganizationBillingManager(
+                        cloudFoundryClient, organizationId, userId)
+                .then(
+                        requestAssociateBillingManagedOrganization(
+                                cloudFoundryClient, organizationId, userId));
     }
 
-    private static Mono<AssociateUserManagedOrganizationResponse> associateManagerOrganization(CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
+    private static Mono<AssociateUserManagedOrganizationResponse> associateManagerOrganization(
+            CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
         return requestAssociateOrganizationManager(cloudFoundryClient, organizationId, userId)
-            .then(requestAssociateManagedOrganization(cloudFoundryClient, organizationId, userId));
+                .then(
+                        requestAssociateManagedOrganization(
+                                cloudFoundryClient, organizationId, userId));
     }
 
-    private static Mono<String> createOrganizationId(CloudFoundryClient cloudFoundryClient, String organizationName) {
+    private static Mono<String> createOrganizationId(
+            CloudFoundryClient cloudFoundryClient, String organizationName) {
         return requestCreateOrganization(cloudFoundryClient, organizationName)
-            .map(ResourceUtils::getId);
+                .map(ResourceUtils::getId);
     }
 
-    private static Mono<String> createSpaceId(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceName) {
+    private static Mono<String> createSpaceId(
+            CloudFoundryClient cloudFoundryClient, String organizationId, String spaceName) {
         return requestCreateSpace(cloudFoundryClient, organizationId, spaceName)
-            .map(ResourceUtils::getId);
+                .map(ResourceUtils::getId);
     }
 
-    private static Mono<String> getApplicationId(CloudFoundryClient cloudFoundryClient, String applicationName, String spaceId) {
+    private static Mono<String> getApplicationId(
+            CloudFoundryClient cloudFoundryClient, String applicationName, String spaceId) {
         return requestCreateApplication(cloudFoundryClient, spaceId, applicationName)
-            .map(ResourceUtils::getId);
+                .map(ResourceUtils::getId);
     }
 
-    private static Mono<AssociateUserAuditedOrganizationResponse> requestAssociateAuditedOrganization(CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
-        return cloudFoundryClient.users()
-            .associateAuditedOrganization(AssociateUserAuditedOrganizationRequest.builder()
-                .auditedOrganizationId(organizationId)
-                .userId(userId)
-                .build());
+    private static Mono<AssociateUserAuditedOrganizationResponse>
+            requestAssociateAuditedOrganization(
+                    CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
+        return cloudFoundryClient
+                .users()
+                .associateAuditedOrganization(
+                        AssociateUserAuditedOrganizationRequest.builder()
+                                .auditedOrganizationId(organizationId)
+                                .userId(userId)
+                                .build());
     }
 
-    private static Mono<AssociateUserAuditedSpaceResponse> requestAssociateAuditedSpace(CloudFoundryClient cloudFoundryClient, String spaceId, String userId) {
-        return cloudFoundryClient.users()
-            .associateAuditedSpace(AssociateUserAuditedSpaceRequest.builder()
-                .auditedSpaceId(spaceId)
-                .userId(userId)
-                .build());
+    private static Mono<AssociateUserAuditedSpaceResponse> requestAssociateAuditedSpace(
+            CloudFoundryClient cloudFoundryClient, String spaceId, String userId) {
+        return cloudFoundryClient
+                .users()
+                .associateAuditedSpace(
+                        AssociateUserAuditedSpaceRequest.builder()
+                                .auditedSpaceId(spaceId)
+                                .userId(userId)
+                                .build());
     }
 
-    private static Mono<AssociateUserBillingManagedOrganizationResponse> requestAssociateBillingManagedOrganization(CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
-        return cloudFoundryClient.users()
-            .associateBillingManagedOrganization(AssociateUserBillingManagedOrganizationRequest.builder()
-                .billingManagedOrganizationId(organizationId)
-                .userId(userId)
-                .build());
+    private static Mono<AssociateUserBillingManagedOrganizationResponse>
+            requestAssociateBillingManagedOrganization(
+                    CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
+        return cloudFoundryClient
+                .users()
+                .associateBillingManagedOrganization(
+                        AssociateUserBillingManagedOrganizationRequest.builder()
+                                .billingManagedOrganizationId(organizationId)
+                                .userId(userId)
+                                .build());
     }
 
-    private static Mono<AssociateUserManagedOrganizationResponse> requestAssociateManagedOrganization(CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
-        return cloudFoundryClient.users()
-            .associateManagedOrganization(AssociateUserManagedOrganizationRequest.builder()
-                .managedOrganizationId(organizationId)
-                .userId(userId)
-                .build());
+    private static Mono<AssociateUserManagedOrganizationResponse>
+            requestAssociateManagedOrganization(
+                    CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
+        return cloudFoundryClient
+                .users()
+                .associateManagedOrganization(
+                        AssociateUserManagedOrganizationRequest.builder()
+                                .managedOrganizationId(organizationId)
+                                .userId(userId)
+                                .build());
     }
 
-    private static Mono<AssociateUserManagedSpaceResponse> requestAssociateManagedSpace(CloudFoundryClient cloudFoundryClient, String spaceId, String userId) {
-        return cloudFoundryClient.users()
-            .associateManagedSpace(AssociateUserManagedSpaceRequest.builder()
-                .managedSpaceId(spaceId)
-                .userId(userId)
-                .build());
+    private static Mono<AssociateUserManagedSpaceResponse> requestAssociateManagedSpace(
+            CloudFoundryClient cloudFoundryClient, String spaceId, String userId) {
+        return cloudFoundryClient
+                .users()
+                .associateManagedSpace(
+                        AssociateUserManagedSpaceRequest.builder()
+                                .managedSpaceId(spaceId)
+                                .userId(userId)
+                                .build());
     }
 
-    private static Mono<AssociateUserOrganizationResponse> requestAssociateOrganization(CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
-        return cloudFoundryClient.users()
-            .associateOrganization(AssociateUserOrganizationRequest.builder()
-                .organizationId(organizationId)
-                .userId(userId)
-                .build());
+    private static Mono<AssociateUserOrganizationResponse> requestAssociateOrganization(
+            CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
+        return cloudFoundryClient
+                .users()
+                .associateOrganization(
+                        AssociateUserOrganizationRequest.builder()
+                                .organizationId(organizationId)
+                                .userId(userId)
+                                .build());
     }
 
-    private static Mono<AssociateOrganizationAuditorResponse> requestAssociateOrganizationAuditor(CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
-        return cloudFoundryClient.organizations()
-            .associateAuditor(AssociateOrganizationAuditorRequest.builder()
-                .auditorId(userId)
-                .organizationId(organizationId)
-                .build());
+    private static Mono<AssociateOrganizationAuditorResponse> requestAssociateOrganizationAuditor(
+            CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
+        return cloudFoundryClient
+                .organizations()
+                .associateAuditor(
+                        AssociateOrganizationAuditorRequest.builder()
+                                .auditorId(userId)
+                                .organizationId(organizationId)
+                                .build());
     }
 
-    private static Mono<AssociateOrganizationBillingManagerResponse> requestAssociateOrganizationBillingManager(CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
-        return cloudFoundryClient.organizations()
-            .associateBillingManager(AssociateOrganizationBillingManagerRequest.builder()
-                .billingManagerId(userId)
-                .organizationId(organizationId)
-                .build());
+    private static Mono<AssociateOrganizationBillingManagerResponse>
+            requestAssociateOrganizationBillingManager(
+                    CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
+        return cloudFoundryClient
+                .organizations()
+                .associateBillingManager(
+                        AssociateOrganizationBillingManagerRequest.builder()
+                                .billingManagerId(userId)
+                                .organizationId(organizationId)
+                                .build());
     }
 
-    private static Mono<AssociateOrganizationManagerResponse> requestAssociateOrganizationManager(CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
-        return cloudFoundryClient.organizations()
-            .associateManager(AssociateOrganizationManagerRequest.builder()
-                .managerId(userId)
-                .organizationId(organizationId)
-                .build());
+    private static Mono<AssociateOrganizationManagerResponse> requestAssociateOrganizationManager(
+            CloudFoundryClient cloudFoundryClient, String organizationId, String userId) {
+        return cloudFoundryClient
+                .organizations()
+                .associateManager(
+                        AssociateOrganizationManagerRequest.builder()
+                                .managerId(userId)
+                                .organizationId(organizationId)
+                                .build());
     }
 
-    private static Mono<AssociateUserSpaceResponse> requestAssociateSpace(CloudFoundryClient cloudFoundryClient, String spaceId, String userId) {
-        return cloudFoundryClient.users()
-            .associateSpace(AssociateUserSpaceRequest.builder()
-                .spaceId(spaceId)
-                .userId(userId)
-                .build());
+    private static Mono<AssociateUserSpaceResponse> requestAssociateSpace(
+            CloudFoundryClient cloudFoundryClient, String spaceId, String userId) {
+        return cloudFoundryClient
+                .users()
+                .associateSpace(
+                        AssociateUserSpaceRequest.builder()
+                                .spaceId(spaceId)
+                                .userId(userId)
+                                .build());
     }
 
-    private static Mono<CreateApplicationResponse> requestCreateApplication(CloudFoundryClient cloudFoundryClient, String spaceId, String applicationName) {
-        return cloudFoundryClient.applicationsV2()
-            .create(CreateApplicationRequest.builder()
-                .name(applicationName)
-                .spaceId(spaceId)
-                .build());
+    private static Mono<CreateApplicationResponse> requestCreateApplication(
+            CloudFoundryClient cloudFoundryClient, String spaceId, String applicationName) {
+        return cloudFoundryClient
+                .applicationsV2()
+                .create(
+                        CreateApplicationRequest.builder()
+                                .name(applicationName)
+                                .spaceId(spaceId)
+                                .build());
     }
 
-    private static Mono<CreateOrganizationResponse> requestCreateOrganization(CloudFoundryClient cloudFoundryClient, String organizationName) {
-        return cloudFoundryClient.organizations()
-            .create(CreateOrganizationRequest.builder()
-                .name(organizationName)
-                .status(STATUS_FILTER)
-                .build());
+    private static Mono<CreateOrganizationResponse> requestCreateOrganization(
+            CloudFoundryClient cloudFoundryClient, String organizationName) {
+        return cloudFoundryClient
+                .organizations()
+                .create(
+                        CreateOrganizationRequest.builder()
+                                .name(organizationName)
+                                .status(STATUS_FILTER)
+                                .build());
     }
 
-    private static Mono<CreateSpaceResponse> requestCreateSpace(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceName) {
-        return cloudFoundryClient.spaces()
-            .create(CreateSpaceRequest.builder()
-                .organizationId(organizationId)
-                .name(spaceName)
-                .build());
+    private static Mono<CreateSpaceResponse> requestCreateSpace(
+            CloudFoundryClient cloudFoundryClient, String organizationId, String spaceName) {
+        return cloudFoundryClient
+                .spaces()
+                .create(
+                        CreateSpaceRequest.builder()
+                                .organizationId(organizationId)
+                                .name(spaceName)
+                                .build());
     }
 
-    private static Mono<CreateUserResponse> requestCreateUser(CloudFoundryClient cloudFoundryClient, String userId) {
-        return cloudFoundryClient.users()
-            .create(CreateUserRequest.builder()
-                .uaaId(userId)
-                .build());
+    private static Mono<CreateUserResponse> requestCreateUser(
+            CloudFoundryClient cloudFoundryClient, String userId) {
+        return cloudFoundryClient.users().create(CreateUserRequest.builder().uaaId(userId).build());
     }
 
-    private static Mono<CreateUserResponse> requestCreateUser(CloudFoundryClient cloudFoundryClient, String spaceId, String userId) {
-        return cloudFoundryClient.users()
-            .create(CreateUserRequest.builder()
-                .defaultSpaceId(spaceId)
-                .uaaId(userId)
-                .build());
+    private static Mono<CreateUserResponse> requestCreateUser(
+            CloudFoundryClient cloudFoundryClient, String spaceId, String userId) {
+        return cloudFoundryClient
+                .users()
+                .create(CreateUserRequest.builder().defaultSpaceId(spaceId).uaaId(userId).build());
     }
 
     private static Flux<UserResource> requestListUsers(CloudFoundryClient cloudFoundryClient) {
-        return PaginationUtils
-            .requestClientV2Resources(page -> cloudFoundryClient.users()
-                .list(ListUsersRequest.builder()
-                    .page(page)
-                    .build()));
+        return PaginationUtils.requestClientV2Resources(
+                page ->
+                        cloudFoundryClient
+                                .users()
+                                .list(ListUsersRequest.builder().page(page).build()));
     }
 
-    private static Mono<SummaryUserResponse> requestSummaryUser(CloudFoundryClient cloudFoundryClient, String userId) {
-        return cloudFoundryClient.users()
-            .summary(SummaryUserRequest.builder()
-                .userId(userId)
-                .build());
+    private static Mono<SummaryUserResponse> requestSummaryUser(
+            CloudFoundryClient cloudFoundryClient, String userId) {
+        return cloudFoundryClient
+                .users()
+                .summary(SummaryUserRequest.builder().userId(userId).build());
     }
-
 }

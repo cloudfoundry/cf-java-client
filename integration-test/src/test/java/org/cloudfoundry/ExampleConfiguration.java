@@ -62,78 +62,78 @@ public class ExampleConfiguration {
 
     @Bean
     @Lazy
-    ReactorCloudFoundryClient cloudFoundryClient(ConnectionContext connectionContext, TokenProvider tokenProvider) {
+    ReactorCloudFoundryClient cloudFoundryClient(
+            ConnectionContext connectionContext, TokenProvider tokenProvider) {
         return ReactorCloudFoundryClient.builder()
-            .connectionContext(connectionContext)
-            .tokenProvider(tokenProvider)
-            .build();
+                .connectionContext(connectionContext)
+                .tokenProvider(tokenProvider)
+                .build();
     }
 
     @Bean
     @Lazy
-    DefaultCloudFoundryOperations cloudFoundryOperations(CloudFoundryClient cloudFoundryClient,
-                                                         DopplerClient dopplerClient,
-                                                         RoutingClient routingClient,
-                                                         UaaClient uaaClient,
-                                                         @Value("${example.organization}") String organization,
-                                                         @Value("${example.space}") String space) {
+    DefaultCloudFoundryOperations cloudFoundryOperations(
+            CloudFoundryClient cloudFoundryClient,
+            DopplerClient dopplerClient,
+            RoutingClient routingClient,
+            UaaClient uaaClient,
+            @Value("${example.organization}") String organization,
+            @Value("${example.space}") String space) {
         return DefaultCloudFoundryOperations.builder()
-            .cloudFoundryClient(cloudFoundryClient)
-            .dopplerClient(dopplerClient)
-            .routingClient(routingClient)
-            .uaaClient(uaaClient)
-            .organization(organization)
-            .space(space)
-            .build();
+                .cloudFoundryClient(cloudFoundryClient)
+                .dopplerClient(dopplerClient)
+                .routingClient(routingClient)
+                .uaaClient(uaaClient)
+                .organization(organization)
+                .space(space)
+                .build();
     }
 
     @Bean
     @Lazy
-    DefaultConnectionContext connectionContext(@Value("${example.apiHost}") String apiHost,
-                                               @Value("${example.skipSslValidation:false}") Boolean skipSslValidation) {
+    DefaultConnectionContext connectionContext(
+            @Value("${example.apiHost}") String apiHost,
+            @Value("${example.skipSslValidation:false}") Boolean skipSslValidation) {
 
         return DefaultConnectionContext.builder()
-            .apiHost(apiHost)
-            .skipSslValidation(skipSslValidation)
-            .build();
+                .apiHost(apiHost)
+                .skipSslValidation(skipSslValidation)
+                .build();
     }
 
     @Bean
     @Lazy
     DopplerClient dopplerClient(ConnectionContext connectionContext, TokenProvider tokenProvider) {
         return ReactorDopplerClient.builder()
-            .connectionContext(connectionContext)
-            .tokenProvider(tokenProvider)
-            .build();
+                .connectionContext(connectionContext)
+                .tokenProvider(tokenProvider)
+                .build();
     }
 
     @Bean
     @Lazy
     RoutingClient routingClient(ConnectionContext connectionContext, TokenProvider tokenProvider) {
         return ReactorRoutingClient.builder()
-            .connectionContext(connectionContext)
-            .tokenProvider(tokenProvider)
-            .build();
+                .connectionContext(connectionContext)
+                .tokenProvider(tokenProvider)
+                .build();
     }
 
     @Bean
     @Lazy
-    PasswordGrantTokenProvider tokenProvider(@Value("${example.password}") String password,
-                                             @Value("${example.username}") String username) {
+    PasswordGrantTokenProvider tokenProvider(
+            @Value("${example.password}") String password,
+            @Value("${example.username}") String username) {
 
-        return PasswordGrantTokenProvider.builder()
-            .password(password)
-            .username(username)
-            .build();
+        return PasswordGrantTokenProvider.builder().password(password).username(username).build();
     }
 
     @Bean
     @Lazy
     ReactorUaaClient uaaClient(ConnectionContext connectionContext, TokenProvider tokenProvider) {
         return ReactorUaaClient.builder()
-            .connectionContext(connectionContext)
-            .tokenProvider(tokenProvider)
-            .build();
+                .connectionContext(connectionContext)
+                .tokenProvider(tokenProvider)
+                .build();
     }
-
 }

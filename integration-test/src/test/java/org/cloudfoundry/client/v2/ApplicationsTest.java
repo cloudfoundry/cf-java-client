@@ -16,6 +16,23 @@
 
 package org.cloudfoundry.client.v2;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.cloudfoundry.client.ZipExpectations.zipEquality;
+import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.time.Duration;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.zip.GZIPInputStream;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.cloudfoundry.AbstractIntegrationTest;
@@ -69,6 +86,7 @@ import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.OperationUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.Assert;
@@ -78,59 +96,54 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import reactor.util.function.Tuple2;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.time.Duration;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Consumer;
-import java.util.zip.GZIPInputStream;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.cloudfoundry.client.ZipExpectations.zipEquality;
-import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
-
 public final class ApplicationsTest extends AbstractIntegrationTest {
 
-    @Autowired
-    private CloudFoundryClient cloudFoundryClient;
+    @Autowired private CloudFoundryClient cloudFoundryClient;
 
-    @Autowired
-    private Mono<String> organizationId;
+    @Autowired private Mono<String> organizationId;
 
-    @Autowired
-    private Mono<String> spaceId;
+    @Autowired private Mono<String> spaceId;
 
-    @Autowired
-    private Mono<String> stackId;
+    @Autowired private Mono<String> stackId;
 
     @Test
     public void associateRoute() {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
-        Mono
-            .zip(this.organizationId, this.spaceId)
-            .flatMap(function((organizationId, spaceId) -> Mono.zip(
-                createApplicationId(this.cloudFoundryClient, spaceId, applicationName),
-                createRouteWithDomain(this.cloudFoundryClient, organizationId, spaceId, domainName, "test-host", "/test/path")
-                    .map(ResourceUtils::getId)
-            )))
-            .delayUntil(function((applicationId, routeId) -> requestAssociateRoute(this.cloudFoundryClient, applicationId, routeId)))
-            .flatMap(function((applicationId, routeId) -> Mono.zip(
-                getSingleRouteId(this.cloudFoundryClient, applicationId),
-                Mono.just(routeId)
-            )))
-            .as(StepVerifier::create)
-            .consumeNextWith(tupleEquality())
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        Mono.zip(this.organizationId, this.spaceId)
+                .flatMap(
+                        function(
+                                (organizationId, spaceId) ->
+                                        Mono.zip(
+                                                createApplicationId(
+                                                        this.cloudFoundryClient,
+                                                        spaceId,
+                                                        applicationName),
+                                                createRouteWithDomain(
+                                                                this.cloudFoundryClient,
+                                                                organizationId,
+                                                                spaceId,
+                                                                domainName,
+                                                                "test-host",
+                                                                "/test/path")
+                                                        .map(ResourceUtils::getId))))
+                .delayUntil(
+                        function(
+                                (applicationId, routeId) ->
+                                        requestAssociateRoute(
+                                                this.cloudFoundryClient, applicationId, routeId)))
+                .flatMap(
+                        function(
+                                (applicationId, routeId) ->
+                                        Mono.zip(
+                                                getSingleRouteId(
+                                                        this.cloudFoundryClient, applicationId),
+                                                Mono.just(routeId))))
+                .as(StepVerifier::create)
+                .consumeNextWith(tupleEquality())
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -139,27 +152,51 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String copyApplicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
-            .flatMap(spaceId -> Mono.zip(
-                createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
-                    .delayUntil(applicationId -> uploadApplication(this.cloudFoundryClient, applicationId)),
-                requestCreateApplication(this.cloudFoundryClient, spaceId, copyApplicationName)
-                    .map(ResourceUtils::getId)
-            ))
-            .delayUntil(function((sourceId, targetId) -> this.cloudFoundryClient.applicationsV2()
-                .copy(CopyApplicationRequest.builder()
-                    .applicationId(targetId)
-                    .sourceApplicationId(sourceId)
-                    .build())
-                .flatMap(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job))
-            ))
-            .flatMap(function((sourceId, targetId) -> Mono.zip(
-                downloadApplication(this.cloudFoundryClient, sourceId),
-                downloadApplication(this.cloudFoundryClient, targetId)
-            )))
-            .as(StepVerifier::create)
-            .consumeNextWith(tupleEquality())
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        spaceId ->
+                                Mono.zip(
+                                        createApplicationId(
+                                                        this.cloudFoundryClient,
+                                                        spaceId,
+                                                        applicationName)
+                                                .delayUntil(
+                                                        applicationId ->
+                                                                uploadApplication(
+                                                                        this.cloudFoundryClient,
+                                                                        applicationId)),
+                                        requestCreateApplication(
+                                                        this.cloudFoundryClient,
+                                                        spaceId,
+                                                        copyApplicationName)
+                                                .map(ResourceUtils::getId)))
+                .delayUntil(
+                        function(
+                                (sourceId, targetId) ->
+                                        this.cloudFoundryClient
+                                                .applicationsV2()
+                                                .copy(
+                                                        CopyApplicationRequest.builder()
+                                                                .applicationId(targetId)
+                                                                .sourceApplicationId(sourceId)
+                                                                .build())
+                                                .flatMap(
+                                                        job ->
+                                                                JobUtils.waitForCompletion(
+                                                                        this.cloudFoundryClient,
+                                                                        Duration.ofMinutes(5),
+                                                                        job))))
+                .flatMap(
+                        function(
+                                (sourceId, targetId) ->
+                                        Mono.zip(
+                                                downloadApplication(
+                                                        this.cloudFoundryClient, sourceId),
+                                                downloadApplication(
+                                                        this.cloudFoundryClient, targetId))))
+                .as(StepVerifier::create)
+                .consumeNextWith(tupleEquality())
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -167,18 +204,24 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
-            .flatMap(spaceId -> Mono.zip(
-                Mono.just(spaceId),
-                requestCreateApplication(this.cloudFoundryClient, spaceId, applicationName)
-                    .map(ResourceUtils::getEntity)
-            ))
-            .as(StepVerifier::create)
-            .consumeNextWith(consumer((spaceId, entity) -> {
-                assertThat(entity.getSpaceId()).isEqualTo(spaceId);
-                assertThat(entity.getName()).isEqualTo(applicationName);
-            }))
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        spaceId ->
+                                Mono.zip(
+                                        Mono.just(spaceId),
+                                        requestCreateApplication(
+                                                        this.cloudFoundryClient,
+                                                        spaceId,
+                                                        applicationName)
+                                                .map(ResourceUtils::getEntity)))
+                .as(StepVerifier::create)
+                .consumeNextWith(
+                        consumer(
+                                (spaceId, entity) -> {
+                                    assertThat(entity.getSpaceId()).isEqualTo(spaceId);
+                                    assertThat(entity.getName()).isEqualTo(applicationName);
+                                }))
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -186,23 +229,29 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
-            .flatMap(spaceId -> Mono.zip(
-                Mono.just(spaceId),
-                this.cloudFoundryClient.applicationsV2()
-                    .create(CreateApplicationRequest.builder()
-                        .dockerImage("cloudfoundry/test-app")
-                        .name(applicationName)
-                        .spaceId(spaceId)
-                        .build())
-                    .map(ResourceUtils::getEntity)
-            ))
-            .as(StepVerifier::create)
-            .consumeNextWith(consumer((spaceId, entity) -> {
-                assertThat(entity.getSpaceId()).isEqualTo(spaceId);
-                assertThat(entity.getName()).isEqualTo(applicationName);
-            }))
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        spaceId ->
+                                Mono.zip(
+                                        Mono.just(spaceId),
+                                        this.cloudFoundryClient
+                                                .applicationsV2()
+                                                .create(
+                                                        CreateApplicationRequest.builder()
+                                                                .dockerImage(
+                                                                        "cloudfoundry/test-app")
+                                                                .name(applicationName)
+                                                                .spaceId(spaceId)
+                                                                .build())
+                                                .map(ResourceUtils::getEntity)))
+                .as(StepVerifier::create)
+                .consumeNextWith(
+                        consumer(
+                                (spaceId, entity) -> {
+                                    assertThat(entity.getSpaceId()).isEqualTo(spaceId);
+                                    assertThat(entity.getName()).isEqualTo(applicationName);
+                                }))
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -210,15 +259,30 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
-            .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .delayUntil(applicationId -> this.cloudFoundryClient.applicationsV2()
-                .delete(DeleteApplicationRequest.builder()
-                    .applicationId(applicationId)
-                    .build()))
-            .flatMap(applicationId -> requestGetApplication(this.cloudFoundryClient, applicationId))
-            .as(StepVerifier::create)
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV2Exception.class).hasMessageMatching("CF-AppNotFound\\([0-9]+\\): The app could not be found: .*"))
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        spaceId ->
+                                createApplicationId(
+                                        this.cloudFoundryClient, spaceId, applicationName))
+                .delayUntil(
+                        applicationId ->
+                                this.cloudFoundryClient
+                                        .applicationsV2()
+                                        .delete(
+                                                DeleteApplicationRequest.builder()
+                                                        .applicationId(applicationId)
+                                                        .build()))
+                .flatMap(
+                        applicationId ->
+                                requestGetApplication(this.cloudFoundryClient, applicationId))
+                .as(StepVerifier::create)
+                .consumeErrorWith(
+                        t ->
+                                assertThat(t)
+                                        .isInstanceOf(ClientV2Exception.class)
+                                        .hasMessageMatching(
+                                                "CF-AppNotFound\\([0-9]+\\): The app could not be"
+                                                        + " found: .*"))
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -226,17 +290,26 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
-            .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .delayUntil(applicationId -> uploadAndStartApplication(this.cloudFoundryClient, applicationId))
-            .flatMapMany(applicationId -> this.cloudFoundryClient.applicationsV2()
-                .downloadDroplet(DownloadApplicationDropletRequest.builder()
-                    .applicationId(applicationId)
-                    .build())
-                .as(OperationUtils::collectByteArray))
-            .as(StepVerifier::create)
-            .consumeNextWith(isTestApplicationDroplet())
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        spaceId ->
+                                createApplicationId(
+                                        this.cloudFoundryClient, spaceId, applicationName))
+                .delayUntil(
+                        applicationId ->
+                                uploadAndStartApplication(this.cloudFoundryClient, applicationId))
+                .flatMapMany(
+                        applicationId ->
+                                this.cloudFoundryClient
+                                        .applicationsV2()
+                                        .downloadDroplet(
+                                                DownloadApplicationDropletRequest.builder()
+                                                        .applicationId(applicationId)
+                                                        .build())
+                                        .as(OperationUtils::collectByteArray))
+                .as(StepVerifier::create)
+                .consumeNextWith(isTestApplicationDroplet())
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -244,19 +317,31 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
-            .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .flatMap(applicationId -> Mono.zip(
-                Mono.just(applicationId),
-                this.cloudFoundryClient.applicationsV2()
-                    .environment(ApplicationEnvironmentRequest.builder()
-                        .applicationId(applicationId)
-                        .build())
-                    .map(response -> getStringApplicationEnvValue(response.getApplicationEnvironmentJsons(), "VCAP_APPLICATION", "application_id"))
-            ))
-            .as(StepVerifier::create)
-            .consumeNextWith(tupleEquality())
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        spaceId ->
+                                createApplicationId(
+                                        this.cloudFoundryClient, spaceId, applicationName))
+                .flatMap(
+                        applicationId ->
+                                Mono.zip(
+                                        Mono.just(applicationId),
+                                        this.cloudFoundryClient
+                                                .applicationsV2()
+                                                .environment(
+                                                        ApplicationEnvironmentRequest.builder()
+                                                                .applicationId(applicationId)
+                                                                .build())
+                                                .map(
+                                                        response ->
+                                                                getStringApplicationEnvValue(
+                                                                        response
+                                                                                .getApplicationEnvironmentJsons(),
+                                                                        "VCAP_APPLICATION",
+                                                                        "application_id"))))
+                .as(StepVerifier::create)
+                .consumeNextWith(tupleEquality())
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -264,15 +349,20 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
-            .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .flatMap(applicationId -> Mono.zip(
-                Mono.just(applicationId),
-                requestGetApplication(this.cloudFoundryClient, applicationId)
-            ))
-            .as(StepVerifier::create)
-            .consumeNextWith(applicationIdAndNameEquality(applicationName))
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        spaceId ->
+                                createApplicationId(
+                                        this.cloudFoundryClient, spaceId, applicationName))
+                .flatMap(
+                        applicationId ->
+                                Mono.zip(
+                                        Mono.just(applicationId),
+                                        requestGetApplication(
+                                                this.cloudFoundryClient, applicationId)))
+                .as(StepVerifier::create)
+                .consumeNextWith(applicationIdAndNameEquality(applicationName))
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_9)
@@ -281,18 +371,26 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
-            .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .flatMap(applicationId -> this.cloudFoundryClient.applicationsV2()
-                .getPermissions(GetApplicationPermissionsRequest.builder()
-                    .applicationId(applicationId)
-                    .build()))
-            .as(StepVerifier::create)
-            .expectNext(GetApplicationPermissionsResponse.builder()
-                .readBasicData(true)
-                .readSensitiveData(true)
-                .build())
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        spaceId ->
+                                createApplicationId(
+                                        this.cloudFoundryClient, spaceId, applicationName))
+                .flatMap(
+                        applicationId ->
+                                this.cloudFoundryClient
+                                        .applicationsV2()
+                                        .getPermissions(
+                                                GetApplicationPermissionsRequest.builder()
+                                                        .applicationId(applicationId)
+                                                        .build()))
+                .as(StepVerifier::create)
+                .expectNext(
+                        GetApplicationPermissionsResponse.builder()
+                                .readBasicData(true)
+                                .readSensitiveData(true)
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -300,17 +398,26 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
-            .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .delayUntil(applicationId -> uploadAndStartApplication(this.cloudFoundryClient, applicationId))
-            .flatMap(applicationId -> this.cloudFoundryClient.applicationsV2()
-                .instances(ApplicationInstancesRequest.builder()
-                    .applicationId(applicationId)
-                    .build()))
-            .map(ApplicationInstancesResponse::getInstances)
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        spaceId ->
+                                createApplicationId(
+                                        this.cloudFoundryClient, spaceId, applicationName))
+                .delayUntil(
+                        applicationId ->
+                                uploadAndStartApplication(this.cloudFoundryClient, applicationId))
+                .flatMap(
+                        applicationId ->
+                                this.cloudFoundryClient
+                                        .applicationsV2()
+                                        .instances(
+                                                ApplicationInstancesRequest.builder()
+                                                        .applicationId(applicationId)
+                                                        .build()))
+                .map(ApplicationInstancesResponse::getInstances)
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -318,22 +425,33 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
-            .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .flatMap(applicationId -> Mono.zip(
-                Mono.just(applicationId),
-                PaginationUtils
-                    .requestClientV2Resources(page -> this.cloudFoundryClient.applicationsV2()
-                        .list(ListApplicationsRequest.builder()
-                            .page(page)
-                            .build()))
-                    .filter(resource -> ResourceUtils.getId(resource).equals(applicationId))
-                    .single()
-                    .cast(AbstractApplicationResource.class)
-            ))
-            .as(StepVerifier::create)
-            .consumeNextWith(applicationIdAndNameEquality(applicationName))
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        spaceId ->
+                                createApplicationId(
+                                        this.cloudFoundryClient, spaceId, applicationName))
+                .flatMap(
+                        applicationId ->
+                                Mono.zip(
+                                        Mono.just(applicationId),
+                                        PaginationUtils.requestClientV2Resources(
+                                                        page ->
+                                                                this.cloudFoundryClient
+                                                                        .applicationsV2()
+                                                                        .list(
+                                                                                ListApplicationsRequest
+                                                                                        .builder()
+                                                                                        .page(page)
+                                                                                        .build()))
+                                                .filter(
+                                                        resource ->
+                                                                ResourceUtils.getId(resource)
+                                                                        .equals(applicationId))
+                                                .single()
+                                                .cast(AbstractApplicationResource.class)))
+                .as(StepVerifier::create)
+                .consumeNextWith(applicationIdAndNameEquality(applicationName))
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -341,23 +459,34 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
-            .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .flatMap(applicationId -> Mono.zip(
-                Mono.just(applicationId),
-                PaginationUtils
-                    .requestClientV2Resources(page -> this.cloudFoundryClient.applicationsV2()
-                        .list(ListApplicationsRequest.builder()
-                            .diego(true)
-                            .page(page)
-                            .build()))
-                    .filter(resource -> ResourceUtils.getId(resource).equals(applicationId))
-                    .single()
-                    .cast(AbstractApplicationResource.class)
-            ))
-            .as(StepVerifier::create)
-            .consumeNextWith(applicationIdAndNameEquality(applicationName))
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        spaceId ->
+                                createApplicationId(
+                                        this.cloudFoundryClient, spaceId, applicationName))
+                .flatMap(
+                        applicationId ->
+                                Mono.zip(
+                                        Mono.just(applicationId),
+                                        PaginationUtils.requestClientV2Resources(
+                                                        page ->
+                                                                this.cloudFoundryClient
+                                                                        .applicationsV2()
+                                                                        .list(
+                                                                                ListApplicationsRequest
+                                                                                        .builder()
+                                                                                        .diego(true)
+                                                                                        .page(page)
+                                                                                        .build()))
+                                                .filter(
+                                                        resource ->
+                                                                ResourceUtils.getId(resource)
+                                                                        .equals(applicationId))
+                                                .single()
+                                                .cast(AbstractApplicationResource.class)))
+                .as(StepVerifier::create)
+                .consumeNextWith(applicationIdAndNameEquality(applicationName))
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -365,51 +494,76 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
-            .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .flatMap(applicationId -> Mono.zip(
-                Mono.just(applicationId),
-                PaginationUtils
-                    .requestClientV2Resources(page -> this.cloudFoundryClient.applicationsV2()
-                        .list(ListApplicationsRequest.builder()
-                            .name(applicationName)
-                            .page(page)
-                            .build()))
-                    .filter(resource -> ResourceUtils.getId(resource).equals(applicationId))
-                    .single()
-                    .cast(AbstractApplicationResource.class)
-            ))
-            .as(StepVerifier::create)
-            .consumeNextWith(applicationIdAndNameEquality(applicationName))
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        spaceId ->
+                                createApplicationId(
+                                        this.cloudFoundryClient, spaceId, applicationName))
+                .flatMap(
+                        applicationId ->
+                                Mono.zip(
+                                        Mono.just(applicationId),
+                                        PaginationUtils.requestClientV2Resources(
+                                                        page ->
+                                                                this.cloudFoundryClient
+                                                                        .applicationsV2()
+                                                                        .list(
+                                                                                ListApplicationsRequest
+                                                                                        .builder()
+                                                                                        .name(
+                                                                                                applicationName)
+                                                                                        .page(page)
+                                                                                        .build()))
+                                                .filter(
+                                                        resource ->
+                                                                ResourceUtils.getId(resource)
+                                                                        .equals(applicationId))
+                                                .single()
+                                                .cast(AbstractApplicationResource.class)))
+                .as(StepVerifier::create)
+                .consumeNextWith(applicationIdAndNameEquality(applicationName))
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void listFilterByOrganizationId() {
         String applicationName = this.nameFactory.getApplicationName();
 
-        Mono
-            .zip(
-                this.organizationId,
-                this.spaceId
-                    .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            )
-            .flatMap(function((organizationId, applicationId) -> Mono.zip(
-                Mono.just(applicationId),
-                PaginationUtils
-                    .requestClientV2Resources(page -> this.cloudFoundryClient.applicationsV2()
-                        .list(ListApplicationsRequest.builder()
-                            .organizationId(organizationId)
-                            .page(page)
-                            .build()))
-                    .filter(resource -> ResourceUtils.getId(resource).equals(applicationId))
-                    .single()
-                    .cast(AbstractApplicationResource.class)
-            )))
-            .as(StepVerifier::create)
-            .consumeNextWith(applicationIdAndNameEquality(applicationName))
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        Mono.zip(
+                        this.organizationId,
+                        this.spaceId.flatMap(
+                                spaceId ->
+                                        createApplicationId(
+                                                this.cloudFoundryClient, spaceId, applicationName)))
+                .flatMap(
+                        function(
+                                (organizationId, applicationId) ->
+                                        Mono.zip(
+                                                Mono.just(applicationId),
+                                                PaginationUtils.requestClientV2Resources(
+                                                                page ->
+                                                                        this.cloudFoundryClient
+                                                                                .applicationsV2()
+                                                                                .list(
+                                                                                        ListApplicationsRequest
+                                                                                                .builder()
+                                                                                                .organizationId(
+                                                                                                        organizationId)
+                                                                                                .page(
+                                                                                                        page)
+                                                                                                .build()))
+                                                        .filter(
+                                                                resource ->
+                                                                        ResourceUtils.getId(
+                                                                                        resource)
+                                                                                .equals(
+                                                                                        applicationId))
+                                                        .single()
+                                                        .cast(AbstractApplicationResource.class))))
+                .as(StepVerifier::create)
+                .consumeNextWith(applicationIdAndNameEquality(applicationName))
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -417,26 +571,41 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
-            .flatMap(spaceId -> Mono.zip(
-                Mono.just(spaceId),
-                createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
-            ))
-            .flatMap(function((spaceId, applicationId) -> Mono.zip(
-                Mono.just(applicationId),
-                PaginationUtils
-                    .requestClientV2Resources(page -> this.cloudFoundryClient.applicationsV2()
-                        .list(ListApplicationsRequest.builder()
-                            .spaceId(spaceId)
-                            .page(page)
-                            .build()))
-                    .filter(resource -> ResourceUtils.getId(resource).equals(applicationId))
-                    .single()
-                    .cast(AbstractApplicationResource.class)
-            )))
-            .as(StepVerifier::create)
-            .consumeNextWith(applicationIdAndNameEquality(applicationName))
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        spaceId ->
+                                Mono.zip(
+                                        Mono.just(spaceId),
+                                        createApplicationId(
+                                                this.cloudFoundryClient, spaceId, applicationName)))
+                .flatMap(
+                        function(
+                                (spaceId, applicationId) ->
+                                        Mono.zip(
+                                                Mono.just(applicationId),
+                                                PaginationUtils.requestClientV2Resources(
+                                                                page ->
+                                                                        this.cloudFoundryClient
+                                                                                .applicationsV2()
+                                                                                .list(
+                                                                                        ListApplicationsRequest
+                                                                                                .builder()
+                                                                                                .spaceId(
+                                                                                                        spaceId)
+                                                                                                .page(
+                                                                                                        page)
+                                                                                                .build()))
+                                                        .filter(
+                                                                resource ->
+                                                                        ResourceUtils.getId(
+                                                                                        resource)
+                                                                                .equals(
+                                                                                        applicationId))
+                                                        .single()
+                                                        .cast(AbstractApplicationResource.class))))
+                .as(StepVerifier::create)
+                .consumeNextWith(applicationIdAndNameEquality(applicationName))
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -444,25 +613,45 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
 
         Mono.zip(this.spaceId, this.stackId)
-            .flatMap(function((spaceId, stackId) -> Mono.zip(
-                createApplicationId(this.cloudFoundryClient, spaceId, applicationName, stackId),
-                Mono.just(stackId))))
-            .flatMap(function((applicationId, stackId) -> Mono.zip(
-                Mono.just(applicationId),
-                PaginationUtils
-                    .requestClientV2Resources(page -> this.cloudFoundryClient.applicationsV2()
-                        .list(ListApplicationsRequest.builder()
-                            .stackId(stackId)
-                            .page(page)
-                            .build()))
-                    .filter(resource -> ResourceUtils.getId(resource).equals(applicationId))
-                    .single()
-                    .cast(AbstractApplicationResource.class)
-            )))
-            .as(StepVerifier::create)
-            .consumeNextWith(applicationIdAndNameEquality(applicationName))
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        function(
+                                (spaceId, stackId) ->
+                                        Mono.zip(
+                                                createApplicationId(
+                                                        this.cloudFoundryClient,
+                                                        spaceId,
+                                                        applicationName,
+                                                        stackId),
+                                                Mono.just(stackId))))
+                .flatMap(
+                        function(
+                                (applicationId, stackId) ->
+                                        Mono.zip(
+                                                Mono.just(applicationId),
+                                                PaginationUtils.requestClientV2Resources(
+                                                                page ->
+                                                                        this.cloudFoundryClient
+                                                                                .applicationsV2()
+                                                                                .list(
+                                                                                        ListApplicationsRequest
+                                                                                                .builder()
+                                                                                                .stackId(
+                                                                                                        stackId)
+                                                                                                .page(
+                                                                                                        page)
+                                                                                                .build()))
+                                                        .filter(
+                                                                resource ->
+                                                                        ResourceUtils.getId(
+                                                                                        resource)
+                                                                                .equals(
+                                                                                        applicationId))
+                                                        .single()
+                                                        .cast(AbstractApplicationResource.class))))
+                .as(StepVerifier::create)
+                .consumeNextWith(applicationIdAndNameEquality(applicationName))
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -470,32 +659,51 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
-        Mono
-            .zip(this.organizationId, this.spaceId)
-            .flatMap(function((organizationId, spaceId) -> Mono.zip(
-                Mono.just(organizationId),
-                Mono.just(spaceId),
-                createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
-            )))
-            .flatMap(function((organizationId, spaceId, applicationId) -> Mono.zip(
-                Mono.just(applicationId),
-                createApplicationRoute(this.cloudFoundryClient, organizationId, spaceId, domainName, applicationId)
-            )))
-            .flatMap(function((applicationId, routeResponse) -> Mono.zip(
-                Mono.just(ResourceUtils.getId(routeResponse)),
-                PaginationUtils
-                    .requestClientV2Resources(page -> this.cloudFoundryClient.applicationsV2()
-                        .listRoutes(ListApplicationRoutesRequest.builder()
-                            .applicationId(applicationId)
-                            .page(page)
-                            .build()))
-                    .single()
-                    .map(ResourceUtils::getId)
-            )))
-            .as(StepVerifier::create)
-            .consumeNextWith(tupleEquality())
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        Mono.zip(this.organizationId, this.spaceId)
+                .flatMap(
+                        function(
+                                (organizationId, spaceId) ->
+                                        Mono.zip(
+                                                Mono.just(organizationId),
+                                                Mono.just(spaceId),
+                                                createApplicationId(
+                                                        this.cloudFoundryClient,
+                                                        spaceId,
+                                                        applicationName))))
+                .flatMap(
+                        function(
+                                (organizationId, spaceId, applicationId) ->
+                                        Mono.zip(
+                                                Mono.just(applicationId),
+                                                createApplicationRoute(
+                                                        this.cloudFoundryClient,
+                                                        organizationId,
+                                                        spaceId,
+                                                        domainName,
+                                                        applicationId))))
+                .flatMap(
+                        function(
+                                (applicationId, routeResponse) ->
+                                        Mono.zip(
+                                                Mono.just(ResourceUtils.getId(routeResponse)),
+                                                PaginationUtils.requestClientV2Resources(
+                                                                page ->
+                                                                        this.cloudFoundryClient
+                                                                                .applicationsV2()
+                                                                                .listRoutes(
+                                                                                        ListApplicationRoutesRequest
+                                                                                                .builder()
+                                                                                                .applicationId(
+                                                                                                        applicationId)
+                                                                                                .page(
+                                                                                                        page)
+                                                                                                .build()))
+                                                        .single()
+                                                        .map(ResourceUtils::getId))))
+                .as(StepVerifier::create)
+                .consumeNextWith(tupleEquality())
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -503,33 +711,56 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
-        Mono
-            .zip(this.organizationId, this.spaceId)
-            .flatMap(function((organizationId, spaceId) -> Mono.zip(
-                Mono.just(organizationId),
-                Mono.just(spaceId),
-                createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
-            )))
-            .flatMap(function((organizationId, spaceId, applicationId) -> Mono.zip(
-                Mono.just(applicationId),
-                createApplicationRoute(this.cloudFoundryClient, organizationId, spaceId, domainName, applicationId)
-            )))
-            .flatMap(function((applicationId, routeResponse) -> Mono.zip(
-                Mono.just(ResourceUtils.getId(routeResponse)),
-                PaginationUtils
-                    .requestClientV2Resources(page -> this.cloudFoundryClient.applicationsV2()
-                        .listRoutes(ListApplicationRoutesRequest.builder()
-                            .applicationId(applicationId)
-                            .domainId(ResourceUtils.getEntity(routeResponse).getDomainId())
-                            .page(page)
-                            .build()))
-                    .single()
-                    .map(ResourceUtils::getId)
-            )))
-            .as(StepVerifier::create)
-            .consumeNextWith(tupleEquality())
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        Mono.zip(this.organizationId, this.spaceId)
+                .flatMap(
+                        function(
+                                (organizationId, spaceId) ->
+                                        Mono.zip(
+                                                Mono.just(organizationId),
+                                                Mono.just(spaceId),
+                                                createApplicationId(
+                                                        this.cloudFoundryClient,
+                                                        spaceId,
+                                                        applicationName))))
+                .flatMap(
+                        function(
+                                (organizationId, spaceId, applicationId) ->
+                                        Mono.zip(
+                                                Mono.just(applicationId),
+                                                createApplicationRoute(
+                                                        this.cloudFoundryClient,
+                                                        organizationId,
+                                                        spaceId,
+                                                        domainName,
+                                                        applicationId))))
+                .flatMap(
+                        function(
+                                (applicationId, routeResponse) ->
+                                        Mono.zip(
+                                                Mono.just(ResourceUtils.getId(routeResponse)),
+                                                PaginationUtils.requestClientV2Resources(
+                                                                page ->
+                                                                        this.cloudFoundryClient
+                                                                                .applicationsV2()
+                                                                                .listRoutes(
+                                                                                        ListApplicationRoutesRequest
+                                                                                                .builder()
+                                                                                                .applicationId(
+                                                                                                        applicationId)
+                                                                                                .domainId(
+                                                                                                        ResourceUtils
+                                                                                                                .getEntity(
+                                                                                                                        routeResponse)
+                                                                                                                .getDomainId())
+                                                                                                .page(
+                                                                                                        page)
+                                                                                                .build()))
+                                                        .single()
+                                                        .map(ResourceUtils::getId))))
+                .as(StepVerifier::create)
+                .consumeNextWith(tupleEquality())
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -537,33 +768,56 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
-        Mono
-            .zip(this.organizationId, this.spaceId)
-            .flatMap(function((organizationId, spaceId) -> Mono.zip(
-                Mono.just(organizationId),
-                Mono.just(spaceId),
-                createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
-            )))
-            .flatMap(function((organizationId, spaceId, applicationId) -> Mono.zip(
-                Mono.just(applicationId),
-                createApplicationRoute(this.cloudFoundryClient, organizationId, spaceId, domainName, applicationId)
-            )))
-            .flatMap(function((applicationId, routeResponse) -> Mono.zip(
-                Mono.just(ResourceUtils.getId(routeResponse)),
-                PaginationUtils
-                    .requestClientV2Resources(page -> this.cloudFoundryClient.applicationsV2()
-                        .listRoutes(ListApplicationRoutesRequest.builder()
-                            .applicationId(applicationId)
-                            .host(ResourceUtils.getEntity(routeResponse).getHost())
-                            .page(page)
-                            .build()))
-                    .single()
-                    .map(ResourceUtils::getId)
-            )))
-            .as(StepVerifier::create)
-            .consumeNextWith(tupleEquality())
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        Mono.zip(this.organizationId, this.spaceId)
+                .flatMap(
+                        function(
+                                (organizationId, spaceId) ->
+                                        Mono.zip(
+                                                Mono.just(organizationId),
+                                                Mono.just(spaceId),
+                                                createApplicationId(
+                                                        this.cloudFoundryClient,
+                                                        spaceId,
+                                                        applicationName))))
+                .flatMap(
+                        function(
+                                (organizationId, spaceId, applicationId) ->
+                                        Mono.zip(
+                                                Mono.just(applicationId),
+                                                createApplicationRoute(
+                                                        this.cloudFoundryClient,
+                                                        organizationId,
+                                                        spaceId,
+                                                        domainName,
+                                                        applicationId))))
+                .flatMap(
+                        function(
+                                (applicationId, routeResponse) ->
+                                        Mono.zip(
+                                                Mono.just(ResourceUtils.getId(routeResponse)),
+                                                PaginationUtils.requestClientV2Resources(
+                                                                page ->
+                                                                        this.cloudFoundryClient
+                                                                                .applicationsV2()
+                                                                                .listRoutes(
+                                                                                        ListApplicationRoutesRequest
+                                                                                                .builder()
+                                                                                                .applicationId(
+                                                                                                        applicationId)
+                                                                                                .host(
+                                                                                                        ResourceUtils
+                                                                                                                .getEntity(
+                                                                                                                        routeResponse)
+                                                                                                                .getHost())
+                                                                                                .page(
+                                                                                                        page)
+                                                                                                .build()))
+                                                        .single()
+                                                        .map(ResourceUtils::getId))))
+                .as(StepVerifier::create)
+                .consumeNextWith(tupleEquality())
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -571,33 +825,56 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
-        Mono
-            .zip(this.organizationId, this.spaceId)
-            .flatMap(function((organizationId, spaceId) -> Mono.zip(
-                Mono.just(organizationId),
-                Mono.just(spaceId),
-                createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
-            )))
-            .flatMap(function((organizationId, spaceId, applicationId) -> Mono.zip(
-                Mono.just(applicationId),
-                createApplicationRoute(this.cloudFoundryClient, organizationId, spaceId, domainName, applicationId)
-            )))
-            .flatMap(function((applicationId, routeResponse) -> Mono.zip(
-                Mono.just(ResourceUtils.getId(routeResponse)),
-                PaginationUtils
-                    .requestClientV2Resources(page -> this.cloudFoundryClient.applicationsV2()
-                        .listRoutes(ListApplicationRoutesRequest.builder()
-                            .applicationId(applicationId)
-                            .path(ResourceUtils.getEntity(routeResponse).getPath())
-                            .page(page)
-                            .build()))
-                    .single()
-                    .map(ResourceUtils::getId)
-            )))
-            .as(StepVerifier::create)
-            .consumeNextWith(tupleEquality())
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        Mono.zip(this.organizationId, this.spaceId)
+                .flatMap(
+                        function(
+                                (organizationId, spaceId) ->
+                                        Mono.zip(
+                                                Mono.just(organizationId),
+                                                Mono.just(spaceId),
+                                                createApplicationId(
+                                                        this.cloudFoundryClient,
+                                                        spaceId,
+                                                        applicationName))))
+                .flatMap(
+                        function(
+                                (organizationId, spaceId, applicationId) ->
+                                        Mono.zip(
+                                                Mono.just(applicationId),
+                                                createApplicationRoute(
+                                                        this.cloudFoundryClient,
+                                                        organizationId,
+                                                        spaceId,
+                                                        domainName,
+                                                        applicationId))))
+                .flatMap(
+                        function(
+                                (applicationId, routeResponse) ->
+                                        Mono.zip(
+                                                Mono.just(ResourceUtils.getId(routeResponse)),
+                                                PaginationUtils.requestClientV2Resources(
+                                                                page ->
+                                                                        this.cloudFoundryClient
+                                                                                .applicationsV2()
+                                                                                .listRoutes(
+                                                                                        ListApplicationRoutesRequest
+                                                                                                .builder()
+                                                                                                .applicationId(
+                                                                                                        applicationId)
+                                                                                                .path(
+                                                                                                        ResourceUtils
+                                                                                                                .getEntity(
+                                                                                                                        routeResponse)
+                                                                                                                .getPath())
+                                                                                                .page(
+                                                                                                        page)
+                                                                                                .build()))
+                                                        .single()
+                                                        .map(ResourceUtils::getId))))
+                .as(StepVerifier::create)
+                .consumeNextWith(tupleEquality())
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -606,19 +883,33 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         this.spaceId
-            .flatMap(spaceId -> Mono.zip(
-                createApplicationId(this.cloudFoundryClient, spaceId, applicationName),
-                createUserServiceInstanceId(this.cloudFoundryClient, spaceId, serviceInstanceName)
-            ))
-            .delayUntil(function((applicationId, serviceInstanceId) -> createServiceBindingId(this.cloudFoundryClient, applicationId, serviceInstanceId)))
-            .flatMap(function((applicationId, serviceInstanceId) -> Mono.zip(
-                Mono.just(serviceInstanceId),
-                getSingleServiceBindingInstanceId(this.cloudFoundryClient, applicationId)
-            )))
-            .as(StepVerifier::create)
-            .consumeNextWith(tupleEquality())
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        spaceId ->
+                                Mono.zip(
+                                        createApplicationId(
+                                                this.cloudFoundryClient, spaceId, applicationName),
+                                        createUserServiceInstanceId(
+                                                this.cloudFoundryClient,
+                                                spaceId,
+                                                serviceInstanceName)))
+                .delayUntil(
+                        function(
+                                (applicationId, serviceInstanceId) ->
+                                        createServiceBindingId(
+                                                this.cloudFoundryClient,
+                                                applicationId,
+                                                serviceInstanceId)))
+                .flatMap(
+                        function(
+                                (applicationId, serviceInstanceId) ->
+                                        Mono.zip(
+                                                Mono.just(serviceInstanceId),
+                                                getSingleServiceBindingInstanceId(
+                                                        this.cloudFoundryClient, applicationId))))
+                .as(StepVerifier::create)
+                .consumeNextWith(tupleEquality())
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -627,31 +918,50 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         this.spaceId
-            .flatMap(spaceId -> Mono.zip(
-                createApplicationId(this.cloudFoundryClient, spaceId, applicationName),
-                createUserServiceInstanceId(this.cloudFoundryClient, spaceId, serviceInstanceName)
-            ))
-            .flatMap(function((applicationId, serviceInstanceId) -> Mono.zip(
-                Mono.just(applicationId),
-                Mono.just(serviceInstanceId),
-                createServiceBindingId(this.cloudFoundryClient, applicationId, serviceInstanceId)
-            )))
-            .flatMap(function((applicationId, serviceInstanceId, serviceBindingId) -> Mono.zip(
-                Mono.just(serviceBindingId),
-                PaginationUtils
-                    .requestClientV2Resources(page -> this.cloudFoundryClient.applicationsV2()
-                        .listServiceBindings(ListApplicationServiceBindingsRequest.builder()
-                            .applicationId(applicationId)
-                            .serviceInstanceId(serviceInstanceId)
-                            .page(page)
-                            .build()))
-                    .single()
-                    .map(ResourceUtils::getId)
-            )))
-            .as(StepVerifier::create)
-            .consumeNextWith(tupleEquality())
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        spaceId ->
+                                Mono.zip(
+                                        createApplicationId(
+                                                this.cloudFoundryClient, spaceId, applicationName),
+                                        createUserServiceInstanceId(
+                                                this.cloudFoundryClient,
+                                                spaceId,
+                                                serviceInstanceName)))
+                .flatMap(
+                        function(
+                                (applicationId, serviceInstanceId) ->
+                                        Mono.zip(
+                                                Mono.just(applicationId),
+                                                Mono.just(serviceInstanceId),
+                                                createServiceBindingId(
+                                                        this.cloudFoundryClient,
+                                                        applicationId,
+                                                        serviceInstanceId))))
+                .flatMap(
+                        function(
+                                (applicationId, serviceInstanceId, serviceBindingId) ->
+                                        Mono.zip(
+                                                Mono.just(serviceBindingId),
+                                                PaginationUtils.requestClientV2Resources(
+                                                                page ->
+                                                                        this.cloudFoundryClient
+                                                                                .applicationsV2()
+                                                                                .listServiceBindings(
+                                                                                        ListApplicationServiceBindingsRequest
+                                                                                                .builder()
+                                                                                                .applicationId(
+                                                                                                        applicationId)
+                                                                                                .serviceInstanceId(
+                                                                                                        serviceInstanceId)
+                                                                                                .page(
+                                                                                                        page)
+                                                                                                .build()))
+                                                        .single()
+                                                        .map(ResourceUtils::getId))))
+                .as(StepVerifier::create)
+                .consumeNextWith(tupleEquality())
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -659,26 +969,47 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
-        Mono
-            .zip(this.organizationId, this.spaceId)
-            .flatMap(function((organizationId, spaceId) -> Mono.zip(
-                Mono.just(organizationId),
-                Mono.just(spaceId),
-                createApplicationId(this.cloudFoundryClient, spaceId, applicationName)
-            )))
-            .flatMap(function((organizationId, spaceId, applicationId) -> Mono.zip(
-                Mono.just(applicationId),
-                createApplicationRoute(this.cloudFoundryClient, organizationId, spaceId, domainName, applicationId)
-            )))
-            .delayUntil(function((applicationId, routeResponse) -> this.cloudFoundryClient.applicationsV2()
-                .removeRoute(RemoveApplicationRouteRequest.builder()
-                    .applicationId(applicationId)
-                    .routeId(ResourceUtils.getId(routeResponse))
-                    .build())))
-            .flatMapMany(function((applicationId, routeResponse) -> requestRoutes(this.cloudFoundryClient, applicationId)))
-            .as(StepVerifier::create)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        Mono.zip(this.organizationId, this.spaceId)
+                .flatMap(
+                        function(
+                                (organizationId, spaceId) ->
+                                        Mono.zip(
+                                                Mono.just(organizationId),
+                                                Mono.just(spaceId),
+                                                createApplicationId(
+                                                        this.cloudFoundryClient,
+                                                        spaceId,
+                                                        applicationName))))
+                .flatMap(
+                        function(
+                                (organizationId, spaceId, applicationId) ->
+                                        Mono.zip(
+                                                Mono.just(applicationId),
+                                                createApplicationRoute(
+                                                        this.cloudFoundryClient,
+                                                        organizationId,
+                                                        spaceId,
+                                                        domainName,
+                                                        applicationId))))
+                .delayUntil(
+                        function(
+                                (applicationId, routeResponse) ->
+                                        this.cloudFoundryClient
+                                                .applicationsV2()
+                                                .removeRoute(
+                                                        RemoveApplicationRouteRequest.builder()
+                                                                .applicationId(applicationId)
+                                                                .routeId(
+                                                                        ResourceUtils.getId(
+                                                                                routeResponse))
+                                                                .build())))
+                .flatMapMany(
+                        function(
+                                (applicationId, routeResponse) ->
+                                        requestRoutes(this.cloudFoundryClient, applicationId)))
+                .as(StepVerifier::create)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -687,23 +1018,43 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String serviceInstanceName = this.nameFactory.getServiceInstanceName();
 
         this.spaceId
-            .flatMap(spaceId -> Mono.zip(
-                createApplicationId(this.cloudFoundryClient, spaceId, applicationName),
-                createUserServiceInstanceId(this.cloudFoundryClient, spaceId, serviceInstanceName)
-            ))
-            .flatMap(function((applicationId, serviceInstanceId) -> Mono.zip(
-                Mono.just(applicationId),
-                createServiceBindingId(this.cloudFoundryClient, applicationId, serviceInstanceId)
-            )))
-            .delayUntil(function((applicationId, serviceBindingId) -> this.cloudFoundryClient.applicationsV2()
-                .removeServiceBinding(RemoveApplicationServiceBindingRequest.builder()
-                    .applicationId(applicationId)
-                    .serviceBindingId(serviceBindingId)
-                    .build())))
-            .flatMapMany(function((applicationId, serviceBindingId) -> requestServiceBindings(this.cloudFoundryClient, applicationId)))
-            .as(StepVerifier::create)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        spaceId ->
+                                Mono.zip(
+                                        createApplicationId(
+                                                this.cloudFoundryClient, spaceId, applicationName),
+                                        createUserServiceInstanceId(
+                                                this.cloudFoundryClient,
+                                                spaceId,
+                                                serviceInstanceName)))
+                .flatMap(
+                        function(
+                                (applicationId, serviceInstanceId) ->
+                                        Mono.zip(
+                                                Mono.just(applicationId),
+                                                createServiceBindingId(
+                                                        this.cloudFoundryClient,
+                                                        applicationId,
+                                                        serviceInstanceId))))
+                .delayUntil(
+                        function(
+                                (applicationId, serviceBindingId) ->
+                                        this.cloudFoundryClient
+                                                .applicationsV2()
+                                                .removeServiceBinding(
+                                                        RemoveApplicationServiceBindingRequest
+                                                                .builder()
+                                                                .applicationId(applicationId)
+                                                                .serviceBindingId(serviceBindingId)
+                                                                .build())))
+                .flatMapMany(
+                        function(
+                                (applicationId, serviceBindingId) ->
+                                        requestServiceBindings(
+                                                this.cloudFoundryClient, applicationId)))
+                .as(StepVerifier::create)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -711,18 +1062,29 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
-            .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .delayUntil(applicationId -> uploadAndStartApplication(this.cloudFoundryClient, applicationId))
-            .delayUntil(applicationId -> this.cloudFoundryClient.applicationsV2()
-                .restage(RestageApplicationRequest.builder()
-                    .applicationId(applicationId)
-                    .build()))
-            .flatMap(applicationId -> waitForStagingApplication(this.cloudFoundryClient, applicationId))
-            .map(resource -> ResourceUtils.getEntity(resource).getName())
-            .as(StepVerifier::create)
-            .expectNext(applicationName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        spaceId ->
+                                createApplicationId(
+                                        this.cloudFoundryClient, spaceId, applicationName))
+                .delayUntil(
+                        applicationId ->
+                                uploadAndStartApplication(this.cloudFoundryClient, applicationId))
+                .delayUntil(
+                        applicationId ->
+                                this.cloudFoundryClient
+                                        .applicationsV2()
+                                        .restage(
+                                                RestageApplicationRequest.builder()
+                                                        .applicationId(applicationId)
+                                                        .build()))
+                .flatMap(
+                        applicationId ->
+                                waitForStagingApplication(this.cloudFoundryClient, applicationId))
+                .map(resource -> ResourceUtils.getEntity(resource).getName())
+                .as(StepVerifier::create)
+                .expectNext(applicationName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -730,17 +1092,32 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
-            .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .delayUntil(applicationId -> uploadAndStartApplication(this.cloudFoundryClient, applicationId))
-            .flatMap(applicationId -> this.cloudFoundryClient.applicationsV2()
-                .statistics(ApplicationStatisticsRequest.builder()
-                    .applicationId(applicationId)
-                    .build())
-                .map(instanceStatistics -> instanceStatistics.getInstances().get("0").getStatistics().getName()))
-            .as(StepVerifier::create)
-            .expectNext(applicationName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        spaceId ->
+                                createApplicationId(
+                                        this.cloudFoundryClient, spaceId, applicationName))
+                .delayUntil(
+                        applicationId ->
+                                uploadAndStartApplication(this.cloudFoundryClient, applicationId))
+                .flatMap(
+                        applicationId ->
+                                this.cloudFoundryClient
+                                        .applicationsV2()
+                                        .statistics(
+                                                ApplicationStatisticsRequest.builder()
+                                                        .applicationId(applicationId)
+                                                        .build())
+                                        .map(
+                                                instanceStatistics ->
+                                                        instanceStatistics
+                                                                .getInstances()
+                                                                .get("0")
+                                                                .getStatistics()
+                                                                .getName()))
+                .as(StepVerifier::create)
+                .expectNext(applicationName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -748,17 +1125,24 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
-            .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .flatMap(applicationId -> this.cloudFoundryClient.applicationsV2()
-                .summary(SummaryApplicationRequest.builder()
-                    .applicationId(applicationId)
-                    .build())
-                .map(SummaryApplicationResponse::getId)
-                .zipWith(Mono.just(applicationId)))
-            .as(StepVerifier::create)
-            .consumeNextWith(tupleEquality())
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        spaceId ->
+                                createApplicationId(
+                                        this.cloudFoundryClient, spaceId, applicationName))
+                .flatMap(
+                        applicationId ->
+                                this.cloudFoundryClient
+                                        .applicationsV2()
+                                        .summary(
+                                                SummaryApplicationRequest.builder()
+                                                        .applicationId(applicationId)
+                                                        .build())
+                                        .map(SummaryApplicationResponse::getId)
+                                        .zipWith(Mono.just(applicationId)))
+                .as(StepVerifier::create)
+                .consumeNextWith(tupleEquality())
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -766,23 +1150,42 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
-            .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .delayUntil(applicationId -> uploadAndStartApplication(this.cloudFoundryClient, applicationId))
-            .flatMap(applicationId -> Mono.zip(
-                Mono.just(applicationId),
-                getInstanceInfo(this.cloudFoundryClient, applicationId, "0")
-                    .map(info -> Optional.ofNullable(info.getSince()))
-            ))
-            .delayUntil(function((applicationId, optionalSince) -> this.cloudFoundryClient.applicationsV2()
-                .terminateInstance(TerminateApplicationInstanceRequest.builder()
-                    .applicationId(applicationId)
-                    .index("0")
-                    .build())))
-            .flatMap(function((applicationId, optionalSince) -> waitForInstanceRestart(this.cloudFoundryClient, applicationId, "0", optionalSince)))
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        spaceId ->
+                                createApplicationId(
+                                        this.cloudFoundryClient, spaceId, applicationName))
+                .delayUntil(
+                        applicationId ->
+                                uploadAndStartApplication(this.cloudFoundryClient, applicationId))
+                .flatMap(
+                        applicationId ->
+                                Mono.zip(
+                                        Mono.just(applicationId),
+                                        getInstanceInfo(this.cloudFoundryClient, applicationId, "0")
+                                                .map(info -> Optional.ofNullable(info.getSince()))))
+                .delayUntil(
+                        function(
+                                (applicationId, optionalSince) ->
+                                        this.cloudFoundryClient
+                                                .applicationsV2()
+                                                .terminateInstance(
+                                                        TerminateApplicationInstanceRequest
+                                                                .builder()
+                                                                .applicationId(applicationId)
+                                                                .index("0")
+                                                                .build())))
+                .flatMap(
+                        function(
+                                (applicationId, optionalSince) ->
+                                        waitForInstanceRestart(
+                                                this.cloudFoundryClient,
+                                                applicationId,
+                                                "0",
+                                                optionalSince)))
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -791,39 +1194,66 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName2 = this.nameFactory.getApplicationName();
 
         this.spaceId
-            .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .flatMap(applicationId -> this.cloudFoundryClient.applicationsV2()
-                .update(UpdateApplicationRequest.builder()
-                    .applicationId(applicationId)
-                    .environmentJson("test-var", "test-value")
-                    .name(applicationName2)
-                    .ports(60606, 60607)
-                    .build())
-                .map(ResourceUtils::getId))
-            .flatMap(applicationId -> Mono.zip(
-                Mono.just(applicationId),
-                requestGetApplication(this.cloudFoundryClient, applicationId)
-                    .map(ResourceUtils::getEntity)
-            ))
-            .flatMap(function((applicationId, entity1) -> Mono.zip(
-                Mono.just(entity1),
-                this.cloudFoundryClient.applicationsV2()
-                    .update(UpdateApplicationRequest.builder()
-                        .applicationId(applicationId)
-                        .environmentJsons(Collections.emptyMap())
-                        .build())
-                    .then(requestGetApplication(this.cloudFoundryClient, applicationId)
-                        .map(ResourceUtils::getEntity))
-            )))
-            .as(StepVerifier::create)
-            .consumeNextWith(consumer((entity1, entity2) -> {
-                assertThat(entity1.getName()).isEqualTo(applicationName2);
-                assertThat(entity1.getPorts().containsAll(Arrays.asList(60606, 60607)));
-                assertThat(entity1.getEnvironmentJsons()).containsEntry("test-var", "test-value");
-                assertThat(entity2.getEnvironmentJsons()).isEmpty();
-            }))
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        spaceId ->
+                                createApplicationId(
+                                        this.cloudFoundryClient, spaceId, applicationName))
+                .flatMap(
+                        applicationId ->
+                                this.cloudFoundryClient
+                                        .applicationsV2()
+                                        .update(
+                                                UpdateApplicationRequest.builder()
+                                                        .applicationId(applicationId)
+                                                        .environmentJson("test-var", "test-value")
+                                                        .name(applicationName2)
+                                                        .ports(60606, 60607)
+                                                        .build())
+                                        .map(ResourceUtils::getId))
+                .flatMap(
+                        applicationId ->
+                                Mono.zip(
+                                        Mono.just(applicationId),
+                                        requestGetApplication(
+                                                        this.cloudFoundryClient, applicationId)
+                                                .map(ResourceUtils::getEntity)))
+                .flatMap(
+                        function(
+                                (applicationId, entity1) ->
+                                        Mono.zip(
+                                                Mono.just(entity1),
+                                                this.cloudFoundryClient
+                                                        .applicationsV2()
+                                                        .update(
+                                                                UpdateApplicationRequest.builder()
+                                                                        .applicationId(
+                                                                                applicationId)
+                                                                        .environmentJsons(
+                                                                                Collections
+                                                                                        .emptyMap())
+                                                                        .build())
+                                                        .then(
+                                                                requestGetApplication(
+                                                                                this
+                                                                                        .cloudFoundryClient,
+                                                                                applicationId)
+                                                                        .map(
+                                                                                ResourceUtils
+                                                                                        ::getEntity)))))
+                .as(StepVerifier::create)
+                .consumeNextWith(
+                        consumer(
+                                (entity1, entity2) -> {
+                                    assertThat(entity1.getName()).isEqualTo(applicationName2);
+                                    assertThat(
+                                            entity1.getPorts()
+                                                    .containsAll(Arrays.asList(60606, 60607)));
+                                    assertThat(entity1.getEnvironmentJsons())
+                                            .containsEntry("test-var", "test-value");
+                                    assertThat(entity2.getEnvironmentJsons()).isEmpty();
+                                }))
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -831,16 +1261,21 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
-            .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .delayUntil(applicationId -> uploadApplication(this.cloudFoundryClient, applicationId))
-            .flatMap(applicationId -> Mono.zip(
-                downloadApplication(this.cloudFoundryClient, applicationId),
-                getBytes("test-application.zip")
-            ))
-            .as(StepVerifier::create)
-            .consumeNextWith(zipEquality())
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        spaceId ->
+                                createApplicationId(
+                                        this.cloudFoundryClient, spaceId, applicationName))
+                .delayUntil(
+                        applicationId -> uploadApplication(this.cloudFoundryClient, applicationId))
+                .flatMap(
+                        applicationId ->
+                                Mono.zip(
+                                        downloadApplication(this.cloudFoundryClient, applicationId),
+                                        getBytes("test-application.zip")))
+                .as(StepVerifier::create)
+                .consumeNextWith(zipEquality())
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -848,16 +1283,22 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
-            .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .delayUntil(applicationId -> uploadApplicationAsyncFalse(this.cloudFoundryClient, applicationId))
-            .flatMap(applicationId -> Mono.zip(
-                downloadApplication(this.cloudFoundryClient, applicationId),
-                getBytes("test-application.zip")
-            ))
-            .as(StepVerifier::create)
-            .consumeNextWith(zipEquality())
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        spaceId ->
+                                createApplicationId(
+                                        this.cloudFoundryClient, spaceId, applicationName))
+                .delayUntil(
+                        applicationId ->
+                                uploadApplicationAsyncFalse(this.cloudFoundryClient, applicationId))
+                .flatMap(
+                        applicationId ->
+                                Mono.zip(
+                                        downloadApplication(this.cloudFoundryClient, applicationId),
+                                        getBytes("test-application.zip")))
+                .as(StepVerifier::create)
+                .consumeNextWith(zipEquality())
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -866,17 +1307,29 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
-            .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .flatMap(applicationId -> this.cloudFoundryClient.applicationsV2()
-                .upload(UploadApplicationRequest.builder()
-                    .application(application)
-                    .async(true)
-                    .applicationId(applicationId)
-                    .build())
-                .flatMap(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job)))
-            .as(StepVerifier::create)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        spaceId ->
+                                createApplicationId(
+                                        this.cloudFoundryClient, spaceId, applicationName))
+                .flatMap(
+                        applicationId ->
+                                this.cloudFoundryClient
+                                        .applicationsV2()
+                                        .upload(
+                                                UploadApplicationRequest.builder()
+                                                        .application(application)
+                                                        .async(true)
+                                                        .applicationId(applicationId)
+                                                        .build())
+                                        .flatMap(
+                                                job ->
+                                                        JobUtils.waitForCompletion(
+                                                                this.cloudFoundryClient,
+                                                                Duration.ofMinutes(5),
+                                                                job)))
+                .as(StepVerifier::create)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_9)
@@ -886,90 +1339,156 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         String applicationName = this.nameFactory.getApplicationName();
 
         this.spaceId
-            .flatMap(spaceId -> createApplicationId(this.cloudFoundryClient, spaceId, applicationName))
-            .flatMap(applicationId -> this.cloudFoundryClient.applicationsV2()
-                .uploadDroplet(UploadApplicationDropletRequest.builder()
-                    .applicationId(applicationId)
-                    .droplet(droplet)
-                    .build())
-                .flatMap(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job)))
-            .as(StepVerifier::create)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        spaceId ->
+                                createApplicationId(
+                                        this.cloudFoundryClient, spaceId, applicationName))
+                .flatMap(
+                        applicationId ->
+                                this.cloudFoundryClient
+                                        .applicationsV2()
+                                        .uploadDroplet(
+                                                UploadApplicationDropletRequest.builder()
+                                                        .applicationId(applicationId)
+                                                        .droplet(droplet)
+                                                        .build())
+                                        .flatMap(
+                                                job ->
+                                                        JobUtils.waitForCompletion(
+                                                                this.cloudFoundryClient,
+                                                                Duration.ofMinutes(5),
+                                                                job)))
+                .as(StepVerifier::create)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
-    private static Consumer<Tuple2<String, AbstractApplicationResource>> applicationIdAndNameEquality(String name) {
+    private static Consumer<Tuple2<String, AbstractApplicationResource>>
+            applicationIdAndNameEquality(String name) {
         Assert.notNull(name, "name must not be null");
 
-        return consumer((applicationId, resource) -> {
-            assertThat(ResourceUtils.getId(resource)).isEqualTo(applicationId);
-            assertThat(ResourceUtils.getEntity(resource).getName()).isEqualTo(name);
-        });
+        return consumer(
+                (applicationId, resource) -> {
+                    assertThat(ResourceUtils.getId(resource)).isEqualTo(applicationId);
+                    assertThat(ResourceUtils.getEntity(resource).getName()).isEqualTo(name);
+                });
     }
 
-    private static Mono<String> createApplicationId(CloudFoundryClient cloudFoundryClient, String spaceId, String applicationName) {
-        return requestCreateApplication(cloudFoundryClient, spaceId, applicationName, "staticfile_buildpack", true, 512, 64, null)
-            .map(ResourceUtils::getId);
+    private static Mono<String> createApplicationId(
+            CloudFoundryClient cloudFoundryClient, String spaceId, String applicationName) {
+        return requestCreateApplication(
+                        cloudFoundryClient,
+                        spaceId,
+                        applicationName,
+                        "staticfile_buildpack",
+                        true,
+                        512,
+                        64,
+                        null)
+                .map(ResourceUtils::getId);
     }
 
-    private static Mono<String> createApplicationId(CloudFoundryClient cloudFoundryClient, String spaceId, String applicationName, String stackId) {
-        return requestCreateApplication(cloudFoundryClient, spaceId, applicationName, "staticfile_buildpack", true, 512, 64, stackId)
-            .map(ResourceUtils::getId);
+    private static Mono<String> createApplicationId(
+            CloudFoundryClient cloudFoundryClient,
+            String spaceId,
+            String applicationName,
+            String stackId) {
+        return requestCreateApplication(
+                        cloudFoundryClient,
+                        spaceId,
+                        applicationName,
+                        "staticfile_buildpack",
+                        true,
+                        512,
+                        64,
+                        stackId)
+                .map(ResourceUtils::getId);
     }
 
-    private static Mono<CreateRouteResponse> createApplicationRoute(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceId, String domainName, String applicationId) {
-        return createRouteWithDomain(cloudFoundryClient, organizationId, spaceId, domainName, "test-host", "/test-path")
-            .flatMap(createRouteResponse -> requestAssociateRoute(cloudFoundryClient, applicationId, createRouteResponse.getMetadata().getId())
-                .map(response -> createRouteResponse));
+    private static Mono<CreateRouteResponse> createApplicationRoute(
+            CloudFoundryClient cloudFoundryClient,
+            String organizationId,
+            String spaceId,
+            String domainName,
+            String applicationId) {
+        return createRouteWithDomain(
+                        cloudFoundryClient,
+                        organizationId,
+                        spaceId,
+                        domainName,
+                        "test-host",
+                        "/test-path")
+                .flatMap(
+                        createRouteResponse ->
+                                requestAssociateRoute(
+                                                cloudFoundryClient,
+                                                applicationId,
+                                                createRouteResponse.getMetadata().getId())
+                                        .map(response -> createRouteResponse));
     }
 
-    private static Mono<String> createPrivateDomainId(CloudFoundryClient cloudFoundryClient, String name, String organizationId) {
+    private static Mono<String> createPrivateDomainId(
+            CloudFoundryClient cloudFoundryClient, String name, String organizationId) {
         return requestCreatePrivateDomain(cloudFoundryClient, name, organizationId)
-            .map(ResourceUtils::getId);
+                .map(ResourceUtils::getId);
     }
 
-    private static Mono<CreateRouteResponse> createRouteWithDomain(CloudFoundryClient cloudFoundryClient, String organizationId, String spaceId, String domainName, String host, String path) {
+    private static Mono<CreateRouteResponse> createRouteWithDomain(
+            CloudFoundryClient cloudFoundryClient,
+            String organizationId,
+            String spaceId,
+            String domainName,
+            String host,
+            String path) {
         return createPrivateDomainId(cloudFoundryClient, domainName, organizationId)
-            .flatMap(domainId -> cloudFoundryClient.routes()
-                .create(CreateRouteRequest.builder()
-                    .domainId(domainId)
-                    .host(host)
-                    .path(path)
-                    .spaceId(spaceId)
-                    .build()));
+                .flatMap(
+                        domainId ->
+                                cloudFoundryClient
+                                        .routes()
+                                        .create(
+                                                CreateRouteRequest.builder()
+                                                        .domainId(domainId)
+                                                        .host(host)
+                                                        .path(path)
+                                                        .spaceId(spaceId)
+                                                        .build()));
     }
 
-    private static Mono<String> createServiceBindingId(CloudFoundryClient cloudFoundryClient, String applicationId, String serviceInstanceId) {
+    private static Mono<String> createServiceBindingId(
+            CloudFoundryClient cloudFoundryClient, String applicationId, String serviceInstanceId) {
         return requestCreateServiceBinding(cloudFoundryClient, applicationId, serviceInstanceId)
-            .map(ResourceUtils::getId);
+                .map(ResourceUtils::getId);
     }
 
-    private static Mono<String> createUserServiceInstanceId(CloudFoundryClient cloudFoundryClient, String spaceId, String serviceInstanceName) {
+    private static Mono<String> createUserServiceInstanceId(
+            CloudFoundryClient cloudFoundryClient, String spaceId, String serviceInstanceName) {
         return requestCreateUserServiceInstance(cloudFoundryClient, spaceId, serviceInstanceName)
-            .map(ResourceUtils::getId);
+                .map(ResourceUtils::getId);
     }
 
-    private static Mono<ApplicationInstanceInfo> getInstanceInfo(CloudFoundryClient cloudFoundryClient, String applicationId, String instanceName) {
+    private static Mono<ApplicationInstanceInfo> getInstanceInfo(
+            CloudFoundryClient cloudFoundryClient, String applicationId, String instanceName) {
         return requestInstances(cloudFoundryClient, applicationId)
-            .filter(response -> response.getInstances().containsKey(instanceName))
-            .map(response -> response.getInstances().get(instanceName));
+                .filter(response -> response.getInstances().containsKey(instanceName))
+                .map(response -> response.getInstances().get(instanceName));
     }
 
-    private static Mono<String> getSingleRouteId(CloudFoundryClient cloudFoundryClient, String applicationId) {
-        return requestRoutes(cloudFoundryClient, applicationId)
-            .single()
-            .map(ResourceUtils::getId);
+    private static Mono<String> getSingleRouteId(
+            CloudFoundryClient cloudFoundryClient, String applicationId) {
+        return requestRoutes(cloudFoundryClient, applicationId).single().map(ResourceUtils::getId);
     }
 
-    private static Mono<String> getSingleServiceBindingInstanceId(CloudFoundryClient cloudFoundryClient, String applicationId) {
+    private static Mono<String> getSingleServiceBindingInstanceId(
+            CloudFoundryClient cloudFoundryClient, String applicationId) {
         return requestServiceBindings(cloudFoundryClient, applicationId)
-            .single()
-            .map(ResourceUtils::getEntity)
-            .map(ServiceBindingEntity::getServiceInstanceId);
+                .single()
+                .map(ResourceUtils::getEntity)
+                .map(ServiceBindingEntity::getServiceInstanceId);
     }
 
     @SuppressWarnings("unchecked")
-    private static String getStringApplicationEnvValue(Map<String, Object> environment, String... keys) {
+    private static String getStringApplicationEnvValue(
+            Map<String, Object> environment, String... keys) {
         for (int i = 0; i < keys.length - 1; ++i) {
             environment = (Map<String, Object>) environment.get(keys[i]);
         }
@@ -984,7 +1503,9 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         return bytes -> {
             Set<String> names = new HashSet<>();
 
-            try (TarArchiveInputStream in = new TarArchiveInputStream(new GZIPInputStream(new ByteArrayInputStream(bytes)))) {
+            try (TarArchiveInputStream in =
+                    new TarArchiveInputStream(
+                            new GZIPInputStream(new ByteArrayInputStream(bytes)))) {
                 TarArchiveEntry entry;
                 while ((entry = in.getNextTarEntry()) != null) {
                     names.add(entry.getName());
@@ -997,164 +1518,235 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         };
     }
 
-    private static Mono<AssociateApplicationRouteResponse> requestAssociateRoute(CloudFoundryClient cloudFoundryClient, String applicationId, String routeId) {
-        return cloudFoundryClient.applicationsV2()
-            .associateRoute(AssociateApplicationRouteRequest.builder()
-                .applicationId(applicationId)
-                .routeId(routeId)
-                .build());
+    private static Mono<AssociateApplicationRouteResponse> requestAssociateRoute(
+            CloudFoundryClient cloudFoundryClient, String applicationId, String routeId) {
+        return cloudFoundryClient
+                .applicationsV2()
+                .associateRoute(
+                        AssociateApplicationRouteRequest.builder()
+                                .applicationId(applicationId)
+                                .routeId(routeId)
+                                .build());
     }
 
-    private static Mono<CreateApplicationResponse> requestCreateApplication(CloudFoundryClient cloudFoundryClient, String spaceId, String applicationName) {
-        return requestCreateApplication(cloudFoundryClient, spaceId, applicationName, null, null, null, null, null);
+    private static Mono<CreateApplicationResponse> requestCreateApplication(
+            CloudFoundryClient cloudFoundryClient, String spaceId, String applicationName) {
+        return requestCreateApplication(
+                cloudFoundryClient, spaceId, applicationName, null, null, null, null, null);
     }
 
-    private static Mono<CreateApplicationResponse> requestCreateApplication(CloudFoundryClient cloudFoundryClient, String spaceId, String applicationName, String buildpack, Boolean diego,
-                                                                            Integer diskQuota, Integer memory, String stackId) {
-        return cloudFoundryClient.applicationsV2()
-            .create(CreateApplicationRequest.builder()
-                .buildpack(buildpack)
-                .diego(diego)
-                .diskQuota(diskQuota)
-                .memory(memory)
-                .name(applicationName)
-                .spaceId(spaceId)
-                .stackId(stackId)
-                .build());
+    private static Mono<CreateApplicationResponse> requestCreateApplication(
+            CloudFoundryClient cloudFoundryClient,
+            String spaceId,
+            String applicationName,
+            String buildpack,
+            Boolean diego,
+            Integer diskQuota,
+            Integer memory,
+            String stackId) {
+        return cloudFoundryClient
+                .applicationsV2()
+                .create(
+                        CreateApplicationRequest.builder()
+                                .buildpack(buildpack)
+                                .diego(diego)
+                                .diskQuota(diskQuota)
+                                .memory(memory)
+                                .name(applicationName)
+                                .spaceId(spaceId)
+                                .stackId(stackId)
+                                .build());
     }
 
-    private static Mono<CreatePrivateDomainResponse> requestCreatePrivateDomain(CloudFoundryClient cloudFoundryClient, String name, String organizationId) {
-        return cloudFoundryClient.privateDomains()
-            .create(CreatePrivateDomainRequest.builder()
-                .name(name)
-                .owningOrganizationId(organizationId)
-                .build());
+    private static Mono<CreatePrivateDomainResponse> requestCreatePrivateDomain(
+            CloudFoundryClient cloudFoundryClient, String name, String organizationId) {
+        return cloudFoundryClient
+                .privateDomains()
+                .create(
+                        CreatePrivateDomainRequest.builder()
+                                .name(name)
+                                .owningOrganizationId(organizationId)
+                                .build());
     }
 
-    private static Mono<CreateServiceBindingResponse> requestCreateServiceBinding(CloudFoundryClient cloudFoundryClient, String applicationId, String serviceInstanceId) {
-        return cloudFoundryClient.serviceBindingsV2()
-            .create(CreateServiceBindingRequest.builder()
-                .applicationId(applicationId)
-                .serviceInstanceId(serviceInstanceId)
-                .build());
+    private static Mono<CreateServiceBindingResponse> requestCreateServiceBinding(
+            CloudFoundryClient cloudFoundryClient, String applicationId, String serviceInstanceId) {
+        return cloudFoundryClient
+                .serviceBindingsV2()
+                .create(
+                        CreateServiceBindingRequest.builder()
+                                .applicationId(applicationId)
+                                .serviceInstanceId(serviceInstanceId)
+                                .build());
     }
 
-    private static Mono<CreateUserProvidedServiceInstanceResponse> requestCreateUserServiceInstance(CloudFoundryClient cloudFoundryClient, String spaceId, String name) {
-        return cloudFoundryClient.userProvidedServiceInstances()
-            .create(CreateUserProvidedServiceInstanceRequest.builder()
-                .name(name)
-                .spaceId(spaceId)
-                .build());
+    private static Mono<CreateUserProvidedServiceInstanceResponse> requestCreateUserServiceInstance(
+            CloudFoundryClient cloudFoundryClient, String spaceId, String name) {
+        return cloudFoundryClient
+                .userProvidedServiceInstances()
+                .create(
+                        CreateUserProvidedServiceInstanceRequest.builder()
+                                .name(name)
+                                .spaceId(spaceId)
+                                .build());
     }
 
-    private static Mono<AbstractApplicationResource> requestGetApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
-        return cloudFoundryClient.applicationsV2()
-            .get(GetApplicationRequest.builder()
-                .applicationId(applicationId)
-                .build())
-            .cast(AbstractApplicationResource.class);
+    private static Mono<AbstractApplicationResource> requestGetApplication(
+            CloudFoundryClient cloudFoundryClient, String applicationId) {
+        return cloudFoundryClient
+                .applicationsV2()
+                .get(GetApplicationRequest.builder().applicationId(applicationId).build())
+                .cast(AbstractApplicationResource.class);
     }
 
-    private static Mono<ApplicationInstancesResponse> requestInstances(CloudFoundryClient cloudFoundryClient, String applicationId) {
-        return cloudFoundryClient.applicationsV2()
-            .instances(ApplicationInstancesRequest.builder()
-                .applicationId(applicationId)
-                .build());
+    private static Mono<ApplicationInstancesResponse> requestInstances(
+            CloudFoundryClient cloudFoundryClient, String applicationId) {
+        return cloudFoundryClient
+                .applicationsV2()
+                .instances(
+                        ApplicationInstancesRequest.builder().applicationId(applicationId).build());
     }
 
-    private static Flux<RouteResource> requestRoutes(CloudFoundryClient cloudFoundryClient, String applicationId) {
-        return PaginationUtils.requestClientV2Resources(page -> cloudFoundryClient.applicationsV2()
-            .listRoutes(ListApplicationRoutesRequest.builder()
-                .page(page)
-                .applicationId(applicationId)
-                .build()));
+    private static Flux<RouteResource> requestRoutes(
+            CloudFoundryClient cloudFoundryClient, String applicationId) {
+        return PaginationUtils.requestClientV2Resources(
+                page ->
+                        cloudFoundryClient
+                                .applicationsV2()
+                                .listRoutes(
+                                        ListApplicationRoutesRequest.builder()
+                                                .page(page)
+                                                .applicationId(applicationId)
+                                                .build()));
     }
 
-    private static Flux<ServiceBindingResource> requestServiceBindings(CloudFoundryClient cloudFoundryClient, String applicationId) {
-        return PaginationUtils
-            .requestClientV2Resources(page -> cloudFoundryClient.applicationsV2()
-                .listServiceBindings(ListApplicationServiceBindingsRequest.builder()
-                    .applicationId(applicationId)
-                    .page(page)
-                    .build()));
+    private static Flux<ServiceBindingResource> requestServiceBindings(
+            CloudFoundryClient cloudFoundryClient, String applicationId) {
+        return PaginationUtils.requestClientV2Resources(
+                page ->
+                        cloudFoundryClient
+                                .applicationsV2()
+                                .listServiceBindings(
+                                        ListApplicationServiceBindingsRequest.builder()
+                                                .applicationId(applicationId)
+                                                .page(page)
+                                                .build()));
     }
 
-    private static Mono<UpdateApplicationResponse> requestUpdateApplicationState(CloudFoundryClient cloudFoundryClient, String applicationId, String state) {
-        return cloudFoundryClient.applicationsV2()
-            .update(UpdateApplicationRequest.builder()
-                .applicationId(applicationId)
-                .state(state)
-                .build());
+    private static Mono<UpdateApplicationResponse> requestUpdateApplicationState(
+            CloudFoundryClient cloudFoundryClient, String applicationId, String state) {
+        return cloudFoundryClient
+                .applicationsV2()
+                .update(
+                        UpdateApplicationRequest.builder()
+                                .applicationId(applicationId)
+                                .state(state)
+                                .build());
     }
 
-    private static Mono<ApplicationInstanceInfo> startApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
+    private static Mono<ApplicationInstanceInfo> startApplication(
+            CloudFoundryClient cloudFoundryClient, String applicationId) {
         return requestUpdateApplicationState(cloudFoundryClient, applicationId, "STARTED")
-            .then(waitForStagingApplication(cloudFoundryClient, applicationId))
-            .then(waitForStartingInstanceInfo(cloudFoundryClient, applicationId));
+                .then(waitForStagingApplication(cloudFoundryClient, applicationId))
+                .then(waitForStartingInstanceInfo(cloudFoundryClient, applicationId));
     }
 
-    private static Mono<ApplicationInstanceInfo> uploadAndStartApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
+    private static Mono<ApplicationInstanceInfo> uploadAndStartApplication(
+            CloudFoundryClient cloudFoundryClient, String applicationId) {
         return uploadApplication(cloudFoundryClient, applicationId)
-            .then(startApplication(cloudFoundryClient, applicationId));
+                .then(startApplication(cloudFoundryClient, applicationId));
     }
 
-    private static Mono<Void> uploadApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
+    private static Mono<Void> uploadApplication(
+            CloudFoundryClient cloudFoundryClient, String applicationId) {
         try {
-            return cloudFoundryClient.applicationsV2()
-                .upload(UploadApplicationRequest.builder()
-                    .application(new ClassPathResource("test-application.zip").getFile().toPath())
-                    .async(true)
-                    .applicationId(applicationId)
-                    .build())
-                .flatMap(job -> JobUtils.waitForCompletion(cloudFoundryClient, Duration.ofMinutes(5), job));
+            return cloudFoundryClient
+                    .applicationsV2()
+                    .upload(
+                            UploadApplicationRequest.builder()
+                                    .application(
+                                            new ClassPathResource("test-application.zip")
+                                                    .getFile()
+                                                    .toPath())
+                                    .async(true)
+                                    .applicationId(applicationId)
+                                    .build())
+                    .flatMap(
+                            job ->
+                                    JobUtils.waitForCompletion(
+                                            cloudFoundryClient, Duration.ofMinutes(5), job));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private static Mono<UploadApplicationResponse> uploadApplicationAsyncFalse(CloudFoundryClient cloudFoundryClient, String applicationId) {
+    private static Mono<UploadApplicationResponse> uploadApplicationAsyncFalse(
+            CloudFoundryClient cloudFoundryClient, String applicationId) {
         try {
-            return cloudFoundryClient.applicationsV2()
-                .upload(UploadApplicationRequest.builder()
-                    .application(new ClassPathResource("test-application.zip").getFile().toPath())
-                    .async(false)
-                    .applicationId(applicationId)
-                    .build());
+            return cloudFoundryClient
+                    .applicationsV2()
+                    .upload(
+                            UploadApplicationRequest.builder()
+                                    .application(
+                                            new ClassPathResource("test-application.zip")
+                                                    .getFile()
+                                                    .toPath())
+                                    .async(false)
+                                    .applicationId(applicationId)
+                                    .build());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private static Mono<ApplicationInstanceInfo> waitForInstanceRestart(CloudFoundryClient cloudFoundryClient, String applicationId, String instanceName, Optional<Double> optionalSince) {
+    private static Mono<ApplicationInstanceInfo> waitForInstanceRestart(
+            CloudFoundryClient cloudFoundryClient,
+            String applicationId,
+            String instanceName,
+            Optional<Double> optionalSince) {
         return getInstanceInfo(cloudFoundryClient, applicationId, instanceName)
-            .filter(info -> !isIdentical(info.getSince(), optionalSince.orElse(null)))
-            .repeatWhenEmpty(DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)));
+                .filter(info -> !isIdentical(info.getSince(), optionalSince.orElse(null)))
+                .repeatWhenEmpty(
+                        DelayUtils.exponentialBackOff(
+                                Duration.ofSeconds(1),
+                                Duration.ofSeconds(15),
+                                Duration.ofMinutes(5)));
     }
 
-    private static Mono<AbstractApplicationResource> waitForStagingApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
+    private static Mono<AbstractApplicationResource> waitForStagingApplication(
+            CloudFoundryClient cloudFoundryClient, String applicationId) {
         return requestGetApplication(cloudFoundryClient, applicationId)
-            .filter(response -> "STAGED".equals(response.getEntity().getPackageState()))
-            .repeatWhenEmpty(DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)));
+                .filter(response -> "STAGED".equals(response.getEntity().getPackageState()))
+                .repeatWhenEmpty(
+                        DelayUtils.exponentialBackOff(
+                                Duration.ofSeconds(1),
+                                Duration.ofSeconds(15),
+                                Duration.ofMinutes(5)));
     }
 
-    private static Mono<ApplicationInstanceInfo> waitForStartingInstanceInfo(CloudFoundryClient cloudFoundryClient, String applicationId) {
-        return cloudFoundryClient.applicationsV2()
-            .instances(ApplicationInstancesRequest.builder()
-                .applicationId(applicationId)
-                .build())
-            .flatMapMany(response -> Flux.fromIterable(response.getInstances().values()))
-            .filter(applicationInstanceInfo -> "RUNNING".equals(applicationInstanceInfo.getState()))
-            .next()
-            .repeatWhenEmpty(DelayUtils.exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), Duration.ofMinutes(5)));
+    private static Mono<ApplicationInstanceInfo> waitForStartingInstanceInfo(
+            CloudFoundryClient cloudFoundryClient, String applicationId) {
+        return cloudFoundryClient
+                .applicationsV2()
+                .instances(
+                        ApplicationInstancesRequest.builder().applicationId(applicationId).build())
+                .flatMapMany(response -> Flux.fromIterable(response.getInstances().values()))
+                .filter(
+                        applicationInstanceInfo ->
+                                "RUNNING".equals(applicationInstanceInfo.getState()))
+                .next()
+                .repeatWhenEmpty(
+                        DelayUtils.exponentialBackOff(
+                                Duration.ofSeconds(1),
+                                Duration.ofSeconds(15),
+                                Duration.ofMinutes(5)));
     }
 
-    private Mono<byte[]> downloadApplication(CloudFoundryClient cloudFoundryClient, String applicationId) {
-        return cloudFoundryClient.applicationsV2()
-            .download(DownloadApplicationRequest.builder()
-                .applicationId(applicationId)
-                .build())
-            .as(OperationUtils::collectByteArray);
+    private Mono<byte[]> downloadApplication(
+            CloudFoundryClient cloudFoundryClient, String applicationId) {
+        return cloudFoundryClient
+                .applicationsV2()
+                .download(DownloadApplicationRequest.builder().applicationId(applicationId).build())
+                .as(OperationUtils::collectByteArray);
     }
-
-
 }

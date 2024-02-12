@@ -16,6 +16,9 @@
 
 package org.cloudfoundry.uaa;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.time.Duration;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
@@ -38,204 +41,245 @@ import org.cloudfoundry.uaa.tokens.RefreshTokenRequest;
 import org.cloudfoundry.uaa.tokens.RefreshTokenResponse;
 import org.cloudfoundry.uaa.tokens.TokenFormat;
 import org.cloudfoundry.uaa.tokens.TokenKey;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.time.Duration;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 public final class TokensTest extends AbstractIntegrationTest {
 
-    @Autowired
-    private String clientId;
+    @Autowired private String clientId;
 
-    @Autowired
-    private String clientSecret;
+    @Autowired private String clientSecret;
 
-    @Autowired
-    private ConnectionContext connectionContext;
+    @Autowired private ConnectionContext connectionContext;
 
-    @Autowired
-    private String password;
+    @Autowired private String password;
 
-    @Autowired
-    private TokenProvider tokenProvider;
+    @Autowired private TokenProvider tokenProvider;
 
-    @Autowired
-    private UaaClient uaaClient;
+    @Autowired private UaaClient uaaClient;
 
-    @Autowired
-    private String username;
+    @Autowired private String username;
 
     @Test
     public void checkTokenNotAuthorized() {
-        this.tokenProvider.getToken(this.connectionContext)
-            .flatMap(token -> this.uaaClient.tokens()
-                .check(CheckTokenRequest.builder()
-                    .token(token)
-                    .clientId(this.clientId)
-                    .clientSecret(this.clientSecret)
-                    .scopes("password.write", "scim.userids")
-                    .build()))
-            .as(StepVerifier::create)
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(UaaException.class).hasMessage("access_denied: Access is denied"))
-            .verify(Duration.ofMinutes(5));
+        this.tokenProvider
+                .getToken(this.connectionContext)
+                .flatMap(
+                        token ->
+                                this.uaaClient
+                                        .tokens()
+                                        .check(
+                                                CheckTokenRequest.builder()
+                                                        .token(token)
+                                                        .clientId(this.clientId)
+                                                        .clientSecret(this.clientSecret)
+                                                        .scopes("password.write", "scim.userids")
+                                                        .build()))
+                .as(StepVerifier::create)
+                .consumeErrorWith(
+                        t ->
+                                assertThat(t)
+                                        .isInstanceOf(UaaException.class)
+                                        .hasMessage("access_denied: Access is denied"))
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void getTokenByAuthorizationCode() {
         requestGetAuthorizationCode(this.uaaClient, this.clientId)
-            .flatMap(authorizationCode -> this.uaaClient.tokens()
-                .getByAuthorizationCode(GetTokenByAuthorizationCodeRequest.builder()
-                    .authorizationCode(authorizationCode)
-                    .clientId(this.clientId)
-                    .clientSecret(this.clientSecret)
-                    .build()))
-            .map(GetTokenByAuthorizationCodeResponse::getTokenType)
-            .as(StepVerifier::create)
-            .expectNext("bearer")
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        authorizationCode ->
+                                this.uaaClient
+                                        .tokens()
+                                        .getByAuthorizationCode(
+                                                GetTokenByAuthorizationCodeRequest.builder()
+                                                        .authorizationCode(authorizationCode)
+                                                        .clientId(this.clientId)
+                                                        .clientSecret(this.clientSecret)
+                                                        .build()))
+                .map(GetTokenByAuthorizationCodeResponse::getTokenType)
+                .as(StepVerifier::create)
+                .expectNext("bearer")
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void getTokenByClientCredentials() {
-        this.uaaClient.tokens()
-            .getByClientCredentials(GetTokenByClientCredentialsRequest.builder()
-                .clientId(this.clientId)
-                .clientSecret(this.clientSecret)
-                .tokenFormat(TokenFormat.OPAQUE)
-                .build())
-            .map(GetTokenByClientCredentialsResponse::getTokenType)
-            .as(StepVerifier::create)
-            .expectNext("bearer")
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        this.uaaClient
+                .tokens()
+                .getByClientCredentials(
+                        GetTokenByClientCredentialsRequest.builder()
+                                .clientId(this.clientId)
+                                .clientSecret(this.clientSecret)
+                                .tokenFormat(TokenFormat.OPAQUE)
+                                .build())
+                .map(GetTokenByClientCredentialsResponse::getTokenType)
+                .as(StepVerifier::create)
+                .expectNext("bearer")
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
-    //TODO: Ready to Implement - Await https://github.com/cloudfoundry/cf-java-client/issues/862 to get passcode
-    @Ignore("Ready to Implement - Await https://github.com/cloudfoundry/cf-java-client/issues/862 to get passcode")
+    // TODO: Ready to Implement - Await https://github.com/cloudfoundry/cf-java-client/issues/862 to
+    // get passcode
+    @Disabled(
+            "Ready to Implement - Await https://github.com/cloudfoundry/cf-java-client/issues/862"
+                    + " to get passcode")
     @Test
     public void getTokenByOneTimePasscode() {
-        this.uaaClient.tokens()
-            .getByOneTimePasscode(GetTokenByOneTimePasscodeRequest.builder()
-                .passcode("some passcode")
-                .clientId(this.clientId)
-                .clientSecret(this.clientSecret)
-                .tokenFormat(TokenFormat.OPAQUE)
-                .build())
-            .map(GetTokenByOneTimePasscodeResponse::getAccessToken)
-            .as(StepVerifier::create)
-            .expectNext("bearer")
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        this.uaaClient
+                .tokens()
+                .getByOneTimePasscode(
+                        GetTokenByOneTimePasscodeRequest.builder()
+                                .passcode("some passcode")
+                                .clientId(this.clientId)
+                                .clientSecret(this.clientSecret)
+                                .tokenFormat(TokenFormat.OPAQUE)
+                                .build())
+                .map(GetTokenByOneTimePasscodeResponse::getAccessToken)
+                .as(StepVerifier::create)
+                .expectNext("bearer")
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void getTokenByOpenId() {
         requestGetAuthorizationCode(this.uaaClient, this.clientId)
-            .flatMap(authorizationCode -> this.uaaClient.tokens()
-                .getByOpenId(GetTokenByOpenIdRequest.builder()
-                    .authorizationCode(authorizationCode)
-                    .clientId(this.clientId)
-                    .clientSecret(this.clientSecret)
-                    .tokenFormat(TokenFormat.OPAQUE)
-                    .build()))
-            .map(GetTokenByOpenIdResponse::getTokenType)
-            .as(StepVerifier::create)
-            .expectNext("bearer")
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        authorizationCode ->
+                                this.uaaClient
+                                        .tokens()
+                                        .getByOpenId(
+                                                GetTokenByOpenIdRequest.builder()
+                                                        .authorizationCode(authorizationCode)
+                                                        .clientId(this.clientId)
+                                                        .clientSecret(this.clientSecret)
+                                                        .tokenFormat(TokenFormat.OPAQUE)
+                                                        .build()))
+                .map(GetTokenByOpenIdResponse::getTokenType)
+                .as(StepVerifier::create)
+                .expectNext("bearer")
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void getTokenByPassword() {
-        this.uaaClient.tokens()
-            .getByPassword(GetTokenByPasswordRequest.builder()
-                .clientId(this.clientId)
-                .clientSecret(this.clientSecret)
-                .password(this.password)
-                .tokenFormat(TokenFormat.OPAQUE)
-                .username(this.username)
-                .build())
-            .map(GetTokenByPasswordResponse::getTokenType)
-            .as(StepVerifier::create)
-            .expectNext("bearer")
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        this.uaaClient
+                .tokens()
+                .getByPassword(
+                        GetTokenByPasswordRequest.builder()
+                                .clientId(this.clientId)
+                                .clientSecret(this.clientSecret)
+                                .password(this.password)
+                                .tokenFormat(TokenFormat.OPAQUE)
+                                .username(this.username)
+                                .build())
+                .map(GetTokenByPasswordResponse::getTokenType)
+                .as(StepVerifier::create)
+                .expectNext("bearer")
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void getTokenKey() {
-        this.uaaClient.tokens()
-            .getKey(GetTokenKeyRequest.builder()
-                .build())
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        this.uaaClient
+                .tokens()
+                .getKey(GetTokenKeyRequest.builder().build())
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void listTokenKeys() {
-        this.uaaClient.tokens()
-            .getKey(GetTokenKeyRequest.builder()
-                .build())
-            .flatMap(getKey -> Mono.zip(
-                this.uaaClient.tokens()
-                    .listKeys(ListTokenKeysRequest.builder()
-                        .build())
-                    .flatMapMany(response -> Flux.fromIterable(response.getKeys()))
-                    .filter(tokenKey -> getKey.getValue().equals(tokenKey.getValue()))
-                    .single()
-                    .map(TokenKey::getId),
-                Mono.just(getKey)
-                    .map(GetTokenKeyResponse::getId)
-            ))
-            .as(StepVerifier::create)
-            .consumeNextWith(tupleEquality())
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        this.uaaClient
+                .tokens()
+                .getKey(GetTokenKeyRequest.builder().build())
+                .flatMap(
+                        getKey ->
+                                Mono.zip(
+                                        this.uaaClient
+                                                .tokens()
+                                                .listKeys(ListTokenKeysRequest.builder().build())
+                                                .flatMapMany(
+                                                        response ->
+                                                                Flux.fromIterable(
+                                                                        response.getKeys()))
+                                                .filter(
+                                                        tokenKey ->
+                                                                getKey.getValue()
+                                                                        .equals(
+                                                                                tokenKey
+                                                                                        .getValue()))
+                                                .single()
+                                                .map(TokenKey::getId),
+                                        Mono.just(getKey).map(GetTokenKeyResponse::getId)))
+                .as(StepVerifier::create)
+                .consumeNextWith(tupleEquality())
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void refreshToken() {
-        getRequestToken(this.uaaClient, this.clientId, this.clientSecret, this.password, this.username)
-            .flatMap(refreshToken -> this.uaaClient.tokens()
-                .refresh(RefreshTokenRequest.builder()
-                    .tokenFormat(TokenFormat.OPAQUE)
-                    .clientId(this.clientId)
-                    .clientSecret(this.clientSecret)
-                    .refreshToken(refreshToken)
-                    .build()))
-            .map(RefreshTokenResponse::getTokenType)
-            .as(StepVerifier::create)
-            .expectNext("bearer")
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        getRequestToken(
+                        this.uaaClient,
+                        this.clientId,
+                        this.clientSecret,
+                        this.password,
+                        this.username)
+                .flatMap(
+                        refreshToken ->
+                                this.uaaClient
+                                        .tokens()
+                                        .refresh(
+                                                RefreshTokenRequest.builder()
+                                                        .tokenFormat(TokenFormat.OPAQUE)
+                                                        .clientId(this.clientId)
+                                                        .clientSecret(this.clientSecret)
+                                                        .refreshToken(refreshToken)
+                                                        .build()))
+                .map(RefreshTokenResponse::getTokenType)
+                .as(StepVerifier::create)
+                .expectNext("bearer")
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
-    private static Mono<String> getRequestToken(UaaClient uaaClient, String clientId, String clientSecret, String password, String username) {
-        return uaaClient.tokens()
-            .getByPassword(GetTokenByPasswordRequest.builder()
-                .clientId(clientId)
-                .clientSecret(clientSecret)
-                .password(password)
-                .tokenFormat(TokenFormat.OPAQUE)
-                .username(username)
-                .build())
-            .map(GetTokenByPasswordResponse::getRefreshToken);
+    private static Mono<String> getRequestToken(
+            UaaClient uaaClient,
+            String clientId,
+            String clientSecret,
+            String password,
+            String username) {
+        return uaaClient
+                .tokens()
+                .getByPassword(
+                        GetTokenByPasswordRequest.builder()
+                                .clientId(clientId)
+                                .clientSecret(clientSecret)
+                                .password(password)
+                                .tokenFormat(TokenFormat.OPAQUE)
+                                .username(username)
+                                .build())
+                .map(GetTokenByPasswordResponse::getRefreshToken);
     }
 
     private static Mono<String> requestGetAuthorizationCode(UaaClient uaaClient, String clientId) {
-        return uaaClient.authorizations()
-            .authorizationCodeGrantApi(AuthorizeByAuthorizationCodeGrantApiRequest.builder()
-                .clientId(clientId)
-                .build());
+        return uaaClient
+                .authorizations()
+                .authorizationCodeGrantApi(
+                        AuthorizeByAuthorizationCodeGrantApiRequest.builder()
+                                .clientId(clientId)
+                                .build());
     }
-
 }

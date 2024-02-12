@@ -16,6 +16,9 @@
 
 package org.cloudfoundry.logcache.v1;
 
+import java.util.HashMap;
+import java.util.function.Function;
+import java.util.stream.Stream;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.QueryBuilder;
@@ -25,62 +28,53 @@ import org.cloudfoundry.reactor.util.UriQueryParameters;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
-import java.util.HashMap;
-import java.util.function.Function;
-import java.util.stream.Stream;
-
 public class TestLogCacheEndpoints extends AbstractReactorOperations {
 
-    public TestLogCacheEndpoints(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
+    public TestLogCacheEndpoints(
+            ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
         super(connectionContext, root, tokenProvider, new HashMap<>());
     }
 
     Mono<Void> counter(String name, long delta) {
-        return get(CounterRequest.builder()
-            .name(name)
-            .delta(delta)
-            .build(), "counter");
+        return get(CounterRequest.builder().name(name).delta(delta).build(), "counter");
     }
 
     Mono<Void> event(String title, String body) {
-        return get(EventRequest.builder()
-            .title(title)
-            .body(body)
-            .build(), "event");
+        return get(EventRequest.builder().title(title).body(body).build(), "event");
     }
 
     Mono<Void> gauge(String name, Double value) {
-        return get(GaugeRequest.builder()
-            .name(name)
-            .value(value.toString())
-            .build(), "gauge");
+        return get(GaugeRequest.builder().name(name).value(value.toString()).build(), "gauge");
     }
 
     Mono<Void> log(String message) {
-        return get(LogRequest.builder()
-            .message(message)
-            .build(), "log");
+        return get(LogRequest.builder().message(message).build(), "log");
     }
 
-    private Function<UriComponentsBuilder, UriComponentsBuilder> buildPathSegments(String[] pathSegments) {
+    private Function<UriComponentsBuilder, UriComponentsBuilder> buildPathSegments(
+            String[] pathSegments) {
         return builder -> builder.pathSegment(pathSegments);
     }
 
     private Mono<Void> get(Object requestPayload, String... pathSegments) {
         return createOperator()
-            .flatMap(operator -> operator.get()
-                .uri(buildPathSegments(pathSegments).andThen(queryTransformer(requestPayload)))
-                .response()
-                .get())
-            .then();
+                .flatMap(
+                        operator ->
+                                operator.get()
+                                        .uri(
+                                                buildPathSegments(pathSegments)
+                                                        .andThen(queryTransformer(requestPayload)))
+                                        .response()
+                                        .get())
+                .then();
     }
 
-    private Function<UriComponentsBuilder, UriComponentsBuilder> queryTransformer(Object requestPayload) {
+    private Function<UriComponentsBuilder, UriComponentsBuilder> queryTransformer(
+            Object requestPayload) {
         return builder -> {
             Stream<UriQueryParameter> parameters = new QueryBuilder().build(requestPayload);
             UriQueryParameters.set(builder, parameters);
             return builder;
         };
     }
-
 }

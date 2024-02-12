@@ -16,27 +16,26 @@
 
 package org.cloudfoundry.operations;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.time.Duration;
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.test.StepVerifier;
 
-import java.time.Duration;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 public final class AdvancedTest extends AbstractIntegrationTest {
 
-    @Autowired
-    private CloudFoundryOperations cloudFoundryOperations;
+    @Autowired private CloudFoundryOperations cloudFoundryOperations;
 
     @Test
     public void sshCode() {
-        this.cloudFoundryOperations.advanced()
-            .sshCode()
-            .as(StepVerifier::create)
-            .consumeNextWith(actual -> assertThat(actual.length()).isGreaterThanOrEqualTo(6))
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        this.cloudFoundryOperations
+                .advanced()
+                .sshCode()
+                .as(StepVerifier::create)
+                .consumeNextWith(actual -> assertThat(actual.length()).isGreaterThanOrEqualTo(6))
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
-
 }

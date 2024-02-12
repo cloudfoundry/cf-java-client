@@ -16,50 +16,56 @@
 
 package org.cloudfoundry.operations;
 
+import java.time.Duration;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.operations.organizations.CreateOrganizationRequest;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.time.Duration;
-
-
 public final class OrganizationsTest extends AbstractIntegrationTest {
 
-    @Autowired
-    private CloudFoundryOperations cloudFoundryOperations;
+    @Autowired private CloudFoundryOperations cloudFoundryOperations;
 
-    @Autowired
-    private Mono<String> organizationId;
+    @Autowired private Mono<String> organizationId;
 
     @Test
     public void create() {
         String organizationName = this.nameFactory.getOrganizationName();
 
-        this.cloudFoundryOperations.organizations()
-            .create(CreateOrganizationRequest.builder()
-                .organizationName(organizationName)
-                .build())
-            .thenMany(this.cloudFoundryOperations.organizations()
-                .list())
-            .filter(organizationSummary -> organizationName.equals(organizationSummary.getName()))
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        this.cloudFoundryOperations
+                .organizations()
+                .create(
+                        CreateOrganizationRequest.builder()
+                                .organizationName(organizationName)
+                                .build())
+                .thenMany(this.cloudFoundryOperations.organizations().list())
+                .filter(
+                        organizationSummary ->
+                                organizationName.equals(organizationSummary.getName()))
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void list() {
         this.organizationId
-            .flatMapMany(organizationId -> this.cloudFoundryOperations.organizations()
-                .list()
-                .filter(organization -> organization.getId().equals(organizationId)))
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMapMany(
+                        organizationId ->
+                                this.cloudFoundryOperations
+                                        .organizations()
+                                        .list()
+                                        .filter(
+                                                organization ->
+                                                        organization
+                                                                .getId()
+                                                                .equals(organizationId)))
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
-
 }

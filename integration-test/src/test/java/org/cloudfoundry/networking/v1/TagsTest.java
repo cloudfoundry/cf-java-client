@@ -16,6 +16,9 @@
 
 package org.cloudfoundry.networking.v1;
 
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
+
+import java.time.Duration;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.CloudFoundryVersion;
 import org.cloudfoundry.IfCloudFoundryVersion;
@@ -31,24 +34,18 @@ import org.cloudfoundry.networking.v1.policies.Source;
 import org.cloudfoundry.networking.v1.tags.ListTagsRequest;
 import org.cloudfoundry.networking.v1.tags.ListTagsResponse;
 import org.cloudfoundry.util.ResourceUtils;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.time.Duration;
-
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
-
 public final class TagsTest extends AbstractIntegrationTest {
 
-    @Autowired
-    private CloudFoundryClient cloudFoundryClient;
+    @Autowired private CloudFoundryClient cloudFoundryClient;
 
-    @Autowired
-    private NetworkingClient networkingClient;
+    @Autowired private NetworkingClient networkingClient;
 
-    @Autowired
-    private Mono<String> spaceId;
+    @Autowired private Mono<String> spaceId;
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_12)
     @Test
@@ -58,57 +55,89 @@ public final class TagsTest extends AbstractIntegrationTest {
         Integer port = this.nameFactory.getPort();
 
         this.spaceId
-            .flatMapMany(spaceId -> Mono.zip(
-                createApplicationId(this.cloudFoundryClient, destinationApplicationName, spaceId),
-                createApplicationId(this.cloudFoundryClient, sourceApplicationName, spaceId)
-            ))
-            .flatMap(function((destinationApplicationId, sourceApplicationId) -> requestCreatePolicy(this.networkingClient, destinationApplicationId, port, sourceApplicationId)
-                .thenReturn(destinationApplicationId)))
-            .flatMap(destinationApplicationId -> this.networkingClient.tags()
-                .list(ListTagsRequest.builder()
-                    .build())
-                .flatMapIterable(ListTagsResponse::getTags)
-                .filter(tag -> destinationApplicationId.equals(tag.getId())))
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMapMany(
+                        spaceId ->
+                                Mono.zip(
+                                        createApplicationId(
+                                                this.cloudFoundryClient,
+                                                destinationApplicationName,
+                                                spaceId),
+                                        createApplicationId(
+                                                this.cloudFoundryClient,
+                                                sourceApplicationName,
+                                                spaceId)))
+                .flatMap(
+                        function(
+                                (destinationApplicationId, sourceApplicationId) ->
+                                        requestCreatePolicy(
+                                                        this.networkingClient,
+                                                        destinationApplicationId,
+                                                        port,
+                                                        sourceApplicationId)
+                                                .thenReturn(destinationApplicationId)))
+                .flatMap(
+                        destinationApplicationId ->
+                                this.networkingClient
+                                        .tags()
+                                        .list(ListTagsRequest.builder().build())
+                                        .flatMapIterable(ListTagsResponse::getTags)
+                                        .filter(
+                                                tag ->
+                                                        destinationApplicationId.equals(
+                                                                tag.getId())))
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
-    private static Mono<String> createApplicationId(CloudFoundryClient cloudFoundryClient, String applicationName, String spaceId) {
+    private static Mono<String> createApplicationId(
+            CloudFoundryClient cloudFoundryClient, String applicationName, String spaceId) {
         return requestCreateApplication(cloudFoundryClient, spaceId, applicationName)
-            .map(ResourceUtils::getId);
+                .map(ResourceUtils::getId);
     }
 
-    private static Mono<CreateApplicationResponse> requestCreateApplication(CloudFoundryClient cloudFoundryClient, String spaceId, String applicationName) {
-        return cloudFoundryClient.applicationsV2()
-            .create(CreateApplicationRequest.builder()
-                .buildpack("staticfile_buildpack")
-                .diego(true)
-                .diskQuota(512)
-                .memory(64)
-                .name(applicationName)
-                .spaceId(spaceId)
-                .build());
+    private static Mono<CreateApplicationResponse> requestCreateApplication(
+            CloudFoundryClient cloudFoundryClient, String spaceId, String applicationName) {
+        return cloudFoundryClient
+                .applicationsV2()
+                .create(
+                        CreateApplicationRequest.builder()
+                                .buildpack("staticfile_buildpack")
+                                .diego(true)
+                                .diskQuota(512)
+                                .memory(64)
+                                .name(applicationName)
+                                .spaceId(spaceId)
+                                .build());
     }
 
-    private static Mono<Void> requestCreatePolicy(NetworkingClient networkingClient, String destinationApplicationId, Integer port, String sourceApplicationId) {
-        return networkingClient.policies()
-            .create(CreatePoliciesRequest.builder()
-                .policy(Policy.builder()
-                    .destination(Destination.builder()
-                        .id(destinationApplicationId)
-                        .ports(Ports.builder()
-                            .end(port)
-                            .start(port)
-                            .build())
-                        .protocol("tcp")
-                        .build())
-                    .source(Source.builder()
-                        .id(sourceApplicationId)
-                        .build())
-                    .build())
-                .build());
+    private static Mono<Void> requestCreatePolicy(
+            NetworkingClient networkingClient,
+            String destinationApplicationId,
+            Integer port,
+            String sourceApplicationId) {
+        return networkingClient
+                .policies()
+                .create(
+                        CreatePoliciesRequest.builder()
+                                .policy(
+                                        Policy.builder()
+                                                .destination(
+                                                        Destination.builder()
+                                                                .id(destinationApplicationId)
+                                                                .ports(
+                                                                        Ports.builder()
+                                                                                .end(port)
+                                                                                .start(port)
+                                                                                .build())
+                                                                .protocol("tcp")
+                                                                .build())
+                                                .source(
+                                                        Source.builder()
+                                                                .id(sourceApplicationId)
+                                                                .build())
+                                                .build())
+                                .build());
     }
-
 }

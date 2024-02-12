@@ -16,37 +16,36 @@
 
 package org.cloudfoundry.client.v2;
 
-import com.github.zafarkhaja.semver.Version;
-import org.cloudfoundry.AbstractIntegrationTest;
-import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v2.info.GetInfoRequest;
-import org.springframework.beans.factory.annotation.Autowired;
-import reactor.test.StepVerifier;
-
-import java.time.Duration;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.client.CloudFoundryClient.SUPPORTED_API_VERSION;
 
+import com.github.zafarkhaja.semver.Version;
+import java.time.Duration;
+import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v2.info.GetInfoRequest;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import reactor.test.StepVerifier;
+
 public final class InfoTest extends AbstractIntegrationTest {
 
-    @Autowired
-    private CloudFoundryClient cloudFoundryClient;
+    @Autowired private CloudFoundryClient cloudFoundryClient;
 
     @Test
     public void info() {
-        this.cloudFoundryClient.info()
-            .get(GetInfoRequest.builder()
-                .build())
-            .as(StepVerifier::create)
-            .consumeNextWith(response -> {
-                Version expected = Version.valueOf(SUPPORTED_API_VERSION);
-                Version actual = Version.valueOf(response.getApiVersion());
+        this.cloudFoundryClient
+                .info()
+                .get(GetInfoRequest.builder().build())
+                .as(StepVerifier::create)
+                .consumeNextWith(
+                        response -> {
+                            Version expected = Version.valueOf(SUPPORTED_API_VERSION);
+                            Version actual = Version.valueOf(response.getApiVersion());
 
-                assertThat(actual).isLessThanOrEqualTo(expected);
-            })
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                            assertThat(actual).isLessThanOrEqualTo(expected);
+                        })
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
-
 }

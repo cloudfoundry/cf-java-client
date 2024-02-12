@@ -16,114 +16,141 @@
 
 package org.cloudfoundry.client.v2;
 
-import org.cloudfoundry.AbstractIntegrationTest;
-import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v2.featureflags.FeatureFlagEntity;
-import org.cloudfoundry.client.v2.featureflags.GetFeatureFlagRequest;
-import org.cloudfoundry.client.v2.featureflags.ListFeatureFlagsRequest;
-import org.cloudfoundry.client.v2.featureflags.SetFeatureFlagRequest;
-import org.springframework.beans.factory.annotation.Autowired;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
-import reactor.util.function.Tuples;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
+import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
-import static org.cloudfoundry.util.tuple.TupleUtils.function;
+import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v2.featureflags.FeatureFlagEntity;
+import org.cloudfoundry.client.v2.featureflags.GetFeatureFlagRequest;
+import org.cloudfoundry.client.v2.featureflags.ListFeatureFlagsRequest;
+import org.cloudfoundry.client.v2.featureflags.SetFeatureFlagRequest;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
+import reactor.util.function.Tuples;
 
 public final class FeatureFlagsTest extends AbstractIntegrationTest {
 
-    private static final List<String> coreFeatureFlagNameList = Arrays.asList(
-        "app_bits_upload",
-        "app_scaling",
-        "diego_docker",
-        "private_domain_creation",
-        "route_creation",
-        "service_instance_creation",
-        "set_roles_by_username",
-        "unset_roles_by_username",
-        "user_org_creation"
-    );
+    private static final List<String> coreFeatureFlagNameList =
+            Arrays.asList(
+                    "app_bits_upload",
+                    "app_scaling",
+                    "diego_docker",
+                    "private_domain_creation",
+                    "route_creation",
+                    "service_instance_creation",
+                    "set_roles_by_username",
+                    "unset_roles_by_username",
+                    "user_org_creation");
 
-    @Autowired
-    private CloudFoundryClient cloudFoundryClient;
+    @Autowired private CloudFoundryClient cloudFoundryClient;
 
     @Test
     public void getEach() {
-        Flux
-            .fromIterable(coreFeatureFlagNameList)
-            .flatMap(flagName -> this.cloudFoundryClient.featureFlags()
-                .get(GetFeatureFlagRequest.builder()
-                    .name(flagName)
-                    .build())
-                .map(response -> Tuples.of(flagName, response)))
-            .collectList()
-            .as(StepVerifier::create)
-            .consumeNextWith(list -> list.forEach(consumer((name, entity) -> assertThat(entity.getName()).isEqualTo(name))))
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        Flux.fromIterable(coreFeatureFlagNameList)
+                .flatMap(
+                        flagName ->
+                                this.cloudFoundryClient
+                                        .featureFlags()
+                                        .get(GetFeatureFlagRequest.builder().name(flagName).build())
+                                        .map(response -> Tuples.of(flagName, response)))
+                .collectList()
+                .as(StepVerifier::create)
+                .consumeNextWith(
+                        list ->
+                                list.forEach(
+                                        consumer(
+                                                (name, entity) ->
+                                                        assertThat(entity.getName())
+                                                                .isEqualTo(name))))
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void list() {
-        this.cloudFoundryClient.featureFlags()
-            .list(ListFeatureFlagsRequest.builder()
-                .build())
-            .as(StepVerifier::create)
-            .consumeNextWith(response -> {
-                Set<String> returnedFlagSet = flagNameSetFrom(response.getFeatureFlags());
-                assertThat(returnedFlagSet).containsAll(coreFeatureFlagNameList);
-            })
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        this.cloudFoundryClient
+                .featureFlags()
+                .list(ListFeatureFlagsRequest.builder().build())
+                .as(StepVerifier::create)
+                .consumeNextWith(
+                        response -> {
+                            Set<String> returnedFlagSet =
+                                    flagNameSetFrom(response.getFeatureFlags());
+                            assertThat(returnedFlagSet).containsAll(coreFeatureFlagNameList);
+                        })
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void setAndResetEach() {
         Flux.fromIterable(coreFeatureFlagNameList)
-            .flatMap(flagName -> this.cloudFoundryClient.featureFlags()
-                .get(GetFeatureFlagRequest.builder()
-                    .name(flagName)
-                    .build())
-                .flatMap(getResponse -> Mono.zip(
-                    Mono.just(getResponse),
-                    this.cloudFoundryClient.featureFlags()
-                        .set(SetFeatureFlagRequest.builder()
-                            .name(getResponse.getName())
-                            .enabled(!getResponse.getEnabled())
-                            .build())
-                ))
-                .flatMap(function((getResponse, setResponse) -> Mono.zip(
-                    Mono.just(getResponse),
-                    Mono.just(setResponse),
-                    this.cloudFoundryClient.featureFlags()
-                        .set(SetFeatureFlagRequest.builder()
-                            .name(getResponse.getName())
-                            .enabled(getResponse.getEnabled())
-                            .build())
-                ))))
-            .collectList()
-            .as(StepVerifier::create)
-            .consumeNextWith(list -> list.forEach(consumer((getResponse, setResponse, resetResponse) -> {
-                assertThat(setResponse.getEnabled()).isNotEqualTo(getResponse.getEnabled());
-                assertThat(resetResponse.getEnabled()).isEqualTo(getResponse.getEnabled());
-            })))
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        flagName ->
+                                this.cloudFoundryClient
+                                        .featureFlags()
+                                        .get(GetFeatureFlagRequest.builder().name(flagName).build())
+                                        .flatMap(
+                                                getResponse ->
+                                                        Mono.zip(
+                                                                Mono.just(getResponse),
+                                                                this.cloudFoundryClient
+                                                                        .featureFlags()
+                                                                        .set(
+                                                                                SetFeatureFlagRequest
+                                                                                        .builder()
+                                                                                        .name(
+                                                                                                getResponse
+                                                                                                        .getName())
+                                                                                        .enabled(
+                                                                                                !getResponse
+                                                                                                        .getEnabled())
+                                                                                        .build())))
+                                        .flatMap(
+                                                function(
+                                                        (getResponse, setResponse) ->
+                                                                Mono.zip(
+                                                                        Mono.just(getResponse),
+                                                                        Mono.just(setResponse),
+                                                                        this.cloudFoundryClient
+                                                                                .featureFlags()
+                                                                                .set(
+                                                                                        SetFeatureFlagRequest
+                                                                                                .builder()
+                                                                                                .name(
+                                                                                                        getResponse
+                                                                                                                .getName())
+                                                                                                .enabled(
+                                                                                                        getResponse
+                                                                                                                .getEnabled())
+                                                                                                .build())))))
+                .collectList()
+                .as(StepVerifier::create)
+                .consumeNextWith(
+                        list ->
+                                list.forEach(
+                                        consumer(
+                                                (getResponse, setResponse, resetResponse) -> {
+                                                    assertThat(setResponse.getEnabled())
+                                                            .isNotEqualTo(getResponse.getEnabled());
+                                                    assertThat(resetResponse.getEnabled())
+                                                            .isEqualTo(getResponse.getEnabled());
+                                                })))
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     private static Set<String> flagNameSetFrom(List<FeatureFlagEntity> listFlags) {
-        return listFlags
-            .stream()
-            .map(FeatureFlagEntity::getName)
-            .collect(Collectors.toSet());
+        return listFlags.stream().map(FeatureFlagEntity::getName).collect(Collectors.toSet());
     }
-
 }

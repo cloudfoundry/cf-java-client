@@ -19,7 +19,6 @@ package org.cloudfoundry;
 import com.github.zafarkhaja.semver.Version;
 
 public enum CloudFoundryVersion {
-
     PCF_1_9(Version.forIntegers(2, 65, 0)),
 
     PCF_1_10(Version.forIntegers(2, 75, 0)),
@@ -67,5 +66,4 @@ public enum CloudFoundryVersion {
     Version getVersion() {
         return this.version;
     }
-
 }

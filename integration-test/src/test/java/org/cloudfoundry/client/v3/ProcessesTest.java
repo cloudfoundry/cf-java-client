@@ -16,6 +16,11 @@
 
 package org.cloudfoundry.client.v3;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.time.Duration;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.CloudFoundryVersion;
 import org.cloudfoundry.IfCloudFoundryVersion;
@@ -41,195 +46,230 @@ import org.cloudfoundry.operations.applications.ApplicationHealthCheck;
 import org.cloudfoundry.operations.applications.GetApplicationRequest;
 import org.cloudfoundry.operations.applications.PushApplicationRequest;
 import org.cloudfoundry.util.PaginationUtils;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.time.Duration;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_0)
 public final class ProcessesTest extends AbstractIntegrationTest {
 
-    @Autowired
-    private CloudFoundryClient cloudFoundryClient;
+    @Autowired private CloudFoundryClient cloudFoundryClient;
 
-    @Autowired
-    private CloudFoundryOperations cloudFoundryOperations;
+    @Autowired private CloudFoundryOperations cloudFoundryOperations;
 
     @Test
     public void get() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
-        Path path =  new ClassPathResource("test-application.zip").getFile().toPath();
+        Path path = new ClassPathResource("test-application.zip").getFile().toPath();
 
         createApplication(this.cloudFoundryOperations, applicationName, path)
-            .then(getApplicationId(this.cloudFoundryOperations, applicationName))
-            .flatMap(applicationId -> getProcessId(this.cloudFoundryClient, applicationId))
-            .flatMap(processId -> this.cloudFoundryClient.processes()
-                .get(GetProcessRequest.builder()
-                    .processId(processId)
-                    .build()))
-            .map(GetProcessResponse::getDiskInMb)
-            .as(StepVerifier::create)
-            .expectNext(258)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .then(getApplicationId(this.cloudFoundryOperations, applicationName))
+                .flatMap(applicationId -> getProcessId(this.cloudFoundryClient, applicationId))
+                .flatMap(
+                        processId ->
+                                this.cloudFoundryClient
+                                        .processes()
+                                        .get(
+                                                GetProcessRequest.builder()
+                                                        .processId(processId)
+                                                        .build()))
+                .map(GetProcessResponse::getDiskInMb)
+                .as(StepVerifier::create)
+                .expectNext(258)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void getStatistics() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
-        Path path =  new ClassPathResource("test-application.zip").getFile().toPath();
+        Path path = new ClassPathResource("test-application.zip").getFile().toPath();
 
         createApplication(this.cloudFoundryOperations, applicationName, path)
-            .then(getApplicationId(this.cloudFoundryOperations, applicationName))
-            .flatMap(applicationId -> getProcessId(this.cloudFoundryClient, applicationId))
-            .flatMap(processId -> this.cloudFoundryClient.processes()
-                .getStatistics(GetProcessStatisticsRequest.builder()
-                    .processId(processId)
-                    .build()))
-            .flatMapIterable(GetProcessStatisticsResponse::getResources)
-            .map(ProcessStatisticsResource::getType)
-            .as(StepVerifier::create)
-            .expectNext("web")
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .then(getApplicationId(this.cloudFoundryOperations, applicationName))
+                .flatMap(applicationId -> getProcessId(this.cloudFoundryClient, applicationId))
+                .flatMap(
+                        processId ->
+                                this.cloudFoundryClient
+                                        .processes()
+                                        .getStatistics(
+                                                GetProcessStatisticsRequest.builder()
+                                                        .processId(processId)
+                                                        .build()))
+                .flatMapIterable(GetProcessStatisticsResponse::getResources)
+                .map(ProcessStatisticsResource::getType)
+                .as(StepVerifier::create)
+                .expectNext("web")
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void list() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
-        Path path =  new ClassPathResource("test-application.zip").getFile().toPath();
+        Path path = new ClassPathResource("test-application.zip").getFile().toPath();
 
         createApplication(this.cloudFoundryOperations, applicationName, path)
-            .then(getApplicationId(this.cloudFoundryOperations, applicationName))
-            .flatMap(applicationId -> getProcessId(this.cloudFoundryClient, applicationId))
-            .flatMapMany(processId -> PaginationUtils.requestClientV3Resources(page -> this.cloudFoundryClient.processes()
-                .list(ListProcessesRequest.builder()
-                    .page(page)
-                    .processId(processId)
-                    .build())))
-            .map(ProcessResource::getDiskInMb)
-            .as(StepVerifier::create)
-            .expectNext(258)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .then(getApplicationId(this.cloudFoundryOperations, applicationName))
+                .flatMap(applicationId -> getProcessId(this.cloudFoundryClient, applicationId))
+                .flatMapMany(
+                        processId ->
+                                PaginationUtils.requestClientV3Resources(
+                                        page ->
+                                                this.cloudFoundryClient
+                                                        .processes()
+                                                        .list(
+                                                                ListProcessesRequest.builder()
+                                                                        .page(page)
+                                                                        .processId(processId)
+                                                                        .build())))
+                .map(ProcessResource::getDiskInMb)
+                .as(StepVerifier::create)
+                .expectNext(258)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void scale() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
-        Path path =  new ClassPathResource("test-application.zip").getFile().toPath();
+        Path path = new ClassPathResource("test-application.zip").getFile().toPath();
 
         createApplication(this.cloudFoundryOperations, applicationName, path)
-            .then(getApplicationId(this.cloudFoundryOperations, applicationName))
-            .flatMap(applicationId -> getProcessId(this.cloudFoundryClient, applicationId))
-            .flatMap(processId -> this.cloudFoundryClient.processes()
-                .scale(ScaleProcessRequest.builder()
-                    .diskInMb(259)
-                    .processId(processId)
-                    .build())
-                .then(Mono.just(processId)))
-            .flatMap(processId -> requestGetProcess(this.cloudFoundryClient, processId))
-            .map(GetProcessResponse::getDiskInMb)
-            .as(StepVerifier::create)
-            .expectNext(259)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .then(getApplicationId(this.cloudFoundryOperations, applicationName))
+                .flatMap(applicationId -> getProcessId(this.cloudFoundryClient, applicationId))
+                .flatMap(
+                        processId ->
+                                this.cloudFoundryClient
+                                        .processes()
+                                        .scale(
+                                                ScaleProcessRequest.builder()
+                                                        .diskInMb(259)
+                                                        .processId(processId)
+                                                        .build())
+                                        .then(Mono.just(processId)))
+                .flatMap(processId -> requestGetProcess(this.cloudFoundryClient, processId))
+                .map(GetProcessResponse::getDiskInMb)
+                .as(StepVerifier::create)
+                .expectNext(259)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void terminateInstance() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
-        Path path =  new ClassPathResource("test-application.zip").getFile().toPath();
+        Path path = new ClassPathResource("test-application.zip").getFile().toPath();
 
         createApplication(this.cloudFoundryOperations, applicationName, path)
-            .then(getApplicationId(this.cloudFoundryOperations, applicationName))
-            .flatMap(applicationId -> getProcessId(this.cloudFoundryClient, applicationId))
-            .flatMap(processId -> this.cloudFoundryClient.processes()
-                .terminateInstance(TerminateProcessInstanceRequest.builder()
-                    .index("1")
-                    .processId(processId)
-                    .build())
-                .then(Mono.just(processId)))
-            .flatMap(processId -> requestGetProcess(this.cloudFoundryClient, processId))
-            .as(StepVerifier::create)
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(ClientV3Exception.class).hasMessageMatching("CF-ResourceNotFound\\([0-9]+\\): Instance not found"))
-            .verify(Duration.ofMinutes(5));
+                .then(getApplicationId(this.cloudFoundryOperations, applicationName))
+                .flatMap(applicationId -> getProcessId(this.cloudFoundryClient, applicationId))
+                .flatMap(
+                        processId ->
+                                this.cloudFoundryClient
+                                        .processes()
+                                        .terminateInstance(
+                                                TerminateProcessInstanceRequest.builder()
+                                                        .index("1")
+                                                        .processId(processId)
+                                                        .build())
+                                        .then(Mono.just(processId)))
+                .flatMap(processId -> requestGetProcess(this.cloudFoundryClient, processId))
+                .as(StepVerifier::create)
+                .consumeErrorWith(
+                        t ->
+                                assertThat(t)
+                                        .isInstanceOf(ClientV3Exception.class)
+                                        .hasMessageMatching(
+                                                "CF-ResourceNotFound\\([0-9]+\\): Instance not"
+                                                        + " found"))
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void update() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
-        Path path =  new ClassPathResource("test-application.zip").getFile().toPath();
+        Path path = new ClassPathResource("test-application.zip").getFile().toPath();
 
         createApplication(this.cloudFoundryOperations, applicationName, path)
-            .then(getApplicationId(this.cloudFoundryOperations, applicationName))
-            .flatMap(applicationId -> getProcessId(this.cloudFoundryClient, applicationId))
-            .flatMap(processId -> this.cloudFoundryClient.processes()
-                .update(UpdateProcessRequest.builder()
-                    .healthCheck(HealthCheck.builder()
-                        .type(HealthCheckType.PROCESS)
-                        .build())
-                    .processId(processId)
-                    .build())
-                .then(Mono.just(processId)))
-            .flatMap(processId -> requestGetProcess(this.cloudFoundryClient, processId))
-            .map(GetProcessResponse::getHealthCheck)
-            .map(HealthCheck::getType)
-            .as(StepVerifier::create)
-            .expectNext(HealthCheckType.PROCESS)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .then(getApplicationId(this.cloudFoundryOperations, applicationName))
+                .flatMap(applicationId -> getProcessId(this.cloudFoundryClient, applicationId))
+                .flatMap(
+                        processId ->
+                                this.cloudFoundryClient
+                                        .processes()
+                                        .update(
+                                                UpdateProcessRequest.builder()
+                                                        .healthCheck(
+                                                                HealthCheck.builder()
+                                                                        .type(
+                                                                                HealthCheckType
+                                                                                        .PROCESS)
+                                                                        .build())
+                                                        .processId(processId)
+                                                        .build())
+                                        .then(Mono.just(processId)))
+                .flatMap(processId -> requestGetProcess(this.cloudFoundryClient, processId))
+                .map(GetProcessResponse::getHealthCheck)
+                .map(HealthCheck::getType)
+                .as(StepVerifier::create)
+                .expectNext(HealthCheckType.PROCESS)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
-    private static Mono<Void> createApplication(CloudFoundryOperations cloudFoundryOperations, String name, Path path) throws IOException {
-        return cloudFoundryOperations.applications()
-            .push(PushApplicationRequest.builder()
-                .buildpack("staticfile_buildpack")
-                .diskQuota(258)
-                .healthCheckType(ApplicationHealthCheck.PORT)
-                .memory(64)
-                .name(name)
-                .path(path)
-                .noStart(false)
-                .build());
+    private static Mono<Void> createApplication(
+            CloudFoundryOperations cloudFoundryOperations, String name, Path path)
+            throws IOException {
+        return cloudFoundryOperations
+                .applications()
+                .push(
+                        PushApplicationRequest.builder()
+                                .buildpack("staticfile_buildpack")
+                                .diskQuota(258)
+                                .healthCheckType(ApplicationHealthCheck.PORT)
+                                .memory(64)
+                                .name(name)
+                                .path(path)
+                                .noStart(false)
+                                .build());
     }
 
-    private static Mono<String> getApplicationId(CloudFoundryOperations cloudFoundryOperations, String applicationName) {
+    private static Mono<String> getApplicationId(
+            CloudFoundryOperations cloudFoundryOperations, String applicationName) {
         return requestGetApplication(cloudFoundryOperations, applicationName)
-            .map(ApplicationDetail::getId);
+                .map(ApplicationDetail::getId);
     }
 
-    private static Mono<String> getProcessId(CloudFoundryClient cloudFoundryClient, String applicationId) {
-        return requestGetApplicationProcess(cloudFoundryClient, applicationId)
-            .map(Process::getId);
+    private static Mono<String> getProcessId(
+            CloudFoundryClient cloudFoundryClient, String applicationId) {
+        return requestGetApplicationProcess(cloudFoundryClient, applicationId).map(Process::getId);
     }
 
-    private static Mono<ApplicationDetail> requestGetApplication(CloudFoundryOperations cloudFoundryOperations, String applicationName) {
-        return cloudFoundryOperations.applications()
-            .get(GetApplicationRequest.builder()
-                .name(applicationName)
-                .build());
+    private static Mono<ApplicationDetail> requestGetApplication(
+            CloudFoundryOperations cloudFoundryOperations, String applicationName) {
+        return cloudFoundryOperations
+                .applications()
+                .get(GetApplicationRequest.builder().name(applicationName).build());
     }
 
-    private static Mono<GetApplicationProcessResponse> requestGetApplicationProcess(CloudFoundryClient cloudFoundryClient, String applicationId) {
-        return cloudFoundryClient.applicationsV3()
-            .getProcess(GetApplicationProcessRequest.builder()
-                .applicationId(applicationId)
-                .type("web")
-                .build());
+    private static Mono<GetApplicationProcessResponse> requestGetApplicationProcess(
+            CloudFoundryClient cloudFoundryClient, String applicationId) {
+        return cloudFoundryClient
+                .applicationsV3()
+                .getProcess(
+                        GetApplicationProcessRequest.builder()
+                                .applicationId(applicationId)
+                                .type("web")
+                                .build());
     }
 
-    private static Mono<GetProcessResponse> requestGetProcess(CloudFoundryClient cloudFoundryClient, String processId) {
-        return cloudFoundryClient.processes()
-            .get(GetProcessRequest.builder()
-                .processId(processId)
-                .build());
+    private static Mono<GetProcessResponse> requestGetProcess(
+            CloudFoundryClient cloudFoundryClient, String processId) {
+        return cloudFoundryClient
+                .processes()
+                .get(GetProcessRequest.builder().processId(processId).build());
     }
-
 }

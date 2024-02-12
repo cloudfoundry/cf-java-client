@@ -16,95 +16,112 @@
 
 package org.cloudfoundry.uaa;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.time.Duration;
+import java.util.function.Consumer;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.uaa.serverinformation.AutoLoginRequest;
 import org.cloudfoundry.uaa.serverinformation.GetAutoLoginAuthenticationCodeRequest;
 import org.cloudfoundry.uaa.serverinformation.GetAutoLoginAuthenticationCodeResponse;
 import org.cloudfoundry.uaa.serverinformation.GetInfoRequest;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.time.Duration;
-import java.util.function.Consumer;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 public final class ServerInformationTest extends AbstractIntegrationTest {
 
-    @Autowired
-    private String clientId;
+    @Autowired private String clientId;
 
-    @Autowired
-    private String clientSecret;
+    @Autowired private String clientSecret;
 
-    @Autowired
-    private String password;
+    @Autowired private String password;
 
-    @Autowired
-    private UaaClient uaaClient;
+    @Autowired private UaaClient uaaClient;
 
-    @Autowired
-    private String username;
+    @Autowired private String username;
 
     @Test
     public void autoLogin() {
-        getAuthenticationCode(this.uaaClient, this.clientId, this.clientSecret, this.password, this.username)
-            .flatMap(code -> this.uaaClient.serverInformation()
-                .autoLogin(AutoLoginRequest.builder()
-                    .clientId(this.clientId)
-                    .code(code)
-                    .build()))
-            .as(StepVerifier::create)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        getAuthenticationCode(
+                        this.uaaClient,
+                        this.clientId,
+                        this.clientSecret,
+                        this.password,
+                        this.username)
+                .flatMap(
+                        code ->
+                                this.uaaClient
+                                        .serverInformation()
+                                        .autoLogin(
+                                                AutoLoginRequest.builder()
+                                                        .clientId(this.clientId)
+                                                        .code(code)
+                                                        .build()))
+                .as(StepVerifier::create)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void getAutoLoginAuthenticationCode() {
-        this.uaaClient.serverInformation()
-            .getAuthenticationCode(GetAutoLoginAuthenticationCodeRequest.builder()
-                .clientId(this.clientId)
-                .clientSecret(this.clientSecret)
-                .password(this.password)
-                .username(this.username)
-                .build())
-            .map(GetAutoLoginAuthenticationCodeResponse::getPath)
-            .as(StepVerifier::create)
-            .expectNext("/oauth/authorize")
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        this.uaaClient
+                .serverInformation()
+                .getAuthenticationCode(
+                        GetAutoLoginAuthenticationCodeRequest.builder()
+                                .clientId(this.clientId)
+                                .clientSecret(this.clientSecret)
+                                .password(this.password)
+                                .username(this.username)
+                                .build())
+                .map(GetAutoLoginAuthenticationCodeResponse::getPath)
+                .as(StepVerifier::create)
+                .expectNext("/oauth/authorize")
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void getInfo() {
-        this.uaaClient.serverInformation()
-            .getInfo(GetInfoRequest.builder()
-                .build())
-            .map(response -> response.getLinks().getPassword())
-            .as(StepVerifier::create)
-            .consumeNextWith(endsWithExpectation("password"))
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        this.uaaClient
+                .serverInformation()
+                .getInfo(GetInfoRequest.builder().build())
+                .map(response -> response.getLinks().getPassword())
+                .as(StepVerifier::create)
+                .consumeNextWith(endsWithExpectation("password"))
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     private static Consumer<String> endsWithExpectation(String suffix) {
         return actual -> assertThat(actual).endsWith(suffix);
     }
 
-    private static Mono<String> getAuthenticationCode(UaaClient uaaClient, String clientId, String clientSecret, String password, String username) {
+    private static Mono<String> getAuthenticationCode(
+            UaaClient uaaClient,
+            String clientId,
+            String clientSecret,
+            String password,
+            String username) {
         return requestAuthenticationCode(uaaClient, clientId, clientSecret, password, username)
-            .map(GetAutoLoginAuthenticationCodeResponse::getCode);
+                .map(GetAutoLoginAuthenticationCodeResponse::getCode);
     }
 
-    private static Mono<GetAutoLoginAuthenticationCodeResponse> requestAuthenticationCode(UaaClient uaaClient, String clientId, String clientSecret, String password, String username) {
-        return uaaClient.serverInformation()
-            .getAuthenticationCode(GetAutoLoginAuthenticationCodeRequest.builder()
-                .clientId(clientId)
-                .clientSecret(clientSecret)
-                .password(password)
-                .username(username)
-                .build());
+    private static Mono<GetAutoLoginAuthenticationCodeResponse> requestAuthenticationCode(
+            UaaClient uaaClient,
+            String clientId,
+            String clientSecret,
+            String password,
+            String username) {
+        return uaaClient
+                .serverInformation()
+                .getAuthenticationCode(
+                        GetAutoLoginAuthenticationCodeRequest.builder()
+                                .clientId(clientId)
+                                .clientSecret(clientSecret)
+                                .password(password)
+                                .username(username)
+                                .build());
     }
-
 }

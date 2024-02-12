@@ -16,63 +16,68 @@
 
 package org.cloudfoundry.operations;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.IOException;
+import java.time.Duration;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.operations.buildpacks.Buildpack;
 import org.cloudfoundry.operations.buildpacks.CreateBuildpackRequest;
 import org.cloudfoundry.operations.buildpacks.DeleteBuildpackRequest;
 import org.cloudfoundry.operations.buildpacks.UpdateBuildpackRequest;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.io.IOException;
-import java.time.Duration;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 public final class BuildpacksTest extends AbstractIntegrationTest {
 
-    @Autowired
-    private CloudFoundryOperations cloudFoundryOperations;
+    @Autowired private CloudFoundryOperations cloudFoundryOperations;
 
     @Test
     public void create() throws IOException {
         String buildpackName = this.nameFactory.getBuildpackName();
 
-        this.cloudFoundryOperations.buildpacks()
-            .create(CreateBuildpackRequest.builder()
-                .buildpack(new ClassPathResource("test-buildpack.zip").getFile().toPath())
-                .name(buildpackName)
-                .position(Integer.MAX_VALUE)
-                .build())
-            .thenMany(this.cloudFoundryOperations.buildpacks()
-                .list())
-            .filter(buildpack -> buildpackName.equals(buildpack.getName()))
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        this.cloudFoundryOperations
+                .buildpacks()
+                .create(
+                        CreateBuildpackRequest.builder()
+                                .buildpack(
+                                        new ClassPathResource("test-buildpack.zip")
+                                                .getFile()
+                                                .toPath())
+                                .name(buildpackName)
+                                .position(Integer.MAX_VALUE)
+                                .build())
+                .thenMany(this.cloudFoundryOperations.buildpacks().list())
+                .filter(buildpack -> buildpackName.equals(buildpack.getName()))
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void createFromDirectory() throws IOException {
         String buildpackName = this.nameFactory.getBuildpackName();
 
-        this.cloudFoundryOperations.buildpacks()
-            .create(CreateBuildpackRequest.builder()
-                .buildpack(new ClassPathResource("test-buildpack").getFile().toPath())
-                .name(buildpackName)
-                .position(Integer.MAX_VALUE)
-                .build())
-            .thenMany(this.cloudFoundryOperations.buildpacks()
-                .list())
-            .filter(buildpack -> buildpackName.equals(buildpack.getName()))
-            .map(Buildpack::getFilename)
-            .as(StepVerifier::create)
-            .expectNext("test-buildpack.zip")
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        this.cloudFoundryOperations
+                .buildpacks()
+                .create(
+                        CreateBuildpackRequest.builder()
+                                .buildpack(
+                                        new ClassPathResource("test-buildpack").getFile().toPath())
+                                .name(buildpackName)
+                                .position(Integer.MAX_VALUE)
+                                .build())
+                .thenMany(this.cloudFoundryOperations.buildpacks().list())
+                .filter(buildpack -> buildpackName.equals(buildpack.getName()))
+                .map(Buildpack::getFilename)
+                .as(StepVerifier::create)
+                .expectNext("test-buildpack.zip")
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -80,29 +85,34 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
         String buildpackName = this.nameFactory.getBuildpackName();
 
         createBuildpack(this.cloudFoundryOperations, buildpackName)
-            .then(this.cloudFoundryOperations.buildpacks()
-                .delete(DeleteBuildpackRequest.builder()
-                    .name(buildpackName)
-                    .build()))
-            .thenMany(this.cloudFoundryOperations.buildpacks()
-                .list())
-            .filter(buildpack -> buildpackName.equals(buildpack.getName()))
-            .as(StepVerifier::create)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .then(
+                        this.cloudFoundryOperations
+                                .buildpacks()
+                                .delete(
+                                        DeleteBuildpackRequest.builder()
+                                                .name(buildpackName)
+                                                .build()))
+                .thenMany(this.cloudFoundryOperations.buildpacks().list())
+                .filter(buildpack -> buildpackName.equals(buildpack.getName()))
+                .as(StepVerifier::create)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void deleteBuildpackNotFound() {
         String buildpackName = this.nameFactory.getBuildpackName();
 
-        this.cloudFoundryOperations.buildpacks()
-            .delete(DeleteBuildpackRequest.builder()
-                .name(buildpackName)
-                .build())
-            .as(StepVerifier::create)
-            .consumeErrorWith(t -> assertThat(t).isInstanceOf(IllegalArgumentException.class).hasMessage("Buildpack %s not found", buildpackName))
-            .verify(Duration.ofMinutes(5));
+        this.cloudFoundryOperations
+                .buildpacks()
+                .delete(DeleteBuildpackRequest.builder().name(buildpackName).build())
+                .as(StepVerifier::create)
+                .consumeErrorWith(
+                        t ->
+                                assertThat(t)
+                                        .isInstanceOf(IllegalArgumentException.class)
+                                        .hasMessage("Buildpack %s not found", buildpackName))
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -110,14 +120,13 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
         String buildpackName = this.nameFactory.getBuildpackName();
 
         createBuildpack(this.cloudFoundryOperations, buildpackName)
-            .thenMany(this.cloudFoundryOperations.buildpacks()
-                .list())
-            .filter(buildpack -> buildpackName.equals(buildpack.getName()))
-            .map(Buildpack::getFilename)
-            .as(StepVerifier::create)
-            .expectNext("test-buildpack.zip")
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .thenMany(this.cloudFoundryOperations.buildpacks().list())
+                .filter(buildpack -> buildpackName.equals(buildpack.getName()))
+                .map(Buildpack::getFilename)
+                .as(StepVerifier::create)
+                .expectNext("test-buildpack.zip")
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -125,19 +134,21 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
         String buildpackName = this.nameFactory.getBuildpackName();
 
         createBuildpack(this.cloudFoundryOperations, buildpackName)
-            .then(this.cloudFoundryOperations.buildpacks()
-                .update(UpdateBuildpackRequest.builder()
-                    .enable(true)
-                    .name(buildpackName)
-                    .build()))
-            .thenMany(this.cloudFoundryOperations.buildpacks()
-                .list())
-            .filter(buildpack -> buildpackName.equals(buildpack.getName()))
-            .map(Buildpack::getEnabled)
-            .as(StepVerifier::create)
-            .expectNext(true)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .then(
+                        this.cloudFoundryOperations
+                                .buildpacks()
+                                .update(
+                                        UpdateBuildpackRequest.builder()
+                                                .enable(true)
+                                                .name(buildpackName)
+                                                .build()))
+                .thenMany(this.cloudFoundryOperations.buildpacks().list())
+                .filter(buildpack -> buildpackName.equals(buildpack.getName()))
+                .map(Buildpack::getEnabled)
+                .as(StepVerifier::create)
+                .expectNext(true)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -145,30 +156,41 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
         String buildpackName = this.nameFactory.getBuildpackName();
 
         createBuildpack(this.cloudFoundryOperations, buildpackName)
-            .then(this.cloudFoundryOperations.buildpacks()
-                .update(UpdateBuildpackRequest.builder()
-                    .buildpack(new ClassPathResource("test-buildpack").getFile().toPath())
-                    .enable(true)
-                    .name(buildpackName)
-                    .build()))
-            .thenMany(this.cloudFoundryOperations.buildpacks()
-                .list())
-            .filter(buildpack -> buildpackName.equals(buildpack.getName()))
-            .map(Buildpack::getFilename)
-            .as(StepVerifier::create)
-            .expectNext("test-buildpack.zip")
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .then(
+                        this.cloudFoundryOperations
+                                .buildpacks()
+                                .update(
+                                        UpdateBuildpackRequest.builder()
+                                                .buildpack(
+                                                        new ClassPathResource("test-buildpack")
+                                                                .getFile()
+                                                                .toPath())
+                                                .enable(true)
+                                                .name(buildpackName)
+                                                .build()))
+                .thenMany(this.cloudFoundryOperations.buildpacks().list())
+                .filter(buildpack -> buildpackName.equals(buildpack.getName()))
+                .map(Buildpack::getFilename)
+                .as(StepVerifier::create)
+                .expectNext("test-buildpack.zip")
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
-    private static Mono<Void> createBuildpack(CloudFoundryOperations cloudFoundryOperations, String buildpackName) throws IOException {
-        return cloudFoundryOperations.buildpacks()
-            .create(CreateBuildpackRequest.builder()
-                .buildpack(new ClassPathResource("test-buildpack.zip").getFile().toPath())
-                .enable(false)
-                .name(buildpackName)
-                .position(Integer.MAX_VALUE)
-                .build());
+    private static Mono<Void> createBuildpack(
+            CloudFoundryOperations cloudFoundryOperations, String buildpackName)
+            throws IOException {
+        return cloudFoundryOperations
+                .buildpacks()
+                .create(
+                        CreateBuildpackRequest.builder()
+                                .buildpack(
+                                        new ClassPathResource("test-buildpack.zip")
+                                                .getFile()
+                                                .toPath())
+                                .enable(false)
+                                .name(buildpackName)
+                                .position(Integer.MAX_VALUE)
+                                .build());
     }
-
 }

@@ -16,6 +16,8 @@
 
 package org.cloudfoundry.client.v2;
 
+import java.time.Duration;
+import java.util.Optional;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainRequest;
@@ -29,34 +31,32 @@ import org.cloudfoundry.client.v2.shareddomains.SharedDomainResource;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.time.Duration;
-import java.util.Optional;
-
 public final class SharedDomainsTest extends AbstractIntegrationTest {
 
-    @Autowired
-    private CloudFoundryClient cloudFoundryClient;
+    @Autowired private CloudFoundryClient cloudFoundryClient;
 
     @Test
     public void create() {
         String domainName = this.nameFactory.getDomainName();
 
-        this.cloudFoundryClient.sharedDomains()
-            .create(CreateSharedDomainRequest.builder()
-                .name(domainName)
-                .build())
-            .map(ResourceUtils::getId)
-            .flatMap(sharedDomainId -> getSharedDomainResource(this.cloudFoundryClient, sharedDomainId))
-            .map(resource -> ResourceUtils.getEntity(resource).getName())
-            .as(StepVerifier::create)
-            .expectNext(domainName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        this.cloudFoundryClient
+                .sharedDomains()
+                .create(CreateSharedDomainRequest.builder().name(domainName).build())
+                .map(ResourceUtils::getId)
+                .flatMap(
+                        sharedDomainId ->
+                                getSharedDomainResource(this.cloudFoundryClient, sharedDomainId))
+                .map(resource -> ResourceUtils.getEntity(resource).getName())
+                .as(StepVerifier::create)
+                .expectNext(domainName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -64,16 +64,19 @@ public final class SharedDomainsTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
 
         getSharedDomainId(this.cloudFoundryClient, domainName)
-            .flatMap(sharedDomainId -> this.cloudFoundryClient.sharedDomains()
-                .delete(DeleteSharedDomainRequest.builder()
-                    .async(false)
-                    .sharedDomainId(sharedDomainId)
-                    .build()))
-            .then(requestListSharedDomains(this.cloudFoundryClient, domainName)
-                .singleOrEmpty())
-            .as(StepVerifier::create)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        sharedDomainId ->
+                                this.cloudFoundryClient
+                                        .sharedDomains()
+                                        .delete(
+                                                DeleteSharedDomainRequest.builder()
+                                                        .async(false)
+                                                        .sharedDomainId(sharedDomainId)
+                                                        .build()))
+                .then(requestListSharedDomains(this.cloudFoundryClient, domainName).singleOrEmpty())
+                .as(StepVerifier::create)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -81,17 +84,25 @@ public final class SharedDomainsTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
 
         getSharedDomainId(this.cloudFoundryClient, domainName)
-            .flatMap(sharedDomainId -> this.cloudFoundryClient.sharedDomains()
-                .delete(DeleteSharedDomainRequest.builder()
-                    .async(true)
-                    .sharedDomainId(sharedDomainId)
-                    .build())
-                .flatMap(job -> JobUtils.waitForCompletion(this.cloudFoundryClient, Duration.ofMinutes(5), job)))
-            .then(requestListSharedDomains(this.cloudFoundryClient, domainName)
-                .singleOrEmpty())
-            .as(StepVerifier::create)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        sharedDomainId ->
+                                this.cloudFoundryClient
+                                        .sharedDomains()
+                                        .delete(
+                                                DeleteSharedDomainRequest.builder()
+                                                        .async(true)
+                                                        .sharedDomainId(sharedDomainId)
+                                                        .build())
+                                        .flatMap(
+                                                job ->
+                                                        JobUtils.waitForCompletion(
+                                                                this.cloudFoundryClient,
+                                                                Duration.ofMinutes(5),
+                                                                job)))
+                .then(requestListSharedDomains(this.cloudFoundryClient, domainName).singleOrEmpty())
+                .as(StepVerifier::create)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -99,16 +110,20 @@ public final class SharedDomainsTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
 
         getSharedDomainId(this.cloudFoundryClient, domainName)
-            .flatMap(sharedDomainId -> this.cloudFoundryClient.sharedDomains()
-                .get(GetSharedDomainRequest.builder()
-                    .sharedDomainId(sharedDomainId)
-                    .build()))
-            .map(ResourceUtils::getEntity)
-            .map(SharedDomainEntity::getName)
-            .as(StepVerifier::create)
-            .expectNext(domainName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        sharedDomainId ->
+                                this.cloudFoundryClient
+                                        .sharedDomains()
+                                        .get(
+                                                GetSharedDomainRequest.builder()
+                                                        .sharedDomainId(sharedDomainId)
+                                                        .build()))
+                .map(ResourceUtils::getEntity)
+                .map(SharedDomainEntity::getName)
+                .as(StepVerifier::create)
+                .expectNext(domainName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -116,14 +131,19 @@ public final class SharedDomainsTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
 
         getSharedDomainId(this.cloudFoundryClient, domainName)
-            .flatMap(sharedDomainId -> requestListSharedDomains(this.cloudFoundryClient, null)
-                .filter(resource -> sharedDomainId.equals(ResourceUtils.getId(resource)))
-                .single())
-            .map(resource -> ResourceUtils.getEntity(resource).getName())
-            .as(StepVerifier::create)
-            .expectNext(domainName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        sharedDomainId ->
+                                requestListSharedDomains(this.cloudFoundryClient, null)
+                                        .filter(
+                                                resource ->
+                                                        sharedDomainId.equals(
+                                                                ResourceUtils.getId(resource)))
+                                        .single())
+                .map(resource -> ResourceUtils.getEntity(resource).getName())
+                .as(StepVerifier::create)
+                .expectNext(domainName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
@@ -131,45 +151,45 @@ public final class SharedDomainsTest extends AbstractIntegrationTest {
         String domainName = this.nameFactory.getDomainName();
 
         getSharedDomainId(this.cloudFoundryClient, domainName)
-            .flatMap(sharedDomainId -> Mono.zip(
-                Mono.just(sharedDomainId),
-                requestListSharedDomains(this.cloudFoundryClient, domainName)
-                    .single()
-                    .map(ResourceUtils::getId)
-            ))
-            .as(StepVerifier::create)
-            .consumeNextWith(tupleEquality())
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .flatMap(
+                        sharedDomainId ->
+                                Mono.zip(
+                                        Mono.just(sharedDomainId),
+                                        requestListSharedDomains(
+                                                        this.cloudFoundryClient, domainName)
+                                                .single()
+                                                .map(ResourceUtils::getId)))
+                .as(StepVerifier::create)
+                .consumeNextWith(tupleEquality())
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
-    private static Mono<String> getSharedDomainId(CloudFoundryClient cloudFoundryClient, String domainName) {
-        return requestCreateSharedDomain(cloudFoundryClient, domainName)
-            .map(ResourceUtils::getId);
+    private static Mono<String> getSharedDomainId(
+            CloudFoundryClient cloudFoundryClient, String domainName) {
+        return requestCreateSharedDomain(cloudFoundryClient, domainName).map(ResourceUtils::getId);
     }
 
-    private static Mono<GetSharedDomainResponse> getSharedDomainResource(CloudFoundryClient cloudFoundryClient, String sharedDomainId) {
-        return cloudFoundryClient.sharedDomains()
-            .get(GetSharedDomainRequest.builder()
-                .sharedDomainId(sharedDomainId)
-                .build());
+    private static Mono<GetSharedDomainResponse> getSharedDomainResource(
+            CloudFoundryClient cloudFoundryClient, String sharedDomainId) {
+        return cloudFoundryClient
+                .sharedDomains()
+                .get(GetSharedDomainRequest.builder().sharedDomainId(sharedDomainId).build());
     }
 
-    private static Mono<CreateSharedDomainResponse> requestCreateSharedDomain(CloudFoundryClient cloudFoundryClient, String sharedDomainName) {
-        return cloudFoundryClient.sharedDomains()
-            .create(CreateSharedDomainRequest.builder()
-                .name(sharedDomainName)
-                .build());
+    private static Mono<CreateSharedDomainResponse> requestCreateSharedDomain(
+            CloudFoundryClient cloudFoundryClient, String sharedDomainName) {
+        return cloudFoundryClient
+                .sharedDomains()
+                .create(CreateSharedDomainRequest.builder().name(sharedDomainName).build());
     }
 
-    private static Flux<SharedDomainResource> requestListSharedDomains(CloudFoundryClient cloudFoundryClient, String sharedDomainName) {
+    private static Flux<SharedDomainResource> requestListSharedDomains(
+            CloudFoundryClient cloudFoundryClient, String sharedDomainName) {
         ListSharedDomainsRequest.Builder requestBuilder = ListSharedDomainsRequest.builder();
         Optional.ofNullable(sharedDomainName).ifPresent(requestBuilder::name);
 
-        return PaginationUtils.requestClientV2Resources(page -> cloudFoundryClient.sharedDomains()
-            .list(requestBuilder
-                .page(page)
-                .build()));
+        return PaginationUtils.requestClientV2Resources(
+                page -> cloudFoundryClient.sharedDomains().list(requestBuilder.page(page).build()));
     }
-
 }

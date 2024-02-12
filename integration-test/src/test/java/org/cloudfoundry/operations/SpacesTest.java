@@ -16,72 +16,73 @@
 
 package org.cloudfoundry.operations;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.time.Duration;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.operations.spaces.CreateSpaceRequest;
 import org.cloudfoundry.operations.spaces.GetSpaceRequest;
 import org.cloudfoundry.operations.spaces.SpaceDetail;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.test.StepVerifier;
 
-import java.time.Duration;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 public final class SpacesTest extends AbstractIntegrationTest {
 
-    @Autowired
-    private CloudFoundryOperations cloudFoundryOperations;
+    @Autowired private CloudFoundryOperations cloudFoundryOperations;
 
-    @Autowired
-    private String organizationName;
+    @Autowired private String organizationName;
 
     @Test
     public void create() {
         String spaceName = this.nameFactory.getSpaceName();
 
-        this.cloudFoundryOperations.spaces()
-            .create(CreateSpaceRequest.builder()
-                .name(spaceName)
-                .organization(this.organizationName)
-                .build())
-            .thenMany(this.cloudFoundryOperations.spaces()
-                .list())
-            .filter(spaceSummary -> spaceName.equals(spaceSummary.getName()))
-            .as(StepVerifier::create)
-            .expectNextCount(1)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        this.cloudFoundryOperations
+                .spaces()
+                .create(
+                        CreateSpaceRequest.builder()
+                                .name(spaceName)
+                                .organization(this.organizationName)
+                                .build())
+                .thenMany(this.cloudFoundryOperations.spaces().list())
+                .filter(spaceSummary -> spaceName.equals(spaceSummary.getName()))
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void getWithURLReservedCharacterInName() {
         String spaceName = this.nameFactory.getSpaceName() + "+test";
 
-        this.cloudFoundryOperations.spaces()
-            .create(CreateSpaceRequest.builder()
-                .name(spaceName)
-                .organization(this.organizationName)
-                .build())
-            .then(this.cloudFoundryOperations.spaces()
-                .get(GetSpaceRequest.builder()
-                    .name(spaceName)
-                    .build()))
-            .map(SpaceDetail::getName)
-            .as(StepVerifier::create)
-            .expectNext(spaceName)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        this.cloudFoundryOperations
+                .spaces()
+                .create(
+                        CreateSpaceRequest.builder()
+                                .name(spaceName)
+                                .organization(this.organizationName)
+                                .build())
+                .then(
+                        this.cloudFoundryOperations
+                                .spaces()
+                                .get(GetSpaceRequest.builder().name(spaceName).build()))
+                .map(SpaceDetail::getName)
+                .as(StepVerifier::create)
+                .expectNext(spaceName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     @Test
     public void list() {
-        this.cloudFoundryOperations.spaces()
-            .list()
-            .count()
-            .as(StepVerifier::create)
-            .consumeNextWith(count -> assertThat(count).isGreaterThan(0))
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+        this.cloudFoundryOperations
+                .spaces()
+                .list()
+                .count()
+                .as(StepVerifier::create)
+                .consumeNextWith(count -> assertThat(count).isGreaterThan(0))
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
-
 }
