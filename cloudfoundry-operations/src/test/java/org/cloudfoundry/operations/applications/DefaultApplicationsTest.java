@@ -1491,14 +1491,11 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
 
         this.applications
@@ -1544,14 +1541,11 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestCreateRoute(
                 this.cloudFoundryClient,
@@ -1615,14 +1609,11 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestCreateRoute(
                 this.cloudFoundryClient,
@@ -1688,14 +1679,11 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestCreateRoute(
                 this.cloudFoundryClient,
@@ -1767,14 +1755,11 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
         requestUpload(
@@ -1826,14 +1811,11 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
         requestUpload(
@@ -1908,14 +1890,11 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestRoutesEmpty(this.cloudFoundryClient, "test-shared-domain-id", "test1", null, null);
         requestCreateRoute(
@@ -1991,14 +1970,11 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
         requestSharedDomains(
@@ -2059,14 +2035,11 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
         requestSharedDomains(
@@ -2136,14 +2109,11 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestCreateRoute(
                 this.cloudFoundryClient,
@@ -2202,14 +2172,11 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestCreateRoute(
                 this.cloudFoundryClient,
@@ -2260,14 +2227,11 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestApplicationRoutesEmpty(this.cloudFoundryClient, "test-application-id");
 
@@ -2305,14 +2269,11 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestApplicationRoutesEmpty(this.cloudFoundryClient, "test-application-id");
 
@@ -2352,14 +2313,11 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestApplicationRoutesEmpty(this.cloudFoundryClient, "test-application-id");
         requestCreateRoute(
@@ -2414,14 +2372,11 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestApplicationRoutesEmpty(this.cloudFoundryClient, "test-application-id");
         requestRoutesEmpty(this.cloudFoundryClient, "test-shared-domain-id", "", null, null);
@@ -2483,14 +2438,11 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestApplicationRoutesEmpty(this.cloudFoundryClient, "test-application-id");
         requestCreateRoute(
@@ -2543,14 +2495,11 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestApplicationRoutesEmpty(this.cloudFoundryClient, "test-application-id");
         requestUpload(
@@ -2597,14 +2546,11 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestApplicationRoutes(this.cloudFoundryClient, "test-application-id", "test-route-id");
         requestRemoveApplicationRoute(
@@ -2654,14 +2600,11 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestApplicationRoutesEmpty(this.cloudFoundryClient, "test-application-id");
         requestCreateRoute(
@@ -2717,14 +2660,11 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestCreateRoute(
                 this.cloudFoundryClient,
@@ -2788,14 +2728,11 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestCreateRoute(
                 this.cloudFoundryClient,
@@ -2854,14 +2791,11 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestCreateRoute(
                 this.cloudFoundryClient,
@@ -2919,14 +2853,11 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestCreateRoute(
                 this.cloudFoundryClient,
@@ -2989,14 +2920,11 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestCreateRoute(
                 this.cloudFoundryClient,
@@ -3053,14 +2981,11 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestApplicationRoutes(this.cloudFoundryClient, "test-application-id", "test-route-id");
         requestRoutesEmpty(this.cloudFoundryClient, "test-tcp-domain-id", null, null, null);
@@ -3116,14 +3041,11 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestApplicationRoutes(this.cloudFoundryClient, "test-application-id", "test-route-id");
         requestRoutesEmpty(this.cloudFoundryClient, "test-tcp-domain-id", null, 61001, null);
@@ -3189,14 +3111,11 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestCreateRoute(
                 this.cloudFoundryClient,
