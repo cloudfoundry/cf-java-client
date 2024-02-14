@@ -83,6 +83,8 @@ public abstract class AbstractOperationsTest {
 
     protected static final String TEST_USERNAME = "test-username";
 
+    protected static final String APP_FEATURE_SSH = "ssh";
+
     protected final ApplicationsV2 applications = mock(ApplicationsV2.class, RETURNS_SMART_NULLS);
 
     protected final ApplicationsV3 applicationsV3 = mock(ApplicationsV3.class, RETURNS_SMART_NULLS);
