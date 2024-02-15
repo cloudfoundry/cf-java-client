@@ -22,3 +22,6 @@
   path: /product-properties/.cloud_controller.default_quota_memory_limit_mb
   value:
     value: ((DEFAULT_QUOTA_MEM_MB))
+- type: replace
+  path: /resource-config/compute/instances
+  value: 3
