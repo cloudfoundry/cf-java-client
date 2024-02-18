@@ -24,4 +24,7 @@
     value: ((DEFAULT_QUOTA_MEM_MB))
 - type: replace
   path: /resource-config/compute/instances
-  value: 3
+  value: 4
+- type: replace
+  path: /resource-config/compute/instance_type/id
+  value: "2xlarge.mem"
