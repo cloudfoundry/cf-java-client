@@ -372,7 +372,7 @@ public class IntegrationTestConfiguration {
                                                         .applicationInstanceLimit(-1)
                                                         .applicationTaskLimit(-1)
                                                         .instanceMemoryLimit(-1)
-                                                        .memoryLimit(8192)
+                                                        .memoryLimit(16384)
                                                         .name(organizationQuotaName)
                                                         .nonBasicServicesAllowed(true)
                                                         .totalPrivateDomains(-1)
