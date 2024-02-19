@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -euox pipefail
 
 [[ -d $PWD/maven && ! -d $HOME/.m2 ]] && ln -s $PWD/maven $HOME/.m2
 
@@ -28,4 +28,4 @@ cat <<EOF > ~/.m2/settings.xml
 EOF
 
 cd cf-java-client
-./mvnw -q -Dmaven.test.skip=true deploy
+./mvnw -Dmaven.test.skip=true deploy
