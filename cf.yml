@@ -1,0 +1,498 @@
+product-name: cf
+product-properties:
+  .cloud_controller.allow_app_ssh_access:
+    value: true
+  .cloud_controller.apps_domain:
+    value: apps.soap.cf-app.com
+  .cloud_controller.default_app_memory:
+    value: 1024
+  .cloud_controller.default_app_ssh_access:
+    value: true
+  .cloud_controller.default_disk_quota_app:
+    value: 1024
+  .cloud_controller.default_quota_max_number_services:
+    value: 100
+  .cloud_controller.default_quota_memory_limit_mb:
+    value: 10240
+  .cloud_controller.enable_custom_buildpacks:
+    value: true
+  .cloud_controller.max_disk_quota_app:
+    value: 2048
+  .cloud_controller.max_file_size:
+    value: 2048
+  .cloud_controller.max_package_size:
+    value: 2147483648
+  .cloud_controller.security_event_logging_enabled:
+    value: true
+  .cloud_controller.staging_timeout_in_seconds:
+    value: 900
+  .cloud_controller.system_domain:
+    value: sys.soap.cf-app.com
+  .diego_brain.starting_container_count_maximum:
+    value: 200
+  .mysql.cli_history:
+    value: true
+  .mysql.max_connections:
+    value: 3500
+  .mysql.prevent_node_auto_rejoin:
+    value: false
+  .mysql.remote_admin_access:
+    value: false
+  .mysql_monitor.poll_frequency:
+    value: 30
+  .mysql_monitor.recipient_email:
+    value: test@example.com
+  .mysql_monitor.write_read_delay:
+    value: 20
+  .mysql_proxy.enable_inactive_mysql_port:
+    value: false
+  .mysql_proxy.shutdown_delay:
+    value: 30
+  .mysql_proxy.startup_delay:
+    value: 0
+  .nfs_server.blobstore_internal_access_rules:
+    value: allow 10.0.0.0/8;,allow 172.16.0.0/12;,allow 192.168.0.0/16;
+  .properties.app_graceful_shutdown_period_in_seconds:
+    value: 10
+  .properties.app_log_rate_limiting:
+    selected_option: disable
+    value: disable
+  .properties.autoscale_api_disable_connection_pooling:
+    value: false
+  .properties.autoscale_api_instance_count:
+    value: 1
+  .properties.autoscale_enable_notifications:
+    value: true
+  .properties.autoscale_enable_verbose_logging:
+    value: false
+  .properties.autoscale_instance_count:
+    value: 3
+  .properties.autoscale_metric_bucket_count:
+    value: 120
+  .properties.autoscale_scaling_interval_in_seconds:
+    value: 35
+  .properties.cc_api_rate_limit:
+    selected_option: disable
+    value: disable
+  .properties.cc_logging_level:
+    value: info
+  .properties.ccdb_connection_validation_timeout:
+    value: 3600
+  .properties.ccdb_read_timeout:
+    value: 3600
+  .properties.cf_networking_database_connection_timeout:
+    value: 120
+  .properties.cf_networking_enable_space_developer_self_service:
+    value: false
+  .properties.cf_networking_internal_domains:
+    value:
+    - name: apps.internal
+  .properties.cloud_controller_audit_events_cutoff_age_in_days:
+    value: 31
+  .properties.cloud_controller_completed_tasks_cutoff_age_in_days:
+    value: 31
+  .properties.cloud_controller_default_health_check_timeout:
+    value: 60
+  .properties.cloud_controller_post_bbr_healthcheck_timeout_in_seconds:
+    value: 60
+  .properties.cloud_controller_temporary_disable_deployments:
+    value: false
+  .properties.cloud_controller_worker_alert_if_above_mb:
+    value: 384
+  .properties.cloud_controller_worker_restart_if_above_mb:
+    value: 512
+  .properties.cloud_controller_worker_restart_if_consistently_above_mb:
+    value: 384
+  .properties.container_networking:
+    selected_option: enable
+    value: enable
+  .properties.container_networking_interface_plugin:
+    selected_option: silk
+    value: silk
+  .properties.container_networking_interface_plugin.silk.enable_log_traffic:
+    value: false
+  .properties.container_networking_interface_plugin.silk.enable_policy_enforcement:
+    value: true
+  .properties.container_networking_interface_plugin.silk.iptables_accepted_udp_logs_per_sec:
+    value: 100
+  .properties.container_networking_interface_plugin.silk.iptables_denied_logs_per_sec:
+    value: 1
+  .properties.container_networking_interface_plugin.silk.network_mtu:
+    value: 1454
+  .properties.container_networking_interface_plugin.silk.policy_enforcement_poll_interval:
+    value: 5
+  .properties.container_networking_interface_plugin.silk.vtep_port:
+    value: 4789
+  .properties.credhub_database:
+    selected_option: internal_mysql
+    value: internal_mysql
+  .properties.credhub_internal_provider_keys:
+    value:
+    - name: primary-encryption-key
+      primary: true
+  .properties.default_loggregator_drain_metadata:
+    value: true
+  .properties.diego_database_max_open_connections:
+    value: 100
+  .properties.disable_diego_cells:
+    value: false
+  .properties.disable_logs_in_firehose:
+    value: false
+  .properties.enable_garden_containerd_mode:
+    value: true
+  .properties.enable_log_cache_syslog_ingestion:
+    value: false
+  .properties.enable_smb_volume_driver:
+    value: true
+  .properties.enable_tls_to_internal_pxc:
+    value: false
+  .properties.enable_v1_firehose:
+    value: true
+  .properties.enable_v2_firehose:
+    value: true
+  .properties.garden_disk_cleanup:
+    selected_option: reserved
+    value: reserved
+  .properties.garden_disk_cleanup.reserved.reserved_space_for_other_jobs_in_mb:
+    value: 15360
+  .properties.gorouter_ssl_ciphers:
+    value: TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256:TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+  .properties.haproxy_client_cert_validation:
+    selected_option: none
+    value: none
+  .properties.haproxy_forward_tls:
+    selected_option: disable
+    value: disable
+  .properties.haproxy_hsts_support:
+    selected_option: disable
+    value: disable
+  .properties.haproxy_max_buffer_size:
+    value: 16384
+  .properties.haproxy_ssl_ciphers:
+    value: DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384
+  .properties.locket_database_max_open_connections:
+    value: 200
+  .properties.log_cache_max_per_source:
+    value: 100000
+  .properties.logging_timestamp_format:
+    selected_option: rfc3339
+    value: rfc3339
+  .properties.metric_registrar_blacklisted_tags:
+    value: deployment,job,index,ip
+  .properties.metric_registrar_enabled:
+    value: true
+  .properties.metric_registrar_scrape_interval_in_seconds:
+    value: 35
+  .properties.mysql_activity_logging:
+    selected_option: enable
+    value: enable
+  .properties.mysql_activity_logging.enable.audit_logging_events:
+    value: connect,query
+  .properties.networking_poe_ssl_certs:
+    value:
+    - name: certificate
+  .properties.networkpolicyserver_database_max_open_connections:
+    value: 200
+  .properties.networkpolicyserverinternal_database_max_open_connections:
+    value: 200
+  .properties.nfs_volume_driver:
+    selected_option: enable
+    value: enable
+  .properties.push_apps_manager_app_poll_interval:
+    value: 10
+  .properties.push_apps_manager_buildpack:
+    value: staticfile_buildpack
+  .properties.push_apps_manager_currency_lookup:
+    value: '{ "usd": "$", "eur": "€" }'
+  .properties.push_apps_manager_display_plan_prices:
+    value: false
+  .properties.push_apps_manager_enable_invitations:
+    value: true
+  .properties.push_apps_manager_invitations_buildpack:
+    value: nodejs_buildpack
+  .properties.push_apps_manager_nav_links:
+    value:
+    - href: https://docs.vmware.com/en/VMware-Tanzu-Application-Service/index.html
+      name: Docs
+    - href: /tools
+      name: Tools
+  .properties.push_apps_manager_poll_interval:
+    value: 30
+  .properties.push_apps_manager_search_server_buildpack:
+    value: nodejs_buildpack
+  .properties.push_usage_service_cutoff_age_in_days:
+    value: 365
+  .properties.route_integrity:
+    selected_option: tls_verify
+    value: tls_verify
+  .properties.route_services:
+    selected_option: enable
+    value: enable
+  .properties.route_services.enable.ignore_ssl_cert_verification:
+    value: false
+  .properties.route_services.enable.internal_lookup:
+    value: false
+  .properties.router_backend_max_conn:
+    value: 500
+  .properties.router_balancing_algorithm:
+    selected_option: round_robin
+    value: round-robin
+  .properties.router_client_cert_validation:
+    selected_option: request
+    value: request
+  .properties.router_enable_proxy:
+    value: false
+  .properties.router_keepalive_connections:
+    selected_option: enable
+    value: enable
+  .properties.router_sticky_session_cookie_names:
+    value:
+    - name: JSESSIONID
+  .properties.routing_disable_http:
+    value: false
+  .properties.routing_log_client_ips:
+    selected_option: log_client_ips
+    value: log_client_ips
+  .properties.routing_minimum_tls_version:
+    selected_option: tls_v1_2
+    value: tls_v1_2
+  .properties.routing_tls_termination:
+    selected_option: load_balancer
+    value: load_balancer
+  .properties.saml_signature_algorithm:
+    value: SHA256
+  .properties.secure_service_instance_credentials:
+    value: true
+  .properties.security_acknowledgement:
+    value: X
+  .properties.service_discovery_controller_staleness_threshold:
+    value: 600
+  .properties.silk_database_max_open_connections:
+    value: 200
+  .properties.smoke_tests:
+    selected_option: on_demand
+    value: on_demand
+  .properties.smtp_auth_mechanism:
+    value: plain
+  .properties.smtp_enable_starttls_auto:
+    value: false
+  .properties.syslog_drop_debug:
+    value: true
+  .properties.syslog_tls:
+    selected_option: disabled
+    value: disabled
+  .properties.syslog_use_tcp_for_file_forwarding_local_transport:
+    value: false
+  .properties.system_blobstore:
+    selected_option: internal
+    value: internal
+  .properties.system_blobstore_backup_level:
+    selected_option: all
+    value: all
+  .properties.system_blobstore_ccdroplet_max_staged_droplets_stored:
+    value: 5
+  .properties.system_blobstore_ccpackage_max_valid_packages_stored:
+    value: 5
+  .properties.system_database:
+    selected_option: internal_pxc
+    value: internal_pxc
+  .properties.system_metrics_scraper_scrape_interval:
+    value: 15s
+  .properties.tcp_routing:
+    selected_option: disable
+    value: disable
+  .properties.uaa:
+    selected_option: internal
+    value: internal
+  .properties.uaa.internal.password_expires_after_months:
+    value: 0
+  .properties.uaa.internal.password_max_retry:
+    value: 5
+  .properties.uaa.internal.password_min_length:
+    value: 0
+  .properties.uaa.internal.password_min_lowercase:
+    value: 0
+  .properties.uaa.internal.password_min_numeric:
+    value: 0
+  .properties.uaa.internal.password_min_special:
+    value: 0
+  .properties.uaa.internal.password_min_uppercase:
+    value: 0
+  .properties.uaa_database:
+    selected_option: internal_mysql
+    value: internal_mysql
+  .properties.uaa_session_cookie_max_age:
+    value: 28800
+  .properties.uaa_session_idle_timeout:
+    value: 1800
+  .router.disable_insecure_cookies:
+    value: false
+  .router.drain_timeout:
+    value: 900
+  .router.drain_wait:
+    value: 20
+  .router.enable_isolated_routing:
+    value: false
+  .router.enable_w3c:
+    value: false
+  .router.enable_write_access_logs:
+    value: true
+  .router.enable_zipkin:
+    value: true
+  .router.frontend_idle_timeout:
+    value: 540
+  .router.lb_healthy_threshold:
+    value: 20
+  .router.max_header_kb:
+    value: 1024
+  .router.request_timeout_in_seconds:
+    value: 900
+  .uaa.apps_manager_access_token_lifetime:
+    value: 3600
+  .uaa.cf_cli_access_token_lifetime:
+    value: 7200
+  .uaa.cf_cli_refresh_token_lifetime:
+    value: 1209600
+  .uaa.customize_password_label:
+    value: Password
+  .uaa.customize_username_label:
+    value: Email
+  .uaa.enable_uri_encoding_compatibility_mode:
+    value: true
+  .uaa.enforce_system_zone_policy_in_all_zones:
+    value: true
+  .uaa.proxy_ips_regex:
+    value: 10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|169\.254\.\d{1,3}\.\d{1,3}|127\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.1[6-9]{1}\.\d{1,3}\.\d{1,3}|172\.2[0-9]{1}\.\d{1,3}\.\d{1,3}|172\.3[0-1]{1}\.\d{1,3}\.\d{1,3}
+network-properties:
+  network:
+    name: soap-pas-subnet
+  other_availability_zones:
+  - name: us-central1-f
+  singleton_availability_zone:
+    name: us-central1-f
+resource-config:
+  backup_restore:
+    max_in_flight: 1
+    additional_networks: []
+    additional_vm_extensions: []
+    elb_names: []
+    instance_type:
+      id: automatic
+    instances: 0
+    internet_connected: true
+    persistent_disk:
+      name: automatic
+      size_mb: automatic
+    swap_as_percent_of_memory_size: automatic
+  blobstore:
+    max_in_flight: 1
+    additional_networks: []
+    additional_vm_extensions: []
+    elb_names: []
+    instance_type:
+      id: medium.disk
+    instances: 1
+    internet_connected: true
+    persistent_disk:
+      name: automatic
+      size_mb: automatic
+    swap_as_percent_of_memory_size: automatic
+  compute:
+    max_in_flight: 4%
+    additional_networks: []
+    additional_vm_extensions: []
+    elb_names: []
+    instance_type:
+      id: toolsmiths.n1-highmem-2.128
+    instances: 1
+    internet_connected: true
+    swap_as_percent_of_memory_size: automatic
+  control:
+    max_in_flight: 1
+    additional_networks: []
+    additional_vm_extensions: []
+    elb_names:
+    - tcp:soap-cf-ssh
+    instance_type:
+      id: automatic
+    instances: 1
+    internet_connected: true
+    swap_as_percent_of_memory_size: automatic
+  database:
+    max_in_flight: 1
+    additional_networks: []
+    additional_vm_extensions: []
+    elb_names: []
+    instance_type:
+      id: automatic
+    instances: automatic
+    internet_connected: true
+    persistent_disk:
+      name: automatic
+      size_mb: automatic
+    swap_as_percent_of_memory_size: automatic
+  ha_proxy:
+    max_in_flight: 1
+    additional_networks: []
+    additional_vm_extensions: []
+    elb_names: []
+    instance_type:
+      id: automatic
+    instances: automatic
+    internet_connected: true
+    swap_as_percent_of_memory_size: automatic
+  mysql_monitor:
+    max_in_flight: 1
+    additional_networks: []
+    additional_vm_extensions: []
+    elb_names: []
+    instance_type:
+      id: automatic
+    instances: 0
+    internet_connected: true
+    swap_as_percent_of_memory_size: automatic
+  router:
+    max_in_flight: 1
+    additional_networks: []
+    additional_vm_extensions: []
+    elb_names:
+    - tcp:soap-cf-ws
+    instance_type:
+      id: automatic
+    instances: 1
+    internet_connected: true
+    swap_as_percent_of_memory_size: automatic
+  tcp_router:
+    max_in_flight: 1
+    additional_networks: []
+    additional_vm_extensions: []
+    elb_names: []
+    instance_type:
+      id: automatic
+    instances: 0
+    internet_connected: true
+    swap_as_percent_of_memory_size: automatic
+errand-config:
+  deploy-autoscaler:
+    post-deploy-state: false
+  deploy-notifications:
+    post-deploy-state: false
+  deploy-notifications-ui:
+    post-deploy-state: false
+  metric_registrar_smoke_test:
+    post-deploy-state: false
+  nfsbrokerpush:
+    post-deploy-state: false
+  push-apps-manager:
+    post-deploy-state: false
+  push-usage-service:
+    post-deploy-state: false
+  rotate_cc_database_key:
+    post-deploy-state: false
+  smbbrokerpush:
+    post-deploy-state: false
+  smoke_tests:
+    post-deploy-state: true
+  test-autoscaling:
+    post-deploy-state: false
+
