@@ -253,7 +253,7 @@ public final class ProcessesTest extends AbstractIntegrationTest {
                         .builder()
                         .data(Data
                             .builder()
-                            .endpoint("/test")
+                            .endpoint("/test_endpoint")
                             .invocationTimeout(1)
                             .interval(2)
                             .build())
